@@ -285,6 +285,137 @@ pandora.createLinks = function($element) {
         });
 };
 
+(function() {
+
+    pandora.doHistory = function(action, items, targets, callback) {
+        items = Ox.makeArray(items);
+        targets = Ox.makeArray(targets);
+        var actions = {
+                copy: 'Copying',
+                cut: 'Cutting',
+                'delete': 'Deleting',
+                move: 'Moving',
+                paste: 'Pasting'
+            },
+            type = getType(items),
+            text = Ox._(actions[action]) + ' ' + Ox.formatCount(
+                items.length,
+                type == 'items' ? pandora.site.itemName.singular : 'Clip',
+                type == 'items' ? pandora.site.itemName.plural : 'Clips'
+            );
+        if (action == 'copy' || action == 'paste') {
+            addItems(items, targets[0], addToHistory);
+        } else if (action == 'cut' || action == 'delete') {
+            removeItems(items, targets[0], addToHistory);
+        } else if (action == 'move') {
+            removeItems(
+                items, targets[0],
+                addItems(items, targets[1], addToHistory)
+            );
+        }
+        function addToHistory(result) {
+            Ox.print('ADD TO HISTORY', text, result);
+            pandora.history.add({
+                action: action,
+                items: items,
+                targets: targets,
+                text: text
+            });
+            pandora.$ui.mainMenu.replaceItemMenu();
+            callback(result);
+        }
+    };
+
+    pandora.redoHistory = function(callback) {
+        var object = pandora.history.redo();
+        if (object) {
+            if (object.action == 'copy' || object.action == 'paste') {
+                addItems(object.items, object.targets[0], done(object, callback));
+            } else if (object.action == 'cut' || object.action == 'delete') {
+                removeItems(object.items, object.targets[0], done(object, callback));
+            } else if (object.action == 'move') {
+                removeItems(
+                    object.items, object.targets[0],
+                    addItems(object.items, object.targets[1], done(object, callback))
+                );
+            }
+            pandora.$ui.mainMenu.replaceItemMenu();
+        }
+    };
+
+    pandora.undoHistory = function(callback) {
+        var object = pandora.history.undo();
+        if (object) {
+            if (object.action == 'copy' || object.action == 'paste') {
+                removeItems(object.items, object.targets[0], done(object, callback));
+            } else if (object.action == 'cut' || object.action == 'delete') {
+                addItems(object.items, object.targets[0], done(object, callback));
+            } else if (object.action == 'move') {
+                removeItems(
+                    object.items, object.targets[1],
+                    addItems(object.items, object.targets[0], done(object, callback))
+                );
+            }
+            pandora.$ui.mainMenu.replaceItemMenu();
+        }
+    };
+
+    function addItems(items, target, callback) {
+        var type = getType(items);
+        pandora.api[type == 'item' ? 'addListItems' : 'addClips'](
+            Ox.extend({items: items}, type == 'item' ? 'list' : 'edit', target),
+            callback
+        );
+    }
+
+    function done(object, callback) {
+        var list, listData,
+            type = getType(object.items),
+            ui = pandora.user.ui;
+        if (object.action != 'copy') {
+            if (type == 'item' && ui.section == 'items' && Ox.contains(object.targets, ui._list)) {
+                Ox.print('RELOADING LIST');
+                pandora.reloadList();
+            } else if (type == 'clip' && ui.section == 'edits' && Ox.contains(object.targets, ui.edit)) {
+                // FIXME: reload clip list
+            }
+        }
+        if (object.action == 'copy' || object.action == 'move') {
+            if (type == 'item' && ui.section == 'items') {
+                list = Ox.last(object.targets);
+                listData = pandora.getListData();
+                Ox.Request.clearCache('find');
+                pandora.api.find({
+                    query: {
+                        conditions: [{key: 'list', value: list, operator: '=='}],
+                        operator: '&'
+                    }
+                }, function(result) {
+                    pandora.$ui.folderList[listData.folder].value(
+                        list, 'items', result.data.items
+                    );
+                });
+            } else if (type == 'clip' && ui.section == 'edits') {
+                // FIXME: update edit list
+            }
+        }
+        callback && callback();
+    }
+
+    function getType(items) {
+        return Ox.contains(items[0], '/') ? 'clip' : 'item';
+    };
+
+    function removeItems(items, target, callback) {
+        var type = getType(items);
+        pandora.api[type == 'item' ? 'removeListItems' : 'removeClips'](
+            Ox.extend({items: items}, type == 'item' ? 'list' : 'edit', target),
+            callback
+        );
+    }
+
+}());
+
 pandora.enableDragAndDrop = function($list, canMove, section) {
 
     section = section || pandora.user.ui.section;
@@ -409,7 +540,26 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                 if (drag.action == 'copy' || (
                     drag.action == 'move' && drag.source.editable
                 )) {
-                    if (section == 'edits') {
+                    if (section == 'items') {
+                        var targets = drag.action == 'copy' ? drag.target.id
+                            : [pandora.user.ui._list, drag.target.id];
+                        pandora.doHistory(drag.action, data.ids, targets, function() {
+                            drag.action == 'move' && pandora.reloadList();
+                            Ox.Request.clearCache('find');
+                            pandora.api.find({
+                                query: {
+                                    conditions: [{key: 'list', value: drag.target.id, operator: '=='}],
+                                    operator: '&'
+                                }
+                            }, function(result) {
+                                var folder = drag.target.status != 'featured' ? 'personal' : 'featured';
+                                pandora.$ui.folderList[folder].value(
+                                    drag.target.id, 'items', result.data.items
+                                );
+                                cleanup(250);
+                            });
+                        });
+                    } else if (section == 'edits') {
                         var clips = data.ids.map(function(id) {
                             var split = id.split('/'),
                                 item = split[0];
@@ -418,50 +568,14 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                                 item: item,
                                 'in': parseFloat(split[0]),
                                 out: parseFloat(split[1]),
-                            }
+                            };
                         });
-                        if (drag.action == 'move') {
-                            pandora.api.removeClips({
-                                edit: pandora.user.ui.edit,
-                                items: clips
-                            }, function() {
-                                Ox.print('FIXME, reload clipslist')
-                            });
-                        }
-                        pandora.api.addClips({
-                            edit: drag.target.id,
-                            clips: clips
-                        }, function() {
+                        pandora.doHistory(drag.action, clips, [pandora.user.ui.edit, drag.target.id], function() {
+                            Ox.print('FIXME, reload clipslist on move');
                             Ox.Request.clearCache('Edit');
                             cleanup(250);
                         });
-                    } else if (section == 'items') {
-                        if (drag.action == 'move') {
-                            pandora.api.removeListItems({
-                                list: pandora.user.ui._list,
-                                items: data.ids
-                            }, pandora.reloadList);
-                        }
-                        pandora.api.addListItems({
-                            list: drag.target.id,
-                            items: data.ids
-                        }, function() {
-                            Ox.Request.clearCache(); // fixme: remove
-                            pandora.api.find({
-                                query: {
-                                    conditions: [{key: 'list', value: drag.target.id, operator: '='}],
-                                    operator: ''
-                                }
-                            }, function(result) {
-                                var folder = drag.target.status != 'featured' ? 'personal' : 'featured';
-                                pandora.$ui.folderList[folder].value(
-                                    drag.target.id, 'items',
-                                    result.data.items
-                                );
-                                cleanup(250);
-                            });
-                        });
-                    }
+                    } 
                 }
             } else {
                 cleanup(0);
