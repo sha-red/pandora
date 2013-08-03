@@ -367,10 +367,7 @@ pandora.ui.mainMenu = function() {
                     var action = data.id == 'cut' ? 'copy' : 'add';
                     fromMenu = true;
                     Ox.Clipboard[action](ui.listSelection, 'item');
-                    pandora.api.removeListItems({
-                        list: ui._list,
-                        items: ui.listSelection
-                    }, function() {
+                    pandora.doHistory('cut', ui.listSelection, ui._list, function() {
                         pandora.UI.set({listSelection: []});
                         pandora.reloadList();
                     });
@@ -390,23 +387,24 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'paste') {
                     fromMenu = true;
                     var items = Ox.Clipboard.paste();
-                    pandora.api.addListItems({
-                        list: ui._list,
-                        items: items
-                    }, function() {
+                    pandora.doHistory('paste', items, ui._list, function() {
                         pandora.UI.set({listSelection: items});
                         pandora.reloadList();
                     });
                 } else if (data.id == 'clearclipboard') {
                     Ox.Clipboard.clear();
                 } else if (data.id == 'delete') {
-                    pandora.api.removeListItems({
-                        list: ui._list,
-                        items: ui.listSelection
-                    }, function() {
+                    pandora.doHistory('delete', ui.listSelection, ui._list, function() {
                         pandora.UI.set({listSelection: []});
                         pandora.reloadList();
                     });
+                } else if (data.id == 'undo') {
+                    pandora.undoHistory();
+                } else if (data.id == 'redo') {
+                    pandora.redoHistory();
+                } else if (data.id == 'clearhistory') {
+                    pandora.history.clear();
+                    that.replaceMenu('itemMenu', getItemMenu());
                 } else if (data.id == 'showsidebar') {
                     pandora.UI.set({showSidebar: !ui.showSidebar});
                 } else if (data.id == 'showinfo') {
@@ -534,6 +532,9 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({find: {conditions: [], operator: '&'}});
                 }
             },
+            key_control_shift_z: function() {
+                pandora.redoHistory();
+            },
             key_control_slash: function() {
                 if (!pandora.hasDialogOrScreen()) {
                     pandora.UI.set({page: 'help'});
@@ -559,6 +560,9 @@ pandora.ui.mainMenu = function() {
                         pandora.UI.set({text: ''});
                     }
                 }
+            },
+            key_control_z: function() {
+                pandora.undoHistory();
             },
             key_shift_a: function() {
                 hasAnnotations() && pandora.UI.set({showAnnotations: !ui.showAnnotations});
@@ -831,7 +835,10 @@ pandora.ui.mainMenu = function() {
             canPaste = !ui.item && !isClipView && !isVideoView
                 && listData.editable && listData.type == 'static' && Ox.Clipboard.type() == 'item',
             canCut = canCopy && !ui.item && !isClipView && !isVideoView
-                && listData.editable && listData.type == 'static';
+                && listData.editable && listData.type == 'static',
+            historyItems = pandora.history.items(),
+            undoText = pandora.history.undoText(),
+            redoText = pandora.history.redoText();
         return { id: 'itemMenu', title: Ox._('Item'), items: [
             { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
             { id: 'upload', title: Ox._('Upload Video...'), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
@@ -849,8 +856,9 @@ pandora.ui.mainMenu = function() {
             {},
             { id: 'delete', title: Ox._('Delete {0}' + (!isVideoView && !isClipView ? ' from List' : ''), [selectionItemName]), disabled: !canCut, keyboard: 'delete' },
             {},
-            { id: 'undo', title: Ox._('Undo'), disabled: true, keyboard: 'control z' },
-            { id: 'redo', title: Ox._('Redo'), disabled: true, keyboard: 'shift control z' }
+            { id: 'undo', title: undoText ? Ox._('Undo {0}', [undoText]) : Ox._('Undo'), disabled: !undoText, keyboard: 'control z' },
+            { id: 'redo', title: redoText ? Ox._('Redo {0}', [redoText]) : Ox._('Redo'), disabled: !redoText, keyboard: 'shift control z' },
+            { id: 'clearhistory', title: Ox._('Clear History'), disabled: !historyItems }
         ] };
     }
 
