@@ -1723,6 +1723,9 @@ pandora.renameList = function(oldId, newId, newName, folder) {
     pandora.$ui.folderList[folder].value(oldId, 'id', newId);
     if (pandora.user.ui.section == 'items') {
         pandora.$ui.toolbar.updateListName(newId);
+        // fixme: ugly
+        // ... does this always coincide with triggerEvents = false, as below?
+        pandora.replaceURL = true;
         pandora.UI.set({
             find: {
                 conditions: [{key: 'list', value: newId, operator: '=='}],
@@ -1730,6 +1733,7 @@ pandora.renameList = function(oldId, newId, newName, folder) {
             }
         }, false);
     } else {
+        pandora.replaceURL = true;
         pandora.UI.set(pandora.user.ui.section.slice(0, -1), newId);
     }
 };

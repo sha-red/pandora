@@ -446,7 +446,7 @@ pandora.URL = (function() {
             title = pandora.getPageTitle(stateOrURL)
                 || pandora.getDocumentTitle(),
             url;
-        pandora.expandURL = expandURL;
+        pandora.replaceURL = expandURL;
         if (Ox.isObject(stateOrURL)) {
             state = stateOrURL;
         } else {
@@ -486,7 +486,7 @@ pandora.URL = (function() {
         } else {
             if (
                 !pandora.$ui.appPanel
-                || pandora.expandURL
+                || pandora.replaceURL
                 || keys.every(function(key) {
                     return [
                             'listColumnWidth', 'listColumns', 'listSelection',
@@ -505,7 +505,7 @@ pandora.URL = (function() {
                 state,
                 pandora.getPageTitle(state) || pandora.getDocumentTitle()
             );
-            pandora.expandURL = false;
+            pandora.replaceURL = false;
         }
     };
 
