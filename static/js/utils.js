@@ -314,7 +314,6 @@ pandora.createLinks = function($element) {
             );
         }
         function addToHistory(result) {
-            Ox.print('ADD TO HISTORY', text, result);
             pandora.history.add({
                 action: action,
                 items: items,
