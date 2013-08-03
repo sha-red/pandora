@@ -122,4 +122,4 @@ def get_cut_sequences(stream, position=0):
                 'out': cut,
             })
         position = cut
-    return sequences
+    return sequences, position
