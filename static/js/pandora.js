@@ -366,6 +366,7 @@ appPanel
     }
 
     function initPandoraApp() {
+        pandora.history = Ox.History();
         pandora.$ui.appPanel = pandora.ui.appPanel().display();
         pandora.$ui.loadingIcon.update(Ox.Request.requests());
         Ox.Request.bindEvent({
@@ -459,7 +460,7 @@ appPanel
             }, 1000, function() {
                 $loadingScreen.remove();
             });
-        }
+        };
 
     }
 
