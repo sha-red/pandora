@@ -397,13 +397,30 @@ pandora.ui.list = function() {
             copyadd: function(data) {
                 Ox.Clipboard.add(data.ids, 'item');
             },
+            cut: function(data) {
+                var listData = pandora.getListData();
+                if (listData.editable && listData.type == 'static') {
+                    Ox.Clipboard.copy(data.ids, 'item');
+                    pandora.doHistory('cut', data.ids, pandora.user.ui._list, function() {
+                        pandora.UI.set({listSelection: []});
+                        pandora.reloadList();
+                    });
+                }
+            },
+            cutadd: function(data) {
+                var listData = pandora.getListData();
+                if (listData.editable && listData.type == 'static') {
+                    Ox.Clipboard.add(data.ids, 'item');
+                    pandora.doHistory('cut', data.ids, pandora.user.ui._list, function() {
+                        pandora.UI.set({listSelection: []});
+                        pandora.reloadList();
+                    });
+                }
+            },
             'delete': function(data) {
                 var listData = pandora.getListData();
                 if (listData.editable && listData.type == 'static') {
-                    pandora.api.removeListItems({
-                        list: pandora.user.ui._list,
-                        items: data.ids
-                    }, function() {
+                    pandora.doHistory('delete', data.ids, pandora.user.ui._list, function() {
                         pandora.UI.set({listSelection: []});
                         pandora.reloadList();
                     });
@@ -458,13 +475,9 @@ pandora.ui.list = function() {
                 }
             },
             paste: function(data) {
-                var items;
-                if (Ox.Clipboard.type() == 'item') {
-                    items = Ox.Clipboard.paste();
-                    items.length && pandora.getListData().editable && pandora.api.addListItems({
-                        list: pandora.user.ui._list,
-                        items: items
-                    }, function() {
+                var items = Ox.Clipboard.paste();
+                if (items.length && Ox.Clipboard.type() == 'item' && pandora.getListData().editable) {
+                    pandora.doHistory('paste', items, pandora.user.ui._list, function() {
                         pandora.UI.set({listSelection: items});
                         pandora.reloadList();
                     });
