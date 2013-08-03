@@ -298,10 +298,9 @@ pandora.createLinks = function($element) {
                 paste: 'Pasting'
             },
             type = getType(items),
-            text = Ox._(actions[action]) + ' ' + Ox.formatCount(
-                items.length,
-                type == 'item' ? pandora.site.itemName.singular : 'Clip',
-                type == 'item' ? pandora.site.itemName.plural : 'Clips'
+            text = Ox._(actions[action]) + ' ' + (
+                items.length == 1 ? Ox._(type == 'item' ? pandora.site.itemName.singular : 'Clip')
+                : items.length + ' ' + Ox._(type == 'item' ? pandora.site.itemName.plural : 'Clips')
             );
         if (action == 'copy' || action == 'paste') {
             addItems(items, targets[0], addToHistory);
