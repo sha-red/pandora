@@ -378,25 +378,25 @@ pandora.createLinks = function($element) {
                 // FIXME: reload clip list
             }
         }
-        if (object.action == 'copy' || object.action == 'move') {
-            if (type == 'item' && ui.section == 'items') {
-                Ox.Request.clearCache('find');
-                object.targets.forEach(function(list) {
-                    listData = pandora.getListData(list);
-                    pandora.api.find({
-                        query: {
-                            conditions: [{key: 'list', value: list, operator: '=='}],
-                            operator: '&'
-                        }
-                    }, function(result) {
-                        pandora.$ui.folderList[listData.folder].value(
-                            list, 'items', result.data.items
-                        );
-                    });
+        if (type == 'item' && ui.section == 'items') {
+            Ox.Request.clearCache('find');
+            object.targets.filter(function(list) {
+                return list != ui._list;
+            }).forEach(function(list) {
+                listData = pandora.getListData(list);
+                pandora.api.find({
+                    query: {
+                        conditions: [{key: 'list', value: list, operator: '=='}],
+                        operator: '&'
+                    }
+                }, function(result) {
+                    pandora.$ui.folderList[listData.folder].value(
+                        list, 'items', result.data.items
+                    );
                 });
-            } else if (type == 'clip' && ui.section == 'edits') {
-                // FIXME: update edit list
-            }
+            });
+        } else if (type == 'clip' && ui.section == 'edits') {
+            // FIXME: update edit list
         }
         callback && callback();
     }
