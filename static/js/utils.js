@@ -824,8 +824,12 @@ pandora.getClipVideos = function(clip, resolution) {
         if (itemData) {
             itemTitles[pandora.user.ui.item] = Ox.decodeHTMLEntities(
                 (itemData.title || Ox._('Untitled')) + (
-                    itemData.director || itemData.year
-                    ? ' (' + (itemData.director || [Ox._('Unknown Director')]).join(', ') + ')'
+                    Ox.len(itemData.director) || itemData.year
+                    ? ' (' + (
+                        Ox.len(itemData.director)
+                        ? itemData.director
+                        : [Ox._('Unknown Director')]
+                    ).join(', ') + ')'
                     : ''
                 ) + (itemData.year ? ' ' + itemData.year : '')
             );
