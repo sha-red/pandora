@@ -380,18 +380,19 @@ pandora.createLinks = function($element) {
         }
         if (object.action == 'copy' || object.action == 'move') {
             if (type == 'item' && ui.section == 'items') {
-                list = Ox.last(object.targets);
-                listData = pandora.getListData();
                 Ox.Request.clearCache('find');
-                pandora.api.find({
-                    query: {
-                        conditions: [{key: 'list', value: list, operator: '=='}],
-                        operator: '&'
-                    }
-                }, function(result) {
-                    pandora.$ui.folderList[listData.folder].value(
-                        list, 'items', result.data.items
-                    );
+                object.targets.forEach(function(list) {
+                    listData = pandora.getListData(list);
+                    pandora.api.find({
+                        query: {
+                            conditions: [{key: 'list', value: list, operator: '=='}],
+                            operator: '&'
+                        }
+                    }, function(result) {
+                        pandora.$ui.folderList[listData.folder].value(
+                            list, 'items', result.data.items
+                        );
+                    });
                 });
             } else if (type == 'clip' && ui.section == 'edits') {
                 // FIXME: update edit list
