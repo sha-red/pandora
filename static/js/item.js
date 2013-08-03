@@ -34,13 +34,7 @@ pandora.ui.item = function() {
         }
 
         pandora.$ui.itemTitle
-            .options({
-                title: '<b>' + result.data.title
-                    + (Ox.len(result.data.director)
-                        ? ' (' + result.data.director.join(', ') + ')'
-                        : '')
-                    + (result.data.year ? ' ' + result.data.year : '') + '</b>'
-            })
+            .options({title: '<b>' + pandora.getItemTitle(result.data) + '</b>'})
             .show();
 
         // fixme: layers have value, subtitles has text?

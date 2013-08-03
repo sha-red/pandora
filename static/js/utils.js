@@ -822,17 +822,7 @@ pandora.getClipVideos = function(clip, resolution) {
     pandora.getDocumentTitle = function(itemData) {
         var parts = [pandora.site.site.name];
         if (itemData) {
-            itemTitles[pandora.user.ui.item] = Ox.decodeHTMLEntities(
-                (itemData.title || Ox._('Untitled')) + (
-                    Ox.len(itemData.director) || itemData.year
-                    ? ' (' + (
-                        Ox.len(itemData.director)
-                        ? itemData.director
-                        : [Ox._('Unknown Director')]
-                    ).join(', ') + ')'
-                    : ''
-                ) + (itemData.year ? ' ' + itemData.year : '')
-            );
+            itemTitles[pandora.user.ui.item] = Ox.decodeHTMLEntities(pandora.getItemTitle(itemData));
         }
         if (pandora.user.ui.section == 'items') {
             if (!pandora.user.ui.item) {
@@ -1119,6 +1109,18 @@ pandora.getItemIdAndPosition = function() {
     }
     return ret;
 }
+
+pandora.getItemTitle = function(itemData) {
+    return (itemData.title || Ox._('Untitled')) + (
+        Ox.len(itemData.director) || itemData.year
+        ? ' (' + (
+            Ox.len(itemData.director)
+            ? itemData.director
+            : [Ox._('Unknown Director')]
+        ).join(', ') + ')'
+        : ''
+    ) + (itemData.year ? ' ' + itemData.year : '')
+};
 
 pandora.getLargeClipTimelineURL = function(item, inPoint, outPoint, type, callback) {
     var fps = 25,
