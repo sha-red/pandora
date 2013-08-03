@@ -166,9 +166,11 @@ pandora.ui.mainMenu = function() {
                     { id: 'findMenu', title: Ox._('Find'), items: [
                         { id: 'find', title: Ox._('Find'), items: [
                             { group: 'find', min: 0, max: 1, items: pandora.site.findKeys.map(function(key, i) {
-                                return Ox.extend({
-                                    checked: key.id == findState.key
-                                }, key);
+                                return {
+                                    id: key.id,
+                                    checked: key.id == findState.key,
+                                    title: Ox._(key.title)
+                                };
                             }) }
                         ] },
                         { id: 'advancedfind', title: Ox._('Advanced Find...'), keyboard: 'shift control f' },
