@@ -371,13 +371,6 @@ pandora.createLinks = function($element) {
         var list, listData,
             type = getType(object.items),
             ui = pandora.user.ui;
-        if (object.action != 'copy') {
-            if (type == 'item' && ui.section == 'items' && Ox.contains(object.targets, ui._list)) {
-                pandora.reloadList();
-            } else if (type == 'clip' && ui.section == 'edits' && Ox.contains(object.targets, ui.edit)) {
-                // FIXME: reload clip list
-            }
-        }
         if (type == 'item' && ui.section == 'items') {
             Ox.Request.clearCache('find');
             object.targets.filter(function(list) {
@@ -397,6 +390,14 @@ pandora.createLinks = function($element) {
             });
         } else if (type == 'clip' && ui.section == 'edits') {
             // FIXME: update edit list
+        }
+        if (object.action != 'copy') {
+            if (type == 'item' && ui.section == 'items' && Ox.contains(object.targets, ui._list)) {
+                Ox.print('RELOADING LIST')
+                pandora.reloadList();
+            } else if (type == 'clip' && ui.section == 'edits' && Ox.contains(object.targets, ui.edit)) {
+                // FIXME: reload clip list
+            }
         }
         callback && callback();
     }
