@@ -163,7 +163,7 @@ pandora.addList = function() {
         pandora.$ui.folder[0].options({collapsed: false});
         Ox.Request.clearCache('findLists');
         $folderList.bindEventOnce({
-            load: function(data) {
+            load: function() {
                 $folderList.gainFocus()
                     .options({selected: [newList]})
                     .editCell(newList, 'name', true);
