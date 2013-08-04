@@ -290,18 +290,6 @@ pandora.createLinks = function($element) {
     pandora.doHistory = function(action, items, targets, callback) {
         items = Ox.makeArray(items);
         targets = Ox.makeArray(targets);
-        var actions = {
-                copy: 'Copying',
-                cut: 'Cutting',
-                'delete': 'Deleting',
-                move: 'Moving',
-                paste: 'Pasting'
-            },
-            type = getType(items),
-            text = Ox._(actions[action]) + ' ' + (
-                items.length == 1 ? Ox._(type == 'item' ? pandora.site.itemName.singular : 'Clip')
-                : items.length + ' ' + Ox._(type == 'item' ? pandora.site.itemName.plural : 'Clips')
-            );
         if (action == 'copy' || action == 'paste') {
             addItems(items, targets[0], addToHistory);
         } else if (action == 'cut' || action == 'delete') {
@@ -312,10 +300,24 @@ pandora.createLinks = function($element) {
                 addItems(items, targets[1], addToHistory)
             );
         }
-        function addToHistory(result) {
+        function addToHistory(result, addedItems) {
+            var actions = {
+                    copy: 'Copying',
+                    cut: 'Cutting',
+                    'delete': 'Deleting',
+                    move: 'Moving',
+                    paste: 'Pasting'
+                },
+                type = getType(items),
+                text = Ox._(actions[action]) + ' ' + (
+                    items.length == 1 ? Ox._(type == 'item' ? pandora.site.itemName.singular : 'Clip')
+                    : items.length + ' ' + Ox._(type == 'item' ? pandora.site.itemName.plural : 'Clips')
+                );
             pandora.history.add({
                 action: action,
-                items: items,
+                items: action == 'cut' || action == 'delete' ? items
+                    : action == 'copy' || action == 'paste' ? addedItems
+                    : [items, addedItems],
                 targets: targets,
                 text: text
             });
@@ -327,46 +329,69 @@ pandora.createLinks = function($element) {
     pandora.redoHistory = function(callback) {
         var object = pandora.history.redo();
         if (object) {
-            if (object.action == 'copy' || object.action == 'paste') {
-                addItems(object.items, object.targets[0], done(object, callback));
-            } else if (object.action == 'cut' || object.action == 'delete') {
-                removeItems(object.items, object.targets[0], done(object, callback));
-            } else if (object.action == 'move') {
-                removeItems(
-                    object.items, object.targets[0],
-                    addItems(object.items, object.targets[1], done(object, callback))
-                );
-            }
             pandora.$ui.mainMenu.replaceItemMenu();
+            if (object.action == 'copy' || object.action == 'paste') {
+                addItems(object.items, object.targets[0], done);
+            } else if (object.action == 'cut' || object.action == 'delete') {
+                removeItems(object.items, object.targets[0], done);
+            } else if (object.action == 'move') {
+                removeItems(object.items[0], object.targets[0], function() {
+                    addItems(object.items[1], object.targets[1], done);
+                });
+            }
+        }
+        function done() {
+            doneHistory(object, callback);
         }
     };
 
     pandora.undoHistory = function(callback) {
         var object = pandora.history.undo();
         if (object) {
-            if (object.action == 'copy' || object.action == 'paste') {
-                removeItems(object.items, object.targets[0], done(object, callback));
-            } else if (object.action == 'cut' || object.action == 'delete') {
-                addItems(object.items, object.targets[0], done(object, callback));
-            } else if (object.action == 'move') {
-                removeItems(
-                    object.items, object.targets[1],
-                    addItems(object.items, object.targets[0], done(object, callback))
-                );
-            }
             pandora.$ui.mainMenu.replaceItemMenu();
+            if (object.action == 'copy' || object.action == 'paste') {
+                removeItems(object.items, object.targets[0], done);
+            } else if (object.action == 'cut' || object.action == 'delete') {
+                addItems(object.removedItems, object.targets[0], done);
+            } else if (object.action == 'move') {
+                removeItems(object.items[1], object.targets[1], function() {
+                    addItems(object.items[0], object.targets[0], done);
+                });
+            }
+        }
+        function done() {
+            doneHistory(object, callback);
         }
     };
 
     function addItems(items, target, callback) {
         var type = getType(items);
-        pandora.api[type == 'item' ? 'addListItems' : 'addClips'](
-            Ox.extend({items: items}, type == 'item' ? 'list' : 'edit', target),
-            callback
-        );
+        if (type == 'item') {
+            pandora.api.find({
+                query: {
+                    conditions: [{key: 'list', operator: '==', value: target}],
+                    operator: '&'
+                },
+                positions: items
+            }, function(result) {
+                var existingItems = Object.keys(result.data.positions),
+                    addedItems = items.filter(function(item) {
+                        return !Ox.contains(existingItems, item);
+                    });
+                if (addedItems.length) {
+                    pandora.api.addListItems({items: addedItems, list: target}, function(result) {
+                        callback(result, addedItems);
+                    });                    
+                } else {
+                    callback(null, []);
+                }
+            });
+        } else {
+            pandora.api.addClips({items: items, edit: target}, callback);
+        }
     }
 
-    function done(object, callback) {
+    function doneHistory(object, callback) {
         var list, listData,
             type = getType(object.items),
             ui = pandora.user.ui;
@@ -398,7 +423,7 @@ pandora.createLinks = function($element) {
     }
 
     function getType(items) {
-        return Ox.contains(items[0], '/') ? 'clip' : 'item';
+        return items[0] && Ox.contains(items[0], '/') ? 'clip' : 'item';
     };
 
     function removeItems(items, target, callback) {
