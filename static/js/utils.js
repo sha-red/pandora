@@ -424,7 +424,7 @@ pandora.createLinks = function($element) {
 
     function getType(items) {
         var item = Ox.isArray(items[0]) ? items[0][0] : items[0];
-        return Ox.contains(item, '/') ? 'clip' : 'item';
+        return item && Ox.contains(item, '/') ? 'clip' : 'item';
     };
 
     function removeItems(items, target, callback) {
