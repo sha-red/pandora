@@ -136,7 +136,7 @@ pandora.ui.apiDialog = function() {
                 + ' both shorter than one hour and whose title does not'
                 + ' start with "X" (sorted by duration, then title, both'
                 + ' in ascending order), it will return their duration,'
-                + ' id and title properties.'
+                + ' id and title properties.</p>',
             [pandora.site.site.name]))
             .append(
                 Ox.SyntaxHighlighter({
