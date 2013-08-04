@@ -47,12 +47,7 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
 
-        $logo = Ox.Element({
-                element: '<img>',
-                tooltip: function() {
-                    return Ox._('Enter {0}', [pandora.site.site.name]);
-                }
-            })
+        $logo = $('<img>')
             .addClass('logo')
             .attr({
                 id: 'logo',
@@ -68,8 +63,8 @@ pandora.ui.home = function() {
                 margin: 'auto',
                 cursor: 'pointer'
             })
-            .bindEvent({
-                anyclick: function() {
+            .on({
+                click: function() {
                     $browseButton.triggerEvent('click');
                 }
             })
@@ -278,7 +273,6 @@ pandora.ui.home = function() {
     };
 
     that.fadeOutScreen = function() {
-        $('.OxTooltip').remove();
         that.find(':not(#logo)').hide();
         $logo.animate({width: window.innerWidth + 'px'}, 500);
         that.animate({opacity: 0}, 500, function() {
