@@ -3,8 +3,6 @@
 from __future__ import division
 import Image
 import os
-import numpy
-import math
 
 ZONE_INDEX = []
 for pixel_index in range(64):
