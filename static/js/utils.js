@@ -295,10 +295,9 @@ pandora.createLinks = function($element) {
         } else if (action == 'cut' || action == 'delete') {
             removeItems(items, targets[0], addToHistory);
         } else if (action == 'move') {
-            removeItems(
-                items, targets[0],
-                addItems(items, targets[1], addToHistory)
-            );
+            removeItems(items, targets[0], function() {
+                addItems(items, targets[1], addToHistory);
+            });
         }
         function addToHistory(result, addedItems) {
             var actions = {
