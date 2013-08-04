@@ -59,7 +59,9 @@ pandora.ui.home = function() {
 
         $logo = Ox.Element({
                 element: '<img>',
-                tooltip: Ox._('Enter {0}', [pandora.site.site.name])
+                tooltip: function() {
+                    return Ox._('Enter {0}', [pandora.site.site.name]);
+                }
             })
             .attr({
                 id: 'logo',

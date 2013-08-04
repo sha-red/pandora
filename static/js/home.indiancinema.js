@@ -59,7 +59,9 @@ pandora.ui.home = function() {
 
         $logo = Ox.Element({
                 element: '<img>',
-                tooltip: 'Enter ' + pandora.site.site.name
+                tooltip: function() {
+                    return Ox._('Enter {0}', [pandora.site.site.name]);
+                }
             })
             .attr({
                 id: 'logo',
@@ -95,7 +97,11 @@ pandora.ui.home = function() {
                 load: function() {
                     $line.animate({opacity: 1}, 250, function() {
                         $line
-                            .options({tooltip: 'Visit Pad.ma'})
+                            .options({
+                                tooltip: function() {
+                                    return Ox._('Visit {0}', ['Pad.ma']);
+                                }
+                            })
                             .bindEvent({
                                 anyclick: function() {
                                     window.open('/url=https://pad.ma', '_blank');
