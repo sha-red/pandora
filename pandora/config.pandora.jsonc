@@ -516,7 +516,7 @@
     ],
     "sendReferrer": true,
     "site": {
-        "description": "This is a demp of pan.do/ra a free, open source media archive. It allows you to manage large, decentralized collections of video, to collaboratively create metadata and time-based annotations, and to serve your archive as a cutting-edge web application.",
+        "description": "This is a demo of pan.do/ra - a free, open source media archive. It allows you to manage large, decentralized collections of video, to collaboratively create metadata and time-based annotations, and to serve your archive as a cutting-edge web application.",
         "email": {
             // E-mail address in contact form (to)
             "contact": "system@pandora.local",
@@ -527,7 +527,6 @@
         },
         "https": false,
         "id": "pandora",
-        "locale": "en",
         "name": "Demo",
         "url": "pandora.local",
         "videoprefix": ""
@@ -613,7 +612,7 @@
             "listSort": [{"key": "title", "operator": "+"}],
             "listView": "grid",
             "lists": {},
-            "locale": "",
+            "locale": "en",
             "mapFind": "",
             "mapSelection": "",
             "page": "",

@@ -1933,7 +1933,7 @@ pandora.setLocale = function(locale, callback) {
     // language from http header might not be supported,
     // fall back to site default
     if (Ox.isUndefined(Ox.LOCALE_NAMES[locale])) {
-        locale = pandora.site.site.locale;
+        locale = pandora.site.user.ui.locale;
     }
     if (locale != 'en') {
         if (pandora.localStorage('enableDebugMode')) {

@@ -717,7 +717,6 @@
             "system": "0xDB@0xDB.org"
         },
         "https": true,
-        "locale": "en",
         "id": "0xdb",
         "name": "0xDB",
         "url": "0xDB.org",
@@ -805,7 +804,7 @@
             "listSort": [{"key": "director", "operator": "+"}],
             "listView": "grid",
             "lists": {},
-            "locale": "",
+            "locale": "en",
             "mapFind": "",
             "mapSelection": "",
             "page": "",
