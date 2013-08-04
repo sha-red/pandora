@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>File not found.</title>
+        <title>We couldn't find what you're looking for.</title>
         <link rel="stylesheet" type="text/css" href="/static/oxjs/build/Ox.UI/css/Ox.UI.css"/>
         <style>
             body {
                 text-align: center;
-                background: rgb(32, 32, 32);
-                color: rgb(224, 224, 224);
+            }
+            img {
+                width: 256px;
+                padding-top: 128px;
+            }
+            div {
+                padding-top: 16px;
             }
         </style>
     </head>
-    <body class="OxThemeModern">
-        <img src="/static/png/logo.png" style="width: 256px; padding-top: 128px"/>
-        <div style="padding-top: 16px">File not found.</div>
+    <body class="OxThemeOxmedium">
+        <img src="/static/png/logo.png"/>
+        <div class="OxSelectable">We couldn't find what you're looking for.</div>
     </body>
 </html>
