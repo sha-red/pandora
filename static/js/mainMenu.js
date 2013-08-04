@@ -519,9 +519,6 @@ pandora.ui.mainMenu = function() {
             key_control_p: function() {
                 window.open(document.location.href + '#?print=true', '_blank');
             },
-            key_control_r: function() {
-                pandora.$ui.appPanel.reload();
-            },
             key_control_shift_f: function() {
                 if (!pandora.hasDialogOrScreen()) {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
