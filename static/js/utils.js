@@ -352,7 +352,7 @@ pandora.createLinks = function($element) {
             if (object.action == 'copy' || object.action == 'paste') {
                 removeItems(object.items, object.targets[0], done);
             } else if (object.action == 'cut' || object.action == 'delete') {
-                addItems(object.removedItems, object.targets[0], done);
+                addItems(object.items, object.targets[0], done);
             } else if (object.action == 'move') {
                 removeItems(object.items[1], object.targets[1], function() {
                     addItems(object.items[0], object.targets[0], done);
@@ -423,7 +423,8 @@ pandora.createLinks = function($element) {
     }
 
     function getType(items) {
-        return items[0] && Ox.contains(items[0], '/') ? 'clip' : 'item';
+        var item = Ox.isArray(items[0]) ? items[0][0] : items[0];
+        return Ox.contains(item, '/') ? 'clip' : 'item';
     };
 
     function removeItems(items, target, callback) {
