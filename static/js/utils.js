@@ -314,8 +314,8 @@ pandora.createLinks = function($element) {
                 );
             pandora.history.add({
                 action: action,
-                items: action == 'cut' || action == 'delete' ? items
-                    : action == 'copy' || action == 'paste' ? addedItems
+                items: action == 'cut' || action == 'delete' ? [items]
+                    : action == 'copy' || action == 'paste' ? [addedItems]
                     : [items, addedItems],
                 targets: targets,
                 text: text
@@ -330,9 +330,9 @@ pandora.createLinks = function($element) {
         if (object) {
             pandora.$ui.mainMenu.replaceItemMenu();
             if (object.action == 'copy' || object.action == 'paste') {
-                addItems(object.items, object.targets[0], done);
+                addItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'cut' || object.action == 'delete') {
-                removeItems(object.items, object.targets[0], done);
+                removeItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'move') {
                 removeItems(object.items[0], object.targets[0], function() {
                     addItems(object.items[1], object.targets[1], done);
@@ -349,9 +349,9 @@ pandora.createLinks = function($element) {
         if (object) {
             pandora.$ui.mainMenu.replaceItemMenu();
             if (object.action == 'copy' || object.action == 'paste') {
-                removeItems(object.items, object.targets[0], done);
+                removeItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'cut' || object.action == 'delete') {
-                addItems(object.items, object.targets[0], done);
+                addItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'move') {
                 removeItems(object.items[1], object.targets[1], function() {
                     addItems(object.items[0], object.targets[0], done);
@@ -392,7 +392,7 @@ pandora.createLinks = function($element) {
 
     function doneHistory(object, callback) {
         var list, listData,
-            type = getType(object.items),
+            type = getType(object.items[0]),
             ui = pandora.user.ui;
         if (type == 'item' && ui.section == 'items') {
             Ox.Request.clearCache('find');
@@ -422,8 +422,7 @@ pandora.createLinks = function($element) {
     }
 
     function getType(items) {
-        var item = Ox.isArray(items[0]) ? items[0][0] : items[0];
-        return item && Ox.contains(item, '/') ? 'clip' : 'item';
+        return items[0] && Ox.contains(items[0], '/') ? 'clip' : 'item';
     };
 
     function removeItems(items, target, callback) {
