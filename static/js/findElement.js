@@ -15,10 +15,16 @@ pandora.ui.findElement = function() {
                             ],
                             overlap: 'right',
                             type: 'image',
+                            tooltip: Ox._('Find: This List'),
                             value: 'list'
                         })
                         .bindEvent({
                             change: function(data) {
+                                pandora.$ui.findListSelect.options({
+                                    tooltip: data.value == 'all'
+                                        ? Ox._('Find: All {0}', [Ox._(pandora.site.itemName.plural)])
+                                        : Ox._('Find: This List')
+                                });
                                 pandora.$ui.findInput.focusInput(true);
                             }
                         }),
