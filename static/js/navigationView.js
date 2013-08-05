@@ -208,7 +208,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
 
     }
 
-    updateStatusbar();
+    updateStatusbar(0);
 
     function selectItem(data) {
         var id = data.id || '';
