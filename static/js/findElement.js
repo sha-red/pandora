@@ -21,9 +21,10 @@ pandora.ui.findElement = function() {
                         .bindEvent({
                             change: function(data) {
                                 pandora.$ui.findListSelect.options({
-                                    tooltip: data.value == 'all'
-                                        ? Ox._('Find: All {0}', [Ox._(pandora.site.itemName.plural)])
-                                        : Ox._('Find: This List')
+                                    tooltip: Ox.getObjectById(
+                                        pandora.$ui.findListSelect.options('items'),
+                                        data.value
+                                    ).title
                                 });
                                 pandora.$ui.findInput.focusInput(true);
                             }
