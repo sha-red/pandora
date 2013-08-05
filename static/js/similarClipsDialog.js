@@ -278,8 +278,7 @@ pandora.ui.similarClipsDialog = function() {
                         .bindEvent({
                             init: function(data) {
                                 $status.html(
-                                    Ox.formatNumber(data.items) + ' Clip'
-                                    + (data.items == 1 ? '' : 's')
+                                    Ox.toTitleCase(Ox.formatCount(data.items, 'clip'))
                                 );
                             },
                             open: changeClip,
@@ -291,7 +290,7 @@ pandora.ui.similarClipsDialog = function() {
                         });
                 } else {
                     $list = Ox.Element();
-                    $status.html('0 Clips');
+                    $status.html('No Clips');
                 }
                 $innerPanel.replaceElement(1, $list);
                 $image.attr({src: getImageURL(sequence.hash)});
