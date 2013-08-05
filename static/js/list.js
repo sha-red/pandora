@@ -218,6 +218,7 @@ pandora.ui.list = function() {
                         width: Math.round(ratio >= 1 ? size : size * ratio)
                     },
                     info: {
+                        css: {marginTop: '2px'},
                         element: pandora.ui.itemClips,
                         id: data.id,
                         options: {
