@@ -67,7 +67,7 @@ pandora.ui.clipList = function(videoRatio) {
             items: function(data, callback) {
                 if (!isClipView) {
                     // fixme: this will have to be updated
-                    callback({data: {items: []}});
+                    callback({data: {items: data.keys ? [] : 0}});
                     return;
                 }
                 var itemsQuery, query;
