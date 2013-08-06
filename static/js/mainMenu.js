@@ -728,9 +728,12 @@ pandora.ui.mainMenu = function() {
                 that.setItemTitle('showtimeline', Ox._((data.value ? 'Hide' : 'Show') + ' Timeline'));
             },
             pandora_videopoints: function(data) {
-                var action = data.value['in'] != data.value.out ? 'enableItem' : 'disableItem';
-                that[action]('copy');
-                that[action]('copyadd');
+                var action;
+                if (data.value['in']) {
+                    action = data.value['in'] != data.value.out ? 'enableItem' : 'disableItem';
+                    that[action]('copy');
+                    that[action]('copyadd');
+                }
             },
             pandora_videotimeline: function(data) {
                 that.checkItem('viewMenu_timelines_' + data.value);
