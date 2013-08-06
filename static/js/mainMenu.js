@@ -349,7 +349,7 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'add') {
                     pandora.addItem();
                 } else if (data.id == 'upload') {
-                    pandora.$ui.uploadDialog = pandora.ui.uploadDialog().open();
+                    pandora.$ui.uploadVideoDialog = pandora.ui.uploadVideoDialog().open();
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
                 } else if (data.id == 'print') {

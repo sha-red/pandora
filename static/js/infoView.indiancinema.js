@@ -84,7 +84,7 @@ pandora.ui.infoView = function(data) {
                     } else if (data_.id == 'metadata') {
                         pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
                     } else if (data_.id == 'upload') {
-                        pandora.$ui.uploadDialog = pandora.ui.uploadDialog(data).open();
+                        pandora.$ui.uploadVideoDialog = pandora.ui.uploadVideoDialog(data).open();
                     } else if (data_.id == 'delete') {
                         pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
                     }

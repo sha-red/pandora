@@ -80,7 +80,7 @@ pandora.ui.allItems = function(section) {
             .hide()
             .bindEvent({
                 click: function() {
-                    pandora.$ui.uploadDialog = pandora.ui.uploadDialog().open();
+                    pandora.$ui.uploadVideoDialog = pandora.ui.uploadVideoDialog().open();
                 }
             })
             .appendTo(that);
