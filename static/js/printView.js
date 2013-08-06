@@ -4,18 +4,16 @@
 
 pandora.ui.printView = function(data) {
 
-    var that = Ox.Element()
-            .css({
-                padding: '64px 128px',
-                backgroundColor: 'rgb(255, 255, 255)',
-                color: 'rgb(0, 0, 0)'
-            }),
+    var that = Ox.Element().css({padding: '64px 128px'}),
         $loading = Ox.LoadingScreen().appendTo(that),
         sortKey = pandora.user.ui.listSort[0].key,
         keys = Ox.unique(
             ['director', 'id', 'summary', 'title', 'year'].concat(sortKey)
         );
-
+    
+    $($loading.find('img')[0]).attr({
+        src: Ox.UI.getImageURL('symbolLoadingAnimated', null, 'oxlight')
+    });
     Ox.$body.css({
         background: 'rgb(255, 255, 255)',
         overflow: 'auto'
@@ -34,7 +32,10 @@ pandora.ui.printView = function(data) {
             var padding;
             $loading.remove();
             $('<div>')
-                .css({height: '16px'})
+                .css({
+                    height: '16px',
+                    color: 'rgb(0, 0, 0)'
+                })
                 .html(
                     '<b>' + pandora.site.site.name + ' - '
                     + (
@@ -58,6 +59,7 @@ pandora.ui.printView = function(data) {
                     .attr({title: url})
                     .css({
                         height: '16px',
+                        color: 'rgb(0, 0, 0)',
                         textAlign: 'justify',
                         textOverflow: 'ellipsis',
                         cursor: 'pointer',
@@ -100,7 +102,7 @@ pandora.ui.printView = function(data) {
                 .css({height: '16px'})
                 .html(
                     '<span style="color: rgb(128, 128, 128)">'
-                    + totals + '</span'
+                    + totals + '</span>'
                 )
                 .appendTo(that);
         });
