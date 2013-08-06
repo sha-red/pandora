@@ -43,6 +43,7 @@ pandora.ui.editor = function(data) {
                     editable: layer.canAddAnnotations[pandora.user.level]
                 }, layer);
             }),
+            loop: ui.videoLoop,
             muted: ui.videoMuted,
             out: ui.videoPoints[ui.item].out,
             position: ui.videoPoints[ui.item].position,
@@ -185,6 +186,9 @@ pandora.ui.editor = function(data) {
                 pandora.ui.annotationDialog(
                     Ox.getObjectById(pandora.site.layers, data.layer).title
                 ).open();
+            },
+            loop: function(data) {
+                pandora.UI.set({videoLoop: data.loop});
             },
             muted: function(data) {
                 pandora.UI.set({videoMuted: data.muted});
