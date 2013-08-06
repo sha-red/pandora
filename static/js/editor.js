@@ -260,7 +260,7 @@ pandora.ui.editor = function(data) {
                 pandora.UI.set({videoResolution: data.resolution});
             },
             select: function(data) {
-                pandora.UI.set('videoPoints.' + ui.item + '.annotation', data.id.split('/')[1]);
+                pandora.UI.set('videoPoints.' + ui.item + '.annotation', data.id.split('/')[1] || '');
             },
             subtitles: function(data) {
                 pandora.UI.set({videoSubtitles: data.subtitles});

@@ -137,7 +137,7 @@ pandora.ui.player = function(data) {
                 pandora.UI.set({videoScale: data.scale});
             },
             select: function(data) {
-                pandora.UI.set('videoPoints.' + ui.item + '.annotation', data.id.split('/')[1]);
+                pandora.UI.set('videoPoints.' + ui.item + '.annotation', data.id.split('/')[1] || '');
             },
             subtitles: function(data) {
                 pandora.UI.set({videoSubtitles: data.subtitles});
