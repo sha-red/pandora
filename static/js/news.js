@@ -122,6 +122,7 @@ pandora.ui.news = function(width, height) {
                     }
                 })
                 .appendTo($left);
+            $('<div>').css({height: '16px'}).appendTo($left);
         }
     }
 
@@ -180,6 +181,7 @@ pandora.ui.news = function(width, height) {
                 })
                 .appendTo($right);
         });
+        $('<div>').css({height: '16px'}).appendTo($right);
     }
 
     function selectItem() {
