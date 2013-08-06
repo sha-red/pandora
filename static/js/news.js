@@ -159,7 +159,7 @@ pandora.ui.news = function(width, height) {
                 .addClass('item')
                 .css({
                     width: '172px',
-                    padding: '4px 8px 5px 8px',
+                    padding: '4px 8px 3px 8px',
                     borderRadius: '8px',
                     margin: '2px',
                     backgroundColor: (item.id == pandora.user.ui.part.news)
