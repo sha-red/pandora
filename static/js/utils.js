@@ -320,7 +320,6 @@ pandora.createLinks = function($element) {
                 targets: targets,
                 text: text
             });
-            pandora.$ui.mainMenu.replaceItemMenu();
             callback(result);
         }
     };
@@ -328,7 +327,6 @@ pandora.createLinks = function($element) {
     pandora.redoHistory = function(callback) {
         var object = pandora.history.redo();
         if (object) {
-            pandora.$ui.mainMenu.replaceItemMenu();
             if (object.action == 'copy' || object.action == 'paste') {
                 addItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'cut' || object.action == 'delete') {
@@ -347,7 +345,6 @@ pandora.createLinks = function($element) {
     pandora.undoHistory = function(callback) {
         var object = pandora.history.undo();
         if (object) {
-            pandora.$ui.mainMenu.replaceItemMenu();
             if (object.action == 'copy' || object.action == 'paste') {
                 removeItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'cut' || object.action == 'delete') {

@@ -401,12 +401,14 @@ pandora.ui.mainMenu = function() {
                         pandora.reloadList();
                     });
                 } else if (data.id == 'undo') {
+                    fromMenu = true;
                     pandora.undoHistory();
                 } else if (data.id == 'redo') {
+                    fromMenu = true;
                     pandora.redoHistory();
                 } else if (data.id == 'clearhistory') {
+                    fromMenu = true;
                     pandora.history.clear();
-                    that.replaceMenu('itemMenu', getItemMenu());
                 } else if (data.id == 'showsidebar') {
                     pandora.UI.set({showSidebar: !ui.showSidebar});
                 } else if (data.id == 'showinfo') {
@@ -741,11 +743,19 @@ pandora.ui.mainMenu = function() {
         });
 
     pandora.clipboard.bindEvent(function(data, event) {
-        if (Ox.contains(['add', 'copy', 'paste'], event) && !fromMenu) {
-            that.highlightMenu('itemMenu');
-        }
         if (Ox.contains(['add', 'copy', 'clear'], event)) {
             that.replaceMenu('itemMenu', getItemMenu());
+            if (Ox.contains(['add', 'copy'], event) && !fromMenu) {
+                that.highlightMenu('itemMenu');
+            }
+        }
+        fromMenu = false;
+    });
+
+    pandora.history.bindEvent(function(data, event) {
+        that.replaceMenu('itemMenu', getItemMenu());
+        if (Ox.contains(['add', 'undo', 'redo'], event) && !fromMenu) {
+            that.highlightMenu('itemMenu');
         }
         fromMenu = false;
     });
