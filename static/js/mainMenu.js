@@ -745,16 +745,16 @@ pandora.ui.mainMenu = function() {
     pandora.clipboard.bindEvent(function(data, event) {
         if (Ox.contains(['add', 'copy', 'clear'], event)) {
             that.replaceMenu('itemMenu', getItemMenu());
-            if (Ox.contains(['add', 'copy'], event) && !fromMenu) {
-                that.highlightMenu('itemMenu');
-            }
+        }
+        if (Ox.contains(['add', 'copy', 'paste'], event) && !fromMenu) {
+            that.highlightMenu('itemMenu');
         }
         fromMenu = false;
     });
 
     pandora.history.bindEvent(function(data, event) {
         that.replaceMenu('itemMenu', getItemMenu());
-        if (Ox.contains(['add', 'undo', 'redo'], event) && !fromMenu) {
+        if (Ox.contains(['undo', 'redo'], event) && !fromMenu) {
             that.highlightMenu('itemMenu');
         }
         fromMenu = false;
