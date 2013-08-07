@@ -660,7 +660,6 @@
             "calendarSelection": "",
             "clipColumns": 2,
             "clipSort": [{"key": "index", "operator": "+"}],
-            "clipView": "list",
             "columns": {
                 "Colors": {
                     "columns": ["title", "source", "project", "language", "hue", "saturation", "brightness"],
@@ -668,7 +667,8 @@
                 }
             },
             "edit": "",
-            "editPoints": {},
+            "edits": {},
+            "editView": "list",
             "embedSize": 256,
             "filters": [
                 {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
@@ -751,7 +751,7 @@
             "showTimeline": true,
             "sidebarSize": 256,
             "text": "",
-            "textPositions": {},
+            "texts": {},
             "theme": "oxlight",
             "updateAdvancedFindResults": false,
             "videoLoop": false,

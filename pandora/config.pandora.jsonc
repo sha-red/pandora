@@ -579,7 +579,6 @@
             "calendarSelection": "",
             "clipColumns": 2,
             "clipSort": [{"key": "index", "operator": "+"}],
-            "clipView": "list",
             "columns": {
                 "Colors": {
                     "columns": ["title", "director", "language", "hue", "saturation", "brightness"],
@@ -587,7 +586,8 @@
                 }
             },
             "edit": "",
-            "editPoints": {},
+            "edits": {},
+            "editView": "list",
             "embedSize": 256,
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
@@ -668,7 +668,7 @@
             "showTimeline": true,
             "sidebarSize": 256,
             "text": "",
-            "textPositions": {},
+            "texts": {},
             "theme": "oxmedium",
             "updateAdvancedFindResults": false,
             "videoLoop": false,
