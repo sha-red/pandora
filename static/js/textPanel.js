@@ -327,8 +327,8 @@ pandora.ui.textPDF = function(text) {
 
     var that = Ox.Element(),
         $iframe,
-        page = pandora.user.ui.textPositions[pandora.user.ui.text] ?
-            pandora.user.ui.textPositions[pandora.user.ui.text][0] : 1,
+        page = pandora.user.ui.texts[pandora.user.ui.text].position ?
+            pandora.user.ui.texts[pandora.user.ui.text].position[0] : 1,
         url = '/texts/' + pandora.user.ui.text + '/text.pdf.html#page=' + page;
     if (text.uploaded) {
         $iframe = Ox.Element('<iframe>')
@@ -361,7 +361,7 @@ pandora.ui.textPDF = function(text) {
                         });
                     }).open();
                 } else if (event == 'page') {
-                    pandora.UI.set('textPositions.' + pandora.user.ui.text, [data.page]);
+                    pandora.UI.set('texts.' + pandora.user.ui.text.replace(/\./g, '\\.') + '.position', [data.page]);
                 }
             })
             .appendTo(that);
