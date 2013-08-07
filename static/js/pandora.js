@@ -328,6 +328,9 @@ appPanel
             sort: [{key: 'index', operator: '+'}],
             view: 'list'
         };
+        pandora.site.textSettings = {
+            position: 0
+        };
 
         Ox.extend(pandora.user, {
             sectionElement: 'buttons',
