@@ -55,7 +55,7 @@ pandora.URL = (function() {
                     );
                 }
             } else if (pandora.user.ui.section == 'edits') {
-                var editPoints = pandora.user.ui.editPoints[state.item] || {};
+                var editPoints = pandora.user.ui.edits[state.item] || {};
                 state.span = editPoints.clip || [].concat(
                     editPoints.position
                         ? editPoints.position
@@ -65,7 +65,7 @@ pandora.URL = (function() {
                         : []
                 );
             } else if (pandora.user.ui.section == 'texts') {
-                var position = pandora.user.ui.textPositions[pandora.user.ui.text];
+                var position = pandora.user.ui.texts[pandora.user.ui.text].position;
                 if (position) {
                     state.span = position;
                 }
@@ -197,25 +197,24 @@ pandora.URL = (function() {
                 } else if (state.type == 'edits') {
 
                     if (state.span) {
+                        var key = 'edits.' + state.item.replace(/\./g, '\\.');
                         if (Ox.isArray(state.span)) {
-                            set['editPoints.' + state.item.replace(/\./g, '\\.')] = {
-                                clip: '',
-                                'in': state.span[state.span.length - 2] || 0,
-                                out: state.span.length == 1 ? 0 : Math.max(
-                                    state.span[state.span.length - 2],
-                                    state.span[state.span.length - 1]
-                                ),
-                                position: state.span[0]
-                            }
+                            set[key + '.clip'] = '';
+                            set[key + '.in'] = state.span[state.span.length - 2] || 0;
+                            set[key + '.out'] = state.span.length == 1 ? 0 : Math.max(
+                                state.span[state.span.length - 2],
+                                state.span[state.span.length - 1]
+                            );
+                            set[key + '.position'] = state.span[0];
                         } else {
-                            set['editPoints.' + state.item.replace(/\./g, '\\.') + '.clip'] = state.span;
+                            set[key + '.clip'] = state.span;
                         }
                     }
 
                 } else if (state.type == 'texts') {
 
                     if (state.span) {
-                        set['textPositions.' + state.item] = state.span;
+                        set['texts.' + state.item.replace(/\./g, '\\.') + '.position'] = state.span;
                     }
 
                 }
@@ -493,7 +492,8 @@ pandora.URL = (function() {
                             'mapFind', 'mapSelection'
                         ].indexOf(key) > -1
                         || /^videoPoints/.test(key)
-                        || /^textPositions/.test(key);
+                        || /^edits/.test(key)
+                        || /^texts/.test(key);
                 })
             ) {
                 action = 'replace';
