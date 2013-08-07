@@ -325,7 +325,8 @@ appPanel
             'in': 0,
             out: 0,
             position: 0,
-            sort: [{key: 'index', operator: '+'}]
+            sort: [{key: 'index', operator: '+'}],
+            view: 'list'
         };
 
         Ox.extend(pandora.user, {
