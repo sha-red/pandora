@@ -587,7 +587,6 @@
             },
             "edit": "",
             "edits": {},
-            "editView": "list",
             "embedSize": 256,
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
