@@ -60,9 +60,9 @@ pandora.ui.editPanel = function() {
                 that = pandora.$ui.editPanel = Ox.VideoEditPanel({
                     clips: Ox.clone(edit.clips),
                     clipSize: listSize,
-                    clipSort: ui.clipSort,
+                    clipSort: ui.edits[ui.edit].sort,
                     clipSortOptions: [/*...*/],
-                    clipView: ui.editView,
+                    clipView: ui.edits[ui.edit].view,
                     duration: edit.duration,
                     editable: edit.editable,
                     enableSubtitles: ui.videoSubtitles,
@@ -86,7 +86,7 @@ pandora.ui.editPanel = function() {
                     showClips: ui.showClips,
                     showTimeline: ui.showTimeline,
                     smallTimelineURL: getSmallTimelineURL(),
-                    sort: ui.clipSort,
+                    sort: ui.edits[ui.edit].sort,
                     sortOptions: [
                             {id: 'index', title: Ox._('Sort Manually'), operator: '+'}
                         ].concat(
@@ -248,7 +248,7 @@ pandora.ui.editPanel = function() {
                         pandora.UI.set({clipSize: data.size});
                     },
                     sort: function(data) {
-                        pandora.UI.set({clipSort: data});
+                        pandora.UI.set(editsKey('sort'), data);
                         var key = data[0].key;
                         if (key == 'position') {
                             key = 'in';
@@ -288,7 +288,7 @@ pandora.ui.editPanel = function() {
                         pandora.UI.set({showTimeline: data.showTimeline});
                     },
                     view: function(data) {
-                        pandora.UI.set({editView: data.view});
+                        pandora.UI.set(editsKey('view'), data.view);
                         data.view == 'grid' && enableDragAndDrop();
                     },
                     volume: function(data) {
@@ -305,7 +305,7 @@ pandora.ui.editPanel = function() {
                     }
                 })
             );
-            ui.editView == 'grid' && enableDragAndDrop();
+            ui.edits[ui.edit].view == 'grid' && enableDragAndDrop();
         });
     }
 
