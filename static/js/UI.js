@@ -34,6 +34,7 @@ pandora.UI = (function() {
 
         var add = {},
             args,
+            editSettings = pandora.site.editSettings,
             item,
             list,
             listSettings = pandora.site.listSettings,
@@ -56,11 +57,11 @@ pandora.UI = (function() {
         self.previousUI._list = pandora.getListState(self.previousUI.find);
 
         if (args.section == 'texts') {
-            trigger['section'] = args['section'];
-            trigger['text'] = args['text'];
+            trigger.section = args.section;
+            trigger.text = args.text;
         } else if (args.section == 'edits') {
-            trigger['section'] = args['section'];
-            trigger['edit'] = args['edit'];
+            trigger.section = args.section;
+            trigger.edit = args.edit;
         } else {
             if ('find' in args) {
                 // the challenge here is that find may change list,
@@ -162,12 +163,12 @@ pandora.UI = (function() {
         }
 
         if (args.edit) {
-            if (
-                !pandora.user.ui.editPoints[args.edit]
-                && !args['editPoints.' + args.edit]
-            ) {
-                add['editPoints.' + args.edit] = {clip: '', 'in': 0, out: 0, position: 0};
-            }
+            add['edits.' + that.encode(args.edit)] = Ox.map(editSettings, function(value, key) {
+                var editsKey = 'edits.' + that.encode(args.edit) + '.' + key;
+                return editsKey in args ? args[editsKey]
+                    : pandora.user.ui.edits[args.edit] ? pandora.user.ui.edits[args.edit][key]
+                    : value;
+            });
         }
 
         // items in args trigger events, items in add do not
@@ -183,7 +184,7 @@ pandora.UI = (function() {
                 }
                 if (!Ox.isEqual(ui[keys[0]], val)) {
                     if (val === null) {
-                        delete ui[keys[0]]
+                        delete ui[keys[0]];
                     } else {
                         ui[keys[0]] = val;
                     }
