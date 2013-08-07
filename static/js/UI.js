@@ -40,6 +40,7 @@ pandora.UI = (function() {
             listSettings = pandora.site.listSettings,
             listView,
             set = {},
+            textSettings = pandora.site.textSettings,
             trigger = {},
             triggerEvents;
 
@@ -167,6 +168,14 @@ pandora.UI = (function() {
                 var editsKey = 'edits.' + that.encode(args.edit) + '.' + key;
                 return editsKey in args ? args[editsKey]
                     : pandora.user.ui.edits[args.edit] ? pandora.user.ui.edits[args.edit][key]
+                    : value;
+            });
+        }
+        if (args.text) {
+            add['texts.' + that.encode(args.text)] = Ox.map(textSettings, function(value, key) {
+                var textsKey = 'texts.' + that.encode(args.text) + '.' + key;
+                return textsKey in args ? args[editextsKeytsKey]
+                    : pandora.user.ui.texts[args.text] ? pandora.user.ui.texts[args.text][key]
                     : value;
             });
         }
