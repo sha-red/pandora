@@ -403,6 +403,13 @@
             "sort": true
         },
         {
+            "id": "oxdbId",
+            "title": "0xDB ID",
+            "type": "string",
+            "columnWidth": 90,
+            "sort": true
+        },
+        {
             "id": "subtitles",
             "title": "Subtitles",
             "type": "layer",
