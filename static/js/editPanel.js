@@ -16,8 +16,8 @@ pandora.ui.editPanel = function() {
 
     ui.edit ? renderEdit() : renderEdits();
 
-    function editPointsKey(key) {
-        return 'editPoints.' + ui.edit.replace(/\./g, '\\.') + '.' + key;
+    function editsKey(key) {
+        return 'edits.' + ui.edit.replace(/\./g, '\\.') + '.' + key;
     }
 
     function enableDragAndDrop() {
@@ -62,7 +62,7 @@ pandora.ui.editPanel = function() {
                     clipSize: listSize,
                     clipSort: ui.clipSort,
                     clipSortOptions: [/*...*/],
-                    clipView: ui.clipView,
+                    clipView: ui.editView,
                     duration: edit.duration,
                     editable: edit.editable,
                     enableSubtitles: ui.videoSubtitles,
@@ -75,11 +75,11 @@ pandora.ui.editPanel = function() {
                         pandora.getLargeEditTimelineURL(edit, type, i, callback);
                     },
                     height: pandora.$ui.appPanel.size(1),
-                    'in': ui.editPoints[ui.edit]['in'],
+                    'in': ui.edits[ui.edit]['in'],
                     loop: ui.videoLoop,
                     muted: ui.videoMuted,
-                    out: ui.editPoints[ui.edit].out,
-                    position: ui.editPoints[ui.edit].position,
+                    out: ui.edits[ui.edit].out,
+                    position: ui.edits[ui.edit].position,
                     resolution: ui.videoResolution,
                     scaleToFill: ui.videoScale == 'fill',
                     // selected: ...
@@ -195,7 +195,7 @@ pandora.ui.editPanel = function() {
                         pandora.UI.set({videoMuted: data.muted});
                     },
                     open: function(data) {
-                        pandora.UI.set(editPointsKey('clip'), data.ids[0]);
+                        pandora.UI.set(editsKey('clip'), data.ids[0]);
                     },
                     paste: function() {
                         var clips;
@@ -221,14 +221,14 @@ pandora.ui.editPanel = function() {
                     },
                     playing: function(data) {
                         var set = {};
-                        set[editPointsKey('clip')] = '';
-                        set[editPointsKey('position')] = data.position;
+                        set[editsKey('clip')] = '';
+                        set[editsKey('position')] = data.position;
                         pandora.UI.set(set);
                     },
                     position: function(data) {
                         var set = {};
-                        set[editPointsKey('clip')] = '';
-                        set[editPointsKey('position')] = data.position;
+                        set[editsKey('clip')] = '';
+                        set[editsKey('position')] = data.position;
                         pandora.UI.set(set);
                     },
                     resize: function(data) {
@@ -288,7 +288,7 @@ pandora.ui.editPanel = function() {
                         pandora.UI.set({showTimeline: data.showTimeline});
                     },
                     view: function(data) {
-                        pandora.UI.set({clipView: data.view});
+                        pandora.UI.set({editView: data.view});
                         data.view == 'grid' && enableDragAndDrop();
                     },
                     volume: function(data) {
@@ -305,7 +305,7 @@ pandora.ui.editPanel = function() {
                     }
                 })
             );
-            ui.clipView == 'grid' && enableDragAndDrop();
+            ui.editView == 'grid' && enableDragAndDrop();
         });
     }
 
