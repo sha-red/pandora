@@ -198,6 +198,7 @@ pandora.URL = (function() {
 
                     if (state.span) {
                         var key = 'edits.' + state.item.replace(/\./g, '\\.');
+                        set[key] = {};
                         if (Ox.isArray(state.span)) {
                             set[key + '.clip'] = '';
                             set[key + '.in'] = state.span[state.span.length - 2] || 0;
