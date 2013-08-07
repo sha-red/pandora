@@ -320,6 +320,13 @@ appPanel
                 pandora.site.listSettings[key] = key[4].toLowerCase() + key.slice(5);
             }
         });
+        pandora.site.editSettings = {
+            clip: '',
+            'in': 0,
+            out: 0,
+            position: 0,
+            sort: [{key: 'index', operator: '+'}]
+        };
 
         Ox.extend(pandora.user, {
             sectionElement: 'buttons',
