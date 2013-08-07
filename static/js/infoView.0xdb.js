@@ -717,7 +717,7 @@ pandora.ui.infoView = function(data) {
                     left: ui.showIconBrowser ? 0 : -listWidth + 'px'
                 }, 250);
                 $icon.options({
-                    tooltip: !pandora.user.ui.showIconBrowser
+                    tooltip: !ui.showIconBrowser
                         ? 'Doubleclick to edit icon'
                         : 'Doubleclick to hide icons'
                 });
