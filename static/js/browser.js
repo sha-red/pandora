@@ -141,7 +141,7 @@ pandora.ui.browser = function() {
             },
             openpreview: function() {
                 if (pandora.isVideoView()) {
-                    pandora.$ui[itemView].gainFocus().triggerEvent('key_space');
+                    pandora.$ui[pandora.user.ui.itemView].gainFocus().triggerEvent('key_space');
                 }
             },
             select: function(data) {
