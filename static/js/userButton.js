@@ -22,8 +22,8 @@ pandora.ui.userButton = function() {
             style: 'symbol',
             title: 'user',
             tooltip: Ox._(
-                isGuest ? 'Click to sign in, doubleclick to sign up'
-                : 'Click to open preferences, doubleclick to sign out'
+                isGuest ? 'Click to sign in or doubleclick to sign up'
+                : 'Click to open preferences or doubleclick to sign out'
             ),
             type: 'image'
         })

@@ -106,7 +106,7 @@ pandora.ui.info = function() {
                                         pandora.user.ui.item
                                         && ['timeline', 'player', 'editor'].indexOf(pandora.user.ui.itemView) > -1
                                     ) ? Ox._('Go to Position') : (
-                                        Ox._(pandora.user.ui.item ? 'Switch to {0} View' : 'Open in {0} Vew',
+                                        Ox._(pandora.user.ui.item ? 'Switch to {0} View' : 'Open in {0} View',
                                             [Ox._(Ox.getObjectById(pandora.site.itemViews, pandora.user.ui.videoView).title)]));
                                 },
                                 width: ui.sidebarSize
