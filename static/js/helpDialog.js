@@ -114,6 +114,7 @@ pandora.ui.helpDialog = function() {
         });
 
         that.select(pandora.user.ui.part.help).options({content: $panel});
+        pandora.createLinks($text);
         $list.gainFocus();
         
     });
@@ -149,7 +150,6 @@ pandora.ui.helpDialog = function() {
                 textAlign: 'right',
                 whiteSpace: 'nowrap'
             });
-        pandora.createLinks($text);
         return that;
     }
 
