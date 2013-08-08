@@ -9,9 +9,15 @@ pandora.ui.mainMenu = function() {
         fromMenu = false,
         fullscreenState = Ox.Fullscreen.getState(),
         that = Ox.MainMenu({
-            extras: [
-                pandora.$ui.loadingIcon = pandora.ui.loadingIcon()
-            ],
+            extras: pandora.site.menuExtras.map(function(menuExtra) {
+                if (menuExtra == 'user') {
+                    return pandora.$ui.userButton = pandora.ui.userButton();
+                } else if (menuExtra == 'locale') {
+                    return pandora.$ui.localeButton = pandora.ui.localeButton();
+                } else if (menuExtra == 'reload') {
+                    return pandora.$ui.loadingIcon = pandora.ui.loadingIcon();
+                }
+            }),
             id: 'mainMenu',
             menus: [].concat(
                 [
