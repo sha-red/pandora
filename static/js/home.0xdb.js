@@ -24,11 +24,14 @@ pandora.ui.home = function() {
                 right: 0,
                 bottom: 0,
                 width: '320px',
+                height: 'auto',
                 margin: 'auto',
                 opacity: 0,
                 MozTransform: 'scaleY(-1)',
+                MsTransform: 'scaleY(-1)',
                 OTransform: 'scaleY(-1)',
-                WebkitTransform: 'scaleY(-1)'
+                WebkitTransform: 'scaleY(-1)',
+                transform: 'scaleY(-1)'
             })
             .appendTo(that),
 
@@ -60,6 +63,7 @@ pandora.ui.home = function() {
                 right: 0,
                 bottom: '160px',
                 width: window.innerWidth + 'px',
+                height: 'auto',
                 margin: 'auto',
                 cursor: 'pointer'
             })

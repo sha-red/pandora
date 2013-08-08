@@ -118,6 +118,7 @@ pandora.ui.siteDialog = function(section) {
                                         })
                                         .css({
                                             width: '256px',
+                                            height: 'auto',
                                             marginTop: id == 'software' ? '-16px' : 0
                                         })
                                 ),

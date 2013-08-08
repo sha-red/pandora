@@ -37,8 +37,10 @@ pandora.ui.home = function() {
                 right: 0,
                 bottom: 0,
                 width: '320px',
+                height: 'auto',
                 margin: '0 auto 0 auto',
                 MozTransform: 'scaleY(-1)',
+                MsTransform: 'scaleY(-1)',
                 OTransform: 'scaleY(-1)',
                 WebkitTransform: 'scaleY(-1)'
             })
@@ -72,6 +74,7 @@ pandora.ui.home = function() {
                 left: 0,
                 right: 0,
                 width: '320px',
+                height: 'auto',
                 margin: '0 auto 0 auto',
                 cursor: 'pointer'
             })

@@ -43,7 +43,8 @@ appPanel
         enableDebugMode = getLocalStorage('pandora.enableDebugMode'),
         enableEventLogging = getLocalStorage('pandora.enableEventLogging'),
         isEmbed = /^#embed(\?.*?)?$/.test(document.location.hash),
-        isMSIE = /MSIE/.test(navigator.userAgent),
+        isMSIE = /MSIE/.test(navigator.userAgent)
+            && !(Math.round(navigator.userAgent.match(/MSIE (\d+)/)[1]) >= 10),
         isPrint = /^#print(\?.*?)?$/.test(document.location.hash),
         legacyThemes = {classic: 'oxlight', modern: 'oxdark'},
         theme = getLocalStorage('Ox.theme')
@@ -106,6 +107,7 @@ appPanel
                 images.reflection.style.MSTransform = 'scaleY(-1)';
                 images.reflection.style.OTransform = 'scaleY(-1)';
                 images.reflection.style.WebkitTransform = 'scaleY(-1)';
+                images.reflection.style.transform = 'scaleY(-1)';
                 images.reflection.src = '/static/png/logo.png';
             }
             images.loadingIcon = document.createElement('img');
@@ -138,15 +140,12 @@ appPanel
             gradient.style.width = isEmbed || isPrint ? '98px' : '322px';
             gradient.style.height = isEmbed || isPrint ? '50px' : '162px';
             gradient.style.margin = 'auto';
-            gradient.style.background = theme == 'oxlight' ? '-moz-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
-                : theme == 'oxmedium' ? '-moz-linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
-                : '-moz-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
-            gradient.style.background = theme == 'oxlight' ? '-o-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
-                : theme == 'oxmedium' ? '-o-linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
-                : '-o-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
-            gradient.style.background = theme == 'oxlight' ? '-webkit-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
-                : theme == 'oxmedium' ? '-webkit-linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
-                : '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
+            ['-moz-', '-ms-', '-o-', '-webkit-', ''].forEach(function(prefix) {
+                gradient.style.background = theme == 'oxlight' ? prefix + 'linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+                    : theme == 'oxmedium' ? prefix + 'linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
+                    : prefix + 'linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
+
+            });
         }
         var loadingScreen = document.createElement('div');
         loadingScreen.setAttribute('id', 'loadingScreen');
@@ -489,6 +488,7 @@ appPanel
             loadingIcon.style.MSTransform = css;
             loadingIcon.style.OTransform = css;
             loadingIcon.style.WebkitTransform = css;
+            loadingIcon.style.transform = css;
         }, 83);
     }
 
