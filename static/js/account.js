@@ -364,7 +364,7 @@ pandora.ui.accountWelcomeDialog = function() {
                     title: Ox._('Preferences...')
                 }).bindEvent('click', function() {
                     that.close();
-                    pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
+                    pandora.UI.set({page: 'preferences'})
                 }),
                 {},
                 Ox.Button({
