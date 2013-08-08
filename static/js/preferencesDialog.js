@@ -3,10 +3,12 @@
 pandora.ui.preferencesDialog = function() {
 
     var tabs = [
-            {id: 'account', title: Ox._('Account'), selected: true},
+            {id: 'account', title: Ox._('Account')},
+            {id: 'appearance', title: Ox._('Appearance')},
             {id: 'advanced', title: Ox._('Advanced')}
-        ],
-        $tabPanel = Ox.TabPanel({
+        ];
+    Ox.getObjectById(tabs, pandora.user.ui.part.preferences || 'account').selected = true;
+    var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var $content = Ox.Element()
                     .css({overflowY: 'auto'})
@@ -96,7 +98,48 @@ pandora.ui.preferencesDialog = function() {
                         })
                         .css({position: 'absolute', left: '96px', top: '16px'})
                     );
-                } else {
+                } else if (id == 'appearance') {
+                    $content.append(
+                        Ox.Form({
+                            items: [
+                                Ox.Select({
+                                        id: 'theme',
+                                        items: pandora.site.themes.map(function(theme) {
+                                            return {id: theme, title: Ox.Theme.getThemeData(theme).themeName}
+                                        }),
+                                        label: Ox._('Theme'),
+                                        labelWidth: 120,
+                                        value: pandora.user.ui.theme,
+                                        width: 320
+                                    })
+                                    .bindEvent({
+                                        change: function(data) {
+                                            pandora.UI.set({theme: data.value});
+                                            pandora.setTheme(data.value);
+                                        }
+                                    }),
+                                Ox.Select({
+                                        disabled: pandora.user.level != 'admin',
+                                        id: 'locale',
+                                        items: Object.keys(Ox.LOCALE_NAMES).map(function(locale) {
+                                            return {id: locale, title: Ox.LOCALE_NAMES[locale]}
+                                        }),
+                                        label: Ox._('Language'),
+                                        labelWidth: 120,
+                                        value: pandora.user.ui.locale,
+                                        width: 320
+                                    })
+                                    .bindEvent({
+                                        change: function(data) {
+                                            pandora.UI.set({locale: data.value});
+                                            pandora.setLocale(data.value, pandora.$ui.appPanel.reload);
+                                        }
+                                    })
+                            ]
+                        })
+                        .css({position: 'absolute', left: '96px', top: '16px'})
+                    );
+                } else if (id == 'advanced') {
                     $content.append(
                         Ox.Button({
                             title: Ox._('Reset UI Settings...'),
@@ -108,8 +151,7 @@ pandora.ui.preferencesDialog = function() {
                             }
                         })
                         .css({position: 'absolute', left: '96px', top: '16px'})
-                    );
-                    $content.append(
+                    ).append(
                         Ox.Button({
                             title: Ox._('Run Script on Load...'),
                             width: 160
@@ -125,7 +167,13 @@ pandora.ui.preferencesDialog = function() {
                 return $content;
             },
             tabs: tabs
+        })
+        .bindEvent({
+            change: function(data) {
+                pandora.UI.set({'part.preferences': data.selected});
+            }
         }),
+
         $dialog = Ox.Dialog({
             buttons: [
                 Ox.Button({
@@ -157,6 +205,11 @@ pandora.ui.preferencesDialog = function() {
         .bindEvent({
             close: function() {
                 pandora.user.ui.page == 'preferences' && pandora.UI.set({page: ''});
+            },
+            'pandora_part.preferences': function(data) {
+                if (pandora.user.ui.page == 'preferences') {
+                    $tabPanel.select(data.value == '' ? 'account' : data.value);
+                }
             }
         });
 
