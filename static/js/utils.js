@@ -1297,6 +1297,11 @@ pandora.getPart = function(state, str, callback) {
             }
             callback();
         });
+    } else if (state.page == 'preferences') {
+        if (Ox.contains(['account', 'appearance', 'advanced'], str)) {
+            state.part = str;
+        }
+        callback();
     } else if (state.page == 'tv') {
         var split = str.split(':'), user, name;
         if (split.length >= 2) {
@@ -1943,6 +1948,18 @@ pandora.setLocale = function(locale, callback) {
         }
     }
     Ox.setLocale(locale, url, callback);
+};
+
+pandora.setTheme = function(theme) {
+    var iframe, src;
+    Ox.Theme(theme);
+    iframe = Ox.UI.elements[$('#embed').data('oxid')];
+    if (iframe) {
+        src = iframe.attr('src');
+        if (src && Ox.parseURL(src).hostname == document.location.hostname) {
+            iframe.postMessage('settheme', {theme: theme});
+        }
+    }
 };
 
 pandora.unloadWindow = function() {
