@@ -502,6 +502,11 @@
         "importPosters": false,
         "importFrames": false 
     },
+    "menuExtras": [
+        "user",
+        //"locale",
+        "reload"
+    ],
     "personalLists": [
         {"title": "Favorites"}
     ],

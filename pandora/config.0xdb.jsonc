@@ -694,6 +694,11 @@
         "importPosters": true,
         "importFrames": true
     },
+    "menuExtras": [
+        "user",
+        //"locale",
+        "reload"
+    ],
     "personalLists": [
         {"title": "Favorites"},
         {"title": "1960s", "query": {"conditions": [{"key": "year", "value": ["1960", "1970"], "operator": "="}], "operator": "&"}}

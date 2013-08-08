@@ -701,6 +701,11 @@
         "importPosters": false,
         "importFrames": false
     },
+    "menuExtras": [
+        "user",
+        //"locale",
+        "reload"
+    ],
     "personalLists": [
         {"title": "Favorites"},
         {"title": "Black & White Films", "query": {"conditions": [{"key": "color", "value": "Black and White", "operator": "=="}], "operator": "&"}},
