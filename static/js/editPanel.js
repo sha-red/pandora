@@ -27,6 +27,15 @@ pandora.ui.editPanel = function() {
         );
     }
 
+    function getClips(ids) {
+        return ids.map(function(id) {
+            var clip = Ox.getObjectById(edit.clips, id);
+            return (
+                clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out
+            ) + '/' + id;
+        });
+    }
+
     function getSmallTimelineURL() {
         var fps = 25,
             width = Math.floor(edit.duration * fps),
@@ -109,44 +118,38 @@ pandora.ui.editPanel = function() {
                 })
                 .bindEvent({
                     copy: function(data) {
-                        pandora.clipboard.copy(data.ids.map(function(id) {
-                            var clip = Ox.getObjectById(edit.clips, id);
-                            return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
-                        }), 'clip');
+                        pandora.clipboard.copy(getClips(data.ids), 'clip');
                     },
                     copyadd: function(data) {
-                        pandora.clipboard.add(data.ids.map(function(id) {
-                            var clip = Ox.getObjectById(edit.clips, id);
-                            return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
-                        }), 'clip');
+                        pandora.clipboard.add(getClips(data.ids), 'clip');
                     },
                     cut: function(data) {
+                        var clips;
                         if (edit.editable) {
-                            pandora.clipboard.copy(data.ids.map(function(id) {
-                                var clip = Ox.getObjectById(edit.clips, id);
-                                return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
-                            }), 'clip');
-                            pandora.doHistory('cut', data.ids, ui.edit, function(result) {
+                            clips = getClips(data.ids);
+                            pandora.clipboard.copy(clips, 'clip');
+                            pandora.doHistory('cut', clips, ui.edit, function(result) {
                                 Ox.Request.clearCache('getEdit');
                                 updateClips(result.data.clips);
                             });
                         }
                     },
                     cutadd: function(data) {
+                        var clips;
                         if (edit.editable) {
-                            pandora.clipboard.add(data.ids.map(function(id) {
-                                var clip = Ox.getObjectById(edit.clips, id);
-                                return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
-                            }), 'clip');
-                            pandora.doHistory('cut', data.ids, ui.edit, function(result) {
+                            clips = getClips(data.ids);
+                            pandora.clipboard.add(clips, 'clip');
+                            pandora.doHistory('cut', clips, ui.edit, function(result) {
                                 Ox.Request.clearCache('getEdit');
                                 updateClips(result.data.clips);
                             });
                         }
                     },
                     'delete': function(data) {
+                        var clips;
                         if (edit.editable) {
-                            pandora.doHistory('delete', data.ids, ui.edit, function(result) {
+                            clips = getClips(data.ids);
+                            pandora.doHistory('delete', clips, ui.edit, function(result) {
                                 Ox.Request.clearCache('getEdit');
                                 updateClips(result.data.clips);
                             });
