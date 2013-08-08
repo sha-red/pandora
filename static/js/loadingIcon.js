@@ -4,7 +4,7 @@ pandora.ui.loadingIcon = function() {
 
     var self = {},
         that = Ox.LoadingIcon({
-            tooltip: Ox._('Reload {0}', [pandora.site.site.name])
+            tooltip: Ox._('Click to reload {0}', [pandora.site.site.name])
         }, self)
         .attr({
             src: Ox.UI.getImageURL('symbolRedo')
