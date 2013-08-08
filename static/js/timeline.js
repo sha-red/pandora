@@ -13,7 +13,10 @@ pandora.ui.timeline = function(data) {
             annotationsRange: ui.annotationsRange,
             annotationsSize: ui.annotationsSize,
             annotationsSort: ui.annotationsSort,
-            annotationsTooltip: 'annotations <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'A</span>',
+            annotationsTooltip: Ox._(
+                'annotations {0}',
+                ['<span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'A</span>']
+            ),
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
             censoredTooltip: pandora.site.cantPlay.text,
