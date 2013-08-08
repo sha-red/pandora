@@ -19,8 +19,10 @@ pandora.ui.statusbar = function() {
             .append(
                 Ox.Element()
                     .css({
-                        marginTop: '2px',
-                        fontSize: '9px'
+                        margin: '2px 4px',
+                        fontSize: '9px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
                     })
                     .append($text.loading)
                     .append($text.titleTotal)
