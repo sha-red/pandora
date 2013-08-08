@@ -200,19 +200,7 @@ pandora.ui.editPanel = function() {
                     paste: function() {
                         var clips;
                         if (pandora.clipboard.type() == 'clip') {
-                            clips = pandora.clipboard.paste().map(function(clip) {
-                                var split = clip.split('/'),
-                                    item = split[0],
-                                    points = split[1].split('-');
-                                return Ox.extend({
-                                    item: item
-                                }, points.length == 1 ? {
-                                    annotation: clip
-                                } : {
-                                    'in': parseFloat(points[0]),
-                                    out: parseFloat(points[1])
-                                });
-                            });
+                            clips = pandora.clipboard.paste();
                             pandora.doHistory('paste', clips, ui.edit, function(result) {
                                 Ox.Request.clearCache('getEdit');
                                 updateClips(edit.clips.concat(result.data.clips));

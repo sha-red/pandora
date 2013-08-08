@@ -360,7 +360,7 @@ pandora.createLinks = function($element) {
     };
 
     function addItems(items, target, callback) {
-        var type = getType(items);
+        var clips, type = getType(items);
         if (type == 'item') {
             pandora.api.find({
                 query: {
@@ -382,7 +382,7 @@ pandora.createLinks = function($element) {
                 }
             });
         } else {
-            pandora.api.addClips({items: items, edit: target}, callback);
+            pandora.api.addClips({clips: parseClips(items), edit: target, index: 0}, callback);
         }
     }
 
@@ -419,14 +419,31 @@ pandora.createLinks = function($element) {
 
     function getType(items) {
         return items[0] && Ox.contains(items[0], '/') ? 'clip' : 'item';
-    };
+    }
+
+    function parseClips(items) {
+        return items.map(function(clip) {
+            var split = clip.split('/'),
+                item = split[0],
+                points = split[1].split('-');
+            return Ox.extend({
+                item: item
+            }, points.length == 1 ? {
+                annotation: clip
+            } : {
+                'in': parseFloat(points[0]),
+                out: parseFloat(points[1])
+            });
+        });
+    }
 
     function removeItems(items, target, callback) {
         var type = getType(items);
-        pandora.api[type == 'item' ? 'removeListItems' : 'removeClips'](
-            Ox.extend({items: items}, type == 'item' ? 'list' : 'edit', target),
-            callback
-        );
+        if (type == 'item') {
+            pandora.api.removeListItems({items: items, list: target}, callback);
+        } else {
+            pandora.api.removeClips({clips: parseClips(items), edit: target}, callback);
+        }
     }
 
 }());
