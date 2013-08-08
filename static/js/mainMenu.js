@@ -271,20 +271,10 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({filters: filters});
                 } else if (data.id == 'setlocale') {
                     pandora.UI.set({locale: value});
-                    pandora.setLocale(value, function() {
-                        pandora.$ui.appPanel.reload();
-                    });
+                    pandora.setLocale(value, pandora.$ui.appPanel.reload);
                 } else if (data.id == 'settheme') {
-                    var iframe, src;
-                    Ox.Theme(value);
                     pandora.UI.set({theme: value});
-                    iframe = Ox.UI.elements[$('#embed').data('oxid')];
-                    if (iframe) {
-                        src = iframe.attr('src');
-                        if (src && Ox.parseURL(src).hostname == document.location.hostname) {
-                            iframe.postMessage('settheme', {theme: value});
-                        }
-                    }
+                    pandora.setTheme(value);
                 } else if (data.id == 'showsiteposters') {
                     pandora.UI.set({showSitePosters: data.checked});
                 } else if (Ox.startsWith(data.id, 'sortfilter')) {
