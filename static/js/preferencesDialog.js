@@ -2,7 +2,8 @@
 
 pandora.ui.preferencesDialog = function() {
 
-    var tabs = [
+    var isReloading = false,
+        tabs = [
             {id: 'account', title: Ox._('Account')},
             {id: 'appearance', title: Ox._('Appearance')},
             {id: 'advanced', title: Ox._('Advanced')}
@@ -133,7 +134,8 @@ pandora.ui.preferencesDialog = function() {
                                         change: function(data) {
                                             pandora.UI.set({locale: data.value});
                                             pandora.setLocale(data.value, function() {
-                                                $dialog.remove();
+                                                isReloading = true;
+                                                $dialog.close();
                                                 pandora.$ui.appPanel.reload();
                                             });
                                         }
@@ -207,7 +209,9 @@ pandora.ui.preferencesDialog = function() {
         })
         .bindEvent({
             close: function() {
-                pandora.user.ui.page == 'preferences' && pandora.UI.set({page: ''});
+                if (pandora.user.ui.page == 'preferences' && !isReloading) {
+                    pandora.UI.set({page: ''});
+                }
             },
             'pandora_part.preferences': function(data) {
                 if (pandora.user.ui.page == 'preferences') {
