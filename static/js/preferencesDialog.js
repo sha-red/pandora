@@ -132,7 +132,10 @@ pandora.ui.preferencesDialog = function() {
                                     .bindEvent({
                                         change: function(data) {
                                             pandora.UI.set({locale: data.value});
-                                            pandora.setLocale(data.value, pandora.$ui.appPanel.reload);
+                                            pandora.setLocale(data.value, function() {
+                                                $dialog.remove();
+                                                pandora.$ui.appPanel.reload();
+                                            });
                                         }
                                     })
                             ]
