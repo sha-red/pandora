@@ -24,8 +24,8 @@ pandora.ui.errorDialog = function(data) {
                     }
                 })
             ],
+            content: Ox._('Sorry, you have made an unauthorized request.'),
             keys: {enter: 'close', escape: 'close'},
-            text: Ox._('Sorry, you have made an unauthorized request.'),
             title: Ox.toTitleCase(data.status.text)
         })
         .addClass('OxErrorDialog')
@@ -62,12 +62,12 @@ pandora.ui.errorDialog = function(data) {
                                 }
                             })
                     ]),
-                    keys: {enter: 'close', escape: 'close'},
-                    text: Ox._('Sorry, a server {0}'
+                    content: Ox._('Sorry, a server {0}'
                         + ' occured while handling your request.'
                         + ' To help us find out what went wrong,'
                         + ' you may want to report this error to an administrator.'
                         + ' Otherwise, please try again later.', [error]),
+                    keys: {enter: 'close', escape: 'close'},
                     title: Ox._('Server {0}', [Ox.toTitleCase(error)])
                 })
                 .addClass('OxErrorDialog')

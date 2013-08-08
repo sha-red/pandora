@@ -35,7 +35,7 @@ pandora.ui.annotationDialog = function(layer) {
                     })
                 ]
             ),
-            text: Ox._('To add or edit {0}, ' + (
+            content: Ox._('To add or edit {0}, ' + (
                 isEditor
                 ? 'please sign up or sign in.'
                 : 'just switch to the editor.'

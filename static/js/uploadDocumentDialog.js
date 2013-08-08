@@ -124,8 +124,8 @@ pandora.ui.uploadDocumentDialog = function(file, callback) {
                         }
                     })
             ],
-            title: Ox._('Upload File'),
-            text: text
+            content: text,
+            title: Ox._('Upload File')
         });
     }
 

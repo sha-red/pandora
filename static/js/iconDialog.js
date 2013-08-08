@@ -4,9 +4,9 @@ pandora.ui.iconDialog = function(options) {
 
     var options = Ox.extend({
                 closeButton: false,
+                content: '',
                 height: 128,
                 keys: null,
-                text: '',
                 title: '',
                 width: 368,
             }, options),
@@ -21,10 +21,13 @@ pandora.ui.iconDialog = function(options) {
                         .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
                 )
                 .append(
-                    $('<div>')
+                    Ox.isObject(options.content)
+                    ? options.content
+                        .css({position: 'absolute', left: '96px', top: '16px', width: options.width - 112 + 'px'})
+                    : $('<div>')
                         .addClass('OxTextPage')
                         .css({position: 'absolute', left: '96px', top: '16px', width: options.width - 112 + 'px'})
-                        .html(options.text)
+                        .html(options.content)
                 ),
             fixedSize: true,
             height: options.height,

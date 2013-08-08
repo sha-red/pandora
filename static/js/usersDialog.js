@@ -897,10 +897,10 @@ pandora.ui.usersDialog = function() {
                             }
                         })
                     ],
-                    keys: {enter: 'close', escape: 'close'},
-                    text: result.status.code == 200
+                    content: result.status.code == 200
                         ? Ox._('Your message has been sent.')
                         : Ox._('Your message could not be sent. Please try again.'),
+                    keys: {enter: 'close', escape: 'close'},
                     title: result.status.code == 200
                         ? Ox._('Message Sent')
                         : Ox._('Application Error')

@@ -371,7 +371,7 @@ pandora.ui.folders = function(section) {
                             }
                         })
                     ],
-                    text: text,
+                    content: text,
                     title: title
                 }).open();
             }

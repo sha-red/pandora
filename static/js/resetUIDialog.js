@@ -26,8 +26,8 @@ pandora.ui.resetUIDialog = function(data) {
                     }
                 })
         ],
+        content: Ox._('Are you sure you want to reset all UI settings?'),
         keys: {enter: 'reset', escape: 'cancel'},
-        text: Ox._('Are you sure you want to reset all UI settings?'),
         title: Ox._('Reset UI Settings')
     });
 

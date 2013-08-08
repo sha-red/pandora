@@ -50,9 +50,11 @@ pandora.ui.metadataDialog = function(data) {
                         }
                     })
             ],
+            content: Ox._(
+                'To update the metadata for this {0}, please enter its IMDb ID.',
+                [pandora.site.itemName.singular.toLowerCase()]
+            ),
             keyboard: {enter: 'update', escape: 'close'},
-            text: Ox._('To update the metadata for this {0}, please enter its IMDb ID.',
-                [pandora.site.itemName.singular.toLowerCase()]),
             title: Ox._('Update Metadata')
         });
     }
@@ -130,9 +132,7 @@ pandora.ui.metadataDialog = function(data) {
                         }
                     })
             ],
-            height: 192,
-            keyboard: {enter: 'update', escape: 'cancel'},
-            text: Ox._('Are you sure you want to update the value'
+            content: Ox._('Are you sure you want to update the value'
                 + (updateKeys.length == 1 ? '' : 's')
                 + ' for {0}?', [updateKeys.map(function(key, index) {
                     return (
@@ -140,7 +140,10 @@ pandora.ui.metadataDialog = function(data) {
                         : index < updateKeys.length - 1 ? ', '
                         : ' ' + Ox._('and') + ' '
                     ) + getTitle(key)
-                }).join('')]),
+                }).join('')]
+            ),
+            height: 192,
+            keyboard: {enter: 'update', escape: 'cancel'},            
             title: Ox._('Update Metadata')
         });
     }

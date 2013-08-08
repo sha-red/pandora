@@ -50,9 +50,9 @@ pandora.ui.deleteListDialog = function(list) {
                     }
                 })
             ],
-            keys: {enter: 'delete', escape: 'keep'},
-            text: Ox._('Are you sure you want to delete the {0} "{1}"?',
+            content: Ox._('Are you sure you want to delete the {0} "{1}"?',
                 [folderItem.toLowerCase(), listData.name]),
+            keys: {enter: 'delete', escape: 'keep'},
             title: Ox._('Delete {0}', [folderItem])
         });
 

@@ -121,8 +121,8 @@ pandora.ui.contactForm = function() {
                                     }
                                 })
                             ],
+                            content: Ox._('Thanks for your message!<br/><br/>We will get back to you as soon as possible.'),
                             keys: {enter: 'close', escape: 'close'},
-                            text: Ox._('Thanks for your message!<br/><br/>We will get back to you as soon as possible.'),
                             title: Ox._('Message Sent')
                         })
                         .open();

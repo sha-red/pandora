@@ -23,9 +23,9 @@ pandora.ui.makeListPrivateDialog = function(name, subscribers, callback) {
                     }
                 })
             ],
-            keys: {enter: 'make', escape: 'keep'},
-            text: Ox._('Are you sure you want to make the list "{0}" private and lose its {1}?',
+            content: Ox._('Are you sure you want to make the list "{0}" private and lose its {1}?',
                 [name, subscribers == 1 ? Ox._('subscriber') : Ox._('{0} subscribers', [subscribers])]),
+            keys: {enter: 'make', escape: 'keep'},
             title: Ox._('Make List Private')
         });
 

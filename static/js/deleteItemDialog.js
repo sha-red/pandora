@@ -28,10 +28,10 @@ pandora.ui.deleteItemDialog = function(item) {
                     }
                 })
             ],
-            keys: {enter: 'delete', escape: 'keep'},
-            text: Ox._('Are you sure you want to delete the {0} "{1}"?'
+            content: Ox._('Are you sure you want to delete the {0} "{1}"?'
                 + '<br><br>All data will be removed.',
                 [Ox._(pandora.site.itemName.singular), item.title]),
+            keys: {enter: 'delete', escape: 'keep'},
             title: Ox._('Delete {0}', [Ox._(pandora.site.itemName.singular)])
         });
 
