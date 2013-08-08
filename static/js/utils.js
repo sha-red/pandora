@@ -383,7 +383,7 @@ pandora.createLinks = function($element) {
                 }
             });
         } else {
-            pandora.api.addClips({clips: getClipData(items), edit: target, index: -1}, callback);
+            pandora.api.addClips({clips: getClipData(items), edit: target, index: 0}, callback);
         }
     }
 
