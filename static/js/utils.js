@@ -264,25 +264,24 @@ pandora.createLinks = function($element) {
         return target.hostname != document.location.hostname
             || Ox.startsWith(target.pathname, '/static');
     } 
-    $element
-        .on({
-            click: function(e) {
-                var $target = $(e.target);
-                if (
-                    $target.is('a')
-                    && !$($target.parent()).is('.OxEditable')
-                    && !$($target.parent()).is('.OxEditableContent')
-                ) {
-                    e.preventDefault();
-                    if (isExternalLink(e.target)) {
-                        window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
-                    } else {
-                        pandora.clickLink(e);
-                    }
+    $element.on({
+        click: function(e) {
+            var $target = $(e.target);
+            if (
+                $target.is('a')
+                && !$($target.parent()).is('.OxEditable')
+                && !$($target.parent()).is('.OxEditableContent')
+            ) {
+                e.preventDefault();
+                if (isExternalLink(e.target)) {
+                    window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
+                } else {
+                    pandora.clickLink(e);
                 }
-                return false;
             }
-        });
+            return false;
+        }
+    });
 };
 
 (function() {
