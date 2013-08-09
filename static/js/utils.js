@@ -293,20 +293,21 @@ pandora.createLinks = function($element) {
             addItems(items, targets[0], addToHistory);
         } else if (action == 'cut' || action == 'delete') {
             removeItems(items, targets[0], addToHistory);
+        } else if (action == 'join' || action == 'split') {
+            removeItems(items[0], targets[0], function() {
+                addItems(items[1], targets[0], addToHistory);
+            });
         } else if (action == 'move') {
             removeItems(items, targets[0], function() {
                 addItems(items, targets[1], addToHistory);
             });
-        } else if (action == 'split' || action == 'join') {
-            removeItems(items[0], targets[0], function() {
-                addItems(items[1], targets[0], addToHistory);
-            });
-        }
+        } 
         function addToHistory(result, addedItems) {
             var actions = {
                     copy: 'Copying',
                     cut: 'Cutting',
                     'delete': 'Deleting',
+                    edit: 'Editing',
                     join: 'Joining',
                     move: 'Moving',
                     paste: 'Pasting',
@@ -339,6 +340,10 @@ pandora.createLinks = function($element) {
                 addItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'cut' || object.action == 'delete') {
                 removeItems(object.items[0], object.targets[0], done);
+            } else if (object.action == 'join' || object.action == 'split') {
+                removeItems(object.items[0], object.targets[0], function() {
+                    addItems(object.items[1], object.targets[0], done);
+                });
             } else if (object.action == 'move') {
                 removeItems(object.items[0], object.targets[0], function() {
                     addItems(object.items[1], object.targets[1], done);
@@ -357,6 +362,10 @@ pandora.createLinks = function($element) {
                 removeItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'cut' || object.action == 'delete') {
                 addItems(object.items[0], object.targets[0], done);
+            } else if (object.action == 'join' || object.action == 'split') {
+                removeItems(object.items[1], object.targets[0], function() {
+                    addItems(object.items[0], object.targets[0], done);
+                });
             } else if (object.action == 'move') {
                 removeItems(object.items[1], object.targets[1], function() {
                     addItems(object.items[0], object.targets[0], done);
@@ -423,7 +432,11 @@ pandora.createLinks = function($element) {
                 setTimeout(pandora.reloadList, 250);
             }
         } else if (type == 'clip' && ui.section == 'edits') {
-            // FIXME: update edit list and reload clip list
+            // FIXME: update edit list (once it has item count)
+            Ox.Request.clearCache('getEdit');
+            if (Ox.contains(object.targets, ui.edit)) {
+                pandora.$ui.editPanel.updatePanel();
+            }
         }
         callback && callback();
     }
@@ -459,7 +472,9 @@ pandora.createLinks = function($element) {
     }
 
     function getType(items) {
-        return items[0] && Ox.contains(items[0], '/') ? 'clip' : 'item';
+        return items[0] && (
+            Ox.contains(items[0], '/') || Ox.contains(items[0][0], '/')
+        ) ? 'clip' : 'item';
     }
 
     function removeItems(items, target, callback) {
