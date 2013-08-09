@@ -29,10 +29,7 @@ pandora.ui.editPanel = function() {
 
     function getClips(ids) {
         return ids.map(function(id) {
-            var clip = Ox.getObjectById(edit.clips, id);
-            return (
-                clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out
-            ) + '/' + id;
+            return Ox.getObjectById(edit.clips, id);
         });
     }
 
@@ -118,42 +115,33 @@ pandora.ui.editPanel = function() {
                 })
                 .bindEvent({
                     copy: function(data) {
-                        pandora.clipboard.copy(getClips(data.ids), 'clip');
+                        pandora.clipboard.copy(serializeClips(data.ids), 'clip');
                     },
                     copyadd: function(data) {
-                        pandora.clipboard.add(getClips(data.ids), 'clip');
+                        pandora.clipboard.add(serializeClips(data.ids), 'clip');
                     },
                     cut: function(data) {
-                        var clips;
-                        if (edit.editable) {
-                            clips = getClips(data.ids);
-                            pandora.clipboard.copy(clips, 'clip');
-                            pandora.doHistory('cut', clips, ui.edit, function(result) {
-                                Ox.Request.clearCache('getEdit');
-                                updateClips(result.data.clips);
-                            });
-                        }
+                        var clips = serializeClips(data.ids);
+                        pandora.clipboard.copy(clips, 'clip');
+                        pandora.doHistory('cut', clips, ui.edit, function(result) {
+                            Ox.Request.clearCache('getEdit');
+                            updateClips(result.data.clips);
+                        });
                     },
                     cutadd: function(data) {
-                        var clips;
-                        if (edit.editable) {
-                            clips = getClips(data.ids);
-                            pandora.clipboard.add(clips, 'clip');
-                            pandora.doHistory('cut', clips, ui.edit, function(result) {
-                                Ox.Request.clearCache('getEdit');
-                                updateClips(result.data.clips);
-                            });
-                        }
+                        var clips = serializeClips(data.ids);
+                        pandora.clipboard.add(clips, 'clip');
+                        pandora.doHistory('cut', clips, ui.edit, function(result) {
+                            Ox.Request.clearCache('getEdit');
+                            updateClips(result.data.clips);
+                        });
                     },
                     'delete': function(data) {
-                        var clips;
-                        if (edit.editable) {
-                            clips = getClips(data.ids);
-                            pandora.doHistory('delete', clips, ui.edit, function(result) {
-                                Ox.Request.clearCache('getEdit');
-                                updateClips(result.data.clips);
-                            });
-                        }                        
+                        var clips = serializeClips(data.ids);
+                        pandora.doHistory('delete', clips, ui.edit, function(result) {
+                            Ox.Request.clearCache('getEdit');
+                            updateClips(result.data.clips);
+                        });
                     },
                     edit: function(data) {
                         var args = {id: data.id},
@@ -182,6 +170,9 @@ pandora.ui.editPanel = function() {
                             });
                         });
                     },
+                    join: function(data) {
+                        Ox.print('JOIN', data);
+                    },
                     loop: function(data) {
                         pandora.UI.set({videoLoop: data.loop});
                     },
@@ -201,14 +192,11 @@ pandora.ui.editPanel = function() {
                         pandora.UI.set(editsKey('clip'), data.ids[0]);
                     },
                     paste: function() {
-                        var clips;
-                        if (pandora.clipboard.type() == 'clip') {
-                            clips = pandora.clipboard.paste();
-                            pandora.doHistory('paste', clips, ui.edit, function(result) {
-                                Ox.Request.clearCache('getEdit');
-                                updateClips(edit.clips.concat(result.data.clips));
-                            });
-                        }
+                        var clips = pandora.clipboard.paste();
+                        pandora.doHistory('paste', clips, ui.edit, function(result) {
+                            Ox.Request.clearCache('getEdit');
+                            updateClips(edit.clips.concat(result.data.clips));
+                        });
                     },
                     playing: function(data) {
                         var set = {};
@@ -266,6 +254,14 @@ pandora.ui.editPanel = function() {
                             });
                         }
                     },
+                    split: function(data) {
+                        var clips = [serializeClips(data.ids), serializeClips(data.split)];
+                        pandora.doHistory('split', clips, ui.edit, function(result) {
+                            updateClips(edit.clips.filter(function(clip) {
+                                return !Ox.contains(data.ids, clip.id);
+                            }).concat(result.data.clips));
+                        });
+                    },
                     subtitles: function(data) {
                         pandora.UI.set({videoSubtitles: data.subtitles});
                     },
@@ -308,7 +304,7 @@ pandora.ui.editPanel = function() {
             item: function(data, sort, size) {
                 size = size || 128;
                 var ui = pandora.user.ui,
-                    url = '/edit/' + data.id + '/icon'+size+'.jpg?' + data.modified,
+                    url = '/edit/' + data.id + '/icon' + size + '.jpg?' + data.modified,
                     info = Ox.formatDuration(data.duration);
                 return {
                     height: size,
@@ -317,7 +313,7 @@ pandora.ui.editPanel = function() {
                     info: info,
                     url: url,
                     width: size,
-                }
+                };
             },
             items: function(data, callback) {
                 pandora.api.findEdits(data, callback);
@@ -342,6 +338,18 @@ pandora.ui.editPanel = function() {
         });
         edit.clips = Ox.sortBy(edit.clips, 'index');
         updateVideos();
+    }
+
+    function serializeClips(clips) {
+        // can be ids or clips
+        return clips.map(function(clip) {
+            if (Ox.isString(clip)) {
+                clip = Ox.getObjectById(edit.clips, clip);
+            }
+            return (
+                clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out
+            ) + '/' + (clip.id || '');
+        });
     }
 
     function updateClips(clips) {
