@@ -295,12 +295,8 @@ pandora.ui.editPanel = function() {
             }
         });
         that.updatePanel = function() {
-            getEdit(function() {
-                that.options({
-                    clips: edit.clips,
-                    duration: edit.duration
-                });
-            });
+            Ox.Request.clearCache('getEdit');
+            getEdit(updateClips);
         };
         pandora.$ui.mainPanel.replaceElement(1, that);
         updateSmallTimelineURL();
@@ -364,6 +360,7 @@ pandora.ui.editPanel = function() {
     }
 
     function updateClips(clips) {
+        clips = clips || edit.clips;
         edit.clips = clips;
         edit.duration = 0;
         edit.clips.forEach(function(clip) {
@@ -372,6 +369,7 @@ pandora.ui.editPanel = function() {
         });
         that.options({
             clips: Ox.clone(clips),
+            duration: edit.duration,
             smallTimelineURL: getSmallTimelineURL(),
             video: getVideos()
         });
@@ -405,6 +403,7 @@ pandora.ui.editPanel = function() {
             edit.duration += clip.duration;
         });
         that.options({
+            duration: edit.duration,
             smallTimelineURL: getSmallTimelineURL(),
             video: getVideos()
         });
