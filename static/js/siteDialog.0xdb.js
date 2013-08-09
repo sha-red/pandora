@@ -94,7 +94,7 @@ pandora.ui.siteDialog = function(section) {
                                         marginTop: '8px'
                                     })
                                     .html(
-                                        '<b>' + name + '</b><br/><div style="padding-top: 2px; font-size: 9px; opacity: 0.75">'
+                                        '<b>' + name + '</b><br/><div style="padding: 2px 0 1px 0; font-size: 9px; opacity: 0.75">'
                                         + risk[i] + ' Risk'
                                         + (risk[i].length > 6 ? '<br/> of ' : ' of<br/>')
                                         + 'Legal Action</div>'
