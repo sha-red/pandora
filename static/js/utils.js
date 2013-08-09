@@ -433,7 +433,6 @@ pandora.createLinks = function($element) {
             }
         } else if (type == 'clip' && ui.section == 'edits') {
             // FIXME: update edit list (once it has item count)
-            Ox.Request.clearCache('getEdit');
             if (Ox.contains(object.targets, ui.edit)) {
                 pandora.$ui.editPanel.updatePanel();
             }
@@ -632,19 +631,11 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                             drag.action == 'move' && pandora.reloadList();
                         });
                     } else if (section == 'edits') {
-                        var clips = data.ids.map(function(id) {
-                            var split = id.split('/'),
-                                item = split[0];
-                            split = split[1].split('-');
-                            return {
-                                item: item,
-                                'in': parseFloat(split[0]),
-                                out: parseFloat(split[1]),
-                            };
-                        });
-                        pandora.doHistory(drag.action, clips, [pandora.user.ui.edit, drag.target.id], function() {
+                        var targets = drag.action == 'copy' ? drag.target.id
+                            : [pandora.user.ui.edit, drag.target.id];
+                        pandora.doHistory(drag.action, data.ids, targets, function() {
                             Ox.print('FIXME, reload clipslist on move');
-                            Ox.Request.clearCache('Edit');
+                            pandora.$ui.editPanel.updatePanel();
                             cleanup(250);
                         });
                     } 
