@@ -742,6 +742,7 @@ class Item(models.Model):
             'duration',
             'hue',
             'id',
+            'oxdbId',
             'lightness',
             'modified',
             'numberofannotations',
@@ -815,6 +816,7 @@ class Item(models.Model):
 
         #sort keys based on database, these will always be available
         s.itemId = self.itemId.replace('0x', 'xx')
+        s.oxdbId = self.oxdbId
         if not settings.USE_IMDB:
             s.itemId = ox.sort_string(str(ox.fromAZ(s.itemId)))
         s.modified = self.modified or datetime.now()
