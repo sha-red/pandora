@@ -297,25 +297,33 @@ pandora.createLinks = function($element) {
             removeItems(items, targets[0], function() {
                 addItems(items, targets[1], addToHistory);
             });
+        } else if (action == 'split' || action == 'join') {
+            removeItems(items[0], targets[0], function() {
+                addItems(items[1], targets[0], addToHistory);
+            });
         }
         function addToHistory(result, addedItems) {
             var actions = {
                     copy: 'Copying',
                     cut: 'Cutting',
                     'delete': 'Deleting',
+                    join: 'Joining',
                     move: 'Moving',
-                    paste: 'Pasting'
+                    paste: 'Pasting',
+                    split: 'Splitting'
                 },
+                length = action == 'join' || action == 'split' ? items[0].length : items.length,
                 type = getType(items),
                 text = Ox._(actions[action]) + ' ' + (
-                    items.length == 1 ? Ox._(type == 'item' ? pandora.site.itemName.singular : 'Clip')
-                    : items.length + ' ' + Ox._(type == 'item' ? pandora.site.itemName.plural : 'Clips')
+                    length == 1 ? Ox._(type == 'item' ? pandora.site.itemName.singular : 'Clip')
+                    : length + ' ' + Ox._(type == 'item' ? pandora.site.itemName.plural : 'Clips')
                 );
             pandora.history.add({
                 action: action,
                 items: action == 'cut' || action == 'delete' ? [items]
                     : action == 'copy' || action == 'paste' ? [addedItems]
-                    : [items, addedItems],
+                    : action == 'move' ? [items, addedItems]
+                    : [items],
                 positions: [],
                 targets: targets,
                 text: text
@@ -383,7 +391,9 @@ pandora.createLinks = function($element) {
                 }
             });
         } else {
-            pandora.api.addClips({clips: getClipData(items), edit: target, index: 0}, callback);
+            pandora.api.addClips({clips: getClipData(items), edit: target, index: 0}, function(result) {
+                callback(result, getClipItems(result.data.clips));
+            });
         }
     }
 
@@ -437,6 +447,14 @@ pandora.createLinks = function($element) {
     function getClipIds(items) {
         return items.map(function(clip) {
             return clip.split('/').pop();
+        });
+    }
+
+    function getClipItems(clips) {
+        return clips.map(function(clip) {
+            return (
+                clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out
+            ) + '/' + (clip.id || '');
         });
     }
 
