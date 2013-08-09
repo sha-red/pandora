@@ -323,8 +323,8 @@ pandora.createLinks = function($element) {
                 action: action,
                 items: action == 'cut' || action == 'delete' ? [items]
                     : action == 'copy' || action == 'paste' ? [addedItems]
-                    : action == 'move' ? [items, addedItems]
-                    : [items],
+                    : action == 'join' || action == 'split' ? [items[0], addedItems]
+                    : [items, addedItems], // move
                 positions: [],
                 targets: targets,
                 text: text
@@ -350,7 +350,10 @@ pandora.createLinks = function($element) {
                 });
             }
         }
-        function done() {
+        function done(result, addedItems) {
+            if (object.action == 'join' || object.action == 'split') {
+                object.items[1] = addedItems;
+            }
             doneHistory(object, callback);
         }
     };
@@ -372,7 +375,10 @@ pandora.createLinks = function($element) {
                 });
             }
         }
-        function done() {
+        function done(result, addedItems) {
+            if (object.action == 'join' || object.action == 'split') {
+                object.items[0] = addedItems;
+            }
             doneHistory(object, callback);
         }
     };
