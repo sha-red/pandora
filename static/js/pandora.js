@@ -324,6 +324,7 @@ appPanel
             'in': 0,
             out: 0,
             position: 0,
+            selection: [],
             sort: [{key: 'index', operator: '+'}],
             view: 'list'
         };
