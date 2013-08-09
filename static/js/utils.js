@@ -293,6 +293,8 @@ pandora.createLinks = function($element) {
             addItems(items, targets[0], addToHistory);
         } else if (action == 'cut' || action == 'delete') {
             removeItems(items, targets[0], addToHistory);
+        } else if (action == 'edit') {
+            editItem(items[1], addToHistory);
         } else if (action == 'join' || action == 'split') {
             removeItems(items[0], targets[0], function() {
                 addItems(items[1], targets[0], addToHistory);
@@ -313,7 +315,9 @@ pandora.createLinks = function($element) {
                     paste: 'Pasting',
                     split: 'Splitting'
                 },
-                length = action == 'join' || action == 'split' ? items[0].length : items.length,
+                length = action == 'edit' ? 1
+                    : action == 'join' || action == 'split' ? items[0].length
+                    : items.length,
                 type = getType(items),
                 text = Ox._(actions[action]) + ' ' + (
                     length == 1 ? Ox._(type == 'item' ? pandora.site.itemName.singular : 'Clip')
@@ -323,6 +327,7 @@ pandora.createLinks = function($element) {
                 action: action,
                 items: action == 'cut' || action == 'delete' ? [items]
                     : action == 'copy' || action == 'paste' ? [addedItems]
+                    : action == 'edit' ? items
                     : action == 'join' || action == 'split' ? [items[0], addedItems]
                     : [items, addedItems], // move
                 positions: [],
@@ -340,6 +345,8 @@ pandora.createLinks = function($element) {
                 addItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'cut' || object.action == 'delete') {
                 removeItems(object.items[0], object.targets[0], done);
+            } else if (object.action == 'edit') {
+                editItem(object.items[1], done);
             } else if (object.action == 'join' || object.action == 'split') {
                 removeItems(object.items[0], object.targets[0], function() {
                     addItems(object.items[1], object.targets[0], done);
@@ -350,7 +357,7 @@ pandora.createLinks = function($element) {
                 });
             }
         }
-        function done(result, addedItems) {
+        function done() {
             doneHistory(object, callback);
         }
     };
@@ -362,6 +369,8 @@ pandora.createLinks = function($element) {
                 removeItems(object.items[0], object.targets[0], done);
             } else if (object.action == 'cut' || object.action == 'delete') {
                 addItems(object.items[0], object.targets[0], done);
+            } else if (object.action == 'edit') {
+                editItem(object.items[0], done);
             } else if (object.action == 'join' || object.action == 'split') {
                 removeItems(object.items[1], object.targets[0], function() {
                     addItems(object.items[0], object.targets[0], done);
@@ -372,7 +381,7 @@ pandora.createLinks = function($element) {
                 });
             }
         }
-        function done(result, addedItems) {
+        function done() {
             doneHistory(object, callback);
         }
     };
@@ -410,7 +419,7 @@ pandora.createLinks = function($element) {
 
     function doneHistory(object, callback) {
         var list, listData,
-            type = getType(object.items[0]),
+            type = getType(object.items),
             ui = pandora.user.ui;
         if (type == 'item' && ui.section == 'items') {
             Ox.Request.clearCache('find');
@@ -440,6 +449,16 @@ pandora.createLinks = function($element) {
             }
         }
         callback && callback();
+    }
+
+    function editItem(item, callback) {
+        var clip = getClipData([item])[0],
+            id = getClipIds([item])[0];
+        pandora.api.editClip({
+            id: id,
+            'in': clip['in'],
+            out: clip.out
+        }, callback);
     }
 
     function getClipData(items) {
@@ -473,9 +492,7 @@ pandora.createLinks = function($element) {
     }
 
     function getType(items) {
-        return items[0] && (
-            Ox.contains(items[0], '/') || Ox.contains(items[0][0], '/')
-        ) ? 'clip' : 'item';
+        return Ox.contains(items[0], '/') || Ox.contains(items[0][0], '/') ? 'clip' : 'item';
     }
 
     function removeItems(items, target, callback) {
