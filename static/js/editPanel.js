@@ -155,14 +155,17 @@ pandora.ui.editPanel = function() {
                     data.value += clip['in'];
                 }
                 pandora.api.get({id: clip.item, keys: ['duration']}, function(result) {
-                    data.value = Math.min(data.value, result.data.duration);
-                    args[data.key] = data.value;
-                    if (data.key == 'in' && data.value > clip.out) {
-                        args.out = args['in'];
-                    } else if (data.key == 'out' && data.value < clip['in']) {
-                        args['in'] = args.out;
+                    var clips;
+                    if (data.key == 'out') {
+                        data.value = Math.min(data.value, result.data.duration);
                     }
-                    pandora.api.editClip(args, function(result) {
+                    clips = serializeClips([data.id]).concat(serializeClips([{
+                        id: data.id,
+                        'in': data.key == 'in' ? data.value : clip['in'],
+                        item: clip.item,
+                        out: data.key == 'out' ? data.value : clip.out
+                    }]));
+                    pandora.doHistory('edit', clips, ui.edit, function(result) {
                         if (result.status.code == 200) {
                             edit.clips[index] = result.data;
                             that.updateClip(data.id, result.data);
@@ -368,7 +371,7 @@ pandora.ui.editPanel = function() {
             edit.duration += clip.duration;
         });
         that.options({
-            clips: Ox.clone(clips),
+            clips: Ox.clone(edit.clips),
             duration: edit.duration,
             smallTimelineURL: getSmallTimelineURL(),
             video: getVideos()
