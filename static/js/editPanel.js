@@ -46,9 +46,21 @@ pandora.ui.editPanel = function() {
         });
     }
 
+    function getSmallTimelineCanvas() {
+        var fps = getSmallTimelineFPS(),
+            width = Math.ceil(edit.duration * fps),
+            height = fps == 1 ? 16 : 64;
+        return Ox.$('<canvas>').attr({width: width, height: height})[0];
+    }
+
+    function getSmallTimelineFPS() {
+        return Math.floor(edit.duration * 25) < 32768 ? 25 : 1;
+    }
+
     function getSmallTimelineURL() {
-        var width = Math.ceil(edit.duration),
-            height = 16;
+        var fps = getSmallTimelineFPS(),
+            width = Math.ceil(edit.duration * fps),
+            height = fps == 1 ? 16 : 64;
         smallTimelineCanvas = Ox.$('<canvas>').attr({width: width, height: height})[0];
         smallTimelineContext = smallTimelineCanvas.getContext('2d');
         return smallTimelineCanvas.toDataURL();
@@ -384,14 +396,19 @@ pandora.ui.editPanel = function() {
     }
 
     function updateSmallTimelineURL() {
+        var canvas = getSmallTimelineCanvas(),
+            context = canvas.getContext('2d'),
+            fps = getSmallTimelineFPS();
         Ox.serialForEach(edit.clips, function(clip) {
             var callback = Ox.last(arguments);
-            pandora.getSmallClipTimelineURL(clip.item, clip['in'], clip.out, ui.videoTimeline, function(url) {
+            pandora[
+                fps == 1 ? 'getSmallClipTimelineURL' : 'getLargeClipTimelineURL'
+            ](clip.item, clip['in'], clip.out, ui.videoTimeline, function(url) {
                 var image = Ox.$('<img>')
                     .on({
                         load: function() {
-                            smallTimelineContext.drawImage(image, Math.floor(clip.position), 0);
-                            that.options({smallTimelineURL: smallTimelineCanvas.toDataURL()});
+                            context.drawImage(image, Math.floor(clip.position * fps), 0);
+                            that.options({smallTimelineURL: canvas.toDataURL()});
                             callback();
                         }
                     })
