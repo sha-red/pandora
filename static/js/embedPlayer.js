@@ -22,6 +22,7 @@ pandora.ui.embedPlayer = function() {
             width: window.innerWidth
         },
         options = getOptions(),
+        removed = false,
         video,
         $innerPanel, $outerPanel,
         $title, $player, $controls, $timeline, $annotations;
@@ -30,7 +31,9 @@ pandora.ui.embedPlayer = function() {
         'duration', 'durations', 'layers', 'parts', 'posterFrame',
         'rightslevel', 'size', 'title', 'videoRatio'
     ]}, function(result) {
-
+        if (removed) {
+            return;
+        }
         video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
 
         var isFrame = options['in'] !== void 0 && (
@@ -319,6 +322,15 @@ pandora.ui.embedPlayer = function() {
         options.showTimeline && $timeline.options({position: position});
         options.showAnnotations && $annotations.options({position: position});
     }
+
+    that.reloadPanel = function(data) {
+        if (Ox.isUndefined(data) || data.value != data.previousValue) {
+            removed = true;
+            pandora.$ui.embedPanel.replaceWith(pandora.$ui.embedPanel = pandora.ui.embedPanel());
+            return pandora.$ui.ui.embedPanel;
+        }
+        return that;
+    };
 
     that.resizePanel = function() {
         var sizes = getSizes();

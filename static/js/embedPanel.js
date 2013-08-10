@@ -45,8 +45,12 @@ pandora.ui.embedPanel = function() {
         return that;
     };
 
-    that.reloadPanel = function() {
-        that.setElement(pandora.$ui.embedPanel = pandora.ui.embedPanel());
+    //only add reloadPanel if not defined by embed element
+    that.reloadPanel = that.reloadPanel || function(data) {
+        if (Ox.isUndefined(data) || data.value != data.previousValue) {
+            pandora.$ui.embedPanel.replaceWith(pandora.$ui.embedPanel = pandora.ui.embedPanel());
+            return pandora.$ui.ui.embedPanel;
+        }
         return that;
     };
 
