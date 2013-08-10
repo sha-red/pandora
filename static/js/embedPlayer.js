@@ -327,7 +327,7 @@ pandora.ui.embedPlayer = function() {
         if (Ox.isUndefined(data) || data.value != data.previousValue) {
             removed = true;
             pandora.$ui.embedPanel.replaceWith(pandora.$ui.embedPanel = pandora.ui.embedPanel());
-            return pandora.$ui.ui.embedPanel;
+            return pandora.$ui.embedPanel;
         }
         return that;
     };
