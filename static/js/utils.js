@@ -1211,7 +1211,7 @@ pandora.getItemTitle = function(itemData) {
 
 pandora.getLargeClipTimelineURL = function(item, inPoint, outPoint, type, callback) {
     var fps = 25,
-        width = Math.floor((outPoint - inPoint) * fps),
+        width = Math.ceil((outPoint - inPoint) * fps),
         height = 64,
         canvas = Ox.$('<canvas>').attr({width: width, height: height})[0],
         context = canvas.getContext('2d'),
