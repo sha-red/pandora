@@ -177,7 +177,12 @@ pandora.ui.editPanel = function() {
                 });
             },
             join: function(data) {
-                Ox.print('JOIN', data);
+                var clips = [serializeClips(data.ids), serializeClips(data.join)];
+                pandora.doHistory('join', clips, ui.edit, function(result) {
+                    updateClips(edit.clips.filter(function(clip) {
+                        return !Ox.contains(data.ids, clip.id);
+                    }).concat(result.data.clips));
+                });
             },
             loop: function(data) {
                 pandora.UI.set({videoLoop: data.loop});
