@@ -169,6 +169,8 @@ pandora.ui.siteDialog = function(section) {
             },
             resize: function(data) {
                 var selected = $tabPanel.selected();
+                dialogHeight = data.height;
+                dialogWidth = data.width;
                 if (selected == 'contact') {
                     pandora.$ui.contactForm.resize();
                 } else if (selected == 'news') {
