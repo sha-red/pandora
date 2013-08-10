@@ -33,7 +33,7 @@ appPanel
 
     // handle legacy embed and print URLs
     document.location.hash = document.location.hash.replace(
-        /^#(embed|print)=true(&)?/,
+        /^\?#(embed|print)=true(&)?/,
         function() {
             return '#' + arguments[1] + (arguments[2] ? '?' : '');
         }
