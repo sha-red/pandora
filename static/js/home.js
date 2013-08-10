@@ -265,7 +265,7 @@ pandora.ui.home = function() {
         that.animate({opacity: 0}, 500, function() {
             that.remove();
         });
-        pandora.$ui.tv && pandora.$ui.tv.unmute();
+        pandora.$ui.tv && pandora.$ui.tv.unmute().find('.OxControls.OxVolume').hide();
         return that;
     };
 

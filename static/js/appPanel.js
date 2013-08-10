@@ -59,9 +59,7 @@ pandora.ui.appPanel = function() {
                     pandora.$ui[dialog + 'Dialog'].close();
                 }
             });
-            if (pandora.$ui.tv) {
-                pandora.$ui.tv.fadeOutScreen();
-            }
+            pandora.$ui.tv && pandora.$ui.tv.fadeOutScreen();
         } else if (page == 'home') {
             if (pandora.$ui.appPanel) {
                 // unless we're on page load, show home screen
@@ -81,6 +79,8 @@ pandora.ui.appPanel = function() {
                     pandora.$ui[dialog + 'Dialog'].close();
                 }
             });
+            // remove tv (may be active behind home screen)
+            pandora.$ui.tv && pandora.$ui.tv.remove();
             if (Ox.getIndexById(pandora.site.sitePages, page) > -1 || page == 'software') {
                 if (pandora.$ui.siteDialog && pandora.$ui.siteDialog.is(':visible')) {
                     pandora.$ui.siteDialog.select(page);

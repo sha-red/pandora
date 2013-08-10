@@ -174,6 +174,7 @@ pandora.ui.tv = function() {
     that.mute = function() {
         muted = true;
         $player && $player.options({muted: muted});
+        return that;
     };
 
     that.showScreen = function() {
@@ -185,6 +186,7 @@ pandora.ui.tv = function() {
     that.unmute = function() {
         $player && $player.options({muted: pandora.user.ui.videoMuted});
         muted = false;
+        return that;
     };
 
     return that;
