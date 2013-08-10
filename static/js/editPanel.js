@@ -47,9 +47,8 @@ pandora.ui.editPanel = function() {
     }
 
     function getSmallTimelineURL() {
-        var fps = 25,
-            width = Math.floor(edit.duration * fps),
-            height = 64;
+        var width = Math.ceil(edit.duration),
+            height = 16;
         smallTimelineCanvas = Ox.$('<canvas>').attr({width: width, height: height})[0];
         smallTimelineContext = smallTimelineCanvas.getContext('2d');
         return smallTimelineCanvas.toDataURL();
@@ -385,14 +384,13 @@ pandora.ui.editPanel = function() {
     }
 
     function updateSmallTimelineURL() {
-        var fps = 25;
         Ox.serialForEach(edit.clips, function(clip) {
             var callback = Ox.last(arguments);
-            pandora.getLargeClipTimelineURL(clip.item, clip['in'], clip.out, ui.videoTimeline, function(url) {
+            pandora.getSmallClipTimelineURL(clip.item, clip['in'], clip.out, ui.videoTimeline, function(url) {
                 var image = Ox.$('<img>')
                     .on({
                         load: function() {
-                            smallTimelineContext.drawImage(image, Math.floor(clip.position * fps), 0);
+                            smallTimelineContext.drawImage(image, Math.floor(clip.position), 0);
                             that.options({smallTimelineURL: smallTimelineCanvas.toDataURL()});
                             callback();
                         }

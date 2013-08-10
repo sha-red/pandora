@@ -1251,11 +1251,16 @@ pandora.getLargeEditTimelineURL = function(edit, type, i, callback) {
             return false; // break
         }
         if (
-            timelineIn <= clipIn <= timelineOut
-            || timelineIn <= clipOut <= timelineOut
-            || (clipIn <= timelineIn && clipOut >= timelineOut)
+            (timelineIn <= clipIn && clipIn <= timelineOut)
+            || (timelineIn <= clipOut && clipOut <= timelineOut)
+            || (clipIn <= timelineIn && timelineOut <= clipOut)
         ) {
-            clips.push(clip);
+            clips.push({
+                'in': clip['in'] + (clipIn < timelineIn ? timelineIn - clipIn : 0),
+                item: clip.item,
+                offset: Math.floor(Math.max(clipIn - timelineIn, 0) * fps),
+                out: clip.out - (clipOut > timelineOut ? clipOut - timelineOut : 0)
+            });
         }
     });
     Ox.parallelForEach(clips, function(clip) {
@@ -1264,7 +1269,7 @@ pandora.getLargeEditTimelineURL = function(edit, type, i, callback) {
             var image = Ox.$('<img>')
                 .on({
                     load: function() {
-                        context.drawImage(image, Math.floor((clip.position - timelineIn) * fps), 0);
+                        context.drawImage(image, clip.offset, 0);
                         callback();
                     }
                 })
@@ -1394,6 +1399,31 @@ pandora.getPart = function(state, str, callback) {
     } else {
         callback();
     }
+};
+
+pandora.getSmallClipTimelineURL = function(item, inPoint, outPoint, type, callback) {
+    var width = Math.ceil(outPoint - inPoint),
+        height = 16,
+        canvas = Ox.$('<canvas>').attr({width: width, height: height})[0],
+        context = canvas.getContext('2d'),
+        inIndex = Math.floor(inPoint / 3600),
+        outIndex = Math.floor(outPoint / 3600),
+        offset = inPoint % 3600 * -1;
+    Ox.parallelForEach(Ox.range(inIndex, outIndex + 1), function(index, i) {
+        var callback = Ox.last(arguments),
+            image = Ox.$('<img>')
+                .on({
+                    load: function() {
+                        context.drawImage(image, offset + i * 3600, 0);
+                        callback();
+                    }
+                })
+                .attr({
+                    src: '/' + item + '/timeline' + type + '16p' + index + '.jpg'
+                })[0];
+    }, function() {
+        callback(canvas.toDataURL());
+    });
 };
 
 pandora.getSortKeyData = function(key) {
