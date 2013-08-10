@@ -237,6 +237,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
             type == 'map' && pandora.UI.set({mapSelection: data.name});
         } else {
             $list.options({
+                selected: []
+            }).options({
                 items: function(data, callback) {
                     callback({data: {items: data.keys ? [] : 0}});
                 }
