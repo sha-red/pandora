@@ -22,7 +22,7 @@ pandora.ui.userButton = function() {
             style: 'symbol',
             title: 'user',
             tooltip: Ox._(
-                isGuest ? 'Click to sign in or doubleclick to sign up'
+                isGuest ? 'Click to sign up or doubleclick to sign in'
                 : 'Click to open preferences or doubleclick to sign out'
             ),
             type: 'image'
@@ -32,10 +32,10 @@ pandora.ui.userButton = function() {
         })
         .bindEvent({
             singleclick: function() {
-                pandora.UI.set({page: isGuest ? 'signin' : 'preferences'});
+                pandora.UI.set({page: isGuest ? 'signup' : 'preferences'});
             },
             doubleclick: function() {
-                pandora.UI.set({page: isGuest ? 'signup' : 'signout'});
+                pandora.UI.set({page: isGuest ? 'signin' : 'signout'});
             }
         })
         .appendTo(that);
