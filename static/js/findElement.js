@@ -74,6 +74,7 @@ pandora.ui.findElement = function() {
                         autocompleteSelectMaxWidth: 256,
                         autocompleteSelectSubmit: true,
                         clear: true,
+                        clearTooltip: Ox._('Click to clear or doubleclick to reset query'),
                         id: 'input',
                         placeholder: findKey == 'advanced' ? Ox._('Edit Query...') : '',
                         value: findValue,
