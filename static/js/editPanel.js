@@ -102,7 +102,7 @@ pandora.ui.editPanel = function() {
             position: ui.edits[ui.edit].position,
             resolution: ui.videoResolution,
             scaleToFill: ui.videoScale == 'fill',
-            // selected: ...
+            selected: ui.edits[ui.edit].selection,
             showClips: ui.showClips,
             showTimeline: ui.showTimeline,
             smallTimelineURL: getSmallTimelineURL(),
@@ -244,6 +244,9 @@ pandora.ui.editPanel = function() {
             },
             scale: function(data) {
                 pandora.UI.set({videoScale: data.scale});
+            },
+            select: function(data) {
+                pandora.UI.set(editsKey('selection'), data.ids);
             },
             size: function(data) {
                 pandora.UI.set({clipSize: data.size});
