@@ -1284,10 +1284,11 @@ pandora.getLargeEditTimelineURL = function(edit, type, i, callback) {
 
 pandora.getListData = function(list) {
     var data = {}, folder;
-    if (pandora.user.ui.section == 'items') {
-        list = Ox.isUndefined(list) ? pandora.user.ui._list : list;
-    } else {
-        list = Ox.isUndefined(list) ? pandora.user.ui[pandora.user.ui.section.slice(0, -1)] : list;
+    if (Ox.isUndefined(list)) {
+        list = pandora.user.ui[
+            pandora.user.ui.section == 'items' ? '_list'
+            : pandora.user.ui.section.slice(0, -1)
+        ];
     }
     if (list && pandora.$ui.folderList) {
         Ox.forEach(pandora.$ui.folderList, function($list, id) {
