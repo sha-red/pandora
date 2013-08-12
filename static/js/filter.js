@@ -245,7 +245,10 @@ pandora.ui.filter = function(id) {
                 },
                 click: function(data) {
                     if (data.id == 'clearFilter') {
-                        that.clearFilter();
+                        // FIXME: List should trigger event on options change
+                        if (!Ox.isEmpty(that.options('selected'))) {
+                            that.options({selected: []}).triggerEvent('select', {ids: []});
+                        }
                     } else if (data.id == 'clearFilters') {
                         pandora.$ui.filters.clearFilters();
                     }
@@ -258,12 +261,6 @@ pandora.ui.filter = function(id) {
         width: '8px',
         height: '8px'
     });
-    that.clearFilter = function() {
-        // FIXME: List should trigger event on options change
-        if (!Ox.isEmpty(that.options('selected'))) {
-            that.options({selected: []}).triggerEvent('select', {ids: []});
-        }
-    };
     that.disableMenuItem = function(id) {
         $menu.disableItem(id);
     };
@@ -279,9 +276,16 @@ pandora.ui.filters = function() {
         $filters[i] = pandora.ui.filter(filter.id);
     });
     $filters.clearFilters = function() {
-        $filters.forEach(function($filter) {
-            $filter.clearFilter();
+        var find = Ox.clone(pandora.user.ui.find, true),
+            indices = pandora.user.ui._filterState.map(function(filterState) {
+                return filterState.index;
+            }).filter(function(index) {
+                return index > -1;
+            });
+        find.conditions = find.conditions.filter(function(condition, index) {
+            return !Ox.contains(indices, index);
         });
+        pandora.UI.set({find: find})
     };
     $filters.updateMenus = function() {
         var selected = $filters.map(function($filter) {
