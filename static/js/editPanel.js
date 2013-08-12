@@ -82,6 +82,7 @@ pandora.ui.editPanel = function() {
             clipSize: listSize,
             clipSort: ui.edits[ui.edit].sort,
             clipSortOptions: [/*...*/],
+            clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'C</span>',
             clipView: ui.edits[ui.edit].view,
             duration: edit.duration,
             editable: edit.editable,
@@ -123,6 +124,7 @@ pandora.ui.editPanel = function() {
                     })
                 ),
             timeline: ui.videoTimeline,
+            timelineTooltip: 'timeline <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'T</span>',
             video: getVideos(),
             volume: ui.videoVolume,
             width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
