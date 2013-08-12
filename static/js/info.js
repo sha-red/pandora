@@ -350,9 +350,19 @@ pandora.ui.listInfo = function() {
 };
 
 pandora.ui.posterInfo = function(data) {
-    var $poster = $('<img>')
+    var $poster = Ox.Element({
+                element: '<img>',
+                tooltip: function() {
+                    return Ox._('Open in Info View');
+                }
+            })
             .attr({src: '/' + data.id + '/poster512.jpg?' + data.modified})
-            .css(getPosterCSS()),
+            .css(getPosterCSS())
+            .bindEvent({
+                anyclick: function() {
+                    pandora.UI.set({item: data.id, itemView: 'info'});
+                }
+            }),
         $text = $('<div>')
             .css({
                 width: pandora.user.ui.sidebarSize - 8 + 'px',
