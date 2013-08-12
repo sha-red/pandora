@@ -97,7 +97,7 @@ pandora.ui.mainMenu = function() {
                             }) }
                         ] },
                         {},
-                        { id: 'filters', title: Ox._('Filters'), items: [
+                        { id: 'filters', title: Ox._('Filters'), disabled: ui.section != 'items', items: [
                             { id: 'clearfilters', title: Ox._('Clear Filters'), disabled: Ox.sum(ui._filterState.map(function(filterState) {
                                 return filterState.selected.length;
                             })) == 0, keyboard: 'shift alt control a' },
@@ -126,7 +126,7 @@ pandora.ui.mainMenu = function() {
                         { 
                             id: 'showfilters',
                             title: Ox._((ui.showFilters ? 'Hide' : 'Show') + ' Filters'),
-                            disabled: !!ui.item, keyboard: 'shift f'
+                            disabled: ui.section != 'items' || !!ui.item, keyboard: 'shift f'
                         },
                         { 
                             id: 'showbrowser',
