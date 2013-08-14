@@ -2212,7 +2212,7 @@ pandora.wait = function(taskId, callback, timeout) {
             state = conditions == 1 && indices.length == 1 ? {
                 index: indices[0],
                 key: find.conditions[indices[0]].key,
-                value: decodeURIComponent(find.conditions[indices[0]].value)
+                value: Ox.decodeURIComponent(find.conditions[indices[0]].value)
             } : {
                 index: -1,
                 key: conditions == 0 && indices.length == 0 ? '*' : 'advanced',

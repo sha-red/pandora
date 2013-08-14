@@ -274,7 +274,7 @@ Ox.load('UI', {
             options;
         vars.forEach(function(v) {
             var kv = v.split('='), k = kv[0], v = kv[1];
-            query[k] = decodeURIComponent(v);
+            query[k] = Ox.decodeURIComponent(v);
             if (query[k] == 'true') {
                 query[k] = true;
             } else if (query[k] == 'false') {
