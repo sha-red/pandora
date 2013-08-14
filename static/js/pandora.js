@@ -47,6 +47,8 @@ appPanel
             && !(Math.round(navigator.userAgent.match(/MSIE (\d+)/)[1]) >= 10),
         isPrint = /^#print(\?.*?)?$/.test(document.location.hash),
         legacyThemes = {classic: 'oxlight', modern: 'oxdark'},
+        logoHeight,
+        logoWidth,
         theme = getLocalStorage('Ox.theme')
             && JSON.parse(localStorage['Ox.theme']) || 'oxmedium';
 
@@ -82,26 +84,27 @@ appPanel
         var images = {};
         images.logo = document.createElement('img');
         images.logo.onload = function() {
-            var ratio = images.logo.width / images.logo.height,
-                width = isEmbed || isPrint ? 96 : 320,
-                height = width / ratio;
+            var ratio = images.logo.width / images.logo.height;
+            logoWidth = isEmbed || isPrint ? 96 : 320;
+            logoHeight = Math.round(logoWidth / ratio);
+            console.log(images.logo.width, images.logo.height, '.....', logoHeight)
             images.logo.style.position = 'absolute';
             images.logo.style.left = 0;
             images.logo.style.top = 0;
             images.logo.style.right = 0;
-            images.logo.style.bottom = height + 'px';
-            images.logo.style.width = width + 'px';
-            images.logo.style.height = height + 'px';
+            images.logo.style.bottom = logoHeight + 'px';
+            images.logo.style.width = logoWidth + 'px';
+            images.logo.style.height = logoHeight + 'px';
             images.logo.style.margin = 'auto';
             if (!isMSIE) {
                 images.reflection = document.createElement('img');
                 images.reflection.style.position = 'absolute';
                 images.reflection.style.left = 0;
-                images.reflection.style.top = height + 'px';
+                images.reflection.style.top = logoHeight + 'px';
                 images.reflection.style.right = 0;
                 images.reflection.style.bottom = 0;
-                images.reflection.style.width = width + 'px';
-                images.reflection.style.height = height + 'px';
+                images.reflection.style.width = logoWidth + 'px';
+                images.reflection.style.height = logoHeight + 'px';
                 images.reflection.style.margin = 'auto';
                 images.reflection.style.MozTransform = 'scaleY(-1)';
                 images.reflection.style.MSTransform = 'scaleY(-1)';
@@ -129,16 +132,17 @@ appPanel
 
     function loadScreen(images) {
         
+        var gradient, loadingScreen;
         if (!isMSIE) {
-            var gradient = document.createElement('div');
+            gradient = document.createElement('div');
             gradient.style.position = 'absolute';
             gradient.style.left = 0;
-            gradient.style.top = isEmbed || isPrint ? '48px' : '160px';
+            gradient.style.top = logoHeight + 'px';
             gradient.style.right = 0;
             gradient.style.bottom = 0;
-            // FIXME: should be 320 and 160 - the values below are temporary fixes for Chrome 26
-            gradient.style.width = isEmbed || isPrint ? '98px' : '322px';
-            gradient.style.height = isEmbed || isPrint ? '50px' : '162px';
+            // + 2 is a temporary fix for Chrome 26
+            gradient.style.width = logoWidth + 2 + 'px' 
+            gradient.style.height = logoHeight + 2 + 'px';
             gradient.style.margin = 'auto';
             ['-moz-', '-ms-', '-o-', '-webkit-', ''].forEach(function(prefix) {
                 gradient.style.background = theme == 'oxlight' ? prefix + 'linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
@@ -147,7 +151,7 @@ appPanel
 
             });
         }
-        var loadingScreen = document.createElement('div');
+        loadingScreen = document.createElement('div');
         loadingScreen.setAttribute('id', 'loadingScreen');
         loadingScreen.className = 'OxScreen';
         loadingScreen.style.position = 'absolute';
