@@ -183,7 +183,7 @@ pandora.ui.listInfo = function() {
         $icon = Ox.Element('<img>')
             .attr({
                 src: list
-                    ? '/' + folderItem.toLowerCase() + '/' + encodeURI(list) + '/icon256.jpg?' + Ox.uid()
+                    ? '/' + folderItem.toLowerCase() + '/' + encodeURIComponent(list) + '/icon256.jpg?' + Ox.uid()
                     : '/static/png/icon.png'
             })
             .css(getIconCSS())

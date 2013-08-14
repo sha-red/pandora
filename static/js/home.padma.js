@@ -561,7 +561,7 @@ pandora.ui.home = function() {
 
             function getImageURL(item) {
                 return '/' + item.type + '/' + item.user
-                    + ':' + encodeURI(item.name) + '/icon256.jpg?' + item.modified;
+                    + ':' + encodeURIComponent(item.name) + '/icon256.jpg?' + item.modified;
             }
 
             function getTooltip(item) {
