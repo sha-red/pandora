@@ -544,12 +544,12 @@ pandora.ui.listIconPanel = function(listData) {
                 posterFrames: posterFrames
             }, function() {
                 $icon.attr({
-                    src: '/' + folderItem.toLowerCase() + '/' + listData.id + '/icon256.jpg?' + Ox.uid()
+                    src: '/' + folderItem.toLowerCase() + '/' + encodeURI(listData.id) + '/icon256.jpg?' + Ox.uid()
                 });
                 pandora.$ui.folderList[listData.folder].$element
-                    .find('img[src*="/' + listData.id + '/"]')
+                    .find('img[src*="/' + encodeURI(listData.id) + '/"]')
                     .attr({
-                        src: '/' + folderItem.toLowerCase() + '/' + listData.id + '/icon.jpg?' + Ox.uid()
+                        src: '/' + folderItem.toLowerCase() + '/' + encodeURI(listData.id) + '/icon.jpg?' + Ox.uid()
                     });
                 pandora.$ui.info.updateListInfo();
             });
