@@ -319,7 +319,7 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({
                         find: {
                             conditions: data.checked ? [
-                                {key: 'list', value: data.id.slice(8), operator: '=='}
+                                {key: 'list', value: data.id.slice(8).replace(/\t/g, '_'), operator: '=='}
                             ] : [],
                             operator: '&'
                         }
@@ -603,7 +603,7 @@ pandora.ui.mainMenu = function() {
                     previousList = pandora.UI.getPrevious()._list;
                 if (list != previousList) {
                     that.uncheckItem(previousList == '' ? 'allitems' : 'viewlist' + previousList.replace(/_/g, Ox.char(9)));
-                    that.checkItem(list == '' ? 'allitems' : 'viewlist' + list.replace(/_/g, Ox.char(9)));
+                    that.checkItem(list == '' ? 'allitems' : 'viewlist' + list.replace(/_/g, '\t'));
                 }
                 that[action]('editlist');
                 that[action]('duplicatelist');
