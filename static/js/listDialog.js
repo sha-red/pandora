@@ -168,7 +168,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                     tooltip: Ox._('Doubleclick to edit icon')
                 })
                 .attr({
-                    src: '/' + folderItem.toLowerCase() + '/' + listData.id + '/icon256.jpg?' + Ox.uid()
+                    src: '/' + folderItem.toLowerCase() + '/' + encodeURI(listData.id) + '/icon256.jpg?' + Ox.uid()
                 })
                 .css({
                     position: 'absolute',
@@ -358,7 +358,7 @@ pandora.ui.listIconPanel = function(listData) {
         $iconPanel = Ox.Element(),
 
         $icon = $('<img>')
-            .attr({src: '/' + folderItem.toLowerCase() + '/' + listData.id + '/icon256.jpg?' + Ox.uid()})
+            .attr({src: '/' + folderItem.toLowerCase() + '/' + encodeURI(listData.id) + '/icon256.jpg?' + Ox.uid()})
             .css({position: 'absolute', borderRadius: '64px', margin: '16px'})
             .appendTo($iconPanel),
 

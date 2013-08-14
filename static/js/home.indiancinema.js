@@ -589,7 +589,7 @@ pandora.ui.home = function() {
 
             function getImageURL(item) {
                 return '/' + item.type + '/' + item.user
-                    + ':' + item.name + '/icon256.jpg?' + item.modified;
+                    + ':' + encodeURI(item.name) + '/icon256.jpg?' + item.modified;
             }
 
             function getTooltip(item) {
