@@ -90,6 +90,38 @@ pandora.ui.placesDialog = function(options) {
                 }),
                 {},
                 Ox.Button({
+                    id: 'exportPlaces',
+                    title: Ox._('Export Places...')
+                }).bindEvent({
+                    click: function() {
+                        var $button = this,
+                            keys = [
+                                'name', 'alternativeNames', 'geoname',
+                                'lat', 'lng', 'south', 'west', 'north', 'east'
+                            ];
+                        $button.options({disabled: true});
+                        pandora.api.findPlaces({
+                            query: {conditions: [], operator: '&'},
+                            keys: keys,
+                            range: [0, 1000000],
+                            sort: [{key: 'name', operator: '+'}]
+                        }, function(result) {
+                            pandora.ui.exportDialog({
+                                data: JSON.stringify(result.data.items.map(function(item) {
+                                    Object.keys(item).filter(function(key) {
+                                        return !Ox.contains(keys, key);
+                                    }).forEach(function(key) {
+                                        delete item[key];
+                                    });
+                                    return item;
+                                }), null, '    '),
+                                title: Ox._('Places')
+                            }).open();
+                            $button.options({disabled: false});
+                        });
+                    }
+                }),
+                Ox.Button({
                     id: 'done',
                     title: Ox._('Done'),
                     width: 48

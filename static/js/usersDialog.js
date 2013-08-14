@@ -517,43 +517,29 @@ pandora.ui.usersDialog = function() {
                     }),
                     {},
                     Ox.Button({
-                            title: Ox._('Export E-Mail Addresses')
+                            title: Ox._('Export E-Mail Addresses...')
                         })
                         .css({margin: '4px 4px 4px 0'})
                         .bindEvent({
                             click: function() {
+                                var $button = this;
+                                $button.options({disabled: true});
                                 pandora.api.findUsers({
                                     query: {conditions: [], operator: '&'},
                                     keys: ['email', 'username'],
                                     range: [0, numberOfUsers],
                                     sort: [{key: 'username', operator: '+'}]
                                 }, function(result) {
-                                    var $dialog = Ox.Dialog({
-                                            buttons: [
-                                                Ox.Button({
-                                                        title: Ox._('Close')
-                                                    })
-                                                    .bindEvent({
-                                                        click: function() {
-                                                            $dialog.close();
-                                                        }
-                                                    })
-                                            ],
-                                            content: Ox.Element()
-                                                .addClass('OxSelectable')
-                                                .css({margin: '16px'})
-                                                .html(
-                                                    result.data.items.filter(function(item) {
-                                                        return item.email;
-                                                    }).map(function(item) {
-                                                        return Ox.encodeHTMLEntities(item.username)
-                                                            + ' &lt;' + item.email + '&gt;';
-                                                    }).join(', ')
-                                                ),
-                                            removeOnClose: true,
-                                            title: Ox._('E-Mail Addresses')
-                                        })
-                                        .open();
+                                    pandora.ui.exportDialog({
+                                        data: result.data.items.filter(function(item) {
+                                            return item.email;
+                                        }).map(function(item) {
+                                            return Ox.encodeHTMLEntities(item.username)
+                                                + ' <' + item.email + '>';
+                                        }).join(', '),
+                                        title: Ox._('E-Mail Addresses')
+                                    }).open();
+                                    $button.options({disabled: false});
                                 });
                             }
                         }),

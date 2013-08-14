@@ -21,6 +21,35 @@ pandora.ui.eventsDialog = function(options) {
                 }),
                 {},
                 Ox.Button({
+                    id: 'exportEvents',
+                    title: Ox._('Export Events...')
+                }).bindEvent({
+                    click: function() {
+                        var $button = this,
+                            keys = ['name', 'alternativeNames', 'start', 'end'];
+                        $button.options({disabled: true});
+                        pandora.api.findEvents({
+                            query: {conditions: [], operator: '&'},
+                            keys: keys,
+                            range: [0, 1000000],
+                            sort: [{key: 'name', operator: '+'}]
+                        }, function(result) {
+                            pandora.ui.exportDialog({
+                                data: JSON.stringify(result.data.items.map(function(item) {
+                                    Object.keys(item).filter(function(key) {
+                                        return !Ox.contains(keys, key);
+                                    }).forEach(function(key) {
+                                        delete item[key];
+                                    });
+                                    return item;
+                                }), null, '    '),
+                                title: Ox._('Events')
+                            }).open();
+                            $button.options({disabled: false});
+                        });
+                    }
+                }),
+                Ox.Button({
                     id: 'done',
                     title: Ox._('Done'),
                     width: 48
