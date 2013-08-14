@@ -602,8 +602,8 @@ pandora.ui.mainMenu = function() {
                     list = ui._list,
                     previousList = pandora.UI.getPrevious()._list;
                 if (list != previousList) {
-                    that.uncheckItem(previousList == '' ? 'allitems' : 'viewlist' + previousList);
-                    that.checkItem(list == '' ? 'allitems' : 'viewlist' + list);
+                    that.uncheckItem(previousList == '' ? 'allitems' : 'viewlist' + previousList.replace(/_/g, Ox.char(9)));
+                    that.checkItem(list == '' ? 'allitems' : 'viewlist' + list.replace(/_/g, Ox.char(9)));
                 }
                 that[action]('editlist');
                 that[action]('duplicatelist');
@@ -906,7 +906,7 @@ pandora.ui.mainMenu = function() {
                         ? [{id: 'nolists', title: Ox._('No ' + Ox.toTitleCase(folder) + ' ' + itemNamePlural), disabled: true}]
                         : lists[folder].map(function(list) {
                             return {
-                                id: 'viewlist' + list.id,
+                                id: 'viewlist' + list.id.replace(/_/g, Ox.char(9)),
                                 title: Ox.encodeHTMLEntities((
                                     folder == 'favorite' ? list.user + ': ' : ''
                                 ) + list.name),
