@@ -87,7 +87,6 @@ appPanel
             var ratio = images.logo.width / images.logo.height;
             logoWidth = isEmbed || isPrint ? 96 : 320;
             logoHeight = Math.round(logoWidth / ratio);
-            console.log(images.logo.width, images.logo.height, '.....', logoHeight)
             images.logo.style.position = 'absolute';
             images.logo.style.left = 0;
             images.logo.style.top = 0;
