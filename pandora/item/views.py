@@ -320,6 +320,8 @@ def autocomplete(request):
     key = settings.CONFIG['keys'][data['key']]
     order_by = key.get('autocompleteSort', False)
     if order_by:
+        for o in order_by:
+            if o['operator'] != '-': o['operator'] = '' 
         order_by = ','.join(['%(operator)ssort__%(key)s' % o for o in order_by])
     else:
         order_by = '-items'
