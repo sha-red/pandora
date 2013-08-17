@@ -240,7 +240,11 @@ pandora.ui.textHTML = function(text) {
                         id: pandora.user.ui.text,
                         name: data.value
                     }, function(result) {
-                        Ox.print('RESULT.DATA:', result.data);
+                        if (result.data.id != pandora.user.ui.text) {
+                            Ox.Request.clearCache();
+                            pandora.renameList(pandora.user.ui.text, result.data.id, result.data.name);
+                            pandora.$ui.info.updateListInfo();
+                        }
                     });
                 }
             })
@@ -287,7 +291,6 @@ pandora.ui.textHTML = function(text) {
             })
             .bindEvent({
                 submit: function(data) {
-                    Ox.print('SUBMIT', data.value);
                     Ox.Request.clearCache('getText');
                     pandora.api.editText({
                         id: pandora.user.ui.text,
@@ -308,13 +311,15 @@ pandora.ui.textHTML = function(text) {
         return window.innerWidth
             - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
             - pandora.user.ui.embedSize - 1
-            - 32;
+            - 32 - 16;
     }
 
     that.update = function() {
         $text.options({
             maxHeight: getHeight(),
             width: getWidth()
+        }).css({
+            width: getWidth() + 'px'
         });
         return that;
     };

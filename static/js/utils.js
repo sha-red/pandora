@@ -1901,6 +1901,9 @@ pandora.resizeFolders = function(section) {
             pandora.$ui.folder[pos].updatePanel();
         }
     });
+    if (pandora.user.ui.section == 'texts') {
+        pandora.$ui.text && pandora.$ui.text.update();
+    }
 };
 
 pandora.resizeWindow = function() {
@@ -1981,7 +1984,7 @@ pandora.resizeWindow = function() {
             });
         }
     } else if (pandora.user.ui.section == 'texts') {
-        // ...
+        pandora.$ui.text && pandora.$ui.text.update();
     }
 };
 
