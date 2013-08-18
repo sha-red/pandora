@@ -141,7 +141,7 @@ pandora.ui.statisticsDialog = function() {
                         }
                     });
                     if (item.location) {
-                        split = item.location.split(', ')
+                        split = Ox.splitGeoname(item.location);
                         if (split.length == 1) {
                             country = split[0];
                         } else {
