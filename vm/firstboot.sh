@@ -1,12 +1,55 @@
-#!/bin/sh
+#!/bin/bash
+LXC=`grep -q lxc /proc/1/environ && echo 'yes' || echo 'no'`
+
 export DEBIAN_FRONTEND=noninteractive
-#fails in bootstrap
-apt-get -y install ipython ntp
-
+apt-get install -y \
+    update-manager-core \
+    python-software-properties
 add-apt-repository -y ppa:j/pandora
+apt-get update
 
-#postgresql
-apt-get -y install postgresql postgresql-contrib
+if [ "$LXC" == "no" ]; then
+apt-get install -y \
+    acpid \
+    ntp
+fi
+
+apt-get install -y \
+    openssh-server \
+    vim \
+    wget \
+    pwgen \
+    nginx \
+    rabbitmq-server \
+    bzr \
+    git \
+    subversion \
+    mercurial \
+    python-setuptools \
+    python-pip \
+    python-virtualenv \
+    python-imaging \
+    python-dev \
+    python-imaging \
+    python-numpy \
+    python-psycopg2 \
+    python-pyinotify \
+    python-simplejson \
+    python-lxml \
+    python-html5lib \
+    python-ox \
+    python-gst0.10 \
+    gstreamer0.10-plugins-good \
+    gstreamer0.10-plugins-bad \
+    oxframe \
+    libavcodec-extra-53 \
+    libav-tools \
+    ffmpeg2theora \
+    imagemagick \
+    ipython \
+    postgresql \
+    postgresql-contrib
+
 sudo -u postgres createuser -S -D -R pandora
 sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
 echo "CREATE EXTENSION pg_trgm;" | sudo -u postgres psql pandora
@@ -72,6 +115,7 @@ cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logrotate.d/pandora"
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
 service nginx restart
 
+if [ "$LXC" == "no" ]; then
 cat > /usr/local/bin/fixtime <<EOF
 #!/bin/bash
 while [ 1 ]; do
@@ -80,6 +124,8 @@ while [ 1 ]; do
 done
 EOF
 chmod +x /usr/local/bin/fixtime
+fi
+
 cat > /usr/local/bin/genissue <<EOF
 #!/bin/bash
 HOST=\$(rgrep .local /var/log/syslog | grep "Host name is" | tail -n 1 | awk '{print \$12}' | sed 's/\.$//')
@@ -101,12 +147,17 @@ cat > /etc/rc.local << EOF
 #vm has one network interface and that might change, make it not persistent
 rm -f /etc/udev/rules.d/70-persistent-net.rules
 
-#vm can be suspended, this help to keep the time in sync
-/usr/local/bin/fixtime &
-
 #update issue
 /usr/local/bin/genissue > /etc/issue
 EOF
+
+if [ "$LXC" == "no" ]; then
+cat >> /etc/rc.local << EOF
+
+#vm can be suspended, this help to keep the time in sync
+/usr/local/bin/fixtime &
+EOF
+fi
 chmod +x /etc/rc.local
 
 cat > /home/pandora/.vimrc <<EOF
