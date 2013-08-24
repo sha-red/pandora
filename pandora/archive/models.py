@@ -145,6 +145,10 @@ class File(models.Model):
         if self.item:
             for key in self.ITEM_INFO:
                 data[key] = self.item.get(key)
+                if isinstance(data[key], basestring):
+                    data[key] = ox.decode_html(data[key])
+                elif isinstance(data[key], list):
+                    data[key] = [ox.decode_html(e) for e in data[key]]
             if self.item.get('series'):
                 data['isEpisode'] = True
             data['directorSort'] = [get_name_sort(n) for n in self.item.get('director', [])]
