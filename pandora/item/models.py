@@ -828,6 +828,7 @@ class Item(models.Model):
             s.words = sum([len(a.value.split()) for a in self.annotations.exclude(value='')])
             s.clips = self.clips.count()
 
+        s.numberoffiles = self.files.all().count()
         videos = self.files.filter(selected=True).filter(Q(is_video=True)|Q(is_audio=True))
         if videos.count() > 0:
             s.duration = sum([v.duration for v in videos])
@@ -843,7 +844,6 @@ class Item(models.Model):
             if not s.aspectratio and v.display_aspect_ratio:
                 s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
             s.pixels = sum([v.pixels for v in videos])
-            s.numberoffiles = self.files.all().count()
             s.parts = videos.count()
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
             if s.duration:
