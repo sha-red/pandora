@@ -115,6 +115,10 @@ cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logrotate.d/pandora"
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
 service nginx restart
 
+if [ "$LXC" == "yes" ]; then
+    sed -i "s/-D/--no-rlimits -D/g" /etc/init/avahi-daemon.conf
+fi
+
 if [ "$LXC" == "no" ]; then
 cat > /usr/local/bin/fixtime <<EOF
 #!/bin/bash
