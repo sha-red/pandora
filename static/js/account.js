@@ -162,7 +162,6 @@ pandora.ui.accountForm = function(action, value) {
                             pandora.ui.accountWelcomeDialog().open();
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
-                            that.setMessages([{id: 'password', message: result.data.errors.toString()}]); // fixme
                         }
                     });
                 } else if (action == 'reset') {
