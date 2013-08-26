@@ -136,7 +136,7 @@ def signup(request):
         elif User.objects.filter(email__iexact=data['email']).count() > 0:
             response = json_response({
                 'errors': {
-                    'email': 'Email address already exits'
+                    'email': 'Email address already exists'
                 }
             })
         elif not data['password']:
