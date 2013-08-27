@@ -764,7 +764,7 @@ pandora.ui.infoView = function(data) {
     }
 
     function formatTitle(title) {
-        var match = /(.+) (\(S\d{2}E\d{2}\))/.exec(title);
+        var match = /(.+) (\(S\d{2}(E\d{2})?\))/.exec(title);
         if (match) {
             title = formatValue(match[1], 'title') + ' '
                 + formatLight(match[2])
