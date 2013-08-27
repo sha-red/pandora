@@ -108,6 +108,10 @@ pandora.ui.embedPlayer = function() {
                         + '/timelineantialias'
                         + size + 'p' + i + '.jpg'
                 } : '/' + options.item + '/' + 'timeline16p.png',
+                /*
+                timeline: options.playInToOut ? getSmallTimelineURL()
+                    : '/' + options.item + '/' + 'timeline16p.png',
+                */
                 timelineType: options.showTimeline
                     ? options.timeline : '',
                 timelineTypes: options.showTimeline
@@ -181,7 +185,7 @@ pandora.ui.embedPlayer = function() {
                 })
                 .bindEvent({
                     mousedown: that.gainFocus,
-                    position: changeTimeline
+                    position: dragTimeline
                 })
                 .appendTo($controls);
         }
@@ -249,7 +253,7 @@ pandora.ui.embedPlayer = function() {
 
     });
 
-    function changeTimeline(data) {
+    function dragTimeline(data) {
         var position = options.playInToOut
             ? Ox.limit(data.position, options['in'], options.out)
             : data.position;
@@ -306,6 +310,22 @@ pandora.ui.embedPlayer = function() {
             + (options.title ? 32 : 0)
             + (options.showTimeline ? 80 : 0);
         return {innerHeight: innerHeight, videoHeight: videoHeight};
+    }
+
+    function getSmallTimelineFPS() {
+        return Math.floor((options.out - options['in']) * 25) < 32768 ? 25 : 1;
+    }
+
+    function getSmallTimelineURL() {
+        var fps = getSmallTimelineFPS(),
+            width = Math.ceil((options.out - options['in']) * fps),
+            height = fps == 1 ? 16 : 64;
+        pandora[
+            fps == 1 ? 'getSmallClipTimelineURL' : 'getLargeClipTimelineURL'
+        ](options.item, options['in'], options.out, options.timeline, function(url) {
+            $player.options({timeline: url});
+        });
+        return Ox.$('<canvas>').attr({width: width, height: height})[0].toDataURL();
     }
 
     function selectAnnotation(data) {
