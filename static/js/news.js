@@ -196,6 +196,13 @@ pandora.ui.news = function(width, height) {
         $text && $text.css({width: width - 512});
     };
 
+    that.selectItem = function(direction) {
+        var index = Ox.getIndexById(items, pandora.user.ui.part.news) + direction;
+        if (index > -1 && index < items.length) {
+            pandora.UI.set('part.news', items[index].id);
+        }
+    };
+
     that.bindEvent({
         'pandora_part.news': selectItem
     });
