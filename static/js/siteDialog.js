@@ -144,6 +144,12 @@ pandora.ui.siteDialog = function(section) {
                 } else if (selected == 'news') {
                     pandora.$ui.news.resize(data);
                 }
+            },
+            key_down: function() {
+                pandora.user.ui.page == 'news' && pandora.$ui.news.selectItem(1);
+            },
+            key_up: function() {
+                pandora.user.ui.page == 'news' && pandora.$ui.news.selectItem(-1);
             }
         });
 
