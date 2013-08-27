@@ -36,10 +36,8 @@ pandora.ui.embedPlayer = function() {
         }
         video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
 
-        var isFrame = options['in'] !== void 0 && (
-                options['in'] == options.out
-                || options['in'] == video.duration
-            ),
+        Ox.print('OPTIONS::::::::', options)
+        var isFrame = options['in'] && options['in'] == options.out,
             sizes = getSizes();
 
         options.height = sizes.videoHeight;
