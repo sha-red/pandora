@@ -207,7 +207,7 @@ pandora.ui.mainMenu = function() {
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                     ? [
                         { id: 'debugMenu', title: Ox._('Debug'), items: [
-                            { id: 'cache', title: Ox._('Disable Cache'), disabled: true},
+                            { id: 'cache', title: Ox._((pandora.localStorage('enableCache') === false ? 'Enable' : 'Disable') + ' Cache')},
                             { id: 'clearcache', title: Ox._('Clear Cache')},
                             {},
                             { id: 'debugmode', title: Ox._((pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode') },
@@ -460,6 +460,12 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.usersDialog = pandora.ui.usersDialog().open();
                 } else if (data.id == 'statistics') {
                     pandora.$ui.statisticsDialog = pandora.ui.statisticsDialog().open();
+                } else if (data.id == 'cache') {
+                    var enabled = pandora.localStorage('enableCache') === false;
+                    pandora.localStorage('enableCache', enabled);
+                    Ox.Request.options({cache: enabled})
+                    that.setItemTitle('cache', Ox._((enabled ? 'Disable' : 'Enable') + ' Cache'));
+                    that[enabled ? 'enableItem' : 'disableItem']('clearcache');
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'debugmode') {
