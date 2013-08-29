@@ -47,6 +47,7 @@ apt-get install -y \
     ffmpeg2theora \
     imagemagick \
     ipython \
+    postfix \
     postgresql \
     postgresql-contrib
 
