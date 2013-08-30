@@ -106,7 +106,10 @@ class SessionData(models.Model):
         data, created = cls.objects.get_or_create(session_key=session_key)
         if request.user.is_authenticated():
             data.user = request.user
-        data.ip = request.META['REMOTE_ADDR']
+        if 'HTTP_X_FORWARDED_FOR' in request.META:
+            data.ip = request.META['HTTP_X_FORWARDED_FOR']
+        else:
+            data.ip = request.META['REMOTE_ADDR']
         if data.ip.startswith('::ffff:'):
             data.ip = data.ip[len('::ffff:'):]
         data.useragent = request.META['HTTP_USER_AGENT']
