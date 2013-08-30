@@ -107,7 +107,7 @@ class SessionData(models.Model):
         if request.user.is_authenticated():
             data.user = request.user
         if 'HTTP_X_FORWARDED_FOR' in request.META:
-            data.ip = request.META['HTTP_X_FORWARDED_FOR']
+            data.ip = request.META['HTTP_X_FORWARDED_FOR'].split(',')[0]
         else:
             data.ip = request.META['REMOTE_ADDR']
         if data.ip.startswith('::ffff:'):
