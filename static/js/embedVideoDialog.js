@@ -24,8 +24,7 @@ pandora.ui.embedVideoDialog = function() {
                 + '" height="' + height
                 + '" src="' + url
                 + '" frameborder="0" '
-                + 'webkitAllowFullScreen mozallowfullscreen allowFullScreen'
-                + '></iframe>'
+                + 'allowfullscreen></iframe>'
             )
             .on({
                 click: function() {
