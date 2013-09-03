@@ -408,7 +408,7 @@ pandora.ui.textEmbed = function() {
                 frameborder: 0,
                 src: '',
                 width: '100%',
-                allowFullScreen: true,
+                allowfullscreen: true,
                 mozallowfullscreen: true,
                 webkitAllowFullScreen: true
             })
