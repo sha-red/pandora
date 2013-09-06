@@ -832,7 +832,7 @@ class Item(models.Model):
         videos = self.files.filter(selected=True).filter(Q(is_video=True)|Q(is_audio=True))
         if videos.count() > 0:
             #s.duration = sum([v.duration for v in videos])
-            s.duration = sum([s.duration for s in self.streams()])
+            s.duration = sum([v.duration for v in self.streams()])
             v = videos[0]
             if v.is_audio:
                 s.resolution = None
