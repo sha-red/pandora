@@ -79,7 +79,9 @@ function getVideoOverlay(page) {
                     $iframe = Ox.$('<iframe>')
                         .attr({
                             id: videoId,
-                            src: video.src + '&showCloseButton=true&fullscreen=false&paused=false',
+                            src: video.src
+                                + (video.src.indexOf('?') == -1 ? '?' : '&')
+                                + '&showCloseButton=true&fullscreen=false&paused=false',
                             width: '100%',
                             height: '100%',
                             frameborder: 0
