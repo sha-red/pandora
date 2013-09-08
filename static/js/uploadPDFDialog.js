@@ -43,10 +43,6 @@ pandora.ui.uploadPDFDialog = function(options) {
         })
         .bindEvent({
             close: function(data) {
-                if (pandora.firefogg) {
-                    pandora.firefogg.cancel();
-                    delete pandora.firefogg;
-                }
                 that.close();
             }
         });
@@ -73,19 +69,6 @@ pandora.ui.uploadPDFDialog = function(options) {
                 name: file.name,
                 id: options.id
             },
-            progress: function(data) {
-                var progress = data.progress || 0;
-                $progress.options({progress: progress});
-            },
-            callback: function(result) {
-                if (result.progress == 1) {
-                    Ox.Request.clearCache();
-                    // fixme reload text view here
-                    that.close();
-                } else {
-                    $content.html("failed: " + result.responseText);
-                }
-            }
         }).bindEvent({
             progress: function(data) {
                 $progress.options({progress: data.progress || 0});
@@ -93,7 +76,7 @@ pandora.ui.uploadPDFDialog = function(options) {
             done: function(data) {
                 if (data.progress == 1) {
                     Ox.Request.clearCache();
-                    pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                    pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.textPanel = pandora.ui.textPanel());
                     that.close();
                 } else {
                     $content.html("failed: " + data.responseText);

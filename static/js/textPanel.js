@@ -373,7 +373,7 @@ pandora.ui.textPDF = function(text) {
             $iframe && $iframe.postMessage('page', {page: page});
         }
     } else {
-        that.html('UPLOADED: ' + text.uploaded);
+        that.html('Please upload PDF');
     }
     return that;
 
