@@ -214,6 +214,18 @@ pandora.ui.textHTML = function(text) {
         that = Ox.Element()
             .css({
                 'overflow-y': 'auto'
+            })
+            .bind({
+                scroll: function(event) {
+                    var position = Math.round(100 * that[0].scrollTop / that[0].scrollHeight)
+                    position = position - position % 10;
+                    if (position != pandora.user.ui.texts[pandora.user.ui.text].position) {
+                        pandora.UI.set(
+                            'texts.' + pandora.UI.encode(pandora.user.ui.text) + '.position',
+                            position ? [position] : 0
+                        );
+                    }
+                }
             }),
         $content = Ox.Element().css({
                 margin: '16px',
@@ -301,6 +313,8 @@ pandora.ui.textHTML = function(text) {
             })
             .appendTo($content);
 
+    scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
+
     function getHeight() {
         // 24 menu + 24 toolbar + 16 statusbar + 32 title + 32 margins
         // + 1px to ge trid of scrollbar
@@ -314,6 +328,10 @@ pandora.ui.textHTML = function(text) {
             - 32 - 16;
     }
 
+    function scrollTo(position) {
+        that[0].scrollTop = that[0].scrollHeight/100 * position;
+    }
+
     that.update = function() {
         $text.options({
             maxHeight: getHeight(),
@@ -321,6 +339,7 @@ pandora.ui.textHTML = function(text) {
         }).css({
             width: getWidth() + 'px'
         });
+        scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
         return that;
     };
 
