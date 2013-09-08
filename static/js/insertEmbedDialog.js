@@ -402,7 +402,7 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                 })
                 .appendTo($form);
 
-            url ? parseURL() : formatURL();
+            url ? parseURL(url) : formatURL();
             updateForm();
 
         } else {
@@ -458,6 +458,12 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
         }
 
         function limitPoint(value, min, max) {
+            if (Ox.typeOf(min) == 'number') {
+                min = Ox.formatDuration(min)
+            }
+            if (Ox.typeOf(max) == 'number') {
+                max = Ox.formatDuration(max)
+            }
             return Ox.formatDuration(
                 Ox.limit(
                     Ox.parseDuration(value),
@@ -477,7 +483,7 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                     var isSameItem = isSameSite && state.item == item,
                         id = (isSameSite ? state.item : url.split('/')[3]) || item,
                         query = {};
-                    if (state.hash) {
+                    if (state.hash && state.hash.query) {
                         state.hash.query.forEach(function(condition) {
                             query[condition.key] = condition.value;
                         });
