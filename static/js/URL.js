@@ -65,8 +65,8 @@ pandora.URL = (function() {
                         : []
                 );
             } else if (pandora.user.ui.section == 'texts') {
-                var position = pandora.user.ui.texts[state.text]
-                    ? pandora.user.ui.texts[state.text].position
+                var position = pandora.user.ui.texts[state.item]
+                    ? pandora.user.ui.texts[state.item].position
                     : 0;
                 if (position) {
                     state.span = position;
@@ -199,7 +199,7 @@ pandora.URL = (function() {
                 } else if (state.type == 'edits') {
 
                     if (state.span) {
-                        var key = 'edits.' + state.item.replace(/\./g, '\\.');
+                        var key = 'edits.' + pandora.UI.encode(state.item);
                         set[key] = {};
                         if (Ox.isArray(state.span)) {
                             set[key + '.clip'] = '';
@@ -217,7 +217,7 @@ pandora.URL = (function() {
                 } else if (state.type == 'texts') {
 
                     if (state.span) {
-                        set['texts.' + state.item.replace(/\./g, '\\.') + '.position'] = state.span;
+                        set['texts.' + pandora.UI.encode(state.item) + '.position'] = state.span;
                     }
 
                 }

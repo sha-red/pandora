@@ -365,7 +365,7 @@ pandora.ui.textPDF = function(text) {
                         });
                     }).open();
                 } else if (event == 'page') {
-                    pandora.UI.set('texts.' + pandora.user.ui.text.replace(/\./g, '\\.') + '.position', [data.page]);
+                    pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text) + '.position', [data.page]);
                 }
             })
             .appendTo(that);

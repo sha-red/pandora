@@ -174,7 +174,7 @@ pandora.UI = (function() {
         if (args.text) {
             add['texts.' + that.encode(args.text)] = Ox.map(textSettings, function(value, key) {
                 var textsKey = 'texts.' + that.encode(args.text) + '.' + key;
-                return textsKey in args ? args[editextsKeytsKey]
+                return textsKey in args ? args[textsKey]
                     : pandora.user.ui.texts[args.text] ? pandora.user.ui.texts[args.text][key]
                     : value;
             });

@@ -2,7 +2,7 @@ Ox.load(function() {
     window.addEventListener('hashchange', function() {
         var page = document.location.hash.substring(1).split('=')[1];
         page && Ox.$parent.postMessage('page', {
-            page: page
+            page: Math.round(page)
         });
     });
     Ox.$parent.onMessage(function(event, data, oxid) {
