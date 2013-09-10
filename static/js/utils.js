@@ -1496,8 +1496,8 @@ pandora.getSpan = function(state, val, callback) {
                                     state.span = id;
                                     state.view = 'calendar';
                                 } else if (canBePlace && isName) {
-                                    Ox.Log('URL', 'setting place id', '@' + str)
-                                    state.span = '@' + str;
+                                    Ox.Log('URL', 'setting place id', '@' + val)
+                                    state.span = '@' + val;
                                     state.view = 'map';
                                 }
                                 callback();
