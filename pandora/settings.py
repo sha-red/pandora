@@ -184,7 +184,7 @@ SITE_CONFIG = join(PROJECT_ROOT, 'config.jsonc')
 DEFAULT_CONFIG = join(PROJECT_ROOT, 'config.pandora.jsonc')
 RELOAD_CONFIG = True
 
-#used if CONFIG['video']['download'] is set
+#used if CONFIG['canDownloadVideo'] is set
 TRACKER_URL="udp://tracker.openbittorrent.com:80"
 
 DATA_SERVICE = ''
