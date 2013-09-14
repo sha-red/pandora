@@ -89,7 +89,7 @@ def process_stream(fileId):
     streams = file.streams.filter(source=None)
     if streams.count() > 0:
         stream = streams[0]
-        models.File.objects.filter(id=fileId).update(encoding=True)
+        models.File.objects.filter(id=fileId).update(encoding=True, queued=False)
         stream.make_timeline()
         stream.extract_derivatives()
         file = models.File.objects.get(id=fileId)
@@ -114,7 +114,7 @@ def extract_stream(fileId):
             file=file, resolution=max(config['resolutions']),
             format=config['formats'][0])
         if created:
-            models.File.objects.filter(id=fileId).update(encoding=True)
+            models.File.objects.filter(id=fileId).update(encoding=True, queued=False)
             stream.media.name = stream.path(stream.name())
             stream.encode()
             if stream.available:

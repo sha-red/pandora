@@ -243,6 +243,7 @@ def firefogg_upload(request):
                     response['result'] = -1
                 elif form.cleaned_data['done']:
                     f.uploading = False
+                    f.queued = True
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
@@ -295,6 +296,7 @@ def direct_upload(request):
                 response['result'] = -1
             if form.cleaned_data['done']:
                 file.uploading = False
+                file.queued = True
                 file.save()
                 #try/execpt so it does not fail if rabitmq is down
                 try:

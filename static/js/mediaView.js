@@ -76,15 +76,19 @@ pandora.ui.mediaView = function(options, self) {
             columns: [
                 {
                     clickable: function(data) {
-                        return !data.encoding;
+                        return ['uploading', 'queued', 'encoding'].indexOf(data.state) == -1;
                     },
                     format: function(value, data) {
                         return $('<img>')
                             .attr({
-                                src: data.encoding
-                                    ? Ox.UI.getImageURL('symbolSync')
+                                src: ['uploading', 'queued', 'encoding'].indexOf(data.state) > -1
+                                    ? Ox.UI.getImageURL('symbol' + {
+                                        'uploading': 'Upload',
+                                        'queued': 'Data',
+                                        'encoding': 'Sync'
+                                    }[data.state])
                                     : data.wanted
-                                    ? Ox.UI.getImageURL('symbolUpload')
+                                    ? Ox.UI.getImageURL('symbolUp')
                                     : Ox.UI.getImageURL('symbolCheck')
                             })
                             .css({
@@ -99,8 +103,12 @@ pandora.ui.mediaView = function(options, self) {
                     title: Ox._('Status'),
                     titleImage: 'check',
                     tooltip: function (data) {
-                        return data.encoding
-                            ? Ox._('Processing video on server')
+                        return ['uploading', 'queued', 'encoding'].indexOf(data.state) > -1
+                            ? Ox._({
+                                'uploading': 'Video is currently uploaded to server',
+                                'queued': 'Waiting for server to process video',
+                                'encoding': 'Processing video on server'
+                            }[data.state])
                             : data.instances.filter(function(i) {return i.ignore; }).length > 0
                             ? Ox._('Use this file')
                             : Ox._('Dont use this file');
@@ -226,7 +234,7 @@ pandora.ui.mediaView = function(options, self) {
                     query: self.filesQuery
                 }), callback);
             },
-            keys: ['encoding', 'instances', 'wanted'],
+            keys: ['state', 'instances', 'wanted'],
             scrollbarVisible: true,
             sort: [{key: 'path', operator: '+'}],
             unique: 'id'

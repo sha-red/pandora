@@ -76,6 +76,7 @@ class File(models.Model):
     available = models.BooleanField(default = False)
     selected = models.BooleanField(default = False)
     uploading = models.BooleanField(default = False)
+    queued = models.BooleanField(default = False)
     encoding = models.BooleanField(default = False)
     wanted = models.BooleanField(default = False)
 
@@ -339,11 +340,22 @@ class File(models.Model):
         duration = self.duration
         if self.type != 'video':
             duration = None
+        state = ''
+        if self.available:
+            state = 'available'
+        elif self.encoding:
+            state = 'encoding'
+        elif self.queued:
+            state = 'queued'
+        elif self.uploading:
+            state = 'uploading'
+        elif self.wanted:
+            state = 'wanted'
         data = {
             'audioCodec': self.audio_codec,
             'available': self.available,
             'duration': duration,
-            'encoding': self.encoding,
+            'state': state,
             'framerate': self.framerate,
             'id': self.oshash,
             'instances': [i.json() for i in self.instances.all()],
