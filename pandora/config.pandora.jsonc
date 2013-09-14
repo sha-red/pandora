@@ -691,7 +691,7 @@
     },
     "userLevels": ["guest", "member", "staff", "admin"],
     "video": {
-        "download": true,
+        "torrent": true,
         //supported formats: webm, mp4
         "formats": ["webm", "mp4"],
         "previewRatio": 1.3333333333,

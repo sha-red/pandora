@@ -928,6 +928,9 @@ pandora.getClipVideos = function(clip, resolution) {
     };
 }());
 
+pandora.getDownloadLink = function(item) {
+    return '/' + item + (pandora.site.video.torrent ? '/torrent/' : '/download/');
+}
 
 pandora.getEditTooltip = function(title) {
     return function(e) {

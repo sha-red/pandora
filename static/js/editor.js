@@ -127,7 +127,7 @@ pandora.ui.editor = function(data) {
                 pandora.$ui[dialog] = pandora.ui[dialog](data).open();
             },
             downloadvideo: function(data) {
-                document.location.href = '/' + ui.item + '/torrent/';
+                document.location.href = pandora.getDownloadLink(ui.item);
             },
             downloadselection: function(data) {
                 document.location.href = '/' + ui.item

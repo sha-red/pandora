@@ -19,6 +19,9 @@ urlpatterns = patterns("item.views",
     (r'^(?P<id>[A-Z0-9].*)/torrent$', 'torrent'),
     (r'^(?P<id>[A-Z0-9].*)/torrent/(?P<filename>.*?)$', 'torrent'),
 
+    #download
+    (r'^(?P<id>[A-Z0-9].*)/download/$', 'download'),
+
     #export
     (r'^(?P<id>[A-Z0-9].*)/json$', 'item_json'),
     (r'^(?P<id>[A-Z0-9].*)/xml$', 'item_xml'),

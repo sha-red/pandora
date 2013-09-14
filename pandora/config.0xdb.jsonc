@@ -890,6 +890,7 @@
     // fixme: this should include colors
     "userLevels": ["guest", "member", "friend", "staff", "admin"],
     "video": {
+        "torrent": true,
         "formats": ["webm", "mp4"],
         // fixme: this should be named "ratio" or "defaultRatio",
         // as it also applies to clip lists (on load)

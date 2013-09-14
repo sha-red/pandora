@@ -84,7 +84,7 @@ pandora.ui.player = function(data) {
                 }), 'clip');
             },
             downloadvideo: function(data) {
-                document.location.href = '/' + ui.item + '/torrent/';
+                document.location.href = pandora.getDownloadLink(ui.item);
             },
             find: function(data) {
                 pandora.UI.set({itemFind: data.find});

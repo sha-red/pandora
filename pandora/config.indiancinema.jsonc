@@ -895,6 +895,7 @@
     // fixme: this should include colors
     "userLevels": ["guest", "member", "student", "staff", "admin"],
     "video": {
+        "torrent": true,
         "formats": ["webm", "mp4"],
         "previewRatio": 1.375,
         "resolutions": [240, 480]
