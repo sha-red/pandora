@@ -669,7 +669,7 @@ class Item(models.Model):
                 elif i == 'user':
                     if self.user:
                         save(i, self.user.username)
-                elif key['id'] == 'annotations':
+                elif i == 'annotations':
                     qs = Annotation.objects.filter(item=self)
                     qs = qs.filter(layer__in=Annotation.public_layers()).exclude(findvalue=None)
                     qs = qs.order_by('start')
@@ -686,7 +686,12 @@ class Item(models.Model):
                     save(i, value)
 
             for key in self.facet_keys:
-                if key == 'character':
+                if key == 'user':
+                    if self.user:
+                        values = self.user.username
+                    else:
+                        values = ''
+                elif key == 'character':
                     values = self.get('cast', '')
                     if values:
                         values = filter(lambda x: x.strip(),
