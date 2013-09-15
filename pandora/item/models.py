@@ -913,6 +913,8 @@ class Item(models.Model):
                 at = self.get('alternativeTitles')
                 if at:
                     current_values += [a[0] for a in at]
+            elif key == 'user':
+                current_values = [self.user.username]
             elif key == 'character':
                 current_values = filter(lambda x: x.strip(),
                                         [f['character'] for f in self.get('cast', [])])
