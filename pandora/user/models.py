@@ -88,7 +88,10 @@ class SessionData(models.Model):
             self.username = self.user.username
             self.level = self.user.get_profile().level
             self.firstseen = self.user.date_joined
-            self.groupssort = ''.join([g.name for g in self.user.groups.all()])
+            if self.user.groups.exists():
+                self.groupssort = ''.join([g.name for g in self.user.groups.all()])
+            else:
+                self.groupssort = None
             self.numberoflists = self.user.lists.count()
         else:
             self.groupssort = None
