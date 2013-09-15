@@ -114,6 +114,20 @@ cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logrotate.d/pandora"
 
 #nginx
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
+
+read -r -d '' GZIP <<EOI
+gzip_static  on;\\
+\tgzip_http_version 1.1;\\
+\tgzip_vary on;\\
+\tgzip_comp_level 6;\\
+\tgzip_proxied any;\\
+\tgzip_types text/plain text/css application/json text/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript text/x-js;\\
+\tgzip_buffers 16 8k;\\
+\tgzip_disable "MSIE [1-6]\.(?!.*SV1)";
+EOI
+
+sed -i -e "s#gzip_disable \"msie6\";#${GZIP}#g" /etc/nginx/nginx.conf
+
 service nginx restart
 
 if [ "$LXC" == "yes" ]; then
