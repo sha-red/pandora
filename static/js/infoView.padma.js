@@ -19,7 +19,7 @@ pandora.ui.infoView = function(data) {
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         margin = 16,
         nameKeys = ['director', 'cinematographer', 'featuring'],
-        listKeys = nameKeys.concat(['language', 'topics', 'license', 'groups']),
+        listKeys = nameKeys.concat(['language', 'topic', 'license', 'groups']),
         statisticsWidth = 128,
 
         $bar = Ox.Bar({size: 16})
@@ -301,7 +301,7 @@ pandora.ui.infoView = function(data) {
 
     renderGroup(['director', 'cinematographer', 'featuring']);
 
-    renderGroup(['topics']);
+    renderGroup(['topic']);
 
     // Summary -------------------------------------------------------------
 
