@@ -584,6 +584,8 @@ class Stream(models.Model):
     def save(self, *args, **kwargs):
         if self.media and not self.info:
             self.info = ox.avinfo(self.media.path)
+            if 'path' in self.info:
+                del self.info['path']
         self.oshash = self.info.get('oshash')
         self.duration = self.info.get('duration', 0)
         if 'video' in self.info and self.info['video']:
