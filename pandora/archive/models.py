@@ -341,14 +341,14 @@ class File(models.Model):
         if self.type != 'video':
             duration = None
         state = ''
-        if self.available:
-            state = 'available'
-        elif self.encoding:
+        if self.encoding:
             state = 'encoding'
         elif self.queued:
             state = 'queued'
         elif self.uploading:
             state = 'uploading'
+        elif self.available:
+            state = 'available'
         elif self.wanted:
             state = 'wanted'
         data = {
