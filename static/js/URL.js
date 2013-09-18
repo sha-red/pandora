@@ -69,7 +69,7 @@ pandora.URL = (function() {
                     ? pandora.user.ui.texts[state.item].position
                     : 0;
                 if (position) {
-                    state.span = position;
+                    state.span = [position];
                 }
             }
             
@@ -217,7 +217,7 @@ pandora.URL = (function() {
                 } else if (state.type == 'texts') {
 
                     if (state.span) {
-                        set['texts.' + pandora.UI.encode(state.item) + '.position'] = state.span;
+                        set['texts.' + pandora.UI.encode(state.item) + '.position'] = state.span[0];
                     }
 
                 }

@@ -222,7 +222,7 @@ pandora.ui.textHTML = function(text) {
                     if (position != pandora.user.ui.texts[pandora.user.ui.text].position) {
                         pandora.UI.set(
                             'texts.' + pandora.UI.encode(pandora.user.ui.text) + '.position',
-                            position ? [position] : 0
+                            position ? position : 0
                         );
                     }
                 }
@@ -384,7 +384,7 @@ pandora.ui.textPDF = function(text) {
                         });
                     }).open();
                 } else if (event == 'page') {
-                    pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text) + '.position', [data.page]);
+                    pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text) + '.position', data.page);
                 }
             })
             .appendTo(that);
