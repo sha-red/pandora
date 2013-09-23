@@ -183,6 +183,10 @@ class Item(models.Model):
     def get(self, key, default=None):
         if key == 'rightslevel':
             return self.level
+        if key == 'user':
+            return self.user and self.user.username or None
+        if key == 'groups':
+            return [g.name for g in self.groups.all()]
         if self.data and key in self.data:
             return self.data[key]
         if self.external_data and key in self.external_data:
@@ -666,9 +670,6 @@ class Item(models.Model):
                     save(i, self.level)
                 elif i == 'filename':
                     save(i, '\n'.join(self.all_paths()))
-                elif i == 'user':
-                    if self.user:
-                        save(i, self.user.username)
                 elif i == 'annotations':
                     qs = Annotation.objects.filter(item=self)
                     qs = qs.filter(layer__in=Annotation.public_layers()).exclude(findvalue=None)
@@ -686,12 +687,7 @@ class Item(models.Model):
                     save(i, value)
 
             for key in self.facet_keys:
-                if key == 'user':
-                    if self.user:
-                        values = self.user.username
-                    else:
-                        values = ''
-                elif key == 'character':
+                if key == 'character':
                     values = self.get('cast', '')
                     if values:
                         values = filter(lambda x: x.strip(),
@@ -918,8 +914,6 @@ class Item(models.Model):
                 at = self.get('alternativeTitles')
                 if at:
                     current_values += [a[0] for a in at]
-            elif key == 'user':
-                current_values = [self.user.username]
             elif key == 'character':
                 current_values = filter(lambda x: x.strip(),
                                         [f['character'] for f in self.get('cast', [])])
