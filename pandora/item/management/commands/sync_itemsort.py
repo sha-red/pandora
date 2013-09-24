@@ -112,9 +112,7 @@ class Command(BaseCommand):
                 print "Updating sort values..."
                 ids = [i['id'] for i in models.Item.objects.all().values('id')]
                 for id in ids:
-                    #try:
                     i = models.Item.objects.get(pk=id)
-                    print i
+                    if optoins['debug']:
+                        print i
                     i.update_sort()
-                    #except:
-                    #    pass
