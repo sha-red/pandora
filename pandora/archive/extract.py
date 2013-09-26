@@ -247,6 +247,11 @@ def stream(video, target, profile, info):
                               stdout=open('/dev/null', 'w'),
                               stderr=subprocess.STDOUT)
     p.communicate()
+    if p.returncode != 0:
+        t = "%s.mp4" % target if format == 'mp4' else target
+        if os.path.exists(t):
+            os.unlink(t)
+        return False
     if format == 'mp4':
         cmd = ['qt-faststart', "%s.mp4" % target, target]
         #print cmd

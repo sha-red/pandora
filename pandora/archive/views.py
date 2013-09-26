@@ -310,6 +310,12 @@ def direct_upload(request):
     else:
         file, created = models.File.objects.get_or_create(oshash=oshash)
         if file.editable(request.user):
+            #remove previous uploads
+            if not created:
+                file.streams.all().delete()
+                file.delete_frames()
+                if file.item.rendered and file.selected:
+                    Item.objects.filter(id=file.item.id).update(rendered=False)
             file.uploading = True
             file.save()
             upload_url = request.build_absolute_uri('/api/upload/direct/?id=%s' % file.oshash)

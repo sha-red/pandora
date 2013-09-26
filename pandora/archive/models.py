@@ -570,6 +570,7 @@ class Stream(models.Model):
             if extract.stream(media, target, self.name(), info):
                 self.available = True
             else:
+                self.media = None
                 self.available = False
             self.save()
 
