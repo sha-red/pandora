@@ -1144,10 +1144,11 @@ class Item(models.Model):
         self.make_torrent()
         self.rendered = streams.count() > 0
         self.save()
-        if async:
-            get_sequences.delay(self.itemId)
-        else:
-            get_sequences(self.itemId)
+        if self.rendered:
+            if async:
+                get_sequences.delay(self.itemId)
+            else:
+                get_sequences(self.itemId)
 
     def save_poster(self, data):
         self.poster.name = self.path('poster.jpg')
