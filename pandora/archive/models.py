@@ -379,17 +379,27 @@ class File(models.Model):
 
     def all_paths(self):
         return [self.path] + [i.path for i in self.instances.all()]
+    
+    def delete(self, *args, **kwargs):
+        self.delete_files()
+        super(File, self).delete(*args, **kwargs)
 
     def delete_frames(self):
         frames = os.path.join(settings.MEDIA_ROOT, self.get_path('frames'))
         if os.path.exists(frames):
             shutil.rmtree(frames)
 
+    def delete_files(self):
+        if self.data:
+            self.data.delete()
+        self.streams.all().delete()
+        prefix = os.path.join(settings.MEDIA_ROOT, self.get_path(''))
+        if os.path.exists(prefix):
+            shutil.rmtree(prefix)
+
 def delete_file(sender, **kwargs):
     f = kwargs['instance']
-    #FIXME: delete streams here
-    if f.data:
-        f.data.delete()
+    f.delete_files()
 pre_delete.connect(delete_file, sender=File)
 
 class Volume(models.Model):
