@@ -231,9 +231,8 @@ pandora.ui.textHTML = function(text) {
                 margin: '16px',
         }).appendTo(that),
 
-        $title = Ox.Editable({
+        $title = Ox.EditableContent({
                 editable: text.name ? text.editable : false,
-                height: 32,
                 placeholder: text.editable ? Ox._('Doubleclick to edit title') : Ox._('Untitled'),
                 tooltip: text.editable ? pandora.getEditTooltip('title') : '',
                 value: text.name || Ox._('{0} Texts', [pandora.site.site.name]),
@@ -266,8 +265,9 @@ pandora.ui.textHTML = function(text) {
             .css({height: '16px'})
             .appendTo($content),
 
-        $text = Ox.Editable({
+        $text = Ox.EditableContent({
                 clickLink: pandora.clickLink,
+                collapseToEnd: false,
                 editable: text.editable,
                 format: function(text) {
                     var index = 0;
@@ -287,7 +287,6 @@ pandora.ui.textHTML = function(text) {
                         }
                     );
                 },
-                maxHeight: height - 1,
                 placeholder: text.editable ? Ox._('Doubleclick to edit text') : '',
                 tooltip: text.editable ? pandora.getEditTooltip('text') : '',
                 type: 'textarea',
@@ -334,7 +333,6 @@ pandora.ui.textHTML = function(text) {
 
     that.update = function() {
         $text.options({
-            maxHeight: getHeight(),
             width: getWidth()
         }).css({
             width: getWidth() + 'px'
