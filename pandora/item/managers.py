@@ -64,7 +64,7 @@ def parseCondition(condition, user, owner=None):
         if not owner:
             owner = user
         if k == 'user':
-            v = ownder.username
+            v = owner.username
         elif k == 'groups':
             q = Q(groups__in=owner.groups.all())
             if exclude:
