@@ -206,44 +206,62 @@ pandora.ui.uploadVideoDialog = function(data) {
         resetProgress();
         $info.html(Ox._('Uploading {0}', [file.name]));
         Ox.oshash(file, function(oshash) {
-            pandora.api.addMedia({
-                filename: file.name,
-                id: oshash,
-                item: pandora.site.itemRequiresVideo ? undefined : pandora.user.ui.item
+            pandora.api.findMedia({
+                query: {
+                    conditions: [{key: 'oshash', value: oshash}]
+                },
+                keys: ['id', 'item', 'available']
             }, function(result) {
-                var item = result.data.item;
-                pandora.$ui.upload = pandora.chunkupload({
-                    file: file,
-                    url: '/api/upload/direct/',
-                    data: {
-                        id: oshash
-                    }
-                }).bindEvent({
-                    done: function(data) {
-                        if (data.progress == 1) {
-                            Ox.Request.clearCache();
-                            if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'media') {
-                                pandora.$ui.item.reload();
-                            } else {
-                                pandora.UI.set({
-                                    item: item,
-                                    itemView: 'media'
-                                });
+                if (
+                    result.data.items.length === 0
+                    || !result.data.items[0].available
+                ) {
+                    pandora.api.addMedia({
+                        filename: file.name,
+                        id: oshash,
+                        item: pandora.site.itemRequiresVideo ? undefined : pandora.user.ui.item
+                    }, function(result) {
+                        var item = result.data.item;
+                        pandora.$ui.upload = pandora.chunkupload({
+                            file: file,
+                            url: '/api/upload/direct/',
+                            data: {
+                                id: oshash
                             }
-                            that.close();
-                        } else {
-                            $status.html(cancelled ? Ox._('Upload cancelled.') : Ox._('Upload failed.'));
-                            !cancelled && pandora.api.log({
-                                text: data.responseText,
-                                url: '/' + item,
-                                line: 1
-                            });
-                        }
-                    },
-                    progress: function(data) {
-                        $progress.options({progress: data.progress || 0});
-                    }
-                });
+                        }).bindEvent({
+                            done: function(data) {
+                                if (data.progress == 1) {
+                                    Ox.Request.clearCache();
+                                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'media') {
+                                        pandora.$ui.item.reload();
+                                    } else {
+                                        pandora.UI.set({
+                                            item: item,
+                                            itemView: 'media'
+                                        });
+                                    }
+                                    that.close();
+                                } else {
+                                    $status.html(cancelled ? Ox._('Upload cancelled.') : Ox._('Upload failed.'));
+                                    !cancelled && pandora.api.log({
+                                        text: data.responseText,
+                                        url: '/' + item,
+                                        line: 1
+                                    });
+                                }
+                            },
+                            progress: function(data) {
+                                $progress.options({progress: data.progress || 0});
+                            }
+                        });
+                    });
+                } else {
+                    pandora.UI.set({
+                        item: result.data.items[0].item,
+                        itemView: 'media'
+                    });
+                    that.close();
+                }
             });
         });
     }
