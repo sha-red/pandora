@@ -23,6 +23,7 @@ from item import utils
 
 import models
 from decorators import capability_required_json
+import persona
 
 def signin(request):
     '''
@@ -42,7 +43,9 @@ def signin(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    if 'username' in data and 'password' in data:
+    if 'assertion' in data:
+        response = persona.signin(request)
+    elif 'username' in data and 'password' in data:
         data['username'] = data['username'].strip()
         if settings.AUTH_CHECK_USERNAME:
             qs = User.objects.filter(username__iexact=data['username'])

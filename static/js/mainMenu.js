@@ -16,6 +16,8 @@ pandora.ui.mainMenu = function() {
                     return pandora.$ui.localeButton = pandora.ui.localeButton();
                 } else if (menuExtra == 'reload') {
                     return pandora.$ui.loadingIcon = pandora.ui.loadingIcon();
+                } else if (menuExtra == 'persona') {
+                    return pandora.$ui.personaButton = pandora.ui.personaButton();
                 }
             }),
             id: 'mainMenu',

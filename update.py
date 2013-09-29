@@ -92,6 +92,8 @@ if __name__ == "__main__":
                 run('git', 'checkout', 'stable/1.4.x')
                 run('git', 'pull')
                 os.chdir(base)
+        if old < 3666:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
 
         if len(sys.argv) == 1:

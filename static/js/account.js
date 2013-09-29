@@ -30,24 +30,28 @@ pandora.ui.accountDialogOptions = function(action, value) {
     var buttons = {
             signin: ['signup', 'reset'],
             signup: ['signin'],
+            username: [],
             reset: ['signin'],
             resetAndSignin: []
         },
         buttonTitle = {
             signin: 'Sign In',
             signup: 'Sign Up',
+            username: 'Sign Up',
             reset: 'Reset Password',
             resetAndSignin: 'Sign In'
         },
         dialogText = {
             signin: Ox._('To sign in to your account, please enter your username and password.'),
             signup: Ox._('To sign up for an account, please choose a username and password, and enter your e-mail address.'),
+            username: Ox._('To sign up for an account, please choose a username.'),
             reset: Ox._('To reset your password, please enter either your username or your e-mail address.'),
             resetAndSignin: Ox._('To sign in to your account, please choose a new password, and enter the code that we have just e-mailed to you.')
         },
         dialogTitle = {
             signin: Ox._('Sign In'),
             signup: Ox._('Sign Up'),
+            username: Ox._('Sign Up'),
             reset: Ox._('Reset Password'),
             resetAndSignin: Ox._('Reset Password')
         };
@@ -132,6 +136,7 @@ pandora.ui.accountForm = function(action, value) {
     var items = {
             'signin': ['username', 'password'],
             'signup': ['newUsername', 'password', 'email'],
+            'username': ['newUsername'],
             'reset': ['usernameOrEmail'],
             'resetAndSignin': ['oldUsername', 'newPassword', 'code']
         },
