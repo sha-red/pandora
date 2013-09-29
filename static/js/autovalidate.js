@@ -49,20 +49,23 @@ pandora.validateCode = function(value, callback) {
 pandora.validateNewEmail = function(value, callback) {
     value == pandora.user.email ? callback({
         message: '',
-        valid: true
+        valid: true,
+        value: value
     }) : Ox.isValidEmail(value) ? pandora.api.findUser({
         key: 'email',
         value: value,
         operator: '=='
     }, function(result) {
         callback({
-            message: Ox._('E-Mail Address already exists'),
-            valid: !result.data.users.length
+            message: !!result.data.users.length ? Ox._('E-Mail Address already exists') : '',
+            valid: !result.data.users.length,
+            value: value
         });
     }) : callback({
         message: value.length ? Ox._('Invalid e-mail address') : '',
         // message: (!value.length ? 'Missing' : 'Invalid') + ' e-mail address',
-        valid: false
+        valid: false,
+        value: value
     });
 };
 
