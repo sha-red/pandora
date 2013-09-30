@@ -314,6 +314,7 @@ pandora.ui.infoView = function(data) {
             .append(
                 Ox.EditableContent({
                     clickLink: pandora.clickLink,
+                    collapseToEnd: false,
                     editable: canEdit,
                     format: function(value) {
                         return value.replace(
