@@ -73,15 +73,6 @@
         included in find annotations. // FIXME: the last bit is not implemented.
     */
     "clipLayers": ["publicnotes", "keywords", "subtitles"],
-    // fixme: either this, or filter: true in itemKeys, but not both
-    "filters": [
-        {"id": "director", "title": "Director", "type": "string"},
-        {"id": "country", "title": "Country", "type": "string"},
-        {"id": "year", "title": "Year", "type": "integer"},
-        {"id": "language", "title": "Languages", "type": "string"},
-        {"id": "featuring", "title": "Featuring", "type": "string"},
-        {"id": "keywords", "title": "Keywords", "type": "string"}
-    ],
     "flags": false,
     "help": [
         {"id": "help", "title": "Help"},
@@ -157,6 +148,7 @@
             "autocomplete": true,
             "columnRequired": true,
             "columnWidth": 180,
+            "filter": true,
             "sort": true,
             "sortType": "person"
         },
@@ -225,6 +217,7 @@
             "id": "keywords",
             "title": "Keywords",
             "type": "layer",
+            "filter": true,
             "find": true
         },
         {

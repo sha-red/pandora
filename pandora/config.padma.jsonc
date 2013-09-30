@@ -183,6 +183,7 @@
             "title": "People",
             "type": ["string"],
             "autocomplete": true,
+            "filter": true,
             "find": true
         },
         {
@@ -272,18 +273,21 @@
             "id": "places",
             "title": "Places",
             "type": "layer",
+            "filter": true,
             "find": true
         },
         {
             "id": "events",
             "title": "Events",
             "type": "layer",
+            "filter": true,
             "find": true
         },
         {
             "id": "keywords",
             "title": "Keywords",
             "type": "layer",
+            "filter": true,
             "find": true
         },
         {
