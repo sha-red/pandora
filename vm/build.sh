@@ -15,7 +15,7 @@ extra="--addpkg avahi-daemon"
 #extra="--libvirt qemu:///system"
 
 base=$(pwd)
-sudo  vmbuilder vbox ubuntu --suite=precise \
+sudo  vmbuilder $hypervisor ubuntu --suite=precise \
     --verbose --debug \
     --arch $arch \
     --flavour generic \
