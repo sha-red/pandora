@@ -278,21 +278,33 @@ def run_command(cmd, timeout=10):
     return p.returncode
 
 
-def frame(videoFile, frame, position, height=128, redo=False):
+def frame(video, frame, position, height=128, redo=False):
     '''
         params:
-            videoFile input
+            video     input
             frame     output
             position as float in seconds
             height of frame
             redo boolean to extract file even if it exists
     '''
-    if exists(videoFile):
-        frameFolder = os.path.dirname(frame)
+    if exists(video):
+        folder = os.path.dirname(frame)
         if redo or not exists(frame):
-            ox.makedirs(frameFolder)
-            cmd = ['oxframe', '-i', videoFile, '-o', frame,
-                '-p', str(position), '-y', str(height)]
+            ox.makedirs(folder)
+            if video.endswith('.mp4'):
+                cmd = [
+                    AVCONV, '-y',
+                    '-ss', str(position),
+                    '-i', video,
+                    '-an', '-vframes', '1',
+                    '-vf', 'scale=-1:%s' % height
+                ]
+                if not frame.endswith('.png'):
+                    cmd += ['-f', 'mjpeg']
+                cmd += [frame]
+            else:
+                cmd = ['oxframe', '-i', video, '-o', frame,
+                    '-p', str(position), '-y', str(height)]
             run_command(cmd)
 
 
