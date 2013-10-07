@@ -254,10 +254,9 @@ pandora.URL = (function() {
 
     }
 
-    that.init = function() {
-
+    function getOptions () {
         var itemsSection = pandora.site.itemsSection,
-            findKeys, sortKeys = {}, spanType = {}, views = {};
+            sortKeys = {}, views = {};
 
         views[itemsSection] = {
             // listView is the default view
@@ -313,6 +312,37 @@ pandora.URL = (function() {
             }
         });
 
+        // Edits
+        views['edits'] = {
+            list: [],
+            item: ['edit']
+        };
+        sortKeys['edits'] = {
+            list: {},
+            item: {}
+        };
+
+        // Texts
+        views['texts'] = {
+            list: [],
+            item: ['text']
+        };
+        sortKeys['texts'] = {
+            list: {},
+            item: {}
+        };
+
+        return {
+            views: views,
+            sortKeys: sortKeys
+        };
+    }
+
+    that.init = function() {
+
+        var itemsSection = pandora.site.itemsSection,
+            findKeys, spanType = {};
+
         spanType[itemsSection] = {
             list: {
                 map: 'location',
@@ -326,38 +356,19 @@ pandora.URL = (function() {
                 calendar: 'date'
             }
         };
-
-        // Edits
-        views['edits'] = {
-            list: [],
-            item: ['edit']
-        };
         spanType['edits'] = {
             list: [],
             item: {edit: 'duration'}
-        };
-        sortKeys['edits'] = {
-            list: {},
-            item: {}
-        };
-
-        // Texts
-        views['texts'] = {
-            list: [],
-            item: ['text']
         };
         spanType['texts'] = {
             list: [],
             item: {text: 'number'}
         };
-        sortKeys['texts'] = {
-            list: {},
-            item: {}
-        };
+
 
         findKeys = [{id: 'list', type: 'string'}].concat(pandora.site.itemKeys);
 
-        self.URL = Ox.URL({
+        self.URL = Ox.URL(Ox.extend({
             findKeys: findKeys,
             getHash: pandora.getHash,
             getItem: pandora.getItem,
@@ -370,11 +381,9 @@ pandora.URL = (function() {
                 }),
                 ['preferences', 'signup', 'signin', 'signout']
             ),
-            sortKeys: sortKeys,
             spanType: spanType,
             types: [pandora.site.itemName.plural.toLowerCase(), 'edits', 'texts'],
-            views: views
-        });
+        }, getOptions()));
 
         window.addEventListener('hashchange', function() {
             Ox.Request.cancel();
@@ -482,6 +491,12 @@ pandora.URL = (function() {
             keys = !pandora.user.ui.item
                 ? ['listView', 'listSort', 'find']
                 : ['item', 'itemView', 'itemSort'];
+        } else {
+            if (keys.some(function(key) {
+                return Ox.contains(['itemSort', 'itemView', 'listSort', 'listView'], key);
+            })) {
+                self.URL.options(getOptions());
+            }
         }
         if (self.isPopState) {
             self.isPopState = false;
