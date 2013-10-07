@@ -325,7 +325,7 @@ class Item(models.Model):
     def __unicode__(self):
         year = self.get('year')
         if year:
-            string = u'%s (%s)' % (self.get('title', 'Untitled'), self.get('year'))
+            string = u'%s (%s)' % (ox.decode_html(self.get('title', 'Untitled')), self.get('year'))
         else:
             string = self.get('title', u'Untitled')
         return u'[%s] %s' % (self.itemId,string)
