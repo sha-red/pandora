@@ -745,7 +745,7 @@ pandora.ui.mainMenu = function() {
             },
             pandora_videopoints: function(data) {
                 var action;
-                if (data.value['in']) {
+                if (data.value && data.value['in']) {
                     action = data.value['in'] != data.value.out ? 'enableItem' : 'disableItem';
                     that[action]('copy');
                     that[action]('copyadd');
