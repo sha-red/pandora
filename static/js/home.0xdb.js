@@ -119,8 +119,10 @@ pandora.ui.home = function() {
                     var folder = pandora.getListData().folder,
                         value = $findInput.value();
                     folder && pandora.$ui.folderList[folder].options({selected: []});
-                    pandora.$ui.findSelect.value('*');
-                    pandora.$ui.findInput.value(value);
+                    if (pandora.user.ui.section == 'items') {
+                        pandora.$ui.findSelect.value('*');
+                        pandora.$ui.findInput.value(value);
+                    }
                     that.fadeOutScreen();
                     pandora.UI.set({
                         page: '',
@@ -129,7 +131,8 @@ pandora.ui.home = function() {
                                 ? []
                                 : [{key: '*', value: value, operator: '='}],
                             operator: '&'
-                        }
+                        },
+                        section: 'items'
                     });
                 }
             })
@@ -151,7 +154,8 @@ pandora.ui.home = function() {
             .bindEvent({
                 click: function() {
                     pandora.UI.set({
-                        page: pandora.user.ui.page == 'home' ? '' : pandora.user.ui.page
+                        page: pandora.user.ui.page == 'home' ? '' : pandora.user.ui.page,
+                        section: 'items'
                     });
                     that.fadeOutScreen();
                 }
