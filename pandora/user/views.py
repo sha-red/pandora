@@ -637,7 +637,7 @@ def contact(request):
             'name': name,
             'email': email,
             'subject': subject,
-            'message': data['message'].strip(),
+            'message': ox.decode_html(data['message']).strip(),
             'sitename': settings.SITENAME,
             'footer': settings.CONFIG['site']['email']['footer'],
             'url': request.build_absolute_uri('/'),
