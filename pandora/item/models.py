@@ -1059,6 +1059,8 @@ class Item(models.Model):
             return
         base = self.path('torrent')
         base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
+        if isinstance(base, unicode):
+            base = base.encode('utf-8')
         if os.path.exists(base):
             shutil.rmtree(base)
         ox.makedirs(base)
