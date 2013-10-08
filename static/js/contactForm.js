@@ -47,7 +47,9 @@ pandora.ui.contactForm = function() {
                     width: width
                 }),
                 Ox.Input({
-                    autovalidate: /.+/,
+                    autovalidate: function(value, blur, callback) {
+                        callback({valid: value.length > 0, value: value});
+                    },
                     height: 256,
                     id: 'message',
                     placeholder: 'Message',
