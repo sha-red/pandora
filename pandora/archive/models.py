@@ -371,8 +371,7 @@ class File(models.Model):
         for key in self.PATH_INFO:
             data[key] = self.info.get(key)
         data['users'] = list(set([i['user'] for i in data['instances']]))
-        if 'item' in keys:
-            data['item'] = self.item.itemId
+        data['item'] = self.item.itemId
         if keys:
             for k in data.keys():
                 if k not in keys:
