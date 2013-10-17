@@ -280,6 +280,7 @@ pandora.ui.infoView = function(data) {
         .append(
             Ox.EditableContent({
                     editable: canEdit,
+                    placeholder: formatLight(Ox._('No Title')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
                     value: data.title
                 })
