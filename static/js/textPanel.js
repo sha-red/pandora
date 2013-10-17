@@ -312,7 +312,8 @@ pandora.ui.textHTML = function(text) {
             })
             .appendTo($content);
 
-    scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
+    pandora.user.ui.texts[pandora.user.ui.text] &&
+        scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
 
     function getHeight() {
         // 24 menu + 24 toolbar + 16 statusbar + 32 title + 32 margins
