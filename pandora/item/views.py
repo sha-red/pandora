@@ -317,7 +317,7 @@ def autocomplete(request):
         data['range'] = [0, 10]
     op = data.get('operator', '=')
 
-    key = settings.CONFIG['keys'][data['key']]
+    key = utils.get_by_id(settings.CONFIG['itemKeys'], data['key'])
     order_by = key.get('autocompleteSort', False)
     if order_by:
         for o in order_by:

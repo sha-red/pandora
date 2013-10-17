@@ -42,7 +42,7 @@ def parseCondition(condition, user, owner=None):
         exclude = False
 
     facet_keys = models.Item.facet_keys + ['title']
-    key_type = settings.CONFIG['keys'].get(k, {'type':'string'}).get('type')
+    key_type = (utils.get_by_id(settings.CONFIG['itemKeys'], k) or {'type': 'string'}).get('type')
     if isinstance(key_type, list):
         key_type = key_type[0]
     key_type = {
