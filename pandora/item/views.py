@@ -1104,8 +1104,7 @@ def oembed(request):
     itemId = parts[1]
     #fixme: embed should reflect actuall url
     item = get_object_or_404_json(models.Item, itemId=itemId)
-    embed_url = request.build_absolute_uri('/%s/embed' % item.itemId)
-    embed_url = '%s#?embed=true' % url
+    embed_url = request.build_absolute_uri('/%s#embed' % item.itemId)
     oembed = {}
     oembed['version'] = '1.0'
     oembed['type'] = 'video'
