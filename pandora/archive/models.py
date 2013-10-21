@@ -578,7 +578,10 @@ class Stream(models.Model):
                 self.media.name = self.path(self.name())
             target = self.media.path
             info = ox.avinfo(media)
-            if extract.stream(media, target, self.name(), info):
+            ffmpeg = ox.file.cmd('ffmpeg')
+            if ffmpeg == 'ffmpeg':
+                ffmpeg = None
+            if extract.stream(media, target, self.name(), info, ffmpeg):
                 self.available = True
             else:
                 self.media = None

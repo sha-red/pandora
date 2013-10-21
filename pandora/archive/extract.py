@@ -62,7 +62,7 @@ def supported_formats():
         'mp4': 'libx264' in stdout and 'libvo_aacenc' in stdout,
     }
 
-def stream(video, target, profile, info):
+def stream(video, target, profile, info, avconv=None):
     if not os.path.exists(target):
         ox.makedirs(os.path.dirname(target))
 
@@ -230,7 +230,9 @@ def stream(video, target, profile, info):
     else:
         audio_settings = ['-an']
 
-    cmd = [AVCONV, '-y', '-i', video, '-threads', '4'] \
+    if not avconv:
+        avconv = AVCONV
+    cmd = [avconv, '-y', '-i', video, '-threads', '4'] \
           + audio_settings \
           + video_settings
 
