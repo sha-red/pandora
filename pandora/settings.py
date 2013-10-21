@@ -5,9 +5,9 @@
 # check pan.do/ra section below for relevant settings
 
 import os
-from os.path import join, normpath
+from os.path import join, normpath, dirname
 
-PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
+PROJECT_ROOT = normpath(dirname(__file__))
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
