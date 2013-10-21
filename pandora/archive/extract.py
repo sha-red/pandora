@@ -246,14 +246,15 @@ def stream(video, target, profile, info, avconv=None):
 
     #print cmd
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-                              stdout=open('/dev/null', 'w'),
+                              stdout=subprocess.PIPE,
                               stderr=subprocess.STDOUT)
-    p.communicate()
+    stdout, stderr = p.communicate()
+
     if p.returncode != 0:
         t = "%s.mp4" % target if format == 'mp4' else target
         if os.path.exists(t):
             os.unlink(t)
-        return False
+        return False, stdout
     if format == 'mp4':
         cmd = ['qt-faststart', "%s.mp4" % target, target]
         #print cmd
@@ -262,7 +263,7 @@ def stream(video, target, profile, info, avconv=None):
                                   stderr=subprocess.STDOUT)
         p.communicate()
         os.unlink("%s.mp4" % target)
-    return True
+    return True, None
 
 
 def run_command(cmd, timeout=10):

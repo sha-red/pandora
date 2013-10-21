@@ -81,11 +81,12 @@ pandora.ui.mediaView = function(options, self) {
                     format: function(value, data) {
                         return $('<img>')
                             .attr({
-                                src: ['uploading', 'queued', 'encoding'].indexOf(data.state) > -1
+                                src: ['uploading', 'queued', 'encoding', 'failed'].indexOf(data.state) > -1
                                     ? Ox.UI.getImageURL('symbol' + {
                                         'uploading': 'Upload',
                                         'queued': 'Data',
-                                        'encoding': 'Sync'
+                                        'encoding': 'Sync',
+                                        'failed': 'Warning'
                                     }[data.state])
                                     : data.wanted
                                     ? Ox.UI.getImageURL('symbolUp')
@@ -103,11 +104,12 @@ pandora.ui.mediaView = function(options, self) {
                     title: Ox._('Status'),
                     titleImage: 'check',
                     tooltip: function (data) {
-                        return ['uploading', 'queued', 'encoding'].indexOf(data.state) > -1
+                        return ['uploading', 'queued', 'encoding', 'failed'].indexOf(data.state) > -1
                             ? Ox._({
                                 'uploading': 'Video is currently uploaded to server',
                                 'queued': 'Waiting for server to process video',
-                                'encoding': 'Processing video on server'
+                                'encoding': 'Processing video on server',
+                                'failed': 'Encoding failed'
                             }[data.state])
                             : data.instances.filter(function(i) {return i.ignore; }).length > 0
                             ? Ox._('Use this file')
@@ -234,7 +236,7 @@ pandora.ui.mediaView = function(options, self) {
                     query: self.filesQuery
                 }), callback);
             },
-            keys: ['state', 'instances', 'wanted'],
+            keys: ['state', 'instances', 'wanted', 'error'],
             scrollbarVisible: true,
             sort: [{key: 'path', operator: '+'}],
             unique: 'id'
@@ -242,17 +244,49 @@ pandora.ui.mediaView = function(options, self) {
         .bindEvent({
             click: function(data) {
                 if (data.key == 'selected') {
-                    var ignored = self.$filesList.value(data.id, 'instances')
-                            .filter(function(i) {return i.ignore; }).length > 0;
-                    pandora.api.editMedia({
-                        files: [{
-                            id: data.id,
-                            ignore: !ignored
-                        }]
-                    }, function(result) {
-                        Ox.Request.clearCache();
-                        self.$filesList.reloadList();
-                    });
+                    var value = self.$filesList.value(data.id);
+                    console.log(data, value);
+                    if (value.state == 'failed') {
+                        var $dialog = Ox.Dialog({
+                            buttons: [
+                                Ox.Button({
+                                    id: 'close',
+                                    title: Ox._('Close')
+                                })
+                                .bindEvent({
+                                    click: function() {
+                                        $dialog.close();
+                                    }
+                                })
+                            ],
+                            closeButton: true,
+                            content: $('<code>').append(
+                                $('<pre>')
+                                    .addClass('OxSelectable')
+                                    .css({margin: '16px'})
+                                    .text(value.error)
+                            ),
+                            height: Math.round((window.innerHeight - 48) * 0.9),
+                            keys: {enter: 'close', escape: 'close'},
+                            maximizeButton: true,
+                            removeOnClose: true,
+                            title: 'Encoding Failed',
+                            width: Math.round(window.innerWidth * 0.9)
+                        })
+                        .open();
+                    } else {
+                        var ignored = self.$filesList.value(data.id, 'instances')
+                                .filter(function(i) {return i.ignore; }).length > 0;
+                        pandora.api.editMedia({
+                            files: [{
+                                id: data.id,
+                                ignore: !ignored
+                            }]
+                        }, function(result) {
+                            Ox.Request.clearCache();
+                            self.$filesList.reloadList();
+                        });
+                    }
                 }
             },
             'delete': function(data) {

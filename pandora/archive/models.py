@@ -79,6 +79,7 @@ class File(models.Model):
     queued = models.BooleanField(default = False)
     encoding = models.BooleanField(default = False)
     wanted = models.BooleanField(default = False)
+    failed = models.BooleanField(default = False)
 
     is_audio = models.BooleanField(default=False)
     is_video = models.BooleanField(default=False)
@@ -341,7 +342,12 @@ class File(models.Model):
         if self.type != 'video':
             duration = None
         state = ''
-        if self.encoding:
+        error = ''
+        if self.failed:
+            state = 'failed'
+            error = '\n\n'.join(['Failed to encode %s:\n%s' % (s.name(), s.error)
+                for s in self.streams.exclude(error='') if s.error])
+        elif self.encoding:
             state = 'encoding'
         elif self.queued:
             state = 'queued'
@@ -368,6 +374,8 @@ class File(models.Model):
             'videoCodec': self.video_codec,
             'wanted': self.wanted,
         }
+        if error:
+            data['error'] = error
         for key in self.PATH_INFO:
             data[key] = self.info.get(key)
         data['users'] = list(set([i['user'] for i in data['instances']]))
@@ -512,6 +520,8 @@ class Stream(models.Model):
     color = fields.TupleField(default=[])
     volume = models.FloatField(default=0)
 
+    error = models.TextField(blank=True, default='')
+
     @property
     def timeline_prefix(self):
         return os.path.join(settings.MEDIA_ROOT, self.path())
@@ -566,11 +576,15 @@ class Stream(models.Model):
                 self.media.name = os.path.join(os.path.dirname(self.source.media.name), self.name())
             target = self.media.path
             info = ox.avinfo(media)
-            if extract.stream(media, target, self.name(), info):
+            ok, error = extract.stream(media, target, self.name(), info)
+            if ok:
                 self.available = True
             else:
                 self.media = None
                 self.available = False
+                self.error = error
+                self.file.failed = True
+                self.file.save()
             self.save()
         elif self.file.data:
             media = self.file.data.path
@@ -581,11 +595,15 @@ class Stream(models.Model):
             ffmpeg = ox.file.cmd('ffmpeg')
             if ffmpeg == 'ffmpeg':
                 ffmpeg = None
-            if extract.stream(media, target, self.name(), info, ffmpeg):
+            ok, error = extract.stream(media, target, self.name(), info, ffmpeg)
+            if ok:
                 self.available = True
             else:
                 self.media = None
                 self.available = False
+                self.error = error
+                self.file.failed = True
+                self.file.save()
             self.save()
 
     def make_timeline(self):
