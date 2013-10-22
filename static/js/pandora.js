@@ -23,7 +23,7 @@ appPanel
 
     window.onerror = function(error, url, line) {
         try {
-            !isMSIE && pandora.api.log({
+            !isMSIE && !/^resource:/.test(url) && pandora.api.log({
                 text: error,
                 url: url,
                 line: line
