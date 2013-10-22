@@ -116,7 +116,7 @@ class Statistics(dict):
 
                 name = {}
                 for key in ['system', 'browser']:
-                    version = item[key];
+                    version = item[key]
                     if version:
                         name[key] = get_name(key, version)
                         if name[key]:
@@ -125,7 +125,7 @@ class Statistics(dict):
                             key = key + 'version';
                             self._increment(self[mode][key], version)
 
-                if name['system'] and name['browser']:
+                if name.get('system') and name.get('browser'):
                     name = name['system'] + ' / ' + name['browser']
                     self._increment(self[mode]['systemandbrowser'], name)
                     
