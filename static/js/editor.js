@@ -6,7 +6,7 @@ pandora.ui.editor = function(data) {
 
     var ui = pandora.user.ui,
 
-        that = Ox.VideoEditor({
+        that = Ox.VideoAnnotationPanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
             annotationsFont: ui.annotationsFont,
             annotationsMapSize: ui.annotationsMapSize,
