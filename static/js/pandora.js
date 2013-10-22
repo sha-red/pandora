@@ -24,8 +24,8 @@ appPanel
     window.onerror = function(error, url, line) {
         try {
             !isMSIE && !/^resource:/.test(url) && pandora.api.log({
-                text: error + ' (' + document.location.pathname + ')',
-                url: url,
+                text: error,
+                url: document.location.pathname + ' at ' + url,
                 line: line
             });
         } catch(e) {}
