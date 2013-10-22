@@ -1615,11 +1615,11 @@ pandora.getVideoURL = function(id, resolution, part) {
 pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
         canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
-        options = {},
-        subtitlesLayer = pandora.site.layers.filter(function(layer) {
-            return layer.isSubtitles;
-        })[0];
-    options.subtitles = subtitlesLayer ? data.layers[subtitlesLayer.id].map(function(subtitle) {
+        options = {};
+    options.subtitlesLayer = pandora.site.layers.filter(function(layer) {
+        return layer.isSubtitles;
+    })[0];
+    options.subtitles = options.subtitlesLayer ? data.layers[options.subtitlesLayer.id].map(function(subtitle) {
         return {
             id: subtitle.id,
             'in': subtitle['in'],
