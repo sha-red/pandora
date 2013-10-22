@@ -146,7 +146,7 @@ if __name__ == "__main__":
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
             print 'Database has changed, please make a backup and run ./update.py db'
-        elif current != new:
+        if current != new:
             if pandora_old_revno != pandora_new_revno:
                 os.chdir(base)
                 run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
