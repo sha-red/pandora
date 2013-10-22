@@ -106,9 +106,9 @@ class Statistics(dict):
                     continent = country_data.get('continent','')
                     region = ', '.join([continent, country_data.get('region', '')])
                     country = ', '.join([region, country])
-                    city = ', '.join(country, city) if city else ''
+                    city = ', '.join([country, city]) if city else ''
 
-                    self._increment(self[mode]['continent'], continent,)
+                    self._increment(self[mode]['continent'], continent)
                     self._increment(self[mode]['region'], region)
                     self._increment(self[mode]['country'], country)
                     if city:
