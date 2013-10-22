@@ -141,13 +141,13 @@ if __name__ == "__main__":
         if current != new:
             run('./manage.py', 'update_static')
             run('./manage.py', 'compile_pyc')
+        if pandora_old_revno != pandora_new_revno:
+            os.chdir(base)
+            run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
         if not development:
             print 'pan.do/ra is at the latest stable release, you can run "./update dev" to update to the development version'
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
             print 'Database has changed, please make a backup and run ./update.py db'
-        if current != new:
-            if pandora_old_revno != pandora_new_revno:
-                os.chdir(base)
-                run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
+        elif current != new:
             reload_notice(base)
