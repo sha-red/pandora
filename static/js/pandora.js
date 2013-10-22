@@ -265,6 +265,20 @@ appPanel
                 delete pandora.user.ui[key];
             }
         });
+        // make sure itemSort is valid
+        if (!Ox.contains(pandora.site.itemKeys.filter(function(itemKey) {
+            return itemKey.sort;
+        }).map(function(itemKey) {
+            return itemKey.id;
+        }), pandora.user.ui.itemSort[0].key)) {
+            pandora.user.ui.itemSort = pandora.site.user.ui.itemSort;
+        }
+        // make sure itemView is valid
+        if (!Ox.contains(pandora.site.itemViews.map(function(itemView) {
+            return itemView.id;
+        }), pandora.user.ui.itemView)) {
+            pandora.user.ui.itemView = pandora.site.user.ui.itemView;
+        }
         // patch theme ... this can be removed at a later point
         pandora.user.ui.theme = legacyThemes[pandora.user.ui.theme] || pandora.user.ui.theme;
         // make sure theme is valid
