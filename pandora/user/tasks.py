@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import json
 from datetime import timedelta
+from itertools import izip_longest
 
 from celery.task import task, periodic_task
 
@@ -14,14 +15,16 @@ def cronjob(**kwargs):
     update_statistics()
 
 def update_statistics():
+    def chunker(iterable, chunksize, filler):
+        return izip_longest(*[iter(iterable)]*chunksize, fillvalue=filler)
+
     stats = Statistics()
     ids = [i['session_key'] for i in models.SessionData.objects.all().values('session_key')]
-    for id in ids:
-        try:
-            u = models.SessionData.objects.get(pk=id)
+
+    for chunk in chunker(ids, 100, None):
+        chunk = filter(None, chunk)
+        for u in models.SessionData.objects.filter(pk__in=chunk):
             stats.add(u.json())
-        except:
-            pass
     Settings.set('statistics', stats)
 
 @task(ignore_results=True, queue='default')
