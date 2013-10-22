@@ -996,7 +996,9 @@ class Item(models.Model):
     def users_with_files(self):
         return User.objects.filter(
             volumes__files__file__item=self
-        ).order_by('-profile__level', 'date_joined').distinct()
+        ).order_by('date_joined').distinct()
+        #FIXME: profile not showing up here
+        #).order_by('-profile__level', 'date_joined').distinct()
 
     def sets(self):
         sets = []
