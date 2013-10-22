@@ -75,7 +75,7 @@ class Statistics(dict):
                 for key in ['firstseen', 'lastseen']:
                     year = '%s-%s' % (item[key].strftime('%Y'), key)
                     month = '%s-%s' % (item[key].strftime('%Y-%m'), key)
-                    day = '%s-%s' % (item[key].strftime('%Y-%m-%d'), key)
+                    day = item[key].strftime('%Y-%m-%d')
                     weekday = item[key].strftime('%u')
                     hour = item[key].strftime('%H')
 
