@@ -19,7 +19,8 @@ def update_statistics():
         return izip_longest(*[iter(iterable)]*chunksize, fillvalue=filler)
 
     stats = Statistics()
-    ids = [i['session_key'] for i in models.SessionData.objects.all().values('session_key')]
+    ids = [i['session_key']
+        for i in models.SessionData.objects.filter(level__gte=0).values('session_key')]
 
     for chunk in chunker(ids, 100, None):
         chunk = filter(None, chunk)

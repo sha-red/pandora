@@ -81,18 +81,18 @@ class Statistics(dict):
 
                     if not year in self[mode]['year']:
                         self[mode]['year'][year] = {}
-                    self._increment(self[mode]['year'][year], month, 1)
+                    self._increment(self[mode]['year'][year], month)
 
-                    self._increment(self[mode]['month'], month, 1)
+                    self._increment(self[mode]['month'], month)
 
                     if key == 'firstseen':
                         if not day in self[mode]['day']:
                             self[mode]['day'][day] = {}
-                        self._increment(self[mode]['day'][day], hour, 1)
+                        self._increment(self[mode]['day'][day], hour)
 
                         if not weekday in self[mode]['weekday']:
                             self[mode]['weekday'][weekday] = {}
-                        self._increment(self[mode]['weekday'][weekday], hour, 1)
+                        self._increment(self[mode]['weekday'][weekday], hour)
 
                         self._increment(self[mode]['hour'], hour)
 
