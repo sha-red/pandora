@@ -1148,7 +1148,7 @@ pandora.ui.infoView = function(data) {
         pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
     };
 
-    that.resize = function() {
+    that.resizeElement = function() {
         var height = getHeight() + 'px';
         $data.css({height: height});
         $list && $list.css({height: height});

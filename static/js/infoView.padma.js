@@ -778,8 +778,6 @@ pandora.ui.infoView = function(data) {
         toggleIconSize();
     };
 
-    that.resize = Ox.noop;
-
     that.bindEvent({
         pandora_icons: that.reload,
         pandora_showsiteposters: function() {

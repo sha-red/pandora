@@ -22,9 +22,9 @@ pandora.ui.posterView = function() {
             orientation: 'horizontal'
         });
 
-    that.resize = function() {
+    that.resizeElement = function() {
         selectedImage.url && renderPreview();
-    }
+    };
 
     pandora.api.get({
         id: item,

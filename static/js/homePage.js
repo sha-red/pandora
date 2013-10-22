@@ -65,7 +65,7 @@ pandora.ui.homePage = function() {
             .html('center')
             .appendTo($center);
 
-    that.resize = function() {
+    that.resizeElement = function() {
         var size = Ox.splitInt(window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1 - 64, 3);
         $left.css({width: size[0] + 'px'});
         $center.css({width: size[1] + 'px'});
@@ -74,7 +74,7 @@ pandora.ui.homePage = function() {
         $right.css({width: size[2] + 'px'});
     };
 
-    that.resize();
+    that.resizeElement();
 
     return that;
 

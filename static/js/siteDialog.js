@@ -140,9 +140,9 @@ pandora.ui.siteDialog = function(section) {
                 dialogHeight = data.height;
                 dialogWidth = data.width;
                 if (selected == 'contact') {
-                    pandora.$ui.contactForm.resize();
+                    pandora.$ui.contactForm.resizeElement();
                 } else if (selected == 'news') {
-                    pandora.$ui.news.resize(data);
+                    pandora.$ui.news.resizeElement(data);
                 }
             },
             key_down: function() {

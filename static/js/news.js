@@ -189,7 +189,7 @@ pandora.ui.news = function(width, height) {
         renderList();
     }
 
-    that.resize = function(data) {
+    that.resizeElement = function(data) {
         width = data.width;
         height = data.height;
         $left.css({width: width - 512});

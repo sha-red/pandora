@@ -1950,7 +1950,7 @@ pandora.resizeWindow = function() {
         } else {
             pandora.$ui.browser.scrollToSelection();
             if (pandora.user.ui.itemView == 'info') {
-                pandora.$ui.item.resize && pandora.$ui.item.resize();
+                pandora.$ui.item.resizeElement && pandora.$ui.item.resizeElement();
             } else if (pandora.user.ui.itemView == 'clips') {
                 pandora.$ui.clipList.size();
             } else if (pandora.user.ui.itemView == 'timeline') {

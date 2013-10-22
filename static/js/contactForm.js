@@ -157,7 +157,7 @@ pandora.ui.contactForm = function() {
         ) - 304 - Ox.UI.SCROLLBAR_SIZE, 512);
     }
 
-    that.resize = function() {
+    that.resizeElement = function() {
         var width = getWidth();
         $form.css({width: width + 'px'});
         $form.options('items').forEach(function($input, i) {
@@ -169,7 +169,7 @@ pandora.ui.contactForm = function() {
             $receiptCheckbox.options({width: width - 136});
         }
         $text.css({width: width + 'px'});
-    }
+    };
 
     return that;
 

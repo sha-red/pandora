@@ -62,7 +62,7 @@ pandora.ui.item = function() {
                 pandora.$ui.item = pandora.ui.infoView(result.data)
                     .bindEvent({
                         resize: function() {
-                            pandora.$ui.item.resize && pandora.$ui.item.resize();
+                            pandora.$ui.item.resizeElement && pandora.$ui.item.resizeElement();
                         }
                     })
             );
@@ -132,7 +132,7 @@ pandora.ui.item = function() {
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.item = pandora.ui.PostersView().bindEvent({
                     resize: function() {
-                        pandora.$ui.item.resize();
+                        pandora.$ui.item.resizeElement();
                     }
                 })
             );
