@@ -86,99 +86,12 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel;
 
-    pandora.api.findUsers({
-        keys: ['browser', 'firstseen', 'lastseen', 'level', 'location', 'system'],
-        query: {
-            conditions: [{key: 'level', value: 'robot', operator: '!='}],
-            operator: '&'
-        },
-        range: [0, 1000000],
-        sort: [{key: 'username', operator: '+'}]
-    }, function(result) {    
-
-        var data = {},
+    pandora.api.statistics({}, function(result) {
+        var data = result.data,
             flagCountry = {},
             $guestsCheckbox;
 
         ['all', 'registered'].forEach(function(mode) {
-
-            data[mode] = {
-                year: {},
-                month: {},
-                day: {},
-                weekday: {},
-                hour: {},
-                continent: {},
-                region: {},
-                country: {},
-                city: {},
-                system: {},
-                browser: {},
-                systemandbrowser: {},
-                systemversion: {},
-                browserversion: {},
-                systemandbrowserversion: {}
-            };
-
-            result.data.items.forEach(function(item) {
-                var city, continent, country, countryData, name = {}, region, split;
-                if (mode == 'all' || item.level != 'guest') {
-                    ['firstseen', 'lastseen'].forEach(function(key, i) {
-                        var year = Ox.formatDate(item[key], '%Y') + '-' + key,
-                            month = Ox.formatDate(item[key], '%Y-%m') + '-' + key,
-                            day = Ox.formatDate(item[key], '%Y-%m-%d'),
-                            weekday = Ox.formatDate(item[key], '%u'),
-                            hour = Ox.formatDate(item[key], '%H');
-                        data[mode].year[year] = data[mode].year[year] || {};
-                        data[mode].year[year][month] = (data[mode].year[year][month] || 0) + 1;                
-                        data[mode].month[month] = (data[mode].month[month] || 0) + 1;
-                        if (key == 'firstseen') {
-                            data[mode].day[day] = data[mode].day[day] || {};
-                            data[mode].day[day][hour] = (data[mode].day[day][hour] || 0) + 1;
-                            data[mode].weekday[weekday] = data[mode].weekday[weekday] || {};
-                            data[mode].weekday[weekday][hour] = (data[mode].weekday[weekday][hour] || 0) + 1;           
-                            data[mode].hour[hour] = (data[mode].hour[hour] || 0) + 1;
-                        }
-                    });
-                    if (item.location) {
-                        split = Ox.splitGeoname(item.location);
-                        if (split.length == 1) {
-                            country = split[0];
-                        } else {
-                            city = split[0];
-                            country = split[1];
-                        }
-                        countryData = Ox.getCountryByName(country) || {continent: '', region: ''};
-                        continent = countryData.continent;
-                        region = [continent, countryData.region].join(', ');
-                        country = [region, country].join(', ')
-                        city = city ? [country, city].join(', ') : '';
-                        data[mode].continent[continent] = (data[mode].continent[continent] || 0) + 1;
-                        data[mode].region[region] = (data[mode].region[region] || 0) + 1;
-                        data[mode].country[country] = (data[mode].country[country] || 0) + 1;
-                        if (city) {
-                            data[mode].city[city] = (data[mode].city[city] || 0) + 1;
-                        }
-                    }
-                    ['system', 'browser'].forEach(function(key) {
-                        var version = item[key];
-                        if (version) {
-                            name[key] = getName(key, version);
-                            if (name[key]) {
-                                data[mode][key][name[key]] = (data[mode][key][name[key]] || 0) + 1; 
-                                key = key + 'version';
-                                data[mode][key][version] = (data[mode][key][version] || 0) + 1;
-                            }
-                        }
-                    });
-                    if (name.system && name.browser) {
-                        name = name.system + ' / ' + name.browser;
-                        data[mode].systemandbrowser[name] = (data[mode].systemandbrowser[name] || 0) + 1;
-                        name = item.system + ' / ' + item.browser;
-                        data[mode].systemandbrowserversion[name] = (data[mode].systemandbrowserversion[name] || 0) + 1;
-                    }
-                }
-            });
 
             var keys, firstKey, lastKey;
             keys = Object.keys(data[mode].month).map(function(key) {

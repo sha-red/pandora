@@ -795,3 +795,17 @@ def setUI(request):
     return render_to_json_response(response)
 actions.register(setUI, cache=False)
 
+@capability_required_json('canManageUsers')
+def statistics(request):
+    '''
+    '''
+    response = json_response()
+    from app.models import Settings
+    stats = Settings.get('statistics')
+    if not stats:
+        import tasks
+        tasks.update_stats()
+        stats = Settings.get('statistics')
+    response['data'] = stats
+    return render_to_json_response(response)
+actions.register(statistics, cache=False)
