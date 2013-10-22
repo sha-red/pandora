@@ -804,7 +804,7 @@ def statistics(request):
     stats = Settings.get('statistics')
     if not stats:
         import tasks
-        tasks.update_stats()
+        tasks.update_statistics()
         stats = Settings.get('statistics')
     response['data'] = stats
     return render_to_json_response(response)
