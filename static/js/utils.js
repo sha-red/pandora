@@ -1618,15 +1618,19 @@ pandora.getVideoOptions = function(data) {
         options = {};
     options.subtitlesLayer = pandora.site.layers.filter(function(layer) {
         return layer.isSubtitles;
+    }).map(function(layer) {
+        return layer.id;
     })[0];
-    options.subtitles = options.subtitlesLayer ? data.layers[options.subtitlesLayer.id].map(function(subtitle) {
-        return {
-            id: subtitle.id,
-            'in': subtitle['in'],
-            out: subtitle.out,
-            text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n')
-        };
-    }) : [];
+    options.subtitles = options.subtitlesLayer
+        ? data.layers[options.subtitlesLayer].map(function(subtitle) {
+            return {
+                id: subtitle.id,
+                'in': subtitle['in'],
+                out: subtitle.out,
+                text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n')
+            };
+        })
+        : [];
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
             options.subtitles.length
