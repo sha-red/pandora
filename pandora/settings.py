@@ -87,7 +87,7 @@ MIDDLEWARE_CLASSES = (
     'ox.django.middleware.ChromeFrameMiddleware',
 )
 
-ROOT_URLCONF = 'pandora.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     join(PROJECT_ROOT, 'templates'),
@@ -138,7 +138,7 @@ LOGGING = {
     'handlers': {
         'errors': {
             'level': 'ERROR',
-            'class': 'pandora.log.utils.ErrorHandler'
+            'class': 'log.utils.ErrorHandler'
         }
     },
     'loggers': {
