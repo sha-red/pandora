@@ -338,7 +338,8 @@ pandora.ui.textHTML = function(text) {
         }).css({
             width: getWidth() + 'px'
         });
-        scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
+        pandora.user.ui.texts[pandora.user.ui.text] &&
+            scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
         return that;
     };
 
