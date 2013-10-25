@@ -413,6 +413,7 @@ appPanel
                 pandora.$ui.loadingIcon.update(data.requests);
             }
         });
+        Ox.Fullscreen.bind('exit', pandora.UI.set);
         pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
         if (getLocalStorage('pandora.onload')) {
             try {
