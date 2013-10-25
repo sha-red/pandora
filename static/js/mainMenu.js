@@ -154,7 +154,11 @@ pandora.ui.mainMenu = function() {
                         { 
                             id: 'togglefullscreen',
                             title: Ox._((fullscreenState ? 'Exit' : 'Enter') + ' Fullscreen'),
-                            disabled: fullscreenState === void 0, keyboard: 'shift alt control f'
+                            disabled: fullscreenState === void 0,
+                            keyboard: /^Mac/.test(window.navigator.platform)
+                                ? 'shift alt control f'
+                                : 'F11'
+
                         },
                         { 
                             id: 'entervideofullscreen',
