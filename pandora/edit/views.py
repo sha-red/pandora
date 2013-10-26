@@ -38,6 +38,7 @@ def addClips(request):
         }
         add clips with item/in/out or annotation to edit with id
         clips are added at index or end if index is not provided
+        (annoation id is in the form item/annotation)
         returns {
         }
     '''
