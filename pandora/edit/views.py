@@ -95,7 +95,8 @@ def editClip(request):
     '''
        takes {
            id: string,
-           in: float
+           in: float,
+           out: float
         }
         returns {
         }
@@ -223,6 +224,7 @@ def addEdit(request):
             name
         }
         returns {
+            id
             ...
         }
     '''
