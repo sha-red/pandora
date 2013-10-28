@@ -146,6 +146,7 @@ if __name__ == "__main__":
             run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
         if not development:
             print 'pan.do/ra is at the latest stable release, you can run "./update dev" to update to the development version'
+        os.chdir(join(base, 'pandora'))
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
             print 'Database has changed, please make a backup and run ./update.py db'
