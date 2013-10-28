@@ -71,6 +71,9 @@ pandora.ui.textPanel = function() {
                     float: 'right',
                     margin: '4px 2px 4px 2px'
                 })
+                .bindEvent({
+                    click: scrollToSelectedEmbed
+                })
                 .appendTo($toolbar),
 
             $previousButton = Ox.Button({
@@ -183,6 +186,12 @@ pandora.ui.textPanel = function() {
         return urls;
     }
 
+    function scrollToSelectedEmbed() {
+        var scrollTop = Math.max(pandora.$ui.text[0].scrollTop + $('#embed' + selected).offset().top - 50, 0),
+            position = 100 * scrollTop / pandora.$ui.text[0].scrollHeight;
+        pandora.$ui.text.scrollTo(position);
+    }
+
     that.selectEmbed = function(index) {
         if (index != selected) {
             selected = index;
@@ -190,6 +199,7 @@ pandora.ui.textPanel = function() {
             $('.OxSpecialLink').removeClass('OxActive');
             selected > -1 && $('#embed' + selected).addClass('OxActive');
             pandora.$ui.textEmbed.update(selectedURL);
+            scrollToSelectedEmbed();
         }
     };
 
@@ -331,6 +341,8 @@ pandora.ui.textHTML = function(text) {
     function scrollTo(position) {
         that[0].scrollTop = that[0].scrollHeight/100 * position;
     }
+
+    that.scrollTo = scrollTo;
 
     that.update = function() {
         $text.options({
