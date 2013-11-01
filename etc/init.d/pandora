@@ -19,7 +19,7 @@ PANDORA_BASE=/srv/pandora
 DAEMON_USER="pandora"
 DAEMON_NAME=bin/gunicorn_django
 DAEMON="$PANDORA_BASE/$DAEMON_NAME"
-DAEMON_ARGS="--bind 127.0.0.1:2620 --timeout 90 --log-level info --log-file /var/log/pandora/$NAME.log --workers 5"
+DAEMON_ARGS="--bind 127.0.0.1:2620 --max-requests 1000 --timeout 90 --log-level info --log-file /var/log/pandora/$NAME.log --workers 5"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
