@@ -155,7 +155,7 @@ pandora.ui.list = function() {
                     height: Math.round(ratio <= 1 ? size : size / ratio),
                     id: data.id,
                     info: info,
-                    title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                    title: data.title + (data.director && data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
                     url: url,
                     width: Math.round(ratio >= 1 ? size : size * ratio)
                 };
