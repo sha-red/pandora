@@ -51,7 +51,6 @@ MEDIA_URL = '/data/'
 
 STATIC_ROOT = normpath(join(PROJECT_ROOT, '..', 'static'))
 STATIC_URL = '/static/'
-ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
