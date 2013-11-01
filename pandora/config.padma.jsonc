@@ -73,18 +73,6 @@
         included in find annotations. // FIXME: the last bit is not implemented.
     */
     "clipLayers": ["transcripts", "keywords", "places", "events", "descriptions"],
-    // fixme: either this, or filter: true in itemKeys, but not both
-    "filters": [
-        {"id": "source", "title": "Sources", "type": "string"},
-        {"id": "project", "title": "Projects", "type": "string"},
-        {"id": "topic", "title": "Topics", "type": "string"},
-        {"id": "name", "title": "People", "type": "string"},
-        {"id": "language", "title": "Languages", "type": "string"},
-        {"id": "license", "title": "License", "type": "string"},
-        {"id": "places", "title": "Places", "type": "string"},
-        {"id": "events", "title": "Events", "type": "string"},
-        {"id": "keywords", "title": "Keywords", "type": "string"}
-    ],
     "flags": false,
     "help": [
         {"id": "help", "title": "Help"},
