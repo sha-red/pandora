@@ -160,6 +160,12 @@ pandora.ui.embedPlayer = function() {
                 }
             });
 
+        Ox.Fullscreen.bind('change', function(state) {
+            $player.options({
+                fullscreen: state
+            });
+        });
+
         $controls = Ox.Element();
 
         if (options.showTimeline) {
