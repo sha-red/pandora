@@ -168,8 +168,9 @@ pandora.ui.textPanel = function() {
         that.replaceElement(1, $panel);
         that.replaceElement(2, $statusbar);
 
-        embedURLs.length && that.selectEmbed(0);
-
+        embedURLs.length && that.selectEmbed(0, false);
+        pandora.user.ui.texts[pandora.user.ui.text] &&
+            pandora.$ui.text.scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
     });
 
     function getEmbedURLs(text) {
@@ -192,14 +193,15 @@ pandora.ui.textPanel = function() {
         pandora.$ui.text.scrollTo(position);
     }
 
-    that.selectEmbed = function(index) {
+    that.selectEmbed = function(index, scroll) {
+        scroll = arguments.length == 1 || scroll;
         if (index != selected) {
             selected = index;
             selectedURL = embedURLs[selected]
             $('.OxSpecialLink').removeClass('OxActive');
             selected > -1 && $('#embed' + selected).addClass('OxActive');
             pandora.$ui.textEmbed.update(selectedURL);
-            scrollToSelectedEmbed();
+            scroll && scrollToSelectedEmbed();
         }
     };
 
@@ -229,7 +231,8 @@ pandora.ui.textHTML = function(text) {
                 scroll: function(event) {
                     var position = Math.round(100 * that[0].scrollTop / that[0].scrollHeight)
                     position = position - position % 10;
-                    if (position != pandora.user.ui.texts[pandora.user.ui.text].position) {
+                    if (pandora.user.ui.texts[pandora.user.ui.text]
+                        && position != pandora.user.ui.texts[pandora.user.ui.text].position) {
                         pandora.UI.set(
                             'texts.' + pandora.UI.encode(pandora.user.ui.text) + '.position',
                             position ? position : 0
@@ -321,9 +324,6 @@ pandora.ui.textHTML = function(text) {
                 }
             })
             .appendTo($content);
-
-    pandora.user.ui.texts[pandora.user.ui.text] &&
-        scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
 
     function getHeight() {
         // 24 menu + 24 toolbar + 16 statusbar + 32 title + 32 margins
