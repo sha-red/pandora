@@ -568,8 +568,13 @@ pandora.ui.listIconPanel = function(listData) {
             items: function(data, callback) {
                 pandora.api.find(Ox.extend(data, {
                     query: {
-                        conditions: [{key: 'list', value: listData.id, operator: '=='}].concat(
-                            value !== '' ? [{key: key, value: value, operator: '='}] : []
+                        conditions: (
+                        ui.section == 'items'
+                            ? [{key: 'list', value: listData.id, operator: '=='}]
+                            : []).concat(
+                        value !== ''
+                            ? [{key: key, value: value, operator: '='}]
+                            : []
                         ),
                         operator: '&'
                     }
