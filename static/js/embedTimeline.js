@@ -16,13 +16,17 @@ pandora.ui.embedTimeline = function() {
             timeline: ui.videoTimeline
         },
         options = getOptions(),
+        removed = false,
         video,
-        $panel, $player, $annotations;
+        $title, $panel, $player, $annotations;
 
     pandora.api.get({id: ui.item, keys: [
-        'duration', 'layers', 'parts', 'rightslevel', 'videoRatio'
-    ]}), function(result) {
-
+        'duration', 'durations', 'layers', 'parts', 'posterFrame',
+        'rightslevel', 'size', 'title', 'videoRatio'
+    ]}, function(result) {
+        if (removed) {
+            return;
+        }
         video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
 
         if (options.title) {
@@ -39,7 +43,7 @@ pandora.ui.embedTimeline = function() {
         } else {
             $title = Ox.Element();
         }
-
+        var sizes = getSizes();
         $player = Ox.VideoTimelinePlayer({
                 censored: video.censored,
                 censoredIcon: pandora.site.cantPlay.icon,
@@ -52,18 +56,19 @@ pandora.ui.embedTimeline = function() {
                 getLargeTimelineURL: function(type, i) {
                     return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
                 },
-                height: options.height,
+                height: sizes.innerHeight,
                 muted: ui.videoMuted,
                 paused: options.paused,
                 position: options.position,
                 resolution: Ox.min(pandora.site.video.resolutions),
                 smallTimelineURL: '/' + ui.item + '/timeline16p.jpg',
                 subtitles: video.subtitles,
-                timeline: ui.timeline,
+                timeline: ui.videoTimeline,
+                timelines: pandora.site.timelines,
                 video: video.video,
                 videoRatio: video.videoRatio,
                 volume: ui.videoVolume,
-                width: options.width
+                width: sizes.innerWidth
             })
             .bindEvent({
                 playing: function(data) {
@@ -127,15 +132,15 @@ pandora.ui.embedTimeline = function() {
 
         Ox.$parent.postMessage('loaded');
 
-    }
+    });
 
     function getOptions() {
         var options = {};
-        ui.hash.query.forEach(function(condition) {
-            if (condition.key != 'embed') {
-                options[condition.key] = condition.value;                
-            }
-        });
+        if (ui._hash.query) {
+            ui._hash.query.forEach(function(condition) {
+                options[condition.key] = condition.value;
+            });
+        }
         options = Ox.extend(
             {item: ui.item},
             ui.videoPoints[ui.item] || {},
@@ -153,6 +158,36 @@ pandora.ui.embedTimeline = function() {
             options.playInToOut = false;
         }
         return options;
+    }
+
+    function getSizes() {
+        var innerHeight,
+            innerWidth,
+            maxVideoHeight = window.innerHeight
+                - (options.title ? 32 : 0)
+                - (options.showTimeline ? 80 : 0)
+                - (options.showAnnotations ? 128 : 0),
+            videoHeight;
+        if (options.matchRatio || options.showAnnotations) {
+            videoHeight = Math.round(window.innerWidth / video.videoRatio);
+            options.matchRatio = videoHeight <= maxVideoHeight;
+            if (!options.matchRatio) {
+                videoHeight = maxVideoHeight;
+            }
+        } else {
+            videoHeight = window.innerHeight
+                - (options.title ? 32 : 0)
+                - (options.showTimeline ? 80 : 0);
+        }
+        innerHeight = videoHeight
+            + (options.title ? 32 : 0)
+            + (options.showTimeline ? 80 : 0);
+        innerWidth = window.innerWidth;
+        return {
+            innerHeight: innerHeight,
+            innerWidth: innerWidth,
+            videoHeight: videoHeight
+        };
     }
 
     function getTimelineHeight() {

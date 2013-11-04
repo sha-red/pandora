@@ -23,7 +23,7 @@ pandora.ui.embedPanel = function() {
             } else if (Ox.contains(['player', 'editor'], view)) {
                 that = pandora.ui.embedPlayer();
             } else if (view == 'timeline') {
-                that = pandora.ui.embedError(true);
+                that = pandora.ui.embedTimeline();
             } else if (view == 'clips') {
                 that = pandora.ui.embedError(true);
             } else if (Ox.contains(['map', 'calendar'], view)) {
