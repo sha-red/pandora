@@ -55,7 +55,8 @@ pandora.ui.textPanel = function() {
                 .bindEvent({
                     click: function() {
                         that.selectEmbed(
-                            selected < embedURLs.length - 1 ? selected + 1 : 0
+                            selected < embedURLs.length - 1 ? selected + 1 : 0,
+                            true
                         );
                     }
                 })
@@ -89,7 +90,8 @@ pandora.ui.textPanel = function() {
                 .bindEvent({
                     click: function() {
                         that.selectEmbed(
-                            selected ? selected - 1 : embedURLs.length - 1
+                            selected ? selected - 1 : embedURLs.length - 1,
+                            true
                         );
                     }
                 })
@@ -168,7 +170,7 @@ pandora.ui.textPanel = function() {
         that.replaceElement(1, $panel);
         that.replaceElement(2, $statusbar);
 
-        embedURLs.length && that.selectEmbed(0, false);
+        embedURLs.length && that.selectEmbed(0);
         pandora.user.ui.texts[pandora.user.ui.text] &&
             pandora.$ui.text.scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
     });
@@ -194,7 +196,6 @@ pandora.ui.textPanel = function() {
     }
 
     that.selectEmbed = function(index, scroll) {
-        scroll = arguments.length == 1 || scroll;
         if (index != selected) {
             selected = index;
             selectedURL = embedURLs[selected]
