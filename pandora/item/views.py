@@ -1102,9 +1102,13 @@ def oembed(request):
     url = request.GET['url']
     parts = urlparse(url).path.split('/')
     itemId = parts[1]
-    #fixme: embed should reflect actuall url
     item = get_object_or_404_json(models.Item, itemId=itemId)
-    embed_url = request.build_absolute_uri('/%s#embed' % item.itemId)
+    embed_url = request.build_absolute_uri('/%s' % itemId)
+    if url.startswith(embed_url):
+        embed_url = '%s#embed' % url
+    else:
+        embed_url = '%s#embed' % embed_url
+
     oembed = {}
     oembed['version'] = '1.0'
     oembed['type'] = 'video'
@@ -1119,7 +1123,7 @@ def oembed(request):
     if width > maxwidth:
         width = maxwidth
         height = min(maxheight, int(width / item.stream_aspect))
-    oembed['html'] = '<iframe width="%s" height="%s" src="%s" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>' % (width, height, embed_url)
+    oembed['html'] = '<iframe width="%s" height="%s" src="%s" frameborder="0" allowfullscreen></iframe>' % (width, height, embed_url)
     oembed['width'] = width
     oembed['height'] = height
     thumbheight = 96
