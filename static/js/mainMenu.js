@@ -347,9 +347,17 @@ pandora.ui.mainMenu = function() {
                 } else if ([
                     'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'
                 ].indexOf(data.id) > -1) {
-                    pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
+                    if (ui.section == 'texts') {
+                        pandora.addText({type: 'text'});
+                    } else {
+                        pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
+                    }
                 } else if (data.id == 'duplicatelist') {
-                    pandora.addList(ui._list);
+                    if (ui.section == 'texts') {
+                        pandora.addText({type: 'text'});
+                    } else {
+                        pandora.addList(ui._list);
+                    }
                 } else if (data.id == 'editlist') {
                     pandora.ui.listDialog().open();
                 } else if (data.id == 'add') {
