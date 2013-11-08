@@ -65,10 +65,12 @@ pandora.URL = (function() {
                         : []
                 );
             } else if (pandora.user.ui.section == 'texts') {
-                var position = pandora.user.ui.texts[state.item]
-                    ? pandora.user.ui.texts[state.item].position
-                    : 0;
-                if (position) {
+                var textState = pandora.user.ui.texts[state.item],
+                    position = textState.position || 0;
+
+                if (textState.name) {
+                    state.span = textState.name;
+                } else {
                     state.span = [position];
                 }
             }
@@ -217,7 +219,10 @@ pandora.URL = (function() {
                 } else if (state.type == 'texts') {
 
                     if (state.span) {
-                        set['texts.' + pandora.UI.encode(state.item) + '.position'] = state.span[0];
+                        set['texts.' + pandora.UI.encode(state.item)] = {
+                            position: Ox.isArray(state.span) ? state.span[0] : 0,
+                            name: Ox.isArray(state.span) ? '' : state.span
+                        };
                     }
 
                 }

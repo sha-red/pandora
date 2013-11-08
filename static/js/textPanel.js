@@ -190,7 +190,7 @@ pandora.ui.textPanel = function() {
     }
 
     function scrollToSelectedEmbed() {
-        var scrollTop = Math.max(pandora.$ui.text[0].scrollTop + $('#embed' + selected).offset().top - 50, 0),
+        var scrollTop = Math.max(pandora.$ui.text[0].scrollTop + $('#embed' + selected).offset().top - 48, 0),
             position = 100 * scrollTop / pandora.$ui.text[0].scrollHeight;
         pandora.$ui.text.scrollTo(position);
     }

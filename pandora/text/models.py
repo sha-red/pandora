@@ -188,6 +188,9 @@ class Text(models.Model):
         if self.type == 'pdf':
             response['uploaded'] = True if self.file and not self.uploading else False
             response['embeds'] = self.embeds
+            response['names'] = []
+        else:
+            response['names'] = re.compile('<[^<>]*?data-name="(.+?)"').findall(self.text)
         return response
 
     def path(self, name=''):

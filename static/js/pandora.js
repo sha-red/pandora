@@ -355,7 +355,8 @@ appPanel
             view: 'list'
         };
         pandora.site.textSettings = {
-            position: 0
+            position: 0,
+            name: ''
         };
 
         Ox.extend(pandora.user, {
