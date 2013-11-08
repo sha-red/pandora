@@ -1462,6 +1462,7 @@ pandora.getSpan = function(state, val, callback) {
     // event/place name (string), and in that case sets state.span, and may
     // modify state.view.
     // fixme: "subtitles:23" is still missing
+    Ox.print('GET SPAN', state, val)
     if (state.type == pandora.site.itemName.plural.toLowerCase()) {
         var isArray = Ox.isArray(val),
             isName, isVideoView, canBeAnnotation, canBeEvent, canBePlace;
@@ -1527,8 +1528,18 @@ pandora.getSpan = function(state, val, callback) {
             });
         }
     } else if (state.type == 'texts') {
-        state.span = val;
-        callback();
+        pandora.api.getText({id: state.item}, function(result) {
+            if (isArray) {
+                if (result.data.type == 'html') {
+                    state.span = Ox.limit(val[0], 0, 100);
+                } else {
+                    state.span = Math.floor(Ox.limit(val[0], 1, result.data.pages));
+                }
+            } else if (result.data.type == 'html' && Ox.contains(result.data.names, val)) {
+                state.span = val;
+            }
+            callback();
+        });
     }
 
     function getId(type, callback) {
