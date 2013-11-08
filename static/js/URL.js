@@ -357,14 +357,13 @@ pandora.URL = (function() {
             }
         };
         spanType['edits'] = {
-            list: [],
+            list: {},
             item: {edit: 'duration'}
         };
         spanType['texts'] = {
-            list: [],
-            item: {text: 'number'}
+            list: {},
+            item: {text: 'string'}
         };
-
 
         findKeys = [{id: 'list', type: 'string'}].concat(pandora.site.itemKeys);
 
