@@ -70,7 +70,7 @@ pandora.URL = (function() {
 
                 if (textState.name) {
                     state.span = textState.name;
-                } else {
+                } else if (position) {
                     state.span = [position];
                 }
             }
