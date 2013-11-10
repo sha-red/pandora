@@ -20,7 +20,6 @@ from person.models import get_name_sort
 
 import extract
 
-
 class File(models.Model):
     AV_INFO = (
         'duration', 'video', 'audio', 'oshash', 'size',
@@ -138,7 +137,6 @@ class File(models.Model):
 
             if self.framerate:
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
-
 
     def get_path_info(self):
         data = {}
@@ -388,7 +386,15 @@ class File(models.Model):
 
     def all_paths(self):
         return [self.path] + [i.path for i in self.instances.all()]
+
+    def extract_stream(self):
+        import tasks
+        return tasks.extract_stream.delay(self.id)
     
+    def process_stream(self):
+        import tasks
+        return tasks.process_stream.delay(self.id)
+
     def delete(self, *args, **kwargs):
         self.delete_files()
         super(File, self).delete(*args, **kwargs)

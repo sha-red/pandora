@@ -247,7 +247,7 @@ def firefogg_upload(request):
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
-                        t = tasks.process_stream.delay(f.id)
+                        t = f.process_stream()
                         response['resultUrl'] = t.task_id
                     except:
                         pass
@@ -300,7 +300,7 @@ def direct_upload(request):
                 file.save()
                 #try/execpt so it does not fail if rabitmq is down
                 try:
-                    t = tasks.extract_stream.delay(file.id)
+                    t = file.extract_stream()
                     response['resultUrl'] = t.task_id
                 except:
                     pass
