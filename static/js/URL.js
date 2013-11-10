@@ -67,7 +67,6 @@ pandora.URL = (function() {
             } else if (pandora.user.ui.section == 'texts') {
                 var textState = pandora.user.ui.texts[state.item] || {},
                     position = textState.position || 0;
-
                 if (textState.name) {
                     state.span = textState.name;
                 } else if (position) {

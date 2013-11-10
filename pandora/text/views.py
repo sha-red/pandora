@@ -72,7 +72,8 @@ actions.register(addText, cache=False)
 def getText(request):
     '''
         takes {
-            id: textid
+            id: textid,
+            keys: []
         }
         returns {
             id:
@@ -101,7 +102,7 @@ def getText(request):
             text = None
             response['status']['code'] = 404
     if text:
-        response['data'] = text.json(user=request.user)
+        response['data'] = text.json(user=request.user, keys=data.get('keys'))
     return render_to_json_response(response)
 actions.register(getText)
 

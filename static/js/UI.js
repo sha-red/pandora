@@ -173,8 +173,10 @@ pandora.UI = (function() {
         }
         if (args.text) {
             add['texts.' + that.encode(args.text)] = Ox.map(textSettings, function(value, key) {
-                var textsKey = 'texts.' + that.encode(args.text) + '.' + key;
-                return textsKey in args ? args[textsKey]
+                var textsKey = 'texts.' + that.encode(args.text),
+                    textsSubKey = textsKey + '.' + key;
+                return textsKey in args && key in args[textsKey] ? args[textsKey][key]
+                    : textsSubKey in args ? args[textSubKey]
                     : pandora.user.ui.texts[args.text] ? pandora.user.ui.texts[args.text][key]
                     : value;
             });
@@ -208,7 +210,7 @@ pandora.UI = (function() {
             pandora.api.setUI(set);
         }
         triggerEvents && Ox.forEach(trigger, function(val, key) {
-            Ox.Log('UI', 'TRIGGER ' + key + ' ' + val);
+            Ox.Log('UI', 'TRIGGER ', key, val);
             Ox.forEach(pandora.$ui, function(element) {
                 Ox.UI.isElement(element) && element.triggerEvent('pandora_' + key.toLowerCase(), {
                     value: val,

@@ -130,7 +130,7 @@ class Text(models.Model):
             elif key == 'description':
                 self.description = ox.sanitize_html(data['description'])
             elif key == 'text':
-                self.text = ox.sanitize_html(data['text'])
+                self.text = ox.sanitize_html(data['text'], global_attributes=['data-name'])
             elif key == 'rightslevel':
                 self.rightslevel = int(data['rightslevel'])
 
@@ -152,6 +152,7 @@ class Text(models.Model):
             self.update_icon()
 
     def json(self, keys=None, user=None):
+        default_keys = ['id']
         if not keys:
              keys=[
                 'description',
@@ -165,7 +166,10 @@ class Text(models.Model):
                 'subscribed',
                 'text',
                 'type',
-                'user'
+                'user',
+                'uploaded',
+                'embeds',
+                'names',
             ]
         response = {}
         _map = {
@@ -191,6 +195,10 @@ class Text(models.Model):
             response['names'] = []
         else:
             response['names'] = re.compile('<[^<>]*?data-name="(.+?)"').findall(self.text)
+
+        for key in response.keys():
+            if key not in keys + default_keys:
+                del response[key]
         return response
 
     def path(self, name=''):

@@ -85,7 +85,9 @@ pandora.ui.mainPanel = function() {
                 data.value == that.options('elements')[0].collapsed && that.toggle(0);
             },
             pandora_text: function(data) {
-                that.replaceElement(1, pandora.$ui.textPanel = pandora.ui.textPanel());
+                if (data.value != data.previousValue) {
+                    that.replaceElement(1, pandora.$ui.textPanel = pandora.ui.textPanel());
+                }
             }
         });
     return that;

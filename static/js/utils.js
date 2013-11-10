@@ -1112,7 +1112,7 @@ pandora.getItem = function(state, str, callback) {
             }
         });
     } else if (state.type == 'texts') {
-        pandora.api.getText({id: str}, function(result) {
+        pandora.api.getText({id: str, keys: ['id', 'names', 'pages', 'type']}, function(result) {
             if (result.status.code == 200) {
                 state.item = result.data.id;
                 callback();
@@ -1528,7 +1528,7 @@ pandora.getSpan = function(state, val, callback) {
             });
         }
     } else if (state.type == 'texts') {
-        pandora.api.getText({id: state.item}, function(result) {
+        pandora.api.getText({id: state.item, keys: ['id', 'names', 'pages', 'type']}, function(result) {
             if (isArray) {
                 if (result.data.type == 'html') {
                     state.span = Ox.limit(val[0], 0, 100);
@@ -1925,7 +1925,7 @@ pandora.resizeFolders = function(section) {
 };
 
 pandora.resizeWindow = function() {
-    if (pandora.$ui.embedPanel) {
+    if (pandora.$ui.embedPanel && pandora.$ui.embedPanel.resizePanel) {
         pandora.$ui.embedPanel.resizePanel();
     }
     if (pandora.$ui.embedPanel || pandora.$ui.printView) {

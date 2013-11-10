@@ -171,8 +171,6 @@ pandora.ui.textPanel = function() {
         that.replaceElement(2, $statusbar);
 
         embedURLs.length && that.selectEmbed(0);
-        pandora.user.ui.texts[pandora.user.ui.text] &&
-            pandora.$ui.text.scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
     });
 
     function getEmbedURLs(text) {
@@ -207,12 +205,14 @@ pandora.ui.textPanel = function() {
     };
 
     that.update = function(text) {
+        var index;
         embedURLs = getEmbedURLs(text);
-        selected = embedURLs.indexOf(selectedURL);
-        if (selected == -1 && embedURLs.length) {
-            selected = 0;
+        index = embedURLs.indexOf(selectedURL);
+        if (embedURLs.length && (index == -1 || index >= embedURLs.length)) {
+            index = 0;
         }
-        that.selectEmbed(selected);
+        selected = -1;
+        that.selectEmbed(index);
     };
 
     return that;
@@ -232,15 +232,19 @@ pandora.ui.textHTML = function(text) {
                 scroll: function(event) {
                     var position = Math.round(100 * that[0].scrollTop / that[0].scrollHeight)
                     position = position - position % 10;
-                    if (pandora.user.ui.texts[pandora.user.ui.text]
+                    if (!scrolling && pandora.user.ui.texts[pandora.user.ui.text]
                         && position != pandora.user.ui.texts[pandora.user.ui.text].position) {
-                        pandora.UI.set(
-                            'texts.' + pandora.UI.encode(pandora.user.ui.text) + '.position',
-                            position ? position : 0
-                        );
+                        pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text), {
+                            position: position ? position : 0
+                        });
                     }
-                }
+                    scrolling = false;
+                },
+            })
+            .bindEvent('pandora_texts.' + text.id.toLowerCase(), function(data) {
+                data.value && data.value.name && scrollToPosition();
             }),
+        scrolling = false,
         $content = Ox.Element().css({
                 margin: '16px',
         }).appendTo(that),
@@ -301,6 +305,7 @@ pandora.ui.textHTML = function(text) {
                         }
                     );
                 },
+                globalAttributes: ['data-name'],
                 placeholder: text.editable ? Ox._('Doubleclick to edit text') : '',
                 tooltip: text.editable ? pandora.getEditTooltip('text') : '',
                 type: 'textarea',
@@ -339,8 +344,23 @@ pandora.ui.textHTML = function(text) {
             - 32 - 16;
     }
 
+
     function scrollTo(position) {
+        scrolling = true;
         that[0].scrollTop = that[0].scrollHeight/100 * position;
+    }
+
+    function scrollToPosition() {
+        var settings = pandora.user.ui.texts[pandora.user.ui.text] || {},
+            position = settings.position || 0,
+            element,
+            scrollTop;
+        if (settings.name) {
+            element = that.find('*[data-name=' + settings.name + ']');
+            scrollTop = Math.max(that[0].scrollTop + element.offset().top - 48, 0);
+            position = 100 * scrollTop / that[0].scrollHeight;
+        }
+        scrollTo(position);
     }
 
     that.scrollTo = scrollTo;
@@ -351,8 +371,7 @@ pandora.ui.textHTML = function(text) {
         }).css({
             width: getWidth() + 'px'
         });
-        pandora.user.ui.texts[pandora.user.ui.text] &&
-            scrollTo(pandora.user.ui.texts[pandora.user.ui.text].position || 0);
+        scrollToPosition();
         return that;
     };
 
@@ -397,7 +416,9 @@ pandora.ui.textPDF = function(text) {
                         });
                     }).open();
                 } else if (event == 'page') {
-                    pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text) + '.position', data.page);
+                    pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text), {
+                        'position': data.page
+                    });
                 }
             })
             .appendTo(that);
@@ -407,6 +428,7 @@ pandora.ui.textPDF = function(text) {
     } else {
         that.html('Please upload PDF');
     }
+
     return that;
 
 };
