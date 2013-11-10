@@ -241,6 +241,11 @@ pandora.ui.textHTML = function(text) {
                     scrolling = false;
                 },
             })
+            .bindEvent({
+                pandora_showsidebar: function(data) {
+                    that.resize();
+                },
+            })
             .bindEvent('pandora_texts.' + text.id.toLowerCase(), function(data) {
                 data.value && data.value.name && scrollToPosition();
             }),
