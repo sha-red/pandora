@@ -139,6 +139,8 @@ class Annotation(models.Model):
             self.findvalue = ox.decode_html(ox.strip_tags(re.sub('<br */?>\n?', ' ', self.value))).replace('\n', ' ')
             self.findvalue = unicodedata.normalize('NFKD', self.findvalue).lower()
             sortvalue = sort_string(self.findvalue)
+            while sortvalue and not unicodedata.category(sortvalue[0])[0] in ('L', 'N'):
+                sortvalue = sortvalue[1:]
             if sortvalue:
                 self.sortvalue = sortvalue[:900]
             else:
