@@ -189,7 +189,8 @@ pandora.ui.textPanel = function() {
 
     function scrollToSelectedEmbed() {
         var scrollTop = Math.max(pandora.$ui.text[0].scrollTop + $('#embed' + selected).offset().top - 48, 0),
-            position = 100 * scrollTop / pandora.$ui.text[0].scrollHeight;
+            position = 100 * scrollTop / Math.max(1,
+                    pandora.$ui.text[0].scrollHeight - pandora.$ui.text.height());
         pandora.$ui.text.scrollTo(position);
     }
 
@@ -230,10 +231,11 @@ pandora.ui.textHTML = function(text) {
             })
             .bind({
                 scroll: function(event) {
-                    var position = Math.round(100 * that[0].scrollTop / that[0].scrollHeight)
+                    var position = Math.round(100 * that[0]. scrollTop / Math.max(1,
+                            that[0].scrollHeight - that.height())),
+                        settings = pandora.user.ui.texts[pandora.user.ui.text];
                     position = position - position % 10;
-                    if (!scrolling && pandora.user.ui.texts[pandora.user.ui.text]
-                        && position != pandora.user.ui.texts[pandora.user.ui.text].position) {
+                    if (!scrolling && settings && (settings.name || (position != settings.position))) {
                         pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text), {
                             position: position ? position : 0
                         });
@@ -243,7 +245,7 @@ pandora.ui.textHTML = function(text) {
             })
             .bindEvent({
                 pandora_showsidebar: function(data) {
-                    that.resize();
+                    that.update();
                 },
             })
             .bindEvent('pandora_texts.' + text.id.toLowerCase(), function(data) {
@@ -336,6 +338,8 @@ pandora.ui.textHTML = function(text) {
             })
             .appendTo($content);
 
+    scrollToPosition();
+
     function getHeight() {
         // 24 menu + 24 toolbar + 16 statusbar + 32 title + 32 margins
         // + 1px to ge trid of scrollbar
@@ -361,9 +365,11 @@ pandora.ui.textHTML = function(text) {
             element,
             scrollTop;
         if (settings.name) {
-            element = that.find('*[data-name=' + settings.name + ']');
-            scrollTop = Math.max(that[0].scrollTop + element.offset().top - 48, 0);
-            position = 100 * scrollTop / that[0].scrollHeight;
+            element = that.find('*[data-name="' + settings.name + '"]');
+            if (element.length) {
+                scrollTop = Math.max(that[0].scrollTop + element.offset().top - 48, 0);
+                position = 100 * scrollTop / that[0].scrollHeight;
+            }
         }
         scrollTo(position);
     }
