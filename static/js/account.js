@@ -166,6 +166,11 @@ pandora.ui.accountForm = function(action, value) {
                             pandora.signin(result.data);
                             pandora.ui.accountWelcomeDialog().open();
                         } else {
+                            Ox.forEach(result.data.errors, function(value, key) {
+                                if (['username', 'password', 'email'].indexOf(key) > -1) {
+                                    that.setMessages([{id: key, message: Ox._(result.data.errors[key])}]);
+                                }
+                            });
                             pandora.$ui.accountDialog.enableButtons();
                         }
                     });

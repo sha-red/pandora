@@ -97,7 +97,7 @@ pandora.validateUser = function(key, existing) {
             value: value,
             operator: '=='
         }, function(result) {
-            var valid = existing == !!result.data.users.length;
+            var valid = (existing == !!result.data.users.length) || pandora.site.site.dontValidateUser;
             callback({
                 message: existing ?
                     Ox._('Unknown ' + string) :
