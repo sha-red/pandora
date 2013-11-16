@@ -1105,8 +1105,8 @@ def oembed(request):
     item = get_object_or_404_json(models.Item, itemId=itemId)
     embed_url = request.build_absolute_uri('/%s' % itemId)
     if url.startswith(embed_url):
-        embed_url = '%s#embed' % url
-    else:
+        embed_url = url
+    if not '#embed' in embed_url:
         embed_url = '%s#embed' % embed_url
 
     oembed = {}
