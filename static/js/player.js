@@ -83,8 +83,8 @@ pandora.ui.player = function(data) {
                     return clip.annotation || ui.item + '/' + clip['in'] + '-' + clip.out;
                 }), 'clip');
             },
-            downloadvideo: function(data) {
-                document.location.href = pandora.getDownloadLink(ui.item);
+            downloadvideo: function() {
+                document.location.href = pandora.getDownloadLink(ui.item, data.rightslevel);
             },
             find: function(data) {
                 pandora.UI.set({itemFind: data.find});

@@ -127,8 +127,8 @@ pandora.ui.editor = function(data) {
                 pandora.$ui[dialog] && pandora.$ui[dialog].remove();
                 pandora.$ui[dialog] = pandora.ui[dialog](data).open();
             },
-            downloadvideo: function(data) {
-                document.location.href = pandora.getDownloadLink(ui.item);
+            downloadvideo: function() {
+                document.location.href = pandora.getDownloadLink(ui.item, data.rightslevel);
             },
             downloadselection: function(data) {
                 document.location.href = '/' + ui.item

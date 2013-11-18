@@ -928,8 +928,14 @@ pandora.getClipVideos = function(clip, resolution) {
     };
 }());
 
-pandora.getDownloadLink = function(item) {
-    return '/' + item + (pandora.site.video.torrent ? '/torrent/' : '/download/');
+pandora.getDownloadLink = function(item, rightslevel) {
+    console.log('pandora.getDownloadLink', item, rightslevel);
+    var torrent = pandora.site.video.torrent;
+    if (arguments.length == 2 && torrent &&
+        pandora.site.capabilities.canSeeItem.guest < rightslevel) {
+        torrent = false;
+    }
+    return '/' + item + (torrent ? '/torrent/' : '/download/');
 }
 
 pandora.getEditTooltip = function(title) {
