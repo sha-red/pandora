@@ -81,7 +81,7 @@ pandora.ui.importAnnotations = function(data) {
                 if (result.data.taskId) {
                     $status.html('').append(Ox.LoadingScreen({
                         text: Ox._('Importing {0} annotations...', [srt.length])
-                    }));
+                    }).start());
                     pandora.wait(result.data.taskId, function(result) {
                         if (result.data.status == 'SUCCESS') {
                             setStatus(Ox._('{0} annotations imported.', [annotations.length]));

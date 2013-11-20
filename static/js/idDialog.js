@@ -47,7 +47,7 @@ pandora.ui.idDialog = function(data) {
                         })
                 ],
                 closeButton: true,
-                content: Ox.LoadingScreen(),
+                content: Ox.LoadingScreen().start(),
                 height: dialogHeight,
                 maximizeButton: true,
                 minHeight: 256,
@@ -106,7 +106,7 @@ pandora.ui.idDialog = function(data) {
                             data[key] = key == 'director'
                                 ? data_.value.split(', ')
                                 : data_.value;
-                            that.options({content: Ox.LoadingScreen()});
+                            that.options({content: Ox.LoadingScreen().start()});
                             getIds();
                         }
                     })
@@ -234,7 +234,7 @@ pandora.ui.idDialog = function(data) {
     }
 
     function updateId() {
-        that.options({content: Ox.LoadingScreen()}).disableButtons();
+        that.options({content: Ox.LoadingScreen().start()}).disableButtons();
         pandora.api.edit({
             id: data.id,
             imdbId: $checkboxGroup.options('value')

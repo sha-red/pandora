@@ -95,7 +95,7 @@ pandora.ui.metadataDialog = function(data) {
                     })
             ],
             closeButton: true,
-            content: Ox.LoadingScreen(),
+            content: Ox.LoadingScreen().start(),
             height: dialogHeight,
             maximizeButton: true,
             minHeight: 256,
@@ -346,7 +346,7 @@ pandora.ui.metadataDialog = function(data) {
                 Ox.isArray(type) ? [] : ''
             );
         });
-        that.options({content: Ox.LoadingScreen()}).disableButtons();
+        that.options({content: Ox.LoadingScreen().start()}).disableButtons();
         pandora.api.edit(edit, function(result) {
             that.close();
             pandora.updateItemContext();

@@ -5,7 +5,7 @@
 pandora.ui.printView = function(data) {
 
     var that = Ox.Element().css({padding: '64px 128px'}),
-        $loading = Ox.LoadingScreen().appendTo(that),
+        $loading = Ox.LoadingScreen().start().appendTo(that),
         sortKey = pandora.user.ui.listSort[0].key,
         keys = Ox.unique(
             ['director', 'id', 'summary', 'title', 'year'].concat(sortKey)

@@ -60,7 +60,7 @@ pandora.ui.eventsDialog = function(options) {
                 })
             ],
             closeButton: true,
-            content: Ox.LoadingScreen(),
+            content: Ox.LoadingScreen().start(),
             height: height,
             maximizeButton: true,
             minHeight: 256,

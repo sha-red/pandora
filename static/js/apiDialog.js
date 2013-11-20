@@ -30,7 +30,7 @@ pandora.ui.apiDialog = function() {
                 })
             ],
             closeButton: true,
-            content: Ox.LoadingScreen(),
+            content: Ox.LoadingScreen().start(),
             height: 384,
             keys: {escape: 'close'},
             maximizeButton: true,

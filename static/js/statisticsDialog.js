@@ -66,7 +66,7 @@ pandora.ui.statisticsDialog = function() {
                 })
             ],
             closeButton: true,
-            content: Ox.LoadingScreen(),
+            content: Ox.LoadingScreen().start(),
             height: dialogHeight,
             maximizeButton: true,
             minHeight: 256,
