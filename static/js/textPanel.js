@@ -455,8 +455,11 @@ pandora.ui.textEmbed = function() {
                     pandora.user.ui.embedSize = data.size;
                     pandora.$ui.text.update();
                 },
-                resizeend: function() {
+                resizeend: function(data) {
                     $iframe.attr('src') && $overlay.hide();
+                    // set to 0 so that UI.set registers a change of the value
+                    pandora.user.ui.embedSize = 0;
+                    pandora.UI.set({embedSize: data.size});
                 }
             }),
 
