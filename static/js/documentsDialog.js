@@ -429,7 +429,7 @@ pandora.ui.documentsDialog = function(options) {
         .bindEvent({
             change: function(event) {
                 var data = Ox.extend({id: file.id}, event.id, event.data.value);
-                pandora.api.editFile(data, function(result) {
+                pandora.api.editDocument(data, function(result) {
                     $list.value(result.data.id, event.id, result.data[event.id]);
                     if (event.id == 'name') {
                         $list.value(file.id, 'id', result.data.id);
