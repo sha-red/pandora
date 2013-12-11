@@ -73,7 +73,7 @@ appPanel
         var i, path, scripts = document.getElementsByTagName('script');
         for (i = 0;i < scripts.length; i++) {
             if(/pandora.js/.test(scripts[i].src)) {
-                return scripts[1].src.replace(/.*\?/, '');
+                return scripts[i].src.replace(/.*\?/, '');
             }
         }
     }
