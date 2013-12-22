@@ -77,7 +77,7 @@ class Document(models.Model):
 
     @classmethod
     def parse_id(cls, id):
-        public_id = id.split(':')
+        public_id = id.replace('_', ' ').replace('\t', '_').split(':')
         username = public_id[0]
         name = ":".join(public_id[1:])
         extension = name.split('.')
@@ -89,7 +89,9 @@ class Document(models.Model):
         return ('/documents/%s' % quote(self.get_id())).replace('%3A', ':')
 
     def get_id(self):
-        return u'%s:%s.%s' % (self.user.username, self.name, self.extension)
+        id = u'%s:%s.%s' % (self.user.username, self.name, self.extension)
+        id = id.replace('_', '%09').replace(' ', '_')
+        return id
 
     def editable(self, user):
         if not user or user.is_anonymous():
