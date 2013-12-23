@@ -15,6 +15,7 @@ import Image
 import ox
 
 from item.models import Item
+from archive.extract import resize_image
 
 import managers
 
@@ -167,18 +168,28 @@ class Document(models.Model):
             return True
         return False
 
-    def thumbnail(self):
+    def thumbnail(self, size=None):
+        src = self.file.path
         if self.extension == 'pdf':
-            thumbnail = '%s.jpg' % self.file.path
+            src = '%s.jpg' % src
+        if size:
+            size = int(size)
+            path = src.replace('.jpg', '.%d.jpg'%size)
         else:
-            thumbnail = self.file.path
-        return thumbnail
+            path = src
+        if os.path.exists(src) and not os.path.exists(path):
+            image_size = max(*Image.open(src).size)
+            if size > image_size:
+                path = src
+            else:
+                resize_image(src, path, size=size)
+        return path
 
     def make_thumbnail(self, force=False):
         thumb = self.thumbnail()
         if not os.path.exists(thumb) or force:
             cmd = ['convert', '%s[0]' % self.file.path,
-                '-background', 'white', '-flatten', '-resize', '256x256', thumb]
+                '-background', 'white', '-flatten', '-resize', '1024x1024', thumb]
             p = subprocess.Popen(cmd)
             p.wait()
 

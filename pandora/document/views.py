@@ -227,7 +227,7 @@ def file(request, id, name=None):
 def thumbnail(request, id, size=256):
     size = int(size)
     document = models.Document.get(id)
-    return HttpFileResponse(document.thumbnail())
+    return HttpFileResponse(document.thumbnail(size))
 
 class ChunkForm(forms.Form):
     chunk = forms.FileField()
