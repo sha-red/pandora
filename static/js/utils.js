@@ -255,7 +255,7 @@ pandora.clickLink = function(e) {
         }
         pandora.URL.push(e.target.pathname, true);
     } else {
-        window.top.open('/url=' + encodeURIComponent(e.target.href), '_blank');
+        window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
     }
 };
 
@@ -274,7 +274,7 @@ pandora.createLinks = function($element) {
             ) {
                 e.preventDefault();
                 if (isExternalLink(e.target)) {
-                    window.top.open('/url=' + encodeURIComponent(e.target.href), '_blank');
+                    window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
                 } else {
                     pandora.clickLink(e);
                 }

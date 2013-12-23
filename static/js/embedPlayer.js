@@ -135,7 +135,7 @@ pandora.ui.embedPlayer = function() {
                         + document.location.hostname + '/'
                         + options.item + '/'
                         + Ox.formatDuration($player.options('position'));
-                    window.top.open(url, '_blank');
+                    window.open(url, '_blank');
                 },
                 playing: function(data) {
                     setPosition(data.position, true);
