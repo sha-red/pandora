@@ -135,7 +135,7 @@ pandora.ui.embedPlayer = function() {
                         + document.location.hostname + '/'
                         + options.item + '/'
                         + Ox.formatDuration($player.options('position'));
-                    window.open(url, '_blank');
+                    window.top.open(url, '_blank');
                 },
                 playing: function(data) {
                     setPosition(data.position, true);
@@ -216,6 +216,7 @@ pandora.ui.embedPlayer = function() {
                 });
             }
             $annotations = Ox.AnnotationPanel(Ox.extend({
+                clickLink: pandora.clickLink,
                 font: options.annotationsFont,
                 layers: video.annotations,
                 position: options.position,

@@ -99,6 +99,7 @@ pandora.ui.embedTimeline = function() {
                 });
             }
             $annotations = Ox.AnnotationPanel(Ox.extend({
+                clickLink: pandora.clickLink,
                 font: options.annotationsFont,
                 layers: video.annotations,
                 position: options.position,
