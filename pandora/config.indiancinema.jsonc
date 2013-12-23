@@ -623,7 +623,7 @@
     "itemRequiresVideo": false,
     "itemViews": [
         {"id": "info", "title": "Info"},
-        //{"id": "documents", "title": "Documents"},
+        {"id": "documents", "title": "Documents"},
         {"id": "player", "title": "Player"},
         {"id": "editor", "title": "Editor"},
         {"id": "timeline", "title": "Timeline"},
