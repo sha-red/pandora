@@ -457,7 +457,7 @@ pandora.ui.documentsDialog = function(options) {
                 click: function() {
                     var info = $list.value(selected),
                         url = '/documents/' + selected + '/' + info.name + '.' + info.extension;
-                    window.open('/url=' + encodeURIComponent(url), '_blank');
+                    window.open(url, '_blank');
                 }
             });
     }

@@ -185,7 +185,7 @@ pandora.ui.documentsView = function(options, self) {
                     click: function() {
                         var info = self.$documentsList.value(self.selected),
                             url = '/documents/' + self.selected + '/' + info.name + '.' + info.extension;
-                        window.open('/url=' + encodeURIComponent(url), '_blank');
+                        window.open(url, '_blank');
                     }
                 })
             )
