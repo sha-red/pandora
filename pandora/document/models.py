@@ -72,26 +72,13 @@ class Document(models.Model):
 
     @classmethod
     def get(cls, id):
-        username, name, extension = cls.parse_id(id)
-        return cls.objects.get(user__username=username, name=name, extension=extension)
-
-    @classmethod
-    def parse_id(cls, id):
-        public_id = id.replace('_', ' ').replace('\t', '_').split(':')
-        username = public_id[0]
-        name = ":".join(public_id[1:])
-        extension = name.split('.')
-        name = '.'.join(extension[:-1])
-        extension = extension[-1].lower()
-        return username, name, extension
+        return cls.objects.get(pk=ox.fromAZ(id))
 
     def get_absolute_url(self):
         return ('/documents/%s' % quote(self.get_id())).replace('%3A', ':')
 
     def get_id(self):
-        id = u'%s:%s.%s' % (self.user.username, self.name, self.extension)
-        id = id.replace('_', '%09').replace(' ', '_')
-        return id
+        return ox.toAZ(self.id)
 
     def editable(self, user):
         if not user or user.is_anonymous():
@@ -180,7 +167,11 @@ class Document(models.Model):
         return False
 
     def thumbnail(self):
-        return '%s.jpg' % self.file.path
+        if self.extension == 'pdf':
+            thumbnail = '%s.jpg' % self.file.path
+        else:
+            thumbnail = self.file.path
+        return thumbnail
 
     def make_thumbnail(self, force=False):
         thumb = self.thumbnail()

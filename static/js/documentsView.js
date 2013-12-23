@@ -19,6 +19,29 @@ pandora.ui.documentsView = function(options, self) {
 
     self.$preview = Ox.Element();
 
+    self.$menu = Ox.MenuButton({
+            items: [
+                {
+                    id: 'add',
+                    title: Ox._('Add Documents...')
+                },
+            ],
+            title: 'set',
+            type: 'image'
+        })
+        .css({
+            float: 'left',
+            margin: '4px'
+        })
+        .bindEvent({
+            click: function(data) {
+                if (data.id == 'add') {
+                    addDocuments();
+                } else if (data.id == 'fixme') {
+                }
+            }
+        })
+        .appendTo(self.$toolbar);
 
     self.$documentsList = Ox.TableList({
             columns: [
@@ -75,6 +98,7 @@ pandora.ui.documentsView = function(options, self) {
             columnsResizable: true,
             columnsVisible: true,
             items: options.documents,
+            keys: ['ratio'],
             scrollbarVisible: true,
             sort: [{key: 'index', operator: '+'}],
             sortable: true,
@@ -82,22 +106,7 @@ pandora.ui.documentsView = function(options, self) {
         })
         .bindEvent({
             add: function(data) {
-                pandora.$ui.documentsDialog = pandora.ui.documentsDialog({
-                    callback: function(ids) {
-                        if (ids) {
-                            pandora.api.addDocument({
-                                item: pandora.user.ui.item,
-                                ids: ids
-                            }, function() {
-                                Ox.Request.clearCache();
-                                //fixme just upload list here
-                                //self.$documentsList.reloadList();
-                                pandora.$ui.contentPanel.replaceElement(1,
-                                    pandora.$ui.item = pandora.ui.item());
-                            });
-                        }
-                    }
-                }).open();
+                addDocuments();
             },
             'delete': function(data) {
                 if (data.ids.length > 0 && options.editable) {
@@ -138,22 +147,73 @@ pandora.ui.documentsView = function(options, self) {
             }
         });
 
+    function addDocuments() {
+        pandora.$ui.documentsDialog = pandora.ui.documentsDialog({
+            callback: function(ids) {
+                if (ids) {
+                    pandora.api.addDocument({
+                        item: pandora.user.ui.item,
+                        ids: ids
+                    }, function() {
+                        Ox.Request.clearCache();
+                        //fixme just upload list here
+                        //self.$documentsList.reloadList();
+                        pandora.$ui.contentPanel.replaceElement(1,
+                            pandora.$ui.item = pandora.ui.item());
+                    });
+                }
+            }
+        }).open();
+    }
+
     function renderPreview() {
-        var isImage = Ox.contains(['jpg', 'png'],
-                self.selected ? self.selected.split('.').pop() : ''),
-            size = {width: 256, height: 256},
-            src = '/documents/' + self.selected + (isImage ? '' : '.jpg');
+        var size = getPreviewSize(),
+            src = '/documents/' + self.selected + '/256p.jpg';
         self.$preview.empty();
         self.selected && self.$preview
-            .append(Ox.ImageElement({
-                height: size.height,
-                src: src,
-                width: size.width
-            }))
+            .append(
+                Ox.ImageElement({
+                    height: size.height,
+                    src: src,
+                    width: size.width
+                })
+                .css({
+                    margin: size.margin,
+                    borderRadius: '8px'
+                })
+                .on({
+                    click: function() {
+                        var info = self.$documentsList.value(self.selected),
+                            url = '/documents/' + self.selected + '/' + info.name + '.' + info.extension;
+                        window.open('/url=' + encodeURIComponent(url), '_blank');
+                    }
+                })
+            )
             .append(Ox.Element()
+                .css({
+                    margin: size.margin,
+                    paddingTop: '8px'
+                })
                 .html(self.$documentsList.value(self.selected, 'description')
             ));
     }
+
+    function getPreviewSize() {
+        var ratio = self.$documentsList.value(self.selected, 'ratio'),
+            previewWidth = self.$preview.width() - 8,
+            height = ratio < 1 ? previewWidth : previewWidth / ratio,
+            width = ratio >= 1 ? previewWidth : previewWidth * ratio,
+            left = Math.floor((previewWidth - Ox.UI.SCROLLBAR_SIZE - width) / 2);
+        return {
+            height: height,
+            // fixme: CSS gets applied twice, to image and enclosing element
+            margin: [8, 8, 8, 8 + left].map(function(px) {
+                return px / 2 + 'px';
+            }).join(' '),
+            width: width
+        };
+    }
+
     function selectDocument(data) {
         if (data.ids[0] != self.selected) {
             self.selected = data.ids[0];

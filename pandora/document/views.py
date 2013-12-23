@@ -14,8 +14,7 @@ from item.models import Item
 import models
 
 def get_document_or_404_json(id):
-    username, name, extension = models.Document.parse_id(id)
-    return get_object_or_404_json(models.Document, user__username=username, name=name, extension=extension)
+    return models.Document.get(id)
 
 @login_required_json
 def addDocument(request):
@@ -221,11 +220,12 @@ def sortDocuments(request):
     return render_to_json_response(response)
 actions.register(sortDocuments, cache=False)
 
-def file(request, id):
+def file(request, id, name=None):
     document = models.Document.get(id)
     return HttpFileResponse(document.file.path)
 
-def thumbnail(request, id):
+def thumbnail(request, id, size=256):
+    size = int(size)
     document = models.Document.get(id)
     return HttpFileResponse(document.thumbnail())
 

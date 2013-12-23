@@ -442,9 +442,8 @@ pandora.ui.documentsDialog = function(options) {
     }
 
     function renderPreview() {
-        var isImage = Ox.contains(['jpg', 'png'], selected.split('.').pop()),
-            size = getPreviewSize(),
-            src = '/documents/' + selected + (isImage ? '' : '.jpg');
+        var size = getPreviewSize(),
+            src = '/documents/' + selected + '/256p.jpg';
         return Ox.ImageElement({
                 height: size.height,
                 src: src,
@@ -453,6 +452,13 @@ pandora.ui.documentsDialog = function(options) {
             .css({
                 margin: size.margin,
                 borderRadius: '8px'
+            })
+            .on({
+                click: function() {
+                    var info = $list.value(selected),
+                        url = '/documents/' + selected + '/' + info.name + '.' + info.extension;
+                    window.open('/url=' + encodeURIComponent(url), '_blank');
+                }
             });
     }
 
