@@ -143,7 +143,8 @@ class Document(models.Model):
         return response
 
     def path(self, name=''):
-        h = "%07d" % self.id
+        h = ox.toAZ(self.id)
+        h = (7-len(h))*'0' + h
         return os.path.join('documents', h[:2], h[2:4], h[4:6], h[6:], name)
 
     def save_chunk(self, chunk, chunk_id=-1, done=False):
