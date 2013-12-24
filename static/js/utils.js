@@ -249,6 +249,7 @@ pandora.clickLink = function(e) {
     } else if (
         e.target.hostname == document.location.hostname
         && !Ox.startsWith(e.target.pathname, '/static')
+        && (window.self == window.top  || pandora.isEmbeddableView(e.target.href))
     ) {
         if (pandora.$ui.home && e.target.pathname != '/home') {
             pandora.$ui.home.fadeOutScreen();
@@ -1753,6 +1754,11 @@ pandora.isClipView = function(view, item) {
     return (
         !item ? ['calendar', 'clip', 'map'] : ['calendar', 'clips', 'map']
     ).indexOf(view) > -1;
+};
+
+pandora.isEmbeddableView = function(url) {
+    //fixme. actually return true for embeddable views
+    return false;
 };
 
 pandora.isEmbedURL = function(url) {
