@@ -4,6 +4,8 @@ import re
 
 from django.shortcuts import get_object_or_404, redirect
 
+import app.views
+
 import models
 
 def padma_find(request):
@@ -49,11 +51,17 @@ def padma_video(request, url):
             layer = view
             view = None
     if layer:
-        alias = get_object_or_404(models.LayerAlias, old=layer)
-        url = '/%s' % alias.new
+        try:
+            alias = get_object_or_404(models.LayerAlias, old=layer)
+            url = '/%s' % alias.new
+        except:
+            return app.views.index(request)
     else:
-        alias = get_object_or_404(models.IDAlias, old=hid)
-        url = '/%s' % alias.new
+        try:
+            alias = get_object_or_404(models.IDAlias, old=hid)
+            url = '/%s' % alias.new
+        except:
+            return app.views.index(request)
     if view:
         timecodes = re.compile('(\d{2}:\d{2}:\d{2}\.\d{3})-(\d{2}:\d{2}:\d{2}\.\d{3})').findall(view)
         if timecodes:
