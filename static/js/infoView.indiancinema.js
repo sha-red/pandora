@@ -26,7 +26,7 @@ pandora.ui.infoView = function(data) {
             'editor', 'composer', 'lyricist', 'actor'
         ],
         listKeys = nameKeys.concat([
-            'country', 'language', 'color', 'sound', 'genre', 'keyword'
+            'country', 'language', 'color', 'sound', 'genre', 'keyword', 'links'
         ]),
         // these may contain commas, and are thus separated by semicolons
         specialListKeys = ['alternativeTitles', 'productionCompany'],
@@ -302,7 +302,7 @@ pandora.ui.infoView = function(data) {
 
     renderGroup(canSeeAllMetadata ? ['genre', 'keyword'] : ['genre']);
 
-    renderGroup(['imdbId']);
+    renderGroup(['imdbId', 'links']);
 
     if (canEdit) {
         updateIMDb();
@@ -583,6 +583,11 @@ pandora.ui.infoView = function(data) {
         var ret;
         if (key == 'year') {
             ret = formatLink(value, 'year');
+        } else if (key == 'links') {
+            ret = value.split(', ').map(function(link) {
+                return '<a href="' + link + '">' + Ox.parseURL(link).host + '</a>';
+            }).join(', ');
+
         } else if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), 'name');
         } else if (listKeys.indexOf(key) > -1) {

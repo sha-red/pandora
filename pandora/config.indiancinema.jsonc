@@ -374,6 +374,13 @@
             "sort": true
         },
         {
+            "id": "links",
+            "title": "Links",
+            "type": ["string"],
+            "columnWidth": 180,
+            "find": true
+        },
+        {
             "id": "comments",
             "title": "Comments",
             "type": "text",
