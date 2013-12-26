@@ -128,9 +128,9 @@ class Text(models.Model):
                     name = data['name'] + ' [%d]' % num
                 self.name = name
             elif key == 'description':
-                self.description = ox.sanitize_html(data['description'])
+                self.description = ox.sanitize_html(data['description'], global_attributes=['lang'])
             elif key == 'text':
-                self.text = ox.sanitize_html(data['text'], global_attributes=['data-name'])
+                self.text = ox.sanitize_html(data['text'], global_attributes=['data-name', 'lang'])
             elif key == 'rightslevel':
                 self.rightslevel = int(data['rightslevel'])
 

@@ -312,7 +312,7 @@ pandora.ui.textHTML = function(text) {
                         }
                     );
                 },
-                globalAttributes: ['data-name'],
+                globalAttributes: ['data-name', 'lang'],
                 placeholder: text.editable ? Ox._('Doubleclick to edit text') : '',
                 tooltip: text.editable ? pandora.getEditTooltip('text') : '',
                 type: 'textarea',
