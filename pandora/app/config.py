@@ -7,6 +7,7 @@ import sys
 import shutil
 import time
 import thread
+import codecs
 from glob import glob
 
 from django.conf import settings
@@ -256,8 +257,8 @@ def update_static():
             with open(site_locale) as fdl:
                 print '    adding', site_locale
                 locale.update(json.load(fdl))
-        with open(locale_file, 'w') as fd:
-            json.dump(locale, fd)
+        with codecs.open(locale_file, "w", "utf-8") as fd:
+            json.dump(locale, fd, ensure_ascii=False)
         os.system('gzip -9 -c "%s" > "%s.gz"' % (locale_file, locale_file))
 
 
