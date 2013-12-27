@@ -188,7 +188,7 @@ pandora.ui.uploadVideoDialog = function(data) {
                     delete pandora.firefogg;
                     that.close();
                 } else {
-                    $status.html(Ox._('Upload Failed.'));
+                    $status.html(Ox._('Upload failed.'));
                     pandora.api.log({
                         text: data.responseText,
                         url: '/' + item,
