@@ -71,7 +71,7 @@ appPanel
 
     function getPandoraVersion() {
         var i, path, scripts = document.getElementsByTagName('script');
-        for (i = 0;i < scripts.length; i++) {
+        for (i = 0; i < scripts.length; i++) {
             if(/pandora.js/.test(scripts[i].src)) {
                 return scripts[i].src.replace(/.*\?/, '');
             }

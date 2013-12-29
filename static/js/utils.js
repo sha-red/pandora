@@ -775,7 +775,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                         whiteSpace: 'nowrap'
                     })
                     .html(text)
-            )
+            );
     }
 
     function isAtListsTop(e) {
@@ -1722,9 +1722,9 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
 };
 
 pandora.hasDialogOrScreen = function() {
-    return $('.OxDialog:visible').length
-        || $('.OxFullscreen').length
-        || $('.OxScreen').length;
+    return !!$('.OxDialog:visible').length
+        || !!$('.OxFullscreen').length
+        || !!$('.OxScreen').length;
 };
 
 pandora.hasEventsLayer = function() {
@@ -1982,15 +1982,15 @@ pandora.resizeWindow = function() {
                 pandora.$ui.clipList.size();
             } else if (pandora.user.ui.itemView == 'timeline') {
                 pandora.$ui.timeline && pandora.$ui.timeline.options({
-                   // fixme: duplicated
-                   height: pandora.$ui.contentPanel.size(1),
-                   width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+                    // fixme: duplicated
+                    height: pandora.$ui.contentPanel.size(1),
+                    width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
                 });
             } else if (pandora.user.ui.itemView == 'player') {
                 pandora.$ui.player && pandora.$ui.player.options({
-                   // fixme: duplicated
-                   height: pandora.$ui.contentPanel.size(1),
-                   width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+                    // fixme: duplicated
+                    height: pandora.$ui.contentPanel.size(1),
+                    width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
                 });
             } else if (pandora.user.ui.itemView == 'editor') {
                 pandora.$ui.editor && pandora.$ui.editor.options({
