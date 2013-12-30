@@ -634,7 +634,7 @@ class Stream(models.Model):
             else:
                 self.aspect_ratio = self.info['video'][0]['width'] / self.info['video'][0]['height']
         else:
-            self.aspect_ratio = 128/80
+            self.aspect_ratio = settings.CONFIG['video']['previewRatio']
         super(Stream, self).save(*args, **kwargs)
         if self.available and not self.file.available:
             self.file.save()
