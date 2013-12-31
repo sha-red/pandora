@@ -1,13 +1,19 @@
 Ox.load(function() {
-    window.addEventListener('hashchange', function() {
-        var page = document.location.hash.substring(1).split('=')[1];
-        page && Ox.$parent.postMessage('page', {
-            page: Math.round(page)
-        });
+    var currentPage = PDFView.page;
+    window.addEventListener('pagechange', function (evt) {
+        var page = evt.pageNumber;
+        if (page && page != currentPage) {
+            currentPage = page;
+            Ox.$parent.postMessage('page', {
+                page: Math.round(page)
+            });
+        }
     });
     Ox.$parent.onMessage(function(event, data, oxid) {
         if (event == 'page' && Ox.isUndefined(oxid)) {
-            window.location.hash = '#page=' + data.page;
+            if (data.page != PDFView.page) {
+                PDFView.page = data.page;
+            }
         }
     });
 });
