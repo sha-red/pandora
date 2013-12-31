@@ -1290,8 +1290,12 @@ canvas {
   bottom: 0;
   color: #000;
   font-family: sans-serif;
+  pointer-events: none;
 }
 
+.imageLayer > div {
+      pointer-events: all;
+}
 .textLayer > div {
   color: transparent;
   position: absolute;
