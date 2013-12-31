@@ -4978,7 +4978,10 @@ function updateViewarea() {
   });
   var href = PDFView.getAnchorUrl(pdfOpenParams);
   document.getElementById('viewBookmark').href = href;
-  document.location.hash = '#page=' + pageNumber;
+  document.getElementById('secondaryViewBookmark').href = href;
+
+  // Update the current bookmark in the browsing history.
+  PDFHistory.updateCurrentBookmark(pdfOpenParams, pageNumber);
 }
 
 window.addEventListener('resize', function webViewerResize(evt) {
