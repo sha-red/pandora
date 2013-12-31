@@ -94,6 +94,8 @@ if __name__ == "__main__":
                 os.chdir(base)
         if old < 3666:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
+        if old < 3770:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
 
         if len(sys.argv) == 1:
