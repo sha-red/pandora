@@ -748,6 +748,7 @@ class Item(models.Model):
             'modified',
             'numberofannotations',
             'numberofcuts',
+            'numberofdocuments',
             'numberoffiles',
             'parts',
             'pixels',
@@ -867,8 +868,9 @@ class Item(models.Model):
         for key in ('hue', 'saturation', 'lightness'):
             if key in self.data:
                 setattr(s, key, self.data.get(key, None))
-        s.numberofannotations = self.annotations.all().count()
+        s.numberofannotations = self.annotations.count()
         s.numberofcuts = len(self.data.get('cuts', []))
+        s.numberofdocuments = self.documents.count()
         if s.duration:
             s.cutsperminute = s.numberofcuts / (s.duration/60)
             s.wordsperminute = s.words / (s.duration / 60)
