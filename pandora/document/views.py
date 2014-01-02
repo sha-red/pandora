@@ -41,7 +41,7 @@ def addDocument(request):
             document = models.Document.get(id)
             document.add(item)
     else:
-        response = json_response(status=403, file='permission denied')
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(addDocument, cache=False)
 
