@@ -148,22 +148,7 @@ pandora.ui.documentsView = function(options, self) {
         });
 
     function addDocuments() {
-        pandora.$ui.documentsDialog = pandora.ui.documentsDialog({
-            callback: function(ids) {
-                if (ids) {
-                    pandora.api.addDocument({
-                        item: pandora.user.ui.item,
-                        ids: ids
-                    }, function() {
-                        Ox.Request.clearCache();
-                        //fixme just upload list here
-                        //self.$documentsList.reloadList();
-                        pandora.$ui.contentPanel.replaceElement(1,
-                            pandora.$ui.item = pandora.ui.item());
-                    });
-                }
-            }
-        }).open();
+        pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
     }
 
     function renderPreview() {

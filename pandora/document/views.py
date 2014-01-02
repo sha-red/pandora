@@ -250,6 +250,7 @@ def upload(request):
             chunk_id = form.cleaned_data['chunkId']
             response = {
                 'result': 1,
+                'id': file.get_id(),
                 'resultUrl': request.build_absolute_uri(file.get_absolute_url())
             }
             if not file.save_chunk(c, chunk_id, form.cleaned_data['done']):

@@ -2,9 +2,7 @@
 
 'use strict';
 
-pandora.ui.documentsDialog = function(options) {
-    options = options || {};
-
+pandora.ui.documentsDialog = function() {
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
         itemWidth = 272 + Ox.UI.SCROLLBAR_SIZE,
@@ -155,6 +153,7 @@ pandora.ui.documentsDialog = function(options) {
                 unique: 'id'
             })
             .bindEvent({
+                'delete': deleteDocuments,
                 init: function(data) {
                     $status.html(
                         Ox.toTitleCase(Ox.formatCount(data.items, 'file'))
@@ -165,10 +164,8 @@ pandora.ui.documentsDialog = function(options) {
                 },
                 select: function(data) {
                     selected = data.ids[0];
+                    $addButton.options({disabled: data.ids.length == 0});
                     selectFile();
-                    options.callback && $doneButton.options({
-                        disabled: !data.ids.length
-                    });
                 }
             }),
 
@@ -219,30 +216,36 @@ pandora.ui.documentsDialog = function(options) {
             .css({float: 'left', margin: '4px'})
             .hide()
             .bindEvent({
-                click: deleteFile
+                click: deleteDocuments
             })
             .appendTo($itemToolbar),
         
+        $addButton = Ox.Button({
+                disabled: true,
+                id: 'add',
+                title: Ox._('Add'),
+                width: 48
+            }).bindEvent({
+                click: addDocuments
+            }),
+        
         $doneButton = Ox.Button({
-                disabled: !!options.callback,
                 id: 'done',
-                title: options.callback ? Ox._('Select') : Ox._('Done'),
+                title: Ox._('Done'),
                 width: 48
             }).bindEvent({
                 click: function() {
-                    options.callback && options.callback($list.options('selected'));
                     that.close();
                 }
             }),
 
         $uploadButton = Ox.FileButton({
-                maxFiles: 1,
-                title: Ox._('Upload Document...'),
+                title: Ox._('Upload Documents...'),
                 width: 128
             })
             .css({float: 'right', margin: '4px'})
             .bindEvent({
-                click: uploadFile
+                click: uploadDocuments
             })
             .appendTo($itemToolbar),
 
@@ -309,7 +312,7 @@ pandora.ui.documentsDialog = function(options) {
             }),
 
         that = Ox.Dialog({
-                buttons: [$doneButton],
+                buttons: pandora.user.ui.item ? [$addButton, $doneButton] : [$doneButton],
                 closeButton: true,
                 content: $content,
                 height: dialogHeight,
@@ -341,9 +344,24 @@ pandora.ui.documentsDialog = function(options) {
         that.superClose();
     };
 
-    function deleteFile() {
-        pandora.ui.deleteDocumentDialog($list.options('selected')[0], function() {
-            Ox.Request.clearCache('findDocuments');
+    function addDocuments() {
+        pandora.api.addDocument({
+            item: pandora.user.ui.item,
+            ids: $list.options('selected')
+        }, function() {
+            Ox.Request.clearCache();
+            if (pandora.user.ui.itemView == 'documents') {
+                //fixme just upload list here
+                //self.$documentsList.reloadList();
+                pandora.$ui.contentPanel.replaceElement(1,
+                    pandora.$ui.item = pandora.ui.item());
+            }
+        });
+    }
+
+    function deleteDocuments() {
+        pandora.ui.deleteDocumentDialog($list.options('selected'), function() {
+            Ox.Request.clearCache(pandora.user.ui.item ? void 0 : 'findDocuments');
             $list.reloadList();
         }).open();
     }
@@ -528,28 +546,18 @@ pandora.ui.documentsDialog = function(options) {
         } : query});
     }
 
-    function uploadFile(data) {
-        pandora.ui.uploadDocumentDialog(data.files[0], function(file) {
-            Ox.Request.clearCache('findDocuments');
-            pandora.api.findDocuments({
-                positions: [file.id],
-                query: $list.options('query'),
-                sort: $list.options('sort'),
-            }, function(data) {
+    function uploadDocuments(data) {
+        pandora.ui.uploadDocumentDialog(data.files, function(files) {
+            if (files) {
+                Ox.Request.clearCache('findDocuments');
                 $list.bindEventOnce({
                     load: function() {
-                        $list.options({selected: [file.id]});
+                        $list.options({selected: [files.ids]});
                         // selectFile(file.id);
                     }
                 });
-                if (data.data.positions[file.id] > -1) {
-                    $list.reloadList();
-                } else {
-                    $list.options({
-                        query: {conditions: [], operator: '&'}
-                    });
-                }
-            });
+                $list.reloadList();
+            }
         }).open();
     }
 
