@@ -234,7 +234,7 @@ appPanel
                 }), callback);
             });
         } else {
-            Ox.getFile(prefix + 'js/pandora.min.js?' + getPandoraVersion(), callback);
+            Ox.getScript(prefix + 'js/pandora.min.js?' + getPandoraVersion(), callback);
         }
     }
 
