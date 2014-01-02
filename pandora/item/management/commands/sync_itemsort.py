@@ -113,6 +113,6 @@ class Command(BaseCommand):
                 ids = [i['id'] for i in models.Item.objects.all().values('id')]
                 for id in ids:
                     i = models.Item.objects.get(pk=id)
-                    if optoins['debug']:
+                    if options['debug']:
                         print i
                     i.update_sort()
