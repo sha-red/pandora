@@ -46,6 +46,7 @@ apt-get install -y \
     libav-tools \
     ffmpeg2theora \
     imagemagick \
+    poppler-utils \
     ipython \
     postfix \
     postgresql \

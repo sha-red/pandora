@@ -86,8 +86,12 @@ def _order_query(qs, sort):
             'name': 'name_sort',
             'description': 'description_sort',
         }.get(e['key'], e['key'])
-        order = '%s%s' % (operator, key)
-        order_by.append(order)
+        if key == 'resolution':
+            order_by.append('%swidth'%operator)
+            order_by.append('%sheight'%operator)
+        else:
+            order = '%s%s' % (operator, key)
+            order_by.append(order)
     if order_by:
         qs = qs.order_by(*order_by)
     qs = qs.distinct()

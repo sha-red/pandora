@@ -18,6 +18,7 @@ from item.models import Item
 from archive.extract import resize_image
 
 import managers
+import utils
 
 
 class Document(models.Model):
@@ -34,6 +35,9 @@ class Document(models.Model):
     size = models.IntegerField(default=0)
     matches = models.IntegerField(default=0)
     ratio = models.FloatField(default=1)
+    pages = models.IntegerField(default=-1)
+    width = models.IntegerField(default=-1)
+    height = models.IntegerField(default=-1)
     description = models.TextField(default="")
     oshash = models.CharField(max_length=16, unique=True, null=True)
 
@@ -53,11 +57,13 @@ class Document(models.Model):
                 self.size = self.file.size
                 if self.extension == 'pdf' and not os.path.exists(self.thumbnail()):
                     self.make_thumbnail()
+                self.get_info()
 
         self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
         self.description_sort = ox.sort_string(self.description or u'')[:512].lower()
 
         super(Document, self).save(*args, **kwargs)
+        self.update_matches()
 
     def __unicode__(self):
         return self.get_id()
@@ -67,6 +73,7 @@ class Document(models.Model):
         if created:
             p.index = ItemProperties.objects.filter(item=item).aggregate(Max('index'))['index__max'] + 1
             p.save()
+            p.document.update_matches()
 
     def remove(self, item):
         ItemProperties.objects.filter(item=item, document=self).delete()
@@ -110,9 +117,13 @@ class Document(models.Model):
                 p.description = ox.sanitize_html(data['description'])
                 p.save()
 
+    @property
+    def resolution(self):
+        return [self.width, self.height]
+
     def json(self, keys=None, user=None, item=None):
         if not keys:
-             keys=[
+            keys=[
                 'description',
                 'editable',
                 'id',
@@ -123,6 +134,10 @@ class Document(models.Model):
                 'ratio',
                 'user'
             ]
+            if self.extension == 'pdf':
+                keys.append('pages')
+            else:
+                keys.append('resolution')
         response = {}
         _map = {
         }
@@ -162,6 +177,7 @@ class Document(models.Model):
                     f.write(chunk.read())
             if done:
                 self.uploading = False
+                self.get_info()
                 self.get_ratio()
                 self.oshash = ox.oshash(self.file.path)
                 self.save()
@@ -178,7 +194,9 @@ class Document(models.Model):
         else:
             path = src
         if os.path.exists(src) and not os.path.exists(path):
-            image_size = max(*Image.open(src).size)
+            image_size = max(self.width, self.height)
+            if image_size == -1:
+                image_size = max(*Image.open(src).size)
             if size > image_size:
                 path = src
             else:
@@ -193,16 +211,29 @@ class Document(models.Model):
             p = subprocess.Popen(cmd)
             p.wait()
 
+    def get_info(self):
+        if self.extension == 'pdf':
+            if self.pages == -1:
+                self.width = 1
+                self.height = -1
+                self.pages = utils.pdfpages(self.file.path)
+        elif self.width == -1:
+            self.pages = -1
+            self.width, self.height = Image.open(self.file.path).size
+
     def get_ratio(self):
         if self.extension == 'pdf':
             self.make_thumbnail()
             image = self.thumbnail()
         else:
             image = self.file.path
-        try:
-            size = Image.open(image).size
-        except:
-            size = [1,1]
+        if self.width > 0:
+            size = self.resolution
+        else:
+            try:
+                size = Image.open(image).size
+            except:
+                size = [1,1]
         self.ratio = size[0] / size[1]
 
     def update_matches(self):
@@ -213,7 +244,7 @@ class Document(models.Model):
         url = unquote(urls[0])
         if url != urls[0]:
             urls.append(url)
-        matches = 0
+        matches = self.items.count()
         for url in urls:
             matches += annotation.models.Annotation.objects.filter(value__contains=url).count()
             matches += item.models.Item.objects.filter(data__contains=url).count()
