@@ -74,7 +74,7 @@ pandora.ui.previewDialog = function() {
                     : item.posterRatio,
                 size = getSize(posterRatio),
                 title = item.title + (
-                    item.director ? ' (' + item.director.join(', ') + ')' : ''
+                    item.director.length ? ' (' + item.director.join(', ') + ')' : ''
                 ) + (
                     item.year ? ' ' + item.year : ''
                 );
