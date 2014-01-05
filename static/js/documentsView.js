@@ -139,7 +139,7 @@ pandora.ui.documentsView = function(options, self) {
                         id: data.id,
                         item: pandora.user.ui.item
                     }, function(result) {
-                        //if description is empty, fall back to global description
+                        // if description is empty, fall back to global description
                         self.$documentsList.value(data.id, data.key, result.data.description);
                         renderPreview();
                     });
@@ -236,6 +236,7 @@ pandora.ui.documentsView = function(options, self) {
     that.reload = function() {
         self.$documentsList.reloadList();
     }
+
     return that;
 
 };
