@@ -3,6 +3,7 @@
 'use strict';
 
 pandora.ui.documentsDialog = function() {
+
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
         itemWidth = 272 + Ox.UI.SCROLLBAR_SIZE,
@@ -156,7 +157,7 @@ pandora.ui.documentsDialog = function() {
                 'delete': deleteDocuments,
                 init: function(data) {
                     $status.html(
-                        Ox.toTitleCase(Ox.formatCount(data.items, 'file'))
+                        Ox.toTitleCase(Ox.formatCount(data.items, 'document'))
                     );
                 },
                 load: function() {
