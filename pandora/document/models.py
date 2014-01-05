@@ -225,16 +225,17 @@ class Document(models.Model):
         if self.extension == 'pdf':
             self.make_thumbnail()
             image = self.thumbnail()
-        else:
-            image = self.file.path
-        if self.width > 0:
-            size = self.resolution
-        else:
             try:
                 size = Image.open(image).size
             except:
                 size = [1,1]
+        else:
+            if self.width > 0:
+                size = self.resolution
+            else:
+                size = [1,1]
         self.ratio = size[0] / size[1]
+        return self.ratio
 
     def update_matches(self):
         import annotation.models
