@@ -774,6 +774,9 @@
                     "columnWidth": {}
                 }
             },
+            "documentSize": 256,
+            "documentsSort": [{"key": "index", "operator": "+"}],
+            "documentsView": "grid",
             "edit": "",
             "edits": {},
             "embedSize": 256,
