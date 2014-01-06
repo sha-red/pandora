@@ -136,6 +136,11 @@ pandora.ui.mainMenu = function() {
                             disabled: !ui.item, keyboard: 'shift b'
                         },
                         {
+                            id: 'showdocument',
+                            title: Ox._((ui.showTimeline ? 'Hide' : 'Show') + ' Document'),
+                            disabled: !hasDocument(), keyboard: 'shift d'
+                        },
+                        {
                             id: 'showtimeline',
                             title: Ox._((ui.showTimeline ? 'Hide' : 'Show') + ' Timeline'),
                             disabled: !hasTimeline(), keyboard: 'shift t'
@@ -438,6 +443,8 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({showFilters: !ui.showFilters});
                 } else if (data.id == 'showbrowser') {
                     pandora.UI.set({showBrowser: !ui.showBrowser});
+                } else if (data.id == 'showdocument') {
+                    pandora.UI.set({showDocument: !ui.showDocument});
                 } else if (data.id == 'showtimeline') {
                     pandora.UI.set({showTimeline: !ui.showTimeline});
                 } else if (data.id == 'showannotations') {
@@ -596,12 +603,15 @@ pandora.ui.mainMenu = function() {
             key_shift_b: function() {
                 ui.item && pandora.UI.set({showBrowser: !ui.showBrowser});
             },
-            key_shift_c: function() {
-                hasClips && pandora.UI.set({showClips: !ui.showClips});
-            },
             key_shift_backtick: function() {
                 changeFocus(-1);
             },
+            key_shift_c: function() {
+                hasClips() && pandora.UI.set({showClips: !ui.showClips});
+            },
+            key_shift_d: function() {
+                hasDocument() && pandora.UI.set({showDocument: !ui.showDocument});
+            }
             key_shift_f: function() {
                 !ui.item && pandora.UI.set({showFilters: !ui.showFilters});
             },
@@ -742,6 +752,9 @@ pandora.ui.mainMenu = function() {
             pandora_showclips: function(data) {
                 that.setItemTitle('showclips', Ox._((data.value ? 'Hide' : 'Show') + ' Clips'));
             },
+            pandora_showdocument: function(data) {
+                that.setItemTitle('showdocument', Ox._((data.value ? 'Hide' : 'Show') + ' Document'));
+            }
             pandora_showfilters: function(data) {
                 that.setItemTitle('showfilters', Ox._((data.value ? 'Hide' : 'Show') + ' Filters'));
             },
@@ -1040,6 +1053,10 @@ pandora.ui.mainMenu = function() {
 
     function hasClips() {
         return ui.section == 'edits' && ui.edit;
+    }
+
+    function hasDocument() {
+        return ui.section == 'items' && ui.item && ui.itemView == 'documents';
     }
 
     function hasTimeline() {
