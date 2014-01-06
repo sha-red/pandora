@@ -712,6 +712,7 @@
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
             "showClips": true,
+            "showDocument": true,
             "showFilters": true,
             "showIconBrowser": false,
             "showInfo": true,
