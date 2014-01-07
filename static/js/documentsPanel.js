@@ -386,8 +386,6 @@ pandora.ui.documentsPanel = function(options) {
         selectDocuments
     );
 
-    selectDocuments();
-
     function addDocuments() {
         pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
     }
@@ -407,6 +405,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function editDocuments() {
+        pandora.UI.set('documentSelection.', $list.options('selected'));
         pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
     }
 
@@ -567,7 +566,10 @@ pandora.ui.documentsPanel = function(options) {
         var options = {
             items: pandora.api.findDocuments,
             keys: ['dimensions', 'extension', 'id', 'name', 'ratio', 'size'],
-            query: {conditions: [], operator: '&'},
+            query: {
+                conditions: isItemView ? [{ key: 'item', value: ui.item }] : [],
+                operator: '&'
+            },
             selected: ui.documentsSelection[isItemView ? ui.item : ''],
             sort: ui.documentsSort.concat([
                 {key: 'extension', operator: '+'},
@@ -621,6 +623,11 @@ pandora.ui.documentsPanel = function(options) {
             },
             sort: function(data) {
                 pandora.UI.set({documentsSort: [data]});
+            }
+        })
+        .bindEventOnce({
+            load: function() {
+                selectDocuments();
             }
         });
     }
@@ -690,20 +697,28 @@ pandora.ui.documentsPanel = function(options) {
         var key = $findSelect.value(),
             value = $findInput.value(),
             query = {
-                conditions: value
-                    ? [].concat(
-                        key != 'user'
-                            ? [{key: 'name', value: value, operator: '='}]
-                            : [],
-                        key == 'all'
-                            ? [{key: 'description', value: value, operator: '='}]
-                            : [],
-                        key != 'name'
-                            ? [{key: 'user', value: value, operator: '='}]
-                            : []
-                    )
+                conditions: [].concat(
+                    isItemView
+                    ? [{ key: 'item', value: ui.item }]
                     : [],
-                operator: '|'
+                    value
+                    ? {
+                        conditions: [].concat(
+                            key != 'user'
+                                ? [{key: 'name', value: value, operator: '='}]
+                                : [],
+                            key == 'all'
+                                ? [{key: 'description', value: value, operator: '='}]
+                                : [],
+                            key != 'name'
+                                ? [{key: 'user', value: value, operator: '='}]
+                                : []
+                        ),
+                        operator: '|'
+                    }
+                    : []
+                ),
+                operator: '&'
             };
         $list.options({query: query});
     }
