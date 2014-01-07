@@ -8,6 +8,7 @@ from ox.django.decorators import login_required_json
 from ox.django.http import HttpFileResponse
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from django import forms
+from django.db.models import Sum
 
 from item import utils
 from item.models import Item
@@ -85,6 +86,8 @@ def _order_query(qs, sort):
         key = {
             'name': 'name_sort',
             'description': 'description_sort',
+            'dimensions': 'dimensions_sort',
+            'index': 'items__itemproperties__index',
         }.get(e['key'], e['key'])
         if key == 'resolution':
             order_by.append('%swidth'%operator)
@@ -93,7 +96,7 @@ def _order_query(qs, sort):
             order = '%s%s' % (operator, key)
             order_by.append(order)
     if order_by:
-        qs = qs.order_by(*order_by)
+        qs = qs.order_by(*order_by, nulls_last=True)
     qs = qs.distinct()
     return qs
 
@@ -154,7 +157,11 @@ def findDocuments(request):
         ids = [i.get_id() for i in qs]
         response['data']['positions'] = utils.get_positions(ids, query['positions'])
     else:
+        r = qs.aggregate(
+            Sum('size')
+        )
         response['data']['items'] = qs.count()
+        response['data']['size'] = r['size__sum']
     return render_to_json_response(response)
 actions.register(findDocuments)
 

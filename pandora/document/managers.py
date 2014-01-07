@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
 
+from ox.django.query import QuerySet
 
 def parseCondition(condition, user):
     '''
@@ -91,7 +92,7 @@ def parseConditions(conditions, operator, user):
 class DocumentManager(Manager):
 
     def get_query_set(self):
-        return super(DocumentManager, self).get_query_set()
+        return QuerySet(self.model)
 
     def find(self, data, user):
         '''

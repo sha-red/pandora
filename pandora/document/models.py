@@ -41,6 +41,9 @@ class Document(models.Model):
     description = models.TextField(default="")
     oshash = models.CharField(max_length=16, unique=True, null=True)
 
+    #type of document, i.e. booklet etc
+    type = models.CharField(max_length=1024, null=True)
+
     file = models.FileField(default=None, blank=True,null=True, upload_to=lambda f, x: f.path(x))
 
     objects = managers.DocumentManager()
@@ -48,6 +51,7 @@ class Document(models.Model):
 
     name_sort = models.CharField(max_length=255)
     description_sort = models.CharField(max_length=512)
+    dimensions_sort = models.CharField(max_length=512)
 
     items = models.ManyToManyField(Item, through='ItemProperties', related_name='documents')
 
@@ -61,6 +65,11 @@ class Document(models.Model):
 
         self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
         self.description_sort = ox.sort_string(self.description or u'')[:512].lower()
+        if self.extension == 'pdf':
+            self.dimension_sort = ox.sort_string('0') + ox.sort_string('%d' % self.pages)
+        else:
+            resolution_sort = self.width * self.height
+            self.dimension_sort = ox.sort_string('1') + ox.sort_string('%d' % resolution_sort)
 
         super(Document, self).save(*args, **kwargs)
         self.update_matches()
@@ -111,11 +120,23 @@ class Document(models.Model):
                 self.name = name
             elif key == 'description' and not item:
                 self.description = ox.sanitize_html(data['description'])
+            elif key == 'type':
+                if not data['type']:
+                    self.type = None
+                else:
+                    self.type = ox.sanitize_html(data['type'])
         if item:
             p, created = ItemProperties.objects.get_or_create(item=item, document=self)
             if 'description' in data:
                 p.description = ox.sanitize_html(data['description'])
                 p.save()
+
+    @property
+    def dimensions(self):
+        if self.extension == 'pdf':
+            return self.pages
+        else:
+            return self.resolution
 
     @property
     def resolution(self):
@@ -125,19 +146,17 @@ class Document(models.Model):
         if not keys:
             keys=[
                 'description',
+                'dimensions',
                 'editable',
                 'id',
                 'name',
                 'extension',
                 'oshash',
                 'size',
+                'type',
                 'ratio',
-                'user'
+                'user',
             ]
-            if self.extension == 'pdf':
-                keys.append('pages')
-            else:
-                keys.append('resolution')
         response = {}
         _map = {
         }
@@ -149,7 +168,7 @@ class Document(models.Model):
             elif key == 'user':
                 response[key] = self.user.username
             elif hasattr(self, _map.get(key, key)):
-                response[key] = getattr(self, _map.get(key,key))
+                response[key] = getattr(self, _map.get(key,key)) or ''
         if item:
             d = self.descriptions.filter(item=item)
             if d.exists():
