@@ -31,6 +31,7 @@
         "canAddItems": {"student": true, "staff": true, "admin": true},
         "canDownloadVideo": {"guest": -1, "member": -1, "student": -1, "staff": -1, "admin": -1},
         "canEditAnnotations": {"staff": true, "admin": true},
+        "canEditDocuments": {"staff": true, "admin": true},
         "canEditEvents": {"student": true, "staff": true, "admin": true},
         "canEditFeaturedEdits": {"student": true, "staff": true, "admin": true},
         "canEditFeaturedLists": {"student": true, "staff": true, "admin": true},
