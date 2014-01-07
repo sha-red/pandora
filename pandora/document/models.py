@@ -66,10 +66,10 @@ class Document(models.Model):
         self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
         self.description_sort = ox.sort_string(self.description or u'')[:512].lower()
         if self.extension == 'pdf':
-            self.dimension_sort = ox.sort_string('0') + ox.sort_string('%d' % self.pages)
+            self.dimension_sort = ox.sort_string('1') + ox.sort_string('%d' % self.pages)
         else:
             resolution_sort = self.width * self.height
-            self.dimension_sort = ox.sort_string('1') + ox.sort_string('%d' % resolution_sort)
+            self.dimension_sort = ox.sort_string('0') + ox.sort_string('%d' % resolution_sort)
 
         super(Document, self).save(*args, **kwargs)
         self.update_matches()
