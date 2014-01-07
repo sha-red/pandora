@@ -257,7 +257,6 @@ def parseConditions(conditions, operator, user, owner=None):
 class ItemManager(Manager):
 
     def get_query_set(self):
-        #return super(ItemManager, self).get_query_set()
         return QuerySet(self.model)
 
     def filter_list(self, qs, l, user):

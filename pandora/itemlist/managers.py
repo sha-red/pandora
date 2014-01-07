@@ -3,6 +3,7 @@
 
 from django.db.models import Q, Manager
 
+from ox.django.query import QuerySet
 
 def parseCondition(condition, user):
     '''
@@ -93,7 +94,7 @@ def parseConditions(conditions, operator, user):
 class ListManager(Manager):
 
     def get_query_set(self):
-        return super(ListManager, self).get_query_set()
+        return QuerySet(self.model)
 
     def find(self, data, user):
         '''

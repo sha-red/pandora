@@ -165,7 +165,7 @@ def _order_query(qs, sort):
         if key == 'subscribers':
             qs = qs.annotate(subscribers=Sum('subscribed_users'))
     if order_by:
-        qs = qs.order_by(*order_by)
+        qs = qs.order_by(*order_by, nulls_last=True)
     qs = qs.distinct()
     return qs
 
