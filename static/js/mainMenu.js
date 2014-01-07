@@ -137,7 +137,7 @@ pandora.ui.mainMenu = function() {
                         },
                         {
                             id: 'showdocument',
-                            title: Ox._((ui.showTimeline ? 'Hide' : 'Show') + ' Document'),
+                            title: Ox._((ui.showDocument ? 'Hide' : 'Show') + ' Document'),
                             disabled: !hasDocument(), keyboard: 'shift d'
                         },
                         {
