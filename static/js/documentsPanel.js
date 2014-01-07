@@ -113,7 +113,11 @@ pandora.ui.documentsPanel = function(options) {
         .css({float: 'left', margin: '4px 2px 4px 4px'})
         .bindEvent({
             click: function() {
-                
+                if (isItemView) {
+                    
+                } else {
+                    
+                }
             }
         })
         .appendTo($listBar),
@@ -190,7 +194,7 @@ pandora.ui.documentsPanel = function(options) {
         })
         .bindEvent({
             change: function(data) {
-                
+                $findInput.options({placeholder: data.title}).focusInput();
             }
         }),
 
@@ -247,7 +251,7 @@ pandora.ui.documentsPanel = function(options) {
             items: isItemView ? [
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'edit', title: ''},
-                {id: 'remove', title: ''}
+                {id: 'remove', title: '', keyboard: 'delete'}
             ] : [
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'addtoitem', title: ''},
@@ -376,6 +380,12 @@ pandora.ui.documentsPanel = function(options) {
         pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
     }
 
+    function closeDocuments() {
+        if (pandora.$ui.documentDialog) {
+            pandora.$ui.documentDialog.close();
+        }
+    }
+
     function deleteDocuments() {
         pandora.ui.deleteDocumentDialog($list.options('selected'), function() {
             Ox.Request.clearCache();
@@ -393,7 +403,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function getOrderButtonTooltip() {
-        return Ox._(ui.documentsSort[0].operator == '+' ? 'ascending' : 'descending');
+        return Ox._(ui.documentsSort[0].operator == '+' ? 'Ascending' : 'Descending');
     }
 
     function getPreviewSize() {
@@ -410,6 +420,30 @@ pandora.ui.documentsPanel = function(options) {
             }).join(' '),
             width: width
         };
+    }
+
+    function openDocuments() {
+        if (!pandora.$ui.documentDialog) {
+            pandora.$ui.documentDialog = pandora.ui.documentDialog({
+                index: 0,
+                items: $list.options('selected').map(function(id) {
+                    return $list.value(id);
+                })
+            })
+            .bindEvent({
+                close: function() {
+                    $list.closePreview();
+                }
+            })
+            .open();
+        } else {
+            pandora.$ui.documentDialog.update({
+                index: 0,
+                items: $list.options('selected').map(function(id) {
+                    return $list.value(id);
+                })
+            });
+        }
     }
 
     function removeDocuments() {
@@ -520,7 +554,7 @@ pandora.ui.documentsPanel = function(options) {
     function renderList() {
         var options = {
             items: pandora.api.findDocuments,
-            keys: ['dimensions', 'extension', 'name', 'ratio', 'size'],
+            keys: ['dimensions', 'extension', 'id', 'name', 'ratio', 'size'],
             query: {conditions: [], operator: '&'},
             selected: ui.documentsSelection[isItemView ? ui.item : ''],
             sort: ui.documentsSort.concat([
@@ -554,14 +588,16 @@ pandora.ui.documentsPanel = function(options) {
         })))
         .bindEvent({
             add: uploadDocuments,
+            closepreview: closeDocuments,
             'delete': deleteDocuments,
             init: function(data) {
-                Ox.print('INIT', data)
                 $listStatus.html(
                     Ox.toTitleCase(Ox.formatCount(data.items, 'document'))
                     + ', ' + Ox.formatValue(data.size, 'B')
                 );
             },
+            open: openDocuments,
+            openpreview: openDocuments,
             select: function(data) {
                 pandora.UI.set(
                     'documentsSelection.' + (isItemView ? ui.item : ''),
@@ -589,20 +625,15 @@ pandora.ui.documentsPanel = function(options) {
             cursor: 'pointer'
         })
         .on({
-            click: function() {
-                pandora.$ui.documentDialog = pandora.ui.documentDialog({
-                    index: 0,
-                    items: $list.options('selected').map(function(id) {
-                        return $list.value(id);
-                    })
-                }).open();
-                return;
-                var item = $list.value(selected);
-                window.open(
-                    '/documents/' + selected + '/' + item.name + '.' + item.extension,
-                    '_blank'
-                );
-            }
+            click: openDocuments
+            // FIXME
+            /*
+            var item = $list.value(selected);
+            window.open(
+                '/documents/' + selected + '/' + item.name + '.' + item.extension,
+                '_blank'
+            );
+            */
         });
     }
 

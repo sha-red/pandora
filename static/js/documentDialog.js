@@ -23,25 +23,36 @@ pandora.ui.documentDialog = function(options) {
                 minWidth: 512,
                 padding: 0,
                 removeOnClose: true,
-                title: item.name + '.' + item.extension,
+                title: '',
                 width: dialogWidth
             })
             .bindEvent({
                 close: function() {
                     pandora.UI.set({document: ''});
+                    delete pandora.$ui.documentDialog;
                 },
                 resize: function(data) {
+                    dialogHeight = data.height;
+                    dialogWidth = data.width;
                     $content.options({
-                        height: data.height,
-                        width: data.width
+                        height: dialogHeight,
+                        width: dialogWidth
                     });
                 },
                 pandora_document: function(data) {
-                    if (Ox.getObjectById(items, data.value)) {
-                        
+                    Ox.print('DOCUMENT', data)
+                    if (data.value.length) {
+                        if (Ox.getObjectById(items, data.value)) {
+
+                        } else {
+
+                        }
                     } else {
-                        
+                        that.close();
                     }
+                },
+                pandora_item: function(data) {
+                    pandora.UI.set({document: ''});
                 }
             }),
 
@@ -71,6 +82,7 @@ pandora.ui.documentDialog = function(options) {
     // fixme: why is this needed?
     $(that.find('.OxContent')[0]).css({overflow: 'hidden'});
 
+    setTitle();
     setContent();
 
     function setContent() {
@@ -89,10 +101,13 @@ pandora.ui.documentDialog = function(options) {
                 })
             )
             .bindEvent({
-                center: function() {
+                center: function(data) {
                     pandora.UI.set('document.' + item.id + '.center', data.center);
                 },
-                page: function() {
+                key_escape: function() {
+                    pandora.$ui.documentDialog.close();
+                },
+                page: function(data) {
                     pandora.UI.set('document.' + item.id + '.page', data.page);
                 },
                 zoom: function(data) {
@@ -101,6 +116,17 @@ pandora.ui.documentDialog = function(options) {
             })
         );
     }
+
+    function setTitle() {
+        that.options({title: item.name + '.' + item.extension});
+    }
+
+    that.update = function(options) {
+        items = options.items;
+        item = items[options.index];
+        setTitle();
+        setContent();
+    };
 
     return that;
 
