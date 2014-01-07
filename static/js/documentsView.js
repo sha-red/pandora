@@ -4,6 +4,9 @@
 
 pandora.ui.documentsView = function(options, self) {
 
+    var that = pandora.ui.documentsPanel();
+    return that;
+
     var self = self || {},
         that = Ox.Element({}, self)
             .defaults({
