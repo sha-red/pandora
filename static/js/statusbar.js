@@ -13,9 +13,7 @@ pandora.ui.statusbar = function() {
         },
 
         that = Ox.Bar({size: 16})
-            .css({
-                textAlign: 'center'
-            })
+            .css({textAlign: 'center'})
             .append(
                 Ox.Element()
                     .css({
