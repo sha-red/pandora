@@ -16,7 +16,9 @@ Ox.load(function() {
             }
         }
         if (event == 'pdf' && Ox.isUndefined(oxid)) {
-            PDFView.open(data.pdf);
+            if (PDFView.url != data.pdf) {
+                PDFView.open(data.pdf);
+            }
         }
     });
     Ox.$parent.postMessage('init', {});
