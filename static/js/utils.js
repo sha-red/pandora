@@ -1789,7 +1789,7 @@ pandora.logEvent = function(data, event, element) {
     var element = this,
         handlers = self.eventHandlers ? self.eventHandlers[event] : [];
     if (!Ox.contains([
-        'mousedown', 'mouserepeat', 'anyclick', 'singleclick', 'doubleclick',
+        'mousedown', 'mouserepeat', 'anyclick', 'singleclick', 'doubleclick', 'mousewheel',
         'dragstart', 'drag', 'dragenter', 'dragleave', 'dragpause', 'dragend',
         'draganddropstart', 'draganddrop', 'draganddropenter', 'draganddropleave', 'draganddropend',
         'playing', 'position', 'progress', 'request'
