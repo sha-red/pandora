@@ -611,7 +611,7 @@ pandora.ui.mainMenu = function() {
             },
             key_shift_d: function() {
                 hasDocument() && pandora.UI.set({showDocument: !ui.showDocument});
-            }
+            },
             key_shift_f: function() {
                 !ui.item && pandora.UI.set({showFilters: !ui.showFilters});
             },
@@ -754,7 +754,7 @@ pandora.ui.mainMenu = function() {
             },
             pandora_showdocument: function(data) {
                 that.setItemTitle('showdocument', Ox._((data.value ? 'Hide' : 'Show') + ' Document'));
-            }
+            },
             pandora_showfilters: function(data) {
                 that.setItemTitle('showfilters', Ox._((data.value ? 'Hide' : 'Show') + ' Filters'));
             },
