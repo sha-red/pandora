@@ -40,8 +40,7 @@ pandora.ui.documentDialog = function(options) {
                     });
                 },
                 pandora_document: function(data) {
-                    Ox.print('DOCUMENT', data)
-                    if (data.value.length) {
+                    if (data.value) {
                         if (Ox.getObjectById(items, data.value)) {
 
                         } else {
@@ -68,6 +67,7 @@ pandora.ui.documentDialog = function(options) {
                 right: '4px',
                 top: '4px'
             })
+            [items.length > 1 ? 'show' : 'hide']()
             .bindEvent({
                 click: function(data) {
                     options.index = Ox.mod(
@@ -89,7 +89,12 @@ pandora.ui.documentDialog = function(options) {
         $content.replaceWith(
             $content = (
                 item.extension == 'pdf'
-                ? Ox.Element()
+                ? Ox.PDFViewer({
+                    height: dialogHeight,
+                    url: '/documents/' + item.id + '/'
+                        + item.name + '.' + item.extension,
+                    width: dialogWidth
+                })
                 : Ox.ImageViewer({
                     height: dialogHeight,
                     imageHeight: item.dimensions[1],

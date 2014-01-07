@@ -114,7 +114,7 @@ pandora.ui.documentsPanel = function(options) {
         .bindEvent({
             click: function() {
                 if (isItemView) {
-                    
+                    editDocuments();
                 } else {
                     
                 }
@@ -265,8 +265,16 @@ pandora.ui.documentsPanel = function(options) {
         })
         .css({float: 'left', margin: '4px'})
         .bindEvent({
-            click: function() {
-                
+            click: function(data) {
+                if (data.id == 'open') {
+                    openDocuments();
+                } else if (data.id == 'edit') {
+                    editDocuments();
+                } else if (data.id == 'remove') {
+                    removeDocuments();
+                } else if (data.id == 'delete') {
+                    deleteDocuments();
+                }
             }
         })
         .appendTo($itemBar),
@@ -318,7 +326,6 @@ pandora.ui.documentsPanel = function(options) {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
             })
-            .html(Ox._('No document selected'))
             .appendTo($itemStatusbar),
 
         $itemPanel = Ox.SplitPanel({
@@ -338,7 +345,7 @@ pandora.ui.documentsPanel = function(options) {
                 ui.documentSize = 0;
                 pandora.UI.set({documentSize: data.size});
             },
-            toggle: function() {
+            toggle: function(data) {
                 pandora.UI.set({showDocument: !data.collapsed});
             }
         }),
@@ -350,11 +357,13 @@ pandora.ui.documentsPanel = function(options) {
                 },
                 {
                     collapsible: isItemView,
-                    collapsed: !ui.showDocument,
+                    collapsed: isItemView && !ui.showDocument,
                     element: $itemPanel,
                     size: ui.documentSize,
                     resizable: true,
-                    resize: [192, 256, 320, 384]
+                    resize: [192, 256, 320, 384],
+                    tooltip: 'document <span class="OxBright">'
+                        + Ox.SYMBOLS.SHIFT + 'D</span>'
                 }
             ],
             orientation: 'horizontal'
@@ -366,6 +375,9 @@ pandora.ui.documentsPanel = function(options) {
             },
             pandora_documentsview: function(data) {
                 $listPanel.replaceElement(1, $list = renderList());
+            },
+            pandora_showdocument: function(data) {
+                isItemView && that.toggle(1);
             }
         });
 
@@ -596,6 +608,9 @@ pandora.ui.documentsPanel = function(options) {
                     + ', ' + Ox.formatValue(data.size, 'B')
                 );
             },
+            key_escape: function() {
+                pandora.UI.set({document: ''});
+            },
             open: openDocuments,
             openpreview: openDocuments,
             select: function(data) {
@@ -664,6 +679,11 @@ pandora.ui.documentsPanel = function(options) {
             $preview = renderPreview().appendTo($item);
             $form = renderForm().appendTo($item);
         }
+        $itemStatus.html(
+            selected.length
+            ? Ox.formatCount(selected.length, 'Document')
+            : Ox._('No document selected')
+        );
     }
 
     function updateList() {
