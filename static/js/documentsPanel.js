@@ -5,18 +5,10 @@
 pandora.ui.documentsPanel = function(options) {
 
     var ui = pandora.user.ui,
-
         hasItemView = false,
-        isItemView = false,
+        isItemView = true,
 
         columns = [
-            {
-                id: 'type',
-                operator: '+',
-                title: Ox._('Type'),
-                visible: true,
-                width: 128
-            },
             {
                 id: 'name',
                 operator: '+',
@@ -57,6 +49,13 @@ pandora.ui.documentsPanel = function(options) {
                 title: Ox._('Size'),
                 visible: true,
                 width: 64
+            },
+            {
+                id: 'type',
+                operator: '+',
+                title: Ox._('Type'),
+                visible: true,
+                width: 128
             },
             {
                 id: 'description',
@@ -104,7 +103,7 @@ pandora.ui.documentsPanel = function(options) {
             }
         ],
 
-        $listbar = Ox.Bar({size: 24}),
+        $listBar = Ox.Bar({size: 24}),
 
         $addButton = Ox.Button({
             title: isItemView ? 'add' : 'upload',
@@ -117,22 +116,23 @@ pandora.ui.documentsPanel = function(options) {
                 
             }
         })
-        .appendTo($listbar),
+        .appendTo($listBar),
 
         $viewSelect = Ox.Select({
             items: [
-                {id: 'list', title: Ox._('List')},
-                {id: 'grid', title: Ox._('Grid')}
+                {id: 'list', title: Ox._('View as List')},
+                {id: 'grid', title: Ox._('View as Grid')}
             ],
-            width: 192
+            value: ui.documentsView,
+            width: 128
         })
         .css({float: 'left', margin: '4px 2px'})
         .bindEvent({
             change: function(data) {
-                pandora.UI.set({documentsView: data.id});
+                pandora.UI.set({documentsView: data.value});
             }
         })
-        .appendTo($listbar),
+        .appendTo($listBar),
 
         $sortSelect = Ox.Select({
             items: columns.map(function(column) {
@@ -141,7 +141,8 @@ pandora.ui.documentsPanel = function(options) {
                     title: Ox._('Sort by ' + column.title)
                 };
             }),
-            width: 192
+            value: ui.documentsSort[0].key,
+            width: 128
         })
         .bindEvent({
             change: function(data) {
@@ -173,7 +174,7 @@ pandora.ui.documentsPanel = function(options) {
             float: 'right'
         })
         .css({float: 'left', margin: '4px 2px'})
-        .appendTo($listbar),
+        .appendTo($listBar),
 
         $findSelect = Ox.Select({
             items: isItemView ? [
@@ -210,13 +211,13 @@ pandora.ui.documentsPanel = function(options) {
                 ]
             })
             .css({float: 'right', margin: '4px 4px 4px 2px'})
-            .appendTo($listbar),
+            .appendTo($listBar),
 
         $list = renderList(),
 
-        $statusbar = Ox.Bar({size: 16}),
+        $listStatusbar = Ox.Bar({size: 16}).css({textAlign: 'center'}),
 
-        $status = Ox.Element()
+        $listStatus = Ox.Element()
             .css({
                 margin: '2px 4px',
                 fontSize: '9px',
@@ -224,54 +225,47 @@ pandora.ui.documentsPanel = function(options) {
                 textOverflow: 'ellipsis'
             })
             .html(Ox._('Loading...'))
-            .appendTo($statusbar),
+            .appendTo($listStatusbar),
 
         $listPanel = Ox.SplitPanel({
             elements: [
-                {element: $listbar, size: 24},
+                {element: $listBar, size: 24},
                 {element: $list},
-                {element: $statusbar, size: 16}
+                {element: $listStatusbar, size: 16}
             ],
             orientation: 'vertical'
+        })
+        .bindEvent({
+            resize: function() {
+                $list.size();
+            },
         }),
 
-        $itembar = Ox.Bar({size: 24}),
+        $itemBar = Ox.Bar({size: 24}),
 
         $itemMenu = Ox.MenuButton({
             items: isItemView ? [
-                {id: 'open', title: '', keyboard: 'enter'},
+                {id: 'open', title: '', keyboard: 'return'},
                 {id: 'edit', title: ''},
                 {id: 'remove', title: ''}
             ] : [
-                {id: 'open', title: '', keyboard: 'enter'},
+                {id: 'open', title: '', keyboard: 'return'},
                 {id: 'addtoitem', title: ''},
                 {id: 'addtolist', title: ''},
                 {id: 'replace', title: Ox._('Replace Document...')},
                 {id: 'delete', title: '', keyboard: 'delete'}
             ],
             title: 'set',
-            tooltip: 'Options'
+            tooltip: 'Options',
+            type: 'image'
         })
+        .css({float: 'left', margin: '4px'})
         .bindEvent({
             click: function() {
                 
             }
-        }),
-
-        $selectButton = Ox.ButtonGroup({
-            buttons: [
-                {id: 'previous', title: 'left'},
-                {id: 'next', title: 'right'}
-            ],
-            type: 'image'
         })
-        .css({float: 'right', margin: '4px 2px'})
-        .appendTo($itembar)
-        .bindEvent({
-            click: function(data) {
-                
-            }
-        }),
+        .appendTo($itemBar),
 
         $deselectButton = Ox.Button({
             title: 'close',
@@ -284,10 +278,25 @@ pandora.ui.documentsPanel = function(options) {
                 pandora.UI.set(
                     'documentsSelection.' + (isItemView ? ui.item : ''),
                     []
-                )
+                );
             }
         })
-        .appendTo($itembar),
+        .appendTo($itemBar),
+
+        $selectButton = Ox.ButtonGroup({
+            buttons: [
+                {id: 'previous', title: 'left'},
+                {id: 'next', title: 'right'}
+            ],
+            type: 'image'
+        })
+        .css({float: 'right', margin: '4px 2px'})
+        .bindEvent({
+            click: function(data) {
+                
+            }
+        })
+        .appendTo($itemBar),
 
         $item = Ox.Element().css({overflowY: 'scroll'}),
 
@@ -295,16 +304,30 @@ pandora.ui.documentsPanel = function(options) {
 
         $form,
 
+        $itemStatusbar = Ox.Bar({size: 16})
+            .css({textAlign: 'center'}),
+
+        $itemStatus = Ox.Element()
+            .css({
+                margin: '2px 4px',
+                fontSize: '9px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+            })
+            .html(Ox._('No document selected'))
+            .appendTo($itemStatusbar),
+
         $itemPanel = Ox.SplitPanel({
             elements: [
-                {element: $itembar, size: 24},
-                {element: $item}
+                {element: $itemBar, size: 24},
+                {element: $item},
+                {element: $itemStatusbar, size: 16}
             ],
             orientation: 'vertical'
         })
         .bindEvent({
             resize: function(data) {
-                ui.sidebarSize = data.size;
+                ui.documentSize = data.size;
             },
             resizeend: function(data) {
                 // set to 0 so that UI.set registers a change of the value
@@ -326,8 +349,8 @@ pandora.ui.documentsPanel = function(options) {
                     collapsed: !ui.showDocument,
                     element: $itemPanel,
                     size: ui.documentSize,
-                    resizable: isItemView,
-                    resize: isItemView ? [192, 256, 320, 384] : []
+                    resizable: true,
+                    resize: [192, 256, 320, 384]
                 }
             ],
             orientation: 'horizontal'
@@ -336,23 +359,21 @@ pandora.ui.documentsPanel = function(options) {
             pandora_documentssort: function(data) {
                 updateSortElement();
                 $list.options({sort: data.value});
+            },
+            pandora_documentsview: function(data) {
+                $listPanel.replaceElement(1, $list = renderList());
             }
         });
 
     that.bindEvent(
-        'documentsSelection.' + (isItemView ? ui.item : ''),
+        'pandora_documentsselection.' + (isItemView ? ui.item.toLowerCase() : ''),
         selectDocuments
     );
 
+    selectDocuments();
+
     function addDocuments() {
-        pandora.api.addDocument({
-            item: ui.item,
-            ids: $list.options('selected')
-        }, function() {
-            Ox.Request.clearCache();
-            // ...
-            $list.reloadList();
-        });
+        pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
     }
 
     function deleteDocuments() {
@@ -361,6 +382,10 @@ pandora.ui.documentsPanel = function(options) {
             // ...
             $list.reloadList();
         }).open();
+    }
+
+    function editDocuments() {
+        pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
     }
 
     function getOrderButtonTitle() {
@@ -372,7 +397,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function getPreviewSize() {
-        var ratio = $list.value(selected[0], 'ratio'),
+        var ratio = $list.value($list.options('selected')[0], 'ratio'),
             size = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE,
             height = ratio > 1 ? size / ratio : size,
             width = ratio > 1 ? size : size * ratio,
@@ -399,7 +424,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function renderForm() {
-        var item = $list.value(selected),
+        var item = $list.value($list.options('selected')[0]),
             editable = item.user == pandora.user.username
                 || pandora.site.capabilities.canEditDocuments[pandora.user.level],
             inputWidth = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE,
@@ -427,9 +452,9 @@ pandora.ui.documentsPanel = function(options) {
                     id: 'dimensions',
                     label: Ox._('Dimensions'),
                     labelWidth: labelWidth,
-                    value: Ox.isArray(value)
-                        ? Ox.formatDimensions(value, 'px')
-                        : Ox.formatCount(value, 'page'),
+                    value: Ox.isArray(item.dimensions)
+                        ? Ox.formatDimensions(item.dimensions, 'px')
+                        : Ox.formatCount(item.dimensions, 'page'),
                     width: inputWidth
                 }),
                 Ox.Input({
@@ -495,13 +520,13 @@ pandora.ui.documentsPanel = function(options) {
     function renderList() {
         var options = {
             items: pandora.api.findDocuments,
-            keys: ['ratio'],
+            keys: ['dimensions', 'extension', 'name', 'ratio', 'size'],
             query: {conditions: [], operator: '&'},
+            selected: ui.documentsSelection[isItemView ? ui.item : ''],
             sort: ui.documentsSort.concat([
                 {key: 'extension', operator: '+'},
-                {key: 'filename', operator: '+'}
+                {key: 'name', operator: '+'}
             ]),
-            sums: ['size'],
             unique: 'id'
         };
         return (ui.documentsView == 'list' ? Ox.TableList(Ox.extend(options, {
@@ -517,12 +542,12 @@ pandora.ui.documentsPanel = function(options) {
                     )(data[infoKey]),
                     size = size || 128;
                 return {
-                    height: Math.round(data.ratio > 1 ? size / ratio : size),
+                    height: Math.round(data.ratio > 1 ? size / data.ratio : size),
                     id: data.id,
                     info: info,
                     title: data.name,
                     url: '/documents/' + data.id + '/256p.jpg',
-                    width: Math.round(data.ratio > 1 ? size : size * ratio)
+                    width: Math.round(data.ratio > 1 ? size : size * data.ratio)
                 };
             },
             size: 128
@@ -531,25 +556,27 @@ pandora.ui.documentsPanel = function(options) {
             add: uploadDocuments,
             'delete': deleteDocuments,
             init: function(data) {
-                $status.html(
+                Ox.print('INIT', data)
+                $listStatus.html(
                     Ox.toTitleCase(Ox.formatCount(data.items, 'document'))
                     + ', ' + Ox.formatValue(data.size, 'B')
                 );
             },
-            select: function() {
+            select: function(data) {
                 pandora.UI.set(
                     'documentsSelection.' + (isItemView ? ui.item : ''),
                     data.ids
                 );
             },
-            sort: function() {
-                pandora.UI.set({documentsSort: data.sort});
+            sort: function(data) {
+                pandora.UI.set({documentsSort: [data]});
             }
         });
     }
 
     function renderPreview() {
-        var size = getPreviewSize(),
+        var selected = $list.options('selected')[0],
+            size = getPreviewSize(),
             src = '/documents/' + selected + '/256p.jpg';
         return Ox.ImageElement({
             height: size.height,
@@ -557,11 +584,19 @@ pandora.ui.documentsPanel = function(options) {
             width: size.width
         })
         .css({
+            borderRadius: '8px',
             margin: size.margin,
-            borderRadius: '8px'
+            cursor: 'pointer'
         })
         .on({
             click: function() {
+                pandora.$ui.documentDialog = pandora.ui.documentDialog({
+                    index: 0,
+                    items: $list.options('selected').map(function(id) {
+                        return $list.value(id);
+                    })
+                }).open();
+                return;
                 var item = $list.value(selected);
                 window.open(
                     '/documents/' + selected + '/' + item.name + '.' + item.extension,
@@ -572,20 +607,14 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function selectDocuments() {
-        var items = ui.documentSelection[isItemView ? ui.item : ''],
-            string = items.length < 2 ? 'Document' : items.length + ' Documents';
-        ['open', 'edit', 'delete'].forEach(function(id) {
-            $itemMenu[items.length ? 'enableItem' : 'disableItem']
-        });
+        var selected = ui.documentsSelection[isItemView ? ui.item : ''] || [],
+            string = selected.length < 2 ? 'Document'
+                : selected.length + ' Documents';
+        $list.options({selected: selected});
         $itemMenu.setItemTitle('open', Ox._('Open ' + string));
         if (isItemView) {
-            $itemMenu.setItemTitle(
-                'edit', Ox._('Edit ' + string + '...')
-            )
-            .setItemTitle('remove', Ox._(
-                'Remove ' + string + ' from this '
-                + pandora.site.itemName.singular
-            ));
+            $itemMenu.setItemTitle('edit', Ox._('Edit ' + string + '...'))
+                .setItemTitle('remove', Ox._('Remove ' + string));
         } else {
             $itemMenu.setItemTitle('addtoitem', Ox._(
                 'Add ' + string + ' to Current '
@@ -596,10 +625,11 @@ pandora.ui.documentsPanel = function(options) {
             ))
             .setItemTitle('delete', Ox._('Delete ' + string + '...'));
         }
-        $selectButton(items.length ? 'show' : 'hide');
-        $deselectButton(items.length ? 'show' : 'hide');
+        $itemMenu[selected.length ? 'show' : 'hide']();
+        $selectButton[selected.length > 1 ? 'show' : 'hide']();
+        $deselectButton[selected.length ? 'show' : 'hide']();
         $item.empty();
-        if (items.length) {
+        if (selected.length) {
             $preview = renderPreview().appendTo($item);
             $form = renderForm().appendTo($item);
         }
