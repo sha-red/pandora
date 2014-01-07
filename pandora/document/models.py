@@ -49,8 +49,8 @@ class Document(models.Model):
     objects = managers.DocumentManager()
     uploading = models.BooleanField(default = False)
 
-    name_sort = models.CharField(max_length=255)
-    description_sort = models.CharField(max_length=512)
+    name_sort = models.CharField(max_length=255, null=True)
+    description_sort = models.CharField(max_length=512, null=True)
     dimensions_sort = models.CharField(max_length=512)
 
     items = models.ManyToManyField(Item, through='ItemProperties', related_name='documents')
@@ -64,7 +64,10 @@ class Document(models.Model):
                 self.get_info()
 
         self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
-        self.description_sort = ox.sort_string(self.description or u'')[:512].lower()
+        if self.description:
+            self.description_sort = ox.sort_string(self.description)[:512].lower()
+        else:
+            self.description_sort = None
         if self.extension == 'pdf':
             self.dimensions_sort = ox.sort_string('1') + ox.sort_string('%d' % self.pages)
         else:
