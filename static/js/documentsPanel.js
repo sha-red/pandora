@@ -147,7 +147,7 @@ pandora.ui.documentsPanel = function(options) {
             change: function(data) {
                 var key = data.value;
                 pandora.UI.set({documentsSort: [{
-                    key: key;
+                    key: key,
                     operator: Ox.getObjectById(columns, key).operator
                 }]});
             }
@@ -325,7 +325,7 @@ pandora.ui.documentsPanel = function(options) {
                     collapsible: isItemView,
                     collapsed: !ui.showDocument,
                     element: $itemPanel,
-                    size: ui.documentSize
+                    size: ui.documentSize,
                     resizable: isItemView,
                     resize: isItemView ? [192, 256, 320, 384] : []
                 }
@@ -342,7 +342,7 @@ pandora.ui.documentsPanel = function(options) {
     that.bindEvent(
         'documentsSelection.' + (isItemView ? ui.item : ''),
         selectDocuments
-    });
+    );
 
     function addDocuments() {
         pandora.api.addDocument({
@@ -588,7 +588,7 @@ pandora.ui.documentsPanel = function(options) {
             ));
         } else {
             $itemMenu.setItemTitle('addtoitem', Ox._(
-                : 'Add ' + string + ' to Current '
+                'Add ' + string + ' to Current '
                 + pandora.site.itemName.singular
             ))
             .setItemTitle('addtolist', Ox._(
@@ -615,7 +615,7 @@ pandora.ui.documentsPanel = function(options) {
                             ? [{key: 'name', value: value, operator: '='}]
                             : [],
                         key == 'all'
-                            ? [key: 'description', value: value, operator: '=']
+                            ? [{key: 'description', value: value, operator: '='}]
                             : [],
                         key != 'name'
                             ? [{key: 'user', value: value, operator: '='}]
