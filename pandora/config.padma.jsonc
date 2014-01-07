@@ -664,7 +664,9 @@
                     "columnWidth": {}
                 }
             },
+            "document": "",
             "documents": {},
+            "documentsSelection": {},
             "documentSize": 256,
             "documentsSort": [{"key": "index", "operator": "+"}],
             "documentsView": "grid",
