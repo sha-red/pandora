@@ -10,6 +10,7 @@ def parseCondition(condition, user):
     k = condition.get('key', 'name')
     k = {
         'user': 'user__username',
+        'item': 'items__itemId',
     }.get(k, k)
     if not k:
         k = 'name'
