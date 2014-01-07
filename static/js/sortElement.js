@@ -4,26 +4,27 @@
 
 pandora.ui.sortElement = function(isNavigationView) {
 
-    var isClipView = pandora.isClipView(),
+    var ui = pandora.user.ui,
+        isClipView = pandora.isClipView(),
         isEmbed = pandora.isEmbedURL(),
         items = (
             isClipView ? pandora.site.clipKeys.map(function(key) {
                 return Ox.extend(Ox.clone(key), {
-                    title: Ox._((!pandora.user.ui.item ? 'Sort by Clip {0}' : 'Sort by {0}'), [Ox._(key.title)])
+                    title: Ox._((!ui.item ? 'Sort by Clip {0}' : 'Sort by {0}'), [Ox._(key.title)])
                 });
             }) : []
         ).concat(
-            !pandora.user.ui.item ? pandora.site.sortKeys.map(function(key) {
+            !ui.item ? pandora.site.sortKeys.map(function(key) {
                 return Ox.extend(Ox.clone(key), {
                     title: Ox._('Sort by {0}', [Ox._(key.title)])
                 });
             }) : []
         ),
-        sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
+        sortKey = !ui.item ? 'listSort' : 'itemSort',
 
         $sortSelect = Ox.Select({
                 items: items,
-                value: pandora.user.ui[sortKey][0].key,
+                value: ui[sortKey][0].key,
                 width: !isEmbed && isNavigationView ? 120 + Ox.UI.SCROLLBAR_SIZE : 144
             })
             .bindEvent({
@@ -45,8 +46,8 @@ pandora.ui.sortElement = function(isNavigationView) {
             .bindEvent({
                 click: function() {
                     pandora.UI.set(sortKey, [{
-                        key: pandora.user.ui[sortKey][0].key,
-                        operator: pandora.user.ui[sortKey][0].operator == '+' ? '-' : '+'
+                        key: ui[sortKey][0].key,
+                        operator: ui[sortKey][0].operator == '+' ? '-' : '+'
                     }]);
                 }
             }),
@@ -62,15 +63,15 @@ pandora.ui.sortElement = function(isNavigationView) {
             .bindEvent('pandora_' + sortKey.toLowerCase(), updateElement);
 
     function getButtonTitle() {
-        return pandora.user.ui[sortKey][0].operator == '+' ? 'up' : 'down';
+        return ui[sortKey][0].operator == '+' ? 'up' : 'down';
     }
 
     function getButtonTooltip() {
-        return Ox._(pandora.user.ui[sortKey][0].operator == '+' ? 'Ascending' : 'Descending');
+        return Ox._(ui[sortKey][0].operator == '+' ? 'Ascending' : 'Descending');
     }
 
     function updateElement() {
-        $sortSelect.value(pandora.user.ui[sortKey][0].key);
+        $sortSelect.value(ui[sortKey][0].key);
         $orderButton.options({
             title: getButtonTitle(),
             tooltip: getButtonTooltip()
