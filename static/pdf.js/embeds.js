@@ -15,14 +15,18 @@ Ox.load(function() {
                 PDFView.page = data.page;
             }
         }
+        if (event == 'pdf' && Ox.isUndefined(oxid)) {
+            PDFView.open(data.pdf);
+        }
     });
+    Ox.$parent.postMessage('init', {});
 });
 
 function getVideoOverlay(page) {
-    var links = embeds.filter(function(embed) {
+    var links = (window.embeds || []).filter(function(embed) {
         return embed.page == page && embed.type =='inline';
     });
-    return (editable || links.length) ? {
+    return (window.editable || links.length) ? {
         beginLayout: function() {
             this.counter = 0;
         },
