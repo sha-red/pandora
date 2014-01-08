@@ -85,7 +85,7 @@ def _order_query(qs, sort, item=None):
             operator = ''
         key = {
             'name': 'name_sort',
-            'description': 'items__itemproperties__description_sort'
+            'description': 'descriptions__description_sort'
                 if item else 'description_sort',
             'dimensions': 'dimensions_sort',
             'index': 'items__itemproperties__index',
