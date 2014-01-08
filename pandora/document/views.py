@@ -169,7 +169,7 @@ def findDocuments(request):
             Sum('size')
         )
         response['data']['items'] = qs.count()
-        response['data']['size'] = r['size__sum']
+        response['data']['size'] = r['size__sum'] or 0
     return render_to_json_response(response)
 actions.register(findDocuments)
 

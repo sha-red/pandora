@@ -405,7 +405,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function editDocuments() {
-        pandora.UI.set('documentSelection.', $list.options('selected'));
+        pandora.UI.set('documentsSelection.', $list.options('selected'));
         pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
     }
 
@@ -573,7 +573,7 @@ pandora.ui.documentsPanel = function(options) {
                 conditions: isItemView ? [{ key: 'item', value: ui.item, operator: '==' }] : [],
                 operator: '&'
             },
-            selected: ui.documentsSelection[isItemView ? ui.item : ''],
+            selected: ui.documentsSelection[isItemView ? ui.item : ''] || [],
             sort: ui.documentsSort.concat([
                 {key: 'extension', operator: '+'},
                 {key: 'name', operator: '+'}
