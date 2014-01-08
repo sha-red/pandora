@@ -77,7 +77,7 @@ def editDocument(request):
 actions.register(editDocument, cache=False)
 
 
-def _order_query(qs, sort):
+def _order_query(qs, sort, item=None):
     order_by = []
     for e in sort:
         operator = e['operator']
@@ -85,7 +85,8 @@ def _order_query(qs, sort):
             operator = ''
         key = {
             'name': 'name_sort',
-            'description': 'description_sort',
+            'description': 'items__itemproperties__description_sort'
+                if item else 'description_sort',
             'dimensions': 'dimensions_sort',
             'index': 'items__itemproperties__index',
         }.get(e['key'], e['key'])
@@ -100,6 +101,12 @@ def _order_query(qs, sort):
     qs = qs.distinct()
     return qs
 
+def get_item(query):
+    for c in query.get('conditions'):
+        if c.get('key') == 'item':
+            return c.get('value')
+    return None
+
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
@@ -108,6 +115,7 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Document.objects.find(data, user).exclude(name='')
+    query['item'] = get_item(data['query'])
     return query
 
 
@@ -144,12 +152,12 @@ def findDocuments(request):
     query = parse_query(data, request.user)
 
     #order
-    qs = _order_query(query['qs'], query['sort'])
+    qs = _order_query(query['qs'], query['sort'], query['item'])
     response = json_response()
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
 
-        response['data']['items'] = [l.json(data['keys'], request.user) for l in qs]
+        response['data']['items'] = [l.json(data['keys'], request.user, query['item']) for l in qs]
     elif 'position' in data:
         #FIXME: actually implement position requests
         response['data']['position'] = 0

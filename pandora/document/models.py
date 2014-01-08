@@ -173,6 +173,8 @@ class Document(models.Model):
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key,key)) or ''
         if item:
+            if isinstance(item, basestring):
+                item = Item.objects.get(itemId=item)
             d = self.descriptions.filter(item=item)
             if d.exists():
                 if 'description' in keys and d[0].description:
@@ -299,3 +301,12 @@ class ItemProperties(models.Model):
     description = models.TextField(default="")
     index = models.IntegerField(default=0)
 
+    description_sort = models.CharField(max_length=512, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.description:
+            self.description_sort = ox.sort_string(self.description)[:512].lower()
+        else:
+            self.description_sort = self.document.description_sort
+
+        super(ItemProperties, self).save(*args, **kwargs)

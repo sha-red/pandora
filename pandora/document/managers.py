@@ -4,7 +4,7 @@ from django.db.models import Q, Manager
 
 from ox.django.query import QuerySet
 
-def parseCondition(condition, user):
+def parseCondition(condition, user, item=None):
     '''
     '''
     k = condition.get('key', 'name')
@@ -14,6 +14,11 @@ def parseCondition(condition, user):
     }.get(k, k)
     if not k:
         k = 'name'
+    if item and k == 'description':
+        item_conditions = condition.copy()
+        item_conditions['key'] = 'items__itemproperties__description'
+        return parseCondition(condition, user) | parseCondition(item_condition, user)
+
     v = condition['value']
     op = condition.get('operator')
     if not op:
@@ -50,7 +55,7 @@ def parseCondition(condition, user):
         q = Q(**{key: v})
     return q
 
-def parseConditions(conditions, operator, user):
+def parseConditions(conditions, operator, user, item=None):
     '''
     conditions: [
         {
@@ -73,12 +78,12 @@ def parseConditions(conditions, operator, user):
     for condition in conditions:
         if 'conditions' in condition:
             q = parseConditions(condition['conditions'],
-                             condition.get('operator', '&'), user)
+                             condition.get('operator', '&'), user, item)
             if q:
                 conn.append(q)
             pass
         else:
-            conn.append(parseCondition(condition, user))
+            conn.append(parseCondition(condition, user, item))
     if conn:
         q = conn[0]
         for c in conn[1:]:
@@ -95,7 +100,7 @@ class DocumentManager(Manager):
     def get_query_set(self):
         return QuerySet(self.model)
 
-    def find(self, data, user):
+    def find(self, data, user, item=None):
         '''
             query: {
                 conditions: [
@@ -121,7 +126,7 @@ class DocumentManager(Manager):
         qs = self.get_query_set()
         conditions = parseConditions(data['query'].get('conditions', []),
                                      data['query'].get('operator', '&'),
-                                     user)
+                                     user, item)
         if conditions:
             qs = qs.filter(conditions)
 

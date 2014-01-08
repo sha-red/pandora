@@ -550,6 +550,9 @@ pandora.ui.documentsPanel = function(options) {
         .bindEvent({
             change: function(event) {
                 var data = Ox.extend({id: item.id}, event.id, event.data.value);
+                if (isItemView) {
+                    data.item = ui.item;
+                }
                 pandora.api.editDocument(data, function(result) {
                     $list.value(result.data.id, event.id, result.data[event.id]);
                     if (event.id == 'name') {
@@ -567,7 +570,7 @@ pandora.ui.documentsPanel = function(options) {
             items: pandora.api.findDocuments,
             keys: ['dimensions', 'extension', 'id', 'name', 'ratio', 'size'],
             query: {
-                conditions: isItemView ? [{ key: 'item', value: ui.item }] : [],
+                conditions: isItemView ? [{ key: 'item', value: ui.item, operator: '==' }] : [],
                 operator: '&'
             },
             selected: ui.documentsSelection[isItemView ? ui.item : ''],
@@ -699,7 +702,7 @@ pandora.ui.documentsPanel = function(options) {
             query = {
                 conditions: [].concat(
                     isItemView
-                    ? [{ key: 'item', value: ui.item }]
+                    ? [{ key: 'item', value: ui.item, operator: '==' }]
                     : [],
                     value
                     ? {
