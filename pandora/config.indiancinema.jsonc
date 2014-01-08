@@ -795,7 +795,7 @@
             "documents": {},
             "documentsSelection": {},
             "documentSize": 256,
-            "documentsSort": [{"key": "index", "operator": "+"}],
+            "documentsSort": [{"key": "name", "operator": "+"}],
             "documentsView": "grid",
             "edit": "",
             "edits": {},
