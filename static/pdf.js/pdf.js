@@ -20,8 +20,8 @@ if (typeof PDFJS === 'undefined') {
   (typeof window !== 'undefined' ? window : this).PDFJS = {};
 }
 
-PDFJS.version = '0.8.798';
-PDFJS.build = '5b0eebb';
+PDFJS.version = '0.8.846';
+PDFJS.build = '05f937e';
 
 (function pdfjsWrapper() {
   // Use strict in our context only - users might not want it
@@ -43,16 +43,14 @@ PDFJS.build = '5b0eebb';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* globals Cmd, ColorSpace, Dict, MozBlobBuilder, Name, PDFJS, Ref, URL */
+/* globals Cmd, ColorSpace, Dict, MozBlobBuilder, Name, PDFJS, Ref, URL,
+           Promise */
 
 'use strict';
 
 var globalScope = (typeof window === 'undefined') ? this : window;
 
 var isWorker = (typeof window == 'undefined');
-
-var ERRORS = 0, WARNINGS = 1, INFOS = 5;
-var verbosity = WARNINGS;
 
 var FONT_IDENTITY_MATRIX = [0.001, 0, 0, 0.001, 0, 0];
 
@@ -77,6 +75,12 @@ if (!globalScope.PDFJS) {
 }
 
 globalScope.PDFJS.pdfBug = false;
+
+PDFJS.VERBOSITY_LEVELS = {
+  errors: 0,
+  warnings: 1,
+  infos: 5
+};
 
 // All the possible operations for an operator list.
 var OPS = PDFJS.OPS = {
@@ -182,21 +186,19 @@ var log = (function() {
   }
 })();
 
-// A notice for devs that will not trigger the fallback UI.  These are good
-// for things that are helpful to devs, such as warning that Workers were
-// disabled, which is important to devs but not end users.
+// A notice for devs. These are good for things that are helpful to devs, such
+// as warning that Workers were disabled, which is important to devs but not
+// end users.
 function info(msg) {
-  if (verbosity >= INFOS) {
+  if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.infos) {
     log('Info: ' + msg);
-    PDFJS.LogManager.notify('info', msg);
   }
 }
 
-// Non-fatal warnings that should trigger the fallback UI.
+// Non-fatal warnings.
 function warn(msg) {
-  if (verbosity >= WARNINGS) {
+  if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.warnings) {
     log('Warning: ' + msg);
-    PDFJS.LogManager.notify('warn', msg);
   }
 }
 
@@ -214,13 +216,8 @@ function error(msg) {
     log('Error: ' + msg);
   }
   log(backtrace());
-  PDFJS.LogManager.notify('error', msg);
+  UnsupportedManager.notify(UNSUPPORTED_FEATURES.unknown);
   throw new Error(msg);
-}
-
-// Missing features that should trigger the fallback UI.
-function TODO(what) {
-  warn('TODO: ' + what);
 }
 
 function backtrace() {
@@ -235,6 +232,31 @@ function assert(cond, msg) {
   if (!cond)
     error(msg);
 }
+
+var UNSUPPORTED_FEATURES = PDFJS.UNSUPPORTED_FEATURES = {
+  unknown: 'unknown',
+  forms: 'forms',
+  javaScript: 'javaScript',
+  smask: 'smask',
+  shadingPattern: 'shadingPattern',
+  font: 'font'
+};
+
+var UnsupportedManager = PDFJS.UnsupportedManager =
+  (function UnsupportedManagerClosure() {
+  var listeners = [];
+  return {
+    listen: function (cb) {
+      listeners.push(cb);
+    },
+    notify: function (featureId) {
+      warn('Unsupported feature "' + featureId + '"');
+      for (var i = 0, ii = listeners.length; i < ii; i++) {
+        listeners[i](featureId);
+      }
+    }
+  };
+})();
 
 // Combines two URLs. The baseUrl shall be absolute URL. If the url is an
 // absolute URL, it will be returned as is.
@@ -288,22 +310,6 @@ function assertWellFormed(cond, msg) {
   if (!cond)
     error(msg);
 }
-
-var LogManager = PDFJS.LogManager = (function LogManagerClosure() {
-  var loggers = [];
-  return {
-    addLogger: function logManager_addLogger(logger) {
-      loggers.push(logger);
-    },
-    notify: function(type, message) {
-      for (var i = 0, ii = loggers.length; i < ii; i++) {
-        var logger = loggers[i];
-        if (logger[type])
-          logger[type](message);
-      }
-    }
-  };
-})();
 
 function shadow(obj, prop, value) {
   Object.defineProperty(obj, prop, { value: value,
@@ -834,6 +840,24 @@ function isPDFFunction(v) {
 }
 
 /**
+ * Legacy support for PDFJS Promise implementation.
+ * TODO remove eventually
+ */
+var LegacyPromise = PDFJS.LegacyPromise = (function LegacyPromiseClosure() {
+  return function LegacyPromise() {
+    var resolve, reject;
+    var promise = new Promise(function (resolve_, reject_) {
+      resolve = resolve_;
+      reject = reject_;
+    });
+    promise.resolve = resolve;
+    promise.reject = reject;
+    return promise;
+  };
+})();
+
+/**
+ * Polyfill for Promises:
  * The following promise implementation tries to generally implment the
  * Promise/A+ spec. Some notable differences from other promise libaries are:
  * - There currently isn't a seperate deferred and promise object.
@@ -842,7 +866,39 @@ function isPDFFunction(v) {
  * Based off of the work in:
  * https://bugzilla.mozilla.org/show_bug.cgi?id=810490
  */
-var Promise = PDFJS.Promise = (function PromiseClosure() {
+(function PromiseClosure() {
+  if (globalScope.Promise) {
+    // Promises existing in the DOM/Worker, checking presence of all/resolve
+    if (typeof globalScope.Promise.all !== 'function') {
+      globalScope.Promise.all = function (iterable) {
+        var count = 0, results = [], resolve, reject;
+        var promise = new globalScope.Promise(function (resolve_, reject_) {
+          resolve = resolve_;
+          reject = reject_;
+        });
+        iterable.forEach(function (p, i) {
+          count++;
+          p.then(function (result) {
+            results[i] = result;
+            count--;
+            if (count === 0) {
+              resolve(results);
+            }
+          }, reject);
+        });
+        if (count === 0) {
+          resolve(results);
+        }
+        return promise;
+      };
+    }
+    if (typeof globalScope.Promise.resolve !== 'function') {
+      globalScope.Promise.resolve = function (x) {
+        return new globalScope.Promise(function (resolve) { resolve(x); });
+      };
+    }
+    return;
+  }
   var STATUS_PENDING = 0;
   var STATUS_RESOLVED = 1;
   var STATUS_REJECTED = 2;
@@ -875,6 +931,8 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     },
 
     runHandlers: function runHandlers() {
+      var RUN_TIMEOUT = 1; // ms
+      var timeoutAt = Date.now() + RUN_TIMEOUT;
       while (this.handlers.length > 0) {
         var handler = this.handlers.shift();
 
@@ -900,6 +958,14 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
         }
 
         handler.nextPromise._updateStatus(nextStatus, nextValue);
+        if (Date.now() >= timeoutAt) {
+          break;
+        }
+      }
+
+      if (this.handlers.length > 0) {
+        setTimeout(this.runHandlers.bind(this), 0);
+        return;
       }
 
       this.running = false;
@@ -950,9 +1016,10 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     }
   };
 
-  function Promise() {
+  function Promise(resolver) {
     this._status = STATUS_PENDING;
     this._handlers = [];
+    resolver.call(this, this._resolve.bind(this), this._reject.bind(this));
   }
   /**
    * Builds a promise that is resolved when all the passed in promises are
@@ -961,11 +1028,15 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
    * @return {Promise} New dependant promise.
    */
   Promise.all = function Promise_all(promises) {
-    var deferred = new Promise();
+    var resolveAll, rejectAll;
+    var deferred = new Promise(function (resolve, reject) {
+      resolveAll = resolve;
+      rejectAll = reject;
+    });
     var unresolved = promises.length;
     var results = [];
     if (unresolved === 0) {
-      deferred.resolve(results);
+      resolveAll(results);
       return deferred;
     }
     function reject(reason) {
@@ -973,7 +1044,7 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
         return;
       }
       results = [];
-      deferred.reject(reason);
+      rejectAll(reason);
     }
     for (var i = 0, ii = promises.length; i < ii; ++i) {
       var promise = promises[i];
@@ -985,7 +1056,7 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
           results[i] = value;
           unresolved--;
           if (unresolved === 0)
-            deferred.resolve(results);
+            resolveAll(results);
         };
       })(i);
       if (Promise.isPromise(promise)) {
@@ -1003,6 +1074,14 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
    */
   Promise.isPromise = function Promise_isPromise(value) {
     return value && typeof value.then === 'function';
+  };
+  /**
+   * Creates resolved promise
+   * @param x resolve value
+   * @returns {Promise}
+   */
+  Promise.resolve = function Promise_resolve(x) {
+    return new Promise(function (resolve) { resolve(x); });
   };
 
   Promise.prototype = {
@@ -1035,24 +1114,19 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
       HandlerManager.scheduleHandlers(this);
     },
 
-    get isResolved() {
-      return this._status === STATUS_RESOLVED;
-    },
-
-    get isRejected() {
-      return this._status === STATUS_REJECTED;
-    },
-
-    resolve: function Promise_resolve(value) {
+    _resolve: function Promise_resolve(value) {
       this._updateStatus(STATUS_RESOLVED, value);
     },
 
-    reject: function Promise_reject(reason) {
+    _reject: function Promise_reject(reason) {
       this._updateStatus(STATUS_REJECTED, reason);
     },
 
     then: function Promise_then(onResolve, onReject) {
-      var nextPromise = new Promise();
+      var nextPromise = new Promise(function (resolve, reject) {
+        this.resolve = reject;
+        this.reject = reject;
+      });
       this._handlers.push({
         thisPromise: this,
         onResolve: onResolve,
@@ -1064,7 +1138,7 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     }
   };
 
-  return Promise;
+  globalScope.Promise = Promise;
 })();
 
 var StatTimer = (function StatTimerClosure() {
@@ -1178,8 +1252,8 @@ function MessageHandler(name, comObj) {
       log.apply(null, data);
     }];
   }
-  ah['_warn'] = [function ah_Warn(data) {
-    warn(data);
+  ah['_unsupported_feature'] = [function ah_unsupportedFeature(data) {
+    UnsupportedManager.notify(data);
   }];
 
   comObj.onmessage = function messageHandlerComObjOnMessage(event) {
@@ -1196,7 +1270,12 @@ function MessageHandler(name, comObj) {
     } else if (data.action in ah) {
       var action = ah[data.action];
       if (data.callbackId) {
-        var promise = new Promise();
+        var deferred = {};
+        var promise = new Promise(function (resolve, reject) {
+          deferred.resolve = resolve;
+          deferred.reject = reject;
+        });
+        deferred.promise = promise;
         promise.then(function(resolvedData) {
           comObj.postMessage({
             isReply: true,
@@ -1204,7 +1283,7 @@ function MessageHandler(name, comObj) {
             data: resolvedData
           });
         });
-        action[0].call(action[1], data.data, promise);
+        action[0].call(action[1], data.data, deferred);
       } else {
         action[0].call(action[1], data.data);
       }
@@ -1876,8 +1955,8 @@ var DeviceCmykCS = (function DeviceCmykCSClosure() {
 var CalGrayCS = (function CalGrayCSClosure() {
   function CalGrayCS(whitePoint, blackPoint, gamma) {
     this.name = 'CalGray';
-    this.numComps = 3;
-    this.defaultColor = new Float32Array([0, 0, 0]);
+    this.numComps = 1;
+    this.defaultColor = new Float32Array([0]);
 
     if (!whitePoint) {
       error('WhitePoint missing - required for color space CalGray');
@@ -1908,7 +1987,7 @@ var CalGrayCS = (function CalGrayCSClosure() {
     }
 
     if (this.XB !== 0 || this.YB !== 0 || this.ZB !== 0) {
-      TODO(this.name + ', BlackPoint: XB: ' + this.XB + ', YB: ' + this.YB +
+      warn(this.name + ', BlackPoint: XB: ' + this.XB + ', YB: ' + this.YB +
            ', ZB: ' + this.ZB + ', only default values are supported.');
     }
 
@@ -1919,6 +1998,33 @@ var CalGrayCS = (function CalGrayCSClosure() {
     }
   }
 
+  function convertToRgb(cs, src, srcOffset, dest, destOffset, scale) {
+    // A represents a gray component of a calibrated gray space.
+    // A <---> AG in the spec
+    var A = src[srcOffset] * scale;
+    var AG = Math.pow(A, cs.G);
+
+    // Computes intermediate variables M, L, N as per spec.
+    // Except if other than default BlackPoint values are used.
+    var M = cs.XW * AG;
+    var L = cs.YW * AG;
+    var N = cs.ZW * AG;
+
+    // Decode XYZ, as per spec.
+    var X = M;
+    var Y = L;
+    var Z = N;
+
+    // http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html, Ch 4.
+    // This yields values in range [0, 100].
+    var Lstar = Math.max(116 * Math.pow(Y, 1 / 3) - 16, 0);
+
+    // Convert values to rgb range [0, 255].
+    dest[destOffset] = Lstar * 255 / 100;
+    dest[destOffset + 1] = Lstar * 255 / 100;
+    dest[destOffset + 2] = Lstar * 255 / 100;
+  }
+
   CalGrayCS.prototype = {
     getRgb: function CalGrayCS_getRgb(src, srcOffset) {
       var rgb = new Uint8Array(3);
@@ -1927,41 +2033,16 @@ var CalGrayCS = (function CalGrayCSClosure() {
     },
     getRgbItem: function CalGrayCS_getRgbItem(src, srcOffset,
                                               dest, destOffset) {
-      // A represents a gray component of a calibrated gray space.
-      // A <---> AG in the spec
-      var A = src[srcOffset];
-      var AG = Math.pow(A, this.G);
-
-      // Computes intermediate variables M, L, N as per spec.
-      // Except if other than default BlackPoint values are used.
-      var M = this.XW * AG;
-      var L = this.YW * AG;
-      var N = this.ZW * AG;
-
-      // Decode XYZ, as per spec.
-      var X = M;
-      var Y = L;
-      var Z = N;
-
-      // http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html, Ch 4.
-      // This yields values in range [0, 100].
-      var Lstar = Math.max(116 * Math.pow(Y, 1 / 3) - 16, 0);
-
-      // Convert values to rgb range [0, 255].
-      dest[destOffset] = Lstar * 255 / 100;
-      dest[destOffset + 1] = Lstar * 255 / 100;
-      dest[destOffset + 2] = Lstar * 255 / 100;
+      convertToRgb(this, src, srcOffset, dest, destOffset, 1);
     },
     getRgbBuffer: function CalGrayCS_getRgbBuffer(src, srcOffset, count,
                                                   dest, destOffset, bits) {
-      // TODO: This part is copied from DeviceGray. Make this utility function.
-      var scale = 255 / ((1 << bits) - 1);
-      var j = srcOffset, q = destOffset;
+      var scale = 1 / ((1 << bits) - 1);
+
       for (var i = 0; i < count; ++i) {
-        var c = (scale * src[j++]) | 0;
-        dest[q++] = c;
-        dest[q++] = c;
-        dest[q++] = c;
+        convertToRgb(this, src, srcOffset, dest, destOffset, scale);
+        srcOffset += 1;
+        destOffset += 3;
       }
     },
     getOutputLength: function CalGrayCS_getOutputLength(inputLength) {
@@ -2155,7 +2236,7 @@ var Pattern = (function PatternClosure() {
         // Both radial and axial shadings are handled by RadialAxial shading.
         return new Shadings.RadialAxial(dict, matrix, xref, res);
       default:
-        TODO('Unsupported shading type: ' + type);
+        UnsupportedManager.notify(UNSUPPORTED_FEATURES.shadingPattern);
         return new Shadings.Dummy();
     }
   };
@@ -2415,7 +2496,7 @@ var TilingPattern = (function TilingPatternClosure() {
       var commonObjs = this.commonObjs;
       var ctx = this.ctx;
 
-      TODO('TilingType: ' + tilingType);
+      info('TilingType: ' + tilingType);
 
       var x0 = bbox[0], y0 = bbox[1], x1 = bbox[2], y1 = bbox[3];
 
@@ -2628,7 +2709,7 @@ var PDFFunction = (function PDFFunctionClosure() {
       if (order !== 1) {
         // No description how cubic spline interpolation works in PDF32000:2008
         // As in poppler, ignoring order, linear interpolation may work as good
-        TODO('No support for cubic spline interpolation: ' + order);
+        info('No support for cubic spline interpolation: ' + order);
       }
 
       var encode = dict.get('Encode');
@@ -3521,7 +3602,7 @@ var Annotation = (function AnnotationClosure() {
     },
 
     loadResources: function(keys) {
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       this.appearance.dict.getAsync('Resources').then(function(resources) {
         if (!resources) {
           promise.resolve();
@@ -3540,7 +3621,7 @@ var Annotation = (function AnnotationClosure() {
 
     getOperatorList: function Annotation_getToOperatorList(evaluator) {
 
-      var promise = new Promise();
+      var promise = new LegacyPromise();
 
       if (!this.appearance) {
         promise.resolve(new OperatorList());
@@ -3646,7 +3727,7 @@ var Annotation = (function AnnotationClosure() {
     if (annotation.isViewable()) {
       return annotation;
     } else {
-      TODO('unimplemented annotation type: ' + subtype);
+      warn('unimplemented annotation type: ' + subtype);
     }
   };
 
@@ -3657,7 +3738,7 @@ var Annotation = (function AnnotationClosure() {
       annotationsReadyPromise.reject(e);
     }
 
-    var annotationsReadyPromise = new Promise();
+    var annotationsReadyPromise = new LegacyPromise();
 
     var annotationPromises = [];
     for (var i = 0, n = annotations.length; i < n; ++i) {
@@ -3738,7 +3819,7 @@ var WidgetAnnotation = (function WidgetAnnotationClosure() {
   Util.inherit(WidgetAnnotation, Annotation, {
     isViewable: function WidgetAnnotation_isViewable() {
       if (this.data.fieldType === 'Sig') {
-        TODO('unimplemented annotation type: Widget signature');
+        warn('unimplemented annotation type: Widget signature');
         return false;
       }
 
@@ -3819,7 +3900,7 @@ var TextWidgetAnnotation = (function TextWidgetAnnotationClosure() {
         return Annotation.prototype.getOperatorList.call(this, evaluator);
       }
 
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       var opList = new OperatorList();
       var data = this.data;
 
@@ -3896,7 +3977,7 @@ var TextAnnotation = (function TextAnnotationClosure() {
   Util.inherit(TextAnnotation, Annotation, {
 
     getOperatorList: function TextAnnotation_getOperatorList(evaluator) {
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       promise.resolve(new OperatorList());
       return promise;
     },
@@ -4023,7 +4104,7 @@ var LinkAnnotation = (function LinkAnnotationClosure() {
       } else if (linkType === 'Named') {
         data.action = action.get('N').name;
       } else {
-        TODO('unrecognized link type: ' + linkType);
+        warn('unrecognized link type: ' + linkType);
       }
     } else if (dict.has('Dest')) {
       // simple destination link
@@ -4148,6 +4229,18 @@ PDFJS.pdfBug = PDFJS.pdfBug === undefined ? false : PDFJS.pdfBug;
  */
 PDFJS.postMessageTransfers = PDFJS.postMessageTransfers === undefined ?
                              true : PDFJS.postMessageTransfers;
+
+/**
+ * Controls the logging level.
+ * The constants from PDFJS.VERBOSITY_LEVELS should be used:
+ * - errors
+ * - warnings [default]
+ * - infos
+ * @var {Number}
+ */
+PDFJS.verbosity = PDFJS.verbosity === undefined ?
+                  PDFJS.VERBOSITY_LEVELS.warnings : PDFJS.verbosity;
+
 /**
  * This is the main entry point for loading a PDF and interacting with it.
  * NOTE: If a URL is used to fetch the PDF data a standard XMLHttpRequest(XHR)
@@ -4204,8 +4297,8 @@ PDFJS.getDocument = function getDocument(source,
     params[key] = source[key];
   }
 
-  workerInitializedPromise = new PDFJS.Promise();
-  workerReadyPromise = new PDFJS.Promise();
+  workerInitializedPromise = new PDFJS.LegacyPromise();
+  workerReadyPromise = new PDFJS.LegacyPromise();
   transport = new WorkerTransport(workerInitializedPromise,
       workerReadyPromise, pdfDataRangeTransport, progressCallback);
   workerInitializedPromise.then(function transportInitialized() {
@@ -4273,7 +4366,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
      * JavaScript strings in the name tree.
      */
     getJavaScript: function PDFDocumentProxy_getJavaScript() {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       var js = this.pdfInfo.javaScript;
       promise.resolve(js);
       return promise;
@@ -4294,7 +4387,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
      * ].
      */
     getOutline: function PDFDocumentProxy_getOutline() {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       var outline = this.pdfInfo.outline;
       promise.resolve(outline);
       return promise;
@@ -4306,7 +4399,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
      * {Metadata} object with information from the metadata section of the PDF.
      */
     getMetadata: function PDFDocumentProxy_getMetadata() {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       var info = this.pdfInfo.info;
       var metadata = this.pdfInfo.metadata;
       promise.resolve({
@@ -4316,7 +4409,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
       return promise;
     },
     isEncrypted: function PDFDocumentProxy_isEncrypted() {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       promise.resolve(this.pdfInfo.encrypted);
       return promise;
     },
@@ -4325,7 +4418,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
      * the raw data from the PDF.
      */
     getData: function PDFDocumentProxy_getData() {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       this.transport.getData(promise);
       return promise;
     },
@@ -4406,7 +4499,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
       if (this.annotationsPromise)
         return this.annotationsPromise;
 
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       this.annotationsPromise = promise;
       this.transport.getAnnotations(this.pageInfo.pageIndex);
       return promise;
@@ -4440,7 +4533,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
       // requested before. Make the request and create the promise.
       if (!this.displayReadyPromise) {
         this.receivingOperatorList = true;
-        this.displayReadyPromise = new Promise();
+        this.displayReadyPromise = new LegacyPromise();
         this.operatorList = {
           fnArray: [],
           argsArray: [],
@@ -4487,9 +4580,9 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
         self._tryDestroy();
 
         if (error) {
-          renderTask.reject(error);
+          renderTask.promise.reject(error);
         } else {
-          renderTask.resolve();
+          renderTask.promise.resolve();
         }
         stats.timeEnd('Rendering');
         stats.timeEnd('Overall');
@@ -4502,7 +4595,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
      * content from the page.
      */
     getTextContent: function PDFPageProxy_getTextContent() {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       this.transport.messageHandler.send('GetTextContent', {
           pageIndex: this.pageNumber - 1
         },
@@ -4516,7 +4609,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
      * Stub for future feature.
      */
     getOperationList: function PDFPageProxy_getOperationList() {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       var operationList = { // not implemented
         dependencyFontsID: null,
         operatorList: null
@@ -4668,7 +4761,7 @@ var WorkerTransport = (function WorkerTransportClosure() {
 
     loadFakeWorkerFiles: function WorkerTransport_loadFakeWorkerFiles() {
       if (!PDFJS.fakeWorkerFilesLoadedPromise) {
-        PDFJS.fakeWorkerFilesLoadedPromise = new Promise();
+        PDFJS.fakeWorkerFilesLoadedPromise = new LegacyPromise();
         // In the developer build load worker_loader which in turn loads all the
         // other files and resolves the promise. In production only the
         // pdf.worker.js file is needed.
@@ -4873,7 +4966,7 @@ var WorkerTransport = (function WorkerTransportClosure() {
           error(data.error);
       }, this);
 
-      messageHandler.on('JpegDecode', function(data, promise) {
+      messageHandler.on('JpegDecode', function(data, deferred) {
         var imageUrl = data[0];
         var components = data[1];
         if (components != 3 && components != 1)
@@ -4902,7 +4995,7 @@ var WorkerTransport = (function WorkerTransportClosure() {
               buf[j] = data[i];
             }
           }
-          promise.resolve({ data: buf, width: width, height: height});
+          deferred.resolve({ data: buf, width: width, height: height});
         }).bind(this);
         img.src = imageUrl;
       });
@@ -4915,7 +5008,8 @@ var WorkerTransport = (function WorkerTransportClosure() {
         source: source,
         disableRange: PDFJS.disableRange,
         maxImageSize: PDFJS.maxImageSize,
-        disableFontFace: PDFJS.disableFontFace
+        disableFontFace: PDFJS.disableFontFace,
+        verbosity: PDFJS.verbosity
       });
     },
 
@@ -4926,7 +5020,7 @@ var WorkerTransport = (function WorkerTransportClosure() {
     },
 
     dataLoaded: function WorkerTransport_dataLoaded() {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       this.messageHandler.send('DataLoaded', null, function(args) {
         promise.resolve(args);
       });
@@ -4937,14 +5031,14 @@ var WorkerTransport = (function WorkerTransportClosure() {
       var pageIndex = pageNumber - 1;
       if (pageIndex in this.pagePromises)
         return this.pagePromises[pageIndex];
-      var promise = new PDFJS.Promise('Page ' + pageNumber);
+      var promise = new PDFJS.LegacyPromise();
       this.pagePromises[pageIndex] = promise;
       this.messageHandler.send('GetPageRequest', { pageIndex: pageIndex });
       return promise;
     },
 
     getPageIndex: function WorkerTransport_getPageIndexByRef(ref) {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       this.messageHandler.send('GetPageIndex', { ref: ref },
         function (pageIndex) {
           promise.resolve(pageIndex);
@@ -4959,7 +5053,7 @@ var WorkerTransport = (function WorkerTransportClosure() {
     },
 
     getDestinations: function WorkerTransport_getDestinations() {
-      var promise = new PDFJS.Promise();
+      var promise = new PDFJS.LegacyPromise();
       this.messageHandler.send('GetDestinations', null,
         function transportDestinations(destinations) {
           promise.resolve(destinations);
@@ -5008,7 +5102,7 @@ var PDFObjects = (function PDFObjectsClosure() {
         return this.objs[objId];
 
       var obj = {
-        promise: new Promise(objId),
+        promise: new LegacyPromise(),
         data: null,
         resolved: false
       };
@@ -5089,16 +5183,12 @@ var PDFObjects = (function PDFObjectsClosure() {
   };
   return PDFObjects;
 })();
-/*
- * RenderTask is basically a promise but adds a cancel function to terminate it.
- */
+
 var RenderTask = (function RenderTaskClosure() {
   function RenderTask(internalRenderTask) {
     this.internalRenderTask = internalRenderTask;
-    Promise.call(this);
+    this.promise = new PDFJS.LegacyPromise();
   }
-
-  RenderTask.prototype = Object.create(Promise.prototype);
 
   /**
    * Cancel the rendering task. If the task is curently rendering it will not be
@@ -5782,6 +5872,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       var commonObjs = this.commonObjs;
       var objs = this.objs;
       var fnId;
+      var deferred = Promise.resolve();
 
       while (true) {
         if (stepper && i === stepper.nextBreakPoint) {
@@ -5823,7 +5914,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
         // to continue exeution after a short delay.
         // However, this is only possible if a 'continueCallback' is passed in.
         if (continueCallback && Date.now() > endTime) {
-          setTimeout(continueCallback, 0);
+          deferred.then(continueCallback);
           return i;
         }
 
@@ -6734,7 +6825,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       // TODO knockout - supposedly possible with the clever use of compositing
       // modes.
       if (group.knockout) {
-        TODO('Support knockout groups.');
+        warn('Knockout groups not supported.');
       }
 
       var currentTransform = currentCtx.mozCurrentTransform;

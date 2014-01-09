@@ -20,8 +20,8 @@ if (typeof PDFJS === 'undefined') {
   (typeof window !== 'undefined' ? window : this).PDFJS = {};
 }
 
-PDFJS.version = '0.8.798';
-PDFJS.build = '5b0eebb';
+PDFJS.version = '0.8.846';
+PDFJS.build = '05f937e';
 
 (function pdfjsWrapper() {
   // Use strict in our context only - users might not want it
@@ -43,16 +43,14 @@ PDFJS.build = '5b0eebb';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* globals Cmd, ColorSpace, Dict, MozBlobBuilder, Name, PDFJS, Ref, URL */
+/* globals Cmd, ColorSpace, Dict, MozBlobBuilder, Name, PDFJS, Ref, URL,
+           Promise */
 
 'use strict';
 
 var globalScope = (typeof window === 'undefined') ? this : window;
 
 var isWorker = (typeof window == 'undefined');
-
-var ERRORS = 0, WARNINGS = 1, INFOS = 5;
-var verbosity = WARNINGS;
 
 var FONT_IDENTITY_MATRIX = [0.001, 0, 0, 0.001, 0, 0];
 
@@ -77,6 +75,12 @@ if (!globalScope.PDFJS) {
 }
 
 globalScope.PDFJS.pdfBug = false;
+
+PDFJS.VERBOSITY_LEVELS = {
+  errors: 0,
+  warnings: 1,
+  infos: 5
+};
 
 // All the possible operations for an operator list.
 var OPS = PDFJS.OPS = {
@@ -182,21 +186,19 @@ var log = (function() {
   }
 })();
 
-// A notice for devs that will not trigger the fallback UI.  These are good
-// for things that are helpful to devs, such as warning that Workers were
-// disabled, which is important to devs but not end users.
+// A notice for devs. These are good for things that are helpful to devs, such
+// as warning that Workers were disabled, which is important to devs but not
+// end users.
 function info(msg) {
-  if (verbosity >= INFOS) {
+  if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.infos) {
     log('Info: ' + msg);
-    PDFJS.LogManager.notify('info', msg);
   }
 }
 
-// Non-fatal warnings that should trigger the fallback UI.
+// Non-fatal warnings.
 function warn(msg) {
-  if (verbosity >= WARNINGS) {
+  if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.warnings) {
     log('Warning: ' + msg);
-    PDFJS.LogManager.notify('warn', msg);
   }
 }
 
@@ -214,13 +216,8 @@ function error(msg) {
     log('Error: ' + msg);
   }
   log(backtrace());
-  PDFJS.LogManager.notify('error', msg);
+  UnsupportedManager.notify(UNSUPPORTED_FEATURES.unknown);
   throw new Error(msg);
-}
-
-// Missing features that should trigger the fallback UI.
-function TODO(what) {
-  warn('TODO: ' + what);
 }
 
 function backtrace() {
@@ -235,6 +232,31 @@ function assert(cond, msg) {
   if (!cond)
     error(msg);
 }
+
+var UNSUPPORTED_FEATURES = PDFJS.UNSUPPORTED_FEATURES = {
+  unknown: 'unknown',
+  forms: 'forms',
+  javaScript: 'javaScript',
+  smask: 'smask',
+  shadingPattern: 'shadingPattern',
+  font: 'font'
+};
+
+var UnsupportedManager = PDFJS.UnsupportedManager =
+  (function UnsupportedManagerClosure() {
+  var listeners = [];
+  return {
+    listen: function (cb) {
+      listeners.push(cb);
+    },
+    notify: function (featureId) {
+      warn('Unsupported feature "' + featureId + '"');
+      for (var i = 0, ii = listeners.length; i < ii; i++) {
+        listeners[i](featureId);
+      }
+    }
+  };
+})();
 
 // Combines two URLs. The baseUrl shall be absolute URL. If the url is an
 // absolute URL, it will be returned as is.
@@ -288,22 +310,6 @@ function assertWellFormed(cond, msg) {
   if (!cond)
     error(msg);
 }
-
-var LogManager = PDFJS.LogManager = (function LogManagerClosure() {
-  var loggers = [];
-  return {
-    addLogger: function logManager_addLogger(logger) {
-      loggers.push(logger);
-    },
-    notify: function(type, message) {
-      for (var i = 0, ii = loggers.length; i < ii; i++) {
-        var logger = loggers[i];
-        if (logger[type])
-          logger[type](message);
-      }
-    }
-  };
-})();
 
 function shadow(obj, prop, value) {
   Object.defineProperty(obj, prop, { value: value,
@@ -834,6 +840,24 @@ function isPDFFunction(v) {
 }
 
 /**
+ * Legacy support for PDFJS Promise implementation.
+ * TODO remove eventually
+ */
+var LegacyPromise = PDFJS.LegacyPromise = (function LegacyPromiseClosure() {
+  return function LegacyPromise() {
+    var resolve, reject;
+    var promise = new Promise(function (resolve_, reject_) {
+      resolve = resolve_;
+      reject = reject_;
+    });
+    promise.resolve = resolve;
+    promise.reject = reject;
+    return promise;
+  };
+})();
+
+/**
+ * Polyfill for Promises:
  * The following promise implementation tries to generally implment the
  * Promise/A+ spec. Some notable differences from other promise libaries are:
  * - There currently isn't a seperate deferred and promise object.
@@ -842,7 +866,39 @@ function isPDFFunction(v) {
  * Based off of the work in:
  * https://bugzilla.mozilla.org/show_bug.cgi?id=810490
  */
-var Promise = PDFJS.Promise = (function PromiseClosure() {
+(function PromiseClosure() {
+  if (globalScope.Promise) {
+    // Promises existing in the DOM/Worker, checking presence of all/resolve
+    if (typeof globalScope.Promise.all !== 'function') {
+      globalScope.Promise.all = function (iterable) {
+        var count = 0, results = [], resolve, reject;
+        var promise = new globalScope.Promise(function (resolve_, reject_) {
+          resolve = resolve_;
+          reject = reject_;
+        });
+        iterable.forEach(function (p, i) {
+          count++;
+          p.then(function (result) {
+            results[i] = result;
+            count--;
+            if (count === 0) {
+              resolve(results);
+            }
+          }, reject);
+        });
+        if (count === 0) {
+          resolve(results);
+        }
+        return promise;
+      };
+    }
+    if (typeof globalScope.Promise.resolve !== 'function') {
+      globalScope.Promise.resolve = function (x) {
+        return new globalScope.Promise(function (resolve) { resolve(x); });
+      };
+    }
+    return;
+  }
   var STATUS_PENDING = 0;
   var STATUS_RESOLVED = 1;
   var STATUS_REJECTED = 2;
@@ -875,6 +931,8 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     },
 
     runHandlers: function runHandlers() {
+      var RUN_TIMEOUT = 1; // ms
+      var timeoutAt = Date.now() + RUN_TIMEOUT;
       while (this.handlers.length > 0) {
         var handler = this.handlers.shift();
 
@@ -900,6 +958,14 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
         }
 
         handler.nextPromise._updateStatus(nextStatus, nextValue);
+        if (Date.now() >= timeoutAt) {
+          break;
+        }
+      }
+
+      if (this.handlers.length > 0) {
+        setTimeout(this.runHandlers.bind(this), 0);
+        return;
       }
 
       this.running = false;
@@ -950,9 +1016,10 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     }
   };
 
-  function Promise() {
+  function Promise(resolver) {
     this._status = STATUS_PENDING;
     this._handlers = [];
+    resolver.call(this, this._resolve.bind(this), this._reject.bind(this));
   }
   /**
    * Builds a promise that is resolved when all the passed in promises are
@@ -961,11 +1028,15 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
    * @return {Promise} New dependant promise.
    */
   Promise.all = function Promise_all(promises) {
-    var deferred = new Promise();
+    var resolveAll, rejectAll;
+    var deferred = new Promise(function (resolve, reject) {
+      resolveAll = resolve;
+      rejectAll = reject;
+    });
     var unresolved = promises.length;
     var results = [];
     if (unresolved === 0) {
-      deferred.resolve(results);
+      resolveAll(results);
       return deferred;
     }
     function reject(reason) {
@@ -973,7 +1044,7 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
         return;
       }
       results = [];
-      deferred.reject(reason);
+      rejectAll(reason);
     }
     for (var i = 0, ii = promises.length; i < ii; ++i) {
       var promise = promises[i];
@@ -985,7 +1056,7 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
           results[i] = value;
           unresolved--;
           if (unresolved === 0)
-            deferred.resolve(results);
+            resolveAll(results);
         };
       })(i);
       if (Promise.isPromise(promise)) {
@@ -1003,6 +1074,14 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
    */
   Promise.isPromise = function Promise_isPromise(value) {
     return value && typeof value.then === 'function';
+  };
+  /**
+   * Creates resolved promise
+   * @param x resolve value
+   * @returns {Promise}
+   */
+  Promise.resolve = function Promise_resolve(x) {
+    return new Promise(function (resolve) { resolve(x); });
   };
 
   Promise.prototype = {
@@ -1035,24 +1114,19 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
       HandlerManager.scheduleHandlers(this);
     },
 
-    get isResolved() {
-      return this._status === STATUS_RESOLVED;
-    },
-
-    get isRejected() {
-      return this._status === STATUS_REJECTED;
-    },
-
-    resolve: function Promise_resolve(value) {
+    _resolve: function Promise_resolve(value) {
       this._updateStatus(STATUS_RESOLVED, value);
     },
 
-    reject: function Promise_reject(reason) {
+    _reject: function Promise_reject(reason) {
       this._updateStatus(STATUS_REJECTED, reason);
     },
 
     then: function Promise_then(onResolve, onReject) {
-      var nextPromise = new Promise();
+      var nextPromise = new Promise(function (resolve, reject) {
+        this.resolve = reject;
+        this.reject = reject;
+      });
       this._handlers.push({
         thisPromise: this,
         onResolve: onResolve,
@@ -1064,7 +1138,7 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     }
   };
 
-  return Promise;
+  globalScope.Promise = Promise;
 })();
 
 var StatTimer = (function StatTimerClosure() {
@@ -1178,8 +1252,8 @@ function MessageHandler(name, comObj) {
       log.apply(null, data);
     }];
   }
-  ah['_warn'] = [function ah_Warn(data) {
-    warn(data);
+  ah['_unsupported_feature'] = [function ah_unsupportedFeature(data) {
+    UnsupportedManager.notify(data);
   }];
 
   comObj.onmessage = function messageHandlerComObjOnMessage(event) {
@@ -1196,7 +1270,12 @@ function MessageHandler(name, comObj) {
     } else if (data.action in ah) {
       var action = ah[data.action];
       if (data.callbackId) {
-        var promise = new Promise();
+        var deferred = {};
+        var promise = new Promise(function (resolve, reject) {
+          deferred.resolve = resolve;
+          deferred.reject = reject;
+        });
+        deferred.promise = promise;
         promise.then(function(resolvedData) {
           comObj.postMessage({
             isReply: true,
@@ -1204,7 +1283,7 @@ function MessageHandler(name, comObj) {
             data: resolvedData
           });
         });
-        action[0].call(action[1], data.data, promise);
+        action[0].call(action[1], data.data, deferred);
       } else {
         action[0].call(action[1], data.data);
       }
@@ -1876,8 +1955,8 @@ var DeviceCmykCS = (function DeviceCmykCSClosure() {
 var CalGrayCS = (function CalGrayCSClosure() {
   function CalGrayCS(whitePoint, blackPoint, gamma) {
     this.name = 'CalGray';
-    this.numComps = 3;
-    this.defaultColor = new Float32Array([0, 0, 0]);
+    this.numComps = 1;
+    this.defaultColor = new Float32Array([0]);
 
     if (!whitePoint) {
       error('WhitePoint missing - required for color space CalGray');
@@ -1908,7 +1987,7 @@ var CalGrayCS = (function CalGrayCSClosure() {
     }
 
     if (this.XB !== 0 || this.YB !== 0 || this.ZB !== 0) {
-      TODO(this.name + ', BlackPoint: XB: ' + this.XB + ', YB: ' + this.YB +
+      warn(this.name + ', BlackPoint: XB: ' + this.XB + ', YB: ' + this.YB +
            ', ZB: ' + this.ZB + ', only default values are supported.');
     }
 
@@ -1919,6 +1998,33 @@ var CalGrayCS = (function CalGrayCSClosure() {
     }
   }
 
+  function convertToRgb(cs, src, srcOffset, dest, destOffset, scale) {
+    // A represents a gray component of a calibrated gray space.
+    // A <---> AG in the spec
+    var A = src[srcOffset] * scale;
+    var AG = Math.pow(A, cs.G);
+
+    // Computes intermediate variables M, L, N as per spec.
+    // Except if other than default BlackPoint values are used.
+    var M = cs.XW * AG;
+    var L = cs.YW * AG;
+    var N = cs.ZW * AG;
+
+    // Decode XYZ, as per spec.
+    var X = M;
+    var Y = L;
+    var Z = N;
+
+    // http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html, Ch 4.
+    // This yields values in range [0, 100].
+    var Lstar = Math.max(116 * Math.pow(Y, 1 / 3) - 16, 0);
+
+    // Convert values to rgb range [0, 255].
+    dest[destOffset] = Lstar * 255 / 100;
+    dest[destOffset + 1] = Lstar * 255 / 100;
+    dest[destOffset + 2] = Lstar * 255 / 100;
+  }
+
   CalGrayCS.prototype = {
     getRgb: function CalGrayCS_getRgb(src, srcOffset) {
       var rgb = new Uint8Array(3);
@@ -1927,41 +2033,16 @@ var CalGrayCS = (function CalGrayCSClosure() {
     },
     getRgbItem: function CalGrayCS_getRgbItem(src, srcOffset,
                                               dest, destOffset) {
-      // A represents a gray component of a calibrated gray space.
-      // A <---> AG in the spec
-      var A = src[srcOffset];
-      var AG = Math.pow(A, this.G);
-
-      // Computes intermediate variables M, L, N as per spec.
-      // Except if other than default BlackPoint values are used.
-      var M = this.XW * AG;
-      var L = this.YW * AG;
-      var N = this.ZW * AG;
-
-      // Decode XYZ, as per spec.
-      var X = M;
-      var Y = L;
-      var Z = N;
-
-      // http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html, Ch 4.
-      // This yields values in range [0, 100].
-      var Lstar = Math.max(116 * Math.pow(Y, 1 / 3) - 16, 0);
-
-      // Convert values to rgb range [0, 255].
-      dest[destOffset] = Lstar * 255 / 100;
-      dest[destOffset + 1] = Lstar * 255 / 100;
-      dest[destOffset + 2] = Lstar * 255 / 100;
+      convertToRgb(this, src, srcOffset, dest, destOffset, 1);
     },
     getRgbBuffer: function CalGrayCS_getRgbBuffer(src, srcOffset, count,
                                                   dest, destOffset, bits) {
-      // TODO: This part is copied from DeviceGray. Make this utility function.
-      var scale = 255 / ((1 << bits) - 1);
-      var j = srcOffset, q = destOffset;
+      var scale = 1 / ((1 << bits) - 1);
+
       for (var i = 0; i < count; ++i) {
-        var c = (scale * src[j++]) | 0;
-        dest[q++] = c;
-        dest[q++] = c;
-        dest[q++] = c;
+        convertToRgb(this, src, srcOffset, dest, destOffset, scale);
+        srcOffset += 1;
+        destOffset += 3;
       }
     },
     getOutputLength: function CalGrayCS_getOutputLength(inputLength) {
@@ -2155,7 +2236,7 @@ var Pattern = (function PatternClosure() {
         // Both radial and axial shadings are handled by RadialAxial shading.
         return new Shadings.RadialAxial(dict, matrix, xref, res);
       default:
-        TODO('Unsupported shading type: ' + type);
+        UnsupportedManager.notify(UNSUPPORTED_FEATURES.shadingPattern);
         return new Shadings.Dummy();
     }
   };
@@ -2415,7 +2496,7 @@ var TilingPattern = (function TilingPatternClosure() {
       var commonObjs = this.commonObjs;
       var ctx = this.ctx;
 
-      TODO('TilingType: ' + tilingType);
+      info('TilingType: ' + tilingType);
 
       var x0 = bbox[0], y0 = bbox[1], x1 = bbox[2], y1 = bbox[3];
 
@@ -2628,7 +2709,7 @@ var PDFFunction = (function PDFFunctionClosure() {
       if (order !== 1) {
         // No description how cubic spline interpolation works in PDF32000:2008
         // As in poppler, ignoring order, linear interpolation may work as good
-        TODO('No support for cubic spline interpolation: ' + order);
+        info('No support for cubic spline interpolation: ' + order);
       }
 
       var encode = dict.get('Encode');
@@ -3521,7 +3602,7 @@ var Annotation = (function AnnotationClosure() {
     },
 
     loadResources: function(keys) {
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       this.appearance.dict.getAsync('Resources').then(function(resources) {
         if (!resources) {
           promise.resolve();
@@ -3540,7 +3621,7 @@ var Annotation = (function AnnotationClosure() {
 
     getOperatorList: function Annotation_getToOperatorList(evaluator) {
 
-      var promise = new Promise();
+      var promise = new LegacyPromise();
 
       if (!this.appearance) {
         promise.resolve(new OperatorList());
@@ -3646,7 +3727,7 @@ var Annotation = (function AnnotationClosure() {
     if (annotation.isViewable()) {
       return annotation;
     } else {
-      TODO('unimplemented annotation type: ' + subtype);
+      warn('unimplemented annotation type: ' + subtype);
     }
   };
 
@@ -3657,7 +3738,7 @@ var Annotation = (function AnnotationClosure() {
       annotationsReadyPromise.reject(e);
     }
 
-    var annotationsReadyPromise = new Promise();
+    var annotationsReadyPromise = new LegacyPromise();
 
     var annotationPromises = [];
     for (var i = 0, n = annotations.length; i < n; ++i) {
@@ -3738,7 +3819,7 @@ var WidgetAnnotation = (function WidgetAnnotationClosure() {
   Util.inherit(WidgetAnnotation, Annotation, {
     isViewable: function WidgetAnnotation_isViewable() {
       if (this.data.fieldType === 'Sig') {
-        TODO('unimplemented annotation type: Widget signature');
+        warn('unimplemented annotation type: Widget signature');
         return false;
       }
 
@@ -3819,7 +3900,7 @@ var TextWidgetAnnotation = (function TextWidgetAnnotationClosure() {
         return Annotation.prototype.getOperatorList.call(this, evaluator);
       }
 
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       var opList = new OperatorList();
       var data = this.data;
 
@@ -3896,7 +3977,7 @@ var TextAnnotation = (function TextAnnotationClosure() {
   Util.inherit(TextAnnotation, Annotation, {
 
     getOperatorList: function TextAnnotation_getOperatorList(evaluator) {
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       promise.resolve(new OperatorList());
       return promise;
     },
@@ -4023,7 +4104,7 @@ var LinkAnnotation = (function LinkAnnotationClosure() {
       } else if (linkType === 'Named') {
         data.action = action.get('N').name;
       } else {
-        TODO('unrecognized link type: ' + linkType);
+        warn('unrecognized link type: ' + linkType);
       }
     } else if (dict.has('Dest')) {
       // simple destination link
@@ -4512,7 +4593,7 @@ var ChunkedStreamManager = (function ChunkedStreamManagerClosure() {
     this.requestsByChunk = {};
     this.callbacksByRequest = {};
 
-    this.loadedStream = new Promise();
+    this.loadedStream = new LegacyPromise();
     if (args.initialData) {
       this.setInitialData(args.initialData);
     }
@@ -4823,7 +4904,7 @@ var LocalPdfManager = (function LocalPdfManagerClosure() {
   function LocalPdfManager(data, password) {
     var stream = new Stream(data);
     this.pdfModel = new PDFDocument(this, stream, password);
-    this.loadedStream = new Promise();
+    this.loadedStream = new LegacyPromise();
     this.loadedStream.resolve(stream);
   }
 
@@ -4832,7 +4913,7 @@ var LocalPdfManager = (function LocalPdfManagerClosure() {
 
   LocalPdfManager.prototype.ensure =
       function LocalPdfManager_ensure(obj, prop, args) {
-    var promise = new Promise();
+    var promise = new LegacyPromise();
     try {
       var value = obj[prop];
       var result;
@@ -4851,7 +4932,7 @@ var LocalPdfManager = (function LocalPdfManagerClosure() {
 
   LocalPdfManager.prototype.requestRange =
       function LocalPdfManager_requestRange(begin, end) {
-    var promise = new Promise();
+    var promise = new LegacyPromise();
     promise.resolve();
     return promise;
   };
@@ -4900,7 +4981,7 @@ var NetworkPdfManager = (function NetworkPdfManagerClosure() {
 
   NetworkPdfManager.prototype.ensure =
       function NetworkPdfManager_ensure(obj, prop, args) {
-    var promise = new Promise();
+    var promise = new LegacyPromise();
     this.ensureHelper(promise, obj, prop, args);
     return promise;
   };
@@ -4931,7 +5012,7 @@ var NetworkPdfManager = (function NetworkPdfManagerClosure() {
 
   NetworkPdfManager.prototype.requestRange =
       function NetworkPdfManager_requestRange(begin, end) {
-    var promise = new Promise();
+    var promise = new LegacyPromise();
     this.streamManager.requestRange(begin, end, function() {
       promise.resolve();
     });
@@ -5058,7 +5139,7 @@ var Page = (function PageClosure() {
         // TODO: add async inheritPageProp and remove this.
         this.resourcesPromise = this.pdfManager.ensure(this, 'resources');
       }
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       this.resourcesPromise.then(function resourceSuccess() {
         var objectLoader = new ObjectLoader(this.resources.map,
                                             keys,
@@ -5071,13 +5152,13 @@ var Page = (function PageClosure() {
     },
     getOperatorList: function Page_getOperatorList(handler) {
       var self = this;
-      var promise = new Promise();
+      var promise = new LegacyPromise();
 
       function reject(e) {
         promise.reject(e);
       }
 
-      var pageListPromise = new Promise();
+      var pageListPromise = new LegacyPromise();
 
       var pdfManager = this.pdfManager;
       var contentStreamPromise = pdfManager.ensure(this, 'getContentStream',
@@ -5143,7 +5224,7 @@ var Page = (function PageClosure() {
 
       var self = this;
 
-      var textContentPromise = new Promise();
+      var textContentPromise = new LegacyPromise();
 
       var pdfManager = this.pdfManager;
       var contentStreamPromise = pdfManager.ensure(this, 'getContentStream',
@@ -5518,7 +5599,7 @@ var Dict = (function DictClosure() {
         if (xref) {
           return xref.fetchIfRefAsync(value);
         }
-        promise = new Promise();
+        promise = new LegacyPromise();
         promise.resolve(value);
         return promise;
       }
@@ -5527,7 +5608,7 @@ var Dict = (function DictClosure() {
         if (xref) {
           return xref.fetchIfRefAsync(value);
         }
-        promise = new Promise();
+        promise = new LegacyPromise();
         promise.resolve(value);
         return promise;
       }
@@ -5535,7 +5616,7 @@ var Dict = (function DictClosure() {
       if (xref) {
         return xref.fetchIfRefAsync(value);
       }
-      promise = new Promise();
+      promise = new LegacyPromise();
       promise.resolve(value);
       return promise;
     },
@@ -5855,7 +5936,7 @@ var Catalog = (function CatalogClosure() {
     },
 
     getPageDict: function Catalog_getPageDict(pageIndex) {
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       var nodesToVisit = [this.catDict.getRaw('Pages')];
       var currentPageIndex = 0;
       var xref = this.xref;
@@ -6541,14 +6622,14 @@ var XRef = (function XRefClosure() {
     },
     fetchIfRefAsync: function XRef_fetchIfRefAsync(obj) {
       if (!isRef(obj)) {
-        var promise = new Promise();
+        var promise = new LegacyPromise();
         promise.resolve(obj);
         return promise;
       }
       return this.fetchAsync(obj);
     },
     fetchAsync: function XRef_fetchAsync(ref, suppressEncryption) {
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       var tryFetch = function (promise) {
         try {
           promise.resolve(this.fetch(ref, suppressEncryption));
@@ -6675,7 +6756,7 @@ var ObjectLoader = (function() {
 
     load: function ObjectLoader_load() {
       var keys = this.keys;
-      this.promise = new Promise();
+      this.promise = new LegacyPromise();
       // Don't walk the graph if all the data is already loaded.
       if (!(this.xref.stream instanceof ChunkedStream) ||
           this.xref.stream.getMissingChunks().length === 0) {
@@ -14841,9 +14922,9 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
             gStateObj.push([key, value]);
             break;
           case 'SMask':
-            // We support the default so don't trigger the TODO.
+            // We support the default so don't trigger a warning bar.
             if (!isName(value) || value.name != 'None')
-              TODO('graphic state operator ' + key);
+              UnsupportedManager.notify(UNSUPPORTED_FEATURES.smask);
             break;
           // Only generate info log messages for the following since
           // they are unlikey to have a big impact on the rendering.
@@ -14933,6 +15014,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
         try {
           translated = this.translateFont(font, xref);
         } catch (e) {
+          UnsupportedManager.notify(UNSUPPORTED_FEATURES.font);
           translated = new ErrorFont(e instanceof Error ? e.message : e);
         }
         font.translated = translated;
@@ -14980,7 +15062,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       // dictionary
       var parser = new Parser(new Lexer(stream, OP_MAP), false, xref);
 
-      var promise = new Promise();
+      var promise = new LegacyPromise();
       var args = [];
       while (true) {
 
@@ -15416,10 +15498,11 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
                           Encodings.WinAnsiEncoding :
                           Encodings.StandardEncoding;
       // The Symbolic attribute can be misused for regular fonts
-      // Heuristic: we have to check if the font is a standard one also
+      // Heuristic: we have to check if the font is a standard one or
+      // toUnicode is provided
       if (!!(flags & FontFlags.Symbolic)) {
-        baseEncoding = !properties.file ? Encodings.SymbolSetEncoding :
-                                          Encodings.MacRomanEncoding;
+        baseEncoding = !properties.file && !properties.toUnicode ?
+          Encodings.SymbolSetEncoding : Encodings.MacRomanEncoding;
       }
       if (dict.has('Encoding')) {
         var encoding = dict.get('Encoding');
@@ -16546,6 +16629,76 @@ var HalfwidthCMaps = {
   'UniJIS-UCS2-HW-V': true
 };
 
+// Glyph map for well-known standard fonts. Sometimes Ghostscript uses CID fonts
+// but does not embed the CID to GID mapping. The mapping is incomplete for all
+// glyphs, but common for some set of the standard fonts.
+var GlyphMapForStandardFonts = {
+  '2': 10, '3': 32, '4': 33, '5': 34, '6': 35, '7': 36, '8': 37, '9': 38,
+  '10': 39, '11': 40, '12': 41, '13': 42, '14': 43, '15': 44, '16': 173,
+  '17': 46, '18': 47, '19': 48, '20': 49, '21': 50, '22': 51, '23': 52,
+  '24': 53, '25': 54, '26': 55, '27': 56, '28': 57, '29': 58, '30': 894,
+  '31': 60, '32': 61, '33': 62, '34': 63, '35': 64, '36': 65, '37': 66,
+  '38': 67, '39': 68, '40': 69, '41': 70, '42': 71, '43': 72, '44': 73,
+  '45': 74, '46': 75, '47': 76, '48': 77, '49': 78, '50': 79, '51': 80,
+  '52': 81, '53': 82, '54': 83, '55': 84, '56': 85, '57': 86, '58': 87,
+  '59': 88, '60': 89, '61': 90, '62': 91, '63': 92, '64': 93, '65': 94,
+  '66': 95, '67': 96, '68': 97, '69': 98, '70': 99, '71': 100, '72': 101,
+  '73': 102, '74': 103, '75': 104, '76': 105, '77': 106, '78': 107, '79': 108,
+  '80': 109, '81': 110, '82': 111, '83': 112, '84': 113, '85': 114, '86': 115,
+  '87': 116, '88': 117, '89': 118, '90': 119, '91': 120, '92': 121, '93': 122,
+  '94': 123, '95': 124, '96': 125, '97': 126, '98': 196, '99': 197, '100': 199,
+  '101': 201, '102': 209, '103': 214, '104': 220, '105': 225, '106': 224,
+  '107': 226, '108': 228, '109': 227, '110': 229, '111': 231, '112': 233,
+  '113': 232, '114': 234, '115': 235, '116': 237, '117': 236, '118': 238,
+  '119': 239, '120': 241, '121': 243, '122': 242, '123': 244, '124': 246,
+  '125': 245, '126': 250, '127': 249, '128': 251, '129': 252, '130': 8224,
+  '131': 176, '132': 162, '133': 163, '134': 167, '135': 8226, '136': 182,
+  '137': 223, '138': 174, '139': 169, '140': 8482, '141': 180, '142': 168,
+  '143': 8800, '144': 198, '145': 216, '146': 8734, '147': 177, '148': 8804,
+  '149': 8805, '150': 165, '151': 181, '152': 8706, '153': 8721, '154': 8719,
+  '156': 8747, '157': 170, '158': 186, '159': 8486, '160': 230, '161': 248,
+  '162': 191, '163': 161, '164': 172, '165': 8730, '166': 402, '167': 8776,
+  '168': 8710, '169': 171, '170': 187, '171': 8230, '210': 218, '305': 963,
+  '306': 964, '307': 966, '308': 8215, '309': 8252, '310': 8319, '311': 8359,
+  '312': 8592, '313': 8593, '337': 9552, '493': 1039, '494': 1040, '705': 1524,
+  '706': 8362, '710': 64288, '711': 64298, '759': 1617, '761': 1776,
+  '763': 1778, '775': 1652, '777': 1764, '778': 1780, '779': 1781, '780': 1782,
+  '782': 771, '783': 64726, '786': 8363, '788': 8532, '790': 768, '791': 769,
+  '792': 768, '795': 803, '797': 64336, '798': 64337, '799': 64342,
+  '800': 64343, '801': 64344, '802': 64345, '803': 64362, '804': 64363,
+  '805': 64364, '2424': 7821, '2425': 7822, '2426': 7823, '2427': 7824,
+  '2428': 7825, '2429': 7826, '2430': 7827, '2433': 7682, '2678': 8045,
+  '2679': 8046, '2830': 1552, '2838': 686, '2840': 751, '2842': 753,
+  '2843': 754, '2844': 755, '2846': 757, '2856': 767, '2857': 848, '2858': 849,
+  '2862': 853, '2863': 854, '2864': 855, '2865': 861, '2866': 862, '2906': 7460,
+  '2908': 7462, '2909': 7463, '2910': 7464, '2912': 7466, '2913': 7467,
+  '2914': 7468, '2916': 7470, '2917': 7471, '2918': 7472, '2920': 7474,
+  '2921': 7475, '2922': 7476, '2924': 7478, '2925': 7479, '2926': 7480,
+  '2928': 7482, '2929': 7483, '2930': 7484, '2932': 7486, '2933': 7487,
+  '2934': 7488, '2936': 7490, '2937': 7491, '2938': 7492, '2940': 7494,
+  '2941': 7495, '2942': 7496, '2944': 7498, '2946': 7500, '2948': 7502,
+  '2950': 7504, '2951': 7505, '2952': 7506, '2954': 7508, '2955': 7509,
+  '2956': 7510, '2958': 7512, '2959': 7513, '2960': 7514, '2962': 7516,
+  '2963': 7517, '2964': 7518, '2966': 7520, '2967': 7521, '2968': 7522,
+  '2970': 7524, '2971': 7525, '2972': 7526, '2974': 7528, '2975': 7529,
+  '2976': 7530, '2978': 1537, '2979': 1538, '2980': 1539, '2982': 1549,
+  '2983': 1551, '2984': 1552, '2986': 1554, '2987': 1555, '2988': 1556,
+  '2990': 1623, '2991': 1624, '2995': 1775, '2999': 1791, '3002': 64290,
+  '3003': 64291, '3004': 64292, '3006': 64294, '3007': 64295, '3008': 64296,
+  '3011': 1900, '3014': 8223, '3015': 8244, '3017': 7532, '3018': 7533,
+  '3019': 7534, '3075': 7590, '3076': 7591, '3079': 7594, '3080': 7595,
+  '3083': 7598, '3084': 7599, '3087': 7602, '3088': 7603, '3091': 7606,
+  '3092': 7607, '3095': 7610, '3096': 7611, '3099': 7614, '3100': 7615,
+  '3103': 7618, '3104': 7619, '3107': 8337, '3108': 8338, '3116': 1884,
+  '3119': 1885, '3120': 1885, '3123': 1886, '3124': 1886, '3127': 1887,
+  '3128': 1887, '3131': 1888, '3132': 1888, '3135': 1889, '3136': 1889,
+  '3139': 1890, '3140': 1890, '3143': 1891, '3144': 1891, '3147': 1892,
+  '3148': 1892, '3153': 580, '3154': 581, '3157': 584, '3158': 585, '3161': 588,
+  '3162': 589, '3165': 891, '3166': 892, '3169': 1274, '3170': 1275,
+  '3173': 1278, '3174': 1279, '3181': 7622, '3182': 7623, '3282': 11799,
+  '3316': 578, '3379': 42785, '3393': 1159, '3416': 8377
+};
+
 var decodeBytes;
 if (typeof TextDecoder !== 'undefined') {
   // The encodings supported by TextDecoder can be found at:
@@ -16585,7 +16738,7 @@ function sjis83pvToUnicode(str) {
     // TODO: 83pv has incompatible mappings in ed40..ee9c range.
     return decodeBytes(bytes, 'shift_jis', true);
   } catch (e) {
-    TODO('Unsupported 83pv character found');
+    warn('Unsupported 83pv character found');
     // Just retry without checking errors for now.
     return decodeBytes(bytes, 'shift_jis');
   }
@@ -16597,7 +16750,7 @@ function sjis90pvToUnicode(str) {
     // TODO: 90pv has incompatible mappings in 8740..879c and eb41..ee9c.
     return decodeBytes(bytes, 'shift_jis', true);
   } catch (e) {
-    TODO('Unsupported 90pv character found');
+    warn('Unsupported 90pv character found');
     // Just retry without checking errors for now.
     return decodeBytes(bytes, 'shift_jis');
   }
@@ -18300,6 +18453,7 @@ var Font = (function FontClosure() {
       // The file data is not specified. Trying to fix the font name
       // to be used with the canvas.font.
       var fontName = name.replace(/[,_]/g, '-');
+      var isStandardFont = fontName in stdFontMap;
       fontName = stdFontMap[fontName] || nonStdFontMap[fontName] || fontName;
 
       this.bold = (fontName.search(/bold/gi) != -1);
@@ -18315,6 +18469,17 @@ var Font = (function FontClosure() {
 
       this.encoding = properties.baseEncoding;
       this.noUnicodeAdaptation = true;
+      if (isStandardFont && type === 'CIDFontType2' &&
+          properties.cidEncoding.indexOf('Identity-') === 0) {
+        // Standard fonts might be embedded as CID font without glyph mapping.
+        // Building one based on GlyphMapForStandardFonts.
+        var map = [];
+        for (var code in GlyphMapForStandardFonts) {
+          map[+code] = GlyphMapForStandardFonts[code];
+        }
+        this.toFontChar = map;
+        this.toUnicode = map;
+      }
       this.loadedName = fontName.split('-')[0];
       this.loading = false;
       return;
@@ -20429,7 +20594,7 @@ var Font = (function FontClosure() {
       var cidEncoding = properties.cidEncoding;
       if (properties.toUnicode) {
         if (cidEncoding && cidEncoding.indexOf('Identity-') !== 0) {
-          TODO('Need to create a reverse mapping from \'ToUnicode\' CMap');
+          warn('Need to create a reverse mapping from \'ToUnicode\' CMap');
         }
         return; // 'ToUnicode' CMap will be used
       }
@@ -28110,7 +28275,7 @@ var PDFImage = (function PDFImageClosure() {
     if (image.getParams) {
       // JPX/JPEG2000 streams directly contain bits per component
       // and color space mode information.
-      TODO('get params from actual stream');
+      warn('get params from actual stream');
       // var bits = ...
       // var colorspace = ...
     }
@@ -28143,7 +28308,7 @@ var PDFImage = (function PDFImageClosure() {
     if (!this.imageMask) {
       var colorSpace = dict.get('ColorSpace', 'CS');
       if (!colorSpace) {
-        TODO('JPX images (which don"t require color spaces');
+        warn('JPX images (which don"t require color spaces');
         colorSpace = new Name('DeviceRGB');
       }
       this.colorSpace = ColorSpace.parse(colorSpace, xref, res);
@@ -28185,9 +28350,9 @@ var PDFImage = (function PDFImageClosure() {
    */
   PDFImage.buildImage = function PDFImage_buildImage(callback, handler, xref,
                                                      res, image, inline) {
-    var imageDataPromise = new Promise();
-    var smaskPromise = new Promise();
-    var maskPromise = new Promise();
+    var imageDataPromise = new LegacyPromise();
+    var smaskPromise = new LegacyPromise();
+    var maskPromise = new LegacyPromise();
     // The image data and smask data may not be ready yet, wait till both are
     // resolved.
     Promise.all([imageDataPromise, smaskPromise, maskPromise]).then(
@@ -32732,12 +32897,18 @@ var FlateStream = (function FlateStreamClosure() {
       var buffer = this.ensureBuffer(bufferLength + blockLen);
       var end = bufferLength + blockLen;
       this.bufferLength = end;
-      for (var n = bufferLength; n < end; ++n) {
-        if (typeof (b = bytes[bytesPos++]) == 'undefined') {
+      if (blockLen === 0) {
+        if (typeof bytes[bytesPos] == 'undefined') {
           this.eof = true;
-          break;
         }
-        buffer[n] = b;
+      } else {
+        for (var n = bufferLength; n < end; ++n) {
+          if (typeof (b = bytes[bytesPos++]) == 'undefined') {
+            this.eof = true;
+            break;
+          }
+          buffer[n] = b;
+        }
       }
       this.bytesPos = bytesPos;
       return;
@@ -34562,7 +34733,7 @@ var WorkerMessageHandler = PDFJS.WorkerMessageHandler = {
     var pdfManager;
 
     function loadDocument(recoveryMode) {
-      var loadDocumentPromise = new Promise();
+      var loadDocumentPromise = new LegacyPromise();
 
       var parseSuccess = function parseSuccess() {
         var numPagesPromise = pdfManager.ensureModel('numPages');
@@ -34606,7 +34777,7 @@ var WorkerMessageHandler = PDFJS.WorkerMessageHandler = {
     }
 
     function getPdfManager(data) {
-      var pdfManagerPromise = new Promise();
+      var pdfManagerPromise = new LegacyPromise();
 
       var source = data.source;
       var disableRange = data.disableRange;
@@ -34765,6 +34936,7 @@ var WorkerMessageHandler = PDFJS.WorkerMessageHandler = {
       PDFJS.maxImageSize = data.maxImageSize === undefined ?
                            -1 : data.maxImageSize;
       PDFJS.disableFontFace = data.disableFontFace;
+      PDFJS.verbosity = data.verbosity;
 
       getPdfManager(data).then(function pdfManagerReady() {
         loadDocument(false).then(onSuccess, function loadFailure(ex) {
@@ -34773,7 +34945,8 @@ var WorkerMessageHandler = PDFJS.WorkerMessageHandler = {
             if (ex instanceof PasswordException) {
               // after password exception prepare to receive a new password
               // to repeat loading
-              pdfManager.passwordChangedPromise = new Promise();
+              pdfManager.passwordChangedPromise =
+                new LegacyPromise();
               pdfManager.passwordChangedPromise.then(pdfManagerReady);
             }
 
@@ -34810,31 +34983,31 @@ var WorkerMessageHandler = PDFJS.WorkerMessageHandler = {
       });
     });
 
-    handler.on('GetPageIndex', function wphSetupGetPageIndex(data, promise) {
+    handler.on('GetPageIndex', function wphSetupGetPageIndex(data, deferred) {
       var ref = new Ref(data.ref.num, data.ref.gen);
       pdfManager.pdfModel.catalog.getPageIndex(ref).then(function (pageIndex) {
-        promise.resolve(pageIndex);
-      }, promise.reject.bind(promise));
+        deferred.resolve(pageIndex);
+      }, deferred.reject);
     });
 
     handler.on('GetDestinations',
-      function wphSetupGetDestinations(data, promise) {
+      function wphSetupGetDestinations(data, deferred) {
         pdfManager.ensureCatalog('destinations').then(function(destinations) {
-          promise.resolve(destinations);
+          deferred.resolve(destinations);
         });
       }
     );
 
-    handler.on('GetData', function wphSetupGetData(data, promise) {
+    handler.on('GetData', function wphSetupGetData(data, deferred) {
       pdfManager.requestLoadedStream();
       pdfManager.onLoadedStream().then(function(stream) {
-        promise.resolve(stream.bytes);
+        deferred.resolve(stream.bytes);
       });
     });
 
-    handler.on('DataLoaded', function wphSetupDataLoaded(data, promise) {
+    handler.on('DataLoaded', function wphSetupDataLoaded(data, deferred) {
       pdfManager.onLoadedStream().then(function(stream) {
-        promise.resolve({ length: stream.bytes.byteLength });
+        deferred.resolve({ length: stream.bytes.byteLength });
       });
     });
 
@@ -34899,29 +35072,29 @@ var WorkerMessageHandler = PDFJS.WorkerMessageHandler = {
       });
     }, this);
 
-    handler.on('GetTextContent', function wphExtractText(data, promise) {
+    handler.on('GetTextContent', function wphExtractText(data, deferred) {
       pdfManager.getPage(data.pageIndex).then(function(page) {
         var pageNum = data.pageIndex + 1;
         var start = Date.now();
         page.extractTextContent().then(function(textContent) {
-          promise.resolve(textContent);
+          deferred.resolve(textContent);
           log('text indexing: page=%d - time=%dms', pageNum,
               Date.now() - start);
         }, function (e) {
           // Skip errored pages
-          promise.reject(e);
+          deferred.reject(e);
         });
       });
     });
 
-    handler.on('Cleanup', function wphCleanup(data, promise) {
+    handler.on('Cleanup', function wphCleanup(data, deferred) {
       pdfManager.cleanup();
-      promise.resolve(true);
+      deferred.resolve(true);
     });
 
-    handler.on('Terminate', function wphTerminate(data, promise) {
+    handler.on('Terminate', function wphTerminate(data, deferred) {
       pdfManager.terminate();
-      promise.resolve();
+      deferred.resolve();
     });
   }
 };
@@ -34963,15 +35136,12 @@ var workerConsole = {
 if (typeof window === 'undefined') {
   globalScope.console = workerConsole;
 
-  // Add a logger so we can pass warnings on to the main thread, errors will
-  // throw an exception which will be forwarded on automatically.
-  PDFJS.LogManager.addLogger({
-    warn: function(msg) {
-      globalScope.postMessage({
-        action: '_warn',
-        data: msg
-      });
-    }
+  // Listen for unsupported features so we can pass them on to the main thread.
+  PDFJS.UnsupportedManager.listen(function (msg) {
+    globalScope.postMessage({
+      action: '_unsupported_feature',
+      data: msg
+    });
   });
 
   var handler = new MessageHandler('worker_processor', this);
