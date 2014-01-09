@@ -12,6 +12,7 @@ from django.db.models import Sum
 
 from item import utils
 from item.models import Item
+from itemlist.models import List
 import models
 
 def get_document_or_404_json(id):
@@ -23,6 +24,9 @@ def addDocument(request):
         add document(s) to item
         takes {
             item: string
+            or:
+            list: string
+
             id: string
             or
             ids: [string]
@@ -36,13 +40,21 @@ def addDocument(request):
         ids = data['ids']
     else:
         ids = [data['id']]
-    item = Item.objects.get(itemId=data['item'])
-    if item.editable(request.user):
-        for id in ids:
-            document = models.Document.get(id)
-            document.add(item)
-    else:
-        response = json_response(status=403, text='permission denied')
+    if 'item' in data:
+        item = Item.objects.get(itemId=data['item'])
+        if item.editable(request.user):
+            for id in ids:
+                document = models.Document.get(id)
+                document.add(item)
+        else:
+            response = json_response(status=403, text='permission denied')
+    elif 'list' in data:
+        list = List.get(data['list'])
+        for item in list.get_items(request.user):
+            if item.editable(request.user):
+                for id in ids:
+                    document = models.Document.get(id)
+                    document.add(item)
     return render_to_json_response(response)
 actions.register(addDocument, cache=False)
 
@@ -258,6 +270,7 @@ def upload(request):
     if 'id' in request.GET:
         file = models.Document.get(request.GET['id'])
     else:
+        file = None
         extension = request.POST['filename'].split('.')
         name = '.'.join(extension[:-1])
         extension = extension[-1].lower()
@@ -279,19 +292,25 @@ def upload(request):
             return render_to_json_response(response)
     #init upload
     else:
-        created = False
-        num = 1
-        _name = name
-        while not created:
-            file, created = models.Document.objects.get_or_create(
-                user=request.user, name=name, extension=extension)
-            if not created:
-                num += 1
-                name = _name + ' [%d]' % num
-        file.name = name
-        file.extension = extension
-        file.uploading = True
-        file.save()
+        if not file:
+            created = False
+            num = 1
+            _name = name
+            while not created:
+                file, created = models.Document.objects.get_or_create(
+                    user=request.user, name=name, extension=extension)
+                if not created:
+                    num += 1
+                    name = _name + ' [%d]' % num
+            file.name = name
+            file.extension = extension
+            file.uploading = True
+            file.save()
+        else:
+            #replace existing file
+            file.file.delete()
+            file.uploading = True
+            file.save()
         upload_url = request.build_absolute_uri('/api/upload/document?id=%s' % file.get_id())
         return render_to_json_response({
             'uploadUrl': upload_url,

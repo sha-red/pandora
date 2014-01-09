@@ -17,7 +17,6 @@ from ox.django.fields import DictField, TupleField
 from archive import extract
 import managers
 
-
 class List(models.Model):
 
     class Meta:
@@ -58,6 +57,13 @@ class List(models.Model):
         if self.id:
             self.numberofitems = self.get_numberofitems(self.user)
         super(List, self).save(*args, **kwargs)
+
+    @classmethod
+    def get(cls, id):
+        id = id.split(':')
+        username = id[0]
+        listname = ":".join(id[1:])
+        return cls.objects.get(user__username=username, name=listname)
 
     def get_items(self, user=None):
         if self.query.get('static', False):
