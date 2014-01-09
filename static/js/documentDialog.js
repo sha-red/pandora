@@ -6,7 +6,7 @@ pandora.ui.documentDialog = function(options) {
 
     Ox.print('OPTIONS', options)
 
-    var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
+    var dialogHeight = Math.round((window.innerHeight - 48) * 0.9) + 24,
         dialogWidth = Math.round(window.innerWidth * 0.9),
         items = options.items,
         item = items[options.index],
