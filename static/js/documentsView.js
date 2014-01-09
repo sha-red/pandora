@@ -4,7 +4,9 @@
 
 pandora.ui.documentsView = function(options, self) {
 
-    var that = pandora.ui.documentsPanel();
+    var that = pandora.ui.documentsPanel({
+        isItemView: true
+    });
     return that;
 
     var self = self || {},

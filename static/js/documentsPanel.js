@@ -6,7 +6,7 @@ pandora.ui.documentsPanel = function(options) {
 
     var ui = pandora.user.ui,
         hasItemView = false,
-        isItemView = true,
+        isItemView = options.isItemView,
 
         columns = [
             {
@@ -105,18 +105,23 @@ pandora.ui.documentsPanel = function(options) {
 
         $listBar = Ox.Bar({size: 24}),
 
-        $addButton = Ox.Button({
-            title: isItemView ? 'add' : 'upload',
-            tooltip: Ox._(isItemView ? 'Add Documents...' : 'Upload Documents...'),
+        $addButton = (isItemView ? Ox.Button({
+            title: 'add',
+            tooltip: Ox._('Add Documents...'),
+            type: 'image'
+        }) : Ox.FileButton({
+            image: 'upload',
+            tooltip: Ox._('Upload Documents...'),
             type: 'image'
         })
+        )
         .css({float: 'left', margin: '4px 2px 4px 4px'})
         .bindEvent({
-            click: function() {
+            click: function(data) {
                 if (isItemView) {
                     editDocuments();
                 } else {
-                    
+                    uploadDocuments(data);
                 }
             }
         })
@@ -266,10 +271,17 @@ pandora.ui.documentsPanel = function(options) {
         .css({float: 'left', margin: '4px'})
         .bindEvent({
             click: function(data) {
-                if (data.id == 'open') {
+                if (data.id == 'addtoitem') {
+                    addToItem();
+                } else if (data.id == 'addtolist') {
+                    addToList();
+                } else if (data.id == 'open') {
                     openDocuments();
                 } else if (data.id == 'edit') {
                     editDocuments();
+                } else if (data.id == 'replace') {
+                    console.log('replace', data);
+                    replaceDocument(data.files);
                 } else if (data.id == 'remove') {
                     removeDocuments();
                 } else if (data.id == 'delete') {
@@ -339,11 +351,14 @@ pandora.ui.documentsPanel = function(options) {
         .bindEvent({
             resize: function(data) {
                 ui.documentSize = data.size;
+                //fixme: resize preview panel
             },
             resizeend: function(data) {
                 // set to 0 so that UI.set registers a change of the value
                 ui.documentSize = 0;
                 pandora.UI.set({documentSize: data.size});
+                //fixme: resize preview panel instead
+                selectDocuments();
             },
             toggle: function(data) {
                 pandora.UI.set({showDocument: !data.collapsed});
@@ -388,6 +403,36 @@ pandora.ui.documentsPanel = function(options) {
 
     function addDocuments() {
         pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
+    }
+
+    function addToItem() {
+        pandora.api.addDocument({
+            item: ui.item,
+            ids: ui.documentsSelection['']
+        }, function() {
+            Ox.Request.clearCache();
+            if (ui.itemView == 'documents') {
+                //fixme just upload list here
+                //self.$documentsList.reloadList();
+                pandora.$ui.contentPanel.replaceElement(1,
+                    pandora.$ui.item = pandora.ui.item());
+            }
+        });
+    }
+
+    function addToList() {
+        pandora.api.addDocument({
+            list: ui._list,
+            ids: ui.documentsSelection['']
+        }, function() {
+            Ox.Request.clearCache();
+            if (ui.item && ui.itemView == 'documents') {
+                //fixme just upload list here
+                //self.$documentsList.reloadList();
+                pandora.$ui.contentPanel.replaceElement(1,
+                    pandora.$ui.item = pandora.ui.item());
+            }
+        });
     }
 
     function closeDocuments() {
@@ -455,6 +500,10 @@ pandora.ui.documentsPanel = function(options) {
                 })
             });
         }
+    }
+
+    function replaceDocument(file) {
+        var id = $list.options('selected')[0];
     }
 
     function removeDocuments() {
