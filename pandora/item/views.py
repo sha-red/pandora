@@ -1221,16 +1221,40 @@ def item(request, id):
         keys = [
             'year',
             'director',
+            'writer',
+            'producer',
+            'cinematographer',
+            'editor',
+            'actor',
             'topic',
-            'summary'
         ]
+        if not settings.USE_IMDB:
+            keys += [
+                'summary'
+            ]
+        keys += [
+            'duration'
+            'aspectratio'
+            'hue',
+            'saturation',
+            'lightness',
+            'volume',
+            'numberofcuts',
+        ]
+
         data = []
-        for key in keys:
-            value = item.get(key)
+        for id in keys:
+            value = item.get(id)
+            key = utils.get_by_id(settings.CONFIG['itemKeys'], id)
             if value:
+                title = key['title'] if key else id.capitalize()
                 if isinstance(value, list):
                     value = value = u', '.join([unicode(v) for v in value])
-                data.append({'key': key.capitalize(), 'value': value})
+                elif key and key.get('type') == 'float':
+                    value = '%0.3f' % value
+                elif key and key.get('type') == 'time':
+                    value = ox.format_duration(value * 1000)
+                data.append({'key': id, 'title': title, 'value': value})
         clips = []
         clip = {'in': 0, 'annotations': []}
         #logged in users should have javascript. not adding annotations makes load faster
