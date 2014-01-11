@@ -1204,6 +1204,7 @@ def item_xml(request, id):
 
 def item(request, id):
     id = id.split('/')[0]
+    view = None
     template = 'index.html'
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     if not request.user.is_anonymous():
@@ -1242,6 +1243,13 @@ def item(request, id):
                         clips.append(clip)
                     clip = {'in': a.start, 'annotations': []}
                 clip['annotations'].append(a.value)
+        head_title = u'%s – %s' % (settings.SITENAME, item.get('title', ''))
+        if item.get('director'):
+            head_title += u' (%s)' % u', '.join(item.get('director', []))
+        if item.get('year'):
+            head_title += u' %s' % item.get('year')
+        if view:
+            head_title += u' – %s' % view
         ctx = {
             'current_url': request.build_absolute_uri(request.get_full_path()),
             'base_url': request.build_absolute_uri('/'),
@@ -1252,6 +1260,7 @@ def item(request, id):
             'clips': clips,
             'icon': settings.CONFIG['user']['ui']['icons'] == 'frames' and 'icon' or 'poster',
             'title': ox.decode_html(item.get('title', '')),
+            'head_title': head_title,
             'description': item.get_item_description()
         }
         if not settings.USE_IMDB:
