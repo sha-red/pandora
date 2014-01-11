@@ -1243,18 +1243,18 @@ def item(request, id):
         ]
 
         data = []
-        for id in keys:
-            value = item.get(id)
-            key = utils.get_by_id(settings.CONFIG['itemKeys'], id)
+        for k in keys:
+            value = item.get(k)
+            key = utils.get_by_id(settings.CONFIG['itemKeys'], k)
             if value:
-                title = key['title'] if key else id.capitalize()
+                title = key['title'] if key else k.capitalize()
                 if isinstance(value, list):
                     value = value = u', '.join([unicode(v) for v in value])
                 elif key and key.get('type') == 'float':
                     value = '%0.3f' % value
-                elif key and key.get('type') == 'time':
+                elif key  and key.get('type') == 'time':
                     value = ox.format_duration(value * 1000)
-                data.append({'key': id, 'title': title, 'value': value})
+                data.append({'key': k, 'title': title, 'value': value})
         clips = []
         clip = {'in': 0, 'annotations': []}
         #logged in users should have javascript. not adding annotations makes load faster
