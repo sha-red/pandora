@@ -1234,7 +1234,7 @@ def item(request, id):
         clips = []
         clip = {'in': 0, 'annotations': []}
         #logged in users should have javascript. not adding annotations makes load faster
-        if request.user.is_anonymous():
+        if not settings.USE_IMDB and request.user.is_anonymous():
             for a in item.annotations.filter(
                 layer__in=models.Annotation.public_layers()).order_by('start', 'end', 'sortvalue'):
                 if clip['in'] < a.start:
