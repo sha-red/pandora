@@ -1274,6 +1274,7 @@ def item(request, id):
             head_title += u' %s' % item.get('year')
         if view:
             head_title += u' – %s' % view
+        head_title = ox.decode_html(head_title)
         ctx = {
             'current_url': request.build_absolute_uri(request.get_full_path()),
             'base_url': request.build_absolute_uri('/'),
