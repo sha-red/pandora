@@ -515,6 +515,15 @@
             "value": {"layer": "subtitles", "type": "wordsperminute"}
         },
         {
+            "id": "numberofdocuments",
+            "title": "Number of Documents",
+            "type": "integer",
+            "columnWidth": 60,
+            "format": {"type": "number", "args": []},
+            "sort": true,
+            "value": {"key": "documents", "type": "length"}
+        },
+        {
             "id": "size",
             "title": "Size",
             "type": "integer",
@@ -539,15 +548,6 @@
             "capability": "canSeeMedia",
             "columnWidth": 60,
             "sort": true
-        },
-        {
-            "id": "numberofdocuments",
-            "title": "Number of Documents",
-            "type": "integer",
-            "columnWidth": 60,
-            "format": {"type": "number", "args": []},
-            "sort": true,
-            "value": {"key": "documents", "type": "length"}
         },
         {
             "id": "numberoffiles",
