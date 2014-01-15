@@ -181,7 +181,7 @@ pandora.ui.browser = function() {
                 }
             },
             pandora_listsort: function() {
-                that.options({sort: getSort()})
+                that.options({sort: getSort()});
             },
             pandora_showsiteposters: function() {
                 pandora.user.ui.icons == 'posters' && that.reloadList(true);
