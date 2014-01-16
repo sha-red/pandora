@@ -310,7 +310,7 @@ pandora.ui.documentsPanel = function(options) {
 
         $preview,
 
-        $form,
+        $data,
 
         $itemStatusbar = Ox.Bar({size: 16})
             .css({textAlign: 'center'}),
@@ -492,101 +492,162 @@ pandora.ui.documentsPanel = function(options) {
         });
     }
 
-    function renderForm() {
-        var item = $list.value($list.options('selected')[0]),
+    function renderData() {
+        var $title, $description,
+            item = $list.value($list.options('selected')[0]),
             editable = item.user == pandora.user.username
                 || pandora.site.capabilities.canEditDocuments[pandora.user.level],
-            inputWidth = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE,
-            labelWidth = 80;
-        return Ox.Form({
-            items: [
-                Ox.Input({
-                    disabled: !editable,
-                    id: 'name',
-                    label: Ox._('Name'),
-                    labelWidth: labelWidth,
-                    value: item.name,
-                    width: inputWidth
-                }),
-                Ox.Input({
-                    disabled: true,
-                    id: 'extension',
-                    label: Ox._('Extension'),
-                    labelWidth: labelWidth,
-                    value: item.extension,
-                    width: inputWidth
-                }),
-                Ox.Input({
-                    disabled: true,
-                    id: 'dimensions',
-                    label: Ox._('Dimensions'),
-                    labelWidth: labelWidth,
-                    value: Ox.isArray(item.dimensions)
-                        ? Ox.formatDimensions(item.dimensions, 'px')
-                        : Ox.formatCount(item.dimensions, 'page'),
-                    width: inputWidth
-                }),
-                Ox.Input({
-                    disabled: true,
-                    id: 'size',
-                    label: Ox._('Size'),
-                    labelWidth: labelWidth,
-                    value: Ox.formatValue(item.size, 'B'),
-                    width: inputWidth
-                }),
-                Ox.Input({
-                    disabled: true,
-                    id: 'matches',
-                    label: Ox._('Matches'),
-                    labelWidth: labelWidth,
-                    value: item.matches,
-                    width: inputWidth
-                }),
-                Ox.Input({
-                    disabled: true,
-                    id: 'username',
-                    label: Ox._('Username'),
-                    labelWidth: labelWidth,
-                    value: item.user,
-                    width: inputWidth
-                }),
-                Ox.Input({
-                    disabled: !editable,
-                    id: 'type',
-                    label: Ox._('Type'),
-                    labelWidth: labelWidth,
-                    value: item.type,
-                    width: inputWidth
-                }),
-                Ox.Input({
-                    disabled: !editable,
-                    height: 256,
-                    id: 'description',
-                    placeholder: Ox._('Description'),
-                    type: 'textarea',
-                    value: item.description,
-                    width: inputWidth
-                })
-            ],
-            width: 240
-        })
-        .css({margin: '12px 8px 8px 8px'})
-        .bindEvent({
-            change: function(event) {
-                var data = Ox.extend({id: item.id}, event.id, event.data.value);
-                if (isItemView) {
-                    data.item = ui.item;
-                }
-                pandora.api.editDocument(data, function(result) {
-                    $list.value(result.data.id, event.id, result.data[event.id]);
-                    if (event.id == 'name') {
-                        $list.value(item.id, 'id', result.data.id);
+            labelWidth = 80,
+            width = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE;
+        return isItemView
+            ? Ox.Element()
+                .append(
+                    Ox.$('<div>').css({height: '16px'})
+                )
+                .append(
+                    $title = Ox.EditableContent({
+                        editable: false,
+                        value: item.name,
+                        width: width
+                    })
+                    .css({
+                        margin: '0 4px',
+                        textAlign: 'center',
+                        fontWeight: 'bold'
+                    })
+                    .bindEvent({
+                        edit: function() {
+                            $title.options({
+                                width: that.width()
+                            });
+                        },
+                        submit: function() {
+                            // ...
+                        }
+                    })
+                )
+                .append(
+                    Ox.$('<div>').css({height: '8px'})
+                )
+                .append(
+                    $description = Ox.EditableContent({
+                        format: function(value) {
+                            return '<div class="OxLight" style="text-align: center">'
+                                + value + '</div>';
+                        },
+                        height: width,
+                        placeholder: 'No description',
+                        type: 'textarea',
+                        value: item.description || '',
+                        width: width
+                    })
+                    .css({
+                        marginLeft: '8px',
+                        textAlign: 'center'
+                    })
+                    .bindEvent({
+                        submit: function(data) {
+                            pandora.api.editDocument({
+                                description: data.value,
+                                id: item.id,
+                                item: ui.item,
+                            }, function(result) {
+                                $description.options({value: result.data.description});
+                                Ox.Request.clearCache('findDocuments');
+                                $list.reloadList();
+                            });
+                        }
+                    })
+                )
+            : Ox.Form({
+                items: [
+                    Ox.Input({
+                        disabled: !editable,
+                        id: 'name',
+                        label: Ox._('Name'),
+                        labelWidth: labelWidth,
+                        value: item.name,
+                        width: width
+                    }),
+                    Ox.Input({
+                        disabled: true,
+                        id: 'extension',
+                        label: Ox._('Extension'),
+                        labelWidth: labelWidth,
+                        value: item.extension,
+                        width: width
+                    }),
+                    Ox.Input({
+                        disabled: true,
+                        id: 'dimensions',
+                        label: Ox._('Dimensions'),
+                        labelWidth: labelWidth,
+                        value: Ox.isArray(item.dimensions)
+                            ? Ox.formatDimensions(item.dimensions, 'px')
+                            : Ox.formatCount(item.dimensions, 'page'),
+                        width: width
+                    }),
+                    Ox.Input({
+                        disabled: true,
+                        id: 'size',
+                        label: Ox._('Size'),
+                        labelWidth: labelWidth,
+                        value: Ox.formatValue(item.size, 'B'),
+                        width: width
+                    }),
+                    Ox.Input({
+                        disabled: true,
+                        id: 'matches',
+                        label: Ox._('Matches'),
+                        labelWidth: labelWidth,
+                        value: item.matches,
+                        width: width
+                    }),
+                    Ox.Input({
+                        disabled: true,
+                        id: 'username',
+                        label: Ox._('Username'),
+                        labelWidth: labelWidth,
+                        value: item.user,
+                        width: width
+                    }),
+                    Ox.Input({
+                        disabled: !editable,
+                        id: 'type',
+                        label: Ox._('Type'),
+                        labelWidth: labelWidth,
+                        value: item.type,
+                        width: width
+                    }),
+                    Ox.Input({
+                        disabled: !editable,
+                        height: 256,
+                        id: 'description',
+                        placeholder: Ox._('Description'),
+                        type: 'textarea',
+                        value: item.description,
+                        width: width
+                    })
+                ],
+                width: 240
+            })
+            .css({margin: '12px 8px 8px 8px'})
+            .bindEvent({
+                change: function(event) {
+                    var data = Ox.extend({id: item.id}, event.id, event.data.value);
+                    if (isItemView) {
+                        data.item = ui.item;
                     }
-                    Ox.Request.clearCache('findDocuments');
-                    $list.reloadList();
-                });
-            }
-        });
+                    pandora.api.editDocument(data, function(result) {
+                        $list.value(result.data.id, event.id, result.data[event.id]);
+                        if (event.id == 'name') {
+                            $list.value(item.id, 'id', result.data.id);
+                        }
+                        Ox.Request.clearCache('findDocuments');
+                        $list.reloadList();
+                    });
+                }
+            });
     }
 
     function renderList() {
@@ -678,14 +739,6 @@ pandora.ui.documentsPanel = function(options) {
         })
         .on({
             click: openDocuments
-            // FIXME
-            /*
-            var item = $list.value(selected);
-            window.open(
-                '/documents/' + selected + '/' + item.name + '.' + item.extension,
-                '_blank'
-            );
-            */
         });
     }
 
@@ -698,9 +751,11 @@ pandora.ui.documentsPanel = function(options) {
         }).css({
             margin: size.margin
         });
-        $form && $form.options('items').forEach(function($item) {
-            $item.options({width: width});
-        });
+        if (!isItemView && $data) {
+            $data.options('items').forEach(function($item) {
+                $item.options({width: width});
+            });
+        }
     }
 
     function selectDocuments() {
@@ -733,7 +788,7 @@ pandora.ui.documentsPanel = function(options) {
         $item.empty();
         if (selected.length) {
             $preview = renderPreview().appendTo($item);
-            $form = renderForm().appendTo($item);
+            $data = renderData().appendTo($item);
         }
         $itemStatus.html(
             selected.length
