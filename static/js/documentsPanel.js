@@ -379,6 +379,9 @@ pandora.ui.documentsPanel = function(options) {
             orientation: 'horizontal'
         })
         .bindEvent({
+            pandora_documentsize: function(data) {
+                that.size(1, data.value);
+            },
             pandora_documentssort: function(data) {
                 updateSortElement();
                 $list.options({sort: data.value});
