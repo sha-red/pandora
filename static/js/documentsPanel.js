@@ -256,11 +256,17 @@ pandora.ui.documentsPanel = function(options) {
 
         $itemMenu = Ox.MenuButton({
             items: isItemView ? [
+                {id: 'add', title: Ox._(
+                    'Add Documents to ' + pandora.site.itemName.singular + '...'
+                ), keyboard: 'control n'},
+                {},
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'edit', title: ''},
                 {},
                 {id: 'remove', title: '', keyboard: 'delete'}
             ] : [
+                {id: 'upload', title: Ox._('Upload Documents...')},
+                {},
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'add', title: ''},
                 {},
@@ -275,7 +281,7 @@ pandora.ui.documentsPanel = function(options) {
         .bindEvent({
             click: function(data) {
                 if (data.id == 'add') {
-                    addDocuments();
+                    isItemView ? openDocumentsDialog() : addDocuments();
                 } else if (data.id == 'open') {
                     openDocuments();
                 } else if (data.id == 'edit') {
@@ -708,13 +714,13 @@ pandora.ui.documentsPanel = function(options) {
     function resizeItem() {
         var size = getPreviewSize(),
             width = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE;
-        $preview.options({
+        $preview && $preview.options({
             height: size.height,
             width: size.width
         }).css({
             margin: size.margin
         });
-        $form.options('items').forEach(function($item) {
+        $form && $form.options('items').forEach(function($item) {
             $item.options({width: width});
         });
     }
@@ -723,10 +729,16 @@ pandora.ui.documentsPanel = function(options) {
         var selected = ui.documentsSelection[isItemView ? ui.item : ''] || [],
             string = selected.length < 2 ? 'Document' : ' Documents';
         $list.options({selected: selected});
-        $itemMenu.setItemTitle('open', Ox._('Open ' + string));
+        $itemMenu.setItemTitle('open', Ox._('Open ' + string))
+            [selected.length > 0 ? 'enableItem' : 'disableItem']('open');
         if (isItemView) {
             $itemMenu.setItemTitle('edit', Ox._('Edit ' + string + '...'))
-                .setItemTitle('remove', Ox._('Remove ' + string));
+            .setItemTitle('remove', Ox._(
+                'Remove ' + string + ' from '
+                + pandora.site.itemName.singular
+            ))
+            [selected.length > 0 ? 'enableItem' : 'disableItem']('edit')
+            [selected.length > 0 ? 'enableItem' : 'disableItem']('remove');
         } else {
             $itemMenu.setItemTitle('add', Ox._(
                 'Add ' + string + ' to Current '
@@ -734,9 +746,9 @@ pandora.ui.documentsPanel = function(options) {
             ))
             .setItemTitle('replace', Ox._('Replace ' + string + '...'))
             .setItemTitle('delete', Ox._('Delete ' + string + '...'))
-            [selected.length == 1 ? 'enableItem' : 'disableItem']('replace');
+            [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')
+            [selected.length > 0 ? 'enableItem' : 'disableItem']('delete');
         }
-        $itemMenu[selected.length ? 'show' : 'hide']();
         $selectButton[selected.length > 1 ? 'show' : 'hide']();
         $deselectButton[selected.length ? 'show' : 'hide']();
         $item.empty();
