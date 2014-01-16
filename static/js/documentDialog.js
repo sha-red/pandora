@@ -14,7 +14,7 @@ pandora.ui.documentDialog = function(options) {
         } : {
             center: 'auto',
             zoom: 'fit'
-        }, pandora.user.ui.document[item.id] || {}),
+        }, pandora.user.ui.documents[item.id] || {}),
     
         $content = Ox.Element(),
 
@@ -116,7 +116,7 @@ pandora.ui.documentDialog = function(options) {
             )
             .bindEvent({
                 center: function(data) {
-                    pandora.UI.set('document.' + item.id, Ox.extend(settings, {
+                    pandora.UI.set('documents.' + item.id, Ox.extend(settings, {
                         center: data.center
                     }));
                 },
@@ -124,12 +124,12 @@ pandora.ui.documentDialog = function(options) {
                     pandora.$ui.documentDialog.close();
                 },
                 page: function(data) {
-                    pandora.UI.set('document.' + item.id, Ox.extend(settings, {
+                    pandora.UI.set('documents.' + item.id, Ox.extend(settings, {
                         page: data.page
                     }));
                 },
                 zoom: function(data) {
-                    pandora.UI.set('document.' + item.id, Ox.extend(settings, {
+                    pandora.UI.set('documents.' + item.id, Ox.extend(settings, {
                         zoom: data.zoom
                     }));
                 }
