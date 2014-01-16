@@ -351,14 +351,12 @@ pandora.ui.documentsPanel = function(options) {
         .bindEvent({
             resize: function(data) {
                 ui.documentSize = data.size;
-                //fixme: resize preview panel
+                resizeItem();
             },
             resizeend: function(data) {
                 // set to 0 so that UI.set registers a change of the value
                 ui.documentSize = 0;
                 pandora.UI.set({documentSize: data.size});
-                //fixme: resize preview panel instead
-                selectDocuments();
             },
             toggle: function(data) {
                 pandora.UI.set({showDocument: !data.collapsed});
@@ -708,6 +706,18 @@ pandora.ui.documentsPanel = function(options) {
                 '_blank'
             );
             */
+        });
+    }
+
+    function resizeItem() {
+        var inputWidth = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE,
+            previewSize = getPreviewSize();
+        $preview.options({
+            height: previewSize.height,
+            width: previewSize.width
+        });
+        $form.options('items').forEach(function($item) {
+            $item.options({width: inputWidth});
         });
     }
 
