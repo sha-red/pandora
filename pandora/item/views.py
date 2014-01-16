@@ -1247,7 +1247,10 @@ def item(request, id):
             value = item.get(k)
             key = utils.get_by_id(settings.CONFIG['itemKeys'], k)
             if value:
-                title = key['title'] if key else k.capitalize()
+                if k == 'actor':
+                    title = 'Cast'
+                else:
+                    title = key['title'] if key else k.capitalize()
                 if isinstance(value, list):
                     value = value = u', '.join([unicode(v) for v in value])
                 elif key and key.get('type') == 'float':
