@@ -4,12 +4,17 @@
 
 pandora.ui.documentDialog = function(options) {
 
-    Ox.print('OPTIONS', options)
-
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9) + 24,
         dialogWidth = Math.round(window.innerWidth * 0.9),
         items = options.items,
         item = items[options.index],
+        settings = Ox.extend(item.extension == 'pdf' ? {
+            page: 1,
+            zoom: 'fit'
+        } : {
+            center: 'auto',
+            zoom: 'fit'
+        }, pandora.user.ui.document[item.id] || {}),
     
         $content = Ox.Element(),
 
@@ -42,9 +47,9 @@ pandora.ui.documentDialog = function(options) {
                 pandora_document: function(data) {
                     if (data.value) {
                         if (Ox.getObjectById(items, data.value)) {
-
+                            // ...
                         } else {
-
+                            // ...
                         }
                     } else {
                         that.close();
@@ -91,32 +96,42 @@ pandora.ui.documentDialog = function(options) {
                 item.extension == 'pdf'
                 ? Ox.PDFViewer({
                     height: dialogHeight,
+                    page: settings.page,
                     url: '/documents/' + item.id + '/'
                         + item.name + '.' + item.extension,
-                    width: dialogWidth
+                    width: dialogWidth,
+                    zoom: settings.zoom
                 })
                 : Ox.ImageViewer({
+                    center: settings.center,
                     height: dialogHeight,
                     imageHeight: item.dimensions[1],
                     imagePreviewURL: '/documents/' + item.id + '/256p.jpg',
                     imageURL: '/documents/' + item.id + '/'
                         + item.name + '.' + item.extension,
                     imageWidth: item.dimensions[0],
-                    width: dialogWidth
+                    width: dialogWidth,
+                    zoom: settings.zoom
                 })
             )
             .bindEvent({
                 center: function(data) {
-                    pandora.UI.set('document.' + item.id + '.center', data.center);
+                    pandora.UI.set('document.' + item.id, Ox.extend(settings, {
+                        center: data.center
+                    }));
                 },
                 key_escape: function() {
                     pandora.$ui.documentDialog.close();
                 },
                 page: function(data) {
-                    pandora.UI.set('document.' + item.id + '.page', data.page);
+                    pandora.UI.set('document.' + item.id, Ox.extend(settings, {
+                        page: data.page
+                    }));
                 },
                 zoom: function(data) {
-                    pandora.UI.set('document.' + item.id + '.zoom', data.zoom);
+                    pandora.UI.set('document.' + item.id, Ox.extend(settings, {
+                        zoom: data.zoom
+                    }));
                 }
             })
         );
