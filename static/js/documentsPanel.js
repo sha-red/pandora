@@ -105,30 +105,6 @@ pandora.ui.documentsPanel = function(options) {
 
         $listBar = Ox.Bar({size: 24}),
 
-        $addButton = (isItemView ? Ox.Button({
-            title: 'add',
-            tooltip: Ox._(
-                'Add Documents... {0}',
-                ['<span class="OxBright">' + Ox.UI.symbols.control + 'N</span>']
-            ),
-            type: 'image'
-        }) : Ox.FileButton({
-            image: 'upload',
-            tooltip: Ox._('Upload Documents...'),
-            type: 'image'
-        }))
-        .css({float: 'left', margin: '4px 2px 4px 4px'})
-        .bindEvent({
-            click: function(data) {
-                if (isItemView) {
-                    openDocumentsDialog();
-                } else {
-                    uploadDocuments(data);
-                }
-            }
-        })
-        .appendTo($listBar),
-
         $viewSelect = Ox.Select({
             items: [
                 {id: 'list', title: Ox._('View as List')},
@@ -137,7 +113,7 @@ pandora.ui.documentsPanel = function(options) {
             value: ui.documentsView,
             width: 128
         })
-        .css({float: 'left', margin: '4px 2px'})
+        .css({float: 'left', margin: '4px 2px 4px 4px'})
         .bindEvent({
             change: function(data) {
                 pandora.UI.set({documentsView: data.value});
@@ -265,7 +241,7 @@ pandora.ui.documentsPanel = function(options) {
                 {},
                 {id: 'remove', title: '', keyboard: 'delete'}
             ] : [
-                {id: 'upload', title: Ox._('Upload Documents...')},
+                {id: 'upload', title: Ox._('Upload Documents...'), file: {width: 192}},
                 {},
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'add', title: ''},
@@ -282,6 +258,8 @@ pandora.ui.documentsPanel = function(options) {
             click: function(data) {
                 if (data.id == 'add') {
                     isItemView ? openDocumentsDialog() : addDocuments();
+                } else if (data.id == 'upload') {
+                    uploadDocuments(data);
                 } else if (data.id == 'open') {
                     openDocuments();
                 } else if (data.id == 'edit') {
@@ -746,6 +724,7 @@ pandora.ui.documentsPanel = function(options) {
             ))
             .setItemTitle('replace', Ox._('Replace ' + string + '...'))
             .setItemTitle('delete', Ox._('Delete ' + string + '...'))
+            [selected.length > 0 ? 'enableItem' : 'disableItem']('add');
             [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')
             [selected.length > 0 ? 'enableItem' : 'disableItem']('delete');
         }
