@@ -154,7 +154,7 @@ def update_sitemap(base_url):
         description = i.get_item_description()
         if description:
             el = ET.SubElement(video, "video:description")
-            el.text = i.get('description', i.get('summary', ''))
+            el.text = description
         el = ET.SubElement(video, "video:family_friendly")
         el.text = 'Yes'
         duration = i.sort.duration
