@@ -8,11 +8,12 @@ random
 
 from django.conf import settings
 from django.db import connection, transaction
+from django.db.models import Q
 from ox.utils import ET
 from celery.task import task, periodic_task
 
 import models
-
+from text.models import Text
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')
 def cronjob(**kwargs):
@@ -160,6 +161,22 @@ def update_sitemap(base_url):
         if duration > 0:
             el = ET.SubElement(video, "video:duration")
             el.text = "%s" % int(duration)
+
+    for t in Text.objects.filter(Q(status='featured')|Q(status='public')):
+        url = ET.SubElement(urlset, "url")
+        # URL of the page. This URL must begin with the protocol (such as http)
+        loc = ET.SubElement(url, "loc")
+        loc.text = absolute_url(t.get_absolute_url()[1:])
+
+        # This date should be in W3C Datetime format, can be %Y-%m-%d
+        lastmod = ET.SubElement(url, "lastmod")
+        lastmod.text = t.modified.strftime("%Y-%m-%d")
+        # always, hourly, daily, weekly, monthly, yearly, never
+        changefreq = ET.SubElement(url, "changefreq")
+        changefreq.text = 'monthly'
+        # priority of page on site values 0.1 - 1.0
+        priority = ET.SubElement(url, "priority")
+        priority.text = '1.0' if t.status == 'featured' else '0.75'
 
     with open(sitemap[:-3], 'wb') as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset))

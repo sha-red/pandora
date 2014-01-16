@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>{{head_title}}</title>
+        <link rel="icon" type="image/png" href="/static/png/icon.png" />
+        <meta name="application-name" content="{{settings.SITENAME}}"/>
+        <meta name="application-url" content="{{base_url}}"/>
+        <link rel="alternate" type="application/json+oembed" href="{{base_url}}oembed?url={{current_url|urlencode}}" title="oEmbed Profile" />
+        <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="{{settings.SITENAME}}" />
+        <script>
+            try {
+                if (localStorage && !localStorage['Ox.theme']) {
+                    localStorage['Ox.theme'] = '"{{settings.CONFIG.user.ui.theme}}"';
+                }
+            } catch(e) {}
+        </script>
+        <script type="text/javascript" src="/static/js/pandora.js?{{settings.CONFIG.site.version}}"></script>
+        <meta name="title" content="{{title}}" />
+        {%if description %}<meta name="description" content="{{description|safe}}"/> {%endif%}
+        <meta property="og:title" content="{{title}}"/>
+        <meta property="og:type" content="article"/>
+        <meta property="og:url" content="{{url}}"/>
+        <meta property="og:image" content="{{icon}}"/>
+        <meta property="og:site_name" content="{{settings.SITENAME}}"/>
+        {%if description %}<meta property="og:description" content="{{description}}"/>{%endif%}
+        <meta name="google" value="notranslate"/>
+    </head>
+    <body>
+        <noscript>
+            <div style="position: fixed; left: 0; top: 0; right: 0; bottom: 0; background-color: rgb(144, 144, 144);"></div>
+            <div style="position: absolute; left: 8px; top: 8px; right: 8px; bottom: 0; font-family: Lucida Grande, Segoe UI, DejaVu Sans, Lucida Sans Unicode, Helvetica, Arial, sans-serif; font-size: 11px; color: rgb(0, 0, 0); -moz-user-select: none; -o-user-select: none; -webkit-user-select: none">
+                <h1>{{text.name}}</h1>
+                <div>{{text.text|safe}}</div>
+            </div>
+        </noscript>
+    </body>
+</html>

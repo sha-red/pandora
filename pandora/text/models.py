@@ -53,12 +53,19 @@ class Text(models.Model):
 
     def __unicode__(self):
         return self.get_id()
+
+    @classmethod
+    def get(cls, id):
+        id = id.split(':')
+        username = id[0]
+        name = ":".join(id[1:])
+        return cls.objects.get(user__username=username, name=name)
     
     def get_absolute_url(self):
-        return '/texts/%s' % quote(self.get_id())
+        return '/texts/%s' % quote(self.get_id().replace('_', '\t').replace(' ', '_')).replace('/', '%2F')
 
     def get_absolute_pdf_url(self):
-        return '/texts/%s/text.pdf' % quote(self.get_id())
+        return '%s/text.pdf' % self.get_absolute_url()
 
     def get_id(self):
         return u'%s:%s' % (self.user.username, self.name)

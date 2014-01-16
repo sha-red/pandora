@@ -4,6 +4,7 @@ from __future__ import division
 import os
 import re
 
+import ox
 from ox.utils import json
 from ox.django.api import actions
 from ox.django.decorators import login_required_json
@@ -434,3 +435,29 @@ def upload(request):
         response = json_response(status=404, text='permission denied')
     response = json_response(status=400, text='this request requires POST')
     return render_to_json_response(response)
+
+def text(request, id):
+    id = id.replace('_', ' ').replace('\t', '_')
+    try:
+
+        text = models.Text.get(id)
+        if not text.accessible(request.user):
+            raise
+        template = 'text.html'
+        context = RequestContext(request, {
+            'base_url': request.build_absolute_uri('/'),
+            'description': ox.strip_tags(text.description),
+            'icon': request.build_absolute_uri('/text/%s/icon256.jpg' % text.get_id()),
+            'settings': settings,
+            'text': text,
+            'title': ox.strip_tags(text.name),
+            'url': request.build_absolute_uri(text.get_absolute_url()),
+        })
+    except models.Text.DoesNotExist:
+        template = 'index.html'
+        context = RequestContext(request, {
+            'base_url': request.build_absolute_uri('/'),
+            'settings': settings,
+            'title':  settings.SITENAME
+        })
+    return render_to_response(template, context)
