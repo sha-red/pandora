@@ -1079,7 +1079,10 @@ class Item(models.Model):
                                            quote(filename.encode('utf-8')))
             video = "%s.webm" % base
             v = streams[0]
-            os.symlink(v.media.path, video)
+            media_path = v.media.path
+            if isinstance(media_path, unicode):
+                media_path = media_path.encode('utf-8')
+            os.symlink(media_path, video)
             size = v.media.size
             duration = v.duration
         else:
@@ -1089,7 +1092,10 @@ class Item(models.Model):
             for v in streams:
                 video = "%s/%s.Part %d.webm" % (base, filename, part)
                 part += 1
-                os.symlink(v.media.path, video)
+                media_path = v.media.path
+                if isinstance(media_path, unicode):
+                    media_path = media_path.encode('utf-8')
+                os.symlink(media_path, video)
                 size += v.media.size
                 duration += v.duration
             video = base
