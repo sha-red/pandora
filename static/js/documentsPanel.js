@@ -710,14 +710,16 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function resizeItem() {
-        var inputWidth = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE,
-            previewSize = getPreviewSize();
+        var size = getPreviewSize(),
+            width = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE;
         $preview.options({
-            height: previewSize.height,
-            width: previewSize.width
+            height: size.height,
+            width: size.width
+        }).css({
+            margin: size.margin
         });
         $form.options('items').forEach(function($item) {
-            $item.options({width: inputWidth});
+            $item.options({width: width});
         });
     }
 
