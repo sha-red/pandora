@@ -107,7 +107,10 @@ pandora.ui.documentsPanel = function(options) {
 
         $addButton = (isItemView ? Ox.Button({
             title: 'add',
-            tooltip: Ox._('Add Documents...'),
+            tooltip: Ox._(
+                'Add Documents... {0}',
+                ['<span class="OxBright">' + Ox.UI.symbols.control + 'N</span>']
+            ),
             type: 'image'
         }) : Ox.FileButton({
             image: 'upload',
@@ -118,7 +121,7 @@ pandora.ui.documentsPanel = function(options) {
         .bindEvent({
             click: function(data) {
                 if (isItemView) {
-                    editDocuments();
+                    openDocumentsDialog();
                 } else {
                     uploadDocuments(data);
                 }
@@ -435,7 +438,7 @@ pandora.ui.documentsPanel = function(options) {
 
     function editDocuments() {
         pandora.UI.set('documentsSelection.', $list.options('selected'));
-        pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
+        openDocumentsDialog();
     }
 
     function getOrderButtonTitle() {
@@ -484,6 +487,10 @@ pandora.ui.documentsPanel = function(options) {
                 })
             });
         }
+    }
+
+    function openDocumentsDialog() {
+        pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
     }
 
     function replaceDocument(file) {
@@ -637,7 +644,10 @@ pandora.ui.documentsPanel = function(options) {
             size: 128
         })))
         .bindEvent({
-            add: uploadDocuments,
+            add: function() {
+                // we can't open upload dialog via control+n
+                isItemView && openDocumentsDialog();
+            },
             closepreview: closeDocuments,
             'delete': deleteDocuments,
             init: function(data) {
@@ -711,8 +721,7 @@ pandora.ui.documentsPanel = function(options) {
 
     function selectDocuments() {
         var selected = ui.documentsSelection[isItemView ? ui.item : ''] || [],
-            string = selected.length < 2 ? 'Document'
-                : selected.length + ' Documents';
+            string = selected.length < 2 ? 'Document' : ' Documents';
         $list.options({selected: selected});
         $itemMenu.setItemTitle('open', Ox._('Open ' + string));
         if (isItemView) {
@@ -723,7 +732,9 @@ pandora.ui.documentsPanel = function(options) {
                 'Add ' + string + ' to Current '
                 + pandora.site.itemName.singular
             ))
-            .setItemTitle('delete', Ox._('Delete ' + string + '...'));
+            .setItemTitle('replace', Ox._('Replace ' + string + '...'))
+            .setItemTitle('delete', Ox._('Delete ' + string + '...'))
+            [selected.length == 1 ? 'enableItem' : 'disableItem']('replace');
         }
         $itemMenu[selected.length ? 'show' : 'hide']();
         $selectButton[selected.length > 1 ? 'show' : 'hide']();
@@ -743,30 +754,32 @@ pandora.ui.documentsPanel = function(options) {
     function updateList() {
         var key = $findSelect.value(),
             value = $findInput.value(),
-            query = {
+            itemCondition = isItemView
+                ? {key: 'item', operator: '==', value: ui.item}
+                : null,
+            findQuery = {
                 conditions: [].concat(
-                    isItemView
-                    ? [{ key: 'item', value: ui.item, operator: '==' }]
-                    : [],
-                    value
-                    ? {
-                        conditions: [].concat(
-                            key != 'user'
-                                ? [{key: 'name', value: value, operator: '='}]
-                                : [],
-                            key == 'all'
-                                ? [{key: 'description', value: value, operator: '='}]
-                                : [],
-                            key != 'name'
-                                ? [{key: 'user', value: value, operator: '='}]
-                                : []
-                        ),
-                        operator: '|'
-                    }
-                    : []
+                    key != 'user'
+                        ? [{key: 'name', operator: '=', value: value}]
+                        : [],
+                    key == 'all'
+                        ? [
+                            {key: 'extension', operator: '=', value: value},
+                            {key: 'description', operator: '=', value: value}
+                        ]
+                        : [],
+                    key != 'name'
+                        ? [{key: 'user', operator: '=', value: value}]
+                        : []
                 ),
-                operator: '&'
-            };
+                operator: '|'
+            },
+            query = isItemView
+                ? {
+                    conditions: [itemCondition].concat(findQuery),
+                    operator: '&'
+                }
+                : findQuery;
         $list.options({query: query});
     }
 
