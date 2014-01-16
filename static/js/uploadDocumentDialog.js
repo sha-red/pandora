@@ -89,9 +89,10 @@ pandora.ui.uploadDocumentDialog = function(files, callback) {
                 }, function(result) {
                     if (result.data.items.length) {
                         var id = result.data.items[0].name + '.' + result.data.items[0].extension;
-                        valid && errorDialog(filename == id
-                            ? Ox._('The file {0} already exists', [filename])
-                            : Ox._('The file {0} already exists as {1}', [filename, id])
+                        valid && errorDialog(
+                            filename == id
+                            ? Ox._('The file "{0}" already exists.', [filename])
+                            : Ox._('The file "{0}" already exists as "{1}".', [filename, id])
                         ).open();
                         valid = false;
                     }
