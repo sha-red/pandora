@@ -23,9 +23,7 @@ def addDocument(request):
     '''
         add document(s) to item
         takes {
-            item: string
-            or:
-            list: string
+            item: string or [string]
 
             id: string
             or
@@ -41,20 +39,20 @@ def addDocument(request):
     else:
         ids = [data['id']]
     if 'item' in data:
-        item = Item.objects.get(itemId=data['item'])
-        if item.editable(request.user):
-            for id in ids:
-                document = models.Document.get(id)
-                document.add(item)
-        else:
-            response = json_response(status=403, text='permission denied')
-    elif 'list' in data:
-        list = List.get(data['list'])
-        for item in list.get_items(request.user):
+        if isinstance(data['item'], basestring):
+            item = Item.objects.get(itemId=data['item'])
             if item.editable(request.user):
                 for id in ids:
                     document = models.Document.get(id)
                     document.add(item)
+            else:
+                response = json_response(status=403, text='permission denied')
+        else:
+            for item in Item.objects.filter(itemId__in=data['item']):
+                if item.editable(request.user):
+                    for id in ids:
+                        document = models.Document.get(id)
+                        document.add(item)
     return render_to_json_response(response)
 actions.register(addDocument, cache=False)
 
