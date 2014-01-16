@@ -418,11 +418,16 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function deleteDocuments() {
-        pandora.ui.deleteDocumentDialog($list.options('selected'), function() {
-            Ox.Request.clearCache();
-            // ...
-            $list.reloadList();
-        }).open();
+        pandora.ui.deleteDocumentDialog(
+            $list.options('selected').map(function(id) {
+                return $list.value(id);
+            }),
+            function() {
+                Ox.Request.clearCache();
+                // ...
+                $list.reloadList();
+            }
+        ).open();
     }
 
     function editDocuments() {
