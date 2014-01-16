@@ -1262,22 +1262,33 @@ def item(request, id):
         clip = {'in': 0, 'annotations': []}
         #logged in users should have javascript. not adding annotations makes load faster
         if not settings.USE_IMDB and request.user.is_anonymous():
-            for a in item.annotations.filter(
-                layer__in=models.Annotation.public_layers()).order_by('start', 'end', 'sortvalue'):
+            for a in item.annotations.exclude(
+                layer='subtitles'
+            ).exclude(
+                value=''
+            ).filter(
+                layer__in=models.Annotation.public_layers()
+            ).order_by('start', 'end', 'sortvalue'):
                 if clip['in'] < a.start:
                     if clip['annotations']:
                         clip['annotations'] = '<br />\n'.join(clip['annotations'])
                         clips.append(clip)
                     clip = {'in': a.start, 'annotations': []}
                 clip['annotations'].append(a.value)
+            if clip['annotations']:
+                clip['annotations'] = '<br />\n'.join(clip['annotations'])
+                clips.append(clip)
         head_title = u'%s – %s' % (settings.SITENAME, item.get('title', ''))
+        title = item.get('title', '')
         if item.get('director'):
             head_title += u' (%s)' % u', '.join(item.get('director', []))
         if item.get('year'):
             head_title += u' %s' % item.get('year')
+            title += u' (%s)' % item.get('year')
         if view:
             head_title += u' – %s' % view
         head_title = ox.decode_html(head_title)
+        title = ox.decode_html(title)
         ctx = {
             'current_url': request.build_absolute_uri(request.get_full_path()),
             'base_url': request.build_absolute_uri('/'),
@@ -1287,9 +1298,10 @@ def item(request, id):
             'data': data,
             'clips': clips,
             'icon': settings.CONFIG['user']['ui']['icons'] == 'frames' and 'icon' or 'poster',
-            'title': ox.decode_html(item.get('title', '')),
+            'title': title,
             'head_title': head_title,
-            'description': item.get_item_description()
+            'description': item.get_item_description(),
+            'description_html': item.get_item_description_html()
         }
         if not settings.USE_IMDB:
             value = item.get('topic' in keys and 'topic' or 'keywords')
