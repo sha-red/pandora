@@ -617,11 +617,50 @@ class Item(models.Model):
         return i
 
     def get_item_description(self):
-        if settings.USE_IMDB:
-            info = tuple([self.data.get(k, 0) for k in ['hue', 'saturation', 'lightness']])
-            description = 'Hue: %.3f, Saturation: %.3f, Lightness: %.3f' % info
-        else:
-            description = ox.strip_tags(self.get('summary', ''))
+        return ox.strip_tags(
+            self.get_item_description_html().replace(
+                '</div><div style="margin-top: 8px; text-align: justify">', '; '
+            )
+        )
+
+    def get_item_description_html(self):
+        description = ''
+        data = self.get_json()
+        info = []
+        for key in [
+            'director', 'writer', 'producer',
+            'cinematographer', 'editor', 'actor'
+        ]:
+            value = data.get(key, [])
+            if value:
+                info.append('<b>%s:</b> %s' % (
+                    'Cast' if key == 'actor' else key.capitalize(),
+                    ', '.join(value)
+                ))
+        if info:
+            description += '<div style="margin-top: 8px; text-align: justify">%s</div>' % '; '.join(info)
+        info = []
+        for key in [
+            'duration', 'aspectratio',
+            'hue', 'saturation', 'lightness',
+            'volume', 'cutsperminute'
+        ]:
+            value = data.get(key, 0)
+            if value:
+                info.append('<b>%s:</b> %s' % (
+                    'Aspect Ratio' if key == 'aspectratio'
+                    else 'Cuts per Minute' if key == 'cutsperminute'
+                    else key.capitalize(),
+                    ox.format_duration(value * 1000 if value else 0, milliseconds=False) if key == 'duration'
+                    else '%.3f:1' % value if key == 'aspectratio'
+                    else '%.3f' % value
+                ))
+        if info:
+            description += '<div style="margin-top: 8px; text-align: justify">%s</div>' % '; '.join(info)
+        if not settings.USE_IMDB:
+            value = data.get('summary', '')
+            if value:
+                description += '<div style="margin-top: 8px; text-align: justify"><b style="display: none">Summary:</b> %s</div>' % value
         return description
 
     def oxdb_id(self):
