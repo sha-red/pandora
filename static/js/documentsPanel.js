@@ -113,8 +113,7 @@ pandora.ui.documentsPanel = function(options) {
             image: 'upload',
             tooltip: Ox._('Upload Documents...'),
             type: 'image'
-        })
-        )
+        }))
         .css({float: 'left', margin: '4px 2px 4px 4px'})
         .bindEvent({
             click: function(data) {
@@ -256,11 +255,12 @@ pandora.ui.documentsPanel = function(options) {
             items: isItemView ? [
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'edit', title: ''},
+                {},
                 {id: 'remove', title: '', keyboard: 'delete'}
             ] : [
                 {id: 'open', title: '', keyboard: 'return'},
-                {id: 'addtoitem', title: ''},
-                {id: 'addtolist', title: ''},
+                {id: 'add', title: ''},
+                {},
                 {id: 'replace', title: Ox._('Replace Document...')},
                 {id: 'delete', title: '', keyboard: 'delete'}
             ],
@@ -271,16 +271,13 @@ pandora.ui.documentsPanel = function(options) {
         .css({float: 'left', margin: '4px'})
         .bindEvent({
             click: function(data) {
-                if (data.id == 'addtoitem') {
-                    addToItem();
-                } else if (data.id == 'addtolist') {
-                    addToList();
+                if (data.id == 'add') {
+                    addDocuments();
                 } else if (data.id == 'open') {
                     openDocuments();
                 } else if (data.id == 'edit') {
                     editDocuments();
                 } else if (data.id == 'replace') {
-                    console.log('replace', data);
                     replaceDocument(data.files);
                 } else if (data.id == 'remove') {
                     removeDocuments();
@@ -400,31 +397,12 @@ pandora.ui.documentsPanel = function(options) {
     );
 
     function addDocuments() {
-        pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
-    }
-
-    function addToItem() {
         pandora.api.addDocument({
             item: ui.item,
             ids: ui.documentsSelection['']
         }, function() {
             Ox.Request.clearCache();
             if (ui.itemView == 'documents') {
-                //fixme just upload list here
-                //self.$documentsList.reloadList();
-                pandora.$ui.contentPanel.replaceElement(1,
-                    pandora.$ui.item = pandora.ui.item());
-            }
-        });
-    }
-
-    function addToList() {
-        pandora.api.addDocument({
-            list: ui._list,
-            ids: ui.documentsSelection['']
-        }, function() {
-            Ox.Request.clearCache();
-            if (ui.item && ui.itemView == 'documents') {
                 //fixme just upload list here
                 //self.$documentsList.reloadList();
                 pandora.$ui.contentPanel.replaceElement(1,
@@ -733,12 +711,9 @@ pandora.ui.documentsPanel = function(options) {
             $itemMenu.setItemTitle('edit', Ox._('Edit ' + string + '...'))
                 .setItemTitle('remove', Ox._('Remove ' + string));
         } else {
-            $itemMenu.setItemTitle('addtoitem', Ox._(
+            $itemMenu.setItemTitle('add', Ox._(
                 'Add ' + string + ' to Current '
                 + pandora.site.itemName.singular
-            ))
-            .setItemTitle('addtolist', Ox._(
-                'Add ' + string + ' to All Items in Current List'
             ))
             .setItemTitle('delete', Ox._('Delete ' + string + '...'));
         }
