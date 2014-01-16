@@ -60,4 +60,3 @@ pandora.ui.documentsDialog = function() {
     return that;
 
 };
-
