@@ -724,7 +724,7 @@ pandora.ui.documentsPanel = function(options) {
             ))
             .setItemTitle('replace', Ox._('Replace ' + string + '...'))
             .setItemTitle('delete', Ox._('Delete ' + string + '...'))
-            [selected.length > 0 ? 'enableItem' : 'disableItem']('add');
+            [selected.length > 0 ? 'enableItem' : 'disableItem']('add')
             [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')
             [selected.length > 0 ? 'enableItem' : 'disableItem']('delete');
         }
