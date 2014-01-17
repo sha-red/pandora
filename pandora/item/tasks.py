@@ -141,26 +141,27 @@ def update_sitemap(base_url):
         # priority of page on site values 0.1 - 1.0
         priority = ET.SubElement(url, "priority")
         priority.text = '1.0'
-        video = ET.SubElement(url, "video:video")
-        #el = ET.SubElement(video, "video:content_loc")
-        #el.text = absolute_url("%s/video" % i.itemId)
-        el = ET.SubElement(video, "video:player_loc")
-        el.attrib['allow_embed'] = 'no'
-        el.text = absolute_url("%s/player" % i.itemId)
-        el = ET.SubElement(video, "video:title")
-        el.text = i.get('title')
-        el = ET.SubElement(video, "video:thumbnail_loc")
-        el.text = absolute_url("%s/96p.jpg" % i.itemId)
-        description = i.get_item_description()
-        if description:
-            el = ET.SubElement(video, "video:description")
-            el.text = description
-        el = ET.SubElement(video, "video:family_friendly")
-        el.text = 'Yes'
-        duration = i.sort.duration
-        if duration > 0:
-            el = ET.SubElement(video, "video:duration")
-            el.text = "%s" % int(duration)
+        if i.rendered:
+            video = ET.SubElement(url, "video:video")
+            #el = ET.SubElement(video, "video:content_loc")
+            #el.text = absolute_url("%s/video" % i.itemId)
+            el = ET.SubElement(video, "video:player_loc")
+            el.attrib['allow_embed'] = 'no'
+            el.text = absolute_url("%s/player" % i.itemId)
+            el = ET.SubElement(video, "video:title")
+            el.text = i.get('title')
+            el = ET.SubElement(video, "video:thumbnail_loc")
+            el.text = absolute_url("%s/96p.jpg" % i.itemId)
+            description = i.get_item_description()
+            if description:
+                el = ET.SubElement(video, "video:description")
+                el.text = description
+            el = ET.SubElement(video, "video:family_friendly")
+            el.text = 'Yes'
+            duration = i.sort.duration
+            if duration > 0:
+                el = ET.SubElement(video, "video:duration")
+                el.text = "%s" % int(duration)
 
     for t in Text.objects.filter(Q(status='featured')|Q(status='public')):
         url = ET.SubElement(urlset, "url")
