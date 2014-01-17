@@ -395,6 +395,7 @@ def pdf_viewer(request, id):
     return render_to_json_response(response)
 
 def pdf(request, id):
+    id = id.replace('_', ' ').replace('\t', '_')
     text = get_text_or_404_json(id)
     if text.type == 'pdf' and text.file and not text.uploading:
         return HttpFileResponse(text.file.path, content_type='application/pdf')
