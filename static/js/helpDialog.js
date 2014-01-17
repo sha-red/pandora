@@ -56,7 +56,7 @@ pandora.ui.helpDialog = function() {
             strings = Ox.clone(pandora.site, true);
 
         strings.addAnnotationShortcuts = strings.layers.map(function(layer, index) {
-            return '<tr><td>' + index + '</td><td>' + Ox._('Add {0}', [layer.item.toLowerCase()]) + '</td></tr>';
+            return '<tr><td>' + (index + 1) + '</td><td>' + Ox._('Add {0}', [layer.item.toLowerCase()]) + '</td></tr>';
         }).join('\n');
         strings.itemName = Ox.map(strings.itemName, function(v) {
             return v.toLowerCase();
