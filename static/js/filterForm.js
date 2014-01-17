@@ -50,7 +50,7 @@ pandora.ui.filterForm = function(list) {
                             query: data.query
                         }, function(result) {
                             if (pandora.user.ui.updateAdvancedFindResults) {
-                                that.updateResults(data.query);
+                                that.updateResults();
                             }
                         });
                     } else if (pandora.user.ui.updateAdvancedFindResults) {
@@ -62,7 +62,7 @@ pandora.ui.filterForm = function(list) {
         );
         that.getList = that.$filter.getList;
     });
-    that.updateResults = function(query) {
+    that.updateResults = function() {
         if (list) {
             Ox.Request.clearCache(list.id);
             pandora.$ui.list
@@ -70,7 +70,7 @@ pandora.ui.filterForm = function(list) {
                     init: function(data) {
                         pandora.$ui.folderList[
                             pandora.getListData().folder
-                        ].value(list.id, 'query', query);
+                        ].value(list.id, 'query', that.$filter.options('query'));
                     }
                 })
                 .reloadList();
