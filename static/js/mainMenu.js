@@ -50,7 +50,18 @@ pandora.ui.mainMenu = function() {
                     getListMenu(),
                     getItemMenu(),
                     { id: 'viewMenu', title: Ox._('View'), items: [
-                        { id: 'items', title: Ox._('View {0}', [Ox._(pandora.site.itemName.plural)]), items: [
+                        { id: 'section', title: Ox._('Section'), items: [
+                            { group: 'viewsection', min: 1, max: 1, items: Object.keys(pandora.site.sectionFolders).map(function(section) {
+                                return {
+                                    id: section,
+                                    title: section == 'items' ? Ox._(pandora.site.itemName.plural) : Ox.toTitleCase(section),
+                                    checked: ui.section == section,
+                                    disabled: section != 'items' && pandora.user.level != 'admin'
+                                };
+                            }) }
+                        ] },
+                        {},
+                        { id: 'movies', title: Ox._('View {0}', [Ox._(pandora.site.itemName.plural)]), items: [
                             { group: 'listview', min: 1, max: 1, items: pandora.site.listViews.map(function(view) {
                                 return Ox.extend({
                                     checked: ui.listView == view.id
@@ -335,6 +346,8 @@ pandora.ui.mainMenu = function() {
                             operator: '&'
                         }
                     });
+                } else if (data.id == 'viewsection') {
+                    pandora.UI.set({section: value});
                 } else if (data.id == 'viewtimelines') {
                     pandora.UI.set({videoTimeline: value});
                 }
@@ -738,7 +751,8 @@ pandora.ui.mainMenu = function() {
                     pandora.getItemIdAndPosition() ? 'enableItem' : 'disableItem'
                 ]('findsimilar');
             },
-            pandora_section: function() {
+            pandora_section: function(data) {
+                that.checkItem('viewMenu_section_' + data.value);
                 that.replaceMenu('listMenu', getListMenu());
                 that.replaceMenu('itemMenu', getItemMenu());
                 that.replaceMenu('sortMenu', getSortMenu());

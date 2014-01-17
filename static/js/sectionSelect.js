@@ -15,7 +15,7 @@ pandora.ui.sectionSelect = function(section) {
             margin: '4px'
         })
         .bindEvent({
-            
+            // ...
         });
     return that;
 };
