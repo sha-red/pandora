@@ -56,10 +56,13 @@ class Text(models.Model):
 
     @classmethod
     def get(cls, id):
-        id = id.split(':')
-        username = id[0]
-        name = ":".join(id[1:])
-        return cls.objects.get(user__username=username, name=name)
+        if id == '':
+            return cls.objects.get(name='')
+        else:
+            id = id.split(':')
+            username = id[0]
+            name = ":".join(id[1:])
+            return cls.objects.get(user__username=username, name=name)
     
     def get_absolute_url(self):
         return '/texts/%s' % quote(self.get_id().replace('_', '\t').replace(' ', '_')).replace('/', '%2F')

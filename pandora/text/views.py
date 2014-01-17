@@ -437,12 +437,12 @@ def upload(request):
     response = json_response(status=400, text='this request requires POST')
     return render_to_json_response(response)
 
-def text(request, id):
+def text(request, id=''):
     id = id.replace('_', ' ').replace('\t', '_')
     try:
 
         text = models.Text.get(id)
-        if not text.accessible(request.user):
+        if id != '' and not text.accessible(request.user):
             raise
         template = 'text.html'
         context = RequestContext(request, {
@@ -454,7 +454,7 @@ def text(request, id):
             'title': ox.strip_tags(text.name),
             'url': request.build_absolute_uri(text.get_absolute_url()),
         })
-    except models.Text.DoesNotExist:
+    except:
         template = 'index.html'
         context = RequestContext(request, {
             'base_url': request.build_absolute_uri('/'),

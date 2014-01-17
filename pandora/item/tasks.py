@@ -163,6 +163,22 @@ def update_sitemap(base_url):
                 el = ET.SubElement(video, "video:duration")
                 el.text = "%s" % int(duration)
 
+    if Text.objects.filter(name='').exclude(text='').exists():
+        t = Text.objects.filter(name='')[0]
+        url = ET.SubElement(urlset, "url")
+        # URL of the page. This URL must begin with the protocol (such as http)
+        loc = ET.SubElement(url, "loc")
+        loc.text = absolute_url('/texts')
+        # This date should be in W3C Datetime format, can be %Y-%m-%d
+        lastmod = ET.SubElement(url, "lastmod")
+        lastmod.text = t.modified.strftime("%Y-%m-%d")
+        # always, hourly, daily, weekly, monthly, yearly, never
+        changefreq = ET.SubElement(url, "changefreq")
+        changefreq.text = 'monthly'
+        # priority of page on site values 0.1 - 1.0
+        priority = ET.SubElement(url, "priority")
+        priority.text = '1.0'
+
     for t in Text.objects.filter(Q(status='featured')|Q(status='public')):
         url = ET.SubElement(urlset, "url")
         # URL of the page. This URL must begin with the protocol (such as http)
