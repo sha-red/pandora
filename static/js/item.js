@@ -16,9 +16,6 @@ pandora.ui.item = function() {
             'cuts', 'director', 'duration', 'durations', 'editable', 'layers',
             'modified', 'parts', 'posterFrame', 'rendered', 'rightslevel',
             'size', 'title', 'videoRatio', 'year'
-        ] : pandora.user.ui.itemView == 'documents' ? [
-            'director', 'documents', 'duration', 'durations', 'editable',
-            'rightslevel', 'size', 'title', 'videoRatio', 'year'
         ] : []
     }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
 
@@ -70,7 +67,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'documents') {
 
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.documents = pandora.ui.documentsView(result.data)
+                pandora.$ui.documents = pandora.ui.documentsPanel({isItemView: true})
             );
 
         } else if (pandora.user.ui.itemView == 'player') {
