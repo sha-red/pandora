@@ -326,9 +326,9 @@ pandora.ui.folderList = function(id, section) {
                     that.value(result.data.id, 'status', result.data.status);
                 });
             } else if (data.key == 'path') {
-                
+                // ...
             } else if (data.key == 'mounted') {
-                alert(JSON.stringify(data));
+                // ...
             }
         },
         'delete': function(data) {
