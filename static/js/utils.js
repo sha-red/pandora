@@ -1407,6 +1407,28 @@ pandora.getPart = function(state, str, callback) {
         } else {
             callback();
         }
+    } else if (state.page == 'documents') {
+        var split = str.split('/')[0],
+            id = split[0];
+        if (id) {
+            pandora.api.findDocuments({
+                query: {
+                    conditions: [{key: 'id', value: id, operator: '=='}],
+                    operator: '&'
+                }
+            }, function(result) {
+                if (result.data.items) {
+                    state.part = str;
+                    //fixme set page/zoom/center here
+                } else {
+                    state.page = '';
+                }
+                callback();
+            });
+        } else {
+            state.page = '';
+            callback();
+        }
     } else {
         callback();
     }

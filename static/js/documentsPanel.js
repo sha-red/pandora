@@ -5,7 +5,7 @@
 pandora.ui.documentsPanel = function(options) {
 
     var ui = pandora.user.ui,
-        hasItemView = false,
+        hasItemView = false, // FIXME
         isItemView = options.isItemView,
 
         columns = [
@@ -396,7 +396,8 @@ pandora.ui.documentsPanel = function(options) {
                 //fixme just upload list here
                 //self.$documentsList.reloadList();
                 pandora.$ui.contentPanel.replaceElement(1,
-                    pandora.$ui.item = pandora.ui.item());
+                    pandora.$ui.item = pandora.ui.item()
+                );
             }
         });
     }
@@ -450,27 +451,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function openDocuments() {
-        if (!pandora.$ui.documentDialog) {
-            pandora.$ui.documentDialog = pandora.ui.documentDialog({
-                index: 0,
-                items: $list.options('selected').map(function(id) {
-                    return $list.value(id);
-                })
-            })
-            .bindEvent({
-                close: function() {
-                    $list.closePreview();
-                }
-            })
-            .open();
-        } else {
-            pandora.$ui.documentDialog.update({
-                index: 0,
-                items: $list.options('selected').map(function(id) {
-                    return $list.value(id);
-                })
-            });
-        }
+        pandora.openDocumentDialog($list.options('selected'));
     }
 
     function openDocumentsDialog() {

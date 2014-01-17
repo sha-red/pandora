@@ -378,7 +378,7 @@ pandora.URL = (function() {
             getPart: pandora.getPart,
             getSpan: pandora.getSpan,
             pages: [].concat(
-                ['home', 'software', 'api', 'help', 'tv'],
+                ['home', 'software', 'api', 'help', 'tv', 'documents'],
                 pandora.site.sitePages.map(function(page) {
                     return page.id;
                 }),

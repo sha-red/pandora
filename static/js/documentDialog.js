@@ -2,6 +2,45 @@
 
 'use strict';
 
+pandora.openDocumentDialog = function(ids) {
+
+    pandora.api.findDocuments({
+        query: {
+            conditions: ids.map(function(id) {
+                return {key: 'id', value: id, operator: '=='}
+            }),
+            operator: '|'
+        },
+        keys: ['description', 'dimensions', 'extension', 'id', 'name']
+    }, function(result) {
+        var i = 0, documents = result.data.items.map(function(document) {
+            return Ox.extend({index: i++}, document);
+        });
+
+        if (!pandora.$ui.documentDialog) {
+            pandora.$ui.documentDialog = pandora.ui.documentDialog({
+                index: 0,
+                items: documents,
+            })
+            .bindEvent({
+                close: function() {
+                    pandora.user.ui.page == 'documents' && pandora.UI.set({page: ''});
+                }
+            })
+            .open();
+        } else {
+            pandora.$ui.documentDialog.update({
+                index: 0,
+                items: documents,
+            });
+        }
+        pandora.UI.set({
+            page: 'documents',
+            'part.documents': documents[0].id
+        });
+    });
+};
+
 pandora.ui.documentDialog = function(options) {
 
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9) + 24,
