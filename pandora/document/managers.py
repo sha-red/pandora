@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
 
+import ox
 from ox.django.query import QuerySet
 
 def parseCondition(condition, user, item=None):
@@ -29,17 +30,8 @@ def parseCondition(condition, user, item=None):
     else:
         exclude = False
     if k == 'id':
-        try:
-            public_id = v.split(':')
-            username = public_id[0]
-            name = ":".join(public_id[1:])
-            extension = name.split('.')
-            name = '.'.join(extension[:-1])
-            extension = extension[-1].lower()
-            q = Q(user__username=username, name=name, extension=extension)
-        except:
-            q = Q(id__in=[])
-        return q
+        v = ox.fromAZ(v)
+        return Q(**{k: v})
     if isinstance(v, bool): #featured and public flag
         key = k
     else:
