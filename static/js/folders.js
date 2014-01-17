@@ -7,7 +7,9 @@ pandora.ui.folders = function(section) {
         that = Ox.Element()
             .css({overflowX: 'hidden', overflowY: 'auto'})
             .bindEvent({
-                resize: pandora.resizeFolders
+                resize: function() {
+                    pandora.resizeFolders();
+                }
             }),
         folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1);
