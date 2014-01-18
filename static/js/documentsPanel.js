@@ -489,6 +489,7 @@ pandora.ui.documentsPanel = function(options) {
                 .append(
                     $name = Ox.EditableContent({
                         editable: editable,
+                        tooltip: editable ? pandora.getEditTooltip('name') : '',
                         value: item.name,
                         width: width
                     })
@@ -527,6 +528,7 @@ pandora.ui.documentsPanel = function(options) {
                         },
                         height: width,
                         placeholder: 'No description',
+                        tooltip: editable ? pandora.getEditTooltip('description') : '',
                         type: 'textarea',
                         value: item.description || '',
                         width: width
@@ -720,6 +722,7 @@ pandora.ui.documentsPanel = function(options) {
         return Ox.ImageElement({
             height: size.height,
             src: src,
+            tooltip: 'Click to open document',
             width: size.width
         })
         .css({
