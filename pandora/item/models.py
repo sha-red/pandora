@@ -410,6 +410,8 @@ class Item(models.Model):
 
     def delete_files(self):
         path = os.path.join(settings.MEDIA_ROOT, self.path())
+        if isinstance(path, unicode):
+            path = path.encode('utf-8')
         if os.path.exists(path):
             shutil.rmtree(path)
 
