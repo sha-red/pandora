@@ -250,7 +250,7 @@ pandora.ui.documentsPanel = function(options) {
                 {id: 'delete', title: '', keyboard: 'delete'}
             ],
             title: 'set',
-            tooltip: 'Options',
+            tooltip: Ox._('Options'),
             type: 'image'
         })
         .css({float: 'left', margin: '4px'})
@@ -387,17 +387,21 @@ pandora.ui.documentsPanel = function(options) {
     );
 
     function addDocuments() {
+        var ids = ui.documentsSelection[''];
         pandora.api.addDocument({
             item: ui.item,
-            ids: ui.documentsSelection['']
+            ids: ids
         }, function() {
             Ox.Request.clearCache();
             if (ui.itemView == 'documents') {
-                //fixme just upload list here
-                //self.$documentsList.reloadList();
+                // FIXME: $list.reloadList() would be much better
                 pandora.$ui.contentPanel.replaceElement(1,
                     pandora.$ui.item = pandora.ui.item()
                 );
+                // FIXME: there has to be a way to do this without timeout
+                setTimeout(function() {
+                    pandora.UI.set('documentsSelection.' + ui.item, ids);
+                }, 1000);
             }
         });
     }
@@ -686,7 +690,7 @@ pandora.ui.documentsPanel = function(options) {
                 isItemView && openDocumentsDialog();
             },
             closepreview: closeDocuments,
-            'delete': deleteDocuments,
+            'delete': isItemView ? removeDocuments : deleteDocuments,
             init: function(data) {
                 $listStatus.html(
                     Ox.toTitleCase(Ox.formatCount(data.items, 'document'))
@@ -722,7 +726,9 @@ pandora.ui.documentsPanel = function(options) {
         return Ox.ImageElement({
             height: size.height,
             src: src,
-            tooltip: 'Click to open document',
+            // fixme: this tends to stick around after menu click
+            // (and may not be necessary in the first place)
+            // tooltip: Ox._('Click to open document'),
             width: size.width
         })
         .css({
