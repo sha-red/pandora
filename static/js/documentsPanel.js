@@ -474,7 +474,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function renderData() {
-        var $title, $description,
+        var $name, $description,
             item = $list.value($list.options('selected')[0]),
             editable = item.user == pandora.user.username
                 || pandora.site.capabilities.canEditDocuments[pandora.user.level],
@@ -482,28 +482,36 @@ pandora.ui.documentsPanel = function(options) {
             width = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE;
         return isItemView
             ? Ox.Element()
+                .css({textAlign: 'center'})
                 .append(
-                    Ox.$('<div>').css({height: '16px'})
+                    Ox.$('<div>').css({height: '8px'})
                 )
                 .append(
-                    $title = Ox.EditableContent({
-                        editable: false,
+                    $name = Ox.EditableContent({
+                        editable: editable,
                         value: item.name,
                         width: width
                     })
                     .css({
-                        margin: '0 4px',
                         textAlign: 'center',
                         fontWeight: 'bold'
                     })
                     .bindEvent({
                         edit: function() {
-                            $title.options({
+                            $name.options({
                                 width: that.width()
                             });
                         },
-                        submit: function() {
-                            // ...
+                        submit: function(data) {
+                            pandora.api.editDocument({
+                                name: data.value,
+                                id: item.id,
+                                item: ui.item,
+                            }, function(result) {
+                                $name.options({value: result.data.name});
+                                Ox.Request.clearCache('findDocuments');
+                                $list.reloadList();
+                            });
                         }
                     })
                 )
@@ -512,6 +520,7 @@ pandora.ui.documentsPanel = function(options) {
                 )
                 .append(
                     $description = Ox.EditableContent({
+                        editable: editable,
                         format: function(value) {
                             return '<div class="OxLight" style="text-align: center">'
                                 + value + '</div>';
@@ -523,7 +532,7 @@ pandora.ui.documentsPanel = function(options) {
                         width: width
                     })
                     .css({
-                        marginLeft: '8px',
+                        margin: '0 8px',
                         textAlign: 'center'
                     })
                     .bindEvent({
