@@ -737,7 +737,7 @@ pandora.ui.mainMenu = function() {
                 }
             },
             pandora_listview: function(data) {
-                that.checkItem('viewMenu_items_' + data.value);
+                that.checkItem('viewMenu_movies_' + data.value);
                 if (
                     pandora.isClipView() != pandora.isClipView(data.previousValue)
                     || pandora.isVideoView() != pandora.isVideoView(data.previousValue)
