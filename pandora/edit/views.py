@@ -172,7 +172,9 @@ def _order_clips(qs, sort):
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
-        qs = qs.order_by(*order_by, nulls_last=True)
+        #fixme use nulls_last
+        #qs = qs.order_by(*order_by, nulls_last=True)
+        qs = qs.order_by(*order_by)
     qs = qs.distinct()
     return qs
 
