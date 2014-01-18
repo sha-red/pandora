@@ -859,6 +859,7 @@
                     "featured": true
                 }
             },
+            "showReflections": true,
             "showSidebar": true,
             "showSitePosters": false,
             "showTimeline": true,
