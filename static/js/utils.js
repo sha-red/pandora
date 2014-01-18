@@ -937,7 +937,7 @@ pandora.getDownloadLink = function(item, rightslevel) {
         torrent = false;
     }
     return '/' + item + (torrent ? '/torrent/' : '/download/');
-}
+};
 
 pandora.getEditTooltip = function(title) {
     return function(e) {
@@ -1056,7 +1056,7 @@ pandora.getInfoHeight = function(section, includeHidden) {
         );
     }
     return height;
-}
+};
 
 pandora.getItem = function(state, str, callback) {
     if (state.type == pandora.site.itemName.plural.toLowerCase()) {
@@ -1145,7 +1145,7 @@ pandora.getItem = function(state, str, callback) {
     } else {
         callback();
     }
-}
+};
 
 pandora.getItemFind = function(find) {
     var itemFind = '';
@@ -1650,7 +1650,7 @@ pandora.getVideoURL = function(id, resolution, part) {
         .replace('{resolution}', resolution)
         .replace('{uid}', Ox.uid());
     return prefix + '/' + id + '/' + resolution + 'p' + part + '.' + pandora.user.videoFormat;
-}
+};
 
 pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
