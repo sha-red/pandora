@@ -715,6 +715,7 @@ pandora.ui.documentsPanel = function(options) {
         .bindEventOnce({
             load: function() {
                 selectDocuments();
+                !ui.showBrowser && $list.gainFocus();
             }
         });
     }
