@@ -694,7 +694,7 @@ pandora.ui.documentsPanel = function(options) {
             init: function(data) {
                 $listStatus.html(
                     Ox.toTitleCase(Ox.formatCount(data.items, 'document'))
-                    + ', ' + Ox.formatValue(data.size, 'B')
+                    + (isItemView ? '' : ', ' + Ox.formatValue(data.size, 'B'))
                 );
             },
             key_escape: function() {
