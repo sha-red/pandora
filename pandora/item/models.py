@@ -1124,6 +1124,8 @@ class Item(models.Model):
             media_path = v.media.path
             if isinstance(media_path, unicode):
                 media_path = media_path.encode('utf-8')
+            if isinstance(video, unicode):
+                video = video.encode('utf-8')
             os.symlink(media_path, video)
             size = v.media.size
             duration = v.duration
@@ -1137,6 +1139,8 @@ class Item(models.Model):
                 media_path = v.media.path
                 if isinstance(media_path, unicode):
                     media_path = media_path.encode('utf-8')
+                if isinstance(video, unicode):
+                    video = video.encode('utf-8')
                 os.symlink(media_path, video)
                 size += v.media.size
                 duration += v.duration
