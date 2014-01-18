@@ -643,13 +643,14 @@ class Item(models.Model):
         for key in [
             'duration', 'aspectratio',
             'hue', 'saturation', 'lightness',
-            'volume', 'cutsperminute'
+            'volume', 'cutsperminute', 'wordsperminute'
         ]:
             value = data.get(key, 0)
             if value:
                 info.append('<b>%s:</b> %s' % (
                     'Aspect Ratio' if key == 'aspectratio'
                     else 'Cuts per Minute' if key == 'cutsperminute'
+                    else 'Words per Minute' if key == 'wordsperminute'
                     else key.capitalize(),
                     ox.format_duration(value * 1000 if value else 0, milliseconds=False) if key == 'duration'
                     else '%.3f:1' % value if key == 'aspectratio'
