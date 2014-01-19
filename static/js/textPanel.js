@@ -325,7 +325,7 @@ pandora.ui.textHTML = function(text) {
                 width: width + 'px',
                 //marginTop: '48px',
                 fontSize: '12px',
-                lineHeight: '16px'
+                lineHeight: '18px'
             })
             .bindEvent({
                 submit: function(data) {
