@@ -252,9 +252,9 @@ pandora.ui.textHTML = function(text) {
                 data.value && data.value.name && scrollToPosition();
             }),
         scrolling = false,
-        $content = Ox.Element().css({
-                margin: '16px',
-        }).appendTo(that),
+        $content = Ox.Element()
+            .css({margin: '16px'})
+            .appendTo(that),
 
         $title = Ox.EditableContent({
                 editable: text.name ? text.editable : false,
@@ -324,7 +324,8 @@ pandora.ui.textHTML = function(text) {
                 //height: height + 'px',
                 width: width + 'px',
                 //marginTop: '48px',
-                fontSize: '12px'
+                fontSize: '12px',
+                lineHeight: '16px'
             })
             .bindEvent({
                 submit: function(data) {
