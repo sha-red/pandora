@@ -49,7 +49,7 @@ pandora.ui.findElement = function() {
                             ),
                             overlap: 'right',
                             value: findKey,
-                            width: 112
+                            width: 128
                         })
                         .bindEvent({
                             change: function(data) {

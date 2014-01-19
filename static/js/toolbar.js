@@ -31,7 +31,7 @@ pandora.ui.toolbar = function() {
                 position: 'absolute',
                 left: getListTitleLeft() + 'px',
                 top: '4px',
-                right: (ui._list ? 324 : 310) + 'px',
+                right: (ui._list ? 340 : 326) + 'px',
                 width: 'auto'
             })
         : pandora.$ui.itemTitle = Ox.Label({
@@ -42,7 +42,7 @@ pandora.ui.toolbar = function() {
                 position: 'absolute',
                 left: '236px',
                 top: '4px',
-                right: (ui._list ? 324 : 310) + 'px',
+                right: (ui._list ? 340 : 326) + 'px',
                 width: 'auto'
             })
             .hide()
