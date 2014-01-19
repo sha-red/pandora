@@ -8,6 +8,7 @@ pandora.ui.mainMenu = function() {
         findState = pandora.getFindState(ui.find),
         fromMenu = false,
         fullscreenState = Ox.Fullscreen.getState(),
+        lists = {},
         that = Ox.MainMenu({
             extras: pandora.site.menuExtras.map(function(menuExtra) {
                 if (menuExtra == 'user') {
@@ -752,6 +753,7 @@ pandora.ui.mainMenu = function() {
                 ]('findsimilar');
             },
             pandora_section: function(data) {
+                lists = {};
                 that.checkItem('viewMenu_section_' + data.value);
                 that.replaceMenu('listMenu', getListMenu());
                 that.replaceMenu('itemMenu', getItemMenu());
@@ -931,7 +933,7 @@ pandora.ui.mainMenu = function() {
         ] };
     }
 
-    function getListMenu(lists) {
+    function getListMenu() {
         var itemNameSingular = ui.section == 'items' ? 'List' : ui.section == 'edits' ? 'Edit' : 'Text',
             itemNamePlural = ui.section == 'items' ? 'Lists' : ui.section == 'edits' ? 'Edits' : 'Texts';
         return { id: 'listMenu', title: Ox._(itemNameSingular), items: [].concat(
@@ -947,7 +949,7 @@ pandora.ui.mainMenu = function() {
                 return {
                     id: folder + 'lists',
                     title: Ox._(Ox.toTitleCase(folder) + ' ' + itemNamePlural),
-                    items: Ox.isUndefined(lists)
+                    items: Ox.isUndefined(lists[folder])
                         ? [{id: 'loading', title: Ox._('Loading...'), disabled: true}]
                         : lists[folder].length == 0
                         ? [{id: 'nolists', title: Ox._('No ' + Ox.toTitleCase(folder) + ' ' + itemNamePlural), disabled: true}]
@@ -1086,42 +1088,12 @@ pandora.ui.mainMenu = function() {
         return that;
     };
 
-    // fixme: the sidebar makes (almost) the same requests.
-    // is it ok to make them twice, or should the sidebar trigger the menu replace?
-
-    var counter = 0,
-        lists = {},
-        queries = {
-            // fixme: duplicated
-            personal: {conditions: [
-                {key: 'user', value: pandora.user.username, operator: '=='},
-                {key: 'status', value: 'featured', operator: '!='}
-            ], operator: '&'},
-            favorite: {conditions: [
-                {key: 'subscribed', value: true, operator: '='},
-                {key: 'status', value: 'featured', operator: '!='},
-            ], operator: '&'},
-            featured: {conditions: [
-                {key: 'status', value: 'featured', operator: '='}
-            ], operator: '&'}
-        };
-
-    Ox.forEach(queries, function(query, folder) {
-        pandora.api[
-            ui.section == 'items' ? 'findLists'
-            : ui.section == 'edits' ? 'findEdits'
-            : 'findTexts'
-        ]({
-            query: query,
-            keys: ['id', 'name', 'user'],
-            sort: [{key: 'position', operator: '+'}]
-        }, function(result) {
-            lists[folder] = result.data.items;
-            if (++counter == 3) {
-                pandora.$ui.mainMenu.replaceMenu('listMenu', getListMenu(lists));
-            }
-        });
-    });
+    that.updateLists = function(folder, items) {
+        lists[folder] = items;
+        if (Ox.len(lists) == 3) {
+            pandora.$ui.mainMenu.replaceMenu('listMenu', getListMenu());
+        }
+    };
 
     return that;
 

@@ -150,12 +150,17 @@ pandora.ui.folderList = function(id, section) {
                 ], operator: '&'};
             } else if (id == 'featured') {
                 query = {conditions: [
-                    {key: 'status', value: 'featured', operator: '='} // fixme: '==' performs better
+                    {key: 'status', value: 'featured', operator: '='}
                 ], operator: '&'};
             }
             return pandora.api['find' + folderItems](Ox.extend(data, {
                 query: query
-            }), callback);
+            }), function(result) {
+                if (Ox.isArray(result.data.items)) {
+                    pandora.$ui.mainMenu.updateLists(id, result.data.items);
+                }
+                callback(result);
+            });
         };
     } else {
         columns = [
