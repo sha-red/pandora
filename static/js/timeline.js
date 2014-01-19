@@ -31,6 +31,7 @@ pandora.ui.timeline = function(data) {
                 return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
             },
             height: pandora.$ui.contentPanel.size(1),
+            itemName: pandora.site.itemName,
             layers: data.annotations,
             muted: ui.videoMuted,
             position: ui.videoPoints[ui.item].position,

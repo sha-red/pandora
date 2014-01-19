@@ -31,6 +31,7 @@ pandora.ui.player = function(data) {
             },
             height: pandora.$ui.contentPanel.size(1),
             'in': ui.videoPoints[ui.item]['in'],
+            itemName: pandora.site.itemName,
             layers: data.annotations,
             loop: ui.videoLoop,
             muted: ui.videoMuted,

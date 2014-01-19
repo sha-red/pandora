@@ -40,6 +40,7 @@ pandora.ui.editor = function(data) {
             height: pandora.$ui.contentPanel.size(1),
             id: 'editor',
             'in': ui.videoPoints[ui.item]['in'],
+            itemName: pandora.site.itemName,
             layers: data.annotations.map(function(layer) {
                 return Ox.extend({
                     editable: layer.canAddAnnotations[pandora.user.level]
