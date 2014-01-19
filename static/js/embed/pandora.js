@@ -58,6 +58,7 @@ Ox.load('UI', {
                                         : data.posterFrame
                                     ) +'.jpg',
                                     resolution: pandora.user.ui.videoResolution,
+                                    showIcon: true,
                                     showMarkers: false,
                                     showMilliseconds: 0,
                                     subtitles: data.subtitles,
