@@ -521,6 +521,7 @@
         {"id": "data", "title": "Data"},
         {"id": "media", "title": "Media"}
     ],
+    "language": "en",
     "layers": [
         {
             "id": "places",

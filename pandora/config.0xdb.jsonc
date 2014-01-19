@@ -630,6 +630,7 @@
         {"id": "data", "title": "Data"},
         {"id": "media", "title": "Media"}
     ],
+    "language": "en",
     // fixme: should be renamed to annotationLayers
     "layers": [
         {
