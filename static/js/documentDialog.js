@@ -95,7 +95,7 @@ pandora.ui.documentDialog = function(options) {
                             setTitle();
                             setContent();
                         } else {
-                            //
+                            // ...
                         }
                     } else {
                         that.close();
