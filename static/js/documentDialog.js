@@ -2,25 +2,34 @@
 
 'use strict';
 
-pandora.openDocumentDialog = function(ids) {
+pandora.openDocumentDialog = function(options) {
 
-    pandora.api.findDocuments({
-        query: {
-            conditions: ids.map(function(id) {
-                return {key: 'id', value: id, operator: '=='}
-            }),
-            operator: '|'
-        },
-        keys: ['description', 'dimensions', 'extension', 'id', 'name']
-    }, function(result) {
-        var i = 0, documents = result.data.items.map(function(document) {
-            return Ox.extend({index: i++}, document);
+    if (pandora.$ui.documentDialog && options.ids && options.ids.length == 1
+        && Ox.getObjectById(pandora.$ui.documentDialog.getItems(), options.ids[0])){
+        pandora.UI.set({document: options.ids[0]});
+    } else if(options.ids) {
+        pandora.api.findDocuments({
+            query: {
+                conditions: options.ids.map(function(id) {
+                    return {key: 'id', value: id, operator: '=='}
+                }),
+                operator: '|'
+            },
+            range: [0, options.ids.length],
+            keys: ['description', 'dimensions', 'extension', 'id', 'name']
+        }, function(result) {
+            var i = 0, documents = Ox.sort(result.data.items, function(item) {
+                return options.ids.indexOf(item.id);
+            }).map(function(document) {
+                return Ox.extend({index: i++}, document);
+            });
+            pandora.openDocumentDialog({documents: documents});
         });
-
+    } else {
         if (!pandora.$ui.documentDialog) {
             pandora.$ui.documentDialog = pandora.ui.documentDialog({
                 index: 0,
-                items: documents,
+                items: options.documents,
             })
             .bindEvent({
                 close: function() {
@@ -31,14 +40,15 @@ pandora.openDocumentDialog = function(ids) {
         } else {
             pandora.$ui.documentDialog.update({
                 index: 0,
-                items: documents,
+                items: options.documents
             });
         }
         pandora.UI.set({
             page: 'documents',
-            'part.documents': documents[0].id
+            'part.documents': options.documents[0].id
         });
-    });
+        return pandora.$ui.documentDialog;
+    }
 };
 
 pandora.ui.documentDialog = function(options) {
@@ -47,13 +57,7 @@ pandora.ui.documentDialog = function(options) {
         dialogWidth = Math.round(window.innerWidth * 0.9),
         items = options.items,
         item = items[options.index],
-        settings = Ox.extend(item.extension == 'pdf' ? {
-            page: 1,
-            zoom: 'fit'
-        } : {
-            center: 'auto',
-            zoom: 'fit'
-        }, pandora.user.ui.documents[item.id] || {}),
+        settings = getSettings(),
     
         $content = Ox.Element(),
 
@@ -86,9 +90,12 @@ pandora.ui.documentDialog = function(options) {
                 pandora_document: function(data) {
                     if (data.value) {
                         if (Ox.getObjectById(items, data.value)) {
-                            // ...
+                            item = Ox.getObjectById(items, data.value);
+                            settings = getSettings();
+                            setTitle();
+                            setContent();
                         } else {
-                            // ...
+                            //
                         }
                     } else {
                         that.close();
@@ -128,6 +135,16 @@ pandora.ui.documentDialog = function(options) {
 
     setTitle();
     setContent();
+
+    function getSettings() {
+        return Ox.extend(item.extension == 'pdf' ? {
+            page: 1,
+            zoom: 'fit'
+        } : {
+            center: 'auto',
+            zoom: 'fit'
+        }, pandora.user.ui.documents[item.id] || {});
+    }
 
     function setContent() {
         $content.replaceWith(
@@ -180,6 +197,9 @@ pandora.ui.documentDialog = function(options) {
         that.options({title: item.name + '.' + item.extension});
     }
 
+    that.getItems = function() {
+        return items;
+    };
     that.update = function(options) {
         items = options.items;
         item = items[options.index];

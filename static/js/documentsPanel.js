@@ -7,6 +7,7 @@ pandora.ui.documentsPanel = function(options) {
     var ui = pandora.user.ui,
         hasItemView = false, // FIXME
         isItemView = options.isItemView,
+        listLoaded = false,
 
         columns = [
             {
@@ -301,7 +302,18 @@ pandora.ui.documentsPanel = function(options) {
         .css({float: 'right', margin: '4px 2px'})
         .bindEvent({
             click: function(data) {
-                
+                var selected = $list.options('selected');
+                if (data.id == 'next') {
+                    selected.push(selected.shift());
+                } else {
+                    selected.splice(0, 0, selected.pop());
+                }
+                $list.options('selected', selected);
+                $item.empty();
+                if (selected.length) {
+                    $preview = renderPreview().appendTo($item);
+                    $data = renderData().appendTo($item);
+                }
             }
         })
         .appendTo($itemBar),
@@ -455,7 +467,15 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function openDocuments() {
-        pandora.openDocumentDialog($list.options('selected'));
+        pandora.openDocumentDialog({
+            documents: $list.options('selected').map(function(id) {
+                return $list.value(id);
+            })
+        }).bindEvent({
+            close: function() {
+                $list.closePreview();
+            }
+        });
     }
 
     function openDocumentsDialog() {
@@ -714,6 +734,7 @@ pandora.ui.documentsPanel = function(options) {
         })
         .bindEventOnce({
             load: function() {
+                listLoaded = true;
                 selectDocuments();
                 !ui.showBrowser && $list.gainFocus();
             }
@@ -759,6 +780,9 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function selectDocuments() {
+        if(!listLoaded) {
+            return;
+        }
         var selected = ui.documentsSelection[isItemView ? ui.item : ''] || [],
             string = selected.length < 2 ? 'Document' : ' Documents';
         $list.options({selected: selected});

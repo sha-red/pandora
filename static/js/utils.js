@@ -1409,7 +1409,7 @@ pandora.getPart = function(state, str, callback) {
         }
     } else if (state.page == 'documents') {
         var split = str.split('/')[0],
-            id = split[0];
+            id = split;
         if (id) {
             pandora.api.findDocuments({
                 query: {

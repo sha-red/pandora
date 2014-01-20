@@ -73,7 +73,9 @@ pandora.ui.appPanel = function() {
             pandora.$ui.home && pandora.$ui.tv.mute();
         } else if (page == 'documents') {
             if (pandora.user.ui.part.documents) {
-                pandora.openDocumentDialog([pandora.user.ui.part.documents.split('/')[0]]);
+                pandora.openDocumentDialog({
+                    ids: [pandora.user.ui.part.documents.split('/')[0]]
+                });
             } else {
                 pandora.UI.set({page: ''});
             }
