@@ -90,6 +90,7 @@ def getText(request):
         if qs.count() == 0:
             text = None
             response['data'] = {
+                    'id': '',
                     'name': '',
                     'text': '',
                     'type': 'html',
