@@ -32,12 +32,14 @@ appPanel
     };
 
     // handle legacy embed and print URLs
-    document.location.hash = document.location.hash.replace(
-        /^#\?(embed|print)=true(&)?/,
-        function() {
-            return '#' + arguments[1] + (arguments[2] ? '?' : '');
-        }
-    );
+    if ( document.location.hash) {
+        document.location.hash = document.location.hash.replace(
+            /^#\?(embed|print)=true(&)?/,
+            function() {
+                return '#' + arguments[1] + (arguments[2] ? '?' : '');
+            }
+        );
+    }
 
     var animationInterval,
         enableDebugMode = getLocalStorage('pandora.enableDebugMode'),
