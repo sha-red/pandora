@@ -498,7 +498,9 @@ pandora.ui.textEmbed = function() {
     that.update = function(url) {
         var parsed, src;
         if (url) {
-            url = url.replace(/&amp;/g, '&') + '&matchRatio=true';
+            url = url.replace(/&amp;/g, '&')
+                + (url.indexOf('#embed') < url.indexOf('?') ? '&' : '?')
+                + 'matchRatio=true';
             src = $iframe.attr('src');
             parsed = {src: Ox.parseURL(src), url: Ox.parseURL(url)};
             if (
