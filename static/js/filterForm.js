@@ -65,16 +65,15 @@ pandora.ui.filterForm = function(list) {
     that.updateResults = function() {
         if (list) {
             Ox.Request.clearCache(list.id);
-            pandora.$ui.list
-                .bindEventOnce({
-                    init: function(data) {
-                        pandora.$ui.folderList[
-                            pandora.getListData().folder
-                        ].value(list.id, 'query', that.$filter.options('query'));
-                    }
-                })
-                .reloadList();
-            pandora.$ui.filters.forEach(function($filter) {
+            pandora.$ui.list && pandora.$ui.list.bindEventOnce({
+                init: function(data) {
+                    pandora.$ui.folderList[
+                        pandora.getListData().folder
+                    ].value(list.id, 'query', that.$filter.options('query'));
+                }
+            })
+            .reloadList();
+            pandora.$ui.filters && pandora.$ui.filters.forEach(function($filter) {
                 $filter.reloadList();
             });
         } else {
