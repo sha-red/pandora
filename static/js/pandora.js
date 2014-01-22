@@ -230,7 +230,7 @@ appPanel
         if (enableDebugMode) {
             Ox.getJSON(prefix + 'json/pandora.json?' + Ox.random(1000), function(files) {
                 Ox.getFile(files.map(function(file) {
-                    return prefix + file;
+                    return prefix + file + '?' + getPandoraVersion();
                 }), callback);
             });
         } else {
