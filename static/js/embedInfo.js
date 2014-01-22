@@ -2,11 +2,19 @@
 
 pandora.ui.embedInfo = function() {
 
-    var item = pandora.user.ui.item,
-
-        data,
-
-        that = Ox.Element();
+    var data,
+        item = pandora.user.ui.item,
+        poster = {
+            size: 256
+        },
+        textCSS = {
+            marginTop: '8px',
+            fontWeight: 'bold',
+            fontSize: '13px',
+            textAlign: 'center'
+        },
+        that = Ox.Element(),
+        $icon, $reflection, $text;
 
     pandora.api.get({
         id: item,
@@ -15,76 +23,67 @@ pandora.ui.embedInfo = function() {
 
         data = result.data;
 
-        var posterSize = 256,
-            posterWidth = Math.round(
-                data.posterRatio > 1
-                ? posterSize
-                : posterSize * data.posterRatio
-            ),
-            posterHeight = Math.round(
-                data.posterRatio > 1
-                ? posterSize / data.posterRatio
-                : posterSize
-            ),
-            posterLeft = Math.floor(
-                (window.innerWidth - posterWidth) / 2
-            ),
-            textCSS = {
-                marginTop: '8px',
-                fontWeight: 'bold',
-                fontSize: '13px',
-                textAlign: 'center'
-            },
+        poster.width = Math.round(
+            data.posterRatio > 1
+            ? poster.size
+            : poster.size * data.posterRatio
+        );
+        poster.height = Math.round(
+            data.posterRatio > 1
+            ? poster.size / data.posterRatio
+            : poster.size
+        );
+        poster.left = Math.floor((window.innerWidth - poster.width) / 2);
 
-            $icon = Ox.$('<img>')
-                .attr({src: '/' + item + '/poster256.jpg'})
-                .css({
-                    position: 'absolute',
-                    left: posterLeft + 'px',
-                    top: '8px',
-                    width: posterWidth + 'px',
-                    height: posterHeight + 'px',
-                    cursor: 'pointer'
-                })
-                .appendTo(that),
+        $icon = Ox.$('<img>')
+            .attr({src: '/' + item + '/poster256.jpg'})
+            .css({
+                position: 'absolute',
+                left: poster.left + 'px',
+                top: '8px',
+                width: poster.width + 'px',
+                height: poster.height + 'px',
+                cursor: 'pointer'
+            })
+            .appendTo(that);
 
-            $reflection = Ox.$('<div>')
-                .addClass('OxReflection')
-                .css({
-                    position: 'absolute',
-                    left: posterLeft + 'px',
-                    top: posterHeight + 8 + 'px',
-                    width: '256px',
-                    height: '128px',
-                    overflow: 'hidden'
-                })
-                .appendTo(that),
+        $reflection = Ox.$('<div>')
+            .addClass('OxReflection')
+            .css({
+                position: 'absolute',
+                left: poster.left + 'px',
+                top: poster.height + 8 + 'px',
+                width: '256px',
+                height: '128px',
+                overflow: 'hidden'
+            })
+            .appendTo(that);
 
-            $reflectionIcon = Ox.$('<img>')
-                .attr({src: '/' + item + '/poster256.jpg'})
-                .css({
-                    position: 'absolute',
-                    width: posterWidth + 'px',
-                    height: posterHeight + 'px'
-                })
-                .appendTo($reflection),
+        Ox.$('<img>')
+            .attr({src: '/' + item + '/poster256.jpg'})
+            .css({
+                position: 'absolute',
+                width: poster.width + 'px',
+                height: poster.height + 'px'
+            })
+            .appendTo($reflection);
 
-            $reflectionGradient = Ox.$('<div>')
-                .css({
-                    position: 'absolute',
-                    width: '256px',
-                    height: '128px'
-                })
-                .appendTo($reflection),
+        Ox.$('<div>')
+            .css({
+                position: 'absolute',
+                width: '256px',
+                height: '128px'
+            })
+            .appendTo($reflection);
 
-            $text = Ox.$('<div>')
-                .css({
-                    position: 'absolute',
-                    left: '8px',
-                    top: 8 + 8 + posterHeight + 'px',
-                    right: '8px'
-                })
-                .appendTo(that);
+        $text = Ox.$('<div>')
+            .css({
+                position: 'absolute',
+                left: '8px',
+                top: 8 + 8 + poster.height + 'px',
+                right: '8px'
+            })
+            .appendTo(that);
 
         Ox.$('<div>')
             .css(textCSS)
@@ -99,6 +98,12 @@ pandora.ui.embedInfo = function() {
         }
 
     });
+
+    that.resizePanel = function() {
+        poster.left = Math.floor((window.innerWidth - poster.width) / 2);
+        $icon.css({left: poster.left + 'px'});
+        $reflection.css({left: poster.left + 'px'});
+    };
 
     return that;
 
