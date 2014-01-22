@@ -140,7 +140,12 @@ class Text(models.Model):
             elif key == 'description':
                 self.description = ox.sanitize_html(data['description'], global_attributes=['lang'])
             elif key == 'text':
-                self.text = ox.sanitize_html(data['text'], global_attributes=['data-name', 'lang'])
+                self.text = ox.sanitize_html(data['text'], global_attributes=[
+                    'data-name',
+                    'data-type',
+                    'data-value',
+                    'lang'
+                ])
             elif key == 'rightslevel':
                 self.rightslevel = int(data['rightslevel'])
 
