@@ -339,7 +339,7 @@ pandora.ui.textHTML = function(text) {
             })
             .appendTo($content);
 
-    scrollToPosition();
+    setTimeout(scrollToPosition);
 
     function getHeight() {
         // 24 menu + 24 toolbar + 16 statusbar + 32 title + 32 margins
