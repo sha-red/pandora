@@ -19,7 +19,7 @@ pandora.ui.embedPanel = function() {
             }
         } else {
             if (view == 'info') {
-                that = pandora.ui.embedError(true);
+                that = pandora.ui.embedInfo();
             } else if (Ox.contains(['player', 'editor'], view)) {
                 that = pandora.ui.embedPlayer();
             } else if (view == 'timeline') {
