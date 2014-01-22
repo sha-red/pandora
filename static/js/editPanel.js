@@ -392,9 +392,14 @@ pandora.ui.editPanel = function() {
                 items: Ox.flatten(clips.map(function(clip) {
                     return clip.layers[layer.id].map(function(annotation) {
                         var a = Ox.clone(annotation);
-                        ['in', 'out'].forEach(function(point) {
-                            a[point] = a[point] - clip['in'] + clip['position'];
-                        });
+                        a['in'] = Math.max(
+                            clip['position'],
+                            a['in'] - clip['in'] + clip['position']
+                        );
+                        a.out = Math.min(
+                            clip['position'] + clip['duration'],
+                            a.out - clip['in'] + clip['position']
+                        );
                         return a;
                     });
                 })),
