@@ -48,6 +48,13 @@ class Edit(models.Model):
 
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.user)
+
+    @classmethod
+    def get(cls, id):
+        id = id.split(':')
+        username = id[0]
+        name = ":".join(id[1:])
+        return cls.objects.get(user__username=username, name=name)
     
     def get_id(self):
         return u'%s:%s' % (self.user.username, self.name)
@@ -360,7 +367,34 @@ class Clip(models.Model):
                 data[key] = value
         data['duration'] = data['out'] - data['in']
         data['cuts'] = tuple([c for c in self.item.get('cuts') if c > self.start and c < self.end])
+        data['layers'] = self.get_layers(user)
         return data
+
+    def get_layers(self, user=None):
+        if self.annotation:
+            start = self.annotation.start
+            end = self.annotation.end
+            item = self.annotation.item
+        else:
+            start = self.start
+            end = self.end
+            item = self.item
+        layers = {}
+        for l in settings.CONFIG['layers']:
+            name = l['id']
+            ll = layers.setdefault(name, [])
+            qs = Annotation.objects.filter(layer=name, item=item).order_by(
+                    'start', 'end', 'sortvalue')
+            if name == 'subtitles':
+                qs = qs.exclude(value='')
+            qs = qs.filter(start__lt=end, end__gt=start)
+            if l.get('private'):
+                if user and user.is_anonymous():
+                    user = None
+                qs = qs.filter(user=user)
+            for a in qs.order_by('start'):
+                ll.append(a.json(user=user))
+        return layers
 
 class Position(models.Model):
 

@@ -78,6 +78,13 @@ pandora.ui.editPanel = function() {
 
     function renderEdit() {
         that = pandora.$ui.editPanel = Ox.VideoEditPanel({
+            annotationsCalendarSize: ui.annotationsCalendarSize,
+            annotationsFont: ui.annotationsFont,
+            annotationsMapSize: ui.annotationsMapSize,
+            annotationsRange: ui.annotationsRange,
+            annotationsSize: ui.annotationsSize,
+            annotationsSort: ui.annotationsSort,
+            clickLink: pandora.clickLink,
             clips: Ox.clone(edit.clips),
             clipSize: listSize,
             clipSort: ui.edits[ui.edit].sort,
@@ -97,6 +104,7 @@ pandora.ui.editPanel = function() {
             },
             height: pandora.$ui.appPanel.size(1),
             'in': ui.edits[ui.edit]['in'],
+            layers: getLayers(edit.clips),
             loop: ui.videoLoop,
             muted: ui.videoMuted,
             out: ui.edits[ui.edit].out,
@@ -104,8 +112,12 @@ pandora.ui.editPanel = function() {
             resolution: ui.videoResolution,
             scaleToFill: ui.videoScale == 'fill',
             selected: ui.edits[ui.edit].selection,
+            showAnnotationsCalendar: ui.showAnnotationsCalendar,
+            showAnnotationsMap: ui.showAnnotationsMap,
             showClips: ui.showClips,
+            showLayers: ui.showLayers,
             showTimeline: ui.showTimeline,
+            showUsers: pandora.site.annotations.showUsers,
             smallTimelineURL: getSmallTimelineURL(),
             sort: ui.edits[ui.edit].sort,
             sortOptions: [
@@ -371,6 +383,26 @@ pandora.ui.editPanel = function() {
         updateVideos();
     }
 
+    function getLayers(clips) {
+        var layers = [];
+        pandora.site.layers.forEach(function(layer, i) { 
+            layers[i] = Ox.extend({}, layer, {
+                title: Ox._(layer.title),
+                item: Ox._(layer.item),
+                items: Ox.flatten(clips.map(function(clip) {
+                    return clip.layers[layer.id].map(function(annotation) {
+                        var a = Ox.clone(annotation);
+                        ['in', 'out'].forEach(function(point) {
+                            a[point] = a[point] - clip['in'] + clip['position'];
+                        });
+                        return a;
+                    });
+                })),
+            });
+        });
+        return layers;
+    }
+
     function serializeClips(clips) {
         // can be ids or clips
         return clips.map(function(clip) {
@@ -394,6 +426,7 @@ pandora.ui.editPanel = function() {
         that.options({
             clips: Ox.clone(edit.clips),
             duration: edit.duration,
+            layers: getLayers(edit.clips),
             smallTimelineURL: getSmallTimelineURL(),
             video: getVideos()
         });
