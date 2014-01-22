@@ -23,6 +23,11 @@ pandora.ui.embedInfo = function() {
                 top: margin + 'px',
                 cursor: 'pointer'
             })
+            .on({
+                click: function() {
+                    window.open('/' + item + '/info', '_blank');
+                }
+            })
             .appendTo(that);
 
         $reflection = Ox.$('<div>')
@@ -60,7 +65,12 @@ pandora.ui.embedInfo = function() {
                 fontSize: '13px',
                 textAlign: 'center'
             })
-            .html(data.title + (data.year ? ' (' + data.year + ')' : ''))
+            .html(data.title + (
+                data.year
+                ? ' (<a href="/year=' + data.year
+                    + '" target="_blank">' + data.year + '</a>)'
+                : ''
+            ))
             .appendTo($text);
 
         if (data.director) {
