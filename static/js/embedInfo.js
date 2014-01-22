@@ -4,12 +4,7 @@ pandora.ui.embedInfo = function() {
 
     var data,
         item = pandora.user.ui.item,
-        textCSS = {
-            marginTop: '8px',
-            fontWeight: 'bold',
-            fontSize: '13px',
-            textAlign: 'center'
-        },
+        margin = 16,
         that = Ox.Element(),
         $icon, $reflection, $reflectionIcon, $reflectionGradient,
         $text;
@@ -25,7 +20,7 @@ pandora.ui.embedInfo = function() {
             .attr({src: '/' + item + '/poster512.jpg'})
             .css({
                 position: 'absolute',
-                top: '8px',
+                top: margin + 'px',
                 cursor: 'pointer'
             })
             .appendTo(that);
@@ -54,19 +49,28 @@ pandora.ui.embedInfo = function() {
         $text = Ox.$('<div>')
             .css({
                 position: 'absolute',
-                left: '8px',
-                right: '8px'
+                left: margin + 'px',
+                right: margin + 'px'
             })
             .appendTo(that);
 
         Ox.$('<div>')
-            .css(textCSS)
+            .css({
+                fontWeight: 'bold',
+                fontSize: '13px',
+                textAlign: 'center'
+            })
             .html(data.title + (data.year ? ' (' + data.year + ')' : ''))
             .appendTo($text);
 
         if (data.director) {
             Ox.$('<div>')
-                .css(textCSS)
+                .css({
+                    marginTop: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '13px',
+                    textAlign: 'center'
+                })
                 .html(data.director.map(function(director) {
                     // fixme: there should be a utils method for this
                     return '<a href="/name='
@@ -81,9 +85,9 @@ pandora.ui.embedInfo = function() {
     });
 
     that.resizePanel = function() {
-        var posterSize = Math.floor(
-                (Math.min(window.innerWidth, window.innerHeight) - 16) * 2/3
-            ),
+        var posterSize = Math.floor((Math.min(
+                window.innerWidth, window.innerHeight
+            ) - 2 * margin) * 2/3),
             posterWidth = Math.round(
                 data.posterRatio > 1
                 ? posterSize
@@ -102,7 +106,7 @@ pandora.ui.embedInfo = function() {
         });
         $reflection.css({
             left: posterLeft + 'px',
-            top: posterHeight + 8 + 'px',
+            top: posterHeight + margin + 'px',
             width: posterWidth + 'px',
             height: Math.round(posterHeight / 2) + 'px'
         });
@@ -115,7 +119,7 @@ pandora.ui.embedInfo = function() {
             height: Math.round(posterHeight / 2) + 'px'
         });
         $text.css({
-            top: 8 + 8 + posterHeight + 'px'
+            top: 2 * margin + posterHeight + 'px'
         });
         return that;
     };
