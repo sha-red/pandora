@@ -45,7 +45,7 @@ pandora.ui.textPanel = function() {
             $nextButton = Ox.Button({
                     disabled: embedURLs.length < 2,
                     title: 'arrowRight',
-                    tooltip: Ox._('Next Clip'),
+                    tooltip: Ox._('Next Reference'),
                     type: 'image'
                 })
                 .css({
@@ -80,7 +80,7 @@ pandora.ui.textPanel = function() {
             $previousButton = Ox.Button({
                     disabled: embedURLs.length < 2,
                     title: 'arrowLeft',
-                    tooltip: Ox._('Previous Clip'),
+                    tooltip: Ox._('Previous Reference'),
                     type: 'image'
                 })
                 .css({
