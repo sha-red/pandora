@@ -10,7 +10,9 @@ pandora.ui.embedPanel = function() {
 
     if (ui.section != 'texts' && !ui.page) {
         if (!ui.item) {
-            if (Ox.contains(['grid', 'clip'], view)) {
+            if (view == 'grid') {
+                that = pandora.ui.embedGrid();
+            } else if (view == 'clip') {
                 that = pandora.ui.embedError(true);
             } else if (view == 'video') {
                 that = pandora.ui.videoView(true);
