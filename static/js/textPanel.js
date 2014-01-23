@@ -295,6 +295,49 @@ pandora.ui.textHTML = function(text) {
                 collapseToEnd: false,
                 editable: text.editable,
                 format: function(text) {
+                    /*
+                    var $text = $('<div>').html(text),
+                        $chapterElement = $text.find('[data-type="chapters"]')[0],
+                        $footnoteElement = $text.find('[data-type="footnotes"]')[0],
+                        $keywordElement = $text.find('[data-type="keywords"]')[0],
+                        $chapters = [],
+                        $footnotes = [],
+                        $keywords = [],
+                        footnote = 0,
+                        keywords = [];
+                    // chapters
+                    $text.find('[data-type="chapter"]').each(function(index, element) {
+                        var $element = $(element),
+                            name = $element.attr('data-name') || $element.html(),
+                            level;
+                        Ox.loop(1, 7, function(i) {
+                            if ($element.is('h' + i)) {
+                                level = i;
+                                return false; // break
+                            }
+                        });
+                        if (!level) {
+                            level = name.split(' ')[0].split('.').length || 1;
+                        }
+                    });
+                    // footnotes
+                    $text.find('[data-type="footnote"]').each(function(index, element) {
+                        var $element = $(element),
+                            value = $element.attr('data-value');
+                        footnote = value ? parseInt(value) : footnote + 1;
+                    });
+                    // keywords
+                    $text.find('[data-type="keywords"]').each(function(index, element) {
+                        var $element = $(element),
+                            value = $element.attr('data-value') || element.html();
+                        keywords.append(value);
+                    });
+                    $keywords = Ox.map(Ox.sort(Ox.unique(keywords)), function(keyword) {
+                        return $('<a>').attr({href: '#'}).html(keyword);
+                    });
+                    text = $text.html();
+                    */
+                    // embeds
                     var index = 0;
                     return text.replace(
                         /<a [^<>]*?href="(.+?)".*?>/gi,
