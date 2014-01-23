@@ -57,12 +57,33 @@ pandora.ui.embedGrid = function() {
         })
         .addClass('OxMedia')
         .bindEvent({
-            open: function() {
-                window.open('/' + item + '', '_blank');
+            init: function(data) {
+                $status.html(
+                    (data.items ? Ox.formatNumber(data.items) : Ox._('No'))
+                    + ' ' + pandora.site.itemName[
+                        data.items == 1 ? 'singular' : 'plural'
+                    ]
+                );
+            },
+            open: function(data) {
+                window.open('/' + data.ids[0] + '', '_blank');
             }
         }),
 
-        $statusbar = Ox.Bar({size: 16}),
+        $statusbar = Ox.Bar({size: 16})
+            .css({
+                textAlign: 'center'
+            }),
+
+        $status = Ox.Element()
+            .css({
+                margin: '2px 4px',
+                fontSize: '9px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+            })
+            .html(Ox._('Loading...'))
+            .appendTo($statusbar),
 
         that = Ox.SplitPanel({
             elements: [
