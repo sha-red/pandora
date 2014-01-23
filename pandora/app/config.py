@@ -62,6 +62,13 @@ def load_config():
         if not 'folderdepth' in config['site']:
             config['site']['folderdepth'] = settings.USE_IMDB and 4 or 3
 
+        # enable default filters if needed
+        default_filters = [f['id'] for f in config['user']['ui']['filters']]
+        for key in config['itemKeys']:
+            if key['id'] in default_filters and not key.get('filter'):
+                key['filter'] = True
+                sys.stderr.write('enabled filter for "%s" since its used as default filter.\n' % (key['id']))
+
         config['keys'] = {}
         for key in config['itemKeys']:
             config['keys'][key['id']] = key
@@ -129,6 +136,7 @@ To fix this on Ubuntu 12.04, run:
 check the README for further details.
 
 ''' % AVCONV)
+
         settings.CONFIG = config
         admin = len(settings.CONFIG['userLevels']) - 1
         if not 'syncdb' in sys.argv \
