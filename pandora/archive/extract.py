@@ -254,6 +254,7 @@ def stream(video, target, profile, info, avconv=None):
         t = "%s.mp4" % target if format == 'mp4' else target
         if os.path.exists(t):
             os.unlink(t)
+        stdout = stdout.replace('\r\n', '\n').replace('\r', '\n')
         return False, stdout
     if format == 'mp4':
         cmd = ['qt-faststart', "%s.mp4" % target, target]
