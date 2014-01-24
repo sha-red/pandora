@@ -388,10 +388,16 @@ class File(models.Model):
         return [self.path] + [i.path for i in self.instances.all()]
 
     def extract_stream(self):
+        '''
+            extract stream from direct upload
+        '''
         import tasks
         return tasks.extract_stream.delay(self.id)
     
     def process_stream(self):
+        '''
+            extract derivatives from webm upload
+        '''
         import tasks
         return tasks.process_stream.delay(self.id)
 
@@ -585,6 +591,10 @@ class Stream(models.Model):
             ok, error = extract.stream(media, target, self.name(), info)
             if ok:
                 self.available = True
+                self.error = ''
+                if self.file.failed:
+                    self.file.failed = False
+                    self.file.save()
             else:
                 self.media = None
                 self.available = False
@@ -604,6 +614,10 @@ class Stream(models.Model):
             ok, error = extract.stream(media, target, self.name(), info, ffmpeg)
             if ok:
                 self.available = True
+                self.error = ''
+                if self.file.failed:
+                    self.file.failed = False
+                    self.file.save()
             else:
                 self.media = None
                 self.available = False
