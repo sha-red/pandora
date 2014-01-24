@@ -4,6 +4,8 @@ pandora.ui.embedGrid = function() {
 
     var ui = pandora.user.ui,
 
+        options = getOptions(),
+
         $list = Ox.IconList({
             borderRadius: ui.icons == 'posters' ? 0 : 16,
             defaultRatio: ui.icons == 'posters' ? pandora.site.posters.ratio : 1,
@@ -70,15 +72,25 @@ pandora.ui.embedGrid = function() {
             }
         }),
 
-        $statusbar = Ox.Bar({size: 16})
-            .css({
-                textAlign: 'center'
-            }),
+        $titlebar = Ox.Bar({size: 16}),
 
-        $status = Ox.Element()
+        $title = Ox.$('<div>')
+            .css({
+                margin: '4px 4px',
+                textAlign: 'center',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+            })
+            .html(options.title || '')
+            .appendTo($titlebar),
+
+        $statusbar = Ox.Bar({size: 16}),
+
+        $status = Ox.$('<div>')
             .css({
                 margin: '2px 4px',
                 fontSize: '9px',
+                textAlign: 'center',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
             })
@@ -86,12 +98,24 @@ pandora.ui.embedGrid = function() {
             .appendTo($statusbar),
 
         that = Ox.SplitPanel({
-            elements: [
+            elements: (options.title ? [
+                {element: $titlebar, size: 24}
+            ] : []).concat([
                 {element: $list},
                 {element: $statusbar, size: 16}
-            ],
+            ]),
             orientation: 'vertical'
         });
+
+    function getOptions() {
+        var options = {};
+        if (ui._hash.query) {
+            ui._hash.query.forEach(function(condition) {
+                options[condition.key] = condition.value;
+            });
+        }
+        return options;
+    }
 
     that.resizePanel = function() {
         $list.size();
