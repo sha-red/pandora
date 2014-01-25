@@ -998,7 +998,7 @@ def atom_xml(request):
 
         entry = ET.Element("entry")
         title = ET.SubElement(entry, "title")
-        title.text = item.get('title')
+        title.text = ox.decode_html(item.get('title'))
         link = ET.SubElement(entry, "link")
         link.attrib['rel'] = 'alternate'
         link.attrib['href'] = "%s/info" % page_link
@@ -1012,7 +1012,7 @@ def atom_xml(request):
         if item.get('director'):
             el = ET.SubElement(entry, "author")
             name = ET.SubElement(el, "name")
-            name.text = u', '.join(item.get('director'))
+            name.text = ox.decode_html(u', '.join(item.get('director')))
         elif item.user:
             el = ET.SubElement(entry, "author")
             name = ET.SubElement(el, "name")
