@@ -52,6 +52,7 @@ pandora.ui.embedGrid = function() {
                 return Ox.clone(data, true);
             },
             keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
+            max: 1,
             selected: ui.listSelection,
             size: 128,
             sort: ui.listSort,
