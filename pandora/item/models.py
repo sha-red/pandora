@@ -697,17 +697,21 @@ class Item(models.Model):
             else:
                 ItemFind.objects.filter(item=self, key=key).delete()
 
+        def get_titles():
+            titles = [self.get('title', 'Untitled')]
+            if self.get('originalTitle'):
+                titles.append(self.get('originalTitle'))
+            at = self.get('alternativeTitles')
+            if at:
+                titles += [a[0] for a in at]
+            return titles
+
+
         with transaction.commit_on_success():
             for key in settings.CONFIG['itemKeys']:
                 i = key['id']
                 if i == 'title':
-                    titles = [self.get('title', 'Untitled')]
-                    if self.get('originalTitle'):
-                        titles.append(self.get('originalTitle'))
-                    at = self.get('alternativeTitles')
-                    if at:
-                        titles += [a[0] for a in at]
-                    save(i, u'\n'.join(titles))
+                    save(i, u'\n'.join(get_titles()))
                 elif i == 'rightslevel':
                     save(i, self.level)
                 elif i == 'filename':
@@ -729,7 +733,9 @@ class Item(models.Model):
                     save(i, value)
 
             for key in self.facet_keys:
-                if key == 'character':
+                if i == 'title':
+                    values = get_titles()
+                elif key == 'character':
                     values = self.get('cast', '')
                     if values:
                         values = filter(lambda x: x.strip(),
