@@ -733,7 +733,7 @@ class Item(models.Model):
                     save(i, value)
 
             for key in self.facet_keys:
-                if i == 'title':
+                if key == 'title':
                     values = get_titles()
                 elif key == 'character':
                     values = self.get('cast', '')
