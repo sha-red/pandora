@@ -37,6 +37,9 @@ pandora.addList = function() {
     var $folderList = pandora.$ui.folderList.personal,
         isDuplicate = arguments.length == 1,
         isSmart, isFrom, list, listData, data;
+    pandora.UI.set({
+        showSidebar: true
+    });
     if (!isDuplicate) {
         isSmart = arguments[0];
         isFrom = arguments[1];
