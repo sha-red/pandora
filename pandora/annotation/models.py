@@ -70,7 +70,7 @@ def get_matches(obj, model, layer_type, qs=None):
             for name in [obj.name] + list(obj.alternativeNames):
                 name = name.lower()
                 name = ox.decode_html(name)
-                if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%re.escape(name)).findall(value)):
+                if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\'"\)\]\-\/\s]|$))'%re.escape(name)).findall(value)):
                     matches.append(a.id)
                     break
     if not matches:
