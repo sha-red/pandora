@@ -238,7 +238,7 @@ class Document(models.Model):
     def get_info(self):
         if self.extension == 'pdf':
             if self.pages == -1:
-                self.width = 1
+                self.width = -1
                 self.height = -1
                 self.pages = utils.pdfpages(self.file.path)
         elif self.width == -1:
