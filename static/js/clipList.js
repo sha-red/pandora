@@ -78,14 +78,19 @@ pandora.ui.clipList = function(videoRatio) {
                     query = {conditions: [], operator: '&'};
                     // if the item query contains a layer condition,
                     // then this condition is added to the clip query
-                    itemsQuery.conditions.forEach(function(condition) {
-                        if (
-                            condition.key == 'annotations'
-                            || Ox.getIndexById(pandora.site.layers, condition.key) > -1
-                        ) {
-                            query.conditions.push(condition);
-                        }
-                    });
+                    addConditions(query, itemsQuery.conditions);
+                    // if a list is selected, check if its a smart list and
+                    // add possible layer conditions from query
+                    if (ui._list) {
+                        pandora.api.getList({id: ui._list}, function(result) {
+                            if (result.data.type == 'smart') {
+                                addConditions(query, result.data.query.conditions);
+                            }
+                            findClips();
+                        });
+                    } else {
+                        findClips();
+                    }
                 } else {
                     itemsQuery = {
                         conditions:[{key: 'id', value: ui.item, operator: '=='}],
@@ -99,11 +104,26 @@ pandora.ui.clipList = function(videoRatio) {
                         }],
                         operator: '&'
                     };
+                    findClips();
                 }
-                pandora.api.findClips(Ox.extend(data, {
-                    itemsQuery: itemsQuery,
-                    query: query
-                }), callback);
+
+                function addConditions(query, conditions) {
+                    conditions.forEach(function(condition) {
+                        if (
+                            condition.key == 'annotations'
+                            || Ox.getIndexById(pandora.site.layers, condition.key) > -1
+                        ) {
+                            query.conditions.push(condition);
+                        }
+                    });
+                }
+
+                function findClips() {
+                    pandora.api.findClips(Ox.extend(data, {
+                        itemsQuery: itemsQuery,
+                        query: query
+                    }), callback);
+                }
             },
             keys: ['annotations', 'id', 'in', 'out'].concat(
                 !ui.item ? ['videoRatio'] : []

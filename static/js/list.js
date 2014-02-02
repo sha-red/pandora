@@ -230,14 +230,16 @@ pandora.ui.list = function() {
                 };
             },
             items: function(data, callback) {
-                pandora.api.find(Ox.extend(data, {
-                    query: ui.find,
-                    clips: {
-                        query: pandora.getClipsQuery(),
-                        items: pandora.getClipsItems(),
-                        keys: []
-                    }
-                }), callback);
+                pandora.getClipsQuery(function(clipsQuery) {
+                    pandora.api.find(Ox.extend(data, {
+                        query: ui.find,
+                        clips: {
+                            query: clipsQuery,
+                            items: pandora.getClipsItems(),
+                            keys: []
+                        }
+                    }), callback);
+                });
                 return Ox.clone(data, true);
             },
             keys: ['clips', 'director', 'duration', 'id', 'modified', 'posterRatio', 'title', 'videoRatio', 'year'],

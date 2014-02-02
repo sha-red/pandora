@@ -847,7 +847,7 @@ pandora.getClipsItems = function(width) {
     return Math.floor((width - 8) / (128 + 8)) - 1;
 };
 
-pandora.getClipsQuery = function() {
+pandora.getClipsQuery = function(callback) {
     // fixme: nice, but not needed
     function addClipsConditions(conditions) {
         conditions.forEach(function(condition) {
@@ -867,7 +867,20 @@ pandora.getClipsQuery = function() {
     };
     addClipsConditions(pandora.user.ui.find.conditions);
     clipsQuery.operator = clipsQuery.conditions.length ? '|' : '&';
-    return clipsQuery;
+    if (callback) {
+        if (pandora.user.ui._list) {
+            pandora.api.getList({id: pandora.user.ui._list}, function(result) {
+                if (result.data.type == 'smart') {
+                    addClipsConditions(result.data.query.conditions);
+                }
+                callback(clipsQuery)
+            });
+        } else {
+                callback(clipsQuery)
+        }
+    } else {
+        return clipsQuery;
+    }
 };
 
 pandora.getClipVideos = function(clip, resolution) {
