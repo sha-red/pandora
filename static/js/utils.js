@@ -1511,7 +1511,6 @@ pandora.getSpan = function(state, val, callback) {
     // event/place name (string), and in that case sets state.span, and may
     // modify state.view.
     // fixme: "subtitles:23" is still missing
-    Ox.print('GET SPAN', state, val)
     if (state.type == pandora.site.itemName.plural.toLowerCase()) {
         var isArray = Ox.isArray(val),
             isName, isVideoView, canBeAnnotation, canBeEvent, canBePlace;

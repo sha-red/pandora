@@ -481,7 +481,6 @@ pandora.ui.home = function() {
                                 });
                             },
                             mousewheel: function(e, delta, deltaX, deltaY) {
-                                Ox.print('mwd', deltaX);
                                 // fixme: arbitrary
                                 scrollToPosition(position + Math.round(deltaX * 2), true);
                             }
