@@ -393,6 +393,10 @@ pandora.ui.documentsPanel = function(options) {
             }
         });
 
+    if (isItemView) {
+        pandora.$ui.documentsList = $list;
+    }
+
     that.bindEvent(
         'pandora_documentsselection.' + (isItemView ? ui.item.toLowerCase() : ''),
         selectDocuments
