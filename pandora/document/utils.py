@@ -17,3 +17,11 @@ def pdfinfo(pdf):
         if key:
             data[key] = ':'.join(parts[1:]).strip()
     return data
+
+def extract_pdfpage(pdf, image, page):
+    page -= 1
+    cmd = ['convert', '%s[%d]' % (pdf, page),
+        '-background', 'white', '-flatten', '-resize', '1024x1024', image]
+    p = subprocess.Popen(cmd)
+    p.wait()
+    return image

@@ -59,8 +59,6 @@ class Document(models.Model):
         if not self.uploading:
             if self.file:
                 self.size = self.file.size
-                if self.extension == 'pdf' and not os.path.exists(self.thumbnail()):
-                    self.make_thumbnail()
                 self.get_info()
 
         self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
@@ -208,15 +206,26 @@ class Document(models.Model):
             return True
         return False
 
-    def thumbnail(self, size=None):
+    def thumbnail(self, size=None, page=None):
         src = self.file.path
-        if self.extension == 'pdf':
-            src = '%s.jpg' % src
+        folder = os.path.dirname(src)
         if size:
             size = int(size)
-            path = src.replace('.jpg', '.%d.jpg'%size)
+            path = os.path.join(folder, '%d.jpg' % size)
         else:
             path = src
+        if self.extension == 'pdf':
+            if page:
+                page = int(page)
+            if page and page > 1 and page <= self.pages:
+                src = os.path.join(folder, '1024p%d.jpg' % page)
+            else:
+                src = os.path.join(folder, '1024p1.jpg')
+                page = 1
+            if not os.path.exists(src):
+                self.extract_page(page)
+            if size:
+                path = os.path.join(folder, '%dp%d.jpg' % (size, page))
         if os.path.exists(src) and not os.path.exists(path):
             image_size = max(self.width, self.height)
             if image_size == -1:
@@ -227,16 +236,14 @@ class Document(models.Model):
                 resize_image(src, path, size=size)
         return path
 
-    def make_thumbnail(self, force=False):
-        thumb = self.thumbnail()
-        if not os.path.exists(thumb) or force:
-            cmd = ['convert', '%s[0]' % self.file.path,
-                '-background', 'white', '-flatten', '-resize', '1024x1024', thumb]
-            p = subprocess.Popen(cmd)
-            p.wait()
+    def extract_page(self, page):
+        pdf = self.file.path
+        image = os.path.join(os.path.dirname(pdf), '1024p%d.jpg' % page)
+        utils.extract_pdfpage(pdf, image, page)
 
     def get_info(self):
         if self.extension == 'pdf':
+            self.thumbnail()
             if self.pages == -1:
                 self.width = -1
                 self.height = -1
@@ -247,7 +254,6 @@ class Document(models.Model):
 
     def get_ratio(self):
         if self.extension == 'pdf':
-            self.make_thumbnail()
             image = self.thumbnail()
             try:
                 size = Image.open(image).size
