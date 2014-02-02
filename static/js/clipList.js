@@ -35,7 +35,9 @@ pandora.ui.clipList = function(videoRatio) {
                 }).map(function(annotation) {
                     return Ox.stripTags(annotation.value.replace(/\n/g, ' '));
                 }).join('; ') : '';
-                url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
+                url = pandora.getMediaURL(
+                    '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg'
+                );
                 sortKey = sort[0].key;
                 if (['text', 'position', 'duration', 'random'].indexOf(sortKey) > -1) {
                     info = Ox.formatDuration(data['in']) + ' - '
@@ -204,7 +206,9 @@ pandora.ui.clipList = function(videoRatio) {
                                     censoredTooltip: pandora.site.cantPlay.text,
                                     height: height,
                                     paused: true,
-                                    poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
+                                    poster: pandora.getMediaURL(
+                                        '/' + item + '/' + height + 'p' + points[0] + '.jpg'
+                                    ),
                                     rewind: true,
                                     video: pandora.getClipVideos({
                                         item: item,

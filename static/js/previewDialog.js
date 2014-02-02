@@ -79,17 +79,17 @@ pandora.ui.previewDialog = function() {
                     item.year ? ' ' + item.year : ''
                 );
             $image = $('<img>')
-                .attr({src: '/' + item.id + '/' + (
+                .attr({src: pandora.getMediaURL('/' + item.id + '/' + (
                     pandora.user.ui.showSitePosters ? 'siteposter' : 'poster'
-                ) + '128.jpg?' + item.modified})
+                ) + '128.jpg?' + item.modified)})
                 .css({width: size.width + 'px', height: size.height + 'px'});
             $('<img>')
                 .load(function() {
                     $image.attr({src: $(this).attr('src')});
                 })
-                .attr({src: '/' + item.id + '/' + (
+                .attr({src: pandora.getMediaURL('/' + item.id + '/' + (
                     pandora.user.ui.showSitePosters ? 'siteposter' : 'poster'
-                ) + '1024.jpg?' + item.modified});
+                ) + '1024.jpg?' + item.modified)});
             that.options({
                     content: $image,
                     title: title,

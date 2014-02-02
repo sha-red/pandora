@@ -34,7 +34,9 @@ pandora.ui.itemClips = function(options) {
                     : a.value > b.value ? 1
                     : 0;
             }),
-            url = '/' + self.options.id + '/' + self.height + 'p' + clip['in'] + '.jpg',
+            url = pandora.getMediaURL(
+                '/' + self.options.id + '/' + self.height + 'p' + clip['in'] + '.jpg'
+            ),
             $item = Ox.IconItem({
                 find: pandora.user.ui.itemFind,
                 imageHeight: self.height,
@@ -106,7 +108,9 @@ pandora.ui.itemClips = function(options) {
                             'in': partsAndPoints.points[0],
                             out: partsAndPoints.points[1],
                             playInToOut: true,
-                            poster: '/' + self.options.id + '/' + self.height + 'p' + points[0] + '.jpg',
+                            poster: pandora.getMediaURL(
+                                '/' + self.options.id + '/' + self.height + 'p' + points[0] + '.jpg'
+                            ),
                             rewind: true,
                             video: partsAndPoints.parts.map(function(i) {
                                 return pandora.getVideoURL(self.options.id, Ox.min(pandora.site.video.resolutions), i + 1);

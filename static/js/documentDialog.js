@@ -162,7 +162,7 @@ pandora.ui.documentDialog = function(options) {
                     center: settings.center,
                     height: dialogHeight,
                     imageHeight: item.dimensions[1],
-                    imagePreviewURL: '/documents/' + item.id + '/256p.jpg',
+                    imagePreviewURL: pandora.getMediaURL('/documents/' + item.id + '/256p.jpg'),
                     imageURL: '/documents/' + item.id + '/'
                         + item.name + '.' + item.extension,
                     imageWidth: item.dimensions[0],

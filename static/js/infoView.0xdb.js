@@ -135,10 +135,10 @@ pandora.ui.infoView = function(data) {
                 ) : ''
             })
             .attr({
-                src: '/' + data.id + '/' + (
+                src: pandora.getMediaURL('/' + data.id + '/' + (
                     ui.icons == 'posters'
                     ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                ) + '512.jpg?' + data.modified
+                ) + '512.jpg?' + data.modified)
             })
             .css({
                 position: 'absolute',
@@ -168,10 +168,10 @@ pandora.ui.infoView = function(data) {
 
         $reflectionIcon = $('<img>')
             .attr({
-                src: '/' + data.id + '/' + (
+                src: pandora.getMediaURL('/' + data.id + '/' + (
                     ui.icons == 'posters'
                     ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                ) + '512.jpg?' + data.modified
+                ) + '512.jpg?' + data.modified)
             })
             .css({
                 position: 'absolute',
@@ -1004,7 +1004,7 @@ pandora.ui.infoView = function(data) {
                             var src;
                             Ox.Request.clearCache();
                             if (ui.icons == 'frames') {
-                                src = '/' + data.id + '/icon512.jpg?' + Ox.uid();
+                                src = pandora.getMediaURL('/' + data.id + '/icon512.jpg?' + Ox.uid());
                                 $icon.attr({src: src});
                                 $reflectionIcon.attr({src: src});
                                 if (pandora.$ui.videoPreview) {
@@ -1015,9 +1015,9 @@ pandora.ui.infoView = function(data) {
                             }
                             if (!ui.showSitePosters) {
                                 $browserImages.each(function() {
-                                    $(this).attr({src: '/' + data.id + '/' + (
+                                    $(this).attr({src: pandora.getMediaURL('/' + data.id + '/' + (
                                         ui.icons == 'posters' ? 'poster' : 'icon'
-                                    ) + '128.jpg?' + Ox.uid()});
+                                    ) + '128.jpg?' + Ox.uid())});
                                 });
                             }
                             if (ui.listSort[0].key == 'modified') {
@@ -1135,10 +1135,10 @@ pandora.ui.infoView = function(data) {
     }
 
     that.reload = function() {
-        var src = src = '/' + data.id + '/' + (
+        var src = pandora.getMediaURL('/' + data.id + '/' + (
             ui.icons == 'posters'
             ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-        ) + '512.jpg?' + Ox.uid()
+        ) + '512.jpg?' + Ox.uid())
         $icon.attr({src: src});
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;

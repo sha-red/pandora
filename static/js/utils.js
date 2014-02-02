@@ -1241,7 +1241,9 @@ pandora.getLargeClipTimelineURL = function(item, inPoint, outPoint, type, callba
                     }
                 })
                 .attr({
-                    src: '/' + item + '/timeline' + type + '64p' + index + '.jpg'
+                    src: pandora.getMediaURL(
+                        '/' + item + '/timeline' + type + '64p' + index + '.jpg'
+                    )
                 })[0];
     }, function() {
         callback(canvas.toDataURL());
@@ -1455,7 +1457,9 @@ pandora.getSmallClipTimelineURL = function(item, inPoint, outPoint, type, callba
                     }
                 })
                 .attr({
-                    src: '/' + item + '/timeline' + type + '16p' + index + '.jpg'
+                    src: pandora.getMediaURL(
+                        '/' + item + '/timeline' + type + '16p' + index + '.jpg'
+                    )
                 })[0];
     }, function() {
         callback(canvas.toDataURL());
@@ -1644,6 +1648,10 @@ pandora.getStatusText = function(data) {
         data.pixels && parts.push(Ox.formatValue(data.pixels, 'px'));
     }
     return parts.join(', ');
+};
+
+pandora.getMediaURL = function(url) {
+    return pandora.site.site.mediaprefix + url;
 };
 
 pandora.getVideoURL = function(id, resolution, part) {

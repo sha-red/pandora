@@ -25,10 +25,14 @@ pandora.ui.timeline = function(data) {
             duration: data.duration,
             followPlayer: ui.followPlayer,
             getFrameURL: function(position) {
-                return '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg';
+                return pandora.getMediaURL(
+                    '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg?' + data.modified
+                );
             },
             getLargeTimelineURL: function(type, i) {
-                return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
+                return pandora.getMediaURL(
+                    '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg?' + data.modified 
+                );
             },
             height: pandora.$ui.contentPanel.size(1),
             itemName: pandora.site.itemName,
@@ -44,7 +48,9 @@ pandora.ui.timeline = function(data) {
             showAnnotationsMap: ui.showAnnotationsMap,
             showLayers: Ox.clone(ui.showLayers),
             showUsers: pandora.site.annotations.showUsers,
-            smallTimelineURL: '/' + ui.item + '/timeline16p.jpg',
+            smallTimelineURL: pandora.getMediaURL(
+                '/' + ui.item + '/timeline16p.jpg?' + data.modified 
+            ),
             timeline: ui.videoTimeline,
             timelines: pandora.site.timelines,
             video: data.video,

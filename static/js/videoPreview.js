@@ -12,15 +12,15 @@ pandora.ui.videoPreview = function(data) {
                     resolution = resolutions.length
                         ? Ox.min(resolutions)
                         : Ox.max(pandora.site.video.resolutions);
-                return '/' + data.id + '/' + resolution + 'p' + (
+                return pandora.getMediaURL('/' + data.id + '/' + resolution + 'p' + (
                     Ox.isUndefined(position) ? '' : position
-                ) + '.jpg';
+                ) + '.jpg');
             },
             frameRatio: data.frameRatio,
             height: data.height,
             position: data.position,
             scaleToFill: true,
-            timeline: '/' + data.id + '/timeline16p.jpg',
+            timeline: pandora.getMediaURL('/' + data.id + '/timeline16p.jpg'),
             videoTooltip: data.videoTooltip,
             width: data.width
         });

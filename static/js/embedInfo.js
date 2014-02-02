@@ -17,7 +17,7 @@ pandora.ui.embedInfo = function() {
         data = result.data;
 
         $icon = Ox.$('<img>')
-            .attr({src: '/' + item + '/poster512.jpg'})
+            .attr({src: pandora.getMediaURL('/' + item + '/poster512.jpg')})
             .css({
                 position: 'absolute',
                 top: margin + 'px',
@@ -39,7 +39,7 @@ pandora.ui.embedInfo = function() {
             .appendTo(that);
 
         $reflectionIcon = Ox.$('<img>')
-            .attr({src: '/' + item + '/poster512.jpg'})
+            .attr({src: pandora.getMediaURL('/' + item + '/poster512.jpg')})
             .css({
                 position: 'absolute'
             })

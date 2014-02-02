@@ -98,7 +98,7 @@ pandora.ui.editPanel = function() {
             fullscreen: false,
             getClipImageURL: function(id, width, height) {
                 var clip = Ox.getObjectById(edit.clips, id);
-                return '/' + clip.item + '/' + height + 'p' + clip['in'] + '.jpg';
+                return pandora.getMediaURL('/' + clip.item + '/' + height + 'p' + clip['in'] + '.jpg');
             },
             getLargeTimelineURL: function(type, i, callback) {
                 pandora.getLargeEditTimelineURL(edit, type, i, callback);
@@ -348,7 +348,7 @@ pandora.ui.editPanel = function() {
             item: function(data, sort, size) {
                 size = size || 128;
                 var ui = pandora.user.ui,
-                    url = '/edit/' + data.id + '/icon' + size + '.jpg?' + data.modified,
+                    url = pandora.getMediaURL('/edit/' + data.id + '/icon' + size + '.jpg?' + data.modified),
                     info = Ox.formatDuration(data.duration);
                 return {
                     height: size,

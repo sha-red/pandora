@@ -29,13 +29,13 @@ pandora.ui.editor = function(data) {
             enableSubtitles: ui.videoSubtitles,
             find: ui.itemFind,
             getFrameURL: function(position) {
-                return '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg?' + data.modified;
+                return pandora.getMediaURL('/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg?' + data.modified);
             },
             getLargeTimelineURL: function(type, i) {
-                return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg?' + data.modified;
+                return pandora.getMediaURL('/' + ui.item + '/timeline' + type + '64p' + i + '.jpg?' + data.modified);
             },
             getSmallTimelineURL: function(type, i) {
-                return '/' + ui.item + '/timeline' + type + '16p' + i + '.jpg?' + data.modified;
+                return pandora.getMediaURL('/' + ui.item + '/timeline' + type + '16p' + i + '.jpg?' + data.modified);
             },
             height: pandora.$ui.contentPanel.size(1),
             id: 'editor',
@@ -298,9 +298,9 @@ pandora.ui.editor = function(data) {
     function updateBrowser() {
         pandora.$ui.browser.find('img[src*="/' + ui.item + '/"]').each(function() {
             $(this).attr({
-                src: '/' + ui.item + '/' + (
+                src: pandora.getMediaURL('/' + ui.item + '/' + (
                     ui.icons == 'posters' ? 'poster' : 'icon'
-                ) + '128.jpg?' + Ox.uid()
+                ) + '128.jpg?' + Ox.uid())
             });
         });
     }

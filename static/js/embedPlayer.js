@@ -95,19 +95,19 @@ pandora.ui.embedPlayer = function() {
                 paused: options.paused,
                 playInToOut: options.playInToOut,
                 position: options.position,
-                poster: '/' + options.item + '/' + '96p' + (
+                poster: pandora.getMediaURL('/' + options.item + '/' + '96p' + (
                     options.position !== void 0 ? options.position
                     : options['in'] !== void 0 ? options['in']
                     : video.posterFrame
-                ) +'.jpg',
+                ) +'.jpg'),
                 resolution: ui.videoResolution,
                 scaleToFill: ui.videoScale == 'fill',
                 subtitles: video.subtitles,
                 timeline: options.playInToOut ? function(size, i) {
-                    return '/' + options.item
+                    return pandora.getMediaURL('/' + options.item
                         + '/timelineantialias'
-                        + size + 'p' + i + '.jpg'
-                } : '/' + options.item + '/' + 'timeline16p.png',
+                        + size + 'p' + i + '.jpg');
+                } : pandora.getMediaURL('/' + options.item + '/' + 'timeline16p.png'),
                 /*
                 timeline: options.playInToOut ? getSmallTimelineURL()
                     : '/' + options.item + '/' + 'timeline16p.png',
@@ -173,7 +173,7 @@ pandora.ui.embedPlayer = function() {
                     disabled: isFrame,
                     duration: video.duration,
                     getImageURL: function(type, i) {
-                        return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
+                        return pandora.getMediaURL('/' + ui.item + '/timeline' + type + '64p' + i + '.jpg');
                     },
                     position: options.position,
                     showInToOut: options.playInToOut && options['in'] < options.out,

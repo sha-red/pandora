@@ -51,17 +51,21 @@ pandora.ui.embedTimeline = function() {
                 duration: video.duration,
                 followPlayer: ui.followPlayer,
                 getFrameURL: function(position) {
-                    return '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg';
+                    return pandora.getMediaURL(
+                        '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg'
+                    );
                 },
                 getLargeTimelineURL: function(type, i) {
-                    return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
+                    return pandora.getMediaURL(
+                        '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg'
+                    );
                 },
                 height: sizes.innerHeight,
                 muted: ui.videoMuted,
                 paused: options.paused,
                 position: options.position,
                 resolution: Ox.min(pandora.site.video.resolutions),
-                smallTimelineURL: '/' + ui.item + '/timeline16p.jpg',
+                smallTimelineURL: pandora.getMediaURL('/' + ui.item + '/timeline16p.jpg'),
                 subtitles: video.subtitles,
                 timeline: ui.videoTimeline,
                 timelines: pandora.site.timelines,

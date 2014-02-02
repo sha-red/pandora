@@ -44,7 +44,7 @@ pandora.ui.list = function() {
                             //background: 'transparent'
                         });
                     }).attr({
-                        src: '/' + data.id + '/' + icon + '14.jpg?' + data.modified 
+                        src: pandora.getMediaURL('/' + data.id + '/' + icon + '14.jpg?' + data.modified)
                     });
                 },
                 id: 'posterRatio',
@@ -128,10 +128,10 @@ pandora.ui.list = function() {
             item: function(data, sort, size) {
                 var ratio = ui.icons == 'posters'
                         ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
-                    url = '/' + data.id + '/' + (
+                    url = pandora.getMediaURL('/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                    ) + size + '.jpg?' + data.modified,
+                    ) + size + '.jpg?' + data.modified),
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director', 'random'].indexOf(sortKey) > -1) {
                     info = data['year'];
@@ -185,10 +185,10 @@ pandora.ui.list = function() {
                 size = 128;
                 var ratio = ui.icons == 'posters'
                         ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
-                    url = '/' + data.id + '/' + (
+                    url = pandora.getMediaURL('/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                    ) + size + '.jpg?' + data.modified,
+                    ) + size + '.jpg?' + data.modified),
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
                     info = data['year'];
@@ -270,10 +270,10 @@ pandora.ui.list = function() {
                     isClipsQuery = !!clipsQuery.conditions.length,
                     ratio = ui.icons == 'posters'
                         ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
-                    url = '/' + data.id + '/' + (
+                    url = pandora.getMediaURL('/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                    ) + size + '.jpg?' + data.modified,
+                    ) + size + '.jpg?' + data.modified),
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
                     info = data['year'];
@@ -323,7 +323,9 @@ pandora.ui.list = function() {
                             duration: data.duration,
                             find: isClipsQuery ? clipsQuery.conditions[0].value : '',
                             getImageURL: function(type, i) {
-                                return '/' + data.id + '/timeline' + type + '16p' + i + '.jpg';
+                                return pandora.getMediaURL(
+                                    '/' + data.id + '/timeline' + type + '16p' + i + '.jpg'
+                                );
                             },
                             position: ui.videoPoints[data.id]
                                 ? ui.videoPoints[data.id].position : 0,

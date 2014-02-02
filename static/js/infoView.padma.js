@@ -107,9 +107,9 @@ pandora.ui.infoView = function(data) {
                 ).title + ' View'
             })
             .attr({
-                src: '/' + data.id + '/' + (
+                src: pandora.getMediaURL('/' + data.id + '/' + (
                     ui.icons == 'posters' ? 'poster' : 'icon'
-                ) + '512.jpg?' + data.modified
+                ) + '512.jpg?' + data.modified)
             })
             .css({
                 position: 'absolute',
@@ -141,9 +141,9 @@ pandora.ui.infoView = function(data) {
 
         $reflectionIcon = $('<img>')
             .attr({
-                src: '/' + data.id + '/' + (
+                src: pandora.getMediaURL('/' + data.id + '/' + (
                     ui.icons == 'posters' ? 'poster' : 'icon'
-                ) + '512.jpg?' + data.modified
+                ) + '512.jpg?' + data.modified)
             })
             .css({
                 position: 'absolute',
@@ -767,9 +767,9 @@ pandora.ui.infoView = function(data) {
     }
 
     that.reload = function() {
-        var src = src = '/' + data.id + '/' + (
+        var src = pandora.getMediaURL('/' + data.id + '/' + (
             ui.icons == 'posters' ? 'poster' : 'icon'
-        ) + '512.jpg?' + Ox.uid();
+        ) + '512.jpg?' + Ox.uid());
         $icon.attr({src: src});
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;

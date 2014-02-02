@@ -352,7 +352,7 @@ pandora.ui.similarClipsDialog = function() {
             id: data.id,
             info: Ox.formatDuration(data['in'], 2) + '-' + Ox.formatDuration(data.out, 2),
             title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-            url: '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg',
+            url: pandora.getMediaURL('/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg'),
             width: width
         };
     }

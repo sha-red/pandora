@@ -168,7 +168,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                     tooltip: Ox._('Doubleclick to edit icon')
                 })
                 .attr({
-                    src: '/' + folderItem.toLowerCase() + '/' + encodeURIComponent(listData.id) + '/icon256.jpg?' + Ox.uid()
+                    src: pandora.getMediaURL('/' + folderItem.toLowerCase() + '/' + encodeURIComponent(listData.id) + '/icon256.jpg?' + Ox.uid())
                 })
                 .css({
                     position: 'absolute',
@@ -358,7 +358,7 @@ pandora.ui.listIconPanel = function(listData) {
         $iconPanel = Ox.Element(),
 
         $icon = $('<img>')
-            .attr({src: '/' + folderItem.toLowerCase() + '/' + encodeURIComponent(listData.id) + '/icon256.jpg?' + Ox.uid()})
+            .attr({src: pandora.getMediaURL('/' + folderItem.toLowerCase() + '/' + encodeURIComponent(listData.id) + '/icon256.jpg?' + Ox.uid())})
             .css({position: 'absolute', borderRadius: '64px', margin: '16px'})
             .appendTo($iconPanel),
 
@@ -435,7 +435,7 @@ pandora.ui.listIconPanel = function(listData) {
                     id: data.id,
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                    url: '/' + data.id + '/icon' + size + '.jpg?' + data.modified,
+                    url: pandora.getMediaURL('/' + data.id + '/icon' + size + '.jpg?' + data.modified),
                     width: size
                 };
             },
@@ -544,12 +544,20 @@ pandora.ui.listIconPanel = function(listData) {
                 posterFrames: posterFrames
             }, function() {
                 $icon.attr({
-                    src: '/' + folderItem.toLowerCase() + '/' + encodeURIComponent(listData.id) + '/icon256.jpg?' + Ox.uid()
+                    src: pandora.getMediaURL('/' + folderItem.toLowerCase()
+                        + '/' + encodeURIComponent(listData.id) + '/icon256.jpg?' + Ox.uid()
+                    )
                 });
                 pandora.$ui.folderList[listData.folder].$element
-                    .find('img[src*="/' + encodeURIComponent(listData.id) + '/"]')
+                    .find('img[src*="'
+                        + pandora.getMediaURL('/' + encodeURIComponent(listData.id))
+                        + '/"]'
+                    )
                     .attr({
-                        src: '/' + folderItem.toLowerCase() + '/' + encodeURIComponent(listData.id) + '/icon.jpg?' + Ox.uid()
+                        src: pandora.getMediaURL('/' + folderItem.toLowerCase()
+                            + '/' + encodeURIComponent(listData.id)
+                            + '/icon.jpg?' + Ox.uid()
+                        )
                     });
                 pandora.$ui.info.updateListInfo();
             });

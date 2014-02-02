@@ -78,10 +78,10 @@ pandora.ui.browser = function() {
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
                         ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
-                    url = '/' + data.id + '/' + (
+                    url = pandora.getMediaURL('/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                    ) + '128.jpg?' + data.modified,
+                    ) + '128.jpg?' + data.modified),
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director', 'random'].indexOf(sortKey) > -1) {
                     info = data['year'];
