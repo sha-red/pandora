@@ -924,7 +924,7 @@ pandora.getClipVideos = function(clip, resolution) {
 (function() {
     var itemTitles = {};
     pandora.getDocumentTitle = function(itemData) {
-        var parts = [pandora.site.site.name];
+        var parts = [];
         if (itemData) {
             itemTitles[pandora.user.ui.item] = Ox.decodeHTMLEntities(pandora.getItemTitle(itemData));
         }
@@ -941,12 +941,12 @@ pandora.getClipVideos = function(clip, resolution) {
         } else if (pandora.user.ui.section == 'texts') {
             parts.push(pandora.user.ui.text ? Ox._('Text') + ' ' + pandora.user.ui.text : Ox._('Texts'));
         }
+        parts.push(pandora.site.site.name);
         return parts.join(' – ');
     };
 }());
 
 pandora.getDownloadLink = function(item, rightslevel) {
-    console.log('pandora.getDownloadLink', item, rightslevel);
     var torrent = pandora.site.video.torrent;
     if (arguments.length == 2 && torrent &&
         pandora.site.capabilities.canSeeItem.guest < rightslevel) {
@@ -1367,8 +1367,7 @@ pandora.getPageTitle = function(stateOrURL) {
             Ox.isObject(stateOrURL) ? stateOrURL.page : stateOrURL.slice(1)
         );
     return page
-        ? pandora.site.site.name
-        + (page.title ? ' – ' + page.title : '')
+        ? (page.title ? page.title + ' – ' : '') + pandora.site.site.name
         : null;
 };
 
