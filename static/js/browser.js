@@ -157,7 +157,11 @@ pandora.ui.browser = function() {
                         pandora.$ui.editor && pandora.$ui.editor.gainFocus();
                     }
                 }
-                if (pandora.user.ui.itemView == 'timeline') {
+                // FIXME: Why are these not handled in the 'resize' handler
+                // of the other SplitPanel element?
+                if (pandora.user.ui.itemView == 'documents') {
+                    pandora.$ui.documentsList.size();
+                } else if (pandora.user.ui.itemView == 'timeline') {
                     pandora.$ui.timeline.options({
                         height: pandora.$ui.contentPanel.size(1)
                     });
