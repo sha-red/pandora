@@ -45,7 +45,7 @@ pandora.ui.info = function() {
     function getId() {
         return ui[folderItem.toLowerCase()] || (
             ui.listSelection.length
-            ? ui.listSelection[ui.listSelection.length - 1]
+            ? ui.listSelection[0]
             : null
         );
     }
