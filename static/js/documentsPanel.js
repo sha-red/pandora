@@ -446,6 +446,12 @@ pandora.ui.documentsPanel = function(options) {
         openDocumentsDialog();
     }
 
+    function getEmbed(item) {
+        return '<a href="/documents/'
+            + item.id + '"><img src="/documents/'
+            + item.id + '/256p.jpg"></a>';
+    }
+
     function getOrderButtonTitle() {
         return ui.documentsSort[0].operator == '+' ? 'up' : 'down';
     }
@@ -646,6 +652,15 @@ pandora.ui.documentsPanel = function(options) {
                         placeholder: Ox._('Description'),
                         type: 'textarea',
                         value: item.description,
+                        width: width
+                    }),
+                    Ox.Input({
+                        disabled: true,
+                        height: 36,
+                        id: 'embed',
+                        placeholder: Ox._('HTML Embed'),
+                        type: 'textarea',
+                        value: getEmbed(item),
                         width: width
                     })
                 ],
