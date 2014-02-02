@@ -310,28 +310,8 @@ pandora.ui.infoView = function(data) {
 
     // Encyclopedia and Wiki ---------------------------------------------------
 
-    if ((data.encyclopedia || data.wiki) && canEdit) {
-        $links = Ox.Element().addClass('OxSelectable').css(css);
-        if (data.encyclopedia) {
-            $links
-                .append(formatKey('encyclopedia'))
-                .append(
-                    '<a href="/texts/indiancine.ma:Encyclopedia%20of%20Indian%20Cinema/'
-                    + (data.encyclopedia == 'Summary' ? '240' : '570') + '">'
-                    + data.encyclopedia + '</a>'
-                )
-                .append(data.wiki ? '; ' : '');
-        }
-        if (data.wiki) {
-            $links
-                .append(formatKey('wiki'))
-                .append(
-                    '<a href="' + data.wiki + '">'
-                    + Ox.decodeURI(data.wiki.split('wiki/').pop()) + '</a>'
-                );
-        }
-        $links.appendTo($text);
-        pandora.createLinks($links);
+    if (['staff', 'admin'].indexOf(pandora.user.level) > -1 && canEdit) {
+        renderGroup(['encyclopedia', 'wiki']);
     }
 
     // Summary -----------------------------------------------------------------
@@ -484,6 +464,8 @@ pandora.ui.infoView = function(data) {
                 }) : [];
                 data[key] = edit[key];
                 $alternativeTitles.html(formatKey(key));
+            } else if (key == 'encyclopedia') {
+                edit[key] = ['Index', 'Summary'].indexOf(value) > -1 ? value : '';
             } else if (key == 'year') {
                 edit[key] = value ? parseInt(value) : '';
             } else if (key == 'runtime') {
@@ -600,6 +582,13 @@ pandora.ui.infoView = function(data) {
         } else if (key == 'imdbId') {
             ret = '<a href="http://www.imdb.com/title/tt'
                 + value + '">' + value + '</a>';
+        } else if (key == 'encyclopedia') {
+            ret = '<a href="/texts/indiancine.ma:Encyclopedia%20of%20Indian%20Cinema/'
+                + (value == 'Summary' ? '240' : '570') + '">'
+                + value + '</a>';
+        } else if (key == 'wiki') {
+            ret = '<a href="' + data.wiki + '">'
+                + Ox.decodeURI(data.wiki.split('wiki/').pop()) + '</a>';
         } else {
             ret = value;
         }
