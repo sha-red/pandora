@@ -287,10 +287,10 @@ class Document(models.Model):
 def delete_document(sender, **kwargs):
     t = kwargs['instance']
     if t.file:
-        if t.extension == 'pdf':
-            thumb = t.thumbnail()
-            if os.path.exists(thumb):
-                os.unlink(thumb)
+        folder = os.path.dirname(self.file.path)
+        for f in glob('%s/*' % folder):
+            if f != self.file.path:
+                os.unlink(f)
         t.file.delete()
 pre_delete.connect(delete_document, sender=Document)
 
