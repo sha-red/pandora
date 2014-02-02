@@ -725,7 +725,9 @@ def frame(request, id, size, position=None):
     if not frame:
         frame = os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
         #raise Http404
-    return HttpFileResponse(frame, content_type='image/jpeg')
+    response = HttpFileResponse(frame, content_type='image/jpeg')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
 def poster_frame(request, id, position):
     item = get_object_or_404(models.Item, itemId=id)
@@ -829,7 +831,9 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
     while modes and not os.path.exists(path):
         mode = modes.pop(0)
         path = timeline()
-    return HttpFileResponse(path, content_type='image/jpeg')
+    response = HttpFileResponse(path, content_type='image/jpeg')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
 def download(request, id, index=1):
     item = get_object_or_404(models.Item, itemId=id)
