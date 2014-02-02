@@ -464,8 +464,6 @@ pandora.ui.infoView = function(data) {
                 }) : [];
                 data[key] = edit[key];
                 $alternativeTitles.html(formatKey(key));
-            } else if (key == 'encyclopedia') {
-                edit[key] = ['Index', 'Summary'].indexOf(value) > -1 ? value : '';
             } else if (key == 'year') {
                 edit[key] = value ? parseInt(value) : '';
             } else if (key == 'runtime') {
@@ -587,8 +585,8 @@ pandora.ui.infoView = function(data) {
                 + (value == 'Summary' ? '240' : '570') + '">'
                 + value + '</a>';
         } else if (key == 'wiki') {
-            ret = '<a href="' + data.wiki + '">'
-                + Ox.decodeURI(data.wiki.split('wiki/').pop()) + '</a>';
+            ret = '<a href="' + value + '">'
+                + Ox.decodeURI(value.split('wiki/').pop()) + '</a>';
         } else {
             ret = value;
         }
@@ -910,6 +908,15 @@ pandora.ui.infoView = function(data) {
                                 key == 'runtime' && $minutes.show();
                             },
                             submit: function(data) {
+                                if (key == 'encyclopedia') {
+                                    data.value = ['Index', 'Summary'].indexOf(data.value) > -1
+                                        ? data.value
+                                        : '';
+                                    this.options({
+                                        value: data.value
+                                    });
+                                }
+
                                 editMetadata(key, data.value);
                             }
                         })
