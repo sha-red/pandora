@@ -46,6 +46,7 @@ pandora.ui.editPanel = function() {
         });
     }
 
+    // FIXME: not used below!
     function getSmallTimelineCanvas() {
         var fps = getSmallTimelineFPS(),
             width = Math.ceil(edit.duration * fps),
