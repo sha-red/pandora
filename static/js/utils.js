@@ -1254,9 +1254,7 @@ pandora.getLargeClipTimelineURL = function(item, inPoint, outPoint, type, callba
                     }
                 })
                 .attr({
-                    src: pandora.getMediaURL(
-                        '/' + item + '/timeline' + type + '64p' + index + '.jpg'
-                    )
+                    src: '/' + item + '/timeline' + type + '64p' + index + '.jpg'
                 })[0];
     }, function() {
         callback(canvas.toDataURL());
@@ -1469,9 +1467,7 @@ pandora.getSmallClipTimelineURL = function(item, inPoint, outPoint, type, callba
                     }
                 })
                 .attr({
-                    src: pandora.getMediaURL(
-                        '/' + item + '/timeline' + type + '16p' + index + '.jpg'
-                    )
+                    src: '/' + item + '/timeline' + type + '16p' + index + '.jpg'
                 })[0];
     }, function() {
         callback(canvas.toDataURL());
