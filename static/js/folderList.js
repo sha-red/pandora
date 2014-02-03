@@ -14,11 +14,14 @@ pandora.ui.folderList = function(id, section) {
         columns = [
             {
                 clickable: function(data) {
-                    return data.user == pandora.user.username || (id == 'featured' && canEditFeatured);
+                    return data.user == pandora.user.username
+                        || (id == 'featured' && canEditFeatured);
                 },
                 format: function(value, data) {
                     return $('<img>').attr({
-                            src: '/' + folderItem.toLowerCase() + '/' + encodeURIComponent(data.id) + '/icon.jpg?' + data.modified
+                            src: '/' + folderItem.toLowerCase() + '/'
+                                + encodeURIComponent(data.id) + '/icon.jpg?'
+                                + data.modified
                         }).css({
                             width: '14px',
                             height: '14px',
