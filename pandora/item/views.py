@@ -1282,7 +1282,7 @@ def item(request, id):
             if clip['annotations']:
                 clip['annotations'] = '<br />\n'.join(clip['annotations'])
                 clips.append(clip)
-        head_title = u'%s – %s' % (settings.SITENAME, item.get('title', ''))
+        head_title = item.get('title', '')
         title = item.get('title', '')
         if item.get('director'):
             head_title += u' (%s)' % u', '.join(item.get('director', []))
@@ -1291,6 +1291,7 @@ def item(request, id):
             title += u' (%s)' % item.get('year')
         if view:
             head_title += u' – %s' % view
+        head_title += u' – %s' % settings.SITENAME
         head_title = ox.decode_html(head_title)
         title = ox.decode_html(title)
         ctx = {
