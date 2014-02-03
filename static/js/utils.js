@@ -991,7 +991,7 @@ pandora.getFoldersHeight = function(section) {
     var height = 0;
     pandora.site.sectionFolders[section].forEach(function(folder, i) {
         height += 16 + pandora.user.ui.showFolder[section][folder.id] * (
-            !!folder.showBrowser * 40 + folder.items * 16
+            !!(folder.showBrowser && folder.items) * 40 + (folder.items || 1) * 16
         );
     });
     return height;

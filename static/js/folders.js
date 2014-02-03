@@ -17,6 +17,7 @@ pandora.ui.folders = function(section) {
     pandora.$ui.folder = [];
     pandora.$ui.folderBrowser = {};
     pandora.$ui.folderList = {};
+    pandora.$ui.folderPlaceholder = {};
     pandora.$ui.findListElement = {};
     pandora.$ui.findListSelect = {};
     pandora.$ui.findListInput = {};
@@ -337,6 +338,9 @@ pandora.ui.folders = function(section) {
                     }
                 }
             })
+            .appendTo(pandora.$ui.folder[i].$content);
+        pandora.$ui.folderPlaceholder[folder.id] = pandora.ui.folderPlaceholder(folder.id, section)
+            .hide()
             .appendTo(pandora.$ui.folder[i].$content);
     });
     function infoButton(title, text) {

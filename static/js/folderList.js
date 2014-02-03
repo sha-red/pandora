@@ -8,6 +8,7 @@ pandora.ui.folderList = function(id, section) {
         folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1),
         canEditFeatured = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
+        $placeholder,
         that;
     var columns, items;
     if (id != 'volumes') {
@@ -267,8 +268,11 @@ pandora.ui.folderList = function(id, section) {
         max: 1,
         min: 0,
         pageLength: 1000,
-        // won't work, getListData looks up data in $folderList
-        //selected: pandora.getListData().folder == id ? [ui._list] : [],
+        // works when switching back from browser, but won't work on load, since
+        // getListData relies on $folderList, so selectList is called in init handler
+        selected: pandora.getListData().folder == id
+            ? [ui[ui.section == 'items' ? '_list' : ui.section.slice(0, -1)]]
+            : [],
         sort: [{key: 'position', operator: '+'}],
         sortable: id != 'featured' || canEditFeatured,
         unique: id != 'volumes' ? 'id' : 'name'
@@ -377,11 +381,12 @@ pandora.ui.folderList = function(id, section) {
             if (pandora.site.sectionFolders[section][i]) {
                 pandora.site.sectionFolders[section][i].items = data.items;
                 pandora.$ui.folder[i].$content.css({
-                    height: data.items * 16 + 'px'
+                    height: (data.items || 1) * 16 + 'px'
                 });
                 pandora.$ui.folderList[id].css({
                     height: data.items * 16 + 'px'
-                });
+                })[data.items ? 'show' : 'hide']();
+                pandora.$ui.folderPlaceholder[id].updateText(id)[data.items ? 'hide' : 'show']();
             }
             pandora.resizeFolders();
         },

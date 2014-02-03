@@ -191,11 +191,12 @@ pandora.ui.folderBrowserList = function(id, section) {
             init: function(data) {
                 pandora.site.sectionFolders[section][i].items = data.items;
                 pandora.$ui.folder[i].$content.css({
-                    height: 40 + data.items * 16 + 'px'
+                    height: (data.items ? 40 + data.items * 16 : 16) + 'px'
                 });
                 pandora.$ui.folderList[id].css({
                     height: 16 + data.items * 16 + 'px'
                 });
+                pandora.$ui.folderPlaceholder[id][data.items ? 'hide' : 'show']();
                 pandora.resizeFolders();
             },
             paste: function(data) {
