@@ -4,10 +4,12 @@
 
 pandora.openDocumentDialog = function(options) {
 
-    if (pandora.$ui.documentDialog && options.ids && options.ids.length == 1
-        && Ox.getObjectById(pandora.$ui.documentDialog.getItems(), options.ids[0])){
+    if (
+        pandora.$ui.documentDialog && options.ids && options.ids.length == 1
+        && Ox.getObjectById(pandora.$ui.documentDialog.getItems(), options.ids[0])
+    ) {
         pandora.UI.set({document: options.ids[0]});
-    } else if(options.ids) {
+    } else if (options.ids) {
         pandora.api.findDocuments({
             query: {
                 conditions: options.ids.map(function(id) {
@@ -18,11 +20,12 @@ pandora.openDocumentDialog = function(options) {
             range: [0, options.ids.length],
             keys: ['description', 'dimensions', 'extension', 'id', 'name']
         }, function(result) {
-            var i = 0, documents = Ox.sort(result.data.items, function(item) {
-                return options.ids.indexOf(item.id);
-            }).map(function(document) {
-                return Ox.extend({index: i++}, document);
-            });
+            var i = 0,
+                documents = Ox.sort(result.data.items, function(item) {
+                    return options.ids.indexOf(item.id);
+                }).map(function(document) {
+                    return Ox.extend({index: i++}, document);
+                });
             pandora.openDocumentDialog({documents: documents});
         });
     } else {
@@ -200,6 +203,7 @@ pandora.ui.documentDialog = function(options) {
     that.getItems = function() {
         return items;
     };
+
     that.update = function(options) {
         items = options.items;
         item = items[options.index];
