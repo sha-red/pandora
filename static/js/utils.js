@@ -934,7 +934,7 @@ pandora.getClipVideos = function(clip, resolution) {
             if (!pandora.user.ui.item) {
                 parts.push(
                     pandora.user.ui._list
-                    ? Ox._('List') + ' ' + pandora.user.ui._list.split(':').slice(1).join(':')
+                    ? pandora.user.ui._list.split(':').slice(1).join(':')
                     : pandora.getAllItemsTitle('items')
                 );
                 parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.listView) + ' View'));
@@ -943,17 +943,15 @@ pandora.getClipVideos = function(clip, resolution) {
                 parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.itemView) + ' View'));
             }
         } else if (pandora.user.ui.section == 'edits') {
-            parts.push(
-                pandora.user.ui.edit
-                ? Ox._('Edit{noun}', {noun: ''}) + ' ' + pandora.user.ui.edit.split(':').slice(1).join(':')
-                : Ox._('Edits')
-            );
+            if (pandora.user.ui.edit) {
+                parts.push(pandora.user.ui.edit.split(':').slice(1).join(':'));
+            }
+            parts.push(Ox._('Edits'));
         } else if (pandora.user.ui.section == 'texts') {
-            parts.push(
-                pandora.user.ui.text
-                ? Ox._('Text') + ' ' + pandora.user.ui.text.split(':').slice(1).join(':')
-                : Ox._('Texts')
-            );
+            if (pandora.user.ui.text) {
+                parts.push(pandora.user.ui.text.split(':').slice(1).join(':'));
+            }
+            parts.push(Ox._('Texts'));
         }
         parts.push(pandora.site.site.name);
         return parts.join(' – ');
