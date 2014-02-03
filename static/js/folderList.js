@@ -264,6 +264,7 @@ pandora.ui.folderList = function(id, section) {
         max: 1,
         min: 0,
         pageLength: 1000,
+        // won't work, getListData looks up data in $folderList
         //selected: pandora.getListData().folder == id ? [ui._list] : [],
         sort: [{key: 'position', operator: '+'}],
         sortable: id != 'featured' || canEditFeatured,

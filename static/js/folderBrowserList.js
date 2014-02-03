@@ -159,6 +159,7 @@ pandora.ui.folderBrowserList = function(id, section) {
         .bindEvent({
             click: function(data) {
                 if (data.key == 'type') {
+                    // FIXME: Why is this commented out?
                     /*
                     if (that.value(data.id, 'type') == 'smart') {
                         pandora.$ui.filterDialog = pandora.ui.filterDialog(that.value(data.id, 'query')).open();
@@ -178,7 +179,7 @@ pandora.ui.folderBrowserList = function(id, section) {
                     }, function(result) {
                         Ox.Log('', 'result', result)
                         if (result.data.user == pandora.user.username || result.data.subscribed) {
-                            Ox.Request.clearCache(); // fixme: removen
+                            Ox.Request.clearCache(); // fixme: remove
                             pandora.$ui.folderList[
                                 result.data.user == pandora.user.username ? 'personal' : 'favorite'
                             ].reloadList();
