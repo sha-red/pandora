@@ -1335,16 +1335,13 @@ pandora.getListData = function(list) {
             // folder it is selected, since for example, a personal
             // list may appear again in the featured lists browser
             if (
-                list == pandora.user.ui._list
-                && $list.options('selected').length
+                (list == pandora.user.ui._list && $list.options('selected').length)
+                || !Ox.isEmpty($list.value(list))
             ) {
                 folder = id;
                 ret = false;
-            } else if (!Ox.isEmpty($list.value(list))) {
-                folder = id
-                ret = false;
             }
-            // FIXME: Is there a `return ret` statement missing here?
+            return ret;
         });
         if (folder) {
             data = pandora.$ui.folderList[folder].value(list);
