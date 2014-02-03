@@ -232,7 +232,12 @@ pandora.ui.editPanel = function() {
                 var clips = pandora.clipboard.paste();
                 pandora.doHistory('paste', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
-                    updateClips(edit.clips.concat(result.data.clips));
+                    updateClips(edit.clips.map(function(clip) {
+                        if (clip.index >= result.data.clips[0].index) {
+                            clip.index += result.data.clips.length
+                        }
+                        return clip;
+                    }).concat(result.data.clips));
                 });
             },
             playing: function(data) {

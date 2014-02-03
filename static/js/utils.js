@@ -413,7 +413,17 @@ pandora.createLinks = function($element) {
                 }
             });
         } else {
-            pandora.api.addClips({clips: getClipData(items), edit: target, index: 0}, function(result) {
+
+            pandora.api.addClips({
+                clips: getClipData(items),
+                edit: target,
+                index: pandora.user.ui.edits[pandora.user.ui.edit].selection.length
+                    ? Ox.getObjectById(
+                            pandora.$ui.editPanel.options('clips'),
+                            pandora.user.ui.edits[pandora.user.ui.edit].selection[0]
+                        ).index
+                    : void 0
+            }, function(result) {
                 // adding clips creates new ids, so mutate items in history
                 items.splice.apply(items, [0, items.length].concat(getClipItems(result.data.clips)));
                 callback(result, items);
