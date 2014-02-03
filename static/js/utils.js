@@ -926,20 +926,34 @@ pandora.getClipVideos = function(clip, resolution) {
     pandora.getDocumentTitle = function(itemData) {
         var parts = [];
         if (itemData) {
-            itemTitles[pandora.user.ui.item] = Ox.decodeHTMLEntities(pandora.getItemTitle(itemData));
+            itemTitles[pandora.user.ui.item] = Ox.decodeHTMLEntities(
+                pandora.getItemTitle(itemData)
+            );
         }
         if (pandora.user.ui.section == 'items') {
             if (!pandora.user.ui.item) {
-                pandora.user.ui._list && parts.push(Ox._('List') + ' ' + pandora.user.ui._list);
+                parts.push(
+                    pandora.user.ui._list
+                    ? Ox._('List') + ' ' + pandora.user.ui._list
+                    : pandora.getAllItemsTitle('items')
+                );
                 parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.listView) + ' View'));
             } else {
                 parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
                 parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.itemView) + ' View'));
             }
         } else if (pandora.user.ui.section == 'edits') {
-            parts.push(pandora.user.ui.edit ? Ox._('Edit{noun}', {noun: ''}) + ' ' + pandora.user.ui.edit : Ox._('Edits'));
+            parts.push(
+                pandora.user.ui.edit
+                ? Ox._('Edit{noun}', {noun: ''}) + ' ' + pandora.user.ui.edit
+                : Ox._('Edits')
+            );
         } else if (pandora.user.ui.section == 'texts') {
-            parts.push(pandora.user.ui.text ? Ox._('Text') + ' ' + pandora.user.ui.text : Ox._('Texts'));
+            parts.push(
+                pandora.user.ui.text
+                ? Ox._('Text') + ' ' + pandora.user.ui.text
+                : Ox._('Texts')
+            );
         }
         parts.push(pandora.site.site.name);
         return parts.join(' – ');
