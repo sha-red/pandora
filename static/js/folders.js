@@ -262,7 +262,7 @@ pandora.ui.folders = function(section) {
                         { id: 'remove', title: Ox._('Remove Selected Volume...'), disabled: true },
                         {},
                         { id: 'import', title: Ox._('Import {0}...',
-                            [Ox._(pandora.site.itemName.plural.toLocaleLowerCase())]), disabled: true }
+                            [Ox._(pandora.site.itemName.plural)]), disabled: true }
                     ],
                     title: 'edit',
                     tooltip: Ox._('Manage Volumes'),
