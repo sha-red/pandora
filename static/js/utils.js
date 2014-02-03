@@ -934,7 +934,7 @@ pandora.getClipVideos = function(clip, resolution) {
             if (!pandora.user.ui.item) {
                 parts.push(
                     pandora.user.ui._list
-                    ? Ox._('List') + ' ' + pandora.user.ui._list
+                    ? Ox._('List') + ' ' + pandora.user.ui._list.split(':').slice(1).join(':')
                     : pandora.getAllItemsTitle('items')
                 );
                 parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.listView) + ' View'));
@@ -945,13 +945,13 @@ pandora.getClipVideos = function(clip, resolution) {
         } else if (pandora.user.ui.section == 'edits') {
             parts.push(
                 pandora.user.ui.edit
-                ? Ox._('Edit{noun}', {noun: ''}) + ' ' + pandora.user.ui.edit
+                ? Ox._('Edit{noun}', {noun: ''}) + ' ' + pandora.user.ui.edit.split(':').slice(1).join(':')
                 : Ox._('Edits')
             );
         } else if (pandora.user.ui.section == 'texts') {
             parts.push(
                 pandora.user.ui.text
-                ? Ox._('Text') + ' ' + pandora.user.ui.text
+                ? Ox._('Text') + ' ' + pandora.user.ui.text.split(':').slice(1).join(':')
                 : Ox._('Texts')
             );
         }
