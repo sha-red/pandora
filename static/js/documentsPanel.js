@@ -290,6 +290,7 @@ pandora.ui.documentsPanel = function(options) {
                 );
             }
         })
+        .hide()
         .appendTo($itemBar),
 
         $selectButton = Ox.ButtonGroup({
@@ -316,6 +317,7 @@ pandora.ui.documentsPanel = function(options) {
                 }
             }
         })
+        .hide()
         .appendTo($itemBar),
 
         $item = Ox.Element().css({overflowY: 'scroll'}),
@@ -799,6 +801,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function selectDocuments() {
+        // FIXME: this looks wrong - will produce inconsistent state
         if(!listLoaded) {
             return;
         }
@@ -809,22 +812,22 @@ pandora.ui.documentsPanel = function(options) {
             [selected.length > 0 ? 'enableItem' : 'disableItem']('open');
         if (isItemView) {
             $itemMenu.setItemTitle('edit', Ox._('Edit ' + string + '...'))
-            .setItemTitle('remove', Ox._(
-                'Remove ' + string + ' from '
-                + pandora.site.itemName.singular
-            ))
-            [selected.length > 0 ? 'enableItem' : 'disableItem']('edit')
-            [selected.length > 0 ? 'enableItem' : 'disableItem']('remove');
+                .setItemTitle('remove', Ox._(
+                    'Remove ' + string + ' from '
+                    + pandora.site.itemName.singular
+                ))
+                [selected.length > 0 ? 'enableItem' : 'disableItem']('edit')
+                [selected.length > 0 ? 'enableItem' : 'disableItem']('remove');
         } else {
             $itemMenu.setItemTitle('add', Ox._(
-                'Add ' + string + ' to Current '
-                + pandora.site.itemName.singular
-            ))
-            .setItemTitle('replace', Ox._('Replace ' + string + '...'))
-            .setItemTitle('delete', Ox._('Delete ' + string + '...'))
-            [selected.length > 0 ? 'enableItem' : 'disableItem']('add')
-            [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')
-            [selected.length > 0 ? 'enableItem' : 'disableItem']('delete');
+                    'Add ' + string + ' to Current '
+                    + pandora.site.itemName.singular
+                ))
+                .setItemTitle('replace', Ox._('Replace ' + string + '...'))
+                .setItemTitle('delete', Ox._('Delete ' + string + '...'))
+                [selected.length > 0 ? 'enableItem' : 'disableItem']('add')
+                [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')
+                [selected.length > 0 ? 'enableItem' : 'disableItem']('delete');
         }
         $selectButton[selected.length > 1 ? 'show' : 'hide']();
         $deselectButton[selected.length ? 'show' : 'hide']();
