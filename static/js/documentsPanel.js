@@ -809,15 +809,15 @@ pandora.ui.documentsPanel = function(options) {
             string = selected.length < 2 ? 'Document' : ' Documents';
         $list.options({selected: selected});
         $itemMenu.setItemTitle('open', Ox._('Open ' + string))
-            [selected.length > 0 ? 'enableItem' : 'disableItem']('open');
+            [selected.length ? 'enableItem' : 'disableItem']('open');
         if (isItemView) {
             $itemMenu.setItemTitle('edit', Ox._('Edit ' + string + '...'))
                 .setItemTitle('remove', Ox._(
                     'Remove ' + string + ' from '
                     + pandora.site.itemName.singular
                 ))
-                [selected.length > 0 ? 'enableItem' : 'disableItem']('edit')
-                [selected.length > 0 ? 'enableItem' : 'disableItem']('remove');
+                [selected.length ? 'enableItem' : 'disableItem']('edit')
+                [selected.length ? 'enableItem' : 'disableItem']('remove');
         } else {
             $itemMenu.setItemTitle('add', Ox._(
                     'Add ' + string + ' to Current '
@@ -825,9 +825,9 @@ pandora.ui.documentsPanel = function(options) {
                 ))
                 .setItemTitle('replace', Ox._('Replace ' + string + '...'))
                 .setItemTitle('delete', Ox._('Delete ' + string + '...'))
-                [selected.length > 0 ? 'enableItem' : 'disableItem']('add')
+                [selected.length ? 'enableItem' : 'disableItem']('add')
                 [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')
-                [selected.length > 0 ? 'enableItem' : 'disableItem']('delete');
+                [selected.length ? 'enableItem' : 'disableItem']('delete');
         }
         $selectButton[selected.length > 1 ? 'show' : 'hide']();
         $deselectButton[selected.length ? 'show' : 'hide']();
