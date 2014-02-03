@@ -84,6 +84,7 @@ class Document(models.Model):
             p.index = ItemProperties.objects.filter(item=item).aggregate(Max('index'))['index__max'] + 1
             p.save()
             p.document.update_matches()
+            item.update_sort()
 
     def remove(self, item):
         ItemProperties.objects.filter(item=item, document=self).delete()
