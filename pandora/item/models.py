@@ -842,7 +842,7 @@ class Item(models.Model):
                         value = u','.join(value)
                     value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
-                elif sort_type in ('length', 'integer', 'float'):
+                elif sort_type in ('length', 'integer', 'time', 'float'):
                     #can be length of strings or length of arrays, i.e. keywords
                     value = self.get(source)
                     if isinstance(value, list):
