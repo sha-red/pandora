@@ -2,8 +2,9 @@
 
 'use strict';
 
-pandora.openDocumentDialog = function(options) {
+// fixme: this is a very uncommon pattern
 
+pandora.openDocumentDialog = function(options) {
     if (
         pandora.$ui.documentDialog && options.ids && options.ids.length == 1
         && Ox.getObjectById(pandora.$ui.documentDialog.getItems(), options.ids[0])
