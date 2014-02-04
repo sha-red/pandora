@@ -904,7 +904,7 @@ pandora.ui.mainMenu = function() {
                 : !!ui.listSelection.length,
             canAdd = canCopy && clipboardItems > 0 && ((clipboardType == 'item') == (!isVideoView && !isClipView)),
             canPaste = !ui.item && !isClipView && !isVideoView
-                && listData.editable && listData.type == 'static' && pandora.clipboard.type() == 'item',
+                && listData.editable && listData.type == 'static' && clipboardType == 'item',
             canCut = canCopy && !ui.item && !isClipView && !isVideoView
                 && listData.editable && listData.type == 'static',
             historyItems = pandora.history.items(),
