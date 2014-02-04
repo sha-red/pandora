@@ -483,7 +483,7 @@ pandora.createLinks = function($element) {
             return Ox.extend({
                 item: item
             }, points.length == 1 ? {
-                annotation: clip
+                annotation: item + '/' + points[0]
             } : {
                 'in': parseFloat(points[0]),
                 out: parseFloat(points[1])
