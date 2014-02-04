@@ -169,6 +169,7 @@ pandora.ui.folders = function(section) {
                             pandora.$ui.folderList.favorite.replaceWith(
                                 pandora.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite', section)
                             );
+                            pandora.$ui.folder[i].options({collapsed: false});
                         } else {
                             listData = pandora.getListData();
                             if (
@@ -218,6 +219,7 @@ pandora.ui.folders = function(section) {
                             pandora.$ui.folderList.featured.replaceWith(
                                 pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured', section)
                             );
+                            pandora.$ui.folder[i].options({collapsed: false});
                         } else {
                             listData = pandora.getListData();
                             Ox.Log('', 'FEATURED', listData)
