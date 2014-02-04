@@ -239,6 +239,7 @@ pandora.ui.documentsPanel = function(options) {
                 {},
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'edit', title: ''},
+                {id: 'embed', title: Ox._('Embed Document...')},
                 {},
                 {id: 'remove', title: '', keyboard: 'delete'}
             ] : [
@@ -246,6 +247,7 @@ pandora.ui.documentsPanel = function(options) {
                 {},
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'add', title: ''},
+                {id: 'embed', title: Ox._('Embed Document...')},
                 {},
                 {id: 'replace', title: Ox._('Replace Document...')},
                 {id: 'delete', title: '', keyboard: 'delete'}
@@ -259,18 +261,20 @@ pandora.ui.documentsPanel = function(options) {
             click: function(data) {
                 if (data.id == 'add') {
                     isItemView ? openDocumentsDialog() : addDocuments();
-                } else if (data.id == 'upload') {
-                    uploadDocuments(data);
-                } else if (data.id == 'open') {
-                    openDocuments();
-                } else if (data.id == 'edit') {
-                    editDocuments();
-                } else if (data.id == 'replace') {
-                    replaceDocument(data.files);
-                } else if (data.id == 'remove') {
-                    removeDocuments();
                 } else if (data.id == 'delete') {
                     deleteDocuments();
+                } else if (data.id == 'edit') {
+                    editDocuments();
+                } else if (data.id == 'embed') {
+                    openEmbedDialog();
+                } else if (data.id == 'open') {
+                    openDocuments();
+                } else if (data.id == 'remove') {
+                    removeDocuments();
+                } else if (data.id == 'replace') {
+                    replaceDocument(data.files);
+                } else if (data.id == 'upload') {
+                    uploadDocuments(data);
                 }
             }
         })
@@ -303,18 +307,7 @@ pandora.ui.documentsPanel = function(options) {
         .css({float: 'right', margin: '4px 2px'})
         .bindEvent({
             click: function(data) {
-                var selected = $list.options('selected');
-                if (data.id == 'next') {
-                    selected.push(selected.shift());
-                } else {
-                    selected.splice(0, 0, selected.pop());
-                }
-                $list.options('selected', selected);
-                $item.empty();
-                if (selected.length) {
-                    $preview = renderPreview().appendTo($item);
-                    $data = renderData().appendTo($item);
-                }
+                $list.selectSelected(data.id == 'previous' ? -1 : 1);
             }
         })
         .hide()
@@ -448,12 +441,6 @@ pandora.ui.documentsPanel = function(options) {
         openDocumentsDialog();
     }
 
-    function getEmbed(item) {
-        return '<a href="/documents/'
-            + item.id + '"><img src="/documents/'
-            + item.id + '/256p.jpg"></a>';
-    }
-
     function getOrderButtonTitle() {
         return ui.documentsSort[0].operator == '+' ? 'up' : 'down';
     }
@@ -492,6 +479,12 @@ pandora.ui.documentsPanel = function(options) {
 
     function openDocumentsDialog() {
         pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
+    }
+
+    function openEmbedDialog() {
+        pandora.$ui.embedDocumentDialog = pandora.ui.embedDocumentDialog(
+            ui.documentsSelection[isItemView ? ui.item : ''][0]
+        ).open();
     }
 
     function replaceDocument(file) {
@@ -655,15 +648,6 @@ pandora.ui.documentsPanel = function(options) {
                         type: 'textarea',
                         value: item.description,
                         width: width
-                    }),
-                    Ox.Input({
-                        disabled: true,
-                        height: 36,
-                        id: 'embed',
-                        placeholder: Ox._('HTML Embed'),
-                        type: 'textarea',
-                        value: getEmbed(item),
-                        width: width
                     })
                 ],
                 width: 240
@@ -817,6 +801,7 @@ pandora.ui.documentsPanel = function(options) {
                     + pandora.site.itemName.singular
                 ))
                 [selected.length ? 'enableItem' : 'disableItem']('edit')
+                [selected.length ? 'enableItem' : 'disableItem']('embed')
                 [selected.length ? 'enableItem' : 'disableItem']('remove');
         } else {
             $itemMenu.setItemTitle('add', Ox._(
@@ -826,6 +811,7 @@ pandora.ui.documentsPanel = function(options) {
                 .setItemTitle('replace', Ox._('Replace ' + string + '...'))
                 .setItemTitle('delete', Ox._('Delete ' + string + '...'))
                 [selected.length ? 'enableItem' : 'disableItem']('add')
+                [selected.length ? 'enableItem' : 'disableItem']('embed')
                 [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')
                 [selected.length ? 'enableItem' : 'disableItem']('delete');
         }
@@ -899,4 +885,4 @@ pandora.ui.documentsPanel = function(options) {
 
     return that;
 
-}
+};

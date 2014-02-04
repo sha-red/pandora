@@ -3,26 +3,20 @@
 
 pandora.ui.embedDocumentDialog = function(id) {
 
-    var isImage = Ox.contains(['jpg', 'png'], selected.split('.').pop()),
-        url = 'http' + (pandora.site.site.https ? 's' : '') + '://'
-            + pandora.site.site.url + '/documents/' + id,
-
-        $content = Ox.Element()
+    var $content = Ox.Element()
             .css({margin: '16px'})
-            .html(
-                Ox._('To embed this file, use the following HTML:<br>')
-            ),
+            .html(Ox._('To embed this document, use the following HTML:')),
 
         $embed = $('<textarea>')
             .css({
-                width: '336px',
+                width: '322px',
                 height: '64px',
-                marginTop: '8px',
+                marginTop: '8px'
             })
             .val(
-                isImage
-                ? '<img src="' + url + '">'
-                : '<a href="' + url + '"><img src="' + url + '.jpg"></a>'
+                '<a href="/documents/'
+                + id + '"><img src="/documents/'
+                + id + '/256p.jpg"></a>'
             )
             .on({
                 click: function() {
@@ -49,7 +43,7 @@ pandora.ui.embedDocumentDialog = function(id) {
             height: 128,
             keys: {escape: 'close'},
             removeOnClose: true,
-            title: Ox._('Embed File'),
+            title: Ox._('Embed Document'),
             width: 368 
         });
 
