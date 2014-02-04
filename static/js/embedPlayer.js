@@ -129,7 +129,7 @@ pandora.ui.embedPlayer = function() {
             .bindEvent({
                 fullscreen: function(data) {
                     Ox.Fullscreen.toggle();
-                    setTimeout(that.resizePanel);
+                    setTimeout(that.resizePanel, 100);
                 },
                 open: function() {
                     $player.options({paused: true});
