@@ -11,11 +11,11 @@ pandora.ui.embedVideoDialog = function() {
 
         $content = Ox.Element()
             .css({margin: '16px'})
-            .html(Ox._('To embed this clip, use the following HTML:<br>')),
+            .html(Ox._('To embed this clip, use the following HTML:')),
 
         $embed = $('<textarea>')
             .css({
-                width: '336px',
+                width: '322px',
                 height: '64px',
                 marginTop: '8px'
             })
