@@ -57,8 +57,10 @@ pandora.ui.embedPanel = function() {
     };
 
     that.bindEvent({
+        pandora_find: that.reloadPanel,
         pandora_item: that.reloadPanel,
         pandora_itemview: that.reloadPanel,
+        pandora_listview: that.reloadPanel,
         pandora_videopoints: that.reloadPanel,
         pandora_hash: that.reloadPanel
     });
