@@ -5,6 +5,8 @@ from __future__ import division, with_statement
 from django.db import models
 from django.conf import settings
 
+import ox
+
 from archive import extract
 import managers
 
@@ -76,6 +78,10 @@ class MetaClip:
                     annotations = annotations.filter(qs)
                 j['annotations'] = [a.json(keys=['value', 'id', 'layer'])
                                     for a in annotations]
+            if 'layers' in keys:
+                j['layers'] = self.get_layers()
+            if 'cuts' in keys:
+                j['cuts'] = tuple([c for c in self.item.get('cuts') if c > self.start and c < self.end])
             for key in keys:
                 if key not in self.clip_keys and key not in j:
                     value = self.item.get(key) or self.item.json.get(key)
@@ -84,6 +90,46 @@ class MetaClip:
                     if value != None:
                         j[key] = value
         return j
+
+    def edit_json(self, user=None):
+        data = {
+            'id': ox.toAZ(self.id),
+        }
+        data['item'] = self.item.itemId
+        data['in'] = self.start
+        data['out'] = self.end
+        data['parts'] = self.item.json['parts']
+        data['durations'] = self.item.json['durations']
+        for key in ('title', 'director', 'year', 'videoRatio'):
+            value = self.item.json.get(key)
+            if value:
+                data[key] = value
+        data['duration'] = data['out'] - data['in']
+        data['cuts'] = tuple([c for c in self.item.get('cuts') if c > self.start and c < self.end])
+        data['layers'] = self.get_layers(user)
+        return data
+
+    def get_layers(self, user=None):
+        from annotation.models import Annotation
+        start = self.start
+        end = self.end
+        item = self.item
+        layers = {}
+        for l in settings.CONFIG['layers']:
+            name = l['id']
+            ll = layers.setdefault(name, [])
+            qs = Annotation.objects.filter(layer=name, item=item).order_by(
+                    'start', 'end', 'sortvalue')
+            if name == 'subtitles':
+                qs = qs.exclude(value='')
+            qs = qs.filter(start__lt=end, end__gt=start)
+            if l.get('private'):
+                if user and user.is_anonymous():
+                    user = None
+                qs = qs.filter(user=user)
+            for a in qs.order_by('start'):
+                ll.append(a.json(user=user))
+        return layers
 
     @classmethod
     def get_or_create(cls, item, start, end):

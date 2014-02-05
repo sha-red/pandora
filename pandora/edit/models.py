@@ -18,6 +18,8 @@ from django.contrib.auth.models import User
 
 from annotation.models import Annotation
 from item.models import Item
+from item.utils import get_by_id
+import clip.models
 
 from archive import extract
 
@@ -158,6 +160,10 @@ class Edit(models.Model):
                 self.description = ox.sanitize_html(data['description'])
             elif key == 'rightslevel':
                 self.rightslevel = int(data['rightslevel'])
+            if key == 'query' and not data['query']:
+                setattr(self, key, {"static":True})
+            elif key == 'query':
+                setattr(self, key, data[key])
 
         if 'position' in data:
             pos, created = Position.objects.get_or_create(edit=self, user=user)
@@ -171,7 +177,7 @@ class Edit(models.Model):
                 self.query = {"static":True}
                 self.type = 'static'
             else:
-                self.type = 'dynamic'
+                self.type = 'smart'
                 if self.query.get('static', False):
                      self.query = {}
         if 'posterFrames' in data:
@@ -185,7 +191,33 @@ class Edit(models.Model):
         return os.path.join('edits', h[:2], h[2:4], h[4:6], h[6:], name)
 
     def get_items(self, user=None):
-        return Item.objects.filter(editclips__id__in=self.clips.all()).distinct()
+        if self.type == 'static':
+            return Item.objects.filter(editclip__id__in=self.clips.all()).distinct()
+        else:
+            return Item.objects.find({'query': self.query}, user)
+
+    def get_clips(self, user=None):
+        if self.type == 'static':
+            clips = [c.json(user) for c in self.clips.all().order_by('index')]
+        else:
+            #FIXME: limit results!!
+            clips = [c.edit_json(user) for c in clip.models.Clip.objects.find(self.clip_query(), user)]
+            index = 0
+            for c in clips:
+                c['index'] = index
+                index += 1
+        return clips
+
+    def clip_query(self):
+        query = {
+            'conditions': [],
+            'operator': self.query['operator']
+        }
+        for condition in self.query['conditions']:
+            if condition['key'] == 'annotations' or \
+                get_by_id(settings.CONFIG['layers'], condition['key']):
+                    query['conditions'].append(condition)
+        return {'query': query}
 
     def update_icon(self):
         frames = []
@@ -260,10 +292,15 @@ class Edit(models.Model):
                 'type',
                 'user',
             ]
-        response = {}
+        response = {
+            'type': self.type
+        }
         _map = {
             'posterFrames': 'poster_frames'
         }
+        if 'clips' in keys or 'duration' in keys:
+            clips = self.get_clips(user)
+
         for key in keys:
             if key == 'id':
                 response[key] = self.get_id()
@@ -273,12 +310,8 @@ class Edit(models.Model):
                 if not self.query.get('static', False):
                     response[key] = self.query
             elif key == 'clips':
-                response[key] = [c.json(user) for c in self.clips.all().order_by('index')]
+                response[key] = clips
             elif key == 'duration':
-                if 'clips' in response:
-                    clips = response['clips']
-                else:
-                    clips = [c.json(user) for c in self.clips.all().order_by('index')]
                 response[key] = sum([c['duration'] for c in clips])
             elif key == 'editable':
                 response[key] = self.editable(user)
