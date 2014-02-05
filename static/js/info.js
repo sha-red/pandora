@@ -71,7 +71,7 @@ pandora.ui.info = function() {
         var id = getId(),
             previousView = view;
         view = getView();
-        if (view == 'list' || view == 'text') {
+        if (view == 'list' || view == 'edit' || view == 'text') {
             emptyInfo();
             that.append(pandora.$ui.listInfo = pandora.ui.listInfo());
             previousView == 'video' && resizeInfo();
@@ -151,7 +151,7 @@ pandora.ui.info = function() {
 
     that.resizeInfo = function() {
         var view = getView();
-        if (view == 'list' || view == 'text') {
+        if (view == 'list' || view == 'edit' || view == 'text') {
             pandora.$ui.listInfo.resizeInfo();
         } else if (view == 'poster') {
             pandora.$ui.posterInfo.resizeInfo();
