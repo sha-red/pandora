@@ -726,7 +726,8 @@ def frame(request, id, size, position=None):
         frame = os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
         #raise Http404
     response = HttpFileResponse(frame, content_type='image/jpeg')
-    response['Access-Control-Allow-Origin'] = '*'
+    if request.method == 'OPTIONS':
+        response.allow_access()
     return response
 
 def poster_frame(request, id, position):
@@ -832,7 +833,8 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
         mode = modes.pop(0)
         path = timeline()
     response = HttpFileResponse(path, content_type='image/jpeg')
-    response['Access-Control-Allow-Origin'] = '*'
+    if request.method == 'OPTIONS':
+        response.allow_access()
     return response
 
 def download(request, id, index=1):
