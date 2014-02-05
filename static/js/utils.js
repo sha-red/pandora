@@ -134,7 +134,6 @@ pandora.addFolderItem = function(section) {
                 ? 'votes' : 'timesaccessed';
         if (!isDuplicate) {
             (isItems ? Ox.noop : pandora.api.getEdit)({id: newList}, function(result) {
-                Ox.print('RESULT::::', result.data)
                 query = isItems ? {
                     conditions: [{key: 'list', value: newList, operator: '=='}],
                     operator: '&'
