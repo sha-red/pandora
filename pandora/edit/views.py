@@ -142,11 +142,14 @@ def orderClips(request):
     response = json_response()
     ids = map(ox.fromAZ, data['ids'])
     if edit.editable(request.user):
-        index = 0
-        with transaction.commit_on_success():
-            for i in ids:
-                models.Clip.objects.filter(edit=edit, id=i).update(index=index)
-                index += 1
+        if edit.type == 'static':
+            index = 0
+            with transaction.commit_on_success():
+                for i in ids:
+                    models.Clip.objects.filter(edit=edit, id=i).update(index=index)
+                    index += 1
+        else:
+            response = json_response(status=500, text='sorting smart lists not possible')
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
