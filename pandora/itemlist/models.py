@@ -123,7 +123,7 @@ class List(models.Model):
                     self.query = {"static":True}
                     self.type = 'static'
                 else:
-                    self.type = 'dynamic'
+                    self.type = 'smart'
                     if self.query.get('static', False):
                          self.query = {}
             elif key == 'status':
