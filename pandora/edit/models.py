@@ -179,7 +179,7 @@ class Edit(models.Model):
             else:
                 self.type = 'smart'
                 if self.query.get('static', False):
-                     self.query = {}
+                     self.query = {'conditions': [], 'operator': '&'}
         if 'posterFrames' in data:
             self.poster_frames = tuple(data['posterFrames'])
         self.save()
@@ -200,7 +200,7 @@ class Edit(models.Model):
         if self.type == 'static':
             clips = self.clips.all()
         else:
-            clips = clip.models.Clip.objects.find(self.clip_query(), user)
+            clips = clip.models.Clip.objects.find({'query': self.clip_query()}, user)
         return clips
 
     def get_clips_json(self, user=None):
@@ -221,13 +221,13 @@ class Edit(models.Model):
     def clip_query(self):
         query = {
             'conditions': [],
-            'operator': self.query['operator']
+            'operator': self.query.get('operator', '&')
         }
-        for condition in self.query['conditions']:
+        for condition in self.query.get('conditions', []):
             if condition['key'] == 'annotations' or \
                 get_by_id(settings.CONFIG['layers'], condition['key']):
                     query['conditions'].append(condition)
-        return {'query': query}
+        return query
 
     def update_icon(self):
         frames = []
