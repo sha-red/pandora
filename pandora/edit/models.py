@@ -198,14 +198,24 @@ class Edit(models.Model):
 
     def get_clips(self, user=None):
         if self.type == 'static':
-            clips = [c.json(user) for c in self.clips.all().order_by('index')]
+            clips = self.clips.all()
         else:
-            #FIXME: limit results!!
-            clips = [c.edit_json(user) for c in clip.models.Clip.objects.find(self.clip_query(), user)]
-            index = 0
-            for c in clips:
-                c['index'] = index
-                index += 1
+            clips = clip.models.Clip.objects.find(self.clip_query(), user)
+        return clips
+
+    def get_clips_json(self, user=None):
+        qs = self.get_clips()
+        if self.type == 'static':
+            clips = [c.json(user) for c in qs.order_by('index')]
+        else:
+            if qs.count() <= 100:
+                clips = [c.edit_json(user) for c in qs]
+                index = 0
+                for c in clips:
+                    c['index'] = index
+                    index += 1
+            else:
+                clips = []
         return clips
 
     def clip_query(self):
@@ -299,13 +309,13 @@ class Edit(models.Model):
             'posterFrames': 'poster_frames'
         }
         if 'clips' in keys or 'duration' in keys:
-            clips = self.get_clips(user)
+            clips = self.get_clips_json(user)
 
         for key in keys:
             if key == 'id':
                 response[key] = self.get_id()
             elif key == 'items':
-                response[key] = self.clips.all().count()
+                response[key] = self.get_clips().count()
             elif key == 'query':
                 if not self.query.get('static', False):
                     response[key] = self.query
