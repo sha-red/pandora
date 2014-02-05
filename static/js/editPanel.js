@@ -136,6 +136,7 @@ pandora.ui.editPanel = function() {
                         });
                     })
                 ),
+            subtitles: getSubtitles(edit.clips),
             timeline: ui.videoTimeline,
             timelineTooltip: 'timeline <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'T</span>',
             video: getVideos(),
@@ -414,6 +415,34 @@ pandora.ui.editPanel = function() {
         return layers;
     }
 
+    function getSubtitles(clips) {
+        var subtitles = [],
+            subtitlesLayer = pandora.site.layers.filter(function(layer) {
+                return layer.isSubtitles;
+            }).map(function(layer) {
+                return layer.id;
+            })[0];
+        subtitlesLayer && clips.map(function(clip) {
+            if (clip.layers[subtitlesLayer]) {
+                clip.layers[subtitlesLayer].forEach(function(subtitle) {
+                    subtitles.push({
+                        id: subtitle.id,
+                        'in': Math.max(
+                            clip['position'],
+                            subtitle['in'] - clip['in'] + clip['position']
+                        ),
+                        out: Math.min(
+                            clip['position'] + clip['duration'],
+                            subtitle.out - clip['in'] + clip['position']
+                        ),
+                        text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n')
+                    });
+                });
+            }
+        });
+        return subtitles;
+    }
+
     function serializeClips(clips) {
         // can be ids or clips
         return clips.map(function(clip) {
@@ -439,6 +468,7 @@ pandora.ui.editPanel = function() {
             duration: edit.duration,
             layers: getLayers(edit.clips),
             smallTimelineURL: getSmallTimelineURL(),
+            subtitles: getSubtitles(edit.clips),
             video: getVideos()
         });
         updateSmallTimelineURL();
