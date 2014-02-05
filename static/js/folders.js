@@ -56,9 +56,9 @@ pandora.ui.folders = function(section) {
                             click: function(data) {
                                 var $list = pandora.$ui.folderList[folder.id];
                                 // fixme: duplicated
-                                if ([
+                                if (Ox.contains([
                                     'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'
-                                ].indexOf(data.id) > -1) {
+                                ], data.id)) {
                                     pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
                                 } else if (data.id == 'duplicatelist') {
                                     pandora.addList(pandora.user.ui._list);
@@ -94,9 +94,8 @@ pandora.ui.folders = function(section) {
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
                                 { id: 'newedit', title: Ox._('New Edit') },
-                                // FIXME: properly disable/enable
-                                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), disabled: true },
-                                { id: 'newsmartedit', title: Ox._('New Smart Edit'), disabled: true },
+                                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), disabled: ui.edit && ui.edits[ui.edit].selection.length },
+                                { id: 'newsmartedit', title: Ox._('New Smart Edit') },
                                 {},
                                 { id: 'duplicateedit', title: Ox._('Duplicate Selected Edit'), disabled: !ui.edit },
                                 { id: 'editedit', title: Ox._('Edit Selected Edit...'), disabled: !editable },
@@ -112,11 +111,11 @@ pandora.ui.folders = function(section) {
                                 if (data.id == 'newedit') {
                                     pandora.addEdit();
                                 } else if (data.id == 'neweditfromselection') {
-                                    // ...
+                                    pandora.addEdit(false, true);
                                 } else if (data.id == 'newsmartedit') {
-                                    // ...
+                                    pandora.addEdit(true, false);
                                 } else if (data.id == 'duplicateedit') {
-                                    // ...
+                                    pandora.addEdit(ui.edit);
                                 } else if (data.id == 'editedit') {
                                     pandora.ui.listDialog().open();
                                 } else if (data.id == 'deleteedit') {
