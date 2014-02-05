@@ -3,7 +3,6 @@
 pandora.ui.folders = function(section) {
     section = section || pandora.user.ui.section;
     var ui = pandora.user.ui,
-        counter = 0,
         that = Ox.Element()
             .css({overflowX: 'hidden', overflowY: 'auto'})
             .bindEvent({
@@ -11,6 +10,10 @@ pandora.ui.folders = function(section) {
                     pandora.resizeFolders();
                 }
             }),
+        counter = 0,
+        editable = (ui[
+            section == 'items' ? '_list' : section.slice(0, -1)
+        ] || '').split(':')[0] == pandora.user.username,
         folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1);
     pandora.$ui.allItems = pandora.ui.allItems(section).appendTo(that);
@@ -41,9 +44,9 @@ pandora.ui.folders = function(section) {
                                 { id: 'newsmartlist', title: Ox._('New Smart List') },
                                 { id: 'newsmartlistfromresults', title: Ox._('New Smart List from Results') },
                                 {},
-                                { id: 'duplicatelist', title: Ox._('Duplicate Selected List'), disabled: !pandora.user.ui._list },
-                                { id: 'editlist', title: Ox._('Edit Selected List...'), disabled: !pandora.user.ui._list },
-                                { id: 'deletelist', title: Ox._('Delete Selected List...'), disabled: !pandora.user.ui._list }
+                                { id: 'duplicatelist', title: Ox._('Duplicate Selected List'), disabled: !ui._list },
+                                { id: 'editlist', title: Ox._('Edit Selected List...'), disabled: !editable },
+                                { id: 'deletelist', title: Ox._('Delete Selected List...'), disabled: !editable }
                             ],
                             title: 'edit',
                             tooltip: Ox._('Manage Personal Lists'),
@@ -66,12 +69,14 @@ pandora.ui.folders = function(section) {
                                 }
                             },
                             pandora_find: function() {
+                                // fixme: duplicated
                                 var action = ui._list
                                     && pandora.getListData(ui._list).user == pandora.user.username
-                                    ? 'enableItem' : 'disableItem';
-                                // fixme: duplicated
+                                    ? 'enableItem' : 'disableItem'
+                                pandora.$ui.personalListsMenu[
+                                    ui._list ? 'enableItem' : 'disableItem'
+                                ]('duplicatelist');
                                 pandora.$ui.personalListsMenu[action]('editlist');
-                                pandora.$ui.personalListsMenu[action]('duplicatelist');
                                 pandora.$ui.personalListsMenu[action]('deletelist');
                                 pandora.$ui.personalListsMenu[
                                     ui.listSelection.length ? 'enableItem' : 'disableItem'
@@ -84,6 +89,52 @@ pandora.ui.folders = function(section) {
                             }
                         })
                     ];
+                } else if (section == 'edits') {
+                    extras = [
+                        pandora.$ui.personalListsMenu = Ox.MenuButton({
+                            items: [
+                                { id: 'newedit', title: Ox._('New Edit') },
+                                // FIXME: properly disable/enable
+                                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), disabled: true },
+                                { id: 'newsmartedit', title: Ox._('New Smart Edit'), disabled: true },
+                                {},
+                                { id: 'duplicateedit', title: Ox._('Duplicate Selected Edit'), disabled: !ui.edit },
+                                { id: 'editedit', title: Ox._('Edit Selected Edit...'), disabled: !editable },
+                                { id: 'deleteedit', title: Ox._('Delete Selected Edit...'), disabled: !editable }
+                            ],
+                            title: 'edit',
+                            tooltip: Ox._('Manage Personal Edits'),
+                            type: 'image'
+                        })
+                        .bindEvent({
+                            click: function(data) {
+                                var $list = pandora.$ui.folderList[folder.id];
+                                if (data.id == 'newedit') {
+                                    pandora.addEdit();
+                                } else if (data.id == 'neweditfromselection') {
+                                    // ...
+                                } else if (data.id == 'newsmartedit') {
+                                    // ...
+                                } else if (data.id == 'duplicateedit') {
+                                    // ...
+                                } else if (data.id == 'editedit') {
+                                    pandora.ui.listDialog().open();
+                                } else if (data.id == 'deleteedit') {
+                                    pandora.ui.deleteListDialog().open();
+                                }
+                            }
+                        })
+                        .bindEvent('pandora_edit', function(data) {
+                            var action = ui.edit
+                                && pandora.getListData(ui.edit).user == pandora.user.username
+                                ? 'enableItem' : 'disableItem';
+                            pandora.$ui.personalListsMenu[
+                                ui.edit ? 'enableItem' : 'disableItem'
+                            ]('duplicateedit');
+                            pandora.$ui.personalListsMenu[action]('editedit');
+                            pandora.$ui.personalListsMenu[action]('deleteedit');
+                        })
+                    ];
                 } else if (section == 'texts') {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
@@ -91,7 +142,8 @@ pandora.ui.folders = function(section) {
                                 { id: 'newtext', title: Ox._('New Text') },
                                 { id: 'newpdf', title: Ox._('New  PDF') },
                                 {},
-                                { id: 'deletetext', title: Ox._('Delete Selected Text...'), disabled: !ui.text }
+                                { id: 'edittext', title: Ox._('Edit Selected Text...'), disabled: !editable },
+                                { id: 'deletetext', title: Ox._('Delete Selected Text...'), disabled: !editable }
                             ],
                             title: 'edit',
                             tooltip: Ox._('Manage Personal Texts'),
@@ -104,43 +156,19 @@ pandora.ui.folders = function(section) {
                                     pandora.addText({type: 'text'});
                                 } else if (data.id == 'newpdf') {
                                     pandora.addText({type: 'pdf'});
+                                } else if (data.id == 'edittext') {
+                                    pandora.ui.listDialog().open();
                                 } else if (data.id == 'deletetext') {
                                     pandora.ui.deleteListDialog().open();
                                 }
                             }
                         })
                         .bindEvent('pandora_text', function(data) {
-                            pandora.$ui.personalListsMenu[
-                                data.value && data.value.length ? 'enableItem' : 'disableItem'
-                            ]('deletetext');
-                        })
-                    ];
-                } else if (section == 'edits') {
-                    extras = [
-                        pandora.$ui.personalListsMenu = Ox.MenuButton({
-                            items: [
-                                { id: 'newedit', title: Ox._('New Edit') },
-                                {},
-                                { id: 'deleteedit', title: Ox._('Delete Selected Edit...'), disabled: !ui.text }
-                            ],
-                            title: 'edit',
-                            tooltip: Ox._('Manage Personal Edits'),
-                            type: 'image'
-                        })
-                        .bindEvent({
-                            click: function(data) {
-                                var $list = pandora.$ui.folderList[folder.id];
-                                if (data.id == 'newedit') {
-                                    pandora.addEdit();
-                                } else if (data.id == 'deleteedit') {
-                                    pandora.ui.deleteListDialog().open();
-                                }
-                            }
-                        })
-                        .bindEvent('pandora_edit', function(data) {
-                            pandora.$ui.personalListsMenu[
-                                data.value && data.value.length ? 'enableItem' : 'disableItem'
-                            ]('deleteedit');
+                            var action = ui.text
+                                && pandora.getListData(ui.text).user == pandora.user.username
+                                ? 'enableItem' : 'disableItem';
+                            pandora.$ui.personalListsMenu[action]('edittext');
+                            pandora.$ui.personalListsMenu[action]('deletetext');
                         })
                     ];
                 } else {
