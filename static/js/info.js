@@ -13,6 +13,7 @@ pandora.ui.info = function() {
                 toggle: function(data) {
                     pandora.UI.set({showInfo: !data.collapsed});
                 },
+                pandora_edit: updateInfo,
                 pandora_find: function() {
                     if (pandora.user.ui._list != pandora.UI.getPrevious('_list')) {
                         updateInfo();
