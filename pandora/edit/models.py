@@ -10,7 +10,7 @@ import subprocess
 from urllib import quote
 
 import ox
-from ox.django.fields import TupleField
+from ox.django.fields import DictField, TupleField
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Max
@@ -39,6 +39,9 @@ class Edit(models.Model):
     _status = ['private', 'public', 'featured']
     description = models.TextField(default='')
     rightslevel = models.IntegerField(db_index=True, default=0)
+
+    query = DictField(default={"static": True})
+    type = models.CharField(max_length=255, default='static')
 
     icon = models.ImageField(default=None, blank=True, null=True,
                              upload_to=lambda i, x: i.path("icon.jpg"))
@@ -164,7 +167,13 @@ class Edit(models.Model):
                 pos.section = 'personal'
             pos.save()
         if 'type' in data:
-            self.type = data['type'] == 'pdf' and 'pdf' or 'html'
+            if data['type'] == 'static':
+                self.query = {"static":True}
+                self.type = 'static'
+            else:
+                self.type = 'dynamic'
+                if self.query.get('static', False):
+                     self.query = {}
         if 'posterFrames' in data:
             self.poster_frames = tuple(data['posterFrames'])
         self.save()
@@ -236,22 +245,22 @@ class Edit(models.Model):
     def json(self, keys=None, user=None):
         if not keys:
              keys=[
+                'clips',
                 'description',
+                'duration',
                 'editable',
-                'rightslevel',
                 'id',
                 'items',
-                'clips',
-                'duration',
                 'name',
                 'posterFrames',
+                'query',
+                'rightslevel',
                 'status',
                 'subscribed',
-                'user'
+                'type',
+                'user',
             ]
-        response = {
-            'type': 'static'
-        }
+        response = {}
         _map = {
             'posterFrames': 'poster_frames'
         }
@@ -260,6 +269,9 @@ class Edit(models.Model):
                 response[key] = self.get_id()
             elif key == 'items':
                 response[key] = self.clips.all().count()
+            elif key == 'query':
+                if not self.query.get('static', False):
+                    response[key] = self.query
             elif key == 'clips':
                 response[key] = [c.json(user) for c in self.clips.all().order_by('index')]
             elif key == 'duration':

@@ -223,7 +223,8 @@ actions.register(getEdit)
 def addEdit(request):
     '''
         takes {
-            name
+            [name],
+            [type]
         }
         returns {
             id
