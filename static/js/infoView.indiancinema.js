@@ -586,7 +586,7 @@ pandora.ui.infoView = function(data) {
                 + value + '</a>';
         } else if (key == 'wiki') {
             ret = '<a href="' + value + '">'
-                + Ox.decodeURI(value.split('wiki/').pop()) + '</a>';
+                + Ox.decodeURIComponent(value.split('wiki/').pop()) + '</a>';
         } else {
             ret = value;
         }
