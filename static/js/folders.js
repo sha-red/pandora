@@ -39,14 +39,14 @@ pandora.ui.folders = function(section) {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
-                                { id: 'newlist', title: Ox._('New List') },
-                                { id: 'newlistfromselection', title: Ox._('New List from Selection'), disabled: ui.listSelection.length == 0 },
-                                { id: 'newsmartlist', title: Ox._('New Smart List') },
-                                { id: 'newsmartlistfromresults', title: Ox._('New Smart List from Results') },
+                                { id: 'newlist', title: Ox._('New List'), keyboard: 'control n' },
+                                { id: 'newlistfromselection', title: Ox._('New List from Selection'), keyboard: 'shift control n', disabled: ui.listSelection.length == 0 },
+                                { id: 'newsmartlist', title: Ox._('New Smart List'), keyboard: 'alt control n' },
+                                { id: 'newsmartlistfromresults', title: Ox._('New Smart List from Results'), keyboard: 'shift alt control n' },
                                 {},
-                                { id: 'duplicatelist', title: Ox._('Duplicate Selected List'), disabled: !ui._list },
-                                { id: 'editlist', title: Ox._('Edit Selected List...'), disabled: !editable },
-                                { id: 'deletelist', title: Ox._('Delete Selected List...'), disabled: !editable }
+                                { id: 'duplicatelist', title: Ox._('Duplicate Selected List'), keyboard: 'control d', disabled: !ui._list },
+                                { id: 'editlist', title: Ox._('Edit Selected List...'), keyboard: 'control e', disabled: !editable },
+                                { id: 'deletelist', title: Ox._('Delete Selected List...'), keyboard: 'delete', disabled: !editable }
                             ],
                             title: 'edit',
                             tooltip: Ox._('Manage Personal Lists'),
@@ -93,13 +93,13 @@ pandora.ui.folders = function(section) {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
-                                { id: 'newedit', title: Ox._('New Edit') },
-                                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), disabled: ui.edit && ui.edits[ui.edit].selection.length },
-                                { id: 'newsmartedit', title: Ox._('New Smart Edit') },
+                                { id: 'newedit', title: Ox._('New Edit'), keyboard: 'control n' },
+                                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), keyboard: 'shift control n', disabled: ui.edit && ui.edits[ui.edit].selection.length },
+                                { id: 'newsmartedit', title: Ox._('New Smart Edit'), keyboard: 'alt control n'},
                                 {},
-                                { id: 'duplicateedit', title: Ox._('Duplicate Selected Edit'), disabled: !ui.edit },
-                                { id: 'editedit', title: Ox._('Edit Selected Edit...'), disabled: !editable },
-                                { id: 'deleteedit', title: Ox._('Delete Selected Edit...'), disabled: !editable }
+                                { id: 'duplicateedit', title: Ox._('Duplicate Selected Edit'), keyboard: 'control d', disabled: !ui.edit },
+                                { id: 'editedit', title: Ox._('Edit Selected Edit...'), keyboard: 'control e', disabled: !editable },
+                                { id: 'deleteedit', title: Ox._('Delete Selected Edit...'), keyboard: 'delete', disabled: !editable }
                             ],
                             title: 'edit',
                             tooltip: Ox._('Manage Personal Edits'),
@@ -138,11 +138,11 @@ pandora.ui.folders = function(section) {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
-                                { id: 'newtext', title: Ox._('New Text') },
-                                { id: 'newpdf', title: Ox._('New  PDF') },
+                                { id: 'newtext', title: Ox._('New Text'), keyboard: 'control n' },
+                                { id: 'newpdf', title: Ox._('New PDF'), keyboard: 'alt control n' },
                                 {},
-                                { id: 'edittext', title: Ox._('Edit Selected Text...'), disabled: !editable },
-                                { id: 'deletetext', title: Ox._('Delete Selected Text...'), disabled: !editable }
+                                { id: 'edittext', title: Ox._('Edit Selected Text...'), keyboard: 'control e', disabled: !editable },
+                                { id: 'deletetext', title: Ox._('Delete Selected Text...'), keyboard: 'delete', disabled: !editable }
                             ],
                             title: 'edit',
                             tooltip: Ox._('Manage Personal Texts'),
@@ -152,7 +152,7 @@ pandora.ui.folders = function(section) {
                             click: function(data) {
                                 var $list = pandora.$ui.folderList[folder.id];
                                 if (data.id == 'newtext') {
-                                    pandora.addText({type: 'text'});
+                                    pandora.addText({type: 'html'});
                                 } else if (data.id == 'newpdf') {
                                     pandora.addText({type: 'pdf'});
                                 } else if (data.id == 'edittext') {
@@ -312,33 +312,11 @@ pandora.ui.folders = function(section) {
                 title: Ox._(folder.title)
             })
             .bindEvent({
-                // fixme: duplicated
                 click: function(data) {
-                    var $list = pandora.$ui.folderList[i],
-                        hasFocus, id;
                     if (data.id == 'new' || data.id == 'newsmart') {
-                        pandora.api.addList({
-                            name: Ox._('Untitled'),
-                            status: 'private',
-                            type: data.id == 'new' ? 'static' : 'smart'
-                        }, function(result) {
-                            id = result.data.id;
-                            pandora.URL.set('?find=list:' + id)
-                            Ox.Request.clearCache(); // fixme: remove
-                            $list.reloadList().bindEventOnce({
-                                load: function(data) {
-                                    $list.gainFocus()
-                                        .options({selected: [id]})
-                                        .editCell(id, 'name');
-                                }
-                            });
-                        });
+                        pandora.addFolderItem(section, data.id == 'newsmart', false);
                     } else if (data.id == 'browse') {
-                        // alert('??')
-                        /*
-                        pandora.$sectionList[1].replaceWith(pandora.$ui.publicLists = pandora.ui.publicLists());
-                        pandora.site.showAllPublicLists = true;
-                        */
+                        // ...
                     }
                 },
                 toggle: function(data) {
@@ -414,10 +392,14 @@ pandora.ui.folders = function(section) {
     }
     that.bindEvent({
         pandora_edit: function() {
-            if (!pandora.user.ui.edit) {
+            var folder = pandora.getListData().folder,
+                edit = pandora.user.ui.edit,
+                previousEdit = pandora.UI.getPrevious().edit;
+            if (edit != previousEdit) {
                 Ox.forEach(pandora.$ui.folderList, function($list, id) {
-                    $list.options('selected', []);
+                    id != folder && $list.options('selected', []);
                 });
+                folder && pandora.$ui.folderList[folder].options({selected: [edit]});
             }
         },
         pandora_find: function() {
