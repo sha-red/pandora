@@ -164,6 +164,9 @@ pandora.UI = (function() {
         }
 
         if (args.edit) {
+            if (!pandora.user.ui.edits[args.edit]) {
+                add['edits.' + that.encode(args.edit)] = {};
+            }
             Ox.forEach(editSettings, function(value, key) {
                 var editsKey = 'edits.' + that.encode(args.edit) + '.' + key;
                 add[editsKey] = editsKey in args ? args[editsKey]
@@ -171,6 +174,7 @@ pandora.UI = (function() {
                     : value;
             });
         }
+
         if (args.text) {
             add['texts.' + that.encode(args.text)] = Ox.map(textSettings, function(value, key) {
                 var textsKey = 'texts.' + that.encode(args.text),
