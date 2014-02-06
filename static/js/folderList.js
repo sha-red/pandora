@@ -81,7 +81,7 @@ pandora.ui.folderList = function(id, section) {
             },
             {
                 clickable: function(data) {
-                    return section == 'items' && (
+                    return section != 'texts' && (
                         data.type == 'smart' || data.user == pandora.user.username
                     );
                 },
@@ -264,7 +264,7 @@ pandora.ui.folderList = function(id, section) {
         columns: columns,
         droppable: id != 'volumes',
         items: items,
-        keys: ['modified'].concat(section == 'items' ? ['query'] : ['rightslevel']),
+        keys: ['modified'].concat(section != 'texts' ? ['query'] : ['rightslevel']),
         max: 1,
         min: 0,
         pageLength: 1000,
@@ -284,31 +284,13 @@ pandora.ui.folderList = function(id, section) {
     })
     .bindEvent({
         add: function(event) {
-            // fixme: this is duplicated,
-            // see folder collapse panel menu handler
             if (id == 'personal') {
                 if (event.keys == '' || event.keys == 'alt') {
-                    pandora.api.addList({
-                        name: Ox._('Untitled'),
-                        status: 'private',
-                        type: event.keys == '' ? 'static' : 'smart'
-                    }, function(result) {
-                        var id = result.data.id;
-                        pandora.UI.set({
-                            find: {
-                                conditions: [{key: 'list', value: id, operator: '=='}],
-                                operator: '&'
-                            }
-                        });
-                        Ox.Request.clearCache(); // fixme: remove
-                        that.reloadList().bindEventOnce({
-                            load: function(data) {
-                                that.gainFocus()
-                                    .options({selected: [id]})
-                                    .editCell(id, 'name');
-                            }
-                        });
-                    });
+                    if (section != 'texts') {
+                        pandora.addFolderItem(section, event.keys == 'alt', false);
+                    } else {
+                        pandora.addText({type: event.keys == '' ? 'html' : 'pdf'});
+                    }
                 }
             } else if (id == 'favorite' || (id == 'featured' && canEditFeatured)) {
                 // this makes the button trigger a change event,
@@ -372,11 +354,6 @@ pandora.ui.folderList = function(id, section) {
                 });
             }
         },
-        /*
-        edit: function() {
-            pandora.ui.listDialog().open();
-        },
-        */
         init: function(data) {
             if (pandora.site.sectionFolders[section][i]) {
                 pandora.site.sectionFolders[section][i].items = data.items;
@@ -389,6 +366,19 @@ pandora.ui.folderList = function(id, section) {
                 pandora.$ui.folderPlaceholder[id].updateText(id)[data.items ? 'hide' : 'show']();
             }
             pandora.resizeFolders();
+        },
+        key_control_d: function() {
+            if (that.options('selected').length) {
+                pandora.addFolderItem(ui.section, ui._list);
+            }
+        },
+        key_control_e: function() {
+            if (
+                that.options('selected').length
+                && (id == 'personal' || (id == 'featured' && canEditFeatured))
+            ) {
+                pandora.ui.listDialog().open();
+            }
         },
         move: function(data) {
             pandora.api['sort' + folderItems]({
