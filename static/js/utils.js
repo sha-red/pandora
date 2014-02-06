@@ -935,6 +935,9 @@ pandora.getClipVideos = function(clip, resolution) {
         if (currentTime + clip.durations[i] <= start || currentTime > end) {
             item = null;
         } else {
+            if (clip.id) {
+                item.id = clip.id;
+            }
             if (currentTime <= start && currentTime + clip.durations[i] > start) {
                 item['in'] = start - currentTime;
             }
