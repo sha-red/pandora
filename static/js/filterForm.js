@@ -65,17 +65,29 @@ pandora.ui.filterForm = function(list) {
     that.updateResults = function() {
         if (list) {
             Ox.Request.clearCache(list.id);
-            pandora.$ui.list && pandora.$ui.list.bindEventOnce({
-                init: function(data) {
-                    pandora.$ui.folderList[
-                        pandora.getListData().folder
-                    ].value(list.id, 'query', that.$filter.options('query'));
-                }
-            })
-            .reloadList();
-            pandora.$ui.filters && pandora.$ui.filters.forEach(function($filter) {
-                $filter.reloadList();
-            });
+            if (pandora.user.ui.section == 'edits') {
+                pandora.$ui.folderList[
+                    pandora.getListData().folder
+                ].value(list.id, 'query', that.$filter.options('query'));
+                pandora.api.editEdit({
+                    id: list.id,
+                    query: that.$filter.options('query')
+                }, function(result) {
+                    pandora.$ui.editPanel.updatePanel();
+                });
+            } else {
+                pandora.$ui.list && pandora.$ui.list.bindEventOnce({
+                    init: function(data) {
+                        pandora.$ui.folderList[
+                            pandora.getListData().folder
+                        ].value(list.id, 'query', that.$filter.options('query'));
+                    }
+                })
+                .reloadList();
+                pandora.$ui.filters && pandora.$ui.filters.forEach(function($filter) {
+                    $filter.reloadList();
+                });
+            }
         } else {
             pandora.UI.set({find: Ox.clone(that.$filter.options('query'), true)});
             pandora.$ui.findElement.updateElement();

@@ -140,8 +140,10 @@ pandora.ui.listDialog = function(section) {
                 }
             });
 
-    $($updateCheckbox.find('.OxButton')[0]).css({margin: 0});
-    $($dialog.$element.find('.OxBar')[2]).append($updateCheckbox);
+    if (pandora.user.ui.section == 'items') {
+        $($updateCheckbox.find('.OxButton')[0]).css({margin: 0});
+        $($dialog.$element.find('.OxBar')[2]).append($updateCheckbox);
+    }
 
     function getWidth(section) {
         return section == 'general' ? 496
@@ -440,9 +442,12 @@ pandora.ui.listIconPanel = function(listData) {
                 };
             },
             items: function(data, callback) {
+                var listData = pandora.getListData();
                 pandora.api.find(Ox.extend(data, {
                     query: {
-                        conditions: ui.section == 'items' ? [{key: 'list', value: listData.id, operator: '=='}] : [],
+                        conditions: ui.section == 'items'
+                            ? [{key: 'list', value: listData.id, operator: '=='}]
+                            : listData.query ? listData.query.conditions : [],
                         operator: '&'
                     }
                 }), callback);
