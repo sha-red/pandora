@@ -42,7 +42,7 @@ pandora.ui.editPanel = function() {
                 clip.position = edit.duration;
                 edit.duration += clip.duration;
             });
-            callback();
+            sortClips(callback);
         });
     }
 
@@ -86,10 +86,9 @@ pandora.ui.editPanel = function() {
             annotationsSize: ui.annotationsSize,
             annotationsSort: ui.annotationsSort,
             clickLink: pandora.clickLink,
+            clipRatio: pandora.site.video.previewRatio,
             clips: Ox.clone(edit.clips),
             clipSize: listSize,
-            clipSort: ui.edits[ui.edit].sort,
-            clipSortOptions: [/*...*/],
             clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'C</span>',
             clipView: ui.edits[ui.edit].view,
             duration: edit.duration,
@@ -121,11 +120,10 @@ pandora.ui.editPanel = function() {
             showUsers: pandora.site.annotations.showUsers,
             smallTimelineURL: getSmallTimelineURL(),
             sort: ui.edits[ui.edit].sort,
-            sortOptions: (
-                    edit.type == 'static'
-                    ? [{id: 'index', title: Ox._('Sort Manually'), operator: '+'}]
-                    : []
-                ).concat(
+            sortOptions: [
+                    {id: 'index', title: Ox._('Sort Manually'), operator: '+'}
+                ]
+                .concat(
                     pandora.site.clipKeys.map(function(key) {
                         return Ox.extend(Ox.clone(key), {
                             title: Ox._(('Sort by Clip {0}'), [Ox._(key.title)])
@@ -269,38 +267,14 @@ pandora.ui.editPanel = function() {
                 pandora.UI.set({videoScale: data.scale});
             },
             select: function(data) {
-                pandora.UI.set(editsKey('selection'), data.ids);
+                pandora.UI.set({editSelection: data.ids});
             },
             size: function(data) {
                 pandora.UI.set({clipSize: data.size});
             },
             sort: function(data) {
-                pandora.UI.set(editsKey('sort'), data);
-                var key = data[0].key;
-                if (key == 'position') {
-                    key = 'in';
-                }
-                if ([
-                    'id', 'index', 'in', 'out', 'duration',
-                    'title', 'director', 'year', 'videoRatio'
-                ].indexOf(key) > -1) {
-                    edit.clips = Ox.sortBy(edit.clips, key);
-                    if (data[0].operator == '-') {
-                        edit.clips.reverse();
-                    }
-                    updateClips(edit.clips);
-                } else {
-                    pandora.api.sortClips({
-                        edit: edit.id,
-                        sort: data
-                    }, function(result) {
-                        edit.clips.forEach(function(clip) {
-                            clip['sort'] = result.data.clips.indexOf(clip.id);
-                        });
-                        edit.clips = Ox.sortBy(edit.clips, 'sort');
-                        updateClips(edit.clips);
-                    });
-                }
+                pandora.UI.set({editSort: data});
+                sortClips(updateClips);
             },
             split: function(data) {
                 var clips = [serializeClips(data.ids), serializeClips(data.split)];
@@ -323,7 +297,7 @@ pandora.ui.editPanel = function() {
                 pandora.UI.set({showTimeline: data.showTimeline});
             },
             view: function(data) {
-                pandora.UI.set(editsKey('view'), data.view);
+                pandora.UI.set({editView: data.view});
                 data.view == 'grid' && enableDragAndDrop();
             },
             volume: function(data) {
@@ -455,6 +429,35 @@ pandora.ui.editPanel = function() {
                 clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out
             ) + '/' + (clip.id || '');
         });
+    }
+
+    function sortClips(callback) {
+        var sort = pandora.user.ui.editSort;
+        var key = sort[0].key;
+        if (key == 'position') {
+            key = 'in';
+        }
+        if ([
+            'id', 'index', 'in', 'out', 'duration',
+            'title', 'director', 'year', 'videoRatio'
+        ].indexOf(key) > -1) {
+            edit.clips = Ox.sortBy(edit.clips, key);
+            if (sort[0].operator == '-') {
+                edit.clips.reverse();
+            }
+            callback(edit.clips);
+        } else {
+            pandora.api.sortClips({
+                edit: edit.id,
+                sort: sort
+            }, function(result) {
+                edit.clips.forEach(function(clip) {
+                    clip['sort'] = result.data.clips.indexOf(clip.id);
+                });
+                edit.clips = Ox.sortBy(edit.clips, 'sort');
+                callback(edit.clips);
+            });
+        }
     }
 
     function updateClips(clips) {
