@@ -656,6 +656,9 @@ pandora.ui.mainMenu = function() {
                 that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
                 that.replaceMenu('itemMenu', getItemMenu());
             },
+            pandora_editselection: function(data) {
+                that[data.value.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+            },
             pandora_find: function() {
                 var action = pandora.getListData().editable ? 'enableItem' : 'disableItem',
                     list = ui._list,
@@ -995,7 +998,7 @@ pandora.ui.mainMenu = function() {
                 { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), disabled: isGuest || ui.listSelection.length == 0 },
                 { id: 'newsmarteditfromresults', title: Ox._('New Smart Edit from Results'), disabled: isGuest }
             ] : ui.section == 'edits' ? [
-                { id: 'newlistfromselection', title: Ox._('New ' + itemNameSingular + ' from Selection'), disabled: isGuest || ui.listSelection.length == 0, keyboard: 'shift control n' },
+                { id: 'newlistfromselection', title: Ox._('New ' + itemNameSingular + ' from Selection'), disabled: isGuest || !ui.edit || ui.editSelection.length == 0, keyboard: 'shift control n' },
                 { id: 'newsmartlist', title: Ox._('New Smart ' + itemNameSingular), disabled: isGuest, keyboard: 'alt control n' }
             ] : [
                 { id: 'newpdf', title: Ox._('New PDF'), disabled: isGuest, keyboard: 'alt control n' },

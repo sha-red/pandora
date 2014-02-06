@@ -94,7 +94,7 @@ pandora.ui.folders = function(section) {
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
                                 { id: 'newedit', title: Ox._('New Edit'), keyboard: 'control n' },
-                                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), keyboard: 'shift control n', disabled: ui.edit && ui.edits[ui.edit].selection.length },
+                                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), keyboard: 'shift control n', disabled: !ui.edit || !ui.editSelection.length },
                                 { id: 'newsmartedit', title: Ox._('New Smart Edit'), keyboard: 'alt control n'},
                                 {},
                                 { id: 'duplicateedit', title: Ox._('Duplicate Selected Edit'), keyboard: 'control d', disabled: !ui.edit },
@@ -123,15 +123,22 @@ pandora.ui.folders = function(section) {
                                 }
                             }
                         })
-                        .bindEvent('pandora_edit', function(data) {
-                            var action = ui.edit
-                                && pandora.getListData(ui.edit).user == pandora.user.username
-                                ? 'enableItem' : 'disableItem';
-                            pandora.$ui.personalListsMenu[
-                                ui.edit ? 'enableItem' : 'disableItem'
-                            ]('duplicateedit');
-                            pandora.$ui.personalListsMenu[action]('editedit');
-                            pandora.$ui.personalListsMenu[action]('deleteedit');
+                        .bindEvent({
+                            pandora_edit: function(data) {
+                                var action = ui.edit
+                                    && pandora.getListData(ui.edit).user == pandora.user.username
+                                    ? 'enableItem' : 'disableItem';
+                                pandora.$ui.personalListsMenu[
+                                    ui.edit ? 'enableItem' : 'disableItem'
+                                ]('duplicateedit');
+                                pandora.$ui.personalListsMenu[action]('editedit');
+                                pandora.$ui.personalListsMenu[action]('deleteedit');
+                            },
+                            pandora_editselection: function(data) {
+                                pandora.$ui.personalListsMenu[
+                                    data.value.length ? 'enableItem' : 'disableItem'
+                                ]('neweditfromselection');
+                            }
                         })
                     ];
                 } else if (section == 'texts') {
