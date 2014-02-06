@@ -182,6 +182,19 @@ pandora.UI = (function() {
             });
         }
 
+        Ox.forEach({
+            editSelection: 'selection',
+            editSort: 'sort',
+            editView: 'view'
+        }, function(editSetting, setting) {
+            var key = 'edits.' + that.encode(pandora.user.ui.edit) + '.' + editSetting;
+            if (setting in args) {
+                add[key] = args[setting];
+            } else if (setting in add) {
+                add[key] == add[setting];
+            }
+        });
+
         // items in args trigger events, items in add do not
         [args, add].forEach(function(obj, isAdd) {
             Ox.forEach(obj, function(val, key) {
