@@ -120,9 +120,11 @@ pandora.ui.editPanel = function() {
             showUsers: pandora.site.annotations.showUsers,
             smallTimelineURL: getSmallTimelineURL(),
             sort: ui.edits[ui.edit].sort,
-            sortOptions: [
-                    {id: 'index', title: Ox._('Sort Manually'), operator: '+'}
-                ]
+            sortOptions: (
+                    edit.type == 'static'
+                    ? [{id: 'index', title: Ox._('Sort Manually'), operator: '+'}]
+                    : []
+                )
                 .concat(
                     pandora.site.clipKeys.map(function(key) {
                         return Ox.extend(Ox.clone(key), {
