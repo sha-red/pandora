@@ -376,7 +376,7 @@ pandora.ui.mainMenu = function() {
                         pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
                     }
                 } else if (Ox.contains(['neweditfromselection', 'newsmarteditfromresults'], data.id)) {
-                    // ...
+                    pandora.addEdit(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
                 } else if (data.id == 'newpdf') {
                     pandora.addText({type: 'pdf'});
                 } else if (data.id == 'duplicatelist') {
@@ -737,7 +737,7 @@ pandora.ui.mainMenu = function() {
             pandora_listselection: function(data) {
                 var action = data.value.length ? 'enableItem' : 'disableItem';
                 that[action]('newlistfromselection');
-                if (ui.section == 'items') {
+                if (ui.section == 'items' && pandora.isClipView()) {
                     that[action]('neweditfromselection');
                 }
                 that.replaceMenu('itemMenu', getItemMenu());
