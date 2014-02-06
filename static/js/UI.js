@@ -168,7 +168,7 @@ pandora.UI = (function() {
                 var editsKey = 'edits.' + that.encode(args.edit) + '.' + key;
                 add[editsKey] = editsKey in args ? args[editsKey]
                     : pandora.user.ui.edits[args.edit] ? pandora.user.ui.edits[args.edit][key]
-                    : valuel
+                    : value;
             });
         }
         if (args.text) {
