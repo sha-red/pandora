@@ -14,7 +14,7 @@ pandora.addItem = function() {
 
 pandora.addEdit = function() {
     // addEdit(isSmart, isFrom) or addEdit(edit) [=duplicate]
-    pandora.addFolderItem.apply(null, ['edit'].concat(Ox.slice(arguments)));
+    pandora.addFolderItem.apply(null, ['edits'].concat(Ox.slice(arguments)));
 };
 
 pandora.addFolderItem = function(section) {
@@ -36,12 +36,15 @@ pandora.addFolderItem = function(section) {
         };
         if (isFrom) {
             if (!isSmart) {
-                data.items = isItems
-                    ? ui.listSelection
-                    : ui.edits[ui.edit].selection;
+                data.items = isItems ? ui.listSelection
+                    : ui.section == 'items' ? pandora.$ui.clipList.options('selected')
+                    : ui.editSelection;
             } else {
                 data.query = ui.find;
             }
+        }
+        if (ui.section == 'items' && section == 'edits') {
+            pandora.UI.set({section: 'edits'});
         }
         addList();
     } else {
