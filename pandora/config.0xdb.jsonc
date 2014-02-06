@@ -784,6 +784,9 @@
             "documentsView": "grid",
             "edit": "",
             "edits": {},
+            "editSelection": [],
+            "editSort": [{"key": "index", "operator": "+"}],
+            "editView": "list",
             "embedSize": 256,
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
