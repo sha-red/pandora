@@ -339,14 +339,18 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'viewicons') {
                     pandora.UI.set({icons: value});
                 } else if (data.id.slice(0, 8) == 'viewlist') {
-                    pandora.UI.set({
-                        find: {
-                            conditions: data.checked ? [
-                                {key: 'list', value: data.id.slice(8).replace(/\t/g, '_'), operator: '=='}
-                            ] : [],
-                            operator: '&'
-                        }
-                    });
+                    if (ui.section == 'items') {
+                        pandora.UI.set({
+                            find: {
+                                conditions: data.checked ? [
+                                    {key: 'list', value: data.id.slice(8).replace(/\t/g, '_'), operator: '=='}
+                                ] : [],
+                                operator: '&'
+                            }
+                        });
+                    } else {
+                        pandora.UI.set(ui.section.slice(0, -1), data.id.slice(8).replace(/\t/g, '_'));
+                    }
                 } else if (data.id == 'viewsection') {
                     pandora.UI.set({section: value});
                 } else if (data.id == 'viewtimelines') {
@@ -354,29 +358,29 @@ pandora.ui.mainMenu = function() {
                 }
             },
             click: function(data) {
-                if ([
+                if (Ox.contains([
                     'home', 'software', 'signup', 'signin', 'signout',
                     'preferences', 'help', 'api'
                 ].concat(
                     pandora.site.sitePages.map(function(page) {
                         return page.id;
                     })
-                ).indexOf(data.id) > -1) {
+                ), data.id)) {
                     pandora.UI.set({page: data.id});
-                } else if ([
+                } else if (Ox.contains([
                     'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'
-                ].indexOf(data.id) > -1) {
+                ], data.id)) {
                     if (ui.section == 'texts') {
                         pandora.addText({type: 'text'});
                     } else {
                         pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
                     }
+                } else if (Ox.contains(['neweditfromselection', 'newsmarteditfromresults'], data.id)) {
+                    // ...
+                } else if (data.id == 'newpdf') {
+                    pandora.addText({type: 'pdf'});
                 } else if (data.id == 'duplicatelist') {
-                    if (ui.section == 'texts') {
-                        pandora.addText({type: 'text'});
-                    } else {
-                        pandora.addList(ui._list);
-                    }
+                    pandora.addFolderItem(ui.section, ui.section == 'items' ? ui._list : ui.edit);
                 } else if (data.id == 'editlist') {
                     pandora.ui.listDialog().open();
                 } else if (data.id == 'add') {
@@ -639,7 +643,18 @@ pandora.ui.mainMenu = function() {
                 hasTimeline() && pandora.UI.set({showTimeline: !ui.showTimeline});
             },
             pandora_edit: function() {
-                // ...
+                var action = pandora.getListData().editable ? 'enableItem' : 'disableItem',
+                    edit = ui.edit,
+                    previousEdit = pandora.UI.getPrevious().edit;
+                if (edit != previousEdit) {
+                    that.uncheckItem(previousEdit == '' ? 'allitems' : 'viewlist' + previousEdit.replace(/_/g, Ox.char(9)));
+                    that.checkItem(edit == '' ? 'allitems' : 'viewlist' + edit.replace(/_/g, '\t'));
+                }
+                that[edit ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[action]('editlist');
+                that[action]('deletelist');
+                that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+                that.replaceMenu('itemMenu', getItemMenu());
             },
             pandora_find: function() {
                 var action = pandora.getListData().editable ? 'enableItem' : 'disableItem',
@@ -649,8 +664,8 @@ pandora.ui.mainMenu = function() {
                     that.uncheckItem(previousList == '' ? 'allitems' : 'viewlist' + previousList.replace(/_/g, Ox.char(9)));
                     that.checkItem(list == '' ? 'allitems' : 'viewlist' + list.replace(/_/g, '\t'));
                 }
+                that[ui._list ? 'enableItem' : 'disableItem']('duplicatelist');
                 that[action]('editlist');
-                that[action]('duplicatelist');
                 that[action]('deletelist');
                 that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
                 that.replaceMenu('itemMenu', getItemMenu());
@@ -719,6 +734,9 @@ pandora.ui.mainMenu = function() {
             pandora_listselection: function(data) {
                 var action = data.value.length ? 'enableItem' : 'disableItem';
                 that[action]('newlistfromselection');
+                if (ui.section == 'items') {
+                    that[action]('neweditfromselection');
+                }
                 that.replaceMenu('itemMenu', getItemMenu());
                 that[
                     pandora.getItemIdAndPosition() ? 'enableItem' : 'disableItem'
@@ -970,16 +988,27 @@ pandora.ui.mainMenu = function() {
                 {},
                 { id: 'newlist', title: Ox._('New ' + itemNameSingular), disabled: isGuest, keyboard: 'control n' },
             ],
-            ui.section != 'texts' ? [
+            ui.section == 'items' ? [
                 { id: 'newlistfromselection', title: Ox._('New ' + itemNameSingular + ' from Selection'), disabled: isGuest || ui.listSelection.length == 0, keyboard: 'shift control n' },
                 { id: 'newsmartlist', title: Ox._('New Smart ' + itemNameSingular), disabled: isGuest, keyboard: 'alt control n' },
                 { id: 'newsmartlistfromresults', title: Ox._('New Smart ' + itemNameSingular + ' from Results'), disabled: isGuest, keyboard: 'shift alt control n' },
+                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), disabled: isGuest || ui.listSelection.length == 0 },
+                { id: 'newsmarteditfromresults', title: Ox._('New Smart Edit from Results'), disabled: isGuest }
+            ] : ui.section == 'edits' ? [
+                { id: 'newlistfromselection', title: Ox._('New ' + itemNameSingular + ' from Selection'), disabled: isGuest || ui.listSelection.length == 0, keyboard: 'shift control n' },
+                { id: 'newsmartlist', title: Ox._('New Smart ' + itemNameSingular), disabled: isGuest, keyboard: 'alt control n' }
+            ] : [
+                { id: 'newpdf', title: Ox._('New PDF'), disabled: isGuest, keyboard: 'alt control n' },
+            ],
+            [
+                {}
+            ],
+            ui.section != 'texts' ? [
+                { id: 'duplicatelist', title: Ox._('Duplicate Selected ' + itemNameSingular), disabled: isGuest || (ui.section == 'items' && !ui._list) || (ui.section == 'edits' && !ui.edit), keyboard: 'control d' }
             ] : [],
             [
-                {},
-                { id: 'duplicatelist', title: Ox._('Duplicate Selected ' + itemNameSingular), disabled: isGuest || !ui._list, keyboard: 'control d' },
-                { id: 'editlist', title: Ox._('Edit Selected ' + itemNameSingular + '...'), disabled: isGuest || !ui._list, keyboard: 'control e' },
-                { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: isGuest || !ui._list, keyboard: 'delete' }
+                { id: 'editlist', title: Ox._('Edit Selected ' + itemNameSingular + '...'), disabled: isGuest || (ui.section == 'items' && !ui._list) || (ui.section == 'edits' && !ui.edit), keyboard: 'control e' },
+                { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: isGuest || (ui.section == 'items' && !ui._list) || (ui.section == 'edits' && !ui.edit), keyboard: 'delete' }
             ],
             ui.section == 'items' ? [
                 {},
