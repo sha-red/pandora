@@ -447,6 +447,7 @@ pandora.ui.editPanel = function() {
             if (sort[0].operator == '-') {
                 edit.clips.reverse();
             }
+            updateDuration();
             callback(edit.clips);
         } else {
             pandora.api.sortClips({
@@ -457,19 +458,24 @@ pandora.ui.editPanel = function() {
                     clip['sort'] = result.data.clips.indexOf(clip.id);
                 });
                 edit.clips = Ox.sortBy(edit.clips, 'sort');
+                updateDuration();
                 callback(edit.clips);
             });
         }
     }
 
-    function updateClips(clips) {
-        clips = clips || edit.clips;
-        edit.clips = clips;
+    function updateDuration() {
         edit.duration = 0;
         edit.clips.forEach(function(clip) {
             clip.position = edit.duration;
             edit.duration += clip.duration;
         });
+    }
+
+    function updateClips(clips) {
+        clips = clips || edit.clips;
+        edit.clips = clips;
+        updateDuration();
         that.options({
             clips: Ox.clone(edit.clips),
             duration: edit.duration,
