@@ -25,7 +25,7 @@ pandora.ui.sortElement = function(isNavigationView) {
         $sortSelect = Ox.Select({
                 items: items,
                 value: ui[sortKey][0].key,
-                width: !isEmbed && isNavigationView ? 120 + Ox.UI.SCROLLBAR_SIZE : 144
+                width: !isEmbed && isNavigationView && ui.clipColumns == 1 ? 120 + Ox.UI.SCROLLBAR_SIZE : 144
             })
             .bindEvent({
                 change: function(data) {
@@ -77,6 +77,10 @@ pandora.ui.sortElement = function(isNavigationView) {
             tooltip: getButtonTooltip()
         });
     }
+
+    that.resizeElement = function(size) {
+        $sortSelect.options({width: size});
+    };
 
     return that;
     
