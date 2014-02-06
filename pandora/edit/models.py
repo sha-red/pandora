@@ -201,6 +201,7 @@ class Edit(models.Model):
             clips = self.clips.all()
         else:
             clips = clip.models.Clip.objects.find({'query': self.clip_query()}, user)
+            clips = clips.filter(item__in=self.get_items(user))
         return clips
 
     def get_clips_json(self, user=None):
