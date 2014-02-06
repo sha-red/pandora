@@ -164,11 +164,11 @@ pandora.UI = (function() {
         }
 
         if (args.edit) {
-            add['edits.' + that.encode(args.edit)] = Ox.map(editSettings, function(value, key) {
+            Ox.forEach(editSettings, function(value, key) {
                 var editsKey = 'edits.' + that.encode(args.edit) + '.' + key;
-                return editsKey in args ? args[editsKey]
+                add[editsKey] = editsKey in args ? args[editsKey]
                     : pandora.user.ui.edits[args.edit] ? pandora.user.ui.edits[args.edit][key]
-                    : value;
+                    : valuel
             });
         }
         if (args.text) {
@@ -187,7 +187,7 @@ pandora.UI = (function() {
             editSort: 'sort',
             editView: 'view'
         }, function(editSetting, setting) {
-            var key = 'edits.' + that.encode(pandora.user.ui.edit) + '.' + editSetting;
+            var key = 'edits.' + that.encode(args.edit || pandora.user.ui.edit) + '.' + editSetting;
             if (setting in args) {
                 add[key] = args[setting];
             } else if (setting in add) {
