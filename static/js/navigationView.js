@@ -63,7 +63,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
             orientation: 'vertical'
         })
         .bindEvent({
-            resize: function() {
+            resize: function(data) {
+                pandora.$ui.sortElement.resizeElement(getSortSelectWidth(data.size));
                 $list.size()
             },
             resizeend: function(data) {
@@ -76,6 +77,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                     } else {
                         size = listSizes[2];
                     }
+                    pandora.$ui.sortElement.resizeElement(getSortSelectWidth(size));
                     that.size(1, size, function() {
                         // strangely, the animation may still not be fully
                         // finished, causing the list size to be off by one
@@ -245,6 +247,10 @@ pandora.ui.navigationView = function(type, videoRatio) {
             });
             type == 'map' && pandora.UI.set({mapSelection: id ? $element.options('find') : ''});
         }
+    }
+
+    function getSortSelectWidth(width) {
+        return Math.min(144, width - 32 + Ox.UI.SCROLLBAR_SIZE);
     }
 
     function updateStatusbar(items) {
