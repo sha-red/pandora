@@ -374,6 +374,8 @@ class Clip(models.Model):
     lightness= models.FloatField(default=0)
     volume = models.FloatField(default=0)
 
+    objects = managers.ClipManager()
+
     def __unicode__(self):
         if self.annotation:
             return u'%s' % self.annotation.public_id

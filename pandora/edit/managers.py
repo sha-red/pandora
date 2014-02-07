@@ -133,3 +133,7 @@ class EditManager(Manager):
         return qs
 
 
+class ClipManager(Manager):
+
+    def get_query_set(self):
+        return QuerySet(self.model)
