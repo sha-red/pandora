@@ -220,15 +220,23 @@ class Edit(models.Model):
         return clips
 
     def clip_query(self):
-        query = {
-            'conditions': [],
+        def get_conditions(conditions):
+            clip_conditions = []
+            for condition in conditions:
+                if 'conditions' in condition:
+                    clip_conditions.append({
+                        'operator': condition.get('operator', '&'),
+                        'conditions': get_conditions(condition['conditions'])
+                    })
+                elif condition['key'] == 'annotations' or \
+                    get_by_id(settings.CONFIG['layers'], condition['key']):
+                        clip_conditions.append(condition)
+            return clip_conditions
+
+        return {
+            'conditions': get_conditions(self.query.get('conditions', [])),
             'operator': self.query.get('operator', '&')
         }
-        for condition in self.query.get('conditions', []):
-            if condition['key'] == 'annotations' or \
-                get_by_id(settings.CONFIG['layers'], condition['key']):
-                    query['conditions'].append(condition)
-        return query
 
     def update_icon(self):
         frames = []
