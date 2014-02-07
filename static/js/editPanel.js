@@ -78,6 +78,9 @@ pandora.ui.editPanel = function() {
     }
 
     function renderEdit() {
+        if (ui.section != 'edits') {
+            return;
+        }
         that = pandora.$ui.editPanel = Ox.VideoEditPanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
             annotationsFont: ui.annotationsFont,
@@ -92,7 +95,7 @@ pandora.ui.editPanel = function() {
             clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'C</span>',
             clipView: ui.edits[ui.edit].view,
             duration: edit.duration,
-            editable: edit.editable,
+            editable: edit.type == 'static' && edit.editable,
             enableSubtitles: ui.videoSubtitles,
             fullscreen: false,
             getClipImageURL: function(id, width, height) {
@@ -104,6 +107,7 @@ pandora.ui.editPanel = function() {
             },
             height: pandora.$ui.appPanel.size(1),
             'in': ui.edits[ui.edit]['in'],
+            itemName: pandora.site.itemName.singular,
             layers: getLayers(edit.clips),
             loop: ui.videoLoop,
             muted: ui.videoMuted,
