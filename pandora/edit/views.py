@@ -191,7 +191,7 @@ def sortClips(request):
     data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['edit'])
     response = json_response()
-    clips = models.Clip.objects.filter(edit=edit)
+    clips = edit.get_clips()
     clips = _order_clips(clips, data['sort'])
     response['data']['clips'] = [ox.toAZ(c['id']) for c in clips.values('id')]
     return render_to_json_response(response)
