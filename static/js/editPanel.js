@@ -235,6 +235,23 @@ pandora.ui.editPanel = function() {
             open: function(data) {
                 pandora.UI.set(editsKey('clip'), data.ids[0]);
             },
+            openlink: function(data) {
+                pandora.UI.set('videoPoints.' + data.item, data.annotation ? {
+                    annotation: data.annotation.split('/')[1],
+                    'in': data['in'],
+                    out: data.out,
+                    position: data.position
+                } : {
+                    'in': data['in'],
+                    out: data.out,
+                    position: data.position
+                });
+                pandora.UI.set({
+                    section: 'items',
+                    item: data.item || data.annotation.split('/')[0],
+                    itemView: ui.videoView,
+                });
+            },
             paste: function() {
                 var clips = pandora.clipboard.paste();
                 pandora.doHistory('paste', clips, ui.edit, function(result) {
