@@ -38,7 +38,7 @@ pandora.addFolderItem = function(section) {
             if (!isSmart) {
                 data.items = isItems ? ui.listSelection
                     : ui.section == 'items' ? pandora.$ui.clipList.options('selected')
-                    : ui.editSelection;
+                    : pandora.$ui.editPanel.getSelectedClips();
             } else {
                 data.query = ui.find;
             }
@@ -446,7 +446,6 @@ pandora.createLinks = function($element) {
                 }
             });
         } else {
-
             pandora.api.addClips({
                 clips: getClipData(items),
                 edit: target,

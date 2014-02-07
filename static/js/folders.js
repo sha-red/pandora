@@ -94,7 +94,7 @@ pandora.ui.folders = function(section) {
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
                                 { id: 'newedit', title: Ox._('New Edit'), keyboard: 'control n' },
-                                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), keyboard: 'shift control n', disabled: !ui.edit || !ui.editSelection.length },
+                                { id: 'neweditfromselection', title: Ox._('New Edit from Selection'), keyboard: 'shift control n', disabled: !ui.edit },
                                 { id: 'newsmartedit', title: Ox._('New Smart Edit'), keyboard: 'alt control n'},
                                 {},
                                 { id: 'duplicateedit', title: Ox._('Duplicate Selected Edit'), keyboard: 'control d', disabled: !ui.edit },
