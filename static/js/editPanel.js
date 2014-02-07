@@ -46,7 +46,6 @@ pandora.ui.editPanel = function() {
         });
     }
 
-    // FIXME: not used below!
     function getSmallTimelineCanvas() {
         var fps = getSmallTimelineFPS(),
             width = Math.ceil(edit.duration * fps),
@@ -59,10 +58,7 @@ pandora.ui.editPanel = function() {
     }
 
     function getSmallTimelineURL() {
-        var fps = getSmallTimelineFPS(),
-            width = Math.ceil(edit.duration * fps),
-            height = fps == 1 ? 16 : 64;
-        smallTimelineCanvas = Ox.$('<canvas>').attr({width: width, height: height})[0];
+        smallTimelineCanvas = getSmallTimelineCanvas();
         smallTimelineContext = smallTimelineCanvas.getContext('2d');
         return smallTimelineCanvas.toDataURL();
     }
@@ -311,6 +307,7 @@ pandora.ui.editPanel = function() {
                 pandora.UI.set({videoSubtitles: data.subtitles});
             },
             timeline: function(data) {
+                updateSmallTimelineURL();
                 pandora.UI.set({videoTimeline: data.timeline});
             },
             toggleclips: function(data) {
@@ -517,7 +514,8 @@ pandora.ui.editPanel = function() {
     function updateSmallTimelineURL() {
         var canvas = getSmallTimelineCanvas(),
             context = canvas.getContext('2d'),
-            fps = getSmallTimelineFPS();
+            fps = getSmallTimelineFPS(),
+            timelineIteration = self.timelineIteration = Ox.uid();
         Ox.serialForEach(edit.clips, function(clip) {
             var callback = Ox.last(arguments);
             pandora[
@@ -526,9 +524,13 @@ pandora.ui.editPanel = function() {
                 var image = Ox.$('<img>')
                     .on({
                         load: function() {
-                            context.drawImage(image, Math.floor(clip.position * fps), 0);
-                            that.options({smallTimelineURL: canvas.toDataURL()});
-                            callback();
+                            if (timelineIteration == self.timelineIteration) {
+                                context.drawImage(image, Math.floor(clip.position * fps), 0);
+                                that.options({smallTimelineURL: canvas.toDataURL()});
+                                callback();
+                            } else {
+                                callback(false);
+                            }
                         }
                     })
                     .attr({
