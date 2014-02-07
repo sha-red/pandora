@@ -155,7 +155,8 @@ def orderClips(request):
     return render_to_json_response(response)
 actions.register(orderClips, cache=False)
 
-def _order_clips(qs, sort):
+def _order_clips(edit, sort):
+    qs = edit.get_clips()
     order_by = []
     for e in sort:
         operator = e['operator']
@@ -169,7 +170,7 @@ def _order_clips(qs, sort):
             'position': 'start',
             'in': 'start',
             'out': 'end',
-            'text': 'annotation__sortvalue',
+            'text': 'annotation__sortvalue' if edit.type == 'static' else 'annotations__sortvalue',
             'item__sort__item': 'item__sort__itemId',
         }.get(key, key)
         order = '%s%s' % (operator, key)
@@ -191,8 +192,7 @@ def sortClips(request):
     data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['edit'])
     response = json_response()
-    clips = edit.get_clips()
-    clips = _order_clips(clips, data['sort'])
+    clips = _order_clips(edit, data['sort'])
     response['data']['clips'] = [ox.toAZ(c['id']) for c in clips.values('id')]
     return render_to_json_response(response)
 actions.register(sortClips, cache=False)
