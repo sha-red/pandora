@@ -209,7 +209,7 @@ class Edit(models.Model):
         if self.type == 'static':
             clips = [c.json(user) for c in qs.order_by('index')]
         else:
-            if qs.count() <= 100:
+            if qs.count() <= 1000:
                 clips = [c.edit_json(user) for c in qs]
                 index = 0
                 for c in clips:
