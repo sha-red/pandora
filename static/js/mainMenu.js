@@ -373,7 +373,7 @@ pandora.ui.mainMenu = function() {
                     if (ui.section == 'texts') {
                         pandora.addText({type: 'text'});
                     } else {
-                        pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
+                        pandora.addFolderItem(ui.section, data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
                     }
                 } else if (Ox.contains(['neweditfromselection', 'newsmarteditfromresults'], data.id)) {
                     pandora.addEdit(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);

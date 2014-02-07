@@ -36,9 +36,15 @@ pandora.addFolderItem = function(section) {
         };
         if (isFrom) {
             if (!isSmart) {
-                data.items = isItems ? ui.listSelection
-                    : ui.section == 'items' ? pandora.$ui.clipList.options('selected')
-                    : pandora.$ui.editPanel.getSelectedClips();
+                if (isItems) {
+                    data.items = ui.listSelection;
+                } else {
+                    data.clips = pandora.getClipData(
+                        ui.section == 'items'
+                        ? pandora.$ui.clipList.options('selected') // FIXME: still wrong, could be annotation or in-to-out
+                        : pandora.$ui.editPanel.getSelectedClips()
+                    );
+                }
             } else {
                 data.query = ui.find;
             }
@@ -78,10 +84,10 @@ pandora.addFolderItem = function(section) {
                                 sort: [{key: 'id', operator: ''}],
                                 range: [0, result.data.items]
                             }, function(result) {
-                                var items = result.data.items.map(function(item) {
+                                data.items = result.data.items.map(function(item) {
                                     return item.id;
                                 });
-                                addList(items);
+                                addList();
                             });
                         } else {
                             addList();
@@ -89,7 +95,7 @@ pandora.addFolderItem = function(section) {
                     });
                 } else {
                     pandora.api.getEdit({id: list}, function(result) {
-                        var items = result.data.clips.map(function(clip) {
+                        data.clips = result.data.clips.map(function(clip) {
                             return Ox.extend({
                                 item: clip.item
                             }, clip.annotation ? {
@@ -99,7 +105,7 @@ pandora.addFolderItem = function(section) {
                                 out: clip.out
                             });
                         });
-                        addList(items);
+                        addList();
                     });
                 }
             } else {
@@ -107,28 +113,9 @@ pandora.addFolderItem = function(section) {
             }
         });
     }
-    function addList(items) {
+    function addList() {
         pandora.api[isItems ? 'addList' : 'addEdit'](data, function(result) {
-            var newList = result.data.id;
-            if (items) {
-                if (isItems) {
-                    pandora.api.addListItems({
-                        list: newList,
-                        items: items
-                    }, function() {
-                        getPosterFrames(newList);
-                    });
-                } else {
-                    pandora.api.addClips({
-                        clips: items,
-                        edit: newList
-                    }, function(result) {
-                        getPosterFrames(newList);
-                    });
-                }
-            } else {
-                getPosterFrames(newList);
-            }
+            getPosterFrames(result.data.id);
         });
     }
     function getPosterFrames(newList) {
@@ -141,7 +128,7 @@ pandora.addFolderItem = function(section) {
                     conditions: [{key: 'list', value: newList, operator: '=='}],
                     operator: '&'
                 } : {
-                    conditions: Ox.unique(result.data.clips.map(function(clips) {
+                    conditions: Ox.unique(result.data.clips.map(function(clip) {
                         return {key: 'id', value: clip.item, operator: '=='};
                     })),
                     operator: '|'
@@ -189,6 +176,9 @@ pandora.addFolderItem = function(section) {
         });
     }
     function reloadFolder(newList) {
+        // FIXME: collapsing sets ui showFolder,
+        // but should work the other way around
+        // (same applies to addText, below)
         pandora.$ui.folder[0].options({collapsed: false});
         Ox.Request.clearCache(isItems ? 'findLists' : 'findEdits');
         $folderList.bindEventOnce({
@@ -447,7 +437,7 @@ pandora.createLinks = function($element) {
             });
         } else {
             pandora.api.addClips({
-                clips: getClipData(items),
+                clips: pandora.getClipData(items),
                 edit: target,
                 index: pandora.user.ui.edits[pandora.user.ui.edit].selection.length
                     ? Ox.getObjectById(
@@ -457,7 +447,7 @@ pandora.createLinks = function($element) {
                     : void 0
             }, function(result) {
                 // adding clips creates new ids, so mutate items in history
-                items.splice.apply(items, [0, items.length].concat(getClipItems(result.data.clips)));
+                items.splice.apply(items, [0, items.length].concat(pandora.getClipItems(result.data.clips)));
                 callback(result, items);
             });
         }
@@ -498,7 +488,7 @@ pandora.createLinks = function($element) {
     }
 
     function editItem(item, callback) {
-        var clip = getClipData([item])[0],
+        var clip = pandora.getClipData([item])[0],
             id = getClipIds([item])[0];
         pandora.api.editClip({
             id: id,
@@ -507,33 +497,9 @@ pandora.createLinks = function($element) {
         }, callback);
     }
 
-    function getClipData(items) {
-        return items.map(function(clip) {
-            var split = clip.split('/'),
-                item = split[0],
-                points = split[1].split('-');
-            return Ox.extend({
-                item: item
-            }, points.length == 1 ? {
-                annotation: item + '/' + points[0]
-            } : {
-                'in': parseFloat(points[0]),
-                out: parseFloat(points[1])
-            });
-        });
-    }
-
     function getClipIds(items) {
         return items.map(function(clip) {
             return clip.split('/').pop();
-        });
-    }
-
-    function getClipItems(clips) {
-        return clips.map(function(clip) {
-            return (
-                clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out
-            ) + '/' + (clip.id || '');
         });
     }
 
@@ -881,6 +847,32 @@ pandora.getAllItemsTitle = function(section) {
         ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
         : Ox._('{0} ' + Ox.toTitleCase(section), [pandora.site.site.name]);
 };
+
+pandora.getClipData = function(items) {
+    return items.map(function(clip) {
+        var split = clip.split('/'),
+            item = split[0],
+            points = split[1].split('-');
+        return Ox.extend({
+            item: item
+        }, points.length == 1 ? {
+            annotation: item + '/' + points[0]
+        } : {
+            'in': parseFloat(points[0]),
+            out: parseFloat(points[1])
+        });
+    });
+};
+
+pandora.getClipItems = function(data) {
+    return data.map(function(clip) {
+        return (
+            clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out
+        ) + '/' + (clip.id || '');
+    });
+};
+
+// FIXME: naming hazard, above and below
 
 pandora.getClipsItems = function(width) {
     width = width || window.innerWidth
