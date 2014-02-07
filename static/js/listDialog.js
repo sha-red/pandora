@@ -198,34 +198,34 @@ pandora.ui.listGeneralPanel = function(listData) {
                     submit: editName
                 })
                 .appendTo(that),
-            $itemsInput = ui.section == 'items'
+            $itemsInput = ui.section != 'texts'
                 ? Ox.Input({
-                    disabled: true,
-                    label: Ox._('Items'),
-                    labelWidth: 80,
-                    value: listData.items,
-                    width: 320
-                })
-                .css({position: 'absolute', left: '160px', top: '40px'})
-                .appendTo(that)
+                        disabled: true,
+                        label: Ox._('Items'),
+                        labelWidth: 80,
+                        value: listData.items,
+                        width: 320
+                    })
+                    .css({position: 'absolute', left: '160px', top: '40px'})
+                    .appendTo(that)
                 : Ox.Select({
-                    items: pandora.site.textRightsLevels.map(function(rightsLevel, i) {
-                        console.log(listData);
-                        return {
-                            id: i,
-                            title: rightsLevel.name,
-                        };
-                    }),
-                    label: Ox._('Rights Level'),
-                    labelWidth: 80,
-                    value: listData.rightslevel,
-                    width: 320
-                })
-                .css({position: 'absolute', left: '160px', top: '40px'})
-                .bindEvent({
-                    change: editRightsLevel
-                })
-                .appendTo(that),
+                        items: pandora.site.textRightsLevels.map(function(rightsLevel, i) {
+                            console.log(listData);
+                            return {
+                                id: i,
+                                title: rightsLevel.name,
+                            };
+                        }),
+                        label: Ox._('Rights Level'),
+                        labelWidth: 80,
+                        value: listData.rightslevel,
+                        width: 320
+                    })
+                    .css({position: 'absolute', left: '160px', top: '40px'})
+                    .bindEvent({
+                        change: editRightsLevel
+                    })
+                    .appendTo(that),
             $statusSelect = listData.status == 'featured'
                 ? Ox.Input({
                     disabled: true,
