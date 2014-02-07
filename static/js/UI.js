@@ -164,6 +164,7 @@ pandora.UI = (function() {
         }
 
         if (args.edit) {
+            // add local edit settings
             if (!pandora.user.ui.edits[args.edit]) {
                 add['edits.' + that.encode(args.edit)] = {};
             }
@@ -175,6 +176,24 @@ pandora.UI = (function() {
             });
         }
 
+        Ox.forEach({
+            editSelection: 'selection',
+            editSort: 'sort',
+            editView: 'view'
+        }, function(editSetting, setting) {
+            var key = 'edits.' + that.encode(args.edit || pandora.user.ui.edit) + '.' + editSetting;
+            if (setting in args) {
+                // add local edit setting
+                add[key] = args[setting];
+            } else if (setting in add) {
+                // add local edit setting
+                add[key] = add[setting];
+            } else if (key in add) {
+                // add global edit setting
+                add[setting] = add[key];
+            }
+        });
+
         if (args.text) {
             add['texts.' + that.encode(args.text)] = Ox.map(textSettings, function(value, key) {
                 var textsKey = 'texts.' + that.encode(args.text),
@@ -185,19 +204,6 @@ pandora.UI = (function() {
                     : value;
             });
         }
-
-        Ox.forEach({
-            editSelection: 'selection',
-            editSort: 'sort',
-            editView: 'view'
-        }, function(editSetting, setting) {
-            var key = 'edits.' + that.encode(args.edit || pandora.user.ui.edit) + '.' + editSetting;
-            if (setting in args) {
-                add[key] = args[setting];
-            } else if (setting in add) {
-                add[key] == add[setting];
-            }
-        });
 
         // items in args trigger events, items in add do not
         [args, add].forEach(function(obj, isAdd) {
