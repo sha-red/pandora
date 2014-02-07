@@ -249,6 +249,16 @@ def addEdit(request):
         edit.edit(data, request.user)
     else:
         edit.save()
+
+    if 'clips' in data and edit.type == 'static':
+        index = 0
+        for c in data['clips']:
+            clip = edit.add_clip(c, index)
+            index += 1
+            if not clip:
+                response = json_response(status=500, text='invalid in/out')
+                return render_to_json_response(response)
+
     if edit.status == 'featured':
         pos, created = models.Position.objects.get_or_create(edit=edit,
                                          user=request.user, section='featured')
