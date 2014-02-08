@@ -56,6 +56,10 @@ pandora.URL = (function() {
                 }
             } else if (pandora.user.ui.section == 'edits') {
                 var editPoints = pandora.user.ui.edits[state.item] || {};
+                if (state.item) {
+                    state.view = pandora.user.ui.editView;
+                    state.sort = pandora.user.ui.editSort;
+                }
                 state.span = editPoints.clip || [].concat(
                     editPoints.position
                         ? editPoints.position
@@ -199,6 +203,14 @@ pandora.URL = (function() {
 
                 } else if (state.type == 'edits') {
 
+                    if (state.view) {
+                        set.editView = state.view;
+                    }
+
+                    if (state.sort) {
+                        set.editSort = state.sort;
+                    }
+
                     if (state.span) {
                         var key = 'edits.' + pandora.UI.encode(state.item);
                         set[key] = {};
@@ -259,6 +271,7 @@ pandora.URL = (function() {
     }
 
     function getOptions () {
+
         var itemsSection = pandora.site.itemsSection,
             sortKeys = {}, views = {};
 
@@ -319,12 +332,19 @@ pandora.URL = (function() {
         // Edits
         views['edits'] = {
             list: [],
-            item: ['edit']
+            item: ['list', 'grid', 'annotations']
         };
         sortKeys['edits'] = {
             list: {},
             item: {}
         };
+        views['edits'].item.forEach(function(view) {
+            sortKeys['edits'].item[view] = [
+                    {id: 'index', operator: '+'}
+                ]
+                .concat(pandora.site.clipKeys)
+                .concat(pandora.site.itemKeys);
+        });
 
         // Texts
         views['texts'] = {
@@ -340,6 +360,7 @@ pandora.URL = (function() {
             views: views,
             sortKeys: sortKeys
         };
+
     }
 
     that.init = function() {
@@ -362,7 +383,11 @@ pandora.URL = (function() {
         };
         spanType['edits'] = {
             list: {},
-            item: {edit: 'duration'}
+            item: {
+                list: 'duration',
+                grid: 'duration',
+                annotations: 'duration'
+            }
         };
         spanType['texts'] = {
             list: {},
