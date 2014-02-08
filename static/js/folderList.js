@@ -50,7 +50,7 @@ pandora.ui.folderList = function(id, section) {
                 visible: id == 'favorite',
                 // fixme: user and name are set to the same width here,
                 // but resizeFolders will set them to different widths
-                width: ui.sidebarWidth - (section == 'items' ? 96 : 48)
+                width: ui.sidebarWidth - (section != 'texts' ? 96 : 48)
             },
             {
                 editable: function(data) {
@@ -69,14 +69,14 @@ pandora.ui.folderList = function(id, section) {
                     return Ox.decodeHTMLEntities(value);
                 },
                 visible: id != 'favorite',
-                width: ui.sidebarWidth - (section == 'items' ? 96 : 48)
+                width: ui.sidebarWidth - (section != 'texts' ? 96 : 48)
             },
             {
                 align: 'right',
                 id: 'items',
                 format: {type: 'number'},
                 operator: '-',
-                visible: section == 'items',
+                visible: section != 'texts',
                 width: 48
             },
             {

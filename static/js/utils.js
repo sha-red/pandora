@@ -1996,7 +1996,7 @@ pandora.resizeFilters = function(width) {
 pandora.resizeFolders = function(section) {
     section = section || pandora.user.ui.section;
     var width = pandora.getFoldersWidth(section),
-        columnWidth = width - (section == 'items' ? 96 : 48),
+        columnWidth = width - (section != 'texts' ? 96 : 48),
         userColumnWidth = Math.round(columnWidth * 0.4),
         nameColumnWidth = columnWidth - userColumnWidth;
     pandora.$ui.allItems && pandora.$ui.allItems.resizeElement(columnWidth - 8);
