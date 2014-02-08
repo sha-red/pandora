@@ -165,7 +165,7 @@ pandora.ui.info = function() {
     };
 
     that.updateListInfo = function() {
-        ['list', 'text'].indexOf(getView()) > -1 && that.empty().append(
+        that.empty().append(
             pandora.$ui.listInfo = pandora.ui.listInfo()
         );
     };
