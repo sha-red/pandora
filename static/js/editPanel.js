@@ -93,6 +93,9 @@ pandora.ui.editPanel = function() {
             duration: edit.duration,
             editable: edit.type == 'static' && edit.editable,
             enableSubtitles: ui.videoSubtitles,
+            formatTitle: function() {
+                return pandora.getItemTitle(Ox.last(arguments));
+            },
             fullscreen: false,
             getClipImageURL: function(id, width, height) {
                 var clip = Ox.getObjectById(edit.clips, id);
