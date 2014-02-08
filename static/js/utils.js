@@ -58,7 +58,7 @@ pandora.addFolderItem = function(section) {
         listData = pandora.getListData();
         data = {
             name: listData.name,
-            status: listData.status,
+            status: listData.status == 'featured' ? 'public' : listData.status,
             type: listData.type
         };
         if (data.type == 'smart') {
