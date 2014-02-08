@@ -140,10 +140,8 @@ pandora.ui.listDialog = function(section) {
                 }
             });
 
-    if (pandora.user.ui.section == 'items') {
-        $($updateCheckbox.find('.OxButton')[0]).css({margin: 0});
-        $($dialog.$element.find('.OxBar')[2]).append($updateCheckbox);
-    }
+    $($updateCheckbox.find('.OxButton')[0]).css({margin: 0});
+    $($dialog.$element.find('.OxBar')[2]).append($updateCheckbox);
 
     function getWidth(section) {
         return section == 'general' ? 496
