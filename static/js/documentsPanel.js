@@ -5,7 +5,7 @@
 pandora.ui.documentsPanel = function(options) {
 
     var ui = pandora.user.ui,
-        hasItemView = false, // FIXME
+        hasItemView = ui.section == 'items' && ui.item,
         isItemView = options.isItemView,
         listLoaded = false,
 
@@ -810,7 +810,7 @@ pandora.ui.documentsPanel = function(options) {
                 ))
                 .setItemTitle('replace', Ox._('Replace ' + string + '...'))
                 .setItemTitle('delete', Ox._('Delete ' + string + '...'))
-                [selected.length ? 'enableItem' : 'disableItem']('add')
+                [selected.length && hasItemView ? 'enableItem' : 'disableItem']('add')
                 [selected.length ? 'enableItem' : 'disableItem']('embed')
                 [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')
                 [selected.length ? 'enableItem' : 'disableItem']('delete');
