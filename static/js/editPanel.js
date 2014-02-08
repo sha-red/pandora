@@ -107,7 +107,6 @@ pandora.ui.editPanel = function() {
             },
             height: pandora.$ui.appPanel.size(1),
             'in': ui.edits[ui.edit]['in'],
-            itemName: pandora.site.itemName.singular,
             layers: getLayers(edit.clips),
             loop: ui.videoLoop,
             muted: ui.videoMuted,
