@@ -36,12 +36,6 @@ pandora.ui.editPanel = function() {
     function getEdit(callback) {
         pandora.api.getEdit({id: ui.edit}, function(result) {
             edit = result.data;
-            // fixme: duration should come from backend
-            edit.duration = 0;
-            edit.clips.forEach(function(clip) {
-                clip.position = edit.duration;
-                edit.duration += clip.duration;
-            });
             sortClips(callback);
         });
     }
@@ -66,7 +60,9 @@ pandora.ui.editPanel = function() {
     function getVideos() {
         var videos = {};
         pandora.site.video.resolutions.forEach(function(resolution) {
-            videos[resolution] = Ox.flatten(edit.clips.map(function(clip) {
+            videos[resolution] = Ox.flatten(edit.clips.filter(function(clip) {
+                return clip.duration;
+            }).map(function(clip) {
                 return pandora.getClipVideos(clip, resolution);
             }));
         });
@@ -544,11 +540,7 @@ pandora.ui.editPanel = function() {
     }
 
     function updateVideos() {
-        edit.duration = 0;
-        edit.clips.forEach(function(clip) {
-            clip.position = edit.duration;
-            edit.duration += clip.duration;
-        });
+        updateDuration();
         that.options({
             duration: edit.duration,
             smallTimelineURL: getSmallTimelineURL(),
