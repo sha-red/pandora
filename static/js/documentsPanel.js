@@ -883,6 +883,10 @@ pandora.ui.documentsPanel = function(options) {
         }).open();
     }
 
+    that.updateSize = function() {
+        $list.size();
+    };
+
     return that;
 
 };

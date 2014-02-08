@@ -34,6 +34,9 @@ pandora.ui.documentsDialog = function() {
                 removeOnClose: true,
                 title: Ox._('Manage Documents'),
                 width: dialogWidth
+            })
+            .bindEvent({
+                resize: $content.updateSize
             });
 
     function addDocuments() {
