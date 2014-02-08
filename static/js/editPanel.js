@@ -86,6 +86,11 @@ pandora.ui.editPanel = function() {
             clipSize: listSize,
             clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'C</span>',
             clipView: ui.edits[ui.edit].view,
+            controlsTooltips: {
+                open: Ox._('Open in {0} View', [Ox._(Ox.getObjectById(
+                    pandora.site.itemViews, pandora.user.ui.videoView
+                ).title)])
+            },
             duration: edit.duration,
             editable: edit.type == 'static' && edit.editable,
             enableSubtitles: ui.videoSubtitles,
