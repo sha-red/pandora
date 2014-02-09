@@ -312,7 +312,6 @@ class Edit(models.Model):
                 'user',
             ]
         response = {
-            'type': self.type
         }
         _map = {
             'posterFrames': 'poster_frames'

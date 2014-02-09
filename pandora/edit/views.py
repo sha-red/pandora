@@ -201,6 +201,7 @@ def getEdit(request):
     '''
         takes {
             id:
+            keys: []
         }
         returns {
             id:
@@ -212,7 +213,7 @@ def getEdit(request):
         response = json_response()
         edit = get_edit_or_404_json(data['id'])
         if edit.accessible(request.user):
-            response['data'] = edit.json(user=request.user)
+            response['data'] = edit.json(keys=data.get('keys'), user=request.user)
         else:
             response = json_response(status=403, text='not allowed')
     else:
