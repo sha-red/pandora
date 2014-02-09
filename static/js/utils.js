@@ -1183,6 +1183,16 @@ pandora.getItem = function(state, str, callback) {
                 });
             }
         });
+    } else if (state.type == 'edits') {
+        pandora.api.getEdit({id: str}, function(result) {
+            if (result.status.code == 200) {
+                state.item = result.data.id;
+                callback();
+            } else {
+                state.item = '';
+                callback();
+            }
+        });
     } else if (state.type == 'texts') {
         pandora.api.getText({id: str, keys: ['id', 'names', 'pages', 'type']}, function(result) {
             if (result.status.code == 200) {
@@ -1193,16 +1203,6 @@ pandora.getItem = function(state, str, callback) {
                 // FIXME: it's obscure that in the texts case,
                 // we have to set item to '', while for videos,
                 // it remains undefined 
-                state.item = '';
-                callback();
-            }
-        });
-    } else if (state.type == 'edits') {
-        pandora.api.getEdit({id: str}, function(result) {
-            if (result.status.code == 200) {
-                state.item = result.data.id;
-                callback();
-            } else {
                 state.item = '';
                 callback();
             }
@@ -1520,6 +1520,34 @@ pandora.getSmallClipTimelineURL = function(item, inPoint, outPoint, type, callba
     });
 };
 
+pandora.getSort = function(state, val, callback) {
+    if (state.type == pandora.site.itemName.plural.toLowerCase()) {
+        // TODO in the future: If str is index, fall back if list is smart
+        // (but this can only be tested after find has been parsed)
+        callback();
+    } else if (state.type == 'edits') {
+        if (val[0].key == 'index') {
+            pandora.api.getEdit({id: state.item}, function(result) {
+                if (result.data.type == 'smart') {
+                    state.sort = state.sort.slice(1);
+                    if (state.sort.length == 0) {
+                        state.sort = [
+                            pandora.site.user.ui.editSort.filter(function(sort) {
+                                return sort.key != 'index';
+                            })[0]
+                        ];
+                    }
+                }
+                callback();
+            });
+        } else {
+            callback();
+        }
+    } else if (state.type == 'texts') {
+        callback();
+    }
+};
+
 pandora.getSortKeyData = function(key) {
     return Ox.getObjectById(pandora.site.itemKeys, key)
         || Ox.getObjectById(pandora.site.clipKeys, key);
@@ -1602,7 +1630,7 @@ pandora.getSpan = function(state, val, callback) {
         }
     } else if (state.type == 'edits') {
         if (isArray) {
-            pandora.api.getEdit({id: state.item, keys: ['duration']}, function(result) {
+            pandora.api.getEdit({id: state.item}, function(result) {
                 state.span = val.map(function(number) {
                     return Math.min(number, result.data.duration);
                 });
@@ -1617,7 +1645,7 @@ pandora.getSpan = function(state, val, callback) {
             });
         }
     } else if (state.type == 'texts') {
-        pandora.api.getText({id: state.item, keys: ['id', 'names', 'pages', 'type']}, function(result) {
+        pandora.api.getText({id: state.item}, function(result) {
             if (isArray) {
                 if (result.data.type == 'html') {
                     state.span = Ox.limit(val[0], 0, 100);
