@@ -9,7 +9,9 @@ pandora.ui.embedPanel = function() {
         view = !ui.item ? ui.listView : ui.itemView;
 
     if (ui.section != 'texts' && !ui.page) {
-        if (!ui.item) {
+        if (ui.section == 'edits') {
+            that = pandora.ui.editPanel(true);
+        } else if (!ui.item) {
             if (view == 'grid') {
                 that = pandora.ui.embedGrid();
             } else if (view == 'clip') {

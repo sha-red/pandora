@@ -1,6 +1,6 @@
 'use strict';
 
-pandora.ui.editPanel = function() {
+pandora.ui.editPanel = function(isEmbed) {
 
     var ui = pandora.user.ui,
         edit,
@@ -14,7 +14,7 @@ pandora.ui.editPanel = function() {
         smallTimelineContext,
         that = Ox.Element();
 
-    ui.edit ? getEdit(renderEdit) : renderEdits();
+    ui.edit ? getEdit(isEmbed ? renderEmbedEdit : renderEdit) : renderEdits();
 
     function editsKey(key) {
         return 'edits.' + ui.edit.replace(/\./g, '\\.') + '.' + key;
@@ -70,7 +70,7 @@ pandora.ui.editPanel = function() {
     }
 
     function renderEdit() {
-        if (ui.section != 'edits') {
+        if (ui.section != 'edits' || ui.edit != edit.id) {
             return;
         }
         that = pandora.$ui.editPanel = Ox.VideoEditPanel({
@@ -381,6 +381,72 @@ pandora.ui.editPanel = function() {
         });
     }
 
+    function renderEmbedEdit() {
+        that = Ox.VideoPlayer({
+            clickLink: pandora.clickLink,
+            clipRatio: pandora.site.video.previewRatio,
+            clipSize: listSize,
+            clips: Ox.clone(edit.clips),
+            clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'C</span>',
+            clipView: ui.edits[ui.edit].view,
+            controlsBottom: [
+                'play', 'volume', 'scale', 'timeline', 'position', 'settings'
+            ],
+            controlsTooltips: {
+                close: Ox._('Close'),
+                open: Ox._('Watch on {0}', [pandora.site.site.name])
+            },
+            controlsTop: [
+                Ox.Fullscreen.available ? 'fullscreen' : 'space16'
+            ].concat(
+                ['chapterTitle', 'open']
+            ),
+            chapters: edit.clips.map(function(clip) {
+                return {
+                    position: clip.position,
+                    title: pandora.getItemTitle(clip)
+                };
+            }),
+            duration: edit.duration,
+            enableFullscreen: Ox.Fullscreen.available,
+            enableKeyboard: true,
+            enableMouse: true,
+            enablePosition: true,
+            enableSubtitles: ui.videoSubtitles,
+            enableTimeline: true,
+            enableVolume: true,
+            height: pandora.$ui.document.height(),
+            paused: true,
+            showIconOnLoad: true,
+            subtitles: getSubtitles(edit.clips),
+            timeline: getSmallTimelineURL(),
+            video: getVideos(),
+            volume: ui.videoVolume,
+            width: pandora.$ui.document.width()
+        }).bindEvent({
+            fullscreen: function(data) {
+                Ox.Fullscreen.toggle();
+                setTimeout(that.resizePanel, 100);
+            },
+            open: function(data) {
+                that.options({paused: true});
+                var clip = Ox.last(edit.clips.filter(function(clip) {
+                        return clip.position <= that.options('position');
+                    })),
+                    position = clip['in'] + that.options('position') - clip['position'],
+                    url = document.location.protocol + '//'
+                        + document.location.hostname + '/'
+                        + clip.item + '/'
+                        + Ox.formatDuration(position) + ','
+                        + Ox.formatDuration(clip['in']) + ','
+                        + Ox.formatDuration(clip.out);
+                window.open(url, '_blank');
+            },
+        });
+        pandora.$ui.embedPanel.replaceWith(that);
+        updateSmallTimelineURL();
+    }
+
     function orderClips(ids) {
         edit.clips.forEach(function(clip) {
             clip.index = ids.indexOf(clip.id);
@@ -529,7 +595,8 @@ pandora.ui.editPanel = function() {
                         load: function() {
                             if (timelineIteration == self.timelineIteration) {
                                 context.drawImage(image, Math.floor(clip.position * fps), 0);
-                                that.options({smallTimelineURL: canvas.toDataURL()});
+                                that.options(isEmbed ? 'timeline' : 'smallTimelineURL',
+                                    canvas.toDataURL());
                                 callback();
                             } else {
                                 callback(false);
