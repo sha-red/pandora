@@ -2028,7 +2028,11 @@ pandora.resizeFolders = function(section) {
         columnWidth = width - (section != 'texts' ? 96 : 48),
         userColumnWidth = Math.round(columnWidth * 0.4),
         nameColumnWidth = columnWidth - userColumnWidth;
-    pandora.$ui.allItems && pandora.$ui.allItems.resizeElement(columnWidth - 8);
+    pandora.$ui.allItems && pandora.$ui.allItems.resizeElement((
+        section == 'items' ? columnWidth
+        : section == 'edits' ? width - 16
+        : width - 48
+    ) - 8);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getIndexById(pandora.site.sectionFolders[section], id);
         pandora.$ui.folder[pos].css({width: width + 'px'});

@@ -89,7 +89,6 @@ pandora.ui.allItems = function(section) {
         }, function(result) {
             that.update(result.data.items);
         });
-    } else if (section == 'edits') {
     } else if (section == 'texts') {
         $buttons[0] = Ox.Button({
                 style: 'symbol',
