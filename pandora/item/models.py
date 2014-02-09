@@ -1458,6 +1458,10 @@ for key in settings.CONFIG['itemKeys']:
     if 'autocomplete' in key and not 'autocompleteSortKey' in key or \
             key.get('filter'):
         Item.facet_keys.append(key['id'])
+    elif key.get('type') == 'layer' and \
+        utils.get_by_id(settings.CONFIG['layers'], key['id']).get('type') == 'string':
+        Item.facet_keys.append(key['id'])
+
 
 Item.person_keys = []
 for key in settings.CONFIG['itemKeys']:
