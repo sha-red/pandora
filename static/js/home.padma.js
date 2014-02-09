@@ -506,7 +506,11 @@ pandora.ui.home = function() {
                             .appendTo($featuresContent);
                         $featureIcon[i] = Ox.Element({
                                 element: '<img>',
-                                tooltip: (lists && texts ? Ox._(Ox.toTitleCase(item.type)) + ': ' : '')
+                                tooltip: (
+                                        (lists && edits) || (lists && texts) || (edits && texts)
+                                        ? Ox._(Ox.toTitleCase(item.type)) + ': '
+                                        : ''
+                                    )
                                     + Ox.encodeHTMLEntities(item.name)
                             })
                             .attr({
@@ -563,7 +567,11 @@ pandora.ui.home = function() {
 
             function getHTML(item) {
                 return '<b>'
-                    + (lists && texts ? Ox._(Ox.toTitleCase(item.type)) + ': ' : '')
+                    + (
+                        (lists && edits) || (lists && texts) || (edits && texts)
+                        ? Ox._(Ox.toTitleCase(item.type)) + ': '
+                        : ''
+                    )
                     + Ox.encodeHTMLEntities(item.name) + '</b><br><br>'
                     + item.description;
             }
