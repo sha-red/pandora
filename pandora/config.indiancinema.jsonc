@@ -799,7 +799,9 @@
                 {"key": "index", "operator": "+"},
                 {"key": "year", "operator": "+"},
                 {"key": "director", "operator": "+"},
-                {"key": "title", "operator": "+"}
+                {"key": "title", "operator": "+"},
+                {"key": "position", "operator": "+"},
+                {"key": "duration", "operator": "+"}
             ],
             "editView": "list",
             "embedSize": 256,
