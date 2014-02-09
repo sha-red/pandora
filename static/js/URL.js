@@ -401,6 +401,7 @@ pandora.URL = (function() {
             getHash: pandora.getHash,
             getItem: pandora.getItem,
             getPart: pandora.getPart,
+            getSort: pandora.getSort,
             getSpan: pandora.getSpan,
             pages: [].concat(
                 ['home', 'software', 'api', 'help', 'tv', 'documents'],
