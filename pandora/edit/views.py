@@ -48,14 +48,15 @@ def addClips(request):
     clips = []
     if edit.editable(request.user):
         index = data.get('index', edit.clips.count())
-        for c in data['clips']:
-            clip = edit.add_clip(c, index)
-            index += 1
-            if not clip:
-                response = json_response(status=500, text='invalid in/out')
-                return render_to_json_response(response)
-            else:
-                clips.append(clip.json(request.user))
+        with transaction.commit_on_success():
+            for c in data['clips']:
+                clip = edit.add_clip(c, index)
+                index += 1
+                if not clip:
+                    response = json_response(status=500, text='invalid in/out')
+                    return render_to_json_response(response)
+                else:
+                    clips.append(clip.json(request.user))
         response['data']['clips'] = clips
     else:
         response = json_response(status=403, text='permission denied')
@@ -253,12 +254,13 @@ def addEdit(request):
 
     if 'clips' in data and edit.type == 'static':
         index = 0
-        for c in data['clips']:
-            clip = edit.add_clip(c, index)
-            index += 1
-            if not clip:
-                response = json_response(status=500, text='invalid in/out')
-                return render_to_json_response(response)
+        with transaction.commit_on_success():
+            for c in data['clips']:
+                clip = edit.add_clip(c, index)
+                index += 1
+                if not clip:
+                    response = json_response(status=500, text='invalid in/out')
+                    return render_to_json_response(response)
 
     if edit.status == 'featured':
         pos, created = models.Position.objects.get_or_create(edit=edit,
