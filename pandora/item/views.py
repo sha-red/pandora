@@ -37,8 +37,9 @@ from ox.django.api import actions
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
     if len(sort) == 1:
+        additional_sort = settings.CONFIG['user']['ui']['listSort']
         key = utils.get_by_id(settings.CONFIG['itemKeys'], sort[0]['key'])
-        for s in key.get('additionalSort', settings.CONFIG.get('additionalSort', [])):
+        for s in key.get('additionalSort', additional_sort):
             sort.append(s)
     for e in sort:
         operator = e['operator']
