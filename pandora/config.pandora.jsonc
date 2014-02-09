@@ -4,9 +4,6 @@
     You can edit this file.
 */
 {
-    "additionalSort": [
-        {"key": "title", "operator": "+"}
-    ],
     "annotations": {
         "showUsers": false
     },
@@ -594,7 +591,12 @@
             "edit": "",
             "edits": {},
             "editSelection": [],
-            "editSort": [{"key": "index", "operator": "+"}],
+            "editSort": [
+                {"key": "index", "operator": "+"},
+                {"key": "year", "operator": "+"},
+                {"key": "director", "operator": "+"},
+                {"key": "title", "operator": "+"}
+            ],
             "editView": "list",
             "embedSize": 256,
             "filters": [

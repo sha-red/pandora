@@ -4,11 +4,6 @@
     You can edit this file.
 */
 {
-    "additionalSort": [
-        {"key": "director", "operator": "+"},
-        {"key": "year", "operator": "-"},
-        {"key": "title", "operator": "+"}
-    ],
     "annotations": {
         "showUsers": false
     },
@@ -785,7 +780,12 @@
             "edit": "",
             "edits": {},
             "editSelection": [],
-            "editSort": [{"key": "index", "operator": "+"}],
+            "editSort": [
+                {"key": "index", "operator": "+"},
+                {"key": "year", "operator": "+"},
+                {"key": "director", "operator": "+"},
+                {"key": "title", "operator": "+"}
+            ],
             "editView": "list",
             "embedSize": 256,
             "filters": [
@@ -808,7 +808,11 @@
             "listColumns": ["title", "director", "country", "year", "language", "runtime", "genre"],
             "listColumnWidth": {},
             "listSelection": [],
-            "listSort": [{"key": "director", "operator": "+"}],
+            "listSort": [
+                {"key": "director", "operator": "+"},
+                {"key": "year", "operator": "-"},
+                {"key": "title", "operator": "+"}
+            ],
             "listView": "grid",
             "lists": {},
             "locale": "en",
