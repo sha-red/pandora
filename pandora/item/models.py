@@ -946,7 +946,9 @@ class Item(models.Model):
 
     def update_layer_facets(self):
         for k in settings.CONFIG['itemKeys']:
-            if k.get('filter') and k['type'] == 'layer':
+            if k['type'] == 'layer' and (
+                k.get('filter') or \
+                utils.get_by_id(settings.CONFIG['layers'], k['id']).get('type') == 'string'):
                 self.update_layer_facet(k['id'])
 
     def update_facets(self):
