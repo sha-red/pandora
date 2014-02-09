@@ -286,24 +286,25 @@ pandora.ui.home = function() {
                 keys: ['description', 'modified', 'name', 'user'],
                 sort: [{key: 'position', operator: '+'}]
             },
-            items, lists, texts;
+            items, lists, edits, texts;
         pandora.api.findLists(find, function(result) {
             lists = result.data.items.length;
             items = result.data.items.map(function(item) {
                 return Ox.extend(item, {type: 'list'});
             });
-            pandora.api.findTexts(find, function(result) {
-                texts = result.data.items.length
+            pandora.api.findEdits(find, function(result) {
+                edits = result.data.items.length;
                 items = items.concat(result.data.items.map(function(item) {
-                    return Ox.extend(item, {type: 'text'});
+                    return Ox.extend(item, {type: 'edit'});
                 }));
-                $features.empty();
-                show();
-                return;
-                if (featured.lists.length) {
-                    top += 24;
-                }
-                show('texts');
+                pandora.api.findTexts(find, function(result) {
+                    texts = result.data.items.length;
+                    items = items.concat(result.data.items.map(function(item) {
+                        return Ox.extend(item, {type: 'text'});
+                    }));
+                    $features.empty();
+                    show();
+                });
             });
         });
         function show() {
@@ -319,11 +320,16 @@ pandora.ui.home = function() {
                 $label = Ox.Label({
                         textAlign: 'center',
                         title: '<b>' + Ox._('Featured ' + (
-                            lists == 1 && texts == 0 ? 'List'
-                            : lists == 0 && texts == 1 ? 'Text'
-                            : texts == 0 ? 'Lists'
-                            : lists == 0 ? 'Texts'
-                            : 'Lists and Texts'
+                            lists == 1 && edits == 0 && texts == 0 ? 'List'
+                            : lists == 0 && edits == 1 && texts == 0 ? 'Edit'
+                            : lists == 0 && edits == 0 && texts == 1 ? 'Text'
+                            : edits == 0 && texts == 0 ? 'Lists'
+                            : lists == 0 && texts == 0 ? 'Edits'
+                            : lists == 0 && edits == 0 ? 'Texts'
+                            : texts == 0 ? 'Lists and Edits'
+                            : edits == 0 ? 'Lists and Texts'
+                            : lists == 0 ? 'Edits and Texts'
+                            : 'Lists, Edits and Texts'
                         )) + '</b>',
                         width: 512
                     })
@@ -574,7 +580,7 @@ pandora.ui.home = function() {
             function openItem(i) {
                 that.fadeOutScreen();
                 pandora.UI.set(Ox.extend({
-                    section: items[i].type == 'list' ? 'items' : 'texts',
+                    section: items[i].type == 'list' ? 'items' : items[i].type + 's',
                     page: ''
                 }, items[i].type == 'list' ? {
                     find: {
@@ -586,6 +592,8 @@ pandora.ui.home = function() {
                         }],
                         operator: '&'
                     }
+                } : items[i].type == 'edit' ? {
+                    edit: items[i].user + ':' + items[i].name
                 } : {
                     text: items[i].user + ':' + items[i].name
                 }));
