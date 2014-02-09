@@ -1529,8 +1529,9 @@ pandora.getSort = function(state, val, callback) {
         if (val[0].key == 'index') {
             pandora.api.getEdit({id: state.item}, function(result) {
                 if (result.data.type == 'smart') {
-                    state.sort = state.sort.slice(1);
-                    if (state.sort.length == 0) {
+                    if (state.sort.length > 1) {
+                        state.sort = [state.sort[1]];
+                    } else {
                         state.sort = [
                             pandora.site.user.ui.editSort.filter(function(sort) {
                                 return sort.key != 'index';
