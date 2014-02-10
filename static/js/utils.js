@@ -245,7 +245,7 @@ pandora.changeFolderItemStatus = function(id, status, callback) {
             if (subscribers) {
                 pandora.ui.makeListPrivateDialog(name, subscribers, function(makePrivate) {
                     if (makePrivate) {
-                        changeListStatus();
+                        changeFolderItemStatus();
                     } else {
                         callback({data: {
                             id: id,
