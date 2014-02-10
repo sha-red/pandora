@@ -521,8 +521,9 @@ pandora.ui.editPanel = function(isEmbed) {
     }
 
     function sortClips(callback) {
-        var sort = pandora.user.ui.editSort;
-        var key = sort[0].key;
+        var sort = pandora.user.ui.editSort,
+            key = sort[0].key,
+            index;
         if (key == 'position') {
             key = 'in';
         }
@@ -531,6 +532,13 @@ pandora.ui.editPanel = function(isEmbed) {
             'title', 'director', 'year', 'videoRatio'
         ].indexOf(key) > -1) {
             sortBy(key);
+            index = 0;
+            edit.clips.forEach(function(clip) {
+                clip.sort = index++;
+                if (sort[0].operator == '-') {
+                    clip.sort = -clip.sort;
+                }
+            });
             updateDuration();
             callback(edit.clips);
         } else {
@@ -550,10 +558,7 @@ pandora.ui.editPanel = function(isEmbed) {
             });
         }
         function sortBy(key) {
-            edit.clips = Ox.sortBy(edit.clips, key);
-            if (sort[0].operator == '-') {
-                edit.clips.reverse();
-            }
+            edit.clips = Ox.sortBy(edit.clips, sort[0].operator + key);
         }
     }
 
