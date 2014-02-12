@@ -10,12 +10,13 @@ pandora.ui.folders = function(section) {
                     pandora.resizeFolders();
                 }
             }),
-        counter = 0,
         editable = (ui[
             section == 'items' ? '_list' : section.slice(0, -1)
         ] || '').split(':')[0] == pandora.user.username,
         folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
-        folderItem = folderItems.slice(0, -1);
+        folderItem = folderItems.slice(0, -1),
+        initCounter = 0,
+        loadCounter = 0;
     pandora.$ui.allItems = pandora.ui.allItems(section).appendTo(that);
     pandora.$ui.folder = [];
     pandora.$ui.folderBrowser = {};
@@ -343,12 +344,17 @@ pandora.ui.folders = function(section) {
             })
             .bindEventOnce({
                 init: function(data) {
-                    if (++counter == pandora.site.sectionFolders[section].length) {
+                    if (++initCounter == pandora.site.sectionFolders[section].length) {
                         pandora.$ui.folder.forEach(function($folder) {
                             that.append($folder);
                         });
                         pandora.resizeFolders(section);
                         pandora.selectList();
+                    }
+                },
+                load: function(data) {
+                    if (++loadCounter == pandora.site.sectionFolders[section].length) {
+                        pandora.$ui.mainMenu.replaceItemMenu();
                     }
                 }
             })
