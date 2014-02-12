@@ -34,8 +34,8 @@ pandora.ui.siteDialog = function(section) {
                             + '<b>pan.do/ra</b> includes <b>OxJS</b>, '
                             + 'a new JavaScript library for web applications.</p>'
                             + '<p>To learn more about <b>pan.do/ra</b> and <b>OxJS</b>, '
-                            + 'please visit <a href="https://pan.do/ra">pan.do/ra</a> '
-                            + 'and <a href="https://oxjs.org">oxjs.org</a>.</p>'
+                            + 'please visit <a href="https://pan.do/ra" target="_blank">pan.do/ra</a> '
+                            + 'and <a href="https://oxjs.org" target="_blank">oxjs.org</a>.</p>'
                             + (
                                 canSeeVersion
                                 ? '<sub><b>{0}'
