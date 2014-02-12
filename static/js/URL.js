@@ -29,11 +29,11 @@ pandora.URL = (function() {
             if (pandora.user.ui.section == 'items') {
                 if (!pandora.user.ui.item) {
                     state.view = pandora.user.ui.listView;
-                    state.sort = pandora.user.ui.listSort;
+                    state.sort = [pandora.user.ui.listSort[0]];
                     state.find = pandora.user.ui.find;
                 } else {
                     state.view = pandora.user.ui.itemView;
-                    state.sort = pandora.user.ui.itemSort;
+                    state.sort = [pandora.user.ui.itemSort[0]];
                 }
                 if (state.view == 'map') {
                     state.span = pandora.user.ui.mapFind
@@ -58,7 +58,7 @@ pandora.URL = (function() {
                 var editPoints = pandora.user.ui.edits[state.item] || {};
                 if (state.item) {
                     state.view = pandora.user.ui.editView;
-                    state.sort = pandora.user.ui.editSort;
+                    state.sort = [pandora.user.ui.editSort[0]];
                 }
                 state.span = editPoints.clip || [].concat(
                     editPoints.position
