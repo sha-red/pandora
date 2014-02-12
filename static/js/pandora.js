@@ -97,6 +97,10 @@ appPanel
             images.logo.style.width = logoWidth + 'px';
             images.logo.style.height = logoHeight + 'px';
             images.logo.style.margin = 'auto';
+            images.logo.style.MozUserSelect = 'none';
+            images.logo.style.MSUserSelect = 'none';
+            images.logo.style.OUserSelect = 'none';
+            images.logo.style.WebkitUserSelect = 'none';
             if (!isMSIE) {
                 images.reflection = document.createElement('img');
                 images.reflection.style.position = 'absolute';
@@ -124,6 +128,10 @@ appPanel
             images.loadingIcon.style.width = isEmbed || isPrint ? '16px' : '32px';
             images.loadingIcon.style.height = isEmbed || isPrint ? '16px' : '32px';
             images.loadingIcon.style.margin = 'auto';
+            images.loadingIcon.style.MozUserSelect = 'none';
+            images.loadingIcon.style.MSUserSelect = 'none';
+            images.loadingIcon.style.OUserSelect = 'none';
+            images.loadingIcon.style.WebkitUserSelect = 'none';
             images.loadingIcon.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'build')
                 + '/Ox.UI/themes/' + theme + '/svg/symbolLoading.svg';
             callback(images);
