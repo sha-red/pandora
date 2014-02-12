@@ -1860,11 +1860,13 @@ pandora.hasPlacesLayer = function() {
 };
 
 pandora.isClipView = function(view, item) {
-    if (arguments.length == 0) {
-        item = pandora.user.ui.item;
-        view = !item ? pandora.user.ui.listView : pandora.user.ui.itemView;
-    } else if (arguments.length == 1) {
-        item = pandora.user.ui.item;
+    if (pandora.user.ui.section == 'items') {
+        if (arguments.length == 0) {
+            item = pandora.user.ui.item;
+            view = !item ? pandora.user.ui.listView : pandora.user.ui.itemView;
+        } else if (arguments.length == 1) {
+            item = pandora.user.ui.item;
+        }
     }
     return (
         !item ? ['calendar', 'clip', 'map'] : ['calendar', 'clips', 'map']
@@ -1889,11 +1891,13 @@ pandora.isPrintURL = function(url) {
 };
 
 pandora.isVideoView = function(view, item) {
-    if (arguments.length == 0) {
-        item = pandora.user.ui.item;
-        view = !item ? pandora.user.ui.listView : pandora.user.ui.itemView;
-    } else if (arguments.length == 1) {
-        item = pandora.user.ui.item;
+    if (pandora.user.ui.section == 'items') {
+        if (arguments.length == 0) {
+            item = pandora.user.ui.item;
+            view = !item ? pandora.user.ui.listView : pandora.user.ui.itemView;
+        } else if (arguments.length == 1) {
+            item = pandora.user.ui.item;
+        }
     }
     return (
         !item ? ['video'] : ['player', 'editor', 'timeline']
