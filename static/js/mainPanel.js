@@ -1,22 +1,21 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 pandora.ui.mainPanel = function() {
-    var that = Ox.SplitPanel({
+    var ui = pandora.user.ui,
+        that = Ox.SplitPanel({
             elements: [
                 {
                     collapsible: true,
-                    collapsed: !pandora.user.ui.showSidebar,
+                    collapsed: !ui.showSidebar,
                     element: pandora.$ui.leftPanel = pandora.ui.leftPanel(),
                     resizable: true,
                     resize: [192, 256, 320, 384],
-                    size: pandora.user.ui.sidebarSize,
+                    size: ui.sidebarSize,
                     tooltip: 'sidebar <span class="OxBright">'
                         + Ox.SYMBOLS.SHIFT + 'S</span>'
                 },
                 {
-                    element: pandora.user.ui.section == 'items' ? pandora.$ui.rightPanel = pandora.ui.rightPanel()
-                        : pandora.user.ui.section == 'edits' ? pandora.$ui.editPanel = pandora.ui.editPanel()
-                        : pandora.$ui.textPanel = pandora.ui.textPanel()
+                    element: getRightPanel()
                 }
             ],
             orientation: 'horizontal'
@@ -28,22 +27,22 @@ pandora.ui.mainPanel = function() {
             pandora_find: function() {
                 var previousUI = pandora.UI.getPrevious();
                 Ox.Log('FIND', 'handled in mainPanel', previousUI.item, previousUI._list)
-                if (!previousUI.item && pandora.user.ui._list == previousUI._list) {
-                    if (['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1) {
+                if (!previousUI.item && ui._list == previousUI._list) {
+                    if (['map', 'calendar'].indexOf(ui.listView) > -1) {
                         pandora.$ui.contentPanel.replaceElement(1,
-                            pandora.ui.navigationView(pandora.user.ui.listView)
+                            pandora.ui.navigationView(ui.listView)
                         );
                     } else {
-                        if (['clips', 'clip'].indexOf(pandora.user.ui.listView) > -1) {
-                            pandora.$ui.list.options({find: pandora.user.ui.itemFind});
+                        if (['clips', 'clip'].indexOf(ui.listView) > -1) {
+                            pandora.$ui.list.options({find: ui.itemFind});
                         }
                         pandora.$ui.list.reloadList();
                     }
                     // FIXME: why is this being handled _here_?
-                    pandora.user.ui._filterState.forEach(function(data, i) {
+                    ui._filterState.forEach(function(data, i) {
                         if (!Ox.isEqual(data.selected, previousUI._filterState[i].selected)) {
                             pandora.$ui.filters[i].options(
-                                pandora.user.ui.showFilters ? {
+                                ui.showFilters ? {
                                     selected: data.selected
                                 } : {
                                     _selected: data.selected,
@@ -52,7 +51,7 @@ pandora.ui.mainPanel = function() {
                             );
                         }
                         if (!Ox.isEqual(data.find, previousUI._filterState[i].find)) {
-                            if (!pandora.user.ui.showFilters) {
+                            if (!ui.showFilters) {
                                 pandora.$ui.filters[i].options({
                                     _selected: data.selected
                                 });
@@ -78,7 +77,7 @@ pandora.ui.mainPanel = function() {
             pandora_section: function(data) {
                 if (data.value != data.previousValue) {
                     that.replaceElement(0, pandora.$ui.leftPanel = pandora.ui.leftPanel());
-                    that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                    that.replaceElement(1, getRightPanel());
                 }
             },
             pandora_showsidebar: function(data) {
@@ -90,6 +89,11 @@ pandora.ui.mainPanel = function() {
                 }
             }
         });
+    function getRightPanel() {
+        return ui.section == 'items' ? pandora.$ui.rightPanel = pandora.ui.rightPanel()
+            : ui.section == 'edits' ? pandora.$ui.editPanel = pandora.ui.editPanel()
+            : pandora.$ui.textPanel = pandora.ui.textPanel();
+    }
     return that;
 };
 
