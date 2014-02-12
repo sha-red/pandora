@@ -415,7 +415,7 @@ actions.register(findUser)
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'name', 'operator':'+'}]
+    query['sort'] = [{'key':'username', 'operator':'+'}]
     for key in ('keys', 'range', 'sort', 'query'):
         if key in data:
             query[key] = data[key]
@@ -441,6 +441,7 @@ def order_query(qs, sort):
             'system': 'system',
             'timesseen': 'timesseen',
             'useragent': 'useragent',
+            'user': 'username',
             'username': 'username',
             'numberoflists': 'numberoflists',
             'windowsize': 'windowsize',

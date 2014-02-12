@@ -600,15 +600,23 @@ pandora.ui.usersDialog = function() {
         return ret;
     };
 
-    function getTo() {
-        return $list.options('selected').map(function(id) {
-            return $list.value(id);
-        }).filter(function(user) {
-            return ['guest', 'robot'].indexOf(user.level) == -1 && (
-                $mailForm.values().include == 'users' || user.newsletter
-            );
-        }).map(function(user) {
-            return user.username;
+    function getTo(callback) {
+        pandora.api.findUsers({
+            query: {conditions: [
+                {key: 'level', value: 'guest', operator: '!='},
+                {key: 'level', value: 'robot', operator: '!='}
+            ], operator: '&'},
+            keys: ['id', 'username', 'newsletter'],
+            range: [0, numberOfUsers],
+            sort: [{key: 'username', operator: '+'}]
+        }, function(result) {
+            var selected = $list.options('selected');
+            callback(result.data.items.filter(function(user) {
+                return selected.indexOf(user.id) > -1
+                    && ($mailForm.values().include == 'users' || user.newsletter);
+            }).map(function(user) {
+                return user.username;
+            }));
         });
     }
 
@@ -766,8 +774,7 @@ pandora.ui.usersDialog = function() {
                     })
                     .bindEvent({
                         change: function() {
-                            setTo();
-                            setSend();
+                            setTo(setSend);
                         }
                     }),
                 Ox.Input({
@@ -835,8 +842,7 @@ pandora.ui.usersDialog = function() {
                 $form.append($editForm = renderEditForm());
             }
         } else {
-            setTo();
-            setSend();
+            setTo(setSend);
             setWidth();
             $editForm && $editForm.remove();
             $form.append($mailForm);
@@ -858,40 +864,41 @@ pandora.ui.usersDialog = function() {
                 $form.append($editForm = renderEditForm());
             }
         } else {
-            setTo();
-            setSend();
+            setTo(setSend);
         }
     }
 
     function sendMail() {
         $sendButton.options({title: Ox._('Sending'), disabled: true});
-        pandora.api.mail({
-            to: getTo(),
-            subject: getFormItemById('subject').value(),
-            message: getFormItemById('message').value(),
-            receipt: getFormItemById('receipt').value()
-        }, function(result) {
-            var $dialog = pandora.ui.iconDialog({
-                    buttons: [
-                        Ox.Button({
-                            id: 'close',
-                            title: Ox._('Close')
-                        })
-                        .bindEvent({
-                            click: function() {
-                                $dialog.close();
-                            }
-                        })
-                    ],
-                    content: result.status.code == 200
-                        ? Ox._('Your message has been sent.')
-                        : Ox._('Your message could not be sent. Please try again.'),
-                    keys: {enter: 'close', escape: 'close'},
-                    title: result.status.code == 200
-                        ? Ox._('Message Sent')
-                        : Ox._('Application Error')
-                }).open();
-            $sendButton.options({title: Ox._('Send'), disabled: false});
+        getTo(function(to) {
+            pandora.api.mail({
+                to: to,
+                subject: getFormItemById('subject').value(),
+                message: getFormItemById('message').value(),
+                receipt: getFormItemById('receipt').value()
+            }, function(result) {
+                var $dialog = pandora.ui.iconDialog({
+                        buttons: [
+                            Ox.Button({
+                                id: 'close',
+                                title: Ox._('Close')
+                            })
+                            .bindEvent({
+                                click: function() {
+                                    $dialog.close();
+                                }
+                            })
+                        ],
+                        content: result.status.code == 200
+                            ? Ox._('Your message has been sent.')
+                            : Ox._('Your message could not be sent. Please try again.'),
+                        keys: {enter: 'close', escape: 'close'},
+                        title: result.status.code == 200
+                            ? Ox._('Message Sent')
+                            : Ox._('Application Error')
+                    }).open();
+                $sendButton.options({title: Ox._('Send'), disabled: false});
+            });
         });
     }
 
@@ -927,10 +934,13 @@ pandora.ui.usersDialog = function() {
         }); 
     }
 
-    function setTo() {
-        var recipients = getTo().length;
-        $mailForm.values({
-            to: Ox.formatCount(recipients, 'recipient').replace('no', 'No')
+    function setTo(callback) {
+        getTo(function(to) {
+            var recipients = to.length;
+            $mailForm.values({
+                to: Ox.formatCount(recipients, 'recipient').replace('no', 'No')
+            });
+            callback();
         });
     }
 
