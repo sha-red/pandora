@@ -656,6 +656,12 @@ pandora.ui.mainMenu = function() {
                 that[!isGuest && edit ? 'enableItem' : 'disableItem']('newlistfromselection');
                 that.replaceMenu('itemMenu', getItemMenu());
             },
+            pandora_editselection: function() {
+                that.replaceMenu('itemMenu', getItemMenu());
+            },
+            pandora_editview: function() {
+                that.replaceMenu('itemMenu', getItemMenu());
+            },
             pandora_find: function() {
                 var action = pandora.getListData().editable ? 'enableItem' : 'disableItem',
                     list = ui._list,
@@ -890,20 +896,31 @@ pandora.ui.mainMenu = function() {
 
     function getItemMenu() {
         var listData = pandora.getListData(),
+            isEditable = listData.editable && listData.type == 'static',
             isClipView = pandora.isClipView()
                 && pandora.$ui.clipList
                 && pandora.$ui.clipList.hasFocus(),
             isVideoView = pandora.isVideoView()
                 && pandora.$ui[ui.itemView]
                 && pandora.$ui[ui.itemView].hasFocus(),
-            listName = isVideoView || isClipView ? '' : ui.section == 'items' ? 'from List' : 'from Edit',
+            isListView = ui.section == 'items' && !ui.item
+                && !isClipView && !isVideoView,
+            isEditView = ui.section == 'edits' && ui.edit
+                && ui.editView != 'annotations', // FIXME: focus
+            listName = isVideoView || isClipView ? ''
+                : ui.section == 'items' ? 'from List'
+                : 'from Edit',
             listItemsName = Ox._(
-                ui.section == 'edits' || isVideoView || isClipView ? 'Clips' : pandora.site.itemName.plural
+                ui.section == 'edits' || isVideoView || isClipView ? 'Clips'
+                : pandora.site.itemName.plural
             ),
             selectionItems = isVideoView ? 1
                 : isClipView ? pandora.$ui.clipList.options('selected').length
+                : isEditView ? ui.editSelection.length
                 : ui.listSelection.length,
-            selectionItemName = (selectionItems > 1 ? Ox.formatNumber(selectionItems) + ' ' : '') + Ox._(
+            selectionItemName = (
+                selectionItems > 1 ? Ox.formatNumber(selectionItems) + ' ' : ''
+            ) + Ox._(
                 isVideoView ? 'Clip'
                 : ui.section == 'edits' || isClipView ? (selectionItems == 1 ? 'Clip' : 'Clips')
                 : pandora.site.itemName[selectionItems == 1 ? 'singular' : 'plural']
@@ -911,20 +928,25 @@ pandora.ui.mainMenu = function() {
             clipboardItems = pandora.clipboard.items(),
             clipboardType = pandora.clipboard.type(),
             clipboardItemName = clipboardItems == 0 ? ''
-                : (clipboardItems > 1 ? Ox.formatNumber(clipboardItems) + ' ' : '') + Ox._(
+                : (
+                    clipboardItems > 1 ? Ox.formatNumber(clipboardItems) + ' ' : ''
+                ) + Ox._(
                     clipboardType == 'item' ? pandora.site.itemName[clipboardItems == 1 ? 'singular' : 'plural']
                     : clipboardType == 'clip' ? (clipboardItems == 1 ? 'Clip' : 'Clips')
                     : ''
                 ),
-            canSelect = ui.section == 'edits' || !ui.item || isClipView,
-            canCopy = isVideoView ? ui.videoPoints[ui.item]['in'] != ui.videoPoints[ui.item].out
+            canSelect = isListView || isClipView || isEditView,
+            canCopy = isListView ? ui.listSelection.length
                 : isClipView ? pandora.$ui.clipList.options('selected').length
-                : !!ui.listSelection.length,
-            canAdd = canCopy && clipboardItems > 0 && ((clipboardType == 'item') == (!isVideoView && !isClipView)),
-            canPaste = !ui.item && !isClipView && !isVideoView
-                && listData.editable && listData.type == 'static' && clipboardType == 'item',
-            canCut = canCopy && !ui.item && !isClipView && !isVideoView
-                && listData.editable && listData.type == 'static',
+                : isVideoView ? ui.videoPoints[ui.item]['in'] != ui.videoPoints[ui.item].out
+                : isEditView && ui.editSelection.length,
+            canCut = canCopy && isEditable,
+            canPaste = (
+                (isListView && clipboardType == 'item')
+                || (isEditView && clipboardType == 'clip')
+            ) && isEditable,
+            canAdd = canCopy && clipboardItems > 0
+                && ((clipboardType == 'item') == isListView),
             historyItems = pandora.history.items(),
             undoText = pandora.history.undoText(),
             redoText = pandora.history.redoText();
