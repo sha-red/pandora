@@ -159,19 +159,25 @@ actions.register(orderClips, cache=False)
 def _order_clips(edit, sort):
     qs = edit.get_clips()
     order_by = []
+    if len(sort) == 1:
+        for s in settings.CONFIG['user']['ui']['editSort']:
+            if (edit.type == 'smart' and s['key'] == 'index') \
+                or s['key'] == sort[0]['key']:
+                continue
+            sort.append(s)
     for e in sort:
         operator = e['operator']
         if operator != '-':
             operator = ''
         key = e['key']
         #fixme, random should be clip random
-        if key not in ('in', 'out', 'position', 'hue', 'saturation', 'lightness', 'volume', 'duration', 'text'):
+        if key not in ('index', 'in', 'out', 'position', 'hue', 'saturation', 'lightness', 'volume', 'duration', 'text'):
             key = "item__sort__%s" % key
         key = {
             'position': 'start',
             'in': 'start',
             'out': 'end',
-            'text': 'annotation__sortvalue' if edit.type == 'static' else 'annotations__sortvalue',
+            'text': 'sortvalue',
             'item__sort__item': 'item__sort__itemId',
         }.get(key, key)
         order = '%s%s' % (operator, key)

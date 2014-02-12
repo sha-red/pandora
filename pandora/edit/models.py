@@ -380,6 +380,7 @@ class Clip(models.Model):
     saturation= models.FloatField(default=0)
     lightness= models.FloatField(default=0)
     volume = models.FloatField(default=0)
+    sortvalue = models.CharField(max_length=1000, null=True, db_index=True)
 
     objects = managers.ClipManager()
 
@@ -394,6 +395,16 @@ class Clip(models.Model):
     def save(self, *args, **kwargs):
         if self.duration != self.end - self.start:
             self.update_calculated_values()
+        sortvalue = ''
+        if self.id:
+            for l in settings.CONFIG.get('clipLayers', []):
+                sortvalue += ''.join(filter(lambda s: s,
+                     [a.sortvalue
+                      for a in self.get_annotations().filter(layer=l)]))
+        if sortvalue:
+            self.sortvalue = sortvalue[:900]
+        else:
+            self.sortvalue = None
         super(Clip, self).save(*args, **kwargs)
 
     def update_calculated_values(self):
@@ -434,6 +445,19 @@ class Clip(models.Model):
         data['cuts'] = tuple([c for c in self.item.get('cuts') if c > self.start and c < self.end])
         data['layers'] = self.get_layers(user)
         return data
+
+    def get_annotations(self):
+        if self.annotation:
+            start = self.annotation.start
+            end = self.annotation.end
+            item = self.annotation.item
+        else:
+            start = self.start
+            end = self.end
+            item = self.item
+        qs = Annotation.objects.filter(item=item).order_by('start', 'sortvalue')
+        qs = qs.filter(start__lt=end, end__gt=start)
+        return qs
 
     def get_layers(self, user=None):
         if self.annotation:
