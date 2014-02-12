@@ -1245,28 +1245,34 @@ pandora.getItemIdAndPosition = function() {
             position: ui.videoPoints[itemId] ? ui.videoPoints[itemId].position : 0
         };
     }
-    if (!ui.item) {
-        if (
-            ui.listView == 'timelines'
-            && (selected = ui.listSelection).length == 1
-        ) {
-            ret = getIdAndPositionByItemId(selected[0]);
-        } else if (
-            ['clip', 'map', 'calendar'].indexOf(ui.listView) > -1
-            && pandora.$ui.clipList
-            && (selected = pandora.$ui.clipList.options('selected')).length == 1
-        ) {
-            ret = getIdAndPositionByClipId(selected[0]);
+    if (ui.section == 'items') {
+        if (!ui.item) {
+            if (
+                ui.listView == 'timelines'
+                && (selected = ui.listSelection).length == 1
+            ) {
+                ret = getIdAndPositionByItemId(selected[0]);
+            } else if (
+                ['clip', 'map', 'calendar'].indexOf(ui.listView) > -1
+                && pandora.$ui.clipList
+                && (selected = pandora.$ui.clipList.options('selected')).length == 1
+            ) {
+                ret = getIdAndPositionByClipId(selected[0]);
+            }
+        } else {
+            if (pandora.isVideoView()) {
+                ret = getIdAndPositionByItemId(ui.item);
+            } else if (
+                ['clips', 'map', 'calendar'].indexOf(ui.itemView) > -1
+                && pandora.$ui.clipList
+                && (selected = pandora.$ui.clipList.options('selected')).length == 1
+            ) {
+                ret = getIdAndPositionByClipId(selected[0]);
+            }
         }
-    } else {
-        if (pandora.isVideoView()) {
-            ret = getIdAndPositionByItemId(ui.item);
-        } else if (
-            ['clips', 'map', 'calendar'].indexOf(ui.itemView) > -1
-            && pandora.$ui.clipList
-            && (selected = pandora.$ui.clipList.options('selected')).length == 1
-        ) {
-            ret = getIdAndPositionByClipId(selected[0]);
+    } else if (ui.section == 'edits') {
+        if (ui.edit) {
+            // TODO
         }
     }
     return ret;
