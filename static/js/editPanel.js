@@ -326,6 +326,9 @@ pandora.ui.editPanel = function(isEmbed) {
             volume: function(data) {
                 pandora.UI.set({videoVolume: data.volume});
             },
+            pandora_editselection: function(data) {
+                that.options({selected: data.value});
+            },
             pandora_showclips: function(data) {
                 that.options({showClips: data.value});
             },
@@ -336,9 +339,12 @@ pandora.ui.editPanel = function(isEmbed) {
                 that.options({timeline: data.value});
             }
         });
-        that.updatePanel = function() {
+        that.updatePanel = function(callback) {
             Ox.Request.clearCache('getEdit');
-            getEdit(updateClips);
+            getEdit(function() {
+                updateClips();
+                callback && callback();
+            });
         };
         pandora.$ui.mainPanel.replaceElement(1, that);
         updateSmallTimelineURL();
