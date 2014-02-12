@@ -392,11 +392,20 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'cut' || data.id == 'cutadd') {
                     var action = data.id == 'cut' ? 'copy' : 'add';
                     fromMenu = true;
-                    pandora.clipboard[action](ui.listSelection, 'item');
-                    pandora.doHistory('cut', ui.listSelection, ui._list, function() {
-                        pandora.UI.set({listSelection: []});
-                        pandora.reloadList();
-                    });
+                    if (ui.section == 'items') {
+                        pandora.clipboard[action](ui.listSelection, 'item');
+                        pandora.doHistory('cut', ui.listSelection, ui._list, function() {
+                            pandora.UI.set({listSelection: []});
+                            pandora.reloadList();
+                        });
+                    } else if (ui.section == 'edits') {
+                        var clips = pandora.$ui.editPanel.getSelectedClips();
+                        pandora.clipboard[action](clips, 'clip');
+                        pandora.doHistory('cut', clips, ui.edit, function() {
+                            pandora.UI.set({editSelection: []});
+                            pandora.$ui.editPanel.updatePanel();
+                        });
+                    }
                 } else if (data.id == 'copy' || data.id == 'copyadd') {
                     var action = data.id == 'copy' ? 'copy' : 'add';
                     fromMenu = true;
