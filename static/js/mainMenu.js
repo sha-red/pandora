@@ -426,9 +426,9 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'paste') {
                     fromMenu = true;
                     var items = pandora.clipboard.paste();
-                    pandora.doHistory('paste', items, ui._list, function() {
-                        pandora.UI.set({listSelection: items});
-                        pandora.reloadList();
+                    pandora.doHistory('paste', items, ui.section == 'items' ? ui._list : ui.edit, function() {
+                        pandora.UI.set(ui.section == 'items' ? 'listSelection' : 'editSelection', items);
+                        ui.section == 'items' && pandora.reloadList();
                     });
                 } else if (data.id == 'clearclipboard') {
                     pandora.clipboard.clear();
