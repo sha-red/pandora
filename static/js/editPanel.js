@@ -198,13 +198,9 @@ pandora.ui.editPanel = function(isEmbed) {
                         out: data.key == 'out' ? data.value : clip.out
                     }]));
                     pandora.doHistory('edit', clips, ui.edit, function(result) {
-                        if (result.status.code == 200) {
-                            edit.clips[index] = result.data;
-                            that.updateClip(data.id, result.data);
-                            updateVideos();
-                        } else {
-                            Ox.print('failed to edit clip', result);
-                        }
+                        edit.clips[index] = result.data;
+                        that.updateClip(data.id, result.data);
+                        updateVideos();
                     });
                 });
             },
@@ -261,6 +257,11 @@ pandora.ui.editPanel = function(isEmbed) {
                         }
                         return clip;
                     }).concat(result.data.clips));
+                    that.options({
+                        selected: result.data.clips.map(function(clip) {
+                            return clip.id;
+                        })
+                    });
                 });
             },
             playing: function(data) {
