@@ -196,20 +196,7 @@ pandora.ui.mainMenu = function() {
                         ] }
                     ]},
                     getSortMenu(),
-                    { id: 'findMenu', title: Ox._('Find'), items: [
-                        { id: 'find', title: Ox._('Find'), items: [
-                            { group: 'find', min: 0, max: 1, items: pandora.site.findKeys.map(function(key, i) {
-                                return {
-                                    id: key.id,
-                                    checked: key.id == findState.key,
-                                    title: Ox._(key.title)
-                                };
-                            }) }
-                        ] },
-                        { id: 'advancedfind', title: Ox._('Advanced Find...'), keyboard: 'shift control f' },
-                        {},
-                        { id: 'findsimilar', title: Ox._('Find Similar Clips...'), keyboard: 'alt control f', disabled: !pandora.getItemIdAndPosition() }
-                    ] },
+                    getFindMenu(),
                     { id: 'dataMenu', title: Ox._('Data'), items: [
                         { id: 'documents', title: Ox._('Manage Documents...'), disabled: !pandora.site.capabilities.canManageDocuments[pandora.user.level] },
                         {},
@@ -793,6 +780,7 @@ pandora.ui.mainMenu = function() {
                 that.replaceMenu('listMenu', getListMenu());
                 that.replaceMenu('itemMenu', getItemMenu());
                 that.replaceMenu('sortMenu', getSortMenu());
+                that.replaceMenu('findMenu', getFindMenu());
             },
             pandora_showannotations: function(data) {
                 that.setItemTitle('showannotations', Ox._((data.value ? 'Hide' : 'Show') + ' Annotations'));
@@ -903,6 +891,23 @@ pandora.ui.mainMenu = function() {
             }
         });
         elements[Ox.mod((index + direction), elements.length)].gainFocus();
+    }
+
+    function getFindMenu() {
+        return { id: 'findMenu', title: Ox._('Find'), items: [
+            { id: 'find', title: Ox._('Find'), items: [
+                { group: 'find', min: 0, max: 1, items: pandora.site.findKeys.map(function(key, i) {
+                    return {
+                        id: key.id,
+                        checked: key.id == findState.key,
+                        title: Ox._(key.title)
+                    };
+                }) }
+            ], disabled: ui.section != 'items' },
+            { id: 'advancedfind', title: Ox._('Advanced Find...'), keyboard: 'shift control f', disabled: ui.section != 'items' },
+            {},
+            { id: 'findsimilar', title: Ox._('Find Similar Clips...'), keyboard: 'alt control f', disabled: !pandora.getItemIdAndPosition() }
+        ] };
     }
 
     function getItemMenu() {
