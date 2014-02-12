@@ -422,6 +422,7 @@ pandora.ui.mainMenu = function() {
                         : pandora.isClipView() && !pandora.$ui.browser.hasFocus() ? pandora.clipboard[action](
                             pandora.$ui.clipList.options('selected'), 'clip'
                         )
+                        : ui.section == 'edits' ? pandora.clipboard[action](ui.editSelection, 'clip')
                         : pandora.clipboard[action](ui.listSelection, 'item');
                 } else if (data.id == 'paste') {
                     var items = pandora.clipboard.paste();
