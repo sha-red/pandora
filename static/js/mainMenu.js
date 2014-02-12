@@ -235,10 +235,14 @@ pandora.ui.mainMenu = function() {
             change: function(data) {
                 var value = data.checked[0] ? data.checked[0].id : null;
                 if (data.id == 'allitems') {
-                    if (data.checked) {
-                        pandora.UI.set({find: {conditions: [], operator: '&'}});
+                    if (ui.section == 'items') {
+                        if (data.checked) {
+                            pandora.UI.set({find: {conditions: [], operator: '&'}});
+                        } else {
+                            that.checkItem('allitems');
+                        }
                     } else {
-                        that.checkItem('allitems');
+                        pandora.UI.set(ui.section.slice(0, -1), '');
                     }
                 } else if (data.id == 'cliporder') {
                     if (!ui.item) {
@@ -586,8 +590,16 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_control_shift_w: function() {
-                if (!pandora.hasDialogOrScreen() || (ui.item || ui._list)) {
-                    pandora.UI.set({find: {conditions: [], operator: '&'}});
+                if (!pandora.hasDialogOrScreen()) {
+                    if (ui.section == 'items') {
+                        if (ui.item) {
+                            pandora.UI.set({item: ''});
+                        } else if (ui._list) {
+                            pandora.UI.set({find: {conditions: [], operator: '&'}});
+                        }
+                    } else {
+                        pandora.UI.set(ui.section.slice(0, -1), '');
+                    }
                 }
             },
             key_control_shift_z: function() {
@@ -605,17 +617,11 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_control_w: function() {
-                if (!pandora.hasDialogOrScreen()) {
-                    if (ui.section == 'items') {
-                        if (ui.item) {
-                            pandora.UI.set({item: ''});
-                        } else if (ui._list) {
-                            pandora.UI.set({find: {conditions: [], operator: '&'}});
-                        }
-                    } else if (ui.section == 'edits') {
-                        pandora.UI.set({edit: ''});
-                    } else if (ui.section == 'texts') {
-                        pandora.UI.set({text: ''});
+                if (!pandora.hasDialogOrScreen() && ui.section == 'items') {
+                    if (ui.item) {
+                        pandora.UI.set({item: ''});
+                    } else if (ui._list) {
+                        pandora.UI.set({find: {conditions: [], operator: '&'}});
                     }
                 }
             },
