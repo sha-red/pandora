@@ -424,12 +424,22 @@ pandora.ui.mainMenu = function() {
                         )
                         : pandora.clipboard[action](ui.listSelection, 'item');
                 } else if (data.id == 'paste') {
-                    fromMenu = true;
                     var items = pandora.clipboard.paste();
-                    pandora.doHistory('paste', items, ui.section == 'items' ? ui._list : ui.edit, function() {
-                        pandora.UI.set(ui.section == 'items' ? 'listSelection' : 'editSelection', items);
-                        ui.section == 'items' && pandora.reloadList();
-                    });
+                    fromMenu = true;
+                    if (ui.section == 'items') {
+                        pandora.doHistory('paste', items, ui._list, function() {
+                            pandora.UI.set({listSelection: items});
+                            pandora.reloadList();
+                        });
+                    } else {
+                        pandora.doHistory('paste', items, ui.edit, function(result) {
+                            pandora.$ui.editPanel.updatePanel(function() {
+                                pandora.UI.set({editSelection: result.data.clips.map(function(clip) {
+                                    return clip.id;
+                                })});
+                            });
+                        });
+                    }
                 } else if (data.id == 'clearclipboard') {
                     pandora.clipboard.clear();
                 } else if (data.id == 'delete') {
