@@ -655,7 +655,6 @@
             "calendarFind": "",
             "calendarSelection": "",
             "clipColumns": 2,
-            "clipSort": [{"key": "index", "operator": "+"}],
             "columns": {
                 "Colors": {
                     "columns": ["title", "source", "project", "language", "hue", "saturation", "brightness"],

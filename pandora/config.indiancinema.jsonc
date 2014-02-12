@@ -779,7 +779,6 @@
             "calendarFind": "",
             "calendarSelection": "",
             "clipColumns": 2,
-            "clipSort": [{"key": "index", "operator": "+"}],
             "columns": {
                 "Colors": {
                     "columns": ["title", "director", "country", "year", "hue", "saturation", "brightness"],
