@@ -1023,7 +1023,7 @@ pandora.getFoldersHeight = function(section) {
     var height = 0;
     pandora.site.sectionFolders[section].forEach(function(folder, i) {
         height += 16 + pandora.user.ui.showFolder[section][folder.id] * (
-            !!(folder.showBrowser && folder.items) * 40 + (folder.items || 1) * 16
+            !!(folder.showBrowser && folder.hasItems) * 40 + (folder.items || 1) * 16
         );
     });
     return height;
@@ -1035,7 +1035,7 @@ pandora.getFoldersWidth = function(section) {
     if (
         pandora.$ui.appPanel
         && pandora.getFoldersHeight(section)
-            > window.innerHeight - 20 - 24 -16 - 1 - pandora.getInfoHeight(section)
+            > window.innerHeight - 20 - 24 - 16 - 1 - pandora.getInfoHeight(section)
     ) {
         width -= Ox.UI.SCROLLBAR_SIZE;
     }

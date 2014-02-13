@@ -191,13 +191,16 @@ pandora.ui.folderBrowserList = function(id, section) {
             init: function(data) {
                 pandora.site.sectionFolders[section][i].items = data.items;
                 pandora.$ui.folder[i].$content.css({
-                    height: (data.items ? 40 + data.items * 16 : 16) + 'px'
+                    height: 40 + (data.items || 1) * 16 + 'px'
                 });
                 pandora.$ui.folderList[id].css({
                     height: 16 + data.items * 16 + 'px'
                 });
-                pandora.$ui.folderPlaceholder[id][data.items ? 'hide' : 'show']();
-                pandora.resizeFolders();
+                pandora.$ui.folderBrowser[id].size(2, data.items ? 0 : 16);
+                if (Ox.isBoolean(pandora.site.sectionFolders[section][i].hasItems)) {
+                    // hasItems is set, so we're not on first init
+                    pandora.resizeFolders();
+                }
             },
             paste: function(data) {
                 if (section == 'items') {
