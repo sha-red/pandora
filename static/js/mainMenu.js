@@ -102,7 +102,9 @@ pandora.ui.mainMenu = function() {
                             { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
                                 return Ox.extend({
                                     checked: ui.itemView == view.id
-                                }, view);
+                                }, view, {
+                                    title: Ox._(view.title)
+                                });
                             }) },
                         ] },
                         { id: 'clips', title: Ox._('Open Clips'), items: [

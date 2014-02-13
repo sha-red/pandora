@@ -127,7 +127,7 @@ pandora.ui.documentsPanel = function(options) {
             items: columns.map(function(column) {
                 return {
                     id: column.id,
-                    title: Ox._('Sort by ' + column.title)
+                    title: Ox._('Sort by {0}', [column.title])
                 };
             }),
             value: ui.documentsSort[0].key,
