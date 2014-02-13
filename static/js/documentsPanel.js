@@ -300,8 +300,8 @@ pandora.ui.documentsPanel = function(options) {
 
         $selectButton = Ox.ButtonGroup({
             buttons: [
-                {id: 'previous', title: 'left'},
-                {id: 'next', title: 'right'}
+                {id: 'previous', title: 'left', tooltip: Ox._('Previous')},
+                {id: 'next', title: 'right', tooltip: Ox._('Next')}
             ],
             type: 'image'
         })
