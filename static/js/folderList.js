@@ -264,7 +264,7 @@ pandora.ui.folderList = function(id, section) {
         columns: columns,
         droppable: id != 'volumes',
         items: items,
-        keys: ['modified'].concat(section != 'texts' ? ['query'] : ['rightslevel']),
+        keys: ['modified'].concat(section != 'texts' ? ['query', 'name'] : ['rightslevel']),
         max: 1,
         min: 0,
         pageLength: 1000,
