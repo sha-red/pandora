@@ -80,6 +80,9 @@ def stream(video, target, profile, info, avconv=None):
     profile, format = profile.split('.')
     bpp = 0.17
 
+    if 'error' in info:
+        return False, "Unsupported Format"
+
     if profile == '1080p':
         height = 1080
 
