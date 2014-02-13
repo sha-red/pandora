@@ -13,6 +13,8 @@ from django.db.models import Count, Sum
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.core.files.temp import NamedTemporaryFile
+from django.core.servers.basehttp import FileWrapper
 from django.conf import settings
 
 from ox.utils import json, ET
@@ -865,6 +867,31 @@ def download(request, id, index=1):
         ext
     )
     response = HttpFileResponse(path, content_type=content_type)
+    response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
+    return response
+
+def download(request, id):
+    item = get_object_or_404(models.Item, itemId=id)
+    resolution = max(settings.CONFIG['video']['resolutions'])
+    if not item.access(request.user) or not item.rendered:
+        return HttpResponseForbidden()
+    ext = '.webm'
+    filename = "%s - %s %s%s" % (
+        item.get('title'),
+        settings.SITENAME,
+        item.itemId,
+        ext
+    )
+    video = NamedTemporaryFile(suffix=ext)
+    content_type = mimetypes.guess_type(video.name)[0]
+    r = item.merge_streams(video.name)
+    if not r:
+        return HttpResponseForbidden()
+    elif r == True:
+        response = HttpResponse(FileWrapper(video), content_type=content_type)
+        response['Content-Length'] = os.path.getsize(video.name)
+    else:
+        response = HttpFileResponse(r, content_type=content_type)
     response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
     return response
 

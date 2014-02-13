@@ -1180,6 +1180,18 @@ class Item(models.Model):
             Q(file__is_audio=True)|Q(file__is_video=True)
         ).order_by('file__part', 'file__sort_path')
 
+    def merge_streams(self, output):
+        first = True
+        cmd = ['mkvmerge', '-o', output]
+        streams = [s.media.path for s in self.streams()]
+        if len(streams) > 1:
+            cmd += [streams[0]] + ['+' + s for s in streams[1:]]
+            print cmd
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p.wait()
+            return True
+        return streams[0] if streams else None
+
     def update_timeline(self, force=False, async=True):
         streams = self.streams()
         self.make_timeline()

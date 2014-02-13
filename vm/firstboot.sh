@@ -45,6 +45,7 @@ apt-get install -y \
     libavcodec-extra-53 \
     libav-tools \
     ffmpeg2theora \
+    mkvtoolnix \
     imagemagick \
     poppler-utils \
     ipython \
