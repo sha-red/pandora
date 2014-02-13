@@ -6,6 +6,7 @@ pandora.ui.documentsPanel = function(options) {
 
     var ui = pandora.user.ui,
         hasItemView = ui.section == 'items' && ui.item,
+        hasListSelection = ui.section == 'items' && !ui.item && ui.listSelection.length,
         isItemView = options.isItemView,
         listLoaded = false,
 
@@ -400,11 +401,11 @@ pandora.ui.documentsPanel = function(options) {
     function addDocuments() {
         var ids = ui.documentsSelection[''];
         pandora.api.addDocument({
-            item: ui.item,
+            item: hasItemView ? ui.item : ui.listSelection,
             ids: ids
         }, function() {
             Ox.Request.clearCache();
-            if (ui.itemView == 'documents') {
+            if (ui.item && ui.itemView == 'documents') {
                 // FIXME: $list.reloadList() would be much better
                 pandora.$ui.contentPanel.replaceElement(1,
                     pandora.$ui.item = pandora.ui.item()
@@ -804,13 +805,15 @@ pandora.ui.documentsPanel = function(options) {
                 [selected.length ? 'enableItem' : 'disableItem']('embed')
                 [selected.length ? 'enableItem' : 'disableItem']('remove');
         } else {
-            $itemMenu.setItemTitle('add', Ox._(
-                    'Add ' + string + ' to Current '
-                    + pandora.site.itemName.singular
-                ))
+            $itemMenu.setItemTitle('add', Ox._('Add ' + string + ' to ' + (
+                    hasListSelection ? 'Selected' : 'Current'
+                ) + ' {0}', [pandora.site.itemName[
+                    hasListSelection && ui.listSelection.length > 1
+                    ? 'plural' : 'singular'
+                ]]))
                 .setItemTitle('replace', Ox._('Replace ' + string + '...'))
                 .setItemTitle('delete', Ox._('Delete ' + string + '...'))
-                [selected.length && hasItemView ? 'enableItem' : 'disableItem']('add')
+                [selected.length && (hasItemView || hasListSelection) ? 'enableItem' : 'disableItem']('add')
                 [selected.length ? 'enableItem' : 'disableItem']('embed')
                 [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')
                 [selected.length ? 'enableItem' : 'disableItem']('delete');
