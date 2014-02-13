@@ -160,6 +160,7 @@ pandora.ui.editPanel = function(isEmbed) {
                 pandora.clipboard.copy(clips, 'clip');
                 pandora.doHistory('cut', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
+                    Ox.Request.clearCache('sortClips');
                     updateClips(result.data.clips);
                 });
             },
@@ -168,6 +169,7 @@ pandora.ui.editPanel = function(isEmbed) {
                 pandora.clipboard.add(clips, 'clip');
                 pandora.doHistory('cut', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
+                    Ox.Request.clearCache('sortClips');
                     updateClips(result.data.clips);
                 });
             },
@@ -175,6 +177,7 @@ pandora.ui.editPanel = function(isEmbed) {
                 var clips = serializeClips(data.ids);
                 pandora.doHistory('delete', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
+                    Ox.Request.clearCache('sortClips');
                     updateClips(result.data.clips);
                 });
             },
@@ -198,9 +201,9 @@ pandora.ui.editPanel = function(isEmbed) {
                         out: data.key == 'out' ? data.value : clip.out
                     }]));
                     pandora.doHistory('edit', clips, ui.edit, function(result) {
-                        edit.clips[index] = result.data;
-                        that.updateClip(data.id, result.data);
-                        updateVideos();
+                        edit.clips[Ox.getIndexById(edit.clips, data.id)] = result.data;
+                        Ox.Request.clearCache('sortClips');
+                        sortClips(updateClips);
                     });
                 });
             },
@@ -221,6 +224,7 @@ pandora.ui.editPanel = function(isEmbed) {
                     ids: data.ids
                 }, function(result) {
                     Ox.Request.clearCache('getEdit');
+                    Ox.Request.clearCache('sortClips');
                     orderClips(data.ids);
                 });
             },
@@ -251,6 +255,7 @@ pandora.ui.editPanel = function(isEmbed) {
                 var clips = pandora.clipboard.paste();
                 pandora.doHistory('paste', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
+                    Ox.Request.clearCache('sortClips');
                     updateClips(edit.clips.map(function(clip) {
                         if (clip.index >= result.data.clips[0].index) {
                             clip.index += result.data.clips.length
@@ -342,6 +347,7 @@ pandora.ui.editPanel = function(isEmbed) {
         });
         that.updatePanel = function(callback) {
             Ox.Request.clearCache('getEdit');
+            Ox.Request.clearCache('sortClips');
             getEdit(function() {
                 updateClips();
                 callback && callback();
