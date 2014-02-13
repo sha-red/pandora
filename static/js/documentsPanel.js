@@ -886,6 +886,11 @@ pandora.ui.documentsPanel = function(options) {
         }).open();
     }
 
+    that.selectSelected = function(offset) {
+        $list.selectSelected(offset);
+        return that;
+    };
+
     that.updateSize = function() {
         $list.size();
     };

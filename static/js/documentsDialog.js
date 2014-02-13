@@ -58,6 +58,8 @@ pandora.ui.documentsDialog = function() {
     that.close = function() {
         Ox.Request.clearCache('findDocuments');
         that.superClose();
+        // needed in documentDialog to determine if isItemView
+        delete pandora.$ui.documentsDialog;
     };
 
     return that;

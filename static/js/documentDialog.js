@@ -59,6 +59,7 @@ pandora.ui.documentDialog = function(options) {
 
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9) + 24,
         dialogWidth = Math.round(window.innerWidth * 0.9),
+        isItemView = !pandora.$ui.documentsDialog,
         items = options.items,
         item = items[options.index],
         settings = getSettings(),
@@ -125,10 +126,11 @@ pandora.ui.documentDialog = function(options) {
             [items.length > 1 ? 'show' : 'hide']()
             .bindEvent({
                 click: function(data) {
-                    options.index = Ox.mod(
-                        options.index + (data.id == 'previous' ? -1 : 1),
-                        items.length
-                    );
+                    var offset = data.id == 'previous' ? -1 : 1;
+                    options.index = Ox.mod(options.index + offset, items.length);
+                    pandora.$ui[
+                        isItemView ? 'documents' : 'documentsDialogPanel'
+                    ].selectSelected(offset);
                     pandora.UI.set({document: items[options.index].id});
                 }
             });
