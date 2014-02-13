@@ -6,6 +6,7 @@ pandora.ui.uploadVideoDialog = function(data) {
     var cancelled = false,
         file,
         hasFirefogg = !(typeof Firefogg == 'undefined'),
+        itemView = pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level] ? 'media' : 'info',
         selectFile,
         $actionButton,
         $closeButton,
@@ -177,13 +178,12 @@ pandora.ui.uploadVideoDialog = function(data) {
             done: function(data) {
                 if (data.progress == 1) {
                     Ox.Request.clearCache();
-                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'media') {
+                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == itemView) {
                         pandora.$ui.item.reload();
                     } else {
                         pandora.UI.set({
                             item: item,
-                            itemView: pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level]
-                                ? 'media' : 'info'
+                            itemView: itemView
                         });
                     }
                     delete pandora.firefogg;
@@ -233,12 +233,12 @@ pandora.ui.uploadVideoDialog = function(data) {
                             done: function(data) {
                                 if (data.progress == 1) {
                                     Ox.Request.clearCache();
-                                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'media') {
+                                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == itemView) {
                                         pandora.$ui.item.reload();
                                     } else {
                                         pandora.UI.set({
                                             item: item,
-                                            itemView: 'media'
+                                            itemView: itemView
                                         });
                                     }
                                     that.close();
@@ -259,7 +259,7 @@ pandora.ui.uploadVideoDialog = function(data) {
                 } else {
                     pandora.UI.set({
                         item: result.data.items[0].item,
-                        itemView: 'media'
+                        itemView: itemView
                     });
                     that.close();
                 }
@@ -427,7 +427,7 @@ pandora.ui.uploadVideoDialog = function(data) {
                     }, function(result) {
                         pandora.UI.set({
                             item: result.data.items[0].id,
-                            itemView: 'media'
+                            itemView: itemView
                         });
                         delete pandora.firefogg;
                         that.close();
