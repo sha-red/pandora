@@ -393,7 +393,7 @@ pandora.ui.infoView = function(data) {
         $('<div>')
             .css({marginBottom: '4px'})
             .append(
-                formatKey(key.slice(0, -9) + ' per minute', 'statistics')
+                formatKey(Ox.toTitleCase(key.slice(0, -9)) + ' per Minute', 'statistics')
             )
             .append(
                 Ox.Theme.formatColor(null, 'gradient')
@@ -673,7 +673,7 @@ pandora.ui.infoView = function(data) {
         return Ox.Theme.formatColorLevel(
             rightsLevel,
             pandora.site.rightsLevels.map(function(rightsLevel) {
-                return rightsLevel.name;
+                return Ox._(rightsLevel.name);
             })
         );
     }
@@ -726,11 +726,11 @@ pandora.ui.infoView = function(data) {
                     .appendTo($capabilities);
             if (canEdit) {
                 $element = Ox.Theme.formatColorLevel(i, userLevels.map(function(userLevel) {
-                    return Ox.toTitleCase(userLevel);
+                    return Ox._(Ox.toTitleCase(userLevel));
                 }), [0, 240]);
                 Ox.Label({
                         textAlign: 'center',
-                        title: Ox.toTitleCase(userLevel),
+                        title: Ox._(Ox.toTitleCase(userLevel)),
                         width: 60
                     })
                     .addClass('OxColor OxColorGradient')
@@ -749,14 +749,14 @@ pandora.ui.infoView = function(data) {
                 var hasCapability = pandora.site.capabilities[capability.name][userLevel] >= rightsLevel,
                     $element = Ox.Theme.formatColorLevel(hasCapability, ['', '']);
                 Ox.Button({
-                        tooltip: (canEdit ? Ox.toTitleCase(userLevel) : 'You') + ' '
+                        tooltip: Ox._((canEdit ? Ox.toTitleCase(userLevel) : 'You') + ' '
                             + (hasCapability ? 'can' : 'can\'t') + ' '
                             + Ox.toSlashes(capability.name)
                                 .split('/').slice(1).join(' ')
                                 .toLowerCase()
                                 .replace('see item', 'see the item')
                                 .replace('play video', 'play the full video')
-                                .replace('download video', 'download the video'),
+                                .replace('download video', 'download the video')),
                         title: capability.symbol,
                         type: 'image'
                     })
@@ -946,9 +946,9 @@ pandora.ui.infoView = function(data) {
                     items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
                         return {
                             id: i,
-                            title: rightsLevel.name,
-                            disabled: !isCopyrighted && rightsLevel.name == Ox._('Under Copyright')
-                                || isCopyrighted && rightsLevel.name == Ox._('Out of Copyright')
+                            title: Ox._(rightsLevel.name),
+                            disabled: !isCopyrighted && rightsLevel.name == 'Under Copyright'
+                                || isCopyrighted && rightsLevel.name == 'Out of Copyright'
                         };
                     }),
                     width: 128,

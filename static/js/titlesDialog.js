@@ -8,7 +8,7 @@ pandora.ui.titlesDialog = function() {
         $findInput = Ox.Input({
                 changeOnKeypress: true,
                 clear: true,
-                placeholder: 'Find',
+                placeholder: Ox._('Find'),
                 width: 192
             })
             .css({float: 'right', margin: '4px'})

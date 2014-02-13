@@ -1710,7 +1710,7 @@ pandora.getStatusText = function(data) {
         canSeeSize = pandora.site.capabilities.canSeeSize[pandora.user.level],
         itemName = ['clip', 'video'].indexOf(ui.listView) > -1
             ? (data.items == 1 ? Ox._('Clip') : Ox._('Clips'))
-            : (pandora.site.itemName[data.items == 1 ? 'singular' : 'plural']),
+            : Ox._(pandora.site.itemName[data.items == 1 ? 'singular' : 'plural']),
         parts = [];
     parts.push(Ox.formatNumber(data.items) + ' '+ itemName);
     if (data.runtime) {

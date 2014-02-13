@@ -55,7 +55,7 @@ pandora.ui.mainMenu = function() {
                             { group: 'viewsection', min: 1, max: 1, items: Object.keys(pandora.site.sectionFolders).map(function(section) {
                                 return {
                                     id: section,
-                                    title: section == 'items' ? Ox._(pandora.site.itemName.plural) : Ox.toTitleCase(section),
+                                    title: section == 'items' ? Ox._(pandora.site.itemName.plural) : Ox._(Ox.toTitleCase(section)),
                                     checked: ui.section == section,
                                     disabled: section != 'items' && pandora.user.level != 'admin'
                                 };

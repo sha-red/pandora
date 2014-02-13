@@ -557,7 +557,7 @@ pandora.ui.documentsPanel = function(options) {
                                 + value + '</div>';
                         },
                         height: width,
-                        placeholder: 'No description',
+                        placeholder: Ox._('No description'),
                         tooltip: editable ? pandora.getEditTooltip('description') : '',
                         type: 'textarea',
                         value: item.description || '',

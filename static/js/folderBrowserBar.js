@@ -13,7 +13,7 @@ pandora.ui.folderBrowserBar = function(id, section) {
                 pandora.$ui.findListsSelect[id] = Ox.Select({
                         items: [
                             {id: 'user', title: Ox._('Find: User')},
-                            {id: 'name', title: Ox._('Find: {0}', [folderItem])}
+                            {id: 'name', title: Ox._('Find: {0}', [Ox._(folderItem)])}
                         ],
                         overlap: 'right',
                         type: 'image'
