@@ -4,15 +4,15 @@
 
     $ sudo apt-get install lxc
 
-2) Create a new container, use other name if installing multiple
+2) Create a new container, use different names if installing multiple instances:
 
     $ sudo lxc-create -n pandora-dev -t ubuntu -- -r precise
 
-3) Install pan.do/ra in container
+3) Install pan.do/ra in container:
 
     $ sudo lxc-start -n pandora-dev
 
-    Now login as ubuntu/ubuntu and run the following commands:
+Now login as ubuntu/ubuntu and run the following commands:
 
     $ sudo su
     $ apt-get -y install avahi-daemon curl
