@@ -15,10 +15,10 @@
     Now login as ubuntu/ubuntu and run the following commands:
 
     $ sudo su
+    $ apt-get -y install avahi-daemon curl
     $ cd /root
     $ curl 'https://wiki.0x2620.org/browser/pandora/vm/firstboot.sh?format=txt' > firstboot.sh
-    $ chmod +x firstboot
-    $ apt-get -y install avahi-daemon
+    $ chmod +x firstboot.sh
     $ sed -i s/ubuntu/pandora/g /etc/passwd /etc/shadow /etc/group
     $ mv /home/ubuntu /home/pandora
     $ echo "pandora:pandora" | chpasswd
