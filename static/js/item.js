@@ -119,9 +119,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'media') {
 
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.item = pandora.ui.mediaView({
-                    id: result.data.id
-                })
+                pandora.$ui.item = pandora.ui.mediaView(result.data)
             );
 
         } else if (pandora.user.ui.itemView == 'frames' || pandora.user.ui.itemView == 'posters') {

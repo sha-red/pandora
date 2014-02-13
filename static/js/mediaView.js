@@ -2,19 +2,20 @@
 
 'use strict';
 
-pandora.ui.mediaView = function(options, self) {
+pandora.ui.mediaView = function(options) {
 
-    var self = self || {},
+    var canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level] || options.editable,
+        self = {},
         that = Ox.Element({}, self)
             .defaults({
                 id: ''
             })
-            .options(options || {});
+            .options({});
 
     self.filesQuery = {
         conditions: [{
             key: 'id',
-            value: self.options.id,
+            value: options.id,
             operator: '=='
         }]
     };
@@ -35,7 +36,7 @@ pandora.ui.mediaView = function(options, self) {
                 },
                 {},
                 {
-                    disabled: !pandora.site.capabilities.canRemoveItems[pandora.user.level],
+                    disabled: !canRemove,
                     id: 'delete',
                     title: Ox._('Delete {0}...', [Ox._(pandora.site.itemName.singular)])
                 }
@@ -527,7 +528,7 @@ pandora.ui.mediaView = function(options, self) {
         );
         pandora.api.moveMedia(data, function(result) {
             if (
-                pandora.user.ui.item == self.options.id
+                pandora.user.ui.item == options.id
                 && pandora.user.ui.itemView == 'media'
             ) {
                 Ox.Request.clearCache(); // fixme: remove

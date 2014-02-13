@@ -4,7 +4,7 @@ pandora.ui.infoView = function(data) {
 
     var ui = pandora.user.ui,
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level] || data.editable,
-        canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level],
+        canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level] || data.editable,
         css = {
             marginTop: '4px',
             textAlign: 'justify'
