@@ -82,7 +82,7 @@ def add_annotations(data):
                 value=a['value'])
             annotation.save()
         #update facets if needed
-        if filter(lambda f: f['id'] == layer_id and f.get('filter'), settings.CONFIG['itemKeys']):
+        if layer_id in item.facet_keys:
             item.update_layer_facet(layer_id)
         Item.objects.filter(id=item.id).update(modified=annotation.modified)
         annotation.item.modified = annotation.modified
