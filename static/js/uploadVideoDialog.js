@@ -182,7 +182,8 @@ pandora.ui.uploadVideoDialog = function(data) {
                     } else {
                         pandora.UI.set({
                             item: item,
-                            itemView: 'media'
+                            itemView: pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level]
+                                ? 'media' : 'info'
                         });
                     }
                     delete pandora.firefogg;
