@@ -8,9 +8,9 @@ pandora.ui.folderBrowserBar = function(id, section) {
         that = Ox.Bar({
             size: 24
         });
-    pandora.$ui.findListElement[id] = Ox.FormElementGroup({
+    pandora.$ui.findListsElement[id] = Ox.FormElementGroup({
             elements: [
-                pandora.$ui.findListSelect[id] = Ox.Select({
+                pandora.$ui.findListsSelect[id] = Ox.Select({
                         items: [
                             {id: 'user', title: Ox._('Find: User')},
                             {id: 'name', title: Ox._('Find: {0}', [folderItem])}
@@ -21,14 +21,14 @@ pandora.ui.folderBrowserBar = function(id, section) {
                     .bindEvent({
                         change: function(data) {
                             var key = data.value,
-                                value = pandora.$ui.findListInput[id].value();
+                                value = pandora.$ui.findListsInput[id].value();
                             value && updateList(key, value);
-                            pandora.$ui.findListInput[id].options({
+                            pandora.$ui.findListsInput[id].options({
                                 placeholder: data.title
                             });
                         }
                     }),
-                pandora.$ui.findListInput[id] = Ox.Input({
+                pandora.$ui.findListsInput[id] = Ox.Input({
                         changeOnKeypress: true,
                         clear: true,
                         placeholder: Ox._('Find: User'),
@@ -36,7 +36,7 @@ pandora.ui.folderBrowserBar = function(id, section) {
                     })
                     .bindEvent({
                         change: function(data) {
-                            var key = pandora.$ui.findListSelect[id].value(),
+                            var key = pandora.$ui.findListsSelect[id].value(),
                                 value = data.value;
                             updateList(key, value);
                         }

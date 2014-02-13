@@ -22,9 +22,9 @@ pandora.ui.folders = function(section) {
     pandora.$ui.folderBrowser = {};
     pandora.$ui.folderList = {};
     pandora.$ui.folderPlaceholder = {};
-    pandora.$ui.findListElement = {};
-    pandora.$ui.findListSelect = {};
-    pandora.$ui.findListInput = {};
+    pandora.$ui.findListsElement = {};
+    pandora.$ui.findListsSelect = {};
+    pandora.$ui.findListsInput = {};
     pandora.$ui.manageListsButton = {};
     pandora.site.sectionFolders[section].forEach(function(folder, i) {
         var extras, $select;
