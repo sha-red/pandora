@@ -1,6 +1,7 @@
 {
-  "Cinematographer": "चलचित्रकार",
+  "Cinematographer": "सिनेमेटोग्राफ़र",
   "Descriptions": "विवरण",
+  "Keyword": "कीवर्ड",
   "No Groups": "समूह नहीं है",
   "No Summary": "सारांश नहीं है",
   "No notes": "नोट्स नहीं हैं",
@@ -10,9 +11,9 @@
   "Project": "परियोजना",
   "Projects": "परियोजनाएं",
   "Source": "स्रोत",
-  "Sources": "स्त्रोत",
+  "Sources": "कई स्त्रोत",
   "Topic": "विषय",
-  "Topics": "विषय",
+  "Topics": "कई विषय",
   "Transcript": "प्रतिलेख",
-  "Transcripts": "प्रतिलेख"
+  "Transcripts": "कई प्रतिलेख"
 }
