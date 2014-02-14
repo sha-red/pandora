@@ -94,6 +94,21 @@ pandora.ui.mainMenu = function() {
                             {},
                             { id: 'resetcolumns', title: Ox._('Reset Layout'), disabled: true }
                         ] },
+                        { id: 'filters', title: Ox._('Filters'), disabled: ui.section != 'items', items: [
+                            { id: 'clearfilters', title: Ox._('Clear Filters'), disabled: Ox.sum(ui._filterState.map(function(filterState) {
+                                return filterState.selected.length;
+                            })) == 0, keyboard: 'shift alt control a' },
+                            {},
+                            { group: 'filters', min: 5, max: 5, items: pandora.site.filters.map(function(filter) {
+                                return Ox.extend({
+                                    checked: Ox.getIndexById(ui.filters, filter.id) > -1
+                                }, filter, {
+                                    title: Ox._(filter.title)
+                                });
+                            }) },
+                            {},
+                            { id: 'resetfilters', title: Ox._('Reset Filters') }
+                        ] },
                         {},
                         { id: 'item', title: [
                                 Ox._('Open {0}', [Ox._(pandora.site.itemName.singular)]),
@@ -111,22 +126,6 @@ pandora.ui.mainMenu = function() {
                             { group: 'videoview', min: 1, max: 1, items: ['player', 'editor', 'timeline'].map(function(view) {
                                 return {id: view, title: Ox._(Ox.toTitleCase(view)), checked: ui.videoView == view};
                             }) }
-                        ] },
-                        {},
-                        { id: 'filters', title: Ox._('Filters'), disabled: ui.section != 'items', items: [
-                            { id: 'clearfilters', title: Ox._('Clear Filters'), disabled: Ox.sum(ui._filterState.map(function(filterState) {
-                                return filterState.selected.length;
-                            })) == 0, keyboard: 'shift alt control a' },
-                            {},
-                            { group: 'filters', min: 5, max: 5, items: pandora.site.filters.map(function(filter) {
-                                return Ox.extend({
-                                    checked: Ox.getIndexById(ui.filters, filter.id) > -1
-                                }, filter, {
-                                    title: Ox._(filter.title)
-                                });
-                            }) },
-                            {},
-                            { id: 'resetfilters', title: Ox._('Reset Filters') }
                         ] },
                         {},
                         { 
@@ -195,7 +194,9 @@ pandora.ui.mainMenu = function() {
                             { group: 'setlocale', min: 1, max: 1, items: Object.keys(Ox.LOCALE_NAMES).map(function(locale) {
                                 return {id: locale, title: Ox.LOCALE_NAMES[locale], checked: ui.locale == locale}
                             }) }
-                        ] }
+                        ] },
+                        {},
+                        { id: 'embed', title: Ox._('Embed...'), disabled: true }
                     ]},
                     getSortMenu(),
                     getFindMenu(),
