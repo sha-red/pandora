@@ -878,7 +878,7 @@ pandora.ui.documentsPanel = function(options) {
                 Ox.Request.clearCache('findDocuments');
                 $list.bindEventOnce({
                     load: function() {
-                        $list.options({selected: [files.ids]});
+                        $list.options({selected: files.ids});
                     }
                 })
                 .reloadList();
