@@ -41,9 +41,14 @@ pandora.chunkupload = function(options) {
     initUpload();
 
     function done() {
+        var response;
+        try {
+            response = JSON.parse(that.responseText);
+        } catch(e) {}
         that.triggerEvent('done', {
           status: that.status,
           progress: that.progress,
+          response: response,
           responseText: that.responseText
         });
     }
