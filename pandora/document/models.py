@@ -3,6 +3,7 @@
 from __future__ import division, with_statement
 import os
 import re
+from glob import glob
 import subprocess
 from urllib import quote, unquote
 
@@ -288,9 +289,9 @@ class Document(models.Model):
 def delete_document(sender, **kwargs):
     t = kwargs['instance']
     if t.file:
-        folder = os.path.dirname(self.file.path)
+        folder = os.path.dirname(t.file.path)
         for f in glob('%s/*' % folder):
-            if f != self.file.path:
+            if f != t.file.path:
                 os.unlink(f)
         t.file.delete()
 pre_delete.connect(delete_document, sender=Document)
