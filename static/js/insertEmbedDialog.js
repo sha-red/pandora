@@ -415,46 +415,29 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
             var data = Ox.map($input, function($element) {
                 return $element.options('value');
             });
-            Ox.print('FU', data.protocol + '://'
-            + data.site + '/'
-            + data.item + '/'
-            + (data.link == 'default' ? '' : data.link + '/')
-            + ([data.position] || []).concat(
-                data['in'] || data.out
-                ? [data['in'], data.out]
-                : []
-            ).join(','),
-            + (data.annotation || '')
-            + '#embed?'
-            + Ox.serialize({
-                title: data.title,
-                showTimeline: data.showTimeline || null,
-                timeline: data.timeline,
-                showAnnotations: data.showAnnotations || null,
-                showLayers: data.showAnnotations && data.showLayers ? data.showLayers : null,
-                matchRatio: true
-            }, true));
-            $input.url.options({
-                value: data.protocol + '://'
-                    + data.site + '/'
-                    + data.item + '/'
-                    + (data.link == 'default' ? '' : data.link + '/')
-                    + ([data.position] || []).concat(
-                        data['in'] || data.out
-                        ? [data['in'], data.out]
-                        : []
-                    ).join(',')
-                    + (data.annotation || '')
-                    + '#embed?'
-                    + Ox.serialize({
-                        title: data.title,
-                        showTimeline: data.showTimeline || null,
-                        timeline: data.timeline,
-                        showAnnotations: data.showAnnotations || null,
-                        showLayers: data.showAnnotations && data.showLayers ? data.showLayers : null,
-                        matchRatio: true
-                    }, true)
-            });
+            url = data.protocol + '://'
+                + data.site + '/'
+                + data.item + '/'
+                + (data.link == 'default' ? '' : data.link + '/')
+                + (data.position ? [data.position] : []).concat(
+                    data['in'] || data.out
+                    ? [data['in'], data.out]
+                    : []
+                ).join(',')
+                + (data.annotation || '')
+                + '#embed?'
+                + Ox.serialize({
+                    title: data.title || void 0,
+                    showTimeline: data.showTimeline || void 0,
+                    timeline: data.timeline && data.timeline != 'default' ? data.timeline : void 0,
+                    showAnnotations: data.showAnnotations || void 0,
+                    showLayers: data.showAnnotations && data.showLayers ? data.showLayers : void 0,
+                    //matchRatio: true
+                }, true)
+                .replace(/_/g, '%09').replace(/\s/g, '_')
+                .replace(/"/g, '&quot;');
+            Ox.print('FU', url);
+            $input.url.options({value: url});
         }
 
         function limitPoint(value, min, max) {
@@ -493,12 +476,13 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                             duration = result.data.duration;
                             item = id;
                         }
+                        console.log('parse url', state);
                         Ox.forEach({
                             protocol: protocol,
                             site: site,
                             item: item,
                             link: state.view || 'default', // FIXME: wrong, user-dependent
-                            position: Ox.isArray(state.span)
+                            position: Ox.isArray(state.span) && state.span.lenght == 3
                                 ? Ox.formatDuration(state.span[0]) : '',
                             'in': Ox.isArray(state.span)
                                 ? Ox.formatDuration(state.span[state.span.length - 2]) : '',
