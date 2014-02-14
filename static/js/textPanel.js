@@ -108,7 +108,7 @@ pandora.ui.textPanel = function() {
                     },
                     {
                         element: pandora.$ui.textEmbed = pandora.ui.textEmbed(),
-                        //fixme: at some point pdf will also have a sidebar
+                        // fixme: at some point pdf will also have a sidebar
                         size: text.type == 'html' ? pandora.user.ui.embedSize : 0,
                         resizable: text.type == 'html',
                         resize: [192, 256, 320, 384, 448, 512]
@@ -326,8 +326,9 @@ pandora.ui.textHTML = function(text) {
                             value = $element.attr('data-value');
                         footnote = value ? parseInt(value) : footnote + 1;
                     });
+                    // FIXME: remove footnotes, don't link to keywords inside footnotes
                     // keywords
-                    $text.find('[data-type="keywords"]').each(function(index, element) {
+                    $text.find('[data-type="keyword"]').each(function(index, element) {
                         var $element = $(element),
                             value = $element.attr('data-value') || element.html();
                         keywords.append(value);
