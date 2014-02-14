@@ -141,10 +141,11 @@ pandora.ui.uploadDocumentDialog = function(files, callback) {
                 done: function(data) {
                     if (data.progress == 1) {
                         part++;
+                        ids.push(data.response.id);
                         if (part == files.length) {
                             $progress.options({progress: data.progress});
-                            $uploadDialog.options('buttons')[0].options({title: Ox._('Done')});
-                            ids.push(data.id);
+                            callback({ids: ids});
+                            $uploadDialog.close();
                         } else {
                             uploadFile(part);
                         }
