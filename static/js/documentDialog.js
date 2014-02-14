@@ -211,6 +211,7 @@ pandora.ui.documentDialog = function(options) {
         items = options.items;
         item = items[options.index];
         setTitle();
+        $selectButton[items.length > 1 ? 'show' : 'hide']();
         setContent();
     };
 
