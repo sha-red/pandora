@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
-pandora.ui.filterDialog = function(list) {
+pandora.ui.filterDialog = function() {
 
     var that = Ox.Dialog({
             buttons: [
@@ -42,14 +42,14 @@ pandora.ui.filterDialog = function(list) {
                         }
                     })
             ],
-            content: pandora.$ui.filterForm = pandora.ui.filterForm(list),
+            content: pandora.$ui.filterForm = pandora.ui.filterForm({mode: 'find'}),
             maxWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
             minHeight: 264,
             minWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
             height: 264,
             // keys: {enter: 'save', escape: 'cancel'},
             removeOnClose: true,
-            title: list ? Ox._('Smart List - {0}', [list.name]) : Ox._('Advanced Find'),
+            title: Ox._('Advanced Find'),
             width: 648 + Ox.UI.SCROLLBAR_SIZE
         }),
 

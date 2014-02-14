@@ -2,8 +2,10 @@
 
 'use strict';
 
-pandora.ui.filterForm = function(list) {
-    var that = Ox.Element();
+pandora.ui.filterForm = function(options) {
+    var list = options.list,
+        mode = options.mode,
+        that = Ox.Element();
     pandora.api.findLists({
         query: {
             conditions: [{key: 'type', value: 'static', operator: '='}],
@@ -33,18 +35,18 @@ pandora.ui.filterForm = function(list) {
                         return item.id;
                     })
                 }]),
-                list: list ? null : {
+                list: mode == 'find' ? {
                     sort: pandora.user.ui.listSort,
                     view: pandora.user.ui.listView
-                },
-                query: Ox.clone(list ? list.query : pandora.user.ui.find, true),
+                } : null,
+                query: Ox.clone(mode == 'list' ? list.query : pandora.user.ui.find, true),
                 sortKeys: pandora.site.sortKeys,
                 viewKeys: pandora.site.listViews
             })
-            .css({padding: '16px'})
+            .css(mode == 'embed' ? {} : {padding: '16px'})
             .bindEvent({
                 change: function(data) {
-                    if (list) {
+                    if (mode == 'list') {
                         pandora.api.editList({
                             id: list.id,
                             query: data.query
@@ -63,7 +65,7 @@ pandora.ui.filterForm = function(list) {
         that.getList = that.$filter.getList;
     });
     that.updateResults = function() {
-        if (list) {
+        if (mode == 'list') {
             Ox.Request.clearCache(list.id);
             if (pandora.user.ui.section == 'edits') {
                 pandora.$ui.folderList[
