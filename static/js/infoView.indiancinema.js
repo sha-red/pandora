@@ -516,9 +516,9 @@ pandora.ui.infoView = function(data) {
         key = Ox._(item ? item.title : key);
         mode = mode || 'text';
         if (key == 'alternativeTitles') {
-            key = 'alternative title' + (
+            key = Ox._('Alternative Title' + (
                 data.alternativeTitles && data.alternativeTitles.length == 1 ? '' : 's'
-            );
+            ));
         } else if (key == 'keyword') {
             key = 'keywords'
         }
@@ -528,8 +528,7 @@ pandora.ui.infoView = function(data) {
             ? Ox.toTitleCase(key)
             : Ox.Element()
                 .css({marginBottom: '4px', fontWeight: 'bold'})
-                .html(Ox.toTitleCase(key)
-                .replace(' Per ', ' per '));
+                .html(Ox.toTitleCase(key).replace(' Per ', ' per '));
     }
 
     function formatLight(str) {
@@ -749,14 +748,15 @@ pandora.ui.infoView = function(data) {
                 var hasCapability = pandora.site.capabilities[capability.name][userLevel] >= rightsLevel,
                     $element = Ox.Theme.formatColorLevel(hasCapability, ['', '']);
                 Ox.Button({
-                        tooltip: Ox._((canEdit ? Ox.toTitleCase(userLevel) : 'You') + ' '
+                        tooltip: Ox._('{0} '
                             + (hasCapability ? 'can' : 'can\'t') + ' '
                             + Ox.toSlashes(capability.name)
                                 .split('/').slice(1).join(' ')
                                 .toLowerCase()
                                 .replace('see item', 'see the item')
                                 .replace('play video', 'play the full video')
-                                .replace('download video', 'download the video')),
+                                .replace('download video', 'download the video'),
+                            [canEdit ? Ox.toTitleCase(userLevel) : Ox._('You')]),
                         title: capability.symbol,
                         type: 'image'
                     })

@@ -235,7 +235,7 @@ pandora.ui.documentsPanel = function(options) {
         $itemMenu = Ox.MenuButton({
             items: isItemView ? [
                 {id: 'add', title: Ox._(
-                    'Add Documents to ' + pandora.site.itemName.singular + '...'
+                    'Add Documents to {0}...', [pandora.site.itemName.singular]
                 ), keyboard: 'control n'},
                 {},
                 {id: 'open', title: '', keyboard: 'return'},
@@ -244,13 +244,13 @@ pandora.ui.documentsPanel = function(options) {
                 {},
                 {id: 'remove', title: '', keyboard: 'delete'}
             ] : [
-                {id: 'upload', title: Ox._('Upload Documents...'), file: {width: 192}},
+                {id: 'upload', title: Ox._('Upload {0}...', [Ox._('Documents')]), file: {width: 192}},
                 {},
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'add', title: ''},
                 {id: 'embed', title: Ox._('Embed Document...')},
                 {},
-                {id: 'replace', title: Ox._('Replace Document...')},
+                {id: 'replace', title: Ox._('Replace {0}...', [Ox._('Document')])},
                 {id: 'delete', title: '', keyboard: 'delete'}
             ],
             title: 'set',
@@ -791,28 +791,28 @@ pandora.ui.documentsPanel = function(options) {
             return;
         }
         var selected = ui.documentsSelection[isItemView ? ui.item : ''] || [],
-            string = selected.length < 2 ? 'Document' : ' Documents';
+            string = Ox._(selected.length < 2 ? 'Document' : 'Documents');
         $list.options({selected: selected});
-        $itemMenu.setItemTitle('open', Ox._('Open ' + string))
+        $itemMenu.setItemTitle('open', Ox._('Open {0}', [string]))
             [selected.length ? 'enableItem' : 'disableItem']('open');
         if (isItemView) {
-            $itemMenu.setItemTitle('edit', Ox._('Edit ' + string + '...'))
+            $itemMenu.setItemTitle('edit', Ox._('Edit {0}...', [string]))
                 .setItemTitle('remove', Ox._(
-                    'Remove ' + string + ' from '
-                    + pandora.site.itemName.singular
+                    'Remove {0} from {1}',
+                    [string, Ox._(pandora.site.itemName.singular)]
                 ))
                 [selected.length ? 'enableItem' : 'disableItem']('edit')
                 [selected.length ? 'enableItem' : 'disableItem']('embed')
                 [selected.length ? 'enableItem' : 'disableItem']('remove');
         } else {
-            $itemMenu.setItemTitle('add', Ox._('Add ' + string + ' to ' + (
-                    hasListSelection ? 'Selected' : 'Current'
-                ) + ' {0}', [pandora.site.itemName[
+            $itemMenu.setItemTitle('add', Ox._('Add {0} to {1} {2}', [
+                    Ox._(hasListSelection ? 'Selected' : 'Current'),
+                    string, Ox._(pandora.site.itemName[
                     hasListSelection && ui.listSelection.length > 1
-                    ? 'plural' : 'singular'
-                ]]))
-                .setItemTitle('replace', Ox._('Replace ' + string + '...'))
-                .setItemTitle('delete', Ox._('Delete ' + string + '...'))
+                    ? 'plural' : 'singular'])
+                ]))
+                .setItemTitle('replace', Ox._('Replace {0}...', [string]))
+                .setItemTitle('delete', Ox._('Delete {0}...',  [string]))
                 [selected.length && (hasItemView || hasListSelection) ? 'enableItem' : 'disableItem']('add')
                 [selected.length ? 'enableItem' : 'disableItem']('embed')
                 [selected.length == 1 ? 'enableItem' : 'disableItem']('replace')

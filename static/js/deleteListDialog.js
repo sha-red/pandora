@@ -14,7 +14,7 @@ pandora.ui.deleteListDialog = function(list) {
             buttons: [
                 Ox.Button({
                     id: 'keep',
-                    title: Ox._('Keep {0}', [folderItem])
+                    title: Ox._('Keep {0}', [Ox._(folderItem)])
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -22,7 +22,7 @@ pandora.ui.deleteListDialog = function(list) {
                 }),
                 Ox.Button({
                     id: 'delete',
-                    title: Ox._('Delete {0}', [folderItem])
+                    title: Ox._('Delete {0}', [Ox._(folderItem)])
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -51,9 +51,9 @@ pandora.ui.deleteListDialog = function(list) {
                 })
             ],
             content: Ox._('Are you sure you want to delete the {0} "{1}"?',
-                [folderItem.toLowerCase(), listData.name]),
+                [Ox._(folderItem.toLowerCase()), listData.name]),
             keys: {enter: 'delete', escape: 'keep'},
-            title: Ox._('Delete {0}', [folderItem])
+            title: Ox._('Delete {0}', [Ox._(folderItem)])
         });
 
     return that;

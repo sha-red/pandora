@@ -969,10 +969,10 @@ pandora.getClipVideos = function(clip, resolution) {
                     ? pandora.user.ui._list.split(':').slice(1).join(':')
                     : pandora.getAllItemsTitle('items')
                 );
-                parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.listView) + ' View'));
+                parts.push(Ox._("{0} View", [Ox._(Ox.toTitleCase(pandora.user.ui.listView))]));
             } else {
                 parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
-                parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.itemView) + ' View'));
+                parts.push(Ox._("{0} View", [Ox._(Ox.toTitleCase(pandora.user.ui.itemView))]));
             }
         } else if (pandora.user.ui.section == 'edits') {
             if (pandora.user.ui.edit) {
@@ -1005,7 +1005,7 @@ pandora.getEditTooltip = function(title) {
         return (
             $target.is('a') || $target.parents('a').length
             ? Ox._('Shift+doubleclick to edit') : Ox._('Doubleclick to edit')
-        ) + (title ? ' ' + title : '');
+        ) + (title ? ' ' + Ox._(title) : '');
     }
 };
 

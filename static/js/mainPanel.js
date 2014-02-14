@@ -11,7 +11,7 @@ pandora.ui.mainPanel = function() {
                     resizable: true,
                     resize: [192, 256, 320, 384],
                     size: ui.sidebarSize,
-                    tooltip: 'sidebar <span class="OxBright">'
+                    tooltip: Ox._('sidebar') + ' <span class="OxBright">'
                         + Ox.SYMBOLS.SHIFT + 'S</span>'
                 },
                 {

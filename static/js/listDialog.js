@@ -26,7 +26,10 @@ pandora.ui.listDialog = function(section) {
                 } else if (id == 'icon') {
                     return pandora.$ui.listIconPanel = pandora.ui.listIconPanel(listData);
                 } else if (id == 'query') {
-                    return pandora.$ui.filterForm = pandora.ui.filterForm(listData)
+                    return pandora.$ui.filterForm = pandora.ui.filterForm({
+                            mode: 'list',
+                            list: listData
+                        })
                         .bindEvent({
                             change: function(data) {
                                 listData.query = data.query;

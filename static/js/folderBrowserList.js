@@ -129,7 +129,7 @@ pandora.ui.folderBrowserList = function(id, section) {
                     tooltip: function(data) {
                         var checked = id == 'favorite' ? data.subscribed : data.status == 'featured';
                         return Ox._((checked ? 'Remove from' : 'Add to')
-                            + ' ' + Ox.toTitleCase(id) + ' ' + folderItems);
+                            + ' {0} {1}', [Ox._(Ox.toTitleCase(id)), Ox._(folderItems)]);
                     },
                     visible: true,
                     width: 16

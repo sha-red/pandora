@@ -143,7 +143,7 @@ pandora.ui.editPanel = function(isEmbed) {
                 ),
             subtitles: getSubtitles(edit.clips),
             timeline: ui.videoTimeline,
-            timelineTooltip: 'timeline <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'T</span>',
+            timelineTooltip: Ox._('timeline') + ' <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'T</span>',
             video: getVideos(),
             volume: ui.videoVolume,
             width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1

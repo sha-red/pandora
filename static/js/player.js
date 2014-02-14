@@ -13,13 +13,11 @@ pandora.ui.player = function(data) {
             annotationsRange: ui.annotationsRange,
             annotationsSize: ui.annotationsSize,
             annotationsSort: ui.annotationsSort,
-            annotationsTooltip: Ox._(
-                'annotations {0}',
-                ['<span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'A</span>']
-            ),
+            annotationsTooltip: Ox._('annotations')
+                + ' <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'A</span>',
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
-            censoredTooltip: pandora.site.cantPlay.text,
+            censoredTooltip: Ox._(pandora.site.cantPlay.text),
             clickLink: pandora.clickLink,
             cuts: data.cuts || [],
             duration: data.duration,
@@ -53,7 +51,7 @@ pandora.ui.player = function(data) {
             smallTimelineURL: pandora.getMediaURL('/' + ui.item + '/timeline16p.jpg'),
             subtitles: data.subtitles,
             timeline: ui.videoTimeline,
-            timelineTooltip: 'timeline <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'T</span>',
+            timelineTooltip: Ox._('timeline') + ' <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'T</span>',
             video: data.video,
             volume: ui.videoVolume,
             width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1

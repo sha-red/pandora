@@ -9,13 +9,10 @@ pandora.ui.folderPlaceholder = function(id, section) {
             });
     that.updateText = function(string, isFind) {
         return that.html(
-            Ox._(
-                string != 'volumes'
-                ? 'No ' + string + ' '
-                    + (section == 'items' ? 'lists' : section)
-                    + (isFind ? ' found' : '')
-                : 'No local volumes'
-            )
+            string != 'volumes'
+            ? Ox._('No {0} {1}' + (isFind ? ' found' : ''),
+                [Ox._(string), Ox._(section == 'items' ? 'lists' : section)])
+            : Ox._('No local volumes')
         );
     };
     return that.updateText(id);

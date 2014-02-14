@@ -196,7 +196,7 @@ pandora.ui.mainMenu = function() {
                             }) }
                         ] },
                         {},
-                        { id: 'embed', title: Ox._('Embed...'), disabled: true }
+                        { id: 'embed', title: Ox._('Embed...') }
                     ]},
                     getSortMenu(),
                     getFindMenu(),
@@ -487,6 +487,8 @@ pandora.ui.mainMenu = function() {
                     Ox.Fullscreen.toggle();
                 } else if (data.id == 'entervideofullscreen') {
                     pandora.$ui.player.options({fullscreen: true});
+                } else if (data.id == 'embed') {
+                    pandora.$ui.embedDialog = pandora.ui.embedDialog().open();
                 } else if (data.id == 'advancedfind') {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 } else if (data.id == 'findsimilar') {
@@ -1026,7 +1028,8 @@ pandora.ui.mainMenu = function() {
                     items: Ox.isUndefined(lists[folder])
                         ? [{id: 'loading', title: Ox._('Loading...'), disabled: true}]
                         : lists[folder].length == 0
-                        ? [{id: 'nolists', title: Ox._('No ' + Ox.toTitleCase(folder) + ' ' + itemNamePlural), disabled: true}]
+                        ? [{id: 'nolists', title: Ox._('No {0} {1}',
+                            [Ox._(Ox.toTitleCase(folder)), Ox._(itemNamePlural)]), disabled: true}]
                         : lists[folder].map(function(list) {
                             return {
                                 id: 'viewlist' + list.id.replace(/_/g, Ox.char(9)),
