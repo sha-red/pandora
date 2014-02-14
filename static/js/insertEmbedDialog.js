@@ -413,8 +413,18 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
 
         function formatURL() {
             var data = Ox.map($input, function($element) {
-                return $element.options('value');
-            });
+                    return $element.options('value');
+                }),
+                options = Ox.serialize({
+                    title: data.title || void 0,
+                    showTimeline: data.showTimeline || void 0,
+                    timeline: data.timeline && data.timeline != 'default' ? data.timeline : void 0,
+                    showAnnotations: data.showAnnotations || void 0,
+                    showLayers: data.showAnnotations && data.showLayers ? data.showLayers : void 0,
+                    //matchRatio: true
+                }, true)
+                .replace(/_/g, '%09').replace(/\s/g, '_')
+                .replace(/"/g, '&quot;');
             url = data.protocol + '://'
                 + data.site + '/'
                 + data.item + '/'
@@ -425,17 +435,8 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                     : []
                 ).join(',')
                 + (data.annotation || '')
-                + '#embed?'
-                + Ox.serialize({
-                    title: data.title || void 0,
-                    showTimeline: data.showTimeline || void 0,
-                    timeline: data.timeline && data.timeline != 'default' ? data.timeline : void 0,
-                    showAnnotations: data.showAnnotations || void 0,
-                    showLayers: data.showAnnotations && data.showLayers ? data.showLayers : void 0,
-                    //matchRatio: true
-                }, true)
-                .replace(/_/g, '%09').replace(/\s/g, '_')
-                .replace(/"/g, '&quot;');
+                + '#embed'
+                + (options ? '?' + options : '');
             Ox.print('FU', url);
             $input.url.options({value: url});
         }
