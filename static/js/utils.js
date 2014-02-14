@@ -2043,7 +2043,7 @@ pandora.resizeFolders = function(section) {
         pandora.$ui.folder[pos].css({width: width + 'px'});
         $list.css({width: width + 'px'});
         if (pandora.site.sectionFolders[section][pos].showBrowser) {
-            pandora.$ui.findListInput[id] && pandora.$ui.findListInput[id].options({
+            pandora.$ui.findListsInput[id] && pandora.$ui.findListsInput[id].options({
                 width: width - 24
             });
             $list.resizeColumn('user', userColumnWidth)
