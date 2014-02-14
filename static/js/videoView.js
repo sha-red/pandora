@@ -1,6 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 
+// FIXME: remove!
+
 pandora.ui.videoView = function(isEmbed) {
     var ui = pandora.user.ui,
         itemsQuery,
