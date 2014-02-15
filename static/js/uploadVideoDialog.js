@@ -156,7 +156,7 @@ pandora.ui.uploadVideoDialog = function(data) {
                     }
                     setTimeout(function() {
                         $info.html('<b>' + filename + '</b><br>' + Ox._('uploading...'));
-                        uploadStream(item, oshash, file);
+                        uploadStream(item, info, file);
                     });
                 },
                 function(progress) {
@@ -167,9 +167,21 @@ pandora.ui.uploadVideoDialog = function(data) {
         });
     }
 
-    function uploadStream(item, oshash, file) {
-        var format = pandora.site.video.formats[0],
-            resolution = Ox.max(pandora.site.video.resolutions);
+    function getResolution(info) {
+        var height = info.video && info.video.length
+                ? info.video[0].height
+                : Ox.max(pandora.site.video.resolutions),
+            resolution = pandora.site.video.resolutions
+                .sort().filter(function(resolution) {
+                    return height <= resolution;
+                })[0] || Ox.max(pandora.site.video.resolutions);
+        return resolution;
+    }
+
+    function uploadStream(item, info, file) {
+        var oshash = info.oshash,
+            format = pandora.site.video.formats[0],
+            resolution = getResolution(info);
         pandora.$ui.upload = pandora.chunkupload({
             file: file,
             url: '/api/upload/?profile=' + resolution + 'p.' + format + '&id=' + oshash,
@@ -273,7 +285,7 @@ pandora.ui.uploadVideoDialog = function(data) {
             format = pandora.site.video.formats[0],
             fps,
             options = {},
-            resolution = Ox.max(pandora.site.video.resolutions);
+            resolution = getResolution(info);
         if (format == 'webm') {
             options.videoCodec = 'vp8';
             options.audioCodec = 'vorbis';

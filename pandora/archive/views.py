@@ -224,7 +224,13 @@ def firefogg_upload(request):
     profile = request.GET['profile']
     oshash = request.GET['id']
     config = settings.CONFIG['video']
-    video_profile = "%sp.%s" % (max(config['resolutions']), config['formats'][0])
+
+    resolution, format = profile.split('p.')
+    resolution = int(resolution)
+    if resolution not in config['resolutions'] \
+        or format not in config['formats']:
+        response = json_response(status=500, text='invalid profile')
+        return render_to_json_response(response)
 
     #handle video upload
     if request.method == 'POST':
@@ -232,14 +238,15 @@ def firefogg_upload(request):
         if 'chunk' in request.FILES and oshash:
             f = get_object_or_404(models.File, oshash=oshash)
             form = ChunkForm(request.POST, request.FILES)
-            if form.is_valid() and profile == video_profile and f.editable(request.user):
+            if form.is_valid() and f.editable(request.user):
                 c = form.cleaned_data['chunk']
                 chunk_id = form.cleaned_data['chunkId']
                 response = {
                     'result': 1,
                     'resultUrl': request.build_absolute_uri('/%s'%f.item.itemId)
                 }
-                if not f.save_chunk_stream(c, chunk_id, form.cleaned_data['done']):
+                if not f.save_chunk_stream(c, chunk_id, resolution, format,
+                        form.cleaned_data['done']):
                     response['result'] = -1
                 elif form.cleaned_data['done']:
                     f.uploading = False
@@ -255,7 +262,7 @@ def firefogg_upload(request):
                     response['done'] = 1
                 return render_to_json_response(response)
         #init upload
-        elif oshash and profile == video_profile:
+        elif oshash:
             #404 if oshash is not know, files must be registered via update api first
             f = get_object_or_404(models.File, oshash=oshash)
             if f.editable(request.user):

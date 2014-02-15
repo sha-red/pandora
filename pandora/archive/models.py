@@ -308,13 +308,19 @@ class File(models.Model):
             return True
         return False
 
-    def save_chunk_stream(self, chunk, chunk_id=-1, done=False):
+    def stream_resolution(self):
+        config = settings.CONFIG['video']
+        height = self.info['video'][0]['height'] if self.info.get('video') else None
+        for resolution in sorted(config['resolutions']):
+            if height and height <= resolution:
+                return resolution
+        return resolution
+
+    def save_chunk_stream(self, chunk, chunk_id, resolution, format, done):
         if not self.available:
             config = settings.CONFIG['video']
             stream, created = Stream.objects.get_or_create(
-                        file=self,
-                        resolution=max(config['resolutions']),
-                        format=config['formats'][0])
+                        file=self, resolution=resolution, format=format)
             if created:
                 stream.media.name = stream.path(stream.name())
                 ox.makedirs(os.path.dirname(stream.media.path))

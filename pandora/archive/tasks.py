@@ -112,9 +112,10 @@ def extract_stream(fileId):
     file = models.File.objects.get(id=fileId)
     if file.data:
         config = settings.CONFIG['video']
+        resolution = file.stream_resolution()
         stream, created = models.Stream.objects.get_or_create(
-            file=file, resolution=max(config['resolutions']),
-            format=config['formats'][0])
+            file=file, resolution=resolution, format=config['formats'][0]
+        )
         if created:
             stream.media.name = stream.path(stream.name())
             stream.encode()
