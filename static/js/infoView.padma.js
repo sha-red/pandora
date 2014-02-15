@@ -601,7 +601,7 @@ pandora.ui.infoView = function(data) {
                 }), [0, 240]);
                 Ox.Label({
                         textAlign: 'center',
-                        title: Ox.toTitleCase(userLevel),
+                        title: Ox._(Ox.toTitleCase(userLevel)),
                         width: 60
                     })
                     .addClass('OxColor OxColorGradient')
@@ -620,11 +620,15 @@ pandora.ui.infoView = function(data) {
                 var hasCapability = pandora.site.capabilities[capability.name][userLevel] >= rightsLevel,
                     $element = Ox.Theme.formatColorLevel(hasCapability, ['', '']);
                 Ox.Button({
-                        tooltip: (canEdit ? Ox.toTitleCase(userLevel) : 'You') + ' '
+                        tooltip: Ox._('{0} '
                             + (hasCapability ? 'can' : 'can\'t') + ' '
                             + Ox.toSlashes(capability.name)
                                 .split('/').slice(1).join(' ')
-                                .toLowerCase(),
+                                .toLowerCase()
+                                .replace('see item', 'see the item')
+                                .replace('play video', 'play the full video')
+                                .replace('download video', 'download the video'),
+                            [canEdit ? Ox.toTitleCase(userLevel) : Ox._('You')]),
                         title: capability.symbol,
                         type: 'image'
                     })
@@ -670,7 +674,7 @@ pandora.ui.infoView = function(data) {
                             format: function(value) {
                                 return formatValue(key, value);
                             },
-                            placeholder: formatLight('unknown'),
+                            placeholder: formatLight(Ox._('unknown')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: getValue(key, data[key])
                         })
