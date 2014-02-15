@@ -234,9 +234,12 @@ pandora.ui.documentsPanel = function(options) {
 
         $itemMenu = Ox.MenuButton({
             items: isItemView ? [
-                {id: 'add', title: Ox._(
-                    'Add Documents to {0}...', [pandora.site.itemName.singular]
-                ), keyboard: 'control n'},
+                {
+                    id: 'add', 
+                    disabled: !pandora.site.capabilities.canManageDocuments[pandora.user.level],
+                    title: Ox._('Add Documents to {0}...', [pandora.site.itemName.singular]),
+                    keyboard: 'control n'
+                },
                 {},
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'edit', title: ''},
