@@ -72,13 +72,16 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 id: 'document',
                 title: 'Document',
                 description: 'Embed a document',
-                inputs: ['document', 'title']
+                inputs: ['document']
             },
             {
                 id: 'edit',
                 title: 'Edit',
                 description: 'Embed an edited video',
-                inputs: ['edit', 'position', 'matchRatio']
+                inputs: [
+                    'edit', 'position',
+                    'showTimeline', 'showAnnotations', 'matchRatio'
+                ]
             },
             {
                 id: 'text',
@@ -695,21 +698,20 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             view = $list.options('selected')[0];
         $form.find('.link')[type == 'link' ? 'show' : 'hide']();
         $form.find('.iframe')[type == 'iframe' ? 'show' : 'hide']();
-        $form.find('.advanced')[advanced ? 'show' : 'hide']();
         viewInputs.forEach(function(id) {
-            Ox.print('$$$', id)
             $input[id][
-                Ox.contains(Ox.getObjectById(views, view).inputs, id) ? 'show' : 'hide'
+                Ox.contains(Ox.getObjectById(views, view).inputs, id)
+                && (advanced || !$input[id].is('.advanced'))  ? 'show' : 'hide'
             ]();
         });
         $input.timeline[
-            advanced && $input.showTimeline.options('value') ? 'show' : 'hide'
+            advanced && view == 'video' && $input.showTimeline.options('value') ? 'show' : 'hide'
         ]();
         $input.showLayersLabel[
-            advanced && $input.showAnnotations.options('value') ? 'show' : 'hide'
+            advanced && view == 'video' && $input.showAnnotations.options('value') ? 'show' : 'hide'
         ]();
         $input.showLayers[
-            advanced && $input.showAnnotations.options('value') ? 'show' : 'hide'
+            advanced && view == 'video' && $input.showAnnotations.options('value') ? 'show' : 'hide'
         ]();
     }
 
