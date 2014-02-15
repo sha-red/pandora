@@ -193,11 +193,12 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
     }
 
     function formatURL() {
-        var data = Ox.map($input, function($element) {
-                return $element.value ? $element.value() : void 0;
-            }),
-            type = data.type,
+        var type = $input.type.value(),
             view = $list.options('selected')[0],
+            data = Ox.map($input, function($element, key) {
+                return Ox.contains(Ox.getObjectById(views, view).inputs, key)
+                    && $element.value ? $element.value() : void 0;
+            }),
             options = Ox.serialize({
                 title: data.title || void 0,
                 showTimeline: data.showTimeline || void 0,
@@ -211,7 +212,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             ).concat(
                 data['in'] || data.out ? [data['in'], data.out] : []
             ).join(',')
-            + data['annotation'] || '';
+            + (data['annotation'] || '');
         return Ox.encodeHTMLEntities(
             (
                 type == 'iframe'
@@ -228,8 +229,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 : ''
             )
             + (
-                Ox.contains(['info', 'grid', 'map', 'calendar'], view)
-                ? (view == 'info' ? '/' : '') + view
+                Ox.contains(['info', 'timeline'], view) ? '/' + view
+                : Ox.contains(['grid', 'map', 'calendar'], view) ? view
                 : ''
             )
             + (
@@ -698,9 +699,9 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             view = $list.options('selected')[0];
         $form.find('.link')[type == 'link' ? 'show' : 'hide']();
         $form.find('.iframe')[type == 'iframe' ? 'show' : 'hide']();
-        viewInputs.forEach(function(id) {
-            $input[id][
-                Ox.contains(Ox.getObjectById(views, view).inputs, id)
+        viewInputs.forEach(function(key) {
+            $input[key][
+                Ox.contains(Ox.getObjectById(views, view).inputs, key)
                 && (advanced || !$input[id].is('.advanced'))  ? 'show' : 'hide'
             ]();
         });
