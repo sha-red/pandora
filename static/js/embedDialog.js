@@ -26,14 +26,14 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         views = [
             {
                 id: 'info',
-                title: 'Info',
-                description: 'Embed poster and basic metadata',
+                title: Ox._('Info'),
+                description: Ox._('Embed poster and basic metadata'),
                 inputs: ['item']
             },
             {
                 id: 'video',
-                title: 'Video',
-                description: 'Embed a clip or a full video',
+                title: Ox._('Video'),
+                description: Ox._('Embed a clip or a full video'),
                 inputs: [
                     'item', 'position', 'in', 'out', 'annotation', 'title',
                     'showTimeline', 'showAnnotations', 'matchRatio'
@@ -41,44 +41,44 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             },
             {
                 id: 'timeline',
-                title: 'Timeline',
-                description: 'Embed a timeline',
+                title: Ox._('Timeline'),
+                description: Ox._('Embed a timeline'),
                 inputs: ['item', 'position', 'title']
             },
             {
                 id: 'list',
-                title: 'List',
-                description: 'Embed list icon and description',
+                title: Ox._('List'),
+                description: Ox._('Embed list icon and description'),
                 inputs: ['list']
             },
             {
                 id: 'grid',
-                title: 'Grid',
-                description: 'Embed movies as a grid',
+                title: Ox._('Grid'),
+                description: Ox._('Embed movies as a grid'),
                 inputs: ['find', 'sort', 'title']
             },
             {
                 id: 'map',
-                title: 'Map',
-                description: 'Embed a map view',
+                title: Ox._('Map'),
+                description: Ox._('Embed a map view'),
                 inputs: ['switch', 'item', 'find', 'sort', 'title']
             },
             {
                 id: 'calendar',
-                title: 'Calendar',
-                description: 'Embed a calendar view',
+                title: Ox._('Calendar'),
+                description: Ox._('Embed a calendar view'),
                 inputs: ['switch', 'item', 'find', 'sort', 'title']
             },
             {
                 id: 'document',
-                title: 'Document',
-                description: 'Embed a document',
+                title: Ox._('Document'),
+                description: Ox._('Embed a document'),
                 inputs: ['document']
             },
             {
                 id: 'edit',
-                title: 'Edit',
-                description: 'Embed an edited video',
+                title: Ox._('Edit'),
+                description: Ox._('Embed an edited video'),
                 inputs: [
                     'edit', 'position',
                     'showTimeline', 'showAnnotations', 'matchRatio'
@@ -86,8 +86,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             },
             {
                 id: 'text',
-                title: 'Text',
-                description: 'Embed text icon and description',
+                title: Ox._('Text'),
+                description: Ox._('Embed text icon and description'),
                 inputs: ['text']
             }
         ].map(function(item, index) {
@@ -319,8 +319,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
 
         $input.type = Ox.ButtonGroup({
                 buttons: [
-                    {id: 'link', title: 'Embed in Text Section', width: formWidth / 2, selected: true},
-                    {id: 'iframe', title: 'Embed in External Site', width: formWidth / 2}
+                    {id: 'link', title: Ox._('Embed in Texts Section'), width: formWidth / 2, selected: true},
+                    {id: 'iframe', title: Ox._('Embed in External Site'), width: formWidth / 2}
                 ],
                 selectable: true
             })
@@ -432,9 +432,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                     {id: 'item', title: Ox._(pandora.site.itemName.singular)},
                     {id: 'find', title: Ox._('Query')}
                 ],
-                label: Ox._('{0} for', [
-                    Ox.getObjectById(views, $list.options('selected')[0]).title
-                ]),
+                label: ' ',
                 labelWidth: labelWidth,
                 width: formWidth
             })
@@ -779,6 +777,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             view = $list.options('selected')[0];
         $form.find('.link')[type == 'link' ? 'show' : 'hide']();
         $form.find('.iframe')[type == 'iframe' ? 'show' : 'hide']();
+        $input.site[advanced ? 'show' : 'hide']();
         viewInputs.forEach(function(key) {
             $input[key][
                 Ox.contains(Ox.getObjectById(views, view).inputs, key)
@@ -795,6 +794,11 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             advanced && view == 'video' && $input.showAnnotations.options('value') ? 'show' : 'hide'
         ]();
         if (Ox.contains(['map', 'calendar'], view)) {
+            $input.switch.options({
+                label: Ox._('{0} for', [
+                    Ox.getObjectById(views, $list.options('selected')[0]).title
+                ])
+            });
             $input.item[$input.switch.value() == 'item' ? 'show' : 'hide']();
             $input.find[$input.switch.value() == 'find' ? 'show' : 'hide']();
         }
