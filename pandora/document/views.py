@@ -6,7 +6,7 @@ from ox.utils import json
 from ox.django.api import actions
 from ox.django.decorators import login_required_json
 from ox.django.http import HttpFileResponse
-from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response, HttpErrorJson
 from django import forms
 from django.db.models import Sum
 
@@ -16,7 +16,12 @@ from itemlist.models import List
 import models
 
 def get_document_or_404_json(id):
-    return models.Document.get(id)
+    try:
+        return models.Document.get(id)
+    except models.Document.DoesNotExist:
+        response = {'status': {'code': 404,
+                               'text': 'Document not found'}}
+        raise HttpErrorJson(response)
 
 @login_required_json
 def addDocument(request):
@@ -182,6 +187,24 @@ def findDocuments(request):
         response['data']['size'] = r['size__sum'] or 0
     return render_to_json_response(response)
 actions.register(findDocuments)
+
+def getDocument(request):
+    '''
+        takes {
+            id: string,
+            keys: [string]
+        }
+        returns {
+            key: value
+        }
+    '''
+    response = json_response({})
+    data = json.loads(request.POST['data'])
+    data['keys'] = data.get('keys', [])
+    document = get_document_or_404_json(data['id'])
+    response['data'] = document.json(keys=data['keys'], user=request.user)
+    return render_to_json_response(response)
+actions.register(getDocument)
 
 @login_required_json
 def removeDocument(request):
