@@ -15,12 +15,13 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         iframeWidth = Math.round(iframeHeight * pandora.site.video.previewRatio),
         listWidth = 128 + Ox.UI.SCROLLBAR_SIZE,
         labelWidth = 192,
+        dialogWidth = listWidth + formWidth + 32 + Ox.UI.SCROLLBAR_SIZE,
+        dialogHeight = 384,
         positionPlaceholder = '00:00:00.000',
         sites = [pandora.site.site].concat(pandora.site.sites).map(function(site) {
             return {id: site.url, title: site.url, https: site.https};
         }),
-        dialogWidth = listWidth + formWidth + 32 + Ox.UI.SCROLLBAR_SIZE,
-        dialogHeight = 384,
+        ui = pandora.user.ui,
 
         views = [
             {
@@ -60,13 +61,13 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 id: 'map',
                 title: 'Map',
                 description: 'Embed a map view',
-                inputs: ['find', 'sort', 'title']
+                inputs: ['switch', 'item', 'find', 'sort', 'title']
             },
             {
                 id: 'calendar',
                 title: 'Calendar',
                 description: 'Embed a calendar view',
-                inputs: ['find', 'sort', 'title']
+                inputs: ['switch', 'item', 'find', 'sort', 'title']
             },
             {
                 id: 'document',
@@ -221,7 +222,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 : '/'
             )
             + (
-                Ox.contains(['info', 'video', 'timeline'], view) ? data.item
+                Ox.contains(['info', 'video', 'timeline'], view) || data.switch == 'item' ? data.item
                 : view == 'list' ? 'list==' + data.list
                 : view == 'document' ? 'documents/' + data.document
                 : view == 'edit' ? 'edits/' + data.edit
@@ -230,7 +231,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             )
             + (
                 Ox.contains(['info', 'timeline'], view) ? '/' + view
-                : Ox.contains(['grid', 'map', 'calendar'], view) ? view
+                : Ox.contains(['grid', 'map', 'calendar'], view) ? (data.switch == 'item' ? '/' : '') + view
                 : ''
             )
             + (
@@ -240,6 +241,57 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             + '#embed'
             + (options ? '?' + options : '')
         ).replace(/ /g, '_');
+    }
+
+    function getDefaults() {
+        var options = {};
+        if (ui.section == 'items') {
+            if (!ui.item) {
+                if (ui.listView == 'map') {
+                    options.view = 'map';
+                } else if (ui.listView == 'calendar') {
+                    options.view = 'calendar';
+                } else if (
+                    ui.find.conditions.length == 1
+                    && ui.find.conditions[0].key == 'list'
+                    && ui.find.conditions[0].operator == '=='
+                ) {
+                    options.view = 'list';
+                } else {
+                    options.view = 'grid';
+                }
+                if (options.view == 'list') {
+                    options.list = ui.find.conditions[0].value;
+                } else {
+                    options.find = ui.find;
+                }
+            } else {
+                if (ui.itemView == 'documents') {
+                    options.view = 'document';
+                } else if (Ox.contains(['player', 'editor'], ui.itemView)) {
+                    options.view = 'video';
+                } else if (ui.itemView == 'timeline') {
+                    options.view = 'timeline';
+                } else if (ui.itemView == 'map') {
+                    options.view = 'map';
+                } else if (ui.itemView == 'calendar') {
+                    options.view = 'calendar';
+                } else {
+                    options.view = 'info';
+                }
+                options.item = ui.item;
+                if (Ox.contains(['player', 'editor', 'timeline'], view)) {
+                    // position
+                }
+                if (Ox.contains(['player', 'editor'], view)) {
+                    // in, out, annotation
+                }
+            }
+        } else if (ui.section == 'edits') {
+            options.view = 'edit';
+        } else {
+            options.view = 'text';
+        }
     }
 
     function getDuration(item, callback) {
@@ -372,6 +424,26 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: updateHTML
+            })
+            .appendTo($form);
+
+        $input.switch = Ox.Select({
+                items: [
+                    {id: 'item', title: Ox._(pandora.site.itemName.singular)},
+                    {id: 'find', title: Ox._('Query')}
+                ],
+                label: Ox._('{0} for', [
+                    Ox.getObjectById(views, $list.options('selected')[0]).title
+                ]),
+                labelWidth: labelWidth,
+                width: formWidth
+            })
+            .css(css)
+            .bindEvent({
+                change: function() {
+                    updateForm();
+                    updateHTML();
+                }
             })
             .appendTo($form);
 
@@ -693,6 +765,14 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         });
     }
 
+    function parseURL() {
+        // ...
+    }
+
+    function updateAPI() {
+        // ...
+    }
+
     function updateForm() {
         var advanced = $input.advanced.value(),
             type = $input.type.value(),
@@ -714,6 +794,10 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         $input.showLayers[
             advanced && view == 'video' && $input.showAnnotations.options('value') ? 'show' : 'hide'
         ]();
+        if (Ox.contains(['map', 'calendar'], view)) {
+            $input.item[$input.switch.value() == 'item' ? 'show' : 'hide']();
+            $input.find[$input.switch.value() == 'find' ? 'show' : 'hide']();
+        }
     }
 
     function updateHTML() {
