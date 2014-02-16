@@ -483,7 +483,7 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                             site: site,
                             item: item,
                             link: state.view || 'default', // FIXME: wrong, user-dependent
-                            position: Ox.isArray(state.span) && state.span.lenght == 3
+                            position: Ox.isArray(state.span) && state.span.length == 3
                                 ? Ox.formatDuration(state.span[0]) : '',
                             'in': Ox.isArray(state.span)
                                 ? Ox.formatDuration(state.span[state.span.length - 2]) : '',
