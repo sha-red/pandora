@@ -188,12 +188,12 @@ def getEmbedDefaults(request):
         document: str // first document, sorted by id
         edit: str // first edit, sorted by name
         editDuration: float // duration of that edit
-        editRatio: float // pandora.site.video.previewRatio
         item: str // first item, sorted by id
         itemDuration: float // duration of that item
         itemRatio: float // video ratio of that item
         list: str // first list, sorted by name
         text: str // first text, sorted by name
+        videoRatio: float // pandora.site.video.previewRatio
         videoResolution: int // largest value in pandora.site.video.resolutions
     }
     '''
@@ -212,7 +212,6 @@ def getEmbedDefaults(request):
         e = qs[0].json(keys=['id', 'duration'])
         response['data']['edit'] = e['id']
         response['data']['editDuration'] = e['duration']
-        response['data']['editRatio'] = settings.CONFIG['video']['previewRatio']
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     qs = Item.objects.filter(level__lte=level, rendered=True).order_by('sort__itemId')
     if qs.exists():
@@ -224,6 +223,7 @@ def getEmbedDefaults(request):
     if qs.exists():
         i = qs[0].json()
         response['data']['list'] = i['id']
+    response['data']['videoRatio'] = settings.CONFIG['video']['previewRatio']
     response['data']['videoResolution'] = max(settings.CONFIG['video']['resolutions'])
     return render_to_json_response(response)
 actions.register(getEmbedDefaults)
