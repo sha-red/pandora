@@ -52,7 +52,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             {
                 id: 'list',
                 title: Ox._('List'),
-                description: Ox._('Embed a List Icon and Description'),
+                description: Ox._('Embed a List Icon with Description'),
                 inputs: ['list']
             },
             {
@@ -65,13 +65,13 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 id: 'map',
                 title: Ox._('Map'),
                 description: Ox._('Embed a Map View'),
-                inputs: ['switch', 'item', 'find', 'sort', 'title']
+                inputs: ['mapMode', 'item', 'find', 'sort', 'title']
             },
             {
                 id: 'calendar',
                 title: Ox._('Calendar'),
-                description: Ox._('Embed a calendar view'),
-                inputs: ['switch', 'item', 'find', 'sort', 'title']
+                description: Ox._('Embed a Calendar View'),
+                inputs: ['mapMode', 'item', 'find', 'sort', 'title']
             },
             {
                 id: 'document',
@@ -84,14 +84,14 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 title: Ox._('Edit'),
                 description: Ox._('Embed an Edited Video'),
                 inputs: [
-                    'edit', 'position',
+                    'edit', 'editMode', 'position',
                     'showTimeline', 'showAnnotations', 'matchRatio'
                 ]
             },
             {
                 id: 'text',
                 title: Ox._('Text'),
-                description: Ox._('Embed text icon and description'),
+                description: Ox._('Embed a Text Icon with Description'),
                 inputs: ['text']
             }
         ].map(function(item, index) {
@@ -215,7 +215,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 timeline: data.timeline && data.timeline != 'default' ? data.timeline : void 0,
                 showAnnotations: data.showAnnotations || void 0,
                 showLayers: data.showAnnotations && data.showLayers ? data.showLayers : void 0,
-                matchRatio: Ox.contains(['video', 'edit'], view) ? data.matchRatio || void 0 : void 0
+                matchRatio: Ox.contains(['video', 'edit'], view) ? data.matchRatio || void 0 : void 0,
+                showInfo: Ox.contains(['list', 'text'], view) || (view == 'edit' && !!$input.editMode.value()) || void 0
             }, true),
             position = (
                 data.position ? [data.position] : []
@@ -231,7 +232,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 : '/'
             )
             + (
-                Ox.contains(['info', 'video', 'timeline'], view) || data.switch == 'item' ? data.item
+                Ox.contains(['info', 'video', 'timeline'], view) || data.mapMode == 'item' ? data.item
                 : view == 'list' ? 'list==' + data.list
                 : view == 'document' ? 'documents/' + data.document
                 : view == 'edit' ? 'edits/' + data.edit
@@ -240,7 +241,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             )
             + (
                 Ox.contains(['info', 'timeline'], view) ? '/' + view
-                : Ox.contains(['grid', 'map', 'calendar'], view) ? (data.switch == 'item' ? '/' : '') + view
+                : Ox.contains(['grid', 'map', 'calendar'], view) ? (data.mapMode == 'item' ? '/' : '') + view
                 : ''
             )
             + (
@@ -382,7 +383,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             })
             .appendTo($form);
 
-        $input.switch = Ox.Select({
+        $input.mapMode = Ox.Select({
                 items: [
                     {id: 'item', title: Ox._(pandora.site.itemName.singular)},
                     {id: 'find', title: Ox._('Query')}
@@ -471,6 +472,24 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 change: function() {
                     updateHTML();
                     validateId('text');
+                }
+            })
+            .appendTo($form);
+
+        $input.editMode = Ox.Select({
+                items: [
+                    {id: 'icon', title: Ox._('Icon and Description')},
+                    {id: 'video', title: Ox._('Video')}
+                ],
+                label: 'Embed',
+                labelWidth: labelWidth,
+                width: formWidth
+            })
+            .css(css)
+            .bindEvent({
+                change: function() {
+                    updateForm();
+                    updateHTML();
                 }
             })
             .appendTo($form);
@@ -791,13 +810,20 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             advanced && view == 'video' && $input.showAnnotations.options('value') ? 'show' : 'hide'
         ]();
         if (Ox.contains(['map', 'calendar'], view)) {
-            $input.switch.options({
+            $input.mapMode.options({
                 label: Ox._('{0} for', [
                     Ox.getObjectById(views, $list.options('selected')[0]).title
                 ])
             });
-            $input.item[$input.switch.value() == 'item' ? 'show' : 'hide']();
-            $input.find[$input.switch.value() == 'find' ? 'show' : 'hide']();
+            $input.item[$input.mapMode.value() == 'item' ? 'show' : 'hide']();
+            $input.find[$input.mapMode.value() == 'find' ? 'show' : 'hide']();
+        } else if (view == 'edit') {
+            [
+                'position', 'showTimeline', 'timeline', 'showAnnotations',
+                'showLayersLabel', 'showLayers', 'matchRatio'
+            ].forEach(function(key) {
+                $input[key][$input.editMode.value() == 'video' ? 'show' : 'hide'];
+            });
         }
     }
 
@@ -841,7 +867,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         } else {
             options.view = 'text';
         }
-        options.switch = !ui.item ? 'list' : 'item';
+        options.mapMode = !ui.item ? 'list' : 'item';
         options.item = ui.item;
         options.document = ui.documentsSelection[ui.item][0] || '';
         options.list = ui._list;
@@ -896,12 +922,13 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
 
     function validatePoint(key) {
         // key can be position, in, out, annotation
-        var hasInAndOut = $input['in'].options('value') !== '';
-        if ($input[key].value()) {
+        var hasInAndOut = $input['in'].options('value') !== '',
+            value = $input[key].value();
+        if (value) {
             if (key == 'position') {
                 $input.position.options({
                     value: limitPoint(
-                        data.value,
+                        value,
                         hasInAndOut ? $input['in'].options('value') : 0,
                         hasInAndOut ? $input.out.options('value') : duration
                     )
@@ -909,28 +936,28 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 $input.annotation.options({value: ''});
             } else if (key == 'in') {
                 $input['in'].options({
-                    value: limitPoint(data.value, 0, duration)
+                    value: limitPoint(value, 0, duration)
                 });
                 if ($input.out.options('value') === '') {
                     $input.out.options({value: Ox.formatDuration(duration)});
                 } else if (
                     Ox.parseDuration($input.out.options('value'))
-                    < Ox.parseDuration(data.value)
+                    < Ox.parseDuration(value)
                 ) {
-                    $input.out.options({value: data.value});
+                    $input.out.options({value: value});
                 }
                 $input.annotation.options({value: ''});
             } else if (key == 'out') {
                 $input.out.options({
-                     value: limitPoint(data.value, 0, duration)
+                     value: limitPoint(value, 0, duration)
                  });
                  if ($input['in'].options('value') === '') {
                      $input['in'].options({value: Ox.formatDuration(0)});
                  } else if (
                      Ox.parseDuration($input['in'].options('value'))
-                     > Ox.parseDuration(data.value)
+                     > Ox.parseDuration(value)
                  ) {
-                     $input['in'].options({value: data.value});
+                     $input['in'].options({value: value});
                  }
                  $input.annotation.options({value: ''});
             } else if (key == 'annotation') {
