@@ -162,7 +162,6 @@ def init(request):
     return render_to_json_response(response)
 actions.register(init)
 
-
 def embedURL(request):
     '''
         
@@ -181,3 +180,51 @@ def embedURL(request):
     response['data'] = ox.get_embed_code(data['url'], data.get('maxwidth'), data.get('maxheight'))
     return render_to_json_response(response)
 actions.register(embedURL)
+
+def getEmbedDefaults(request):
+    '''
+        takes {}
+    returns {
+        document: str // first document, sorted by id
+        edit: str // first edit, sorted by name
+        editDuration: float // duration of that edit
+        editRatio: float // pandora.site.video.previewRatio
+        item: str // first item, sorted by id
+        itemDuration: float // duration of that item
+        itemRatio: float // video ratio of that item
+        list: str // first list, sorted by name
+        text: str // first text, sorted by name
+        videoResolution: int // largest value in pandora.site.video.resolutions
+    }
+    '''
+    from document.models import Document
+    from item.models import Item
+    from itemlist.models import List
+    from edit.models import Edit
+    from text.models import Text
+    data = json.loads(request.POST['data'])
+    response = json_response({})
+    qs = Document.objects.filter(uploading=False).order_by('id')
+    if qs.exists():
+        response['data']['document'] = qs[0].get_id()
+    qs = Edit.objects.exclude(status='private').order_by('name')
+    if qs.exists():
+        e = qs[0].json(keys=['id', 'duration'])
+        response['data']['edit'] = e['id']
+        response['data']['editDuration'] = e['duration']
+        response['data']['editRatio'] = settings.CONFIG['video']['previewRatio']
+    level = settings.CONFIG['capabilities']['canSeeItem']['guest']
+    qs = Item.objects.filter(level__lte=level, rendered=True).order_by('sort__itemId')
+    if qs.exists():
+        i = qs[0].json
+        response['data']['item'] = i['id']
+        response['data']['itemDuration'] = i['duration']
+        response['data']['itemRatio'] = i['videoRatio']
+    qs = List.objects.exclude(status='private').order_by('name')
+    if qs.exists():
+        i = qs[0].json()
+        response['data']['list'] = i['id']
+    response['data']['videoResolution'] = max(settings.CONFIG['video']['resolutions'])
+    return render_to_json_response(response)
+actions.register(getEmbedDefaults)
+
