@@ -352,7 +352,6 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 width: formWidth,
                 value: '...'
             })
-            .addClass('link')
             .css(css)
             .bindEvent({
                 change: function(data) {
@@ -381,7 +380,6 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                     })
                 ]
             })
-            .addClass('iframe')
             .css(css)
             .bindEvent({
                 change: updateHTML
@@ -409,7 +407,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                         width: 80
                     }),
                     $input.hostname = Ox.SelectInput({
-                        inputWidth: formWidth - labelWidth - 160,
+                        inputWidth: 192,
                         id: 'hostname',
                         items: sites.concat([{id: 'other', title: Ox._('Other...')}]),
                         max: 1,
@@ -775,8 +773,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         var advanced = $input.advanced.value(),
             type = $input.type.value(),
             view = $list.options('selected')[0];
-        $form.find('.link')[type == 'link' ? 'show' : 'hide']();
-        $form.find('.iframe')[type == 'iframe' ? 'show' : 'hide']();
+        $input.text[type == 'link' ? 'show' : 'hide']();
+        $input.size[type == 'iframe' ? 'show' : 'hide']();
         $input.site[advanced ? 'show' : 'hide']();
         viewInputs.forEach(function(key) {
             $input[key][
