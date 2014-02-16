@@ -19,6 +19,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         dialogWidth = listWidth + formWidth + 32 + Ox.UI.SCROLLBAR_SIZE,
         dialogHeight = 384,
         linkPlaceholder = '...',
+        options = {},
         positionPlaceholder = '00:00:00.000',
         sites = [pandora.site.site].concat(pandora.site.sites).map(function(site) {
             return {id: site.url, title: site.url, https: site.https};
@@ -30,13 +31,13 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             {
                 id: 'info',
                 title: Ox._('Info'),
-                description: Ox._('Embed poster and basic metadata'),
+                description: Ox._('Embed a Poster and Basic Metadata'),
                 inputs: ['item']
             },
             {
                 id: 'video',
                 title: Ox._('Video'),
-                description: Ox._('Embed a clip or a full video'),
+                description: Ox._('Embed a Clip or a Full Video'),
                 inputs: [
                     'item', 'position', 'in', 'out', 'annotation', 'title',
                     'showTimeline', 'showAnnotations', 'matchRatio'
@@ -45,25 +46,25 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             {
                 id: 'timeline',
                 title: Ox._('Timeline'),
-                description: Ox._('Embed a timeline'),
+                description: Ox._('Embed a Timeline'),
                 inputs: ['item', 'position', 'title']
             },
             {
                 id: 'list',
                 title: Ox._('List'),
-                description: Ox._('Embed list icon and description'),
+                description: Ox._('Embed a List Icon and Description'),
                 inputs: ['list']
             },
             {
                 id: 'grid',
                 title: Ox._('Grid'),
-                description: Ox._('Embed movies as a grid'),
+                description: Ox._('Embed Movies as a Grid'),
                 inputs: ['find', 'sort', 'title']
             },
             {
                 id: 'map',
                 title: Ox._('Map'),
-                description: Ox._('Embed a map view'),
+                description: Ox._('Embed a Map View'),
                 inputs: ['switch', 'item', 'find', 'sort', 'title']
             },
             {
@@ -75,13 +76,13 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             {
                 id: 'document',
                 title: Ox._('Document'),
-                description: Ox._('Embed a document'),
+                description: Ox._('Embed a Document'),
                 inputs: ['document']
             },
             {
                 id: 'edit',
                 title: Ox._('Edit'),
-                description: Ox._('Embed an edited video'),
+                description: Ox._('Embed an Edited Video'),
                 inputs: [
                     'edit', 'position',
                     'showTimeline', 'showAnnotations', 'matchRatio'
@@ -184,13 +185,16 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
     $($input.advanced.find('.OxButton')[0]).css({margin: 0});
     $(that.find('.OxBar')[1]).append($input.advanced);
 
-    updateAPI();
+    updateOptions();
+    updateAPI(function() {
+        updateDefaults(true);
+    });
 
     function formatHTML() {
         var type = $input.type.value();
         return type == 'link'
             ? '<a href="' + formatURL()
-                + '">' + $input.text.value()
+                + '">' + $input.link.value()
                 + '</a>'
             : '<iframe src="' + formatURL()
                 + '" width="' + $input.width.value()
@@ -372,8 +376,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function() {
-                    updateAPI();
                     updateHTML();
+                    updateAPI(updateDefaults);
                 }
             })
             .appendTo($form);
@@ -480,7 +484,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function(data) {
-                    validatePosition('position');
+                    validatePoint('position');
                     updateHTML()
                 }
             })
@@ -495,7 +499,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function(data) {
-                    validatePosition('in');
+                    validatePoint('in');
                     updateHTML();
                 }
             })
@@ -510,7 +514,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function(data) {
-                    validatePosition('out');
+                    validatePoint('out');
                     updateHTML();
                 }
             })
@@ -524,7 +528,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function(data) {
-                    validatePosition('annotation');
+                    validatePoint('annotation');
                     updateHTML();
                 }
             })
@@ -675,57 +679,6 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
 
     }
 
-    function getOptions() {
-        var options = {};
-        if (ui.section == 'items') {
-            if (!ui.item) {
-                if (ui.listView == 'map') {
-                    options.view = 'map';
-                } else if (ui.listView == 'calendar') {
-                    options.view = 'calendar';
-                } else if (
-                    ui.find.conditions.length == 1
-                    && ui.find.conditions[0].key == 'list'
-                    && ui.find.conditions[0].operator == '=='
-                ) {
-                    options.view = 'list';
-                } else {
-                    options.view = 'grid';
-                }
-                if (options.view == 'list') {
-                    options.list = ui.find.conditions[0].value;
-                } else {
-                    options.find = ui.find;
-                }
-            } else {
-                if (ui.itemView == 'documents') {
-                    options.view = 'document';
-                } else if (Ox.contains(['player', 'editor'], ui.itemView)) {
-                    options.view = 'video';
-                } else if (ui.itemView == 'timeline') {
-                    options.view = 'timeline';
-                } else if (ui.itemView == 'map') {
-                    options.view = 'map';
-                } else if (ui.itemView == 'calendar') {
-                    options.view = 'calendar';
-                } else {
-                    options.view = 'info';
-                }
-                options.item = ui.item;
-                if (Ox.contains(['player', 'editor', 'timeline'], view)) {
-                    // position
-                }
-                if (Ox.contains(['player', 'editor'], view)) {
-                    // in, out, annotation
-                }
-            }
-        } else if (ui.section == 'edits') {
-            options.view = 'edit';
-        } else {
-            options.view = 'text';
-        }
-    }
-
     function limitPoint(value, min, max) {
         /*
         if (Ox.typeOf(min) == 'number') {
@@ -793,37 +746,25 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         api = Ox.API({
             url: $input.protocol.value() + '://' + $input.hostname.value() + '/api/'
         }, function() {
-            // FIXME: remove
-            api.getEmbedDefaults = function(callback) {
-                callback({
-                    data: {
-                        document: 'A',
-                        edit: 'foo:bar',
-                        editDuration: 3600,
-                        item: 'B',
-                        itemDuration: 7200,
-                        itemRatio: 4/3,
-                        list: 'bar:baz',
-                        text: 'baz:foo',
-                        videoRatio: 16/9,
-                        videoResolution: 480
-                    }
-                });
-            }; 
             api.getEmbedDefaults(function(result) {
                 defaults = result.data;
-                $input.width.options({value: Math.round(defaults.videoResolution * defaults.videoRatio)});
-                $input.height.options({value: defaults.videoResolution});
-                ['item', 'document', 'list', 'edit', 'text'].forEach(function(key) {
-                    $input[key].options({value: defaults[key]});
-                });
-                ['position', 'in', 'out'].forEach(function(key) {
-                    validatePosition(key);
-                });
-                updateHTML();
                 callback && callback();
             });
         });
+    }
+
+    function updateDefaults(keepValues) {
+        $input.width.options({value: Math.round(defaults.videoResolution * defaults.videoRatio)});
+        $input.height.options({value: defaults.videoResolution});
+        ['item', 'document', 'list', 'edit', 'text'].forEach(function(key) {
+            if (!keepValues || !$input[key].options('value')) {
+                $input[key].options({value: defaults[key]});
+            }
+        });
+        ['position', 'in', 'out'].forEach(function(key) {
+            validatePoint(key);
+        });
+        updateHTML();
     }
 
     function updateForm() {
@@ -864,6 +805,69 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         $input.html.options({value: formatHTML()});
     }
 
+    function updateOptions() {
+        if (ui.section == 'items') {
+            if (!ui.item) {
+                if (ui.listView == 'map') {
+                    options.view = 'map';
+                } else if (ui.listView == 'calendar') {
+                    options.view = 'calendar';
+                } else if (
+                    ui.find.conditions.length == 1
+                    && ui.find.conditions[0].key == 'list'
+                    && ui.find.conditions[0].operator == '=='
+                ) {
+                    options.view = 'list';
+                } else {
+                    options.view = 'grid';
+                }
+            } else {
+                if (ui.itemView == 'documents') {
+                    options.view = 'document';
+                } else if (Ox.contains(['player', 'editor'], ui.itemView)) {
+                    options.view = 'video';
+                } else if (ui.itemView == 'timeline') {
+                    options.view = 'timeline';
+                } else if (ui.itemView == 'map') {
+                    options.view = 'map';
+                } else if (ui.itemView == 'calendar') {
+                    options.view = 'calendar';
+                } else {
+                    options.view = 'info';
+                }
+            }
+        } else if (ui.section == 'edits') {
+            options.view = 'edit';
+        } else {
+            options.view = 'text';
+        }
+        options.switch = !ui.item ? 'list' : 'item';
+        options.item = ui.item;
+        options.document = ui.documentsSelection[ui.item][0] || '';
+        options.list = ui._list;
+        options.edit = ui.edit;
+        options.text = ui.text;
+        options.find = ui.find;
+        if (ui.item && ui.videoPoints[ui.item]) {
+            if (ui.videoPoints[ui.item].annotation) {
+                options.annotation = ui.videoPoints[ui.item].annotation;
+            } else {
+                ['position', 'in', 'out'].forEach(function(key) {
+                    options[key] = ui.videoPoints[ui.item][key] || '';
+                });
+            }
+        }
+        Ox.forEach(options, function(value, key) {
+            if (key == 'view') {
+                $list.options({selected: [value]});
+            } else {
+                $input[key].options({value: value});
+            }
+        });
+        updateForm();
+        updateHTML();
+    }
+
     function validateId(key) {
         // key can be item, document, list, edit, text
         pandora.api['get' + (key == 'item' ? '' : Ox.toTitleCase(key))]({
@@ -876,7 +880,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 if (key == 'item' || key == 'edit') {
                     duration = result.data.duration;
                     ['position', 'in', 'out'].forEach(function(key) {
-                        validatePosition(key);
+                        validatePoint(key);
                     });
                 }
                 if (key == 'item') {
@@ -890,7 +894,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         });
     }
 
-    function validatePosition(key) {
+    function validatePoint(key) {
         // key can be position, in, out, annotation
         var hasInAndOut = $input['in'].options('value') !== '';
         if ($input[key].value()) {
