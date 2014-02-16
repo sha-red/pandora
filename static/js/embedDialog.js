@@ -702,7 +702,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         viewInputs.forEach(function(key) {
             $input[key][
                 Ox.contains(Ox.getObjectById(views, view).inputs, key)
-                && (advanced || !$input[id].is('.advanced'))  ? 'show' : 'hide'
+                && (advanced || !$input[key].is('.advanced'))  ? 'show' : 'hide'
             ]();
         });
         $input.timeline[
