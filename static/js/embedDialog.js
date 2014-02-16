@@ -18,11 +18,11 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         labelWidth = 192,
         dialogWidth = listWidth + formWidth + 32 + Ox.UI.SCROLLBAR_SIZE,
         dialogHeight = 384,
+        linkPlaceholder = '...',
         positionPlaceholder = '00:00:00.000',
         sites = [pandora.site.site].concat(pandora.site.sites).map(function(site) {
             return {id: site.url, title: site.url, https: site.https};
         }),
-        textPlaceholder = '...',
         ui = pandora.user.ui,
         videoRatio,
 
@@ -124,8 +124,6 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             }
         }),
 
-        $form,
-
         $input = {
             advanced: Ox.Checkbox({
                     title: Ox._('Show Advanced Options'),
@@ -140,6 +138,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 })
         },
 
+        $form = getForm(),
+
         $panel = Ox.SplitPanel({
             elements: [
                 {element: $list, size: 128 + Ox.UI.SCROLLBAR_SIZE},
@@ -147,8 +147,6 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             ],
             orientation: 'horizontal'
         }),
-
-        $loading = Ox.loadingScreen().start(),
 
         that = Ox.Dialog({
             buttons: [
@@ -175,7 +173,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                     })
             ],
             closeButton: true,
-            content: $loading,
+            content: $panel,
             fixedSize: true,
             height: dialogHeight,
             removeOnClose: true,
@@ -186,11 +184,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
     $($input.advanced.find('.OxButton')[0]).css({margin: 0});
     $(that.find('.OxBar')[1]).append($input.advanced);
 
-    updateAPI(function() {
-        $form = getForm();
-        $loadingScreen.stop();
-        that.options({content: $panel})
-    });
+    updateAPI();
 
     function formatHTML() {
         var type = $input.type.value();
@@ -263,7 +257,13 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .attr({id: 'form'})
             .css({padding: '16px', overflowY: 'auto'});
 
-        space().html(Ox.getObjectById(views, view).description).appendTo($form);
+        $input.description = Ox.Label({
+                textAlign: 'center',
+                title: '',
+                width: formWidth
+            })
+            .css(css)
+            .appendTo($form);
 
         space().appendTo($form);
 
@@ -277,8 +277,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function() {
-                    updateHTML();
                     updateForm();
+                    updateHTML();
                 }
             })
             .appendTo($form);
@@ -296,17 +296,17 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             })
             .appendTo($form);
 
-        $input.text = Ox.Input({
+        $input.link = Ox.Input({
                 label: Ox._('Link Text'),
                 labelWidth: labelWidth,
                 width: formWidth,
-                value: textPlaceholder
+                value: linkPlaceholder
             })
             .css(css)
             .bindEvent({
                 change: function(data) {
-                    $input.text.options({
-                        value: Ox.sanitizeHTML(data.value).trim() || textPlaceholder
+                    $input.link.options({
+                        value: Ox.sanitizeHTML(data.value).trim() || linkPlaceholder
                     });
                     updateHTML();
                 }
@@ -400,7 +400,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 label: Ox._(pandora.site.itemName.singular),
                 labelWidth: labelWidth,
                 width: formWidth,
-                value: 'XYZ'
+                value: ''
             })
             .css(css)
             .bindEvent({
@@ -415,7 +415,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 label: Ox._('List'),
                 labelWidth: labelWidth,
                 width: formWidth,
-                value: 'foo:bar'
+                value: ''
             })
             .css(css)
             .bindEvent({
@@ -430,7 +430,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 label: Ox._('Document'),
                 labelWidth: labelWidth,
                 width: formWidth,
-                value: 'XYZ'
+                value: ''
             })
             .css(css)
             .bindEvent({
@@ -445,7 +445,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 label: Ox._('Edit{noun}'),
                 labelWidth: labelWidth,
                 width: formWidth,
-                value: 'foo:bar'
+                value: ''
             })
             .css(css)
             .bindEvent({
@@ -460,7 +460,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 label: Ox._('Text'),
                 labelWidth: labelWidth,
                 width: formWidth,
-                value: 'foo:bar'
+                value: ''
             })
             .css(css)
             .bindEvent({
@@ -480,18 +480,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function(data) {
-                    var hasInAndOut = $input['in']
-                        && $input['in'].options('value') !== '';
-                    if (data.value) {
-                        $input.position.options({
-                            value: limitPoint(
-                                data.value,
-                                hasInAndOut ? $input['in'].options('value') : 0,
-                                hasInAndOut ? $input.out.options('value') : duration
-                            )
-                        });
-                    }
-                    $input.annotation && $input.annotation.options({value: ''});
+                    validatePosition('position');
                     updateHTML()
                 }
             })
@@ -506,20 +495,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function(data) {
-                    if (data.value) {
-                        $input['in'].options({
-                            value: limitPoint(data.value, 0, duration)
-                        });
-                        if ($input.out.options('value') === '') {
-                            $input.out.options({value: Ox.formatDuration(duration)});
-                        } else if (
-                            Ox.parseDuration($input.out.options('value'))
-                            < Ox.parseDuration(data.value)
-                        ) {
-                            $input.out.options({value: data.value});
-                        }
-                        $input.annotation && $input.annotation.options({value: ''});
-                    }
+                    validatePosition('in');
                     updateHTML();
                 }
             })
@@ -534,20 +510,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function(data) {
-                    if (data.value) {
-                        $input.out.options({
-                            value: limitPoint(data.value, 0, duration)
-                        });
-                        if ($input['in'].options('value') === '') {
-                            $input['in'].options({value: Ox.formatDuration(0)});
-                        } else if (
-                            Ox.parseDuration($input['in'].options('value'))
-                            > Ox.parseDuration(data.value)
-                        ) {
-                            $input['in'].options({value: data.value});
-                        }
-                        $input.annotation && $input.annotation.options({value: ''});
-                    }
+                    validatePosition('out');
                     updateHTML();
                 }
             })
@@ -561,9 +524,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .bindEvent({
                 change: function(data) {
-                    ['position', 'in', 'out'].forEach(function(key) {
-                        $input[key].options({value: ''});
-                    });
+                    validatePosition('annotation');
                     updateHTML();
                 }
             })
@@ -839,41 +800,29 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                         document: 'A',
                         edit: 'foo:bar',
                         editDuration: 3600,
-                        editRatio: 16/9,
-                        item: 'A',
+                        item: 'B',
                         itemDuration: 7200,
                         itemRatio: 4/3,
                         list: 'bar:baz',
                         text: 'baz:foo',
-                        videoResoltion: 480
+                        videoRatio: 16/9,
+                        videoResolution: 480
                     }
                 });
             }; 
             api.getEmbedDefaults(function(result) {
                 defaults = result.data;
+                $input.width.options({value: Math.round(defaults.videoResolution * defaults.videoRatio)});
+                $input.height.options({value: defaults.videoResolution});
+                ['item', 'document', 'list', 'edit', 'text'].forEach(function(key) {
+                    $input[key].options({value: defaults[key]});
+                });
+                ['position', 'in', 'out'].forEach(function(key) {
+                    validatePosition(key);
+                });
+                updateHTML();
                 callback && callback();
             });
-        });
-    }
-
-    function updateEditDefaults(callback) {
-        api.getEdit({
-            id: $input.edit.value(),
-            keys: ['duration']
-        }, function(result) {
-            duration = result.data.duration;
-            callback();
-        });
-    }
-
-    function updateItemDefaults(callback) {
-        api.get({
-            id: $input.item.value(),
-            keys: ['aspectratio', 'duration']
-        }, function(result) {
-            duration = result.data.duration;
-            videoRatio = result.data.aspectratio;
-            callback();
         });
     }
 
@@ -881,7 +830,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         var advanced = $input.advanced.value(),
             type = $input.type.value(),
             view = $list.options('selected')[0];
-        $input.text[type == 'link' ? 'show' : 'hide']();
+        $input.description.options({title: Ox.getObjectById(views, view).description});
+        $input.link[type == 'link' ? 'show' : 'hide']();
         $input.size[type == 'iframe' ? 'show' : 'hide']();
         $input.site[advanced ? 'show' : 'hide']();
         viewInputs.forEach(function(key) {
@@ -917,13 +867,75 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
     function validateId(key) {
         // key can be item, document, list, edit, text
         pandora.api['get' + (key == 'item' ? '' : Ox.toTitleCase(key))]({
-            id: $input[key].value();
+            id: $input[key].value(),
+            keys: key == 'item' ? ['aspectratio', 'duration']
+                : key == 'edit' ? ['duration']
+                : []
         }, function(result) {
-            if (result.data.status == 404) {
+            if (result.status == 200) {
+                if (key == 'item' || key == 'edit') {
+                    duration = result.data.duration;
+                    ['position', 'in', 'out'].forEach(function(key) {
+                        validatePosition(key);
+                    });
+                }
+                if (key == 'item') {
+                    videoRatio = result.data.aspectratio;
+                    // ...
+                }
+            } else {
                 $input[key].value(defaults[key]);
                 updateHTML();
             }
         });
+    }
+
+    function validatePosition(key) {
+        // key can be position, in, out, annotation
+        var hasInAndOut = $input['in'].options('value') !== '';
+        if ($input[key].value()) {
+            if (key == 'position') {
+                $input.position.options({
+                    value: limitPoint(
+                        data.value,
+                        hasInAndOut ? $input['in'].options('value') : 0,
+                        hasInAndOut ? $input.out.options('value') : duration
+                    )
+                });
+                $input.annotation.options({value: ''});
+            } else if (key == 'in') {
+                $input['in'].options({
+                    value: limitPoint(data.value, 0, duration)
+                });
+                if ($input.out.options('value') === '') {
+                    $input.out.options({value: Ox.formatDuration(duration)});
+                } else if (
+                    Ox.parseDuration($input.out.options('value'))
+                    < Ox.parseDuration(data.value)
+                ) {
+                    $input.out.options({value: data.value});
+                }
+                $input.annotation.options({value: ''});
+            } else if (key == 'out') {
+                $input.out.options({
+                     value: limitPoint(data.value, 0, duration)
+                 });
+                 if ($input['in'].options('value') === '') {
+                     $input['in'].options({value: Ox.formatDuration(0)});
+                 } else if (
+                     Ox.parseDuration($input['in'].options('value'))
+                     > Ox.parseDuration(data.value)
+                 ) {
+                     $input['in'].options({value: data.value});
+                 }
+                 $input.annotation.options({value: ''});
+            } else if (key == 'annotation') {
+                // TODO: validate
+                ['position', 'in', 'out'].forEach(function(key) {
+                    $input[key].options({value: ''});
+                });
+            }
+        }
     }
 
     return that;
