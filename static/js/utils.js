@@ -179,6 +179,7 @@ pandora.addFolderItem = function(section) {
         // FIXME: collapsing sets ui showFolder,
         // but should work the other way around
         // (same applies to addText, below)
+        $folderList = pandora.$ui.folderList.personal;
         pandora.$ui.folder[0].options({collapsed: false});
         Ox.Request.clearCache(isItems ? 'findLists' : 'findEdits');
         $folderList.bindEventOnce({
