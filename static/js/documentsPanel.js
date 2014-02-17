@@ -396,6 +396,12 @@ pandora.ui.documentsPanel = function(options) {
         pandora.$ui.documentsList = $list;
     }
 
+    // to determine the width of the find input inside
+    // the documents dialog, that dialog has to be present
+    setTimeout(function() {
+        $findInput.options({width: getFindInputWidth()});
+    });
+
     that.bindEvent(
         'pandora_documentsselection.' + (isItemView ? ui.item.toLowerCase() : ''),
         selectDocuments
@@ -451,6 +457,17 @@ pandora.ui.documentsPanel = function(options) {
 
     function getOrderButtonTooltip() {
         return Ox._(ui.documentsSort[0].operator == '+' ? 'Ascending' : 'Descending');
+    }
+
+    function getFindInputWidth() {
+        // 2 * 128px selects + 2 * 16px buttons + 4 * 4px margins = 304px
+        return Math.min(192, (
+            isItemView
+            ? window.innerWidth - (ui.showSidebar * ui.sidebarSize) - 1
+                - (ui.showDocument * ui.documentSize)
+            : pandora.$ui.documentsDialog.options('width')
+                - ui.documentSize - 1
+        ) - 304);
     }
 
     function getPreviewSize() {
@@ -895,6 +912,7 @@ pandora.ui.documentsPanel = function(options) {
     };
 
     that.updateSize = function() {
+        $findInput.options({width: getFindInputWidth()});
         $list.size();
     };
 
