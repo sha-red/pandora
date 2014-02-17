@@ -66,6 +66,7 @@ pandora.ui.filterForm = function(options) {
             })
         );
         that.getList = that.$filter.getList;
+        that.value = that.$filter.value;
     });
     that.updateResults = function() {
         if (mode == 'list') {
@@ -81,14 +82,15 @@ pandora.ui.filterForm = function(options) {
                     pandora.$ui.editPanel.updatePanel();
                 });
             } else {
-                pandora.$ui.list && pandora.$ui.list.bindEventOnce({
-                    init: function(data) {
-                        pandora.$ui.folderList[
-                            pandora.getListData().folder
-                        ].value(list.id, 'query', that.$filter.options('value'));
-                    }
-                })
-                .reloadList();
+                pandora.$ui.list && pandora.$ui.list
+                    .bindEventOnce({
+                        init: function(data) {
+                            pandora.$ui.folderList[
+                                pandora.getListData().folder
+                            ].value(list.id, 'query', that.$filter.options('value'));
+                        }
+                    })
+                    .reloadList();
                 pandora.$ui.filters && pandora.$ui.filters.forEach(function($filter) {
                     $filter.reloadList();
                 });
