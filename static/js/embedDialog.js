@@ -240,7 +240,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             options = Ox.serialize({
                 title: data.title || void 0,
                 showTimeline: data.showTimeline || void 0,
-                timeline: data.timeline && data.timeline != 'default' ? data.timeline : void 0,
+                timeline: data.timeline || void 0,
                 showAnnotations: data.showAnnotations || void 0,
                 showLayers: data.showAnnotations && data.showLayers ? data.showLayers : void 0,
                 matchRatio: Ox.contains(['video', 'edit'], view) ? data.matchRatio || void 0 : void 0,
@@ -284,7 +284,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
 
     function formatValue(value) {
         // See Ox.URL (encodeValue)
-        var chars = isItem ? '/#%' : '*=&|()#%',
+        var chars = '*=&|()#%',
             ret = '';
         value.toString().split('').forEach(function(char) {
             var index = chars.indexOf(char);
@@ -292,11 +292,10 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 ? '%' + char.charCodeAt(0).toString(16).toUpperCase()
                 : char;
         });
-        ret = ret.replace(/_/g, '%09').replace(/\s/g, '_');
-        if (!isItem) {
-            ret = ret.replace(/</g, '%0E').replace(/>/g, '%0F');
-        }
-        return ret;
+        return ret.replace(/_/g, '%09')
+            .replace(/\s/g, '_')
+            .replace(/</g, '%0E')
+            .replace(/>/g, '%0F');
     }
 
     function getForm() {
@@ -663,14 +662,10 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .appendTo($form);
 
         $input.timeline = Ox.Select({
-                items: [
-                    {id: 'default', title: Ox._('Default')}
-                ].concat(
-                    pandora.site.timelines
-                ),
+                items: pandora.site.timelines,
                 label: Ox._('Timeline'),
                 labelWidth: labelWidth,
-                value: 'default',
+                value: pandora.site.user.ui.videoTimeline,
                 width: formWidth
             })
             .addClass('advanced')
