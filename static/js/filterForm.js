@@ -73,10 +73,10 @@ pandora.ui.filterForm = function(options) {
             if (pandora.user.ui.section == 'edits') {
                 pandora.$ui.folderList[
                     pandora.getListData().folder
-                ].value(list.id, 'query', that.$filter.options('query'));
+                ].value(list.id, 'query', that.$filter.options('value'));
                 pandora.api.editEdit({
                     id: list.id,
-                    query: that.$filter.options('query')
+                    query: that.$filter.options('value')
                 }, function(result) {
                     pandora.$ui.editPanel.updatePanel();
                 });
@@ -85,7 +85,7 @@ pandora.ui.filterForm = function(options) {
                     init: function(data) {
                         pandora.$ui.folderList[
                             pandora.getListData().folder
-                        ].value(list.id, 'query', that.$filter.options('query'));
+                        ].value(list.id, 'query', that.$filter.options('value'));
                     }
                 })
                 .reloadList();
@@ -94,7 +94,7 @@ pandora.ui.filterForm = function(options) {
                 });
             }
         } else {
-            pandora.UI.set({find: Ox.clone(that.$filter.options('query'), true)});
+            pandora.UI.set({find: Ox.clone(that.$filter.options('value'), true)});
             pandora.$ui.findElement.updateElement();
         }
     };
