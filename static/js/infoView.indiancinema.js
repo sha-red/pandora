@@ -267,7 +267,7 @@ pandora.ui.infoView = function(data) {
                         format: function(value) {
                             return formatLink(value.split(', '), 'name');
                         },
-                        placeholder: formatLight('Unknown Director'),
+                        placeholder: formatLight(Ox._('Unknown Director')),
                         tooltip: canEdit ? pandora.getEditTooltip() : '',
                         value: data.director ? data.director.join(', ') : ''
                     })
@@ -613,7 +613,7 @@ pandora.ui.infoView = function(data) {
                 items = {};
             if (result.data.items) {
                 result.data.items.forEach(function(item) {
-                    var year = item.year || 'Unknown Year';
+                    var year = item.year || Ox._('Unknown Year');
                     if (key == 'name' && result.data.items.length > 1) {
                         item.roles = nameKeys.filter(function(nameKey) {
                             return Ox.contains(item[nameKey], value);
@@ -756,7 +756,7 @@ pandora.ui.infoView = function(data) {
                                 .replace('see item', 'see the item')
                                 .replace('play video', 'play the full video')
                                 .replace('download video', 'download the video'),
-                            [canEdit ? Ox.toTitleCase(userLevel) : Ox._('You')]),
+                            [canEdit ? Ox._(Ox.toTitleCase(userLevel)) : Ox._('You')]),
                         title: capability.symbol,
                         type: 'image'
                     })
@@ -899,7 +899,7 @@ pandora.ui.infoView = function(data) {
                             format: function(value) {
                                 return formatValue(key, value);
                             },
-                            placeholder: formatLight('unknown'),
+                            placeholder: formatLight(Ox._('unknown')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: getValue(key, data[key])
                         })

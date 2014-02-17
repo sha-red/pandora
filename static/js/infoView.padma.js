@@ -628,7 +628,7 @@ pandora.ui.infoView = function(data) {
                                 .replace('see item', 'see the item')
                                 .replace('play video', 'play the full video')
                                 .replace('download video', 'download the video'),
-                            [canEdit ? Ox.toTitleCase(userLevel) : Ox._('You')]),
+                            [canEdit ? Ox._(Ox.toTitleCase(userLevel)) : Ox._('You')]),
                         title: capability.symbol,
                         type: 'image'
                     })
