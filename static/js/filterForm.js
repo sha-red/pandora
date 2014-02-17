@@ -3,6 +3,7 @@
 'use strict';
 
 pandora.ui.filterForm = function(options) {
+    // mode can be find, list, embed
     var list = options.list,
         mode = options.mode,
         that = Ox.Element();
@@ -46,7 +47,11 @@ pandora.ui.filterForm = function(options) {
             .css(mode == 'embed' ? {} : {padding: '16px'})
             .bindEvent({
                 change: function(data) {
-                    if (mode == 'list') {
+                    if (mode == 'find') {
+                        if (pandora.user.ui.updateAdvancedFindResults) {
+                            that.updateResults();
+                        }
+                    } else if (mode == 'list') {
                         pandora.api.editList({
                             id: list.id,
                             query: data.value
@@ -55,8 +60,6 @@ pandora.ui.filterForm = function(options) {
                                 that.updateResults();
                             }
                         });
-                    } else if (pandora.user.ui.updateAdvancedFindResults) {
-                        that.updateResults();
                     }
                     that.triggerEvent('change', data);
                 }
