@@ -1911,7 +1911,8 @@ pandora.logEvent = function(data, event, element) {
     if (!Ox.contains([
         'mousedown', 'mouserepeat', 'anyclick', 'singleclick', 'doubleclick', 'mousewheel',
         'dragstart', 'drag', 'dragenter', 'dragleave', 'dragpause', 'dragend',
-        'draganddropstart', 'draganddrop', 'draganddropenter', 'draganddropleave', 'draganddropend',
+        'draganddropstart', 'draganddrop', 'draganddropenter',
+        'draganddropleave', 'draganddroppause', 'draganddropend',
         'playing', 'position', 'progress', 'request'
     ], event) && !Ox.startsWith(event, 'pandora_')) {
         try {
