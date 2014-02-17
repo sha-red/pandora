@@ -39,8 +39,8 @@ pandora.ui.filterForm = function(options) {
                     sort: pandora.user.ui.listSort,
                     view: pandora.user.ui.listView
                 } : null,
-                query: Ox.clone(mode == 'list' ? list.query : pandora.user.ui.find, true),
                 sortKeys: pandora.site.sortKeys,
+                value: Ox.clone(mode == 'list' ? list.query : pandora.user.ui.find, true),
                 viewKeys: pandora.site.listViews
             })
             .css(mode == 'embed' ? {} : {padding: '16px'})
@@ -49,7 +49,7 @@ pandora.ui.filterForm = function(options) {
                     if (mode == 'list') {
                         pandora.api.editList({
                             id: list.id,
-                            query: data.query
+                            query: data.value
                         }, function(result) {
                             if (pandora.user.ui.updateAdvancedFindResults) {
                                 that.updateResults();
