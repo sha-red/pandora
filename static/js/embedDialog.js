@@ -319,8 +319,6 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             .css(css)
             .appendTo($form);
 
-        space().appendTo($form);
-
         $input.type = Ox.ButtonGroup({
                 buttons: [
                     {id: 'link', title: Ox._('Embed in Texts Section'), width: formWidth / 2, selected: true},
