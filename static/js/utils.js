@@ -2000,15 +2000,21 @@ pandora.renameList = function(oldId, newId, newName, folder) {
         // fixme: ugly
         // ... does this always coincide with triggerEvents = false, as below?
         pandora.replaceURL = true;
+        pandora.UI.set('lists.' + pandora.UI.encode(newId), pandora.user.ui.lists[oldId], false);
         pandora.UI.set({
             find: {
                 conditions: [{key: 'list', value: newId, operator: '=='}],
                 operator: '&'
             }
         }, false);
+        pandora.UI.set('lists.' + pandora.UI.encode(oldId), null, false);
+
     } else {
         pandora.replaceURL = true;
+        pandora.UI.set(pandora.user.ui.section + '.' + pandora.UI.encode(newId),
+                pandora.user.ui[pandora.user.ui.section][oldId], false);
         pandora.UI.set(pandora.user.ui.section.slice(0, -1), newId);
+        pandora.UI.set(pandora.user.ui.section + '.' + pandora.UI.encode(oldId), null, false);
     }
 };
 
