@@ -235,6 +235,11 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             view = $list.options('selected')[0],
             data = Ox.map($input, function($element, key) {
                 return Ox.contains(Ox.getObjectById(views, view).inputs, key)
+                    && (
+                        !Ox.contains(['map', 'calendar'], view)
+                        || ($input.mapMode.value() == 'item' && key != 'find')
+                        || ($input.mapMode.value() == 'find' && key != 'item')
+                    )
                     && $element.value ? $element.value() : void 0;
             }),
             options = Ox.serialize({
@@ -269,12 +274,11 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             )
             + (
                 Ox.contains(['info', 'timeline'], view) ? '/' + view
+                : view == 'video' ? '/player'
                 : Ox.contains(['grid', 'map', 'calendar'], view) ? (data.mapMode == 'item' ? '/' : '') + view
                 : ''
             )
-            + (
-                Ox.contains(['grid', 'map', 'calendar'], view) ? '/' + data.sort : ''
-            )
+            + (data.sort ? '/' + data.sort : '')
             + (data.find ? '/' + formatFind(data.find) : '')
             + (position ? '/' + position : '')
             + '#embed'
