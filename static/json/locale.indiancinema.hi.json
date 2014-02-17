@@ -20,11 +20,11 @@
   "Lists and Texts": "सूचियों और पाठ",
   "Loading {0}...": "लोडिंग {0}...",
   "Lyricist": "गीतकार",
-  "Movie": "चलचित्र",
   "Movies": "चलचित्र",
+  "Movie": "चलचित्र",
+  "No comments": "टिप्पणियां नहीं है",
   "No Description": "विवरण नहीं है",
   "No Summary": "सारांश नहीं है",
-  "No comments": "टिप्पणियां नहीं है",
   "Number of Actors": "अभिनेताओं कि संख्या ",
   "Number of Parts": "भागों कि संख्या ",
   "Only {0} can see and edit these comments": "केवल {0} इन टिप्पणियों को देख व संपादित कर सकते हैं",
@@ -37,6 +37,6 @@
   "This movie is still under copyright.": "यह फ़िल्म पर अभी तक कॉपीराइट लागु है ",
   "Under Copyright": "कॉपीराइट लागु",
   "Wiki": "विकी",
-  "Writer": "लेखक",
-  "with the same IMDb ID": "एक सामान IMDb आईडी वाला "
+  "with the same IMDb ID": "एक सामान IMDb आईडी वाला ",
+  "Writer": "लेखक"
 }
