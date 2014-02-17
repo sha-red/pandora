@@ -275,7 +275,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             + (
                 Ox.contains(['grid', 'map', 'calendar'], view) ? '/' + data.sort : ''
             )
-            + (data.find ? formatFind(data.find) : '')
+            + (data.find ? '/' + formatFind(data.find) : '')
             + (position ? '/' + position : '')
             + '#embed'
             + (options ? '?' + options : '')
@@ -911,7 +911,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         } else {
             options.view = 'text';
         }
-        options.mapMode = !ui.item ? 'list' : 'item';
+        options.mapMode = !ui.item ? 'find' : 'item';
         options.item = ui.item;
         options.document = ui.documentsSelection[ui.item][0] || '';
         options.list = ui._list;
