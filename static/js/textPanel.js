@@ -387,21 +387,21 @@ pandora.ui.textHTML = function(text) {
 
     function getHeight() {
         // 24 menu + 24 toolbar + 16 statusbar + 32 title + 32 margins
-        // + 1px to ge trid of scrollbar
-        return window.innerHeight - 128 -1;
+        // + 1px to get rid of scrollbar
+        return window.innerHeight - 128 - 1;
     }
 
     function getWidth() {
         return window.innerWidth
             - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
             - pandora.user.ui.embedSize - 1
-            - 32 - 16;
+            - 32 - Ox.UI.SCROLLBAR_SIZE;
     }
 
 
     function scrollTo(position) {
         scrolling = true;
-        that[0].scrollTop = that[0].scrollHeight/100 * position;
+        that[0].scrollTop = that[0].scrollHeight / 100 * position;
     }
 
     function scrollToPosition() {
