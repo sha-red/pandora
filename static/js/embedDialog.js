@@ -190,6 +190,34 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         updateDefaults(true);
     });
 
+    function formatCondition(condition) {
+        // See Ox.URL (constructCondition)
+        var key = condition.key == '*' ? '' : condition.key,
+            operator = condition.operator,
+            value = (
+                Ox.isArray(condition.value) ? condition.value : [condition.value]
+            ).map(formatValue).join(',');
+        if (!key) {
+            operator = operator.replace('=', '');
+        } else if (operator.indexOf('^') > -1) {
+            operator = operator.replace('^', '=');
+            value += '*';
+        } else if (operator.indexOf('$') > -1) {
+            operator = operator.replace('$', '=');
+            value = '*' + value;
+        }
+        return [key, operator, value].join('');
+    }
+
+    function formatFind(find) {
+        // See Ox.URL (constructFind)
+        return find.conditions.map(function(condition) {
+            return condition.conditions
+                ? '(' + formatFind(condition) + ')'
+                : formatCondition(condition);
+        }).join(find.operator);
+    }
+
     function formatHTML() {
         var type = $input.type.value();
         return type == 'link'
@@ -247,10 +275,28 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             + (
                 Ox.contains(['grid', 'map', 'calendar'], view) ? '/' + data.sort : ''
             )
+            + (data.find ? formatFind(data.find) : '')
             + (position ? '/' + position : '')
             + '#embed'
             + (options ? '?' + options : '')
         ).replace(/ /g, '_');
+    }
+
+    function formatValue(value) {
+        // See Ox.URL (encodeValue)
+        var chars = isItem ? '/#%' : '*=&|()#%',
+            ret = '';
+        value.toString().split('').forEach(function(char) {
+            var index = chars.indexOf(char);
+            ret += index > -1
+                ? '%' + char.charCodeAt(0).toString(16).toUpperCase()
+                : char;
+        });
+        ret = ret.replace(/_/g, '%09').replace(/\s/g, '_');
+        if (!isItem) {
+            ret = ret.replace(/</g, '%0E').replace(/>/g, '%0F');
+        }
+        return ret;
     }
 
     function getForm() {
@@ -555,6 +601,9 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
 
         $input.find = pandora.ui.filterForm({mode: 'embed'})
             .css(css)
+            .bindEvent({
+                change: updateHTML
+            })
             .appendTo($form);
 
         $input.sort = Ox.Select({
