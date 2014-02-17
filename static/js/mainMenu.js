@@ -944,8 +944,8 @@ pandora.ui.mainMenu = function() {
             isEditView = ui.section == 'edits' && ui.edit
                 && ui.editView != 'annotations', // FIXME: focus
             listName = isVideoView || isClipView ? ''
-                : ui.section == 'items' ? 'from List'
-                : 'from Edit',
+                : ui.section == 'items' ? Ox._('from List')
+                : Ox._('from Edit'),
             listItemsName = Ox._(
                 ui.section == 'edits' || isVideoView || isClipView ? 'Clips'
                 : pandora.site.itemName.plural
