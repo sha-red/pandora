@@ -757,7 +757,6 @@
         "newsletter": true,
         "ui": {
             "annotationsCalendarSize": 128,
-            "annotationsFont": "small",
             "annotationsMapSize": 128,
             "annotationsRange": "all",
             "annotationsSize": 256,

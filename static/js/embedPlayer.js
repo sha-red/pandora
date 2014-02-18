@@ -5,7 +5,6 @@ pandora.ui.embedPlayer = function() {
     var that = Ox.Element(),
         ui = pandora.user.ui,
         defaults = {
-            annotationsFont: ui.annotationsFont,
             annotationsRange: ui.annotationsRange,
             annotationsSort: ui.annotationsSort,
             invertHighlight: true,
@@ -219,7 +218,6 @@ pandora.ui.embedPlayer = function() {
             }
             $annotations = Ox.AnnotationPanel(Ox.extend({
                 clickLink: pandora.clickLink,
-                font: options.annotationsFont,
                 layers: video.annotations,
                 position: options.position,
                 range: options.annotationsRange,

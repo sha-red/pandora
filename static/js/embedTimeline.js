@@ -5,7 +5,6 @@ pandora.ui.embedTimeline = function() {
     var that = Ox.Element(),
         ui = pandora.user.ui,
         defaults = {
-            annotationsFont: ui.annotationsFont,
             annotationsRange: ui.annotationsRange,
             annotationsSort: ui.annotationsSort,
             paused: true,
@@ -104,7 +103,6 @@ pandora.ui.embedTimeline = function() {
             }
             $annotations = Ox.AnnotationPanel(Ox.extend({
                 clickLink: pandora.clickLink,
-                font: options.annotationsFont,
                 layers: video.annotations,
                 position: options.position,
                 range: options.annotationsRange,

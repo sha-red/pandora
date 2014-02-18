@@ -8,7 +8,6 @@ pandora.ui.player = function(data) {
 
         that = Ox.VideoPlayerPanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
-            annotationsFont: ui.annotationsFont,
             annotationsMapSize: ui.annotationsMapSize,
             annotationsRange: ui.annotationsRange,
             annotationsSize: ui.annotationsSize,
@@ -56,9 +55,6 @@ pandora.ui.player = function(data) {
             volume: ui.videoVolume,
             width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
         }).bindEvent({
-            annotationsfont: function(data) {
-                pandora.UI.set({annotationsFont: data.font});
-            },
             annotationsrange: function(data) {
                 pandora.UI.set({annotationsRange: data.range});
             },

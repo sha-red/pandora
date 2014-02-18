@@ -8,7 +8,6 @@ pandora.ui.timeline = function(data) {
 
         that = Ox.VideoTimelinePanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
-            annotationsFont: ui.annotationsFont,
             annotationsMapSize: ui.annotationsMapSize,
             annotationsRange: ui.annotationsRange,
             annotationsSize: ui.annotationsSize,
@@ -57,9 +56,6 @@ pandora.ui.timeline = function(data) {
             width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
         })
         .bindEvent({
-            annotationsfont: function(data) {
-                pandora.UI.set({annotationsFont: data.font});
-            },
             annotationsrange: function(data) {
                 pandora.UI.set({annotationsRange: data.range});
             },

@@ -75,7 +75,6 @@ pandora.ui.editPanel = function(isEmbed) {
         }
         that = pandora.$ui.editPanel = Ox.VideoEditPanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
-            annotationsFont: ui.annotationsFont,
             annotationsMapSize: ui.annotationsMapSize,
             annotationsRange: ui.annotationsRange,
             annotationsSize: ui.annotationsSize,

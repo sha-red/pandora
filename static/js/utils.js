@@ -1045,7 +1045,7 @@ pandora.getFoldersWidth = function(section) {
 
 pandora.getHash = function(state, callback) {
     var embedKeys = [
-            'annotationsFont', 'annotationsRange', 'annotationsSort',
+            'annotationsRange', 'annotationsSort',
             'embed',
             'ignoreRights', 'invertHighlight',
             'matchRatio',
