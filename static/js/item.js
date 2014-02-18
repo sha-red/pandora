@@ -140,7 +140,7 @@ pandora.ui.item = function() {
                 videopointsEvent,
                 function(data, event, element) {
                     var options = {};
-                    if (event == videopointsEvent) {
+                    if (pandora.user.ui.item && event == videopointsEvent) {
                         //Ox.print('DATA.VALUE', JSON.stringify(data.value));
                         if (data && data.value && data.value.annotation) {
                             options.selected = pandora.user.ui.item + '/' + data.value.annotation;
