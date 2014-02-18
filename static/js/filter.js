@@ -89,8 +89,7 @@ pandora.ui.filter = function(id) {
                     'name',
                     Ox._(Ox.getObjectById(pandora.site.filters, id).title)
                     + '<div class="OxColumnStatus OxLight">'
-                    + (data.items ? Ox.formatNumber(data.items) : '')
-                    + '</div>'
+                    + Ox.formatNumber(data.items) + '</div>'
                 );
             },
             paste: function(data) {
