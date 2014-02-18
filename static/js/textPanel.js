@@ -398,7 +398,6 @@ pandora.ui.textHTML = function(text) {
             - 32 - Ox.UI.SCROLLBAR_SIZE;
     }
 
-
     function scrollTo(position) {
         scrolling = true;
         that[0].scrollTop = that[0].scrollHeight / 100 * position;
