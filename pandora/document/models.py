@@ -42,9 +42,6 @@ class Document(models.Model):
     description = models.TextField(default="")
     oshash = models.CharField(max_length=16, unique=True, null=True)
 
-    #type of document, i.e. booklet etc
-    type = models.CharField(max_length=1024, null=True)
-
     file = models.FileField(default=None, blank=True,null=True, upload_to=lambda f, x: f.path(x))
 
     objects = managers.DocumentManager()
@@ -123,11 +120,6 @@ class Document(models.Model):
                 self.name = name
             elif key == 'description' and not item:
                 self.description = ox.sanitize_html(data['description'])
-            elif key == 'type':
-                if not data['type']:
-                    self.type = None
-                else:
-                    self.type = ox.sanitize_html(data['type'])
         if item:
             p, created = ItemProperties.objects.get_or_create(item=item, document=self)
             if 'description' in data:
@@ -156,7 +148,6 @@ class Document(models.Model):
                 'extension',
                 'oshash',
                 'size',
-                'type',
                 'ratio',
                 'user',
             ]
