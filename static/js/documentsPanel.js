@@ -811,10 +811,11 @@ pandora.ui.documentsPanel = function(options) {
                 [selected.length ? 'enableItem' : 'disableItem']('remove');
         } else {
             $itemMenu.setItemTitle('add', Ox._('Add {0} to {1} {2}', [
+                    string,
                     Ox._(hasListSelection ? 'Selected' : 'Current'),
-                    string, Ox._(pandora.site.itemName[
-                    hasListSelection && ui.listSelection.length > 1
-                    ? 'plural' : 'singular'])
+                    Ox._(pandora.site.itemName[
+                        hasListSelection && ui.listSelection.length > 1
+                        ? 'plural' : 'singular'])
                 ]))
                 .setItemTitle('replace', Ox._('Replace {0}...', [string]))
                 .setItemTitle('delete', Ox._('Delete {0}...',  [string]))
