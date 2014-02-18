@@ -115,8 +115,8 @@ pandora.ui.info = function() {
                             .bindEvent({
                                 click: function(data) {
                                     pandora.UI.set(
-                                        'videoPoints.' + id,
-                                        {'in': 0, out: 0, position: data.position}
+                                        'videoPoints.' + id + '.position',
+                                        data.position
                                     );
                                     if (ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1) {
                                         pandora.$ui[ui.itemView].options({
