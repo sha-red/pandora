@@ -745,14 +745,12 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
     }
 
     function limitPoint(value, min, max) {
-        /*
         if (Ox.typeOf(min) == 'number') {
             min = Ox.formatDuration(min)
         }
         if (Ox.typeOf(max) == 'number') {
             max = Ox.formatDuration(max)
         }
-        */
         return Ox.formatDuration(
             Ox.limit(
                 Ox.parseDuration(value),
@@ -915,7 +913,9 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         }
         options.mapMode = !ui.item ? 'find' : 'item';
         options.item = ui.item;
-        options.document = ui.documentsSelection[ui.item][0] || '';
+        options.document = ui.documentsSelection[ui.item] && ui.documentsSelection[ui.item].length
+            ? ui.documentsSelection[ui.item][0]
+            : '';
         options.list = ui._list;
         options.edit = ui.edit;
         options.text = ui.text;
@@ -927,6 +927,9 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 ['position', 'in', 'out'].forEach(function(key) {
                     options[key] = ui.videoPoints[ui.item][key] || '';
                 });
+            }
+            if (pandora.$ui[pandora.user.ui.videoView]) {
+                duration = pandora.$ui[pandora.user.ui.videoView].options('duration');
             }
         }
         Ox.forEach(options, function(value, key) {
