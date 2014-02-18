@@ -53,13 +53,6 @@ pandora.ui.documentsPanel = function(options) {
                 width: 64
             },
             {
-                id: 'type',
-                operator: '+',
-                title: Ox._('Type'),
-                visible: true,
-                width: 128
-            },
-            {
                 id: 'description',
                 operator: '+',
                 title: Ox._('Description'),
@@ -651,14 +644,6 @@ pandora.ui.documentsPanel = function(options) {
                         label: Ox._('Username'),
                         labelWidth: labelWidth,
                         value: item.user,
-                        width: width
-                    }),
-                    Ox.Input({
-                        disabled: !editable,
-                        id: 'type',
-                        label: Ox._('Type'),
-                        labelWidth: labelWidth,
-                        value: item.type,
                         width: width
                     }),
                     Ox.Input({
