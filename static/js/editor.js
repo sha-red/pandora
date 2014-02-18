@@ -52,6 +52,7 @@ pandora.ui.editor = function(data) {
             selected: ui.videoPoints[ui.item].annotation
                 ? ui.item + '/' + ui.videoPoints[ui.item].annotation
                 : '',
+            selectResult: !pandora._dontSelectResult,
             showAnnotations: ui.showAnnotations,
             showAnnotationsCalendar: ui.showAnnotationsCalendar,
             showAnnotationsMap: ui.showAnnotationsMap,
@@ -288,6 +289,7 @@ pandora.ui.editor = function(data) {
                 that.options({timeline: data.value});
             }
         });
+    pandora._dontSelectResult = false;
 
     function updateBrowser() {
         pandora.$ui.browser.find('img[src*="/' + ui.item + '/"]').each(function() {

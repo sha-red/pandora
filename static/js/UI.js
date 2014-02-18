@@ -147,6 +147,12 @@ pandora.UI = (function() {
                     // add default video points
                     add['videoPoints.' + item] = {annotation: '', 'in': 0, out: 0, position: 0};
                 }
+                if (
+                    args['videoPoints.' + item]
+                    && (!pandora.user.ui.item || pandora.user.ui.itemView != 'editor')
+                ) {
+                    pandora._dontSelectResult = true;
+                }
             }
 
             if (['timeline', 'player', 'editor'].indexOf(args.itemView) > -1) {
