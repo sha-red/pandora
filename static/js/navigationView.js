@@ -152,6 +152,9 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 zoombar: true
             })
             .bindEvent({
+                find: function(data) {
+                    pandora.UI.set({mapFind: data.value});
+                },
                 resize: function() {
                     $element.resizeMap();
                 },
