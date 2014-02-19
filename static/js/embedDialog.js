@@ -168,7 +168,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                     })
                     .bindEvent({
                         click: function() {
-                            callback($input.url.options('value'));
+                            callback && callback($input.html.options('value'));
                             that.close();
                         }
                     })
