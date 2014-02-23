@@ -31,8 +31,8 @@ pandora.ui.similarClipsDialog = function() {
 
         $clipButtons = Ox.ButtonGroup({
                 buttons: [
-                    {id: 'previous', title: 'left', disabled: true},
-                    {id: 'next', title: 'right', disabled: true}
+                    {id: 'previous', title: 'left', tooltip: Ox._('Previous Clip'), disabled: true},
+                    {id: 'next', title: 'right', tooltip: Ox._('Next Clip'), disabled: true}
                 ],
                 type: 'image'
             })
