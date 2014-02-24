@@ -15,6 +15,7 @@
 Now login as ubuntu/ubuntu and run the following commands:
 
     $ sudo su
+    $ apt-get update
     $ apt-get -y install avahi-daemon curl
     $ cd /root
     $ curl 'https://wiki.0x2620.org/browser/pandora/vm/firstboot.sh?format=txt' > firstboot.sh
