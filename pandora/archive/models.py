@@ -372,6 +372,7 @@ class File(models.Model):
             'path': self.path,
             'resolution': resolution,
             'samplerate': self.samplerate,
+            'channels': self.channels,
             'selected': self.selected,
             'size': self.size,
             'type': self.type,
