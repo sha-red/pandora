@@ -776,10 +776,10 @@ class Item(models.Model):
             return sort_value
 
         def set_value(s, name, value):
-            if not value:
-                value = None
             if isinstance(value, basestring):
                 value = ox.decode_html(value.lower())
+                if not value:
+                    value = None
             setattr(s, name, value)
 
         base_keys = (
