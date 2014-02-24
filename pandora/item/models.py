@@ -383,6 +383,17 @@ class Item(models.Model):
                 if key in self.data:
                     del self.data[key]
 
+        # update defaults
+        if settings.USE_IMDB:
+            defaults = filter(lambda k: 'default' in k, settings.CONFIG['itemKeys'])
+            for k in defaults:
+                if len(self.itemId) == 7:
+                    if k['id'] in self.data and self.data[k['id']] == k['default']:
+                        del self.data[k['id']]
+                else:
+                    if k['id'] not in self.data:
+                        self.data[k['id']] = k['default']
+
         if self.poster and os.path.exists(self.poster.path):
             self.poster_height = self.poster.height
             self.poster_width = self.poster.width
