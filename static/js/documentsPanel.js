@@ -564,6 +564,7 @@ pandora.ui.documentsPanel = function(options) {
                 )
                 .append(
                     $description = Ox.EditableContent({
+                        clickLink: pandora.clickLink,
                         editable: editable,
                         format: function(value) {
                             return '<div class="OxLight" style="text-align: center">'
