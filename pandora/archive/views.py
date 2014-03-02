@@ -269,6 +269,7 @@ def firefogg_upload(request):
                 f.streams.all().delete()
                 f.delete_frames()
                 f.uploading = True
+                f.failed = False
                 f.save()
                 if f.item.rendered and f.selected:
                     Item.objects.filter(id=f.item.id).update(rendered=False)
