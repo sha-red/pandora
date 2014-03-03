@@ -30,7 +30,7 @@ class SessionData(models.Model):
 
     timesseen = models.IntegerField(default=0)
     ip = models.CharField(max_length=255, null=True)
-    useragent = models.CharField(max_length=255, null=True)
+    useragent = models.CharField(max_length=4096, null=True)
     windowsize = models.CharField(max_length=255, null=True)
     screensize = models.CharField(max_length=255, null=True)
     info = DictField(default={})
@@ -115,7 +115,7 @@ class SessionData(models.Model):
             data.ip = request.META['REMOTE_ADDR']
         if data.ip.startswith('::ffff:'):
             data.ip = data.ip[len('::ffff:'):]
-        data.useragent = request.META['HTTP_USER_AGENT']
+        data.useragent = request.META['HTTP_USER_AGENT'][:4096]
         data.info = json.loads(request.POST.get('data', '{}'))
         screen = data.info.get('screen', {})
         if screen and 'height' in screen and 'width' in screen:
