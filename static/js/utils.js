@@ -283,7 +283,7 @@ pandora.clickLink = function(e) {
         }
         pandora.URL.push(e.target.pathname, true);
     } else {
-        window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
+        pandora.openLink(e.target.href);
     }
 };
 
@@ -302,7 +302,7 @@ pandora.createLinks = function($element) {
             ) {
                 e.preventDefault();
                 if (isExternalLink(e.target)) {
-                    window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
+                    pandora.openLink(e.target.href);
                 } else {
                     pandora.clickLink(e);
                 }
@@ -1934,6 +1934,14 @@ pandora.logEvent = function(data, event, element) {
                 return handler.toString().split('\n').shift();
             })
         );
+    }
+};
+
+pandora.openLink = function(url) {
+    if (Ox.startsWith(url, 'mailto:')) {
+        window.open(url);
+    } else {
+        window.open('/url=' + encodeURIComponent(url), '_blank');
     }
 };
 
