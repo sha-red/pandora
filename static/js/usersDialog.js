@@ -178,7 +178,7 @@ pandora.ui.usersDialog = function() {
                         title: Ox._('Level'),
                         type: 'label',
                         visible: true,
-                        width: 64
+                        width: 80
                     },
                     {
                         format: function(value) {
