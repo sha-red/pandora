@@ -120,7 +120,6 @@ pandora.ui.preferencesDialog = function() {
                                         }
                                     }),
                                 Ox.Select({
-                                        disabled: pandora.user.level != 'admin',
                                         id: 'locale',
                                         items: Object.keys(Ox.LOCALE_NAMES).map(function(locale) {
                                             return {id: locale, title: Ox.LOCALE_NAMES[locale]}

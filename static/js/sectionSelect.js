@@ -6,8 +6,8 @@ pandora.ui.sectionSelect = function(section) {
             id: 'sectionSelect',
             items: [
                 {id: 'items', title: Ox._(pandora.site.itemName.plural)},
-                {id: 'edits', title: Ox._('Edits'), disabled: pandora.user.level != 'admin'},
-                {id: 'texts', title: Ox._('Texts'), disabled: pandora.user.level != 'admin'}
+                {id: 'edits', title: Ox._('Edits')},
+                {id: 'texts', title: Ox._('Texts')}
             ],
             value: section || pandora.user.ui.section
         }).css({

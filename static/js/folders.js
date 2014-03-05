@@ -232,6 +232,7 @@ pandora.ui.folders = function(section) {
                 })];
             }
         } else if (folder.id == 'featured') {
+            //FIXME: this should use 'canEditFeatured' + section
             if (pandora.user.level != 'admin') {
                 extras = [infoButton(Ox._('Featured ' + folderItems),
                     Ox._('Featured {0} are selected public {0}, picked by the {1} staff.',

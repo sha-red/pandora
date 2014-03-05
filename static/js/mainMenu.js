@@ -56,8 +56,7 @@ pandora.ui.mainMenu = function() {
                                 return {
                                     id: section,
                                     title: section == 'items' ? Ox._(pandora.site.itemName.plural) : Ox._(Ox.toTitleCase(section)),
-                                    checked: ui.section == section,
-                                    disabled: section != 'items' && pandora.user.level != 'admin'
+                                    checked: ui.section == section
                                 };
                             }) }
                         ] },
