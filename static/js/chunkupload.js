@@ -73,10 +73,10 @@ pandora.chunkupload = function(options) {
                 maxRetry = response.maxRetry;
             }
             chunkURL = response.uploadUrl;
-            if (document.location.protocol == 'https:') {
-                chunkURL = chunkURL.replace(/http:\/\//, 'https://');
-            }
             if (chunkURL) {
+                if (document.location.protocol == 'https:') {
+                    chunkURL = chunkURL.replace(/http:\/\//, 'https://');
+                }
                 that.status = 'uploading';
                 that.progress = 0.0;
                 // start upload
