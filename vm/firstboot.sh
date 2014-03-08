@@ -46,6 +46,7 @@ apt-get install -y \
     libav-tools \
     ffmpeg2theora \
     mkvtoolnix \
+    gpac \
     imagemagick \
     poppler-utils \
     ipython \
