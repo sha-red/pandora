@@ -2,15 +2,16 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 
-from datetime import datetime
-import os.path
-import subprocess
-from glob import glob
-import shutil
-import uuid
-import unicodedata
-from urllib import quote
 import json
+import os
+import shutil
+import subprocess
+import tempfile
+import unicodedata
+import uuid
+from datetime import datetime
+from glob import glob
+from urllib import quote
 
 from django.db import models, transaction
 from django.db.models import Q, Sum, Max
@@ -450,6 +451,30 @@ class Item(models.Model):
         if save:
             other.save()
             #FIXME: update poster, stills and streams after this
+
+    def merge_streams(self, output, resolution=None, format="webm"):
+        streams = [s.get(resolution, format).media.path for s in self.streams()]
+        if len(streams) > 1:
+            if format == "webm":
+                first = True
+                cmd = ['mkvmerge', '-o', output]
+                cmd += [streams[0]] + ['+' + s for s in streams[1:]]
+                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p.wait()
+                return True
+            elif format == "mp4":
+                fd, tmp_output = tempfile.mkstemp('.mp4')
+                shutil.copy(streams[0], tmp_output)
+                for s in streams[1:]:
+                    cmd = ['MP4Box', '-cat', s, tmp_output]
+                    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    p.wait()
+                shutil.copy(tmp_output, output)
+                os.unlink(tmp_output)
+                return True
+            else:
+                return None
+        return streams[0] if streams else None
 
     def get_posters(self):
         url = self.prefered_poster_url()
@@ -1190,18 +1215,6 @@ class Item(models.Model):
         ).filter(
             Q(file__is_audio=True)|Q(file__is_video=True)
         ).order_by('file__part', 'file__sort_path')
-
-    def merge_streams(self, output):
-        first = True
-        cmd = ['mkvmerge', '-o', output]
-        streams = [s.media.path for s in self.streams()]
-        if len(streams) > 1:
-            cmd += [streams[0]] + ['+' + s for s in streams[1:]]
-            print cmd
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            p.wait()
-            return True
-        return streams[0] if streams else None
 
     def update_timeline(self, force=False, async=True):
         streams = self.streams()

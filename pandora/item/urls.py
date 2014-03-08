@@ -12,15 +12,17 @@ urlpatterns = patterns("item.views",
     (r'^(?P<id>[A-Z0-9].*)/timeline(?P<mode>[a-z]*)(?P<size>\d+)p(?P<position>\d+)\.(?P<format>png|jpg)$', 'timeline'),
     (r'^(?P<id>[A-Z0-9].*)/timeline(?P<mode>[a-z]*)(?P<size>\d+)p\.(?P<format>png|jpg)$', 'timeline'),
 
+    #download
+    (r'^(?P<id>[A-Z0-9].*)/download$', 'download'),
+    (r'^(?P<id>[A-Z0-9].*)/download/$', 'download'),
+    (r'^(?P<id>[A-Z0-9].*)/download/(?P<resolution>\d+)p\.(?P<format>webm|ogv|mp4)$', 'download'),
+
     #video
     (r'^(?P<id>[A-Z0-9].*)/(?P<resolution>\d+)p(?P<index>\d*)\.(?P<format>webm|ogv|mp4)$', 'video'),
 
     #torrent
     (r'^(?P<id>[A-Z0-9].*)/torrent$', 'torrent'),
     (r'^(?P<id>[A-Z0-9].*)/torrent/(?P<filename>.*?)$', 'torrent'),
-
-    #download
-    (r'^(?P<id>[A-Z0-9].*)/download/$', 'download'),
 
     #export
     (r'^(?P<id>[A-Z0-9].*)/json$', 'item_json'),

@@ -840,51 +840,24 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
         response.allow_access()
     return response
 
-def download(request, id, index=1):
+def download(request, id, resolution=None, format='webm'):
+    print 'download', id, resolution, format
     item = get_object_or_404(models.Item, itemId=id)
-    resolution = max(settings.CONFIG['video']['resolutions'])
-    format = 'webm'
-
-    if not item.access(request.user):
-        return HttpResponseForbidden()
-    if index:
-        index = int(index) - 1
+    if not resolution or int(resolution) not in settings.CONFIG['video']['resolutions']:
+        resolution = max(settings.CONFIG['video']['resolutions'])
     else:
-        index = 0
-    streams = item.streams()
-    if index + 1 > streams.count():
-        raise Http404
-    stream = streams[index].get(resolution, format)
-    if not stream.available or not stream.media:
-        raise Http404
-    path = stream.media.path
-    content_type = mimetypes.guess_type(path)[0]
-    ext = os.path.splitext(path)[-1]
-    filename = "%s - %s %s%s" % (
-        item.get('title'),
-        settings.SITENAME,
-        item.itemId,
-        ext
-    )
-    response = HttpFileResponse(path, content_type=content_type)
-    response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
-    return response
-
-def download(request, id):
-    item = get_object_or_404(models.Item, itemId=id)
-    resolution = max(settings.CONFIG['video']['resolutions'])
+        resolution = int(resolution)
     if not item.access(request.user) or not item.rendered:
         return HttpResponseForbidden()
-    ext = '.webm'
-    filename = "%s - %s %s%s" % (
-        item.get('title'),
-        settings.SITENAME,
-        item.itemId,
-        ext
-    )
+    ext = '.%s' % format
+    parts = ['%s - %s ' % (item.get('title'), settings.SITENAME), item.itemId]
+    if resolution != max(settings.CONFIG['video']['resolutions']):
+        parts.append('.%dp' % resolution)
+    parts.append(ext)
+    filename = ''.join(parts)
     video = NamedTemporaryFile(suffix=ext)
     content_type = mimetypes.guess_type(video.name)[0]
-    r = item.merge_streams(video.name)
+    r = item.merge_streams(video.name, resolution, format)
     if not r:
         return HttpResponseForbidden()
     elif r == True:
