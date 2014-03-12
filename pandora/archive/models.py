@@ -226,8 +226,12 @@ class File(models.Model):
         self.parse_info()
 
     def save(self, *args, **kwargs):
-        if self.id and self.info:
-            self.path = self.normalize_path()
+        update_path = False
+        if self.info:
+            if self.id:
+                self.path = self.normalize_path()
+            else:
+                update_path = True
         if self.item:
             data = self.get_path_info()
             self.extension = data.get('extension')
@@ -257,6 +261,9 @@ class File(models.Model):
             self.available = not self.uploading and \
                 self.streams.filter(source=None, available=True).count() > 0
         super(File, self).save(*args, **kwargs)
+        if update_path:
+            self.path = self.normalize_path()
+            super(File, self).save(*args, **kwargs)
 
     def get_path(self, name):
         h = self.oshash
