@@ -692,6 +692,7 @@
             "videoResolution": 240,
             "videoScale": "fit",
             "videoSize": "small",
+            "videoSubtitles": true,
             "videoTimeline": "antialias",
             "videoView": "player",
             "videoVolume": 1
