@@ -70,25 +70,26 @@ def add_annotations(data):
     from user.models import User
     item = Item.objects.get(itemId=data['item'])
     layer_id = data['layer']
-    layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
+    layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])
+    if not layer:
+        return False
     user = User.objects.get(username=data['user'])
-    with transaction.commit_on_success():
-        for a in data['annotations']:
-            annotation = models.Annotation(
-                item=item,
-                layer=layer_id,
-                user=user,
-                start=float(a['in']), end=float(a['out']),
-                value=a['value'])
-            annotation.save()
-        #update facets if needed
-        if layer_id in item.facet_keys:
-            item.update_layer_facet(layer_id)
-        Item.objects.filter(id=item.id).update(modified=annotation.modified)
-        annotation.item.modified = annotation.modified
-        annotation.item.update_find()
-        annotation.item.update_sort()
-        annotation.item.update_facets()
+    for a in data['annotations']:
+        annotation = models.Annotation(
+            item=item,
+            layer=layer_id,
+            user=user,
+            start=float(a['in']), end=float(a['out']),
+            value=a['value'])
+        annotation.save()
+    #update facets if needed
+    if layer_id in item.facet_keys:
+        item.update_layer_facet(layer_id)
+    Item.objects.filter(id=item.id).update(modified=annotation.modified)
+    annotation.item.modified = annotation.modified
+    annotation.item.update_find()
+    annotation.item.update_sort()
+    annotation.item.update_facets()
     return True
 
 @task(ignore_results=True, queue='default')
