@@ -1250,6 +1250,7 @@ class Item(models.Model):
                 get_sequences.delay(self.itemId)
             else:
                 get_sequences(self.itemId)
+            tasks.load_subtitles.delay(item.itemId)
 
     def save_poster(self, data):
         self.poster.name = self.path('poster.jpg')
