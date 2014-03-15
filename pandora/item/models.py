@@ -1405,6 +1405,28 @@ class Item(models.Model):
                     pass
         return icon
 
+    def add_empty_clips(self):
+        subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
+        if not subtitles:
+            return
+        #otherwise add empty 5 seconds annotation every minute
+        duration = sum([s.duration for s in self.streams()])
+        start = 0
+        layer = subtitles['id']
+        Annotation.objects.filter(layer=layer, item=self, value='').delete()
+        #FIXME: allow annotations from no user instead?
+        user = User.objects.all().order_by('id')[0]
+        for i in range(0, int(duration) - 5, 60):
+            annotation = Annotation(
+                item=self,
+                layer=layer,
+                start=i,
+                end=i + 5,
+                value='',
+                user=user
+            )
+            annotation.save()
+
     def load_subtitles(self, force=False):
         subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
         if not subtitles:
@@ -1412,6 +1434,7 @@ class Item(models.Model):
         # only import on 0xdb for now or if forced manually
         # since this will remove all existing subtitles
         if not settings.USE_IMDB and not force:
+            self.add_empty_clips()
             return False
         with transaction.commit_on_success():
             layer = subtitles['id']
