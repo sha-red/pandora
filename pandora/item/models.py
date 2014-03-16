@@ -1104,11 +1104,14 @@ class Item(models.Model):
         wanted = []
         for s in self.sets():
             if s.filter(selected=False).count() != 0:
-                wanted += [i.id for i in s]
+                wanted += [f.id for f in s if not f.available]
             else:
                 break
-        self.files.filter(id__in=wanted).update(wanted=True)
-        self.files.exclude(id__in=wanted).update(wanted=False)
+        qs = self.files.all()
+        if wanted:
+            self.files.filter(id__in=wanted).update(wanted=True)
+            qs = qs.exclude(id__in=wanted)
+        qs.update(wanted=False)
 
     def update_selected(self):
         sets = self.sets()
