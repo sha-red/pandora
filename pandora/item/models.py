@@ -401,6 +401,7 @@ class Item(models.Model):
         else:
             self.poster_height = 128
             self.poster_width = 80
+        self.update_sort()
         self.json = self.get_json()
         self.json['modified'] = datetime.now()
         super(Item, self).save(*args, **kwargs)
