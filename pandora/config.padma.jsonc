@@ -386,7 +386,7 @@
             "columnWidth": 60,
             "format": {"type": "number", "args": []},
             "sort": true,
-            "value": {"layer": "subtitles", "type": "words"}
+            "value": {"layer": "transcripts", "type": "words"}
         },
         {
             "id": "wordsperminute",
@@ -395,7 +395,7 @@
             "columnWidth": 60,
             "format": {"type": "number", "args": [3]},
             "sort": true,
-            "value": {"layer": "subtitles", "type": "wordsperminute"}
+            "value": {"layer": "transcripts", "type": "wordsperminute"}
         },
         {
             "id": "size",

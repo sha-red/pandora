@@ -818,6 +818,20 @@ class Item(models.Model):
                     value = None
             setattr(s, name, value)
 
+        def get_value(source, key):
+            if 'value' in key and 'layer' in key['value']:
+                value = [a.value for a in self.annotations.filter(layer=key['value']['layer']).exclude(value='')]
+            else:
+                value = self.get(source)
+            return value
+
+        def get_words(source, key):
+            value = get_value(source, key)
+            if isinstance(value, list):
+                value = '\n'.join(value)
+            value = len(value.split(' ')) if value else 0
+            return value
+
         base_keys = (
             'aspectratio',
             'bitrate',
@@ -847,58 +861,7 @@ class Item(models.Model):
             'saturation',
             'size',
             'volume',
-            'words',
-            'wordsperminute',
         )
-
-        for key in filter(lambda k: k.get('sort', False), settings.CONFIG['itemKeys']):
-            name = key['id']
-            source = name
-            sort_type = key.get('sortType', key['type'])
-            if 'value' in key:
-                if 'layer' in key['value']:
-                   continue
-                source = key['value']['key']
-                sort_type = key['value'].get('type', sort_type)
-            if isinstance(sort_type, list):
-                sort_type = sort_type[0]
-
-            if name not in base_keys:
-                if sort_type == 'title':
-                    value = get_title_sort(self.get(source, u'Untitled'))
-                    value = utils.sort_title(value)[:955]
-                    set_value(s, name, value)
-                elif sort_type == 'person':
-                    value = sortNames(self.get(source, []))
-                    value = utils.sort_string(value)[:955]
-                    set_value(s, name, value)
-                elif sort_type == 'string':
-                    value = self.get(source, u'')
-                    if isinstance(value, list):
-                        value = u','.join(value)
-                    value = utils.sort_string(value)[:955]
-                    set_value(s, name, value)
-                elif sort_type in ('length', 'integer', 'time', 'float'):
-                    #can be length of strings or length of arrays, i.e. keywords
-                    value = self.get(source)
-                    if isinstance(value, list):
-                        value = len(value)
-                    set_value(s, name, value)
-                elif sort_type == 'words':
-                    value = self.get(source)
-                    if isinstance(value, list):
-                        value = '\n'.join(value)
-                    if value:
-                        value = len(value.split(' '))
-                    set_value(s, name, value)
-                elif sort_type == 'year':
-                    value = self.get(source)
-                    set_value(s, name, value)
-                elif sort_type == 'date':
-                    value = self.get(source)
-                    if isinstance(value, basestring):
-                        value = datetime_safe.datetime.strptime(value, '%Y-%m-%d')
-                    set_value(s, name, value)
 
         #sort keys based on database, these will always be available
         s.itemId = self.itemId.replace('0x', 'xx')
@@ -911,7 +874,6 @@ class Item(models.Model):
 
         s.aspectratio = self.get('aspectratio')
         if self.id:
-            s.words = sum([len(a.value.split()) for a in self.annotations.exclude(value='')])
             s.clips = self.clips.count()
 
         s.numberoffiles = self.files.all().count()
@@ -957,14 +919,60 @@ class Item(models.Model):
         s.numberofdocuments = self.documents.count()
         if s.duration:
             s.cutsperminute = s.numberofcuts / (s.duration/60)
-            s.wordsperminute = s.words / (s.duration / 60)
         else:
             s.cutsperminute = None
-            s.wordsperminute = None
         s.timesaccessed = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
         if not s.timesaccessed:
             s.timesaccessed = 0
         s.accessed = self.accessed.aggregate(Max('access'))['access__max']
+
+        for key in filter(lambda k: k.get('sort', False), settings.CONFIG['itemKeys']):
+            name = key['id']
+            source = name
+            sort_type = key.get('sortType', key['type'])
+            if 'value' in key:
+                if 'key' in key['value']:
+                    source = key['value']['key']
+                sort_type = key['value'].get('type', sort_type)
+            if isinstance(sort_type, list):
+                sort_type = sort_type[0]
+            if name not in base_keys:
+                if sort_type == 'title':
+                    value = get_title_sort(self.get(source, u'Untitled'))
+                    value = utils.sort_title(value)[:955]
+                    set_value(s, name, value)
+                elif sort_type == 'person':
+                    value = sortNames(self.get(source, []))
+                    value = utils.sort_string(value)[:955]
+                    set_value(s, name, value)
+                elif sort_type == 'string':
+                    value = self.get(source, u'')
+                    if isinstance(value, list):
+                        value = u','.join(value)
+                    value = utils.sort_string(value)[:955]
+                    set_value(s, name, value)
+                elif sort_type == 'words':
+                    value = get_words(source, key) if s.duration else None
+                    set_value(s, name, value)
+                elif sort_type == 'wordsperminute':
+                    value = get_words(source, key)
+                    value = value / (s.duration / 60) if value and s.duration else None
+                    set_value(s, name, value)
+                elif sort_type in ('length', 'integer', 'time', 'float'):
+                    #can be length of strings or length of arrays, i.e. keywords
+                    value = self.get(source)
+                    if isinstance(value, list):
+                        value = len(value)
+                    set_value(s, name, value)
+                elif sort_type == 'year':
+                    value = self.get(source)
+                    set_value(s, name, value)
+                elif sort_type == 'date':
+                    value = self.get(source)
+                    if isinstance(value, basestring):
+                        value = datetime_safe.datetime.strptime(value, '%Y-%m-%d')
+                    set_value(s, name, value)
+
         s.save()
 
     def update_layer_facet(self, key):
