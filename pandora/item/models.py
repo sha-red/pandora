@@ -1417,15 +1417,27 @@ class Item(models.Model):
         duration = sum([s.duration for s in self.streams()])
         start = 0
         layer = subtitles['id']
-        Annotation.objects.filter(layer=layer, item=self, value='').delete()
         #FIXME: allow annotations from no user instead?
         user = User.objects.all().order_by('id')[0]
-        for i in range(0, int(duration) - 5, 60):
+
+        clips = [(i, i+5) for i in range(0, int(duration) - 5, 60)]
+        exist = []
+        delete = []
+        for a in Annotation.objects.filter(layer=layer, item=self, value=''):
+            clip = (a.start, a.end)
+            if clip not in clips:
+                delete.append(a.id)
+            else:
+                exist.append(clip)
+        if delete:
+            Annotation.objects.filter(layer=layer, item=self, value='', id__in=delete).delete()
+        clips = list(set(clips) - set(exist))
+        for clip in clips:
             annotation = Annotation(
                 item=self,
                 layer=layer,
-                start=i,
-                end=i + 5,
+                start=clip[0],
+                end=clip[1],
                 value='',
                 user=user
             )
