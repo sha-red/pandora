@@ -458,8 +458,6 @@ def removeMedia(request):
         qs = models.File.objects.filter(oshash__in=data['ids'], instances__id=None)
         selected = set([f.item.id for f in qs if f.selected])
         items = list(set([f.item.id for f in qs]))
-        print selected
-        print items
         qs.delete()
         for i in Item.objects.filter(id__in=items):
             if i.id in selected:
