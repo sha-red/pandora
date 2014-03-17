@@ -1352,7 +1352,7 @@ class Item(models.Model):
                     })
                 offset += f.duration
         else:
-            if 'videoRatio' in self.json:
+            if 'videoRatio' in self.json and self.sort.duration:
                 width, height = self.json['resolution']
                 pos = self.sort.duration / 2
                 for p in map(int, [pos/2, pos, pos+pos/2]):
