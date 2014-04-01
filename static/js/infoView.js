@@ -528,7 +528,7 @@ pandora.ui.infoView = function(data) {
                             format: function(value) {
                                 return formatValue(key, value);
                             },
-                            placeholder: formatLight('unknown'),
+                            placeholder: formatLight(Ox._('unknown')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: getValue(key, data[key])
                         })
