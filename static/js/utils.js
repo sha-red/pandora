@@ -2204,7 +2204,7 @@ pandora.setLocale = function(locale, callback) {
     var url;
     // language from http header might not be supported,
     // fall back to site default
-    if (Ox.isUndefined(Ox.LOCALE_NAMES[locale])) {
+    if (pandora.site.languages.indexOf(locale) == -1) {
         locale = pandora.site.user.ui.locale;
     }
     if (locale != 'en') {

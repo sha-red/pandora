@@ -121,7 +121,7 @@ pandora.ui.preferencesDialog = function() {
                                     }),
                                 Ox.Select({
                                         id: 'locale',
-                                        items: Object.keys(Ox.LOCALE_NAMES).map(function(locale) {
+                                        items: pandora.site.languages.map(function(locale) {
                                             return {id: locale, title: Ox.LOCALE_NAMES[locale]}
                                         }),
                                         label: Ox._('Language'),
