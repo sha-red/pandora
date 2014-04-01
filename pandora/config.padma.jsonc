@@ -520,6 +520,7 @@
         {"id": "media", "title": "Media"}
     ],
     "language": "en",
+    "languages": ["ar", "el", "en", "hi"],
     "layers": [
         {
             "id": "places",

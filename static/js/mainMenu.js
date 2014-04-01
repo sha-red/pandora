@@ -190,7 +190,7 @@ pandora.ui.mainMenu = function() {
                         ] },
                         { id: 'locale',
                           title: Ox._('Language'), items: [
-                            { group: 'setlocale', min: 1, max: 1, items: Object.keys(Ox.LOCALE_NAMES).map(function(locale) {
+                            { group: 'setlocale', min: 1, max: 1, items: pandora.site.languages.map(function(locale) {
                                 return {id: locale, title: Ox.LOCALE_NAMES[locale], checked: ui.locale == locale}
                             }) }
                         ] },

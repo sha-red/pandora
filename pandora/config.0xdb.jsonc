@@ -629,6 +629,7 @@
         {"id": "media", "title": "Media"}
     ],
     "language": "en",
+    "languages": ["ar", "el", "en", "hi"],
     // fixme: should be renamed to annotationLayers
     "layers": [
         {
