@@ -239,7 +239,7 @@ pandora.ui.mediaView = function(options) {
             },
             keys: ['state', 'instances', 'wanted', 'error'],
             scrollbarVisible: true,
-            sort: [{key: 'path', operator: '+'}],
+            sort: [{key: 'part', operator: '+'}],
             unique: 'id'
         })
         .bindEvent({
