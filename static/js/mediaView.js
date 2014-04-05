@@ -246,7 +246,6 @@ pandora.ui.mediaView = function(options) {
             click: function(data) {
                 if (data.key == 'selected') {
                     var value = self.$filesList.value(data.id);
-                    console.log(data, value);
                     if (value.state == 'failed') {
                         var $dialog = Ox.Dialog({
                             buttons: [
@@ -305,6 +304,7 @@ pandora.ui.mediaView = function(options) {
             },
             init: function(data) {
                 self.numberOfItems = data.items;
+                updateStatus();
             },
             select: selectFiles,
             submit: function(data) {
@@ -515,6 +515,11 @@ pandora.ui.mediaView = function(options) {
         });
     }
 
+    function isActive() {
+        return pandora.user.ui.item == options.id
+            && pandora.user.ui.itemView == 'media';
+    }
+
     function moveFiles(data) {
         var data = {
             ids: self.selected,
@@ -527,10 +532,7 @@ pandora.ui.mediaView = function(options) {
             {disabled: true, title: Ox._('Moving Files...')}
         );
         pandora.api.moveMedia(data, function(result) {
-            if (
-                pandora.user.ui.item == options.id
-                && pandora.user.ui.itemView == 'media'
-            ) {
+            if (isActive()) {
                 Ox.Request.clearCache(); // fixme: remove
                 if (self.$switch.value()) {
                     pandora.UI.set({item: result.data.item});
@@ -616,6 +618,42 @@ pandora.ui.mediaView = function(options) {
         self.$menu[
             self.selected.length == 0 ? 'disableItem' : 'enableItem'
         ]('ignore');
+    }
+
+    function updateStatus() {
+        if (self.numberOfItems) {
+            setTimeout(function() {
+                if (isActive() && self.numberOfItems) {
+                    Ox.Request.clearCache();
+                    pandora.api.findMedia({
+                        query: self.filesQuery,
+                        range: [0, self.numberOfItems],
+                        keys: ['id', 'state']
+                    }, function(result) {
+                        if (isActive()) {
+                            var done = false,
+                                update = false;
+                            result.data.items.forEach(function(item) {
+                                if (self.$filesList.value(item.id, 'state') == 'encoding'
+                                    && item.state != 'encoding') {
+                                    done = true;
+                                }
+                                self.$filesList.value(item.id, 'state', item.state);
+                                if (!update && item.state == 'encoding') {
+                                    update = true;
+                                }
+                            });
+                            if (update) {
+                                updateStatus();
+                            } else if (done) {
+                                Ox.Request.clearCache();
+                                pandora.updateItemContext();
+                            }
+                        }
+                    });
+                }
+            }, 10000);
+        }
     }
 
     that.reload = function() {
