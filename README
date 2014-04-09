@@ -158,7 +158,7 @@ to apply them.
     ./manage.py runserver
 
   and background task in another:
-    ./manage.py celeryd -B -Q celery,default,encoding
+    ./manage.py celeryd -B -Q celery,default,encoding -l INFO
 
   now you can access your local pandora instace at http://127.0.0.1:8000/
 
