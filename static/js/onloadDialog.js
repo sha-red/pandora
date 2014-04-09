@@ -11,9 +11,9 @@ pandora.ui.onloadDialog = function() {
                 id: 'onload',
                 placeholder: Ox._('/*\nAny JavaScript you paste here will run on load.\n'
                     + 'If you ever need to manually change or remove it, '
-                    + 'you can do so by setting localStorage["pandora.onload"] in the console.\n*/'),
+                    + 'you can do so by pandora.UI.set({onload: ""}) in the console.\n*/'),
                 type: 'textarea',
-                value: localStorage['pandora.onload'] || '',
+                value: pandora.user.ui.onload || '',
                 width: dialogWidth - 32
             })
             .css({margin: '16px'}),
@@ -62,18 +62,14 @@ pandora.ui.onloadDialog = function() {
     }
 
     function clear() {
-        delete localStorage['pandora.onload'];
+        pandora.UI.set({onload: ''});
         $input.options({value: ''});
     }
 
     that.superClose = that.close;
     that.close = function() {
         var value = $input.value();
-        if (value) {
-            localStorage['pandora.onload'] = value;
-        } else {
-            delete localStorage['pandora.onload'];
-        }
+        pandora.UI.set({onload: value || ''});
         that.superClose();
     };
 

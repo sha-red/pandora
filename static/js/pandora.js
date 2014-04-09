@@ -426,11 +426,7 @@ appPanel
         });
         Ox.Fullscreen.bind('exit', pandora.UI.set);
         pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
-        if (getLocalStorage('pandora.onload')) {
-            try {
-                eval(localStorage['pandora.onload'])
-            } catch(e) {}
-        }
+        pandora.loadUserScript();
     }
 
     function loadBrowserMessage() {

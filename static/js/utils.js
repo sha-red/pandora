@@ -1906,6 +1906,16 @@ pandora.isVideoView = function(view, item) {
     ).indexOf(view) > -1;
 };
 
+pandora.loadUserScript = function() {
+    if (pandora.user.ui.onload) {
+        try {
+            eval(pandora.user.ui.onload);
+        } catch(e) {
+            Ox.print('user onload script error', e);
+        }
+    }
+};
+
 pandora.logEvent = function(data, event, element) {
     var element = this,
         handlers = self.eventHandlers ? self.eventHandlers[event] : [];
@@ -1959,6 +1969,7 @@ pandora.signin = function(data) {
     pandora.URL.update();
     Ox.Theme(pandora.user.ui.theme);
     pandora.$ui.appPanel.reload();
+    pandora.loadUserScript();
 };
 
 pandora.signout = function(data) {
