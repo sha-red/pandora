@@ -155,7 +155,7 @@ to apply them.
 
 === Development ===
   in one terminal:
-    ./manage.py runserver
+    ./manage.py runserver 2620
 
   and background task in another:
     ./manage.py celeryd -B -Q celery,default,encoding -l INFO
