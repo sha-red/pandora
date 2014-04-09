@@ -776,6 +776,7 @@
             "videoResolution": 240,
             "videoScale": "fit",
             "videoSize": "large",
+            "videoSubtitles": false,
             "videoTimeline": "antialias",
             "videoView": "player",
             "videoVolume": 1
