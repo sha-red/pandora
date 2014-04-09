@@ -335,16 +335,22 @@ pandora.ui.uploadVideoDialog = function(data) {
             options.audioBitrate = 22;
             options.channels = 1;
         }
-        if (info.video && info.video[0].display_aspect_ratio) {
+        if (info.video && info.video.length) {
+            info.video.forEach(function(video) {
+                if (!video.display_aspect_ratio) {
+                    video.display_aspect_ratio = video.width + ':' + video.height;
+                    video.pixel_aspect_ratio = '1:1';
+                }
+            });
             dar = aspectratio(info.video[0].display_aspect_ratio);
             fps = aspectratio(info.video[0].framerate).float;
             options.width = parseInt(dar.float * options.height, 10);
             options.width += options.width % 2;
             // interlaced hdv material is detected with double framerates
             if (fps == 50) {
-                options.framerate = 25;
+                fps = options.framerate = 25;
             } else if (fps == 60) {
-                options.framerate = 30;
+                fps = options.framerate = 30;
             }
             if (Math.abs(options.width/options.height - dar.float) < 0.02) {
                 options.aspect = options.width + ':' + options.height;
