@@ -2279,6 +2279,48 @@ pandora.updateItemContext = function() {
     }
 };
 
+pandora.updateStatus = function(item) {
+    var ui = pandora.user.ui;
+    item = item || ui.item;
+    if (pandora.$ui.updateStatus && pandora.$ui.updateStatus[item]) {
+        return;
+    }
+    pandora.$ui.updateStatus = pandora.$ui.updateStatus || {};
+    pandora.$ui.updateStatus[item] = setTimeout(function() {
+        if(isActive()) {
+            Ox.Request.clearCache();
+            pandora.api.get({
+                id: item,
+                keys: ['rendered']
+            }, function(result) {
+                delete pandora.$ui.updateStatus[item];
+                if (isActive()) {
+                    if (result.data.rendered) {
+                        Ox.Request.clearCache();
+                        if (pandora.isVideoView()) {
+                            pandora.$ui.mainPanel.replaceElement(1,
+                                pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                        } else if(pandora.$ui.item) {
+                            pandora.updateItemContext();
+                            pandora.$ui.item.reload();
+                        }
+                    } else {
+                        pandora.updateStatus(item);
+                    }
+                }
+            });
+        } else {
+            delete pandora.$ui.updateStatus[item];
+        }
+    }, 10000);
+
+    function isActive() {
+        return ui.item == item && [
+            'info', 'player', 'editor', 'timeline'
+        ].indexOf(ui.itemView) > -1;
+    }
+};
+
 pandora.wait = function(taskId, callback, timeout) {
     var task = {};
     timeout = timeout || 5000;
