@@ -99,7 +99,7 @@ class DataTimeline():
         x = frame * 8 - tile * self.timeline_width
         return self.timeline_image.crop((x, 0, x + 8, 8))
 
-def get_cut_sequences(stream, position=0):
+def get_cut_sequences(stream):
     timeline = DataTimeline(stream.timeline_prefix)
     cuts = list(stream.cuts) + [stream.duration]
     modes = ['color', 'shape']
@@ -120,4 +120,4 @@ def get_cut_sequences(stream, position=0):
                 'out': cut,
             })
         position = cut
-    return sequences, position
+    return sequences
