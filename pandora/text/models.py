@@ -16,6 +16,7 @@ import ox
 from ox.django.fields import DictField, TupleField
 
 from archive import extract
+from archive.chunk import save_chunk
 
 import managers
 
@@ -278,25 +279,16 @@ class Text(models.Model):
 
     def save_chunk(self, chunk, offset=None, done=False):
         if self.uploading:
-            if not self.file:
-                self.file.name = self.path('data.pdf')
-                ox.makedirs(os.path.dirname(self.file.path))
-                with open(self.file.path, 'w') as f:
-                    f.write(chunk.read())
-                self.save()
-            else:
-                if offset == None:
-                    offset = self.file.size
-                elif offset > self.file.size:
-                    return False
-                with open(self.file.path, 'r+') as f:
-                    f.seek(offset)
-                    f.write(chunk.read())
-            if done:
-                self.uploading = False
-                self.save()
-            return True
-        return False
+            name = self.path('data.pdf')
+
+            def done_cb():
+                if done:
+                    self.uploading = False
+                    self.save()
+                return True, self.file.size
+
+            return save_chunk(self, self.file, chunk, offset, name, done_cb)
+        return False, 0
 
 def delete_file(sender, **kwargs):
     t = kwargs['instance']

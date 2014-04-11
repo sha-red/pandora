@@ -17,6 +17,7 @@ import ox
 
 from item.models import Item
 from archive.extract import resize_image
+from archive.chunk import save_chunk
 
 import managers
 import utils
@@ -180,29 +181,20 @@ class Document(models.Model):
 
     def save_chunk(self, chunk, offset=None, done=False):
         if self.uploading:
-            if not self.file:
-                name = 'data.%s' % self.extension
-                self.file.name = self.path(name)
-                ox.makedirs(os.path.dirname(self.file.path))
-                with open(self.file.path, 'w') as f:
-                    f.write(chunk.read())
-                self.save()
-            else:
-                if offset == None:
-                    offset = self.file.size
-                elif offset > self.file.size:
-                    return False
-                with open(self.file.path, 'r+') as f:
-                    f.seek(offset)
-                    f.write(chunk.read())
-            if done:
-                self.uploading = False
-                self.get_info()
-                self.get_ratio()
-                self.oshash = ox.oshash(self.file.path)
-                self.save()
-            return True
-        return False
+            name = 'data.%s' % self.extension
+            name = self.path(name)
+
+            def done_cb():
+                if done:
+                    self.uploading = False
+                    self.get_info()
+                    self.get_ratio()
+                    self.oshash = ox.oshash(self.file.path)
+                    self.save()
+                return True, self.file.size
+
+            return save_chunk(self, self.file, chunk, offset, name, done_cb)
+        return False, 0
 
     def thumbnail(self, size=None, page=None):
         src = self.file.path

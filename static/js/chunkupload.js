@@ -162,7 +162,15 @@ pandora.chunkupload = function(options) {
                     nextChunkId = chunkId + 1;
                     that.triggerEvent('paused', {next: nextChunkId});
                 } else {
-                    uploadChunk(chunkId + 1);
+                    if (Ox.isUndefined(response.offset) ||
+                        response.offset ==  (chunkId +1) * chunkSize) {
+                        uploadChunk(chunkId + 1);
+                    } else {
+                        // continue at chunk closest to offset from server
+                        console.log('server offset', response.offset,
+                            'next chunk', Math.floor(response.offset / chuknSize));
+                        uploadChunk(Math.floor(response.offset / chuknSize));
+                    }
                 }
             } else {
                 // failed to upload, try again in 5 second

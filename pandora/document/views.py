@@ -13,6 +13,8 @@ from django.db.models import Sum
 from item import utils
 from item.models import Item
 from itemlist.models import List
+from archive.chunk import process_chunk
+
 import models
 
 def get_document_or_404_json(id):
@@ -281,11 +283,6 @@ def thumbnail(request, id, size=256, page=None):
     document = models.Document.get(id)
     return HttpFileResponse(document.thumbnail(size, page=page))
 
-class ChunkForm(forms.Form):
-    chunk = forms.FileField()
-    offset = forms.IntegerField(required=False)
-    done = forms.IntegerField(required=False)
-
 @login_required_json
 def upload(request):
     if 'id' in request.GET:
@@ -297,19 +294,9 @@ def upload(request):
         extension = extension[-1].lower()
     response = json_response(status=400, text='this request requires POST')
     if 'chunk' in request.FILES:
-        form = ChunkForm(request.POST, request.FILES)
-        if form.is_valid() and file.editable(request.user):
-            c = form.cleaned_data['chunk']
-            offset = form.cleaned_data['offset']
-            response = {
-                'result': 1,
-                'id': file.get_id(),
-                'resultUrl': request.build_absolute_uri(file.get_absolute_url())
-            }
-            if not file.save_chunk(c, offset, form.cleaned_data['done']):
-                response['result'] = -1
-            if form.cleaned_data['done']:
-                response['done'] = 1
+        if file.editable(request.user):
+            response = process_chunk(request, file.save_chunk)
+            response['resultUrl'] = request.build_absolute_uri(file.get_absolute_url())
             return render_to_json_response(response)
     #init upload
     else:

@@ -23,6 +23,7 @@ from ox.django.api import actions
 
 import models
 import tasks
+from chunk import process_chunk
 
 
 @login_required_json
@@ -159,12 +160,6 @@ def upload(request):
 actions.register(upload, cache=False)
 
 
-class ChunkForm(forms.Form):
-    chunk = forms.FileField()
-    chunkId = forms.IntegerField(required=False)
-    offset = forms.IntegerField(required=False)
-    done = forms.IntegerField(required=False)
-
 @login_required_json
 def addMedia(request):
     '''
@@ -238,18 +233,12 @@ def firefogg_upload(request):
         #post next chunk
         if 'chunk' in request.FILES and oshash:
             f = get_object_or_404(models.File, oshash=oshash)
-            form = ChunkForm(request.POST, request.FILES)
-            if form.is_valid() and f.editable(request.user):
-                c = form.cleaned_data['chunk']
-                offset = form.cleaned_data['offset']
-                response = {
-                    'result': 1,
-                    'resultUrl': request.build_absolute_uri('/%s'%f.item.itemId)
-                }
-                if not f.save_chunk_stream(c, offset, resolution, format,
-                        form.cleaned_data['done']):
-                    response['result'] = -1
-                elif form.cleaned_data['done']:
+            if f.editable(request.user):
+                def save_chunk(chunk, offset, done):
+                    return f.save_chunk_stream(chunk, offset, resolution, format, done)
+                response = process_chunk(request, save_chunk)
+                response['resultUrl'] = request.build_absolute_uri('/%s'%f.item.itemId)
+                if response.get('done'):
                     f.uploading = False
                     if response['result'] == 1:
                         f.queued = True
@@ -264,8 +253,6 @@ def firefogg_upload(request):
                         response['resultUrl'] = t.task_id
                     except:
                         pass
-                    response['result'] = 1
-                    response['done'] = 1
                 return render_to_json_response(response)
         #init upload
         elif oshash:
@@ -298,17 +285,10 @@ def direct_upload(request):
         oshash = request.POST['id']
     response = json_response(status=400, text='this request requires POST')
     if 'chunk' in request.FILES:
-        form = ChunkForm(request.POST, request.FILES)
-        if form.is_valid() and file.editable(request.user):
-            c = form.cleaned_data['chunk']
-            offset = form.cleaned_data['offset']
-            response = {
-                'result': 1,
-                'resultUrl': request.build_absolute_uri(file.item.get_absolute_url())
-            }
-            if not file.save_chunk(c, offset, form.cleaned_data['done']):
-                response['result'] = -1
-            if form.cleaned_data['done']:
+        if file.editable(request.user):
+            response = process_chunk(request, file.save_chunk)
+            response['resultUrl'] = request.build_absolute_uri(file.item.get_absolute_url())
+            if response.get('done'):
                 file.uploading = False
                 if response['result'] == 1:
                     file.queued = True
@@ -323,7 +303,6 @@ def direct_upload(request):
                     response['resultUrl'] = t.task_id
                 except:
                     pass
-                response['done'] = 1
             return render_to_json_response(response)
     #init upload
     else:

@@ -17,6 +17,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from item import utils
+from archive.chunk import process_chunk
 import models
 
 def get_text_or_404_json(id):
@@ -377,11 +378,6 @@ def icon(request, id, size=16):
         icon = os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
     return HttpFileResponse(icon, content_type='image/jpeg')
 
-class ChunkForm(forms.Form):
-    chunk = forms.FileField()
-    offset = forms.IntegerField(required=False)
-    done = forms.IntegerField(required=False)
-
 def pdf_viewer(request, id):
     text = get_text_or_404_json(id)
     if text.type == 'pdf' and text.file and not text.uploading:
@@ -409,18 +405,10 @@ def upload(request):
     if text.editable(request.user):
         #post next chunk
         if 'chunk' in request.FILES:
-            form = ChunkForm(request.POST, request.FILES)
-            if form.is_valid() and text.editable(request.user):
-                c = form.cleaned_data['chunk']
-                offset = form.cleaned_data['offset']
-                response = {
-                    'result': 1,
-                    'resultUrl': request.build_absolute_uri(text.get_absolute_url())
-                }
-                if not text.save_chunk(c, offset, form.cleaned_data['done']):
-                    response['result'] = -1
-                if form.cleaned_data['done']:
-                    response['done'] = 1
+            if text.editable(request.user):
+                response = process_chunk(request, text.save_chunk)
+                response['resultUrl'] = request.build_absolute_uri(text.get_absolute_url())
+                return render_to_json_response(response)
                 return render_to_json_response(response)
         #init upload
         else:

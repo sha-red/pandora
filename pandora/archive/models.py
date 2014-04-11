@@ -18,6 +18,7 @@ from item import utils
 import item.models
 from person.models import get_name_sort
 
+from chunk import save_chunk
 import extract
 
 class File(models.Model):
@@ -299,32 +300,32 @@ class File(models.Model):
 
     def save_chunk(self, chunk, offset=None, done=False):
         if not self.available:
-            if not self.data:
-                name = 'data.%s' % self.info.get('extension', 'avi')
-                self.data.name = self.get_path(name)
-                ox.makedirs(os.path.dirname(self.data.path))
-                with open(self.data.path, 'w') as f:
-                    f.write(chunk.read())
-                self.save()
-            else:
-                if offset == None:
-                    offset = self.data.size
-                elif offset > self.data.size:
-                    return False
-                with open(self.data.path, 'r+') as f:
-                    f.seek(offset)
-                    f.write(chunk.read())
-            if done:
-                self.info.update(ox.avinfo(self.data.path))
-                self.parse_info()
-                # reject invalid uploads
-                if self.info.get('oshash') != self.oshash:
-                    self.data.delete()
+            name = 'data.%s' % self.info.get('extension', 'avi')
+            name = self.get_path(name)
+
+            def done_cb():
+                if done:
+                    self.info.update(ox.avinfo(self.data.path))
+                    self.parse_info()
+                    # reject invalid uploads
+                    if self.info.get('oshash') != self.oshash:
+                        self.data.delete()
+                        self.save()
+                        return False, 0
                     self.save()
-                    return False
-                self.save()
-            return True
-        return False
+                return True, self.data.size
+            return save_chunk(self, self.data, chunk, offset, name, done_cb)
+        else:
+            return False, 0
+
+    def save_chunk_stream(self, chunk, offset, resolution, format, done):
+        if not self.available:
+            config = settings.CONFIG['video']
+            stream, created = Stream.objects.get_or_create(
+                        file=self, resolution=resolution, format=format)
+            name = stream.path(stream.name())
+            return save_chunk(stream, stream.media, chunk, offset, name)
+        return False, 0
 
     def stream_resolution(self):
         config = settings.CONFIG['video']
@@ -333,32 +334,6 @@ class File(models.Model):
             if height and height <= resolution:
                 return resolution
         return resolution
-
-    def save_chunk_stream(self, chunk, offset, resolution, format, done):
-        if not self.available:
-            config = settings.CONFIG['video']
-            stream, created = Stream.objects.get_or_create(
-                        file=self, resolution=resolution, format=format)
-            if created:
-                stream.media.name = stream.path(stream.name())
-                ox.makedirs(os.path.dirname(stream.media.path))
-                with open(stream.media.path, 'w') as f:
-                    f.write(chunk.read())
-                stream.save()
-            else:
-                if offset == -1:
-                    offset = stream.media.size
-                elif offset > stream.media.size:
-                    return False
-                with open(stream.media.path, 'r+') as f:
-                    f.seek(offset)
-                    f.write(chunk.read())
-            if done:
-                stream.available = True
-                stream.info = {}
-                stream.save()
-            return True
-        return False
 
     def json(self, keys=None, user=None):
         resolution = (self.width, self.height)
