@@ -324,7 +324,14 @@ class File(models.Model):
             stream, created = Stream.objects.get_or_create(
                         file=self, resolution=resolution, format=format)
             name = stream.path(stream.name())
-            return save_chunk(stream, stream.media, chunk, offset, name)
+
+            def done_cb():
+                if done:
+                    stream.available = True 
+                    stream.info = {} 
+                    stream.save()
+                return True, stream.media.size
+            return save_chunk(stream, stream.media, chunk, offset, name, done_cb)
         return False, 0
 
     def stream_resolution(self):
