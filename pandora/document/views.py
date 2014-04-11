@@ -283,7 +283,7 @@ def thumbnail(request, id, size=256, page=None):
 
 class ChunkForm(forms.Form):
     chunk = forms.FileField()
-    chunkId = forms.IntegerField(required=False)
+    offset = forms.IntegerField(required=False)
     done = forms.IntegerField(required=False)
 
 @login_required_json
@@ -300,13 +300,13 @@ def upload(request):
         form = ChunkForm(request.POST, request.FILES)
         if form.is_valid() and file.editable(request.user):
             c = form.cleaned_data['chunk']
-            chunk_id = form.cleaned_data['chunkId']
+            offset = form.cleaned_data['offset']
             response = {
                 'result': 1,
                 'id': file.get_id(),
                 'resultUrl': request.build_absolute_uri(file.get_absolute_url())
             }
-            if not file.save_chunk(c, chunk_id, form.cleaned_data['done']):
+            if not file.save_chunk(c, offset, form.cleaned_data['done']):
                 response['result'] = -1
             if form.cleaned_data['done']:
                 response['done'] = 1

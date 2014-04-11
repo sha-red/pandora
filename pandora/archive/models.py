@@ -297,7 +297,7 @@ class File(models.Model):
             self.instances.filter(volume__user=user).count() > 0 or \
             (not self.item or self.item.user == user)
 
-    def save_chunk(self, chunk, chunk_id=-1, done=False):
+    def save_chunk(self, chunk, offset=None, done=False):
         if not self.available:
             if not self.data:
                 name = 'data.%s' % self.info.get('extension', 'avi')
@@ -307,11 +307,21 @@ class File(models.Model):
                     f.write(chunk.read())
                 self.save()
             else:
-                with open(self.data.path, 'a') as f:
+                if offset == None:
+                    offset = self.data.size
+                elif offset > self.data.size:
+                    return False
+                with open(self.data.path, 'r+') as f:
+                    f.seek(offset)
                     f.write(chunk.read())
             if done:
                 self.info.update(ox.avinfo(self.data.path))
                 self.parse_info()
+                # reject invalid uploads
+                if self.info.get('oshash') != self.oshash:
+                    self.data.delete()
+                    self.save()
+                    return False
                 self.save()
             return True
         return False
@@ -324,7 +334,7 @@ class File(models.Model):
                 return resolution
         return resolution
 
-    def save_chunk_stream(self, chunk, chunk_id, resolution, format, done):
+    def save_chunk_stream(self, chunk, offset, resolution, format, done):
         if not self.available:
             config = settings.CONFIG['video']
             stream, created = Stream.objects.get_or_create(
@@ -336,8 +346,12 @@ class File(models.Model):
                     f.write(chunk.read())
                 stream.save()
             else:
-                with open(stream.media.path, 'a') as f:
-                    #FIXME: should check that chunk_id/offset is right
+                if offset == -1:
+                    offset = stream.media.size
+                elif offset > stream.media.size:
+                    return False
+                with open(stream.media.path, 'r+') as f:
+                    f.seek(offset)
                     f.write(chunk.read())
             if done:
                 stream.available = True
@@ -351,7 +365,7 @@ class File(models.Model):
         if resolution == (0, 0) or self.type != 'video':
             resolution = None
         duration = self.duration
-        if self.type != 'video':
+        if self.type not in ('audio', 'video'):
             duration = None
         state = ''
         error = ''

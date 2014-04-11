@@ -276,7 +276,7 @@ class Text(models.Model):
                 path = source
         return path
 
-    def save_chunk(self, chunk, chunk_id=-1, done=False):
+    def save_chunk(self, chunk, offset=None, done=False):
         if self.uploading:
             if not self.file:
                 self.file.name = self.path('data.pdf')
@@ -285,7 +285,12 @@ class Text(models.Model):
                     f.write(chunk.read())
                 self.save()
             else:
-                with open(self.file.path, 'a') as f:
+                if offset == None:
+                    offset = self.file.size
+                elif offset > self.file.size:
+                    return False
+                with open(self.file.path, 'r+') as f:
+                    f.seek(offset)
                     f.write(chunk.read())
             if done:
                 self.uploading = False

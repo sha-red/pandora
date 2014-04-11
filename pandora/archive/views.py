@@ -162,6 +162,7 @@ actions.register(upload, cache=False)
 class ChunkForm(forms.Form):
     chunk = forms.FileField()
     chunkId = forms.IntegerField(required=False)
+    offset = forms.IntegerField(required=False)
     done = forms.IntegerField(required=False)
 
 @login_required_json
@@ -240,17 +241,22 @@ def firefogg_upload(request):
             form = ChunkForm(request.POST, request.FILES)
             if form.is_valid() and f.editable(request.user):
                 c = form.cleaned_data['chunk']
-                chunk_id = form.cleaned_data['chunkId']
+                offset = form.cleaned_data['offset']
                 response = {
                     'result': 1,
                     'resultUrl': request.build_absolute_uri('/%s'%f.item.itemId)
                 }
-                if not f.save_chunk_stream(c, chunk_id, resolution, format,
+                if not f.save_chunk_stream(c, offset, resolution, format,
                         form.cleaned_data['done']):
                     response['result'] = -1
                 elif form.cleaned_data['done']:
                     f.uploading = False
-                    f.queued = True
+                    if response['result'] == 1:
+                        f.queued = True
+                        f.wanted = False
+                    else:
+                        f.queued = False
+                        f.wanted = True
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
@@ -295,16 +301,21 @@ def direct_upload(request):
         form = ChunkForm(request.POST, request.FILES)
         if form.is_valid() and file.editable(request.user):
             c = form.cleaned_data['chunk']
-            chunk_id = form.cleaned_data['chunkId']
+            offset = form.cleaned_data['offset']
             response = {
                 'result': 1,
                 'resultUrl': request.build_absolute_uri(file.item.get_absolute_url())
             }
-            if not file.save_chunk(c, chunk_id, form.cleaned_data['done']):
+            if not file.save_chunk(c, offset, form.cleaned_data['done']):
                 response['result'] = -1
             if form.cleaned_data['done']:
                 file.uploading = False
-                file.queued = True
+                if response['result'] == 1:
+                    file.queued = True
+                    file.wanted = False
+                else:
+                    file.queued = False
+                    file.wanted = True
                 file.save()
                 #try/execpt so it does not fail if rabitmq is down
                 try:

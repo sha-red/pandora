@@ -379,7 +379,7 @@ def icon(request, id, size=16):
 
 class ChunkForm(forms.Form):
     chunk = forms.FileField()
-    chunkId = forms.IntegerField(required=False)
+    offset = forms.IntegerField(required=False)
     done = forms.IntegerField(required=False)
 
 def pdf_viewer(request, id):
@@ -412,12 +412,12 @@ def upload(request):
             form = ChunkForm(request.POST, request.FILES)
             if form.is_valid() and text.editable(request.user):
                 c = form.cleaned_data['chunk']
-                chunk_id = form.cleaned_data['chunkId']
+                offset = form.cleaned_data['offset']
                 response = {
                     'result': 1,
                     'resultUrl': request.build_absolute_uri(text.get_absolute_url())
                 }
-                if not text.save_chunk(c, chunk_id, form.cleaned_data['done']):
+                if not text.save_chunk(c, offset, form.cleaned_data['done']):
                     response['result'] = -1
                 if form.cleaned_data['done']:
                     response['done'] = 1

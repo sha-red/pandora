@@ -178,7 +178,7 @@ class Document(models.Model):
         h = (7-len(h))*'0' + h
         return os.path.join('documents', h[:2], h[2:4], h[4:6], h[6:], name)
 
-    def save_chunk(self, chunk, chunk_id=-1, done=False):
+    def save_chunk(self, chunk, offset=None, done=False):
         if self.uploading:
             if not self.file:
                 name = 'data.%s' % self.extension
@@ -188,7 +188,12 @@ class Document(models.Model):
                     f.write(chunk.read())
                 self.save()
             else:
-                with open(self.file.path, 'a') as f:
+                if offset == None:
+                    offset = self.file.size
+                elif offset > self.file.size:
+                    return False
+                with open(self.file.path, 'r+') as f:
+                    f.seek(offset)
                     f.write(chunk.read())
             if done:
                 self.uploading = False

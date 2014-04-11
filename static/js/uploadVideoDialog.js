@@ -64,6 +64,7 @@ pandora.ui.uploadVideoDialog = function(data) {
                 }).bindEvent({
                     click: function(data) {
                         if (data.files.length) {
+                            cancelled = false;
                             $actionButton.hide();
                             $closeButton.options('title', Ox._('Cancel'));
                             upload(data.files[0]);

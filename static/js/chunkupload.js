@@ -26,7 +26,8 @@
   });
 */
 pandora.chunkupload = function(options) {
-    var chunkSize = options.size || 1024 * 1024,
+    var aborted = false,
+        chunkSize = options.size || 1024 * 1024,
         chunkURL,
         file = options.file,
         maxRetry = -1,
@@ -120,6 +121,10 @@ pandora.chunkupload = function(options) {
             chunk,
             chunkOffset = chunkId * chunkSize;
 
+        if (aborted) {
+            return;
+        }
+
         if (file.mozSlice) {
             chunk = file.mozSlice(chunkOffset, chunkOffset+chunkSize, file.type);
         } else if (file.webkitSlice) {
@@ -145,7 +150,8 @@ pandora.chunkupload = function(options) {
             if (response.done == 1) {
                 //upload finished
                 that.resultUrl = response.resultUrl;
-                that.progress = 1;
+                // set progress to -1 if overall upload failed
+                that.progress = response.result;
                 that.status = 'done';
                 done();
             } else if (response.result == 1) {
@@ -210,7 +216,7 @@ pandora.chunkupload = function(options) {
         Object.keys(options.data).forEach(function(key) {
             formData.append(key, options.data[key]);
         });
-        formData.append('chunkId', chunkId);
+        formData.append('offset', chunkOffset);
         if (bytesAvailable <= chunkOffset + chunkSize) {
             formData.append('done', 1);
         }
@@ -220,9 +226,13 @@ pandora.chunkupload = function(options) {
     }
 
     that.abort = function() {
+        aborted = true;
         if (request) {
             request.abort();
             request = null;
+        } else {
+            that.progress = -1;
+            done();
         }
         return that;
     };
