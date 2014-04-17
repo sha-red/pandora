@@ -681,7 +681,7 @@ pandora.ui.documentsPanel = function(options) {
     function renderList() {
         var options = {
             items: pandora.api.findDocuments,
-            keys: ['description', 'dimensions', 'extension', 'id', 'name', 'ratio', 'size'],
+            keys: ['description', 'dimensions', 'extension', 'id', 'name', 'ratio', 'size', 'user'],
             query: {
                 conditions: isItemView ? [{ key: 'item', value: ui.item, operator: '==' }] : [],
                 operator: '&'
