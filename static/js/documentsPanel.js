@@ -520,7 +520,8 @@ pandora.ui.documentsPanel = function(options) {
         var $name, $description,
             item = $list.value($list.options('selected')[0]),
             editable = item.user == pandora.user.username
-                || pandora.site.capabilities.canEditDocuments[pandora.user.level],
+                || pandora.site.capabilities.canEditDocuments[pandora.user.level]
+                || options.editable,
             labelWidth = 80,
             width = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE;
         return isItemView

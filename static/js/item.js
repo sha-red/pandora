@@ -68,7 +68,10 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'documents') {
 
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.documents = pandora.ui.documentsPanel({isItemView: true})
+                pandora.$ui.documents = pandora.ui.documentsPanel({
+                    editable: result.data.editable,
+                    isItemView: true
+                })
             );
 
         } else if (pandora.user.ui.itemView == 'player') {

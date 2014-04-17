@@ -82,8 +82,8 @@ def editDocument(request):
     item = 'item' in data and Item.objects.get(itemId=data['item']) or None
     if data['id']:
         document = models.Document.get(data['id'])
-        if document.editable(request.user):
-            document.edit(data, request.user, item=item)
+        if document.editable(request.user, item):
+            document.edit(data, request.user, item)
             document.save()
             response['data'] = document.json(user=request.user, item=item)
         else:

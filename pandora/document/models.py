@@ -98,12 +98,13 @@ class Document(models.Model):
     def get_id(self):
         return ox.toAZ(self.id)
 
-    def editable(self, user):
+    def editable(self, user, item=None):
         if not user or user.is_anonymous():
             return False
         if self.user == user or \
            user.is_staff or \
-           user.get_profile().capability('canEditDocuments') == True:
+           user.get_profile().capability('canEditDocuments') == True or \
+           (item and item.editable(user)):
             return True
         return False
 
