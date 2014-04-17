@@ -438,6 +438,7 @@
         {"id": "clips", "title": "Clips"},
         {"id": "map", "title": "Map"},
         {"id": "calendar", "title": "Calendar"},
+        {"id": "documents", "title": "Documents"},
         {"id": "data", "title": "Data"},
         {"id": "media", "title": "Media"}
     ],
