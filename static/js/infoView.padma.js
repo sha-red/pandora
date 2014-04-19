@@ -536,10 +536,11 @@ pandora.ui.infoView = function(data) {
         return '<span class="OxLight">' + str + '</span>';
     }
 
-    function formatLink(key, value) {
+    function formatLink(key, value, linkValue) {
+        linkValue = linkValue || value;
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key
-                ? '<a href="/' + key + '=' + value + '">' + value + '</a>'
+                ? '<a href="/' + key + '=' + linkValue + '">' + value + '</a>'
                 : value;
         }).join(', ');
     }
@@ -558,7 +559,7 @@ pandora.ui.infoView = function(data) {
         if (nameKeys.indexOf(key) > -1) {
             key = 'name';
         }
-        return formatLink(key, ret);
+        return formatLink(key, ret, key == 'date' && value);
     }
 
     function getRightsLevelElement(rightsLevel) {
