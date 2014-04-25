@@ -168,8 +168,8 @@ pandora.chunkupload = function(options) {
                     } else {
                         // continue at chunk closest to offset from server
                         console.log('server offset', response.offset,
-                            'next chunk', Math.floor(response.offset / chuknSize));
-                        uploadChunk(Math.floor(response.offset / chuknSize));
+                            'next chunk', Math.floor(response.offset / chunkSize));
+                        uploadChunk(Math.floor(response.offset / chunkSize));
                     }
                 }
             } else {
