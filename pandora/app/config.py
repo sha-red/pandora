@@ -79,7 +79,7 @@ def load_config():
         for section in (
             'capabilities', 'cantPlay', 'itemName', 'media', 'posters',
             'site', 'tv', 'user.ui', 'user.ui.part', 'user.ui.showFolder',
-            'menuExtras'
+            'menuExtras', 'languages', 'language'
         ):
             parts = map(lambda p: p.replace('\0', '\\.'), section.replace('\\.', '\0').split('.'))
             #print 'checking', section
