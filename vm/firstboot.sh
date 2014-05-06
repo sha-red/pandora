@@ -134,7 +134,7 @@ sed -i -e "s#gzip_disable \"msie6\";#${GZIP}#g" /etc/nginx/nginx.conf
 service nginx restart
 
 if [ "$LXC" == "yes" ]; then
-    sed -i "s/-D/--no-rlimits -D/g" /etc/init/avahi-daemon.conf
+    test -e /etc/init/avahi-daemon.conf && sed -i "s/-D/--no-rlimits -D/g" /etc/init/avahi-daemon.conf
 fi
 
 if [ "$LXC" == "no" ]; then
