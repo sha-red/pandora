@@ -63,7 +63,7 @@ pandora.ui.errorDialog = function(data) {
                             })
                     ]),
                     content: Ox._('Sorry, a server {0}'
-                        + ' occured while handling your request.'
+                        + ' occurred while handling your request.'
                         + ' To help us find out what went wrong,'
                         + ' you may want to report this error to an administrator.'
                         + ' Otherwise, please try again later.', [error]),
