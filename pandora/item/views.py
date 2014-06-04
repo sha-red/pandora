@@ -555,7 +555,10 @@ def edit(request):
         item.log()
         response = json_response(status=200, text='ok')
         if 'rightslevel' in data:
-            item.level = int(data['rightslevel'])
+            if request.user.get_profile().capability('canEditRightsLevel') == True:
+                item.level = int(data['rightslevel'])
+            else:
+                response = json_response(status=403, text='permission denied')
             del data['rightslevel']
         if 'user' in data:
             if request.user.get_profile().get_level() in ('admin', 'staff') and \
@@ -572,7 +575,7 @@ def edit(request):
             tasks.update_clips.delay(item.itemId)
         response['data'] = item.get_json()
     else:
-        response = json_response(status=403, text='permissino denied')
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(edit, cache=False)
 

@@ -33,6 +33,7 @@
         "canEditMedia": {"researcher": true, "staff": true, "admin": true},
         "canEditMetadata": {"researcher": true, "staff": true, "admin": true},
         "canEditPlaces": {"researcher": true, "staff": true, "admin": true},
+        "canEditRightsLevel": {"researcher": true, "staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"staff": true, "admin": true},
         "canImportAnnotations": {"researcher": true, "staff": true, "admin": true},

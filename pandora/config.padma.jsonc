@@ -32,6 +32,7 @@
         "canEditMedia": {"staff": true, "admin": true},
         "canEditMetadata": {"staff": true, "admin": true},
         "canEditPlaces": {"staff": true, "admin": true},
+        "canEditRightsLevel": {"member": true, "staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"admin": true},
         "canImportAnnotations": {"member": true, "staff": true, "admin": true},
