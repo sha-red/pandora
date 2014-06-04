@@ -87,7 +87,7 @@ def process_stream(fileId):
     '''
     file = models.File.objects.get(id=fileId)
     streams = file.streams.filter(source=None)
-    models.File.objects.filter(id=fileId).update(encoding=True, queued=False)
+    models.File.objects.filter(id=fileId).update(encoding=True, queued=False, failed=False)
     if streams.count() > 0:
         stream = streams[0]
         stream.make_timeline()
@@ -108,7 +108,7 @@ def extract_stream(fileId):
     '''
         extract stream from direct upload
     '''
-    models.File.objects.filter(id=fileId).update(encoding=True, queued=False)
+    models.File.objects.filter(id=fileId).update(encoding=True, queued=False, failed=False)
     file = models.File.objects.get(id=fileId)
     if file.data:
         config = settings.CONFIG['video']
