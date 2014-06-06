@@ -10,7 +10,9 @@ pandora.ui.linkVideoDialog = function() {
             + ui.videoPoints[ui.item]['in'] + ','
             + ui.videoPoints[ui.item]['out'],
 
-        src = '/' + ui.item + '/480p' + ui.videoPoints[ui.item]['in'] + '.jpg',
+        src = (pandora.site.site.https ? 'https' : 'http') + '://'
+            + pandora.site.site.url + '/' + ui.item
+            + '/480p' + ui.videoPoints[ui.item]['in'] + '.jpg',
 
         $content = Ox.Element()
             .css({margin: '16px'})
