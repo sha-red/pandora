@@ -205,7 +205,7 @@ class Edit(models.Model):
         return clips
 
     def get_clips_json(self, user=None):
-        qs = self.get_clips()
+        qs = self.get_clips(user)
         if self.type == 'static':
             clips = [c.json(user) for c in qs.order_by('index')]
         else:
@@ -323,7 +323,7 @@ class Edit(models.Model):
             if key == 'id':
                 response[key] = self.get_id()
             elif key == 'items':
-                response[key] = self.get_clips().count()
+                response[key] = self.get_clips(user).count()
             elif key == 'query':
                 if not self.query.get('static', False):
                     response[key] = self.query
