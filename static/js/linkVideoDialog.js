@@ -5,7 +5,8 @@ pandora.ui.linkVideoDialog = function() {
 
     var ui = pandora.user.ui,
 
-        href = '/' + ui.item + '/'
+        href = (pandora.site.site.https ? 'https' : 'http') + '://'
+            + pandora.site.site.url + '/' + ui.item + '/'
             + ui.videoPoints[ui.item]['in'] + ','
             + ui.videoPoints[ui.item]['out'],
 
