@@ -48,9 +48,11 @@ def get_matches(obj, model, layer_type, qs=None):
     contains = [l['id'] for l in filter(lambda l: l.get(has_type), settings.CONFIG['layers'])]
     if contains:
         name = ox.decode_html(obj.name)
+        name = unicodedata.normalize('NFKD', name).lower()
         q = Q(findvalue__icontains=" " + name)|Q(findvalue__istartswith=name)
         for name in obj.alternativeNames:
             name = ox.decode_html(name)
+            name = unicodedata.normalize('NFKD', name).lower()
             q = q|Q(findvalue__icontains=" " + name)|Q(findvalue__istartswith=name)
         contains_matches = q&Q(layer__in=contains)
         if f:
@@ -70,6 +72,7 @@ def get_matches(obj, model, layer_type, qs=None):
             for name in [obj.name] + list(obj.alternativeNames):
                 name = name.lower()
                 name = ox.decode_html(name)
+                name = unicodedata.normalize('NFKD', name).lower()
                 if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\'"\)\]\-\/\s]|$))'%re.escape(name)).findall(value)):
                     matches.append(a.id)
                     break
