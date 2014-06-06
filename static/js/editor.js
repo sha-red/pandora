@@ -186,6 +186,10 @@ pandora.ui.editor = function(data) {
                     Ox.getObjectById(pandora.site.layers, data.layer).title
                 ).open();
             },
+            linktoselection: function(data) {
+                pandora.$ui.linkVideoDialog && pandora.$ui.linkVideoDialog.remove();
+                pandora.$ui.linkVideoDialog = pandora.ui.linkVideoDialog().open();
+            },
             loop: function(data) {
                 pandora.UI.set({videoLoop: data.loop});
             },
