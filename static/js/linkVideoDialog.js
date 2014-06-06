@@ -5,7 +5,11 @@ pandora.ui.linkVideoDialog = function() {
 
     var ui = pandora.user.ui,
 
-        url = '/' + ui.item + '/480p' + ui.videoPoints[ui.item]['in'] + '.jpg',
+        href = '/' + ui.item + '/'
+            + ui.videoPoints[ui.item]['in'] + ','
+            + ui.videoPoints[ui.item]['out'],
+
+        src = '/' + ui.item + '/480p' + ui.videoPoints[ui.item]['in'] + '.jpg',
 
         $content = Ox.Element()
             .css({margin: '16px'})
@@ -18,8 +22,7 @@ pandora.ui.linkVideoDialog = function() {
                 marginTop: '8px'
             })
             .val(
-                '<a href="' + document.location.href
-                + '"><img src="' + url + '"></a>'
+                '<a href="' + href + '"><img src="' + src + '"></a>'
             )
             .on({
                 click: function() {
