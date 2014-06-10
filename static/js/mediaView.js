@@ -80,24 +80,25 @@ pandora.ui.mediaView = function(options) {
                         return ['uploading', 'queued', 'encoding'].indexOf(data.state) == -1;
                     },
                     format: function(value, data) {
+                        var opacity = value
+                            || ['encoding', 'failed', 'queued', 'uploading', 'wanted'].indexOf(data.state) > -1
+                            ? 1 : 0;
                         return $('<img>')
                             .attr({
-                                src: ['uploading', 'queued', 'encoding', 'failed'].indexOf(data.state) > -1
-                                    ? Ox.UI.getImageURL('symbol' + {
-                                        'uploading': 'Upload',
-                                        'queued': 'Data',
-                                        'encoding': 'Sync',
-                                        'failed': 'Warning'
-                                    }[data.state])
-                                    : data.wanted
-                                    ? Ox.UI.getImageURL('symbolUp')
-                                    : Ox.UI.getImageURL('symbolCheck')
+                                src: Ox.UI.getImageURL('symbol' + {
+                                    'available': 'Check',
+                                    'encoding': 'Sync',
+                                    'failed': 'Warning',
+                                    'queued': 'Data',
+                                    'uploading': 'Upload',
+                                    'wanted': 'Up',
+                                }[data.state])
                             })
                             .css({
                                 width: '10px',
                                 height: '10px',
                                 padding: '3px',
-                                opacity: (value || data.wanted) ? 1 : 0
+                                opacity: opacity
                             });
                     },
                     id: 'selected',
