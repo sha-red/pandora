@@ -85,14 +85,14 @@ pandora.ui.mediaView = function(options) {
                             ? 1 : 0;
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImageURL('symbol' + {
+                                src: Ox.UI.getImageURL('symbol' + ({
                                     'available': 'Check',
                                     'encoding': 'Sync',
                                     'failed': 'Warning',
                                     'queued': 'Data',
                                     'uploading': 'Upload',
                                     'wanted': 'Up',
-                                }[data.state])
+                                }[data.state] || 'Check'))
                             })
                             .css({
                                 width: '10px',
