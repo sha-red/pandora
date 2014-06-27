@@ -15,6 +15,7 @@ pandora.ui.folders = function(section) {
         ] || '').split(':')[0] == pandora.user.username,
         folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1),
+        canEditFeatured = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
         initCounter = 0,
         loadCounter = 0;
     pandora.$ui.allItems = pandora.ui.allItems(section).appendTo(that);
@@ -232,8 +233,7 @@ pandora.ui.folders = function(section) {
                 })];
             }
         } else if (folder.id == 'featured') {
-            //FIXME: this should use 'canEditFeatured' + section
-            if (pandora.user.level != 'admin') {
+            if (!canEditFeatured) {
                 extras = [infoButton(Ox._('Featured ' + folderItems),
                     Ox._('Featured {0} are selected public {0}, picked by the {1} staff.',
                         [Ox._(folderItems.toLowerCase()), pandora.site.site.name]))];
