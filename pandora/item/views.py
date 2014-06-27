@@ -276,7 +276,7 @@ Positions
 
     else: # otherwise stats
         items = query['qs']
-        files = File.objects.filter(item__in=items).filter(size__gt=0)
+        files = File.objects.filter(item__in=items).filter(selected=True).filter(size__gt=0)
         r = files.aggregate(
             Sum('duration'),
             Sum('pixels'),
