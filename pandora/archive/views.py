@@ -81,15 +81,9 @@ def update(request):
         user_profile.files_updated = datetime.now()
         user_profile.save()
 
-    if 'info' in data:
-        files = models.File.objects.filter(oshash__in=data['info'].keys())
-        for f in files:
-            if not f.info:
-                f.update_info(data['info'][f.oshash], user)
-                f.save()
-        for i in Item.objects.filter(files__in=files).distinct():
-            i.update_selected()
-            i.update_wanted()
+    if 'info' in data and data['info']:
+        t = tasks.update_info.delay(user.username, data['info'])
+        response['data']['taskId'] = t.task_id
     if not upload_only:
         all_files = models.Instance.objects.filter(volume__user=user)
         files = all_files.filter(file__available=False)

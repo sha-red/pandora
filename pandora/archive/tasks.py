@@ -80,6 +80,17 @@ def update_files(user, volume, files):
         i = Item.objects.get(itemId=i)
         i.update_selected()
 
+@task(ignore_results=True, queue='default')
+def update_info(user, info):
+    files = models.File.objects.filter(oshash__in=info.keys())
+    for f in files:
+        if not f.info:
+            f.update_info(data['info'][f.oshash], user)
+            f.save()
+    for i in Item.objects.filter(files__in=files).distinct():
+        i.update_selected()
+        i.update_wanted()
+
 @task(queue="encoding")
 def process_stream(fileId):
     '''
