@@ -571,8 +571,9 @@ pandora.ui.mediaView = function(options) {
     function selectFiles(data) {
         self.selected = data.ids;
         self.$instancesList.options({
-            items: data.ids.length == 1
-                ? self.$filesList.value(data.ids[0], 'instances') : []
+            items: Ox.flatten(data.ids.map(function(id) {
+                return self.$filesList.value(id, 'instances');
+            }))
         });
         updateForm();
     }
