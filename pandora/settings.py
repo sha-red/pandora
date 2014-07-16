@@ -151,6 +151,7 @@ LOGGING = {
 
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 AUTH_CHECK_USERNAME = True
+AVCONV_VERSION = 0
 
 #=========================================================================
 #Pan.do/ra related settings settings

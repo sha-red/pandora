@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 import ox.jsonc
 from ox.utils import json
 
-from archive.extract import supported_formats, AVCONV
+from archive.extract import supported_formats, AVCONV, avconv_version
 from item.utils import get_by_id
 
 
@@ -142,6 +142,7 @@ check the README for further details.
 
 ''' % AVCONV)
 
+        settings.AVCONV_VERSION = avconv_version()
         settings.CONFIG = config
         admin = len(settings.CONFIG['userLevels']) - 1
         if not 'syncdb' in sys.argv \
