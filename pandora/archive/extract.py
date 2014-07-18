@@ -17,6 +17,7 @@ import Image
 import ox
 import ox.image
 from ox.utils import json
+from django.conf import settings
 
 img_extension='jpg'
 
