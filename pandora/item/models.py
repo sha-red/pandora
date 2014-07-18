@@ -4,6 +4,7 @@ from __future__ import division, with_statement
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -402,6 +403,7 @@ class Item(models.Model):
             self.poster_height = 128
             self.poster_width = 80
         self.update_sort()
+        self.update_languages()
         self.json = self.get_json()
         self.json['modified'] = datetime.now()
         super(Item, self).save(*args, **kwargs)
@@ -718,6 +720,20 @@ class Item(models.Model):
     '''
         Search related functions
     '''
+
+    def update_languages(self):
+        languages = {}
+        for layer in settings.CONFIG['layers']:
+            l = layer['id']
+            ll = []
+            if self.annotations.filter(layer=l).count():
+                ll.append(settings.CONFIG['language'])
+            for a in self.annotations.filter(layer=l, value__contains='lang="'):
+                ll += re.compile('lang="(.*?)"').findall(a.value)
+            languages[l] = sorted(set(ll))
+        changed = languages != self.data.get('annotationLanguages')
+        self.data['annotationLanguages'] = languages
+        return changed
 
     def update_find(self):
 

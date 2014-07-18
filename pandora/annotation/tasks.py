@@ -107,3 +107,5 @@ def update_item(id):
     a.item.update_find()
     a.item.update_sort()
     a.item.update_facets()
+    if a.item.update_languages():
+        a.item.save()
