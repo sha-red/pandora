@@ -250,7 +250,7 @@ def stream(video, target, profile, info, avconv=None):
 
     if not avconv:
         avconv = AVCONV
-    cmd = [avconv, '-y', '-i', video, '-threads', '4'] \
+    cmd = [avconv, '-y', '-i', video, '-threads', '4', '-map_metadata', '-1'] \
           + audio_settings \
           + video_settings
 
