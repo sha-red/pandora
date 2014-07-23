@@ -49,6 +49,7 @@ pandora.ui.player = function(data) {
             showTimeline: ui.showTimeline,
             smallTimelineURL: pandora.getMediaURL('/' + ui.item + '/timeline16p.jpg'),
             subtitles: data.subtitles,
+            subtitlesDefaultTrack: pandora.site.language,
             timeline: ui.videoTimeline,
             timelineTooltip: Ox._('timeline') + ' <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'T</span>',
             video: data.video,

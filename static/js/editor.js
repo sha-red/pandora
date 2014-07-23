@@ -60,6 +60,7 @@ pandora.ui.editor = function(data) {
             showLayers: Ox.clone(ui.showLayers),
             showUsers: pandora.site.annotations.showUsers,
             subtitles: data.subtitles,
+            subtitlesDefaultTrack: pandora.site.language,
             subtitlesLayer: data.subtitlesLayer,
             timeline: ui.videoTimeline,
             timelines: pandora.site.timelines,
