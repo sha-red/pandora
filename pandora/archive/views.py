@@ -399,6 +399,7 @@ def editMedia(request):
     data = json.loads(request.POST['data'])
 
     ignore = []
+    save_items = []
     dont_ignore = []
     response = json_response(status=200, text='updated')
     response['data']['files'] = []
@@ -414,6 +415,8 @@ def editMedia(request):
             for key in f.PATH_INFO:
                 if key in info:
                     f.info[key] = info[key]
+                    if key == 'language' and (f.is_video or f.is_audio):
+                        save_items.append(f.item)
                     update = True
             if update:
                 f.save()
@@ -430,6 +433,9 @@ def editMedia(request):
         for i in Item.objects.filter(files__in=files).distinct():
             i.update_selected()
             i.update_wanted()
+    if save_items:
+        for i in Item.objects.filter(id__in=list(set(save_items))):
+            i.save()
     return render_to_json_response(response)
 actions.register(editMedia, cache=False)
 

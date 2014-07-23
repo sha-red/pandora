@@ -897,7 +897,7 @@ def torrent(request, id, filename=None):
                                       quote(os.path.basename(filename.encode('utf-8')))
     return response
 
-def video(request, id, resolution, format, index=None):
+def video(request, id, resolution, format, index=None, track=None):
     resolution = int(resolution)
     resolutions = sorted(settings.CONFIG['video']['resolutions'])
     if resolution not in resolutions:
@@ -909,7 +909,7 @@ def video(request, id, resolution, format, index=None):
         index = int(index) - 1
     else:
         index = 0
-    streams = item.streams()
+    streams = item.streams(track)
     if index + 1 > streams.count():
         raise Http404
     stream = streams[index].get(resolution, format)

@@ -19,6 +19,7 @@ urlpatterns = patterns("item.views",
 
     #video
     (r'^(?P<id>[A-Z0-9].*)/(?P<resolution>\d+)p(?P<index>\d*)\.(?P<format>webm|ogv|mp4)$', 'video'),
+    (r'^(?P<id>[A-Z0-9].*)/(?P<resolution>\d+)p(?P<index>\d*)\.(?P<track>.+)\.(?P<format>webm|ogv|mp4)$', 'video'),
 
     #torrent
     (r'^(?P<id>[A-Z0-9].*)/torrent$', 'torrent'),

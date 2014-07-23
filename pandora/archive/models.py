@@ -3,8 +3,9 @@
 from __future__ import division, with_statement
 
 import os.path
-import time
 import shutil
+import tempfile
+import time
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -13,6 +14,7 @@ from django.db.models.signals import pre_delete
 
 from ox.django import fields
 import ox
+import ox.iso
 
 from item import utils
 import item.models
@@ -48,7 +50,7 @@ class File(models.Model):
 
     #editable
     extension = models.CharField(default="", max_length=255, null=True) 
-    language = models.CharField(default="", max_length=8, null=True)
+    language = models.CharField(default="", max_length=255, null=True)
     part = models.CharField(default="", max_length=255, null=True)
     part_title = models.CharField(default="", max_length=255, null=True)
     version = models.CharField(default="", max_length=255, null=True) 
@@ -404,13 +406,67 @@ class File(models.Model):
         '''
         import tasks
         return tasks.extract_stream.delay(self.id)
-    
+
     def process_stream(self):
         '''
             extract derivatives from webm upload
         '''
         import tasks
         return tasks.process_stream.delay(self.id)
+
+    def extract_tracks(self):
+        '''
+            extract audio tracks from direct upload
+        '''
+        audio = self.info.get('audio', [])
+        if self.data and len(audio) > 1:
+            config = settings.CONFIG['video']
+            resolution = self.stream_resolution()
+            ffmpeg = ox.file.cmd('ffmpeg')
+            if ffmpeg == 'ffmpeg':
+                ffmpeg = None
+            tmp = tempfile.mkdtemp()
+            languages = [settings.CONFIG['language']]
+            for i, a in enumerate(audio[1:]):
+                media = self.data.path
+                info = ox.avinfo(media)
+                lang = ox.iso.langCode3To2(a.get('language', u'und').encode('utf-8'))
+                if not lang:
+                    lang = settings.CONFIG['language']
+                language = lang
+                n = 2
+                while language in languages:
+                    language = '%s%d' % (lang, n)
+                    n += 1
+                profile = '%s.%s' % (resolution, config['formats'][0])
+                target = os.path.join(tmp, language + '_' + profile)
+                ok, error = extract.stream(media, target, profile, info, ffmpeg,
+                        audio_track=i+1)
+                if ok:
+                    tinfo = ox.avinfo(target)
+                    del tinfo['path']
+                    f = File(oshash=tinfo['oshash'], item=self.item)
+                    f.path = self.path
+                    f.info = tinfo
+                    f.info['language'] = language
+                    f.info['extension'] = config['formats'][0]
+                    f.parse_info()
+                    f.selected = True
+                    f.save()
+                    stream, created = Stream.objects.get_or_create(
+                        file=f, resolution=resolution, format=config['formats'][0]
+                    )
+                    if created:
+                        stream.media.name = stream.path(stream.name())
+                        ox.makedirs(os.path.dirname(stream.media.path))
+                        shutil.move(target, stream.media.path)
+                        stream.available = True
+                        stream.save()
+                        stream.make_timeline()
+                        stream.extract_derivatives()
+                if os.path.exists(target):
+                    os.unlink(target)
+            shutil.rmtree(tmp)
 
     def delete(self, *args, **kwargs):
         self.delete_files()

@@ -604,6 +604,7 @@ class Item(models.Model):
         streams = self.streams()
         i['durations'] = [s.duration for s in streams]
         i['duration'] = sum(i['durations'])
+        i['audioTracks'] = self.audio_tracks()
         if not streams:
             i['duration'] = self.files.filter(
                 Q(selected=True)|Q(wanted=True)
@@ -1239,12 +1240,27 @@ class Item(models.Model):
         self.torrent.name = torrent[len(settings.MEDIA_ROOT)+1:]
         self.save()
 
-    def streams(self):
-        return archive.models.Stream.objects.filter(
+    def audio_tracks(self):
+        tracks = [f['language'] for f in self.files.filter(selected=True).values('language') if f['language']]
+        return sorted(set(tracks))
+
+    def streams(self, track=None):
+        qs = archive.models.Stream.objects.filter(
             source=None, available=True, file__item=self, file__selected=True
         ).filter(
             Q(file__is_audio=True)|Q(file__is_video=True)
-        ).order_by('file__part', 'file__sort_path')
+        )
+        if not track:
+            tracks = self.audio_tracks()
+            if len(tracks) > 1:
+                if settings.CONFIG['language'] in tracks:
+                    track = settings.CONFIG['language']
+                else:
+                    track = tracks[0]
+        if track:
+            qs = qs.filter(file__language=track)
+        qs = qs.order_by('file__part', 'file__sort_path')
+        return qs
 
     def update_timeline(self, force=False, async=True):
         streams = self.streams()

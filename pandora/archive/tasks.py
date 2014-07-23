@@ -139,6 +139,7 @@ def extract_stream(fileId):
                     file.item.update_timeline()
                 if file.item.rendered:
                     file.item.save()
+                file.extract_tracks()
     models.File.objects.filter(id=fileId).update(encoding=False)
 
 @task(queue="encoding")

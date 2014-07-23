@@ -70,7 +70,7 @@ def avconv_version():
     version = stderr.split(' ')[2].split('-')[0]
     return version
 
-def stream(video, target, profile, info, avconv=None):
+def stream(video, target, profile, info, avconv=None, audio_track=0):
     if not os.path.exists(target):
         ox.makedirs(os.path.dirname(target))
 
@@ -231,14 +231,36 @@ def stream(video, target, profile, info, avconv=None):
                     '-qmin', '10', '-qmax', '51',
                     '-qdiff', '4'
                 ]
+        video_settings += ['-map', '0:%s,0:0'%info['video'][0]['id']]
     else:
         video_settings = ['-vn']
 
     if info['audio']:
+        if video_settings == ['-vn'] or not info['video']:
+            n = 0
+        else:
+            n = 1
+        #mix 2 mono channels into stereo(common for fcp dv mov files)
+        if audio_track == 0 and len(info['audio']) == 2 \
+                and len(filter(None, [a['channels'] == 1 or None for a in info['audio']])) == 2:
+            video_settings += [
+                '-filter_complex',
+                '[0:%s][0:%s] amerge' % (info['audio'][0]['id'], info['audio'][1]['id'])
+            ]
+            mono_mix = True
+        else:
+            video_settings += ['-map', '0:%s,0:%s' % (info['audio'][audio_track]['id'], n)]
+            mono_mix = False
         audio_settings = ['-ar', str(audiorate), '-aq', str(audioquality)]
-        if audiochannels and 'channels' in info['audio'][0] \
-            and info['audio'][0]['channels'] > audiochannels:
-            audio_settings += ['-ac', str(audiochannels)]
+        if mono_mix:
+            ac = 2
+        else:
+            ac = info['audio'][audio_track].get('channels', audiochannels)
+        if ac:
+            ac = min(ac, audiochannels)
+        else:
+            ac = audiochannels
+        audio_settings += ['-ac', str(ac)]
         if audiobitrate:
             audio_settings += ['-ab', audiobitrate]
         if format == 'mp4':
