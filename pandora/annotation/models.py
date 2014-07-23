@@ -99,6 +99,8 @@ class Annotation(models.Model):
     value = models.TextField()
     findvalue = models.TextField(null=True)
     sortvalue = models.CharField(max_length=1000, null=True, blank=True, db_index=True)
+    
+    languages = models.CharField(max_length=255, null=True, blank=True)
 
     def editable(self, user):
         if user.is_authenticated():
@@ -148,9 +150,13 @@ class Annotation(models.Model):
                 self.sortvalue = sortvalue[:900]
             else:
                 self.sortvalue = None
+            self.languages = ','.join(re.compile('lang="(.*?)"').findall(self.value))
+            if not self.languages:
+                self.languages = None
         else:
             self.findvalue = None
             self.sortvalue = None
+            self.languages = None
 
         #no clip or update clip
         if self.layer in settings.CONFIG.get('clipLayers', []):
@@ -213,7 +219,8 @@ class Annotation(models.Model):
         j['duration'] = abs(j['out'] - j['in'])
         if user:
             j['editable'] = self.editable(user)
-
+        if self.languages:
+            j['languages'] = self.languages.split(',')
         l = self.get_layer()
         if l['type'] == 'place':
             qs = self.places.all()
