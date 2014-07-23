@@ -1738,13 +1738,15 @@ pandora.getMediaURL = function(url) {
     return pandora.site.site.mediaprefix + url;
 };
 
-pandora.getVideoURL = function(id, resolution, part) {
+pandora.getVideoURL = function(id, resolution, part, track) {
     var prefix = pandora.site.site.videoprefix
         .replace('{id}', id)
         .replace('{part}', part)
         .replace('{resolution}', resolution)
         .replace('{uid}', Ox.uid());
-    return prefix + '/' + id + '/' + resolution + 'p' + part + '.' + pandora.user.videoFormat;
+    return prefix + '/' + id + '/' + resolution + 'p' + part
+        + (track ? '.' + track : '')
+        + '.' + pandora.user.videoFormat;
 };
 
 pandora.getVideoOptions = function(data) {
@@ -1758,12 +1760,14 @@ pandora.getVideoOptions = function(data) {
     })[0];
     options.subtitles = options.subtitlesLayer
         ? data.layers[options.subtitlesLayer].map(function(subtitle) {
-            return {
+            return Ox.extend({
                 id: subtitle.id,
                 'in': subtitle['in'],
                 out: subtitle.out,
                 text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n')
-            };
+            }, subtitle.languages ? {
+                tracks: subtitle.languages
+            } : {});
         })
         : [];
     options.censored = canPlayVideo ? []
@@ -1788,14 +1792,30 @@ pandora.getVideoOptions = function(data) {
                 })
         )
         : [{'in': 0, out: data.duration}];
-    options.video = {};
+    options.video = [];
     pandora.site.video.resolutions.forEach(function(resolution) {
-        options.video[resolution] = Ox.range(data.parts).map(function(i) {
-            return {
-                duration: data.durations[i],
-                src: pandora.getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1)
-            };
-        });
+        if (data.audioTracks) {
+            data.audioTracks.forEach(function(track) {
+                Ox.range(data.parts).forEach(function(i) {
+                    options.video.push({
+                        duration: data.durations[i],
+                        index: i,
+                        track: track,
+                        resolution: resolution,
+                        src: pandora.getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1, track)
+                    });
+                });
+            });
+        } else {
+            Ox.range(data.parts).forEach(function(i) {
+                options.video.push({
+                    duration: data.durations[i],
+                    index: i,
+                    resolution: resolution,
+                    src: pandora.getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1)
+                });
+            });
+        }
     });
     options.annotations = [];
     pandora.site.layers.forEach(function(layer, i) { 
@@ -1811,6 +1831,7 @@ pandora.getVideoOptions = function(data) {
             })
         });
     });
+    Ox.Log('Video', 'VideoOptions', options);
     return options;
 };
 

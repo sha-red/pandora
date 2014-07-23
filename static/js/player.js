@@ -14,6 +14,7 @@ pandora.ui.player = function(data) {
             annotationsSort: ui.annotationsSort,
             annotationsTooltip: Ox._('annotations')
                 + ' <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'A</span>',
+            audioTrack: data.audioTracks ? data.audioTracks[0] : void 0,
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
             censoredTooltip: Ox._(pandora.site.cantPlay.text),

@@ -13,6 +13,7 @@ pandora.ui.item = function() {
     pandora.api.get({
         id: pandora.user.ui.item,
         keys: isVideoView ? [
+            'audioTracks',
             'cuts', 'director', 'duration', 'durations', 'editable', 'layers',
             'modified', 'parts', 'posterFrame', 'rendered', 'rightslevel',
             'size', 'title', 'videoRatio', 'year'
