@@ -14,6 +14,7 @@ pandora.ui.timeline = function(data) {
             annotationsSort: ui.annotationsSort,
             annotationsTooltip: Ox._('annotations')
                 + ' <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'A</span>',
+            audioTrack: data.audioTrack,
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
             censoredTooltip: Ox._(pandora.site.cantPlay.text),
