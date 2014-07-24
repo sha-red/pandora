@@ -14,6 +14,7 @@ pandora.ui.editor = function(data) {
             annotationsSort: ui.annotationsSort,
             annotationsTooltip: Ox._('annotations')
                 + ' <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'A</span>',
+            audioTrack: data.audioTrack,
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
             censoredTooltip: Ox._(pandora.site.cantPlay.text),
@@ -60,8 +61,9 @@ pandora.ui.editor = function(data) {
             showLayers: Ox.clone(ui.showLayers),
             showUsers: pandora.site.annotations.showUsers,
             subtitles: data.subtitles,
-            subtitlesDefaultTrack: pandora.site.language,
+            subtitlesDefaultTrack: Ox.getLanguageNameByCode(pandora.site.language),
             subtitlesLayer: data.subtitlesLayer,
+            subtitlesTrack: Ox.getLanguageNameByCode(pandora.site.language),
             timeline: ui.videoTimeline,
             timelines: pandora.site.timelines,
             video: data.video,

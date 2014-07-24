@@ -1758,18 +1758,6 @@ pandora.getVideoOptions = function(data) {
     }).map(function(layer) {
         return layer.id;
     })[0];
-    options.subtitles = options.subtitlesLayer
-        ? data.layers[options.subtitlesLayer].map(function(subtitle) {
-            return Ox.extend({
-                id: subtitle.id,
-                'in': subtitle['in'],
-                out: subtitle.out,
-                text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n')
-            }, subtitle.languages ? {
-                tracks: subtitle.languages
-            } : {});
-        })
-        : [];
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
             options.subtitles.length
@@ -1800,7 +1788,7 @@ pandora.getVideoOptions = function(data) {
                     options.video.push({
                         duration: data.durations[i],
                         index: i,
-                        track: track,
+                        track: Ox.getLanguageNameByCode(track),
                         resolution: resolution,
                         src: pandora.getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1, track)
                     });
@@ -1817,6 +1805,7 @@ pandora.getVideoOptions = function(data) {
             });
         }
     });
+    options.audioTrack = data.audioTracks ? Ox.getLanguageNameByCode(data.audioTracks[0]) : void 0;
     options.annotations = [];
     pandora.site.layers.forEach(function(layer, i) { 
         options.annotations[i] = Ox.extend({}, layer, {
@@ -1827,6 +1816,11 @@ pandora.getVideoOptions = function(data) {
                 annotation.editable = annotation.editable
                     || annotation.user == pandora.user.username
                     || pandora.site.capabilities['canEditAnnotations'][pandora.user.level];
+                annotation.languages = (
+                    annotation.languages || [pandora.site.language]
+                ).map(function(language) {
+                    return Ox.getLanguageNameByCode(language);
+                });
                 return annotation;
             })
         });
