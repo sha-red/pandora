@@ -1805,7 +1805,11 @@ pandora.getVideoOptions = function(data) {
             });
         }
     });
-    options.audioTrack = data.audioTracks ? Ox.getLanguageNameByCode(data.audioTracks[0]) : void 0;
+    options.audioTrack = data.audioTracks ? Ox.getLanguageNameByCode(
+        Ox.contains(data.audioTracks, pandora.site.language)
+            ? pandora.site.language
+            : data.audioTracks[0]
+    ) : void 0;
     options.annotations = [];
     pandora.site.layers.forEach(function(layer, i) { 
         options.annotations[i] = Ox.extend({}, layer, {
