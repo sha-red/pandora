@@ -605,6 +605,8 @@ class Item(models.Model):
         i['durations'] = [s.duration for s in streams]
         i['duration'] = sum(i['durations'])
         i['audioTracks'] = self.audio_tracks()
+        if not i['audioTracks']:
+            del i['audioTracks']
         if not streams:
             i['duration'] = self.files.filter(
                 Q(selected=True)|Q(wanted=True)
