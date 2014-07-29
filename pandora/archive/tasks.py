@@ -129,6 +129,7 @@ def extract_stream(fileId):
             file=file, resolution=resolution, format=config['formats'][0]
         )
         if created:
+            file.extract_frames()
             stream.media.name = stream.path(stream.name())
             stream = stream.encode()
             if stream.available:

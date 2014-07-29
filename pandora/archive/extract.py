@@ -351,6 +351,22 @@ def frame(video, frame, position, height=128, redo=False):
                     '-p', str(position), '-y', str(height)]
             run_command(cmd)
 
+def frame_direct(video, target, position):
+    fdir = os.path.dirname(target)
+    if fdir and not os.path.exists(fdir):
+        os.makedirs(fdir)
+
+    pre = position - 2
+    if pre < 0:
+        pre = 0
+    else:
+        position = 2
+    cmd = [ox.file.cmd('ffmpeg'), '-y', '-ss', str(pre), '-i', video, '-ss', str(position),
+            '-vf', 'scale=iw*sar:ih',
+            '-an', '-vframes', '1', target]
+    r = run_command(cmd)
+    return r == 0
+
 
 def resize_image(image_source, image_output, width=None, size=None):
     if exists(image_source):

@@ -400,6 +400,30 @@ class File(models.Model):
     def all_paths(self):
         return [self.path] + [i.path for i in self.instances.all()]
 
+    def extract_frames(self):
+        def video_frame_positions(duration):
+            pos = duration / 2
+            return map(int, [pos/2, pos, pos+pos/2])
+        if settings.CONFIG['media'].get('importFrames') and self.data:
+            filename = self.data.path
+            prefix = os.path.dirname(filename)
+            info = self.info
+            oshash = info['oshash']
+
+            for pos in video_frame_positions(info['duration']):
+                position = float(pos)
+                name = "%s.png" % position
+                fr, created = Frame.objects.get_or_create(file=self, position=position)
+                if fr.frame:
+                    fr.frame.delete()
+                fr.frame.name = self.get_path(name)
+                if not os.path.exists(fr.frame.path):
+                    extract.frame_direct(filename, fr.frame.path, pos)
+                if os.path.exists(fr.frame.path):
+                    fr.save()
+                    os.chmod(fr.frame.path, 0644)
+            self.item.select_frame()
+
     def extract_stream(self):
         '''
             extract stream from direct upload
