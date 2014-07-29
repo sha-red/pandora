@@ -624,7 +624,10 @@ class Stream(models.Model):
         return stream
 
     def path(self, name=''):
-        return self.file.get_path(name)
+        if self.source:
+            return os.path.join(os.path.dirname(self.source.media.name), name)
+        else:
+            return self.file.get_path(name)
 
     def extract_derivatives(self, rebuild=False):
         config = settings.CONFIG['video']
@@ -649,49 +652,38 @@ class Stream(models.Model):
         return True
 
     def encode(self):
-        if self.source:
-            media = self.source.media.path
-            if not self.media:
-                self.media.name = os.path.join(os.path.dirname(self.source.media.name), self.name())
-            target = self.media.path
-            info = ox.avinfo(media)
-            ok, error = extract.stream(media, target, self.name(), info)
-            if ok:
-                self.available = True
-                self.error = ''
-                if self.file.failed:
-                    self.file.failed = False
-                    self.file.save()
-            else:
-                self.media = None
-                self.available = False
-                self.error = error
-                self.file.failed = True
-                self.file.save()
-            self.save()
-        elif self.file.data:
-            media = self.file.data.path
+        media = self.source.media.path if self.source else self.file.data
+        ffmpeg = ox.file.cmd('ffmpeg')
+        if self.source or ffmpeg == 'ffmpeg':
+            ffmpeg = None
+
+        if not self.media:
+            self.media.name = self.path(self.name())
+        target = self.media.path
+
+        info = ox.avinfo(media)
+        ok, error = extract.stream(media, target, self.name(), info, ffmpeg)
+        # file could have been moved while encoding
+        # get current version from db and update
+        _self = Stream.objects.get(id=self.id)
+        _self.update_status(ok, error)
+
+    def update_status(self, ok, error):
+        if ok:
             if not self.media:
                 self.media.name = self.path(self.name())
-            target = self.media.path
-            info = ox.avinfo(media)
-            ffmpeg = ox.file.cmd('ffmpeg')
-            if ffmpeg == 'ffmpeg':
-                ffmpeg = None
-            ok, error = extract.stream(media, target, self.name(), info, ffmpeg)
-            if ok:
-                self.available = True
-                self.error = ''
-                if self.file.failed:
-                    self.file.failed = False
-                    self.file.save()
-            else:
-                self.media = None
-                self.available = False
-                self.error = error
-                self.file.failed = True
+            self.available = True
+            self.error = ''
+            if self.file.failed:
+                self.file.failed = False
                 self.file.save()
-            self.save()
+        else:
+            self.media = None
+            self.available = False
+            self.error = error
+            self.file.failed = True
+            self.file.save()
+        self.save()
 
     def make_timeline(self):
         if self.available and not self.source:
