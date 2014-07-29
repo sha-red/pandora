@@ -652,7 +652,7 @@ class Stream(models.Model):
         return True
 
     def encode(self):
-        media = self.source.media.path if self.source else self.file.data
+        media = self.source.media.path if self.source else self.file.data.path
         ffmpeg = ox.file.cmd('ffmpeg')
         if self.source or ffmpeg == 'ffmpeg':
             ffmpeg = None
