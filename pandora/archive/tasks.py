@@ -130,11 +130,12 @@ def extract_stream(fileId):
         )
         if created:
             stream.media.name = stream.path(stream.name())
-            stream.encode()
+            stream = stream.encode()
             if stream.available:
                 stream.make_timeline()
                 stream.extract_derivatives()
-                file.item.update_selected()
+                # get current version from db
+                file = models.File.objects.get(id=fileId)
                 if not file.item.rendered:
                     file.item.update_timeline()
                 if file.item.rendered:

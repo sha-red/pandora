@@ -636,20 +636,12 @@ class Stream(models.Model):
                 for f in config['formats']:
                     derivative, created = Stream.objects.get_or_create(file=self.file,
                                                       resolution=resolution, format=f)
-                    
-                    name = derivative.name()
-                    name = os.path.join(os.path.dirname(self.media.name), name)
                     if created:
                         derivative.source = self
                         derivative.save()
-                        derivative.media.name = name
                         derivative.encode()
-                        derivative.save()
                     elif rebuild or not derivative.available:
-                        if not derivative.media:
-                            derivative.media.name = name
                         derivative.encode()
-        return True
 
     def encode(self):
         media = self.source.media.path if self.source else self.file.data.path
@@ -660,13 +652,13 @@ class Stream(models.Model):
         if not self.media:
             self.media.name = self.path(self.name())
         target = self.media.path
-
         info = ox.avinfo(media)
         ok, error = extract.stream(media, target, self.name(), info, ffmpeg)
         # file could have been moved while encoding
         # get current version from db and update
         _self = Stream.objects.get(id=self.id)
         _self.update_status(ok, error)
+        return _self
 
     def update_status(self, ok, error):
         if ok:
