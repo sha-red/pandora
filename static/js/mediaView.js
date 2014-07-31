@@ -602,7 +602,7 @@ pandora.ui.mediaView = function(options) {
     }
 
     function updateForm() {
-        if (self.selected.length == self.numberOfItems) {
+        if (pandora.site.itemRequiresVideo && self.selected.length == self.numberOfItems) {
             self.wasChecked = self.$switch.value();
             self.$switch.options({
                 disabled: true,
