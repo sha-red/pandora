@@ -4,7 +4,8 @@ LXC=`grep -q lxc /proc/1/environ && echo 'yes' || echo 'no'`
 export DEBIAN_FRONTEND=noninteractive
 apt-get install -y \
     update-manager-core \
-    python-software-properties
+    software-properties-common
+[[ `lsb_release -sr` == "12.04" ]] && apt-get install -y python-software-properties
 add-apt-repository -y ppa:j/pandora
 apt-get update
 
@@ -12,6 +13,12 @@ if [ "$LXC" == "no" ]; then
 apt-get install -y \
     acpid \
     ntp
+fi
+
+if [[ `lsb_release -sr` == "12.04" ]]; then
+    LIBAVCODEC_EXTRA=libavcodec-extra-53
+else
+    LIBAVCODEC_EXTRA=libavcodec-extra
 fi
 
 apt-get install -y \
@@ -42,7 +49,7 @@ apt-get install -y \
     gstreamer0.10-plugins-good \
     gstreamer0.10-plugins-bad \
     oxframe \
-    libavcodec-extra-53 \
+    $LIBAVCODEC_EXTRA \
     libav-tools \
     ffmpeg2theora \
     mkvtoolnix \
