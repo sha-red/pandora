@@ -170,7 +170,7 @@ def signup(request):
                         if key == 'query':
                             for c in list.query['conditions']:
                                 if c['key'] == 'user':
-                                    c['value'] = c['value'].format(user=user.username)
+                                    c['value'] = c['value'].format(username=user.username)
                 list.save()
                 pos = models.Position(list=list, section='personal', user=user)
                 qs = models.Position.objects.filter(user=user, section='personal')
