@@ -30,6 +30,9 @@ urlpatterns = patterns("item.views",
     (r'^(?P<id>[A-Z0-9].*)/xml$', 'item_xml'),
 
     #srt export
+    (r'^(?P<id>[A-Z0-9].*)/(?P<layer>.+)\.(?P<language>.{2})\.srt$', 'srt'),
+
+    #srt export
     (r'^(?P<id>[A-Z0-9].*)/(?P<layer>.+)\.srt$', 'srt'),
 
     #icon

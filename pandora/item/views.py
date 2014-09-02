@@ -956,16 +956,19 @@ def video(request, id, resolution, format, index=None, track=None):
     response['Cache-Control'] = 'public'
     return response
 
-def srt(request, id, layer, index=None):
+def srt(request, id, layer, language=None, index=None):
     item = get_object_or_404(models.Item, itemId=id)
     if not item.access(request.user):
         response = HttpResponseForbidden()
     else:
         response = HttpResponse()
-        filename = u"%s.srt" % item.get('title')
+        if language:
+            filename = u"%s.%s.srt" % (item.get('title'), language)
+        else:
+            filename = u"%s.srt" % item.get('title')
         response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
         response['Content-Type'] = 'text/x-srt'
-        response.write(item.srt(layer))
+        response.write(item.srt(layer, language))
     return response
 
 def random_annotation(request):

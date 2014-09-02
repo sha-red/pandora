@@ -1559,16 +1559,19 @@ class Item(models.Model):
             Clip.objects.filter(item=self, annotations__id=None).delete()
         return True
 
-    def srt(self, layer):
+    def srt(self, layer, language=None):
         def format_value(value):
             value = value.replace('<br/>', '<br>').replace('<br>\n', '\n').replace('<br>', '\n')
             value = value.replace('\n\n', '<br>\n')
             return value
+        annotations = self.annotations.filter(layer=layer)
+        if language:
+            annotations = annotations.filter(languages__contains=language)
         return ox.srt.encode([{
             'in': a.start,
             'out': a.end,
             'value': format_value(a.value)
-        } for a in self.annotations.filter(layer=layer).order_by('start', 'end', 'sortvalue')])
+        } for a in annotations.order_by('start', 'end', 'sortvalue')])
 
 def delete_item(sender, **kwargs):
     i = kwargs['instance']
