@@ -432,6 +432,11 @@
             "find": true
         },
         {
+            "id": "groups",
+            "title": "Group",
+            "type": ["string"]
+        },
+        {
             "id": "filename",
             "title": "Filename",
             "type": ["string"],

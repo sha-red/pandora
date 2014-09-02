@@ -8,11 +8,34 @@ from django.conf import settings
 
 from archive.models import Volume
 from itemlist.models import List
+from django.contrib.auth.models import Group
 import models
 import utils
 
 from ox.django.query import QuerySet
 
+def get_operator(op, type='str'):
+    return {
+        'str': {
+            '==': '__iexact',
+            '>': '__gt',
+            '>=': '__gte',
+            '<': '__lt',
+            '<=': '__lte',
+            '^': '__istartswith',
+            '$': '__iendswith',
+        },
+        'int':  {
+            '==': '__exact',
+            '>': '__gt',
+            '>=': '__gte',
+            '<': '__lt',
+            '<=': '__lte',
+        }
+    }[type].get(op, {
+        'str': '__icontains',
+        'int': ''
+    }[type])
 
 def parseCondition(condition, user, owner=None):
     '''
@@ -57,16 +80,20 @@ def parseCondition(condition, user, owner=None):
     if k == 'list':
         key_type = ''
 
-    if v == '{me}' and op == '==':
-        if not owner:
-            owner = user
-        if k == 'user':
-            v = owner.username
-        elif k == 'groups':
-            q = Q(groups__in=owner.groups.all())
-            if exclude:
-                q = ~q
-            return q
+    if k == 'groups':
+        if op == '==' and v == '$my':
+            if not owner:
+                owner = user
+            groups = owner.groups.all()
+        else:
+            key = 'name' + get_operator(op)
+            groups = Group.objects.filter(**{key: v})
+        if not groups.count():
+            return Q(id=0)
+        q = Q(groups__in=groups)
+        if exclude:
+            q = ~q
+        return q
 
     if (not exclude and op == '=' or op in ('$', '^')) and v == '':
         return Q()
@@ -115,28 +142,11 @@ def parseCondition(condition, user, owner=None):
             value_key = k
         if k in facet_keys:
             in_find = False
-            facet_value = 'facets__value%s' % {
-                '==': '__iexact',
-                '>': '__gt',
-                '>=': '__gte',
-                '<': '__lt',
-                '<=': '__lte',
-                '^': '__istartswith',
-                '$': '__iendswith',
-            }.get(op, '__icontains')
+            facet_value = 'facets__value' + get_operator(op)
             v = models.Item.objects.filter(**{'facets__key':k, facet_value:v})
             value_key = 'id__in'
         else:
-            value_key = '%s%s' % (value_key, {
-                '==': '__iexact',
-                '>': '__gt',
-                '>=': '__gte',
-                '<': '__lt',
-                '<=': '__lte',
-                '^': '__istartswith',
-                '$': '__iendswith',
-            }.get(op, '__icontains'))
-
+            value_key = value_key + get_operator(op)
         k = str(k)
         value_key = str(value_key)
         if isinstance(v, unicode):
@@ -183,13 +193,7 @@ def parseCondition(condition, user, owner=None):
 
         #using sort here since find only contains strings
         v = parse_date(v.split('-'))
-        vk = 'sort__%s%s' % (k, {
-            '==': '__exact',
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-        }.get(op,''))
+        vk = 'sort__%s%s' % (k, get_operator(op, 'int'))
         vk = str(vk)
         q = Q(**{vk: v})
         if exclude:
@@ -200,13 +204,7 @@ def parseCondition(condition, user, owner=None):
         if key_type == 'time':
             v = int(utils.parse_time(v))
 
-        vk = 'sort__%s%s' % (k, {
-            '==': '__exact',
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-        }.get(op,''))
+        vk = 'sort__%s%s' % (k, get_operator(op, 'int'))
         vk = str(vk)
         q = Q(**{vk: v})
         if exclude:
