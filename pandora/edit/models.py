@@ -271,7 +271,7 @@ class Edit(models.Model):
                 '-f', ','.join(frames),
                 '-o', icon
             ]
-            p = subprocess.Popen(cmd)
+            p = subprocess.Popen(cmd, close_fds=True)
             p.wait()
             self.save()
 
@@ -355,12 +355,12 @@ class Edit(models.Model):
                    '-ss', data['in'], '-t', data['out'],
                    '-vcodec', 'copy', '-acodec', 'copy',
                     clips[-1]]
-            #p = subprocess.Popen(cmd)
+            #p = subprocess.Popen(cmd, close_fds=True)
             #p.wait()
         cmd = ['mkvmerge', clips[0]] \
             + ['+'+c for c in clips[1:]] \
             + [os.path.join(tmp, 'render.webm')]
-        #p = subprocess.Popen(cmd)
+        #p = subprocess.Popen(cmd, close_fds=True)
         #p.wait()
         shutil.rmtree(tmp)
 

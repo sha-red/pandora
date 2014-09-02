@@ -255,7 +255,7 @@ class Text(models.Model):
                 '-f', ','.join(frames),
                 '-o', icon
             ]
-            p = subprocess.Popen(cmd)
+            p = subprocess.Popen(cmd, close_fds=True)
             p.wait()
             self.save()
 

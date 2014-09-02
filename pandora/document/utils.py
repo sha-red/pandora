@@ -8,7 +8,7 @@ def pdfpages(pdf):
 
 def pdfinfo(pdf):
     cmd = ['pdfinfo', pdf]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     data = {}
     for line in stdout.strip().split('\n'):
@@ -22,6 +22,6 @@ def extract_pdfpage(pdf, image, page):
     page -= 1
     cmd = ['convert', '%s[%d]' % (pdf, page),
         '-background', 'white', '-flatten', '-resize', '1024x1024', image]
-    p = subprocess.Popen(cmd)
+    p = subprocess.Popen(cmd, close_fds=True)
     p.wait()
     return image

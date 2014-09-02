@@ -50,12 +50,12 @@ class AspectRatio(fractions.Fraction):
 
 def supported_formats():
     p = subprocess.Popen(['which', AVCONV],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     if not stdout.strip():
         return None
     p = subprocess.Popen([AVCONV, '-codecs'],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     return {
         'ogg': 'libtheora' in stdout and 'libvorbis' in stdout,
@@ -65,7 +65,7 @@ def supported_formats():
 
 def avconv_version():
     p = subprocess.Popen([AVCONV],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     version = stderr.split(' ')[2].split('-')[0]
     return version
@@ -287,7 +287,8 @@ def stream(video, target, profile, info, avconv=None, audio_track=0):
     #print cmd
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                               stdout=subprocess.PIPE,
-                              stderr=subprocess.STDOUT)
+                              stderr=subprocess.STDOUT,
+                              close_fds=True)
     stdout, stderr = p.communicate()
 
     if p.returncode != 0:
@@ -301,7 +302,8 @@ def stream(video, target, profile, info, avconv=None, audio_track=0):
         #print cmd
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                                   stdout=open('/dev/null', 'w'),
-                                  stderr=subprocess.STDOUT)
+                                  stderr=subprocess.STDOUT,
+                                  close_fds=True)
         p.communicate()
         os.unlink("%s.mp4" % target)
     return True, None
@@ -310,7 +312,8 @@ def stream(video, target, profile, info, avconv=None, audio_track=0):
 def run_command(cmd, timeout=10):
     #print cmd
     p = subprocess.Popen(cmd, stdout=open('/dev/null', 'w'),
-                              stderr=subprocess.STDOUT)
+                              stderr=subprocess.STDOUT,
+                              close_fds=True)
     while timeout > 0:
         time.sleep(0.2)
         timeout -= 0.2
@@ -412,7 +415,8 @@ def timeline(video, prefix, modes=None, size=None):
         '-c', os.path.join(prefix, 'cuts.json'),
     ] + video
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        close_fds=True)
     #print cmd
     #p = subprocess.Popen(cmd)
     p.wait()
@@ -569,7 +573,8 @@ def chop(video, start, end):
     ]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                               stdout=open('/dev/null', 'w'),
-                              stderr=open('/dev/null', 'w'))
+                              stderr=open('/dev/null', 'w'),
+                              close_fds=True)
     p.wait()
     f = open(choped_video, 'r')
     os.unlink(choped_video)

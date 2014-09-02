@@ -4,7 +4,6 @@ from __future__ import division, with_statement
 import os
 import re
 from glob import glob
-import subprocess
 from urllib import quote, unquote
 
 from django.db import models

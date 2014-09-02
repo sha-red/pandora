@@ -462,7 +462,7 @@ class Item(models.Model):
                 first = True
                 cmd = ['mkvmerge', '-o', output]
                 cmd += [streams[0]] + ['+' + s for s in streams[1:]]
-                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
                 p.wait()
                 return True
             elif format == "mp4":
@@ -470,7 +470,7 @@ class Item(models.Model):
                 shutil.copy(streams[0], tmp_output)
                 for s in streams[1:]:
                     cmd = ['MP4Box', '-cat', s, tmp_output]
-                    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
                     p.wait()
                 shutil.copy(tmp_output, output)
                 os.unlink(tmp_output)
@@ -1367,7 +1367,7 @@ class Item(models.Model):
             data['timeline'] = timeline
         data['oxdbId'] = self.oxdbId or self.oxdb_id() or self.itemId
         ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
-        p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, close_fds=True)
         p.communicate(json.dumps(data, default=fields.to_json))
         for f in glob(poster.replace('.jpg', '*.jpg')):
             if f != poster:
@@ -1442,7 +1442,7 @@ class Item(models.Model):
            cmd += ['-l', timeline]
         if frame:
            cmd += ['-f', frame]
-        p = subprocess.Popen(cmd)
+        p = subprocess.Popen(cmd, close_fds=True)
         p.wait()
         #remove cached versions
         icon = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
