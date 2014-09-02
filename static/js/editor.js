@@ -141,6 +141,11 @@ pandora.ui.editor = function(data) {
                     result.data.date = Ox.formatDate(
                         result.data.modified.slice(0, 10), '%B %e, %Y'
                     );
+                    result.data.languages = (
+                        result.data.languages || [pandora.site.language]
+                    ).map(function(language) {
+                        return Ox.getLanguageNameByCode(language);
+                    });
                     that.updateAnnotation(data.id, result.data);
                     Ox.Request.clearCache();
                 };
