@@ -442,6 +442,16 @@ class File(models.Model):
         '''
             extract audio tracks from direct upload
         '''
+        def parse_language(lang):
+            if lang:
+                short = ox.iso.langCode3To2(lang.encode('utf-8'))
+                if not short and ox.iso.codeToLang(lang[:2]):
+                    lang = lang[:2]
+                else:
+                    lang = short
+            if not lang:
+                lang = settings.CONFIG['language']
+            return lang
         audio = self.info.get('audio', [])
         if self.data and len(audio) > 1:
             config = settings.CONFIG['video']
@@ -450,14 +460,14 @@ class File(models.Model):
             if ffmpeg == 'ffmpeg':
                 ffmpeg = None
             tmp = tempfile.mkdtemp()
-            languages = [settings.CONFIG['language']]
+            if not self.info.get('language'):
+                self.info['language'] = parse_language(audio[0].get('language'))
+                self.save()
+            languages = [self.info['language']]
             for i, a in enumerate(audio[1:]):
                 media = self.data.path
                 info = ox.avinfo(media)
-                lang = ox.iso.langCode3To2(a.get('language', u'und').encode('utf-8'))
-                if not lang:
-                    lang = settings.CONFIG['language']
-                language = lang
+                language = parse_language(a.get('language'))
                 n = 2
                 while language in languages:
                     language = '%s%d' % (lang, n)
