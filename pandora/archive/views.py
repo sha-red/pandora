@@ -416,7 +416,7 @@ def editMedia(request):
                 if key in info:
                     f.info[key] = info[key]
                     if key == 'language' and (f.is_video or f.is_audio):
-                        save_items.append(f.item)
+                        save_items.append(f.item.id)
                     update = True
             if update:
                 f.save()
