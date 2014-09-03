@@ -1380,12 +1380,13 @@ class Item(models.Model):
             offset = 0
             for f in self.files.filter(selected=True, is_video=True).order_by('sort_path'):
                 for ff in f.frames.all().order_by('position'):
-                    frames.append({
-                        'position': offset + ff.position,
-                        'path': ff.frame.path,
-                        'width': ff.frame.width,
-                        'height': ff.frame.height
-                    })
+                    if ff.frame:
+                        frames.append({
+                            'position': offset + ff.position,
+                            'path': ff.frame.path,
+                            'width': ff.frame.width,
+                            'height': ff.frame.height
+                        })
                 offset += f.duration
         else:
             if 'videoRatio' in self.json and self.sort.duration:
