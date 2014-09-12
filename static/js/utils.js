@@ -1758,6 +1758,19 @@ pandora.getVideoOptions = function(data) {
     }).map(function(layer) {
         return layer.id;
     })[0];
+    options.subtitles = options.subtitlesLayer 
+                ? data.layers[options.subtitlesLayer].map(function(subtitle) { 
+                    return Ox.extend({ 
+                        id: subtitle.id, 
+                        'in': subtitle['in'], 
+                        out: subtitle.out, 
+                        text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n') 
+                    }, subtitle.languages ? { 
+                        tracks: subtitle.languages 
+                    } : {}); 
+                }) 
+                : []; 
+
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
             options.subtitles.length
