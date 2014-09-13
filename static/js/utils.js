@@ -1758,29 +1758,17 @@ pandora.getVideoOptions = function(data) {
     }).map(function(layer) {
         return layer.id;
     })[0];
-    options.subtitles = options.subtitlesLayer 
-                ? data.layers[options.subtitlesLayer].map(function(subtitle) { 
-                    return Ox.extend({ 
-                        id: subtitle.id, 
-                        'in': subtitle['in'], 
-                        out: subtitle.out, 
-                        text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n') 
-                    }, subtitle.languages ? { 
-                        tracks: subtitle.languages 
-                    } : {}); 
-                }) 
-                : []; 
-
+    
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
-            options.subtitles.length
-                ? options.subtitles.map(function(subtitle, i) {
+            options.subtitlesLayer
+                ? data.layers[options.subtitlesLayer].map(function(subtitle, i) {
                     return {
-                        'in': i == 0 ? 0 : options.subtitles[i - 1].out,
+                        'in': i == 0 ? 0 : subtitles[i - 1].out,
                         out: subtitle['in']
                     };
                 }).concat(
-                    [{'in': Ox.last(options.subtitles).out, out: data.duration}]
+                    [{'in': Ox.last(data.layers[options.subtitlesLayer]).out, out: data.duration}]
                 ).filter(function(censored) {
                     // don't include gaps shorter than one second
                     return censored.out - censored['in'] >= 1;

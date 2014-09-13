@@ -76,6 +76,9 @@ pandora.ui.tv = function() {
                     resolution: pandora.user.ui.videoResolution,
                     scaleToFill: pandora.user.ui.videoScale == 'fill',
                     subtitles: videoOptions.subtitles,
+                    subtitlesDefaultTrack: Ox.getLanguageNameByCode(pandora.site.language),
+                    subtitlesLayer: videoOptions.subtitlesLayer,
+                    subtitlesTrack: Ox.getLanguageNameByCode(pandora.site.language),
                     tooltips: true,
                     timeline: '/' + result.data.item + '/timeline16p.jpg',
                     title: pandora.site.site.name + ' &mdash; ' + (
