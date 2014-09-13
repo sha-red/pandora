@@ -58,13 +58,13 @@ pandora.ui.editPanel = function(isEmbed) {
     }
 
     function getVideos() {
-        var videos = {};
-        pandora.site.video.resolutions.forEach(function(resolution) {
-            videos[resolution] = Ox.flatten(edit.clips.filter(function(clip) {
-                return clip.duration;
-            }).map(function(clip) {
-                return pandora.getClipVideos(clip, resolution);
-            }));
+        var videos = [];
+        edit.clips.filter(function(clip) {
+            return clip.duration;
+        }).map(function(clip) {
+            pandora.site.video.resolutions.forEach(function(resolution) {
+                videos = videos.concat(pandora.getClipVideos(clip, resolution));
+            });
         });
         return videos;
     }

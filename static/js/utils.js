@@ -1734,6 +1734,14 @@ pandora.getStatusText = function(data) {
     return parts.join(', ');
 };
 
+pandora.getSubtitlesLayer = function() {
+    return pandora.site.layers.filter(function(layer) {
+        return layer.isSubtitles;
+    }).map(function(layer) {
+        return layer.id;
+    })[0];
+}
+
 pandora.getMediaURL = function(url) {
     return pandora.site.site.mediaprefix + url;
 };
@@ -1753,11 +1761,7 @@ pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
         canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
         options = {};
-    options.subtitlesLayer = pandora.site.layers.filter(function(layer) {
-        return layer.isSubtitles;
-    }).map(function(layer) {
-        return layer.id;
-    })[0];
+    options.subtitlesLayer = pandora.getSubtitlesLayer();
     
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
