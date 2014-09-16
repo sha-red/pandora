@@ -920,7 +920,8 @@ pandora.getClipVideos = function(clip, resolution) {
     resolution = resolution || pandora.user.ui.videoResolution;
     return Ox.flatten(Ox.range(clip.parts).map(function(i) {
         var item = {
-            src: pandora.getVideoURL(clip.item, resolution, i + 1)
+            src: pandora.getVideoURL(clip.item, resolution, i + 1),
+            resolution: resolution
         };
         if (currentTime + clip.durations[i] <= start || currentTime > end) {
             item = null;

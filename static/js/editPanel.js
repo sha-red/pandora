@@ -431,6 +431,8 @@ pandora.ui.editPanel = function(isEmbed) {
             paused: true,
             showIconOnLoad: true,
             subtitles: getSubtitles(edit.clips),
+            subtitlesDefaultTrack: Ox.getLanguageNameByCode(pandora.site.language),
+            subtitlesTrack: Ox.getLanguageNameByCode(pandora.site.language),
             timeline: getSmallTimelineURL(),
             video: getVideos(),
             volume: ui.videoVolume,
@@ -494,11 +496,7 @@ pandora.ui.editPanel = function(isEmbed) {
 
     function getSubtitles(clips) {
         var subtitles = [],
-            subtitlesLayer = pandora.site.layers.filter(function(layer) {
-                return layer.isSubtitles;
-            }).map(function(layer) {
-                return layer.id;
-            })[0];
+            subtitlesLayer = pandora.getSubtitlesLayer();
         subtitlesLayer && clips.map(function(clip) {
             if (clip.layers[subtitlesLayer]) {
                 clip.layers[subtitlesLayer].forEach(function(subtitle) {
