@@ -1279,7 +1279,7 @@ class Item(models.Model):
             n = streams.count()
             for s in streams:
                 self.data['volume'] += s.volume * s.duration
-                color = map(lambda a,b: (a+b)/n, color,ox.image.getRGB(s.color))
+                color = map(lambda a,b: (a+b)/n, color, ox.image.getRGB(s.color or [0.0] * 3))
                 offset += s.duration
             self.data['hue'], self.data['saturation'], self.data['lightness'] = ox.image.getHSL(color)
             if offset:
