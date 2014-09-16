@@ -38,6 +38,20 @@ pandora.ui.tv = function() {
         });
     }
 
+    function getSubtitles(options) {
+        return options.subtitlesLayer ? options.annotations.filter(function(layer) {
+            return layer.id == options.subtitlesLayer;
+        })[0].items.map(function(subtitle) {
+            return {
+                id: subtitle.id,
+                'in': subtitle['in'],
+                out: subtitle.out,
+                text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n'),
+                tracks: subtitle.languages || [Ox.getLanguageNameByCode(pandora.site.language)]
+            };
+        }) : []
+    }
+
     function play() {
         var $loading = $('<img>')
                 .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
@@ -75,7 +89,7 @@ pandora.ui.tv = function() {
                     position: result.data.position,
                     resolution: pandora.user.ui.videoResolution,
                     scaleToFill: pandora.user.ui.videoScale == 'fill',
-                    subtitles: videoOptions.subtitles,
+                    subtitles: getSubtitles(videoOptions),
                     subtitlesDefaultTrack: Ox.getLanguageNameByCode(pandora.site.language),
                     subtitlesLayer: videoOptions.subtitlesLayer,
                     subtitlesTrack: Ox.getLanguageNameByCode(pandora.site.language),

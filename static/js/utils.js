@@ -1741,7 +1741,7 @@ pandora.getSubtitlesLayer = function() {
     }).map(function(layer) {
         return layer.id;
     })[0];
-}
+};
 
 pandora.getMediaURL = function(url) {
     return pandora.site.site.mediaprefix + url;

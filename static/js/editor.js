@@ -3,7 +3,6 @@
 'use strict';
 
 pandora.ui.editor = function(data) {
-
     var ui = pandora.user.ui,
 
         that = Ox.VideoAnnotationPanel({
