@@ -9,7 +9,7 @@ pandora.ui.importAnnotationsDialog = function(data) {
 
         languages = Ox.sortBy(Ox.LANGUAGES.map(function(language) {
             return {id: language.code, title: language.name};
-        }, 'title')),
+        }), 'title'),
     
         $content = Ox.Element()
             .css({margin: '16px'}),
@@ -17,7 +17,7 @@ pandora.ui.importAnnotationsDialog = function(data) {
         $layerSelect = Ox.Select({
             items: layers,
             label: Ox._('Layer'),
-            labelWidth: 128
+            labelWidth: 128,
             width: 384
         })
         .css({
@@ -26,9 +26,9 @@ pandora.ui.importAnnotationsDialog = function(data) {
         .appendTo($content),
 
         $languageSelect = Ox.Select({
-            items: layers,
+            items: languages,
             label: Ox._('Language'),
-            labelWidth: 128
+            labelWidth: 128,
             width: 384
         })
         .css({
@@ -37,7 +37,7 @@ pandora.ui.importAnnotationsDialog = function(data) {
         .appendTo($content),
 
         $fileInput = Ox.FileInput({
-            max: 1,
+            maxFiles: 1,
             width: 384
         })
         .css({
@@ -45,8 +45,9 @@ pandora.ui.importAnnotationsDialog = function(data) {
         })
         .bindEvent({
             change: function(data) {
-                if (data.files.length) {
-                    var reader = new FileReader();
+                var reader;
+                if (data.value.length) {
+                    reader = new FileReader();
                     reader.onloadend = function(event) {
                         srt = parseSRT(this.result);
                         total = srt.length;
@@ -60,7 +61,7 @@ pandora.ui.importAnnotationsDialog = function(data) {
                             + (total == 1 ? '' : 's') + '.', [total])
                         );
                     };
-                    reader.readAsText(data.files[0]);
+                    reader.readAsText(data.value[0]);
                 } else {
                     srt = [];
                     total = 0;
