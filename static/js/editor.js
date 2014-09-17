@@ -169,6 +169,9 @@ pandora.ui.editor = function(data) {
                 pandora.$ui.embedVideoDialog && pandora.$ui.embedVideoDialog.remove();
                 pandora.$ui.embedVideoDialog = pandora.ui.embedVideoDialog().open();
             },
+            exportannotations: function() {
+                // ...
+            },
             find: function(data) {
                 pandora.UI.set({itemFind: data.find});
             },
@@ -186,7 +189,7 @@ pandora.ui.editor = function(data) {
                 pandora.$ui.mainMenu.replaceItemMenu();
             },
             importannotations: function(data) {
-                pandora.ui.importAnnotations().open();
+                pandora.ui.importAnnotationsDialog().open();
             },
             info: function(data) {
                 pandora.ui.annotationDialog(
