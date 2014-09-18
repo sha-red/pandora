@@ -39,6 +39,26 @@ pandora.ui.exportAnnotationsDialog = function(options) {
             }
         })
         .appendTo($content),
+
+        $formatSelect = Ox.Select({
+            items: [
+                {id: 'json', title: 'JSON'},
+                {id: 'srt', title: 'SRT'}
+            ],
+            label: Ox._('Format'),
+            labelWidth: 128,
+            value: 'json',
+            width: 384
+        })
+        .css({
+            marginTop: '16px'
+        })
+        .bindEvent({
+            change: function() {
+                $link && updateLink();
+            }
+        })
+        .appendTo($content),
     
         $status = Ox.$('<div>')
         .css({
@@ -68,7 +88,7 @@ pandora.ui.exportAnnotationsDialog = function(options) {
             closeButton: true,
             content: $content,
             fixedSize: true,
-            height: 80,
+            height: 112,
             removeOnClose: true,
             title: Ox._('Export Annotations'),
             width: 416
@@ -76,38 +96,41 @@ pandora.ui.exportAnnotationsDialog = function(options) {
 
     updateStatus();
 
-    if (enabledLayers.length) {
-        addLink();
-        updateLink();
-    }
+    enabledLayers.length && addLink();
 
     function addLink() {
-        var layer = $layerSelect.value();
-        $link = $('<a>').attr({
-            target: '_blank'
-        });
+        var $button = $(Ox.last(that.find('.OxButton')))
         updateLink();
-        $(that.find('.OxButton')[3]).wrap($link);
+        $button.wrap($('<a>'));
+        // On wrap, a reference to the link would *not* be the link in the DOM
+        $link = $($button.parent());
     }
 
     function updateLink() {
-        var layer = $layerSelect.value();
+        var layer = $layerSelect.value(),
+            format = $formatSelect.value(),
+            items = annotations[layer].map(function(annotation) {
+                var text = format == 'json'
+                    ? annotation.value
+                    : annotation.value
+                        .replace(/\n/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .replace(/<br>\s+?/g, '\n');
+                return {
+                    'in': annotation['in'],
+                    out: annotation.out,
+                    text: text
+                };
+            });
         $link.attr({
             download: options.title + ' - '
-                + Ox.getObjectById(layers, layer).title + '.srt',
+                + Ox.getObjectById(layers, layer).title + '.' + format,
             href: 'data:text/plain;base64,' + btoa(
-                Ox.formatSRT(annotations[layer].map(function(annotation) {
-                    return {
-                        'in': annotation['in'],
-                        out: annotation.out,
-                        text: annotation.value
-                            .replace(/\n/g, ' ')
-                            .replace(/\s+/g, ' ')
-                            .replace(/<br>\s+?/g, '\n')
-                    };
-                }))
+                format == 'json'
+                ? JSON.stringify(items, null, '    ')
+                : Ox.formatSRT(items)
             )
-        })
+        });
     }
 
     function updateStatus() {
