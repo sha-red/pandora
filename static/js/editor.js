@@ -22,6 +22,7 @@ pandora.ui.editor = function(data) {
             cuts: data.cuts || [],
             duration: data.duration,
             enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= data.rightslevel || data.editable,
+            enableExport: true,
             enableImport: pandora.site.capabilities.canImportAnnotations[pandora.user.level] || data.editable,
             enableSetPosterFrame: !pandora.site.media.importFrames && data.editable,
             enableSubtitles: ui.videoSubtitles,
@@ -190,7 +191,7 @@ pandora.ui.editor = function(data) {
                 pandora.$ui.mainMenu.replaceItemMenu();
             },
             importannotations: function() {
-                pandora.$ui.importAnnotationsDialog = pandora.ui.importAnnotationsDialog(data.duration).open();
+                pandora.$ui.importAnnotationsDialog = pandora.ui.importAnnotationsDialog({duration: data.duration}).open();
             },
             info: function(data) {
                 pandora.ui.annotationDialog(
