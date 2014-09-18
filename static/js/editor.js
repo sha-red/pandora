@@ -3,6 +3,7 @@
 'use strict';
 
 pandora.ui.editor = function(data) {
+
     var ui = pandora.user.ui,
 
         that = Ox.VideoAnnotationPanel({
@@ -170,7 +171,7 @@ pandora.ui.editor = function(data) {
                 pandora.$ui.embedVideoDialog = pandora.ui.embedVideoDialog().open();
             },
             exportannotations: function() {
-                // ...
+                pandora.$ui.exportAnnotationsDialog = pandora.ui.exportAnnotationsDialog().open();
             },
             find: function(data) {
                 pandora.UI.set({itemFind: data.find});
@@ -188,8 +189,8 @@ pandora.ui.editor = function(data) {
             gainfocus: function() {
                 pandora.$ui.mainMenu.replaceItemMenu();
             },
-            importannotations: function(data) {
-                pandora.ui.importAnnotationsDialog().open();
+            importannotations: function() {
+                pandora.$ui.importAnnotationsDialog = pandora.ui.importAnnotationsDialog(data.duration).open();
             },
             info: function(data) {
                 pandora.ui.annotationDialog(
@@ -303,6 +304,7 @@ pandora.ui.editor = function(data) {
                 that.options({timeline: data.value});
             }
         });
+
     pandora._dontSelectResult = false;
 
     function updateBrowser() {
