@@ -34,6 +34,8 @@ pandora.ui.exportAnnotationsDialog = function(options) {
             change: function() {
                 updateStatus();
                 that.enableButton('export');
+                !$link && addLink();
+                updateLink();
             }
         })
         .appendTo($content),
@@ -44,25 +46,24 @@ pandora.ui.exportAnnotationsDialog = function(options) {
         })
         .appendTo($content),
 
+        $link,
+
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
-                        id: 'dontExport',
-                        title: Ox._('Don\'t Export')
-                    })
-                    .bindEvent({
-                        click: function() {
-                            that.close();
-                        }
-                    }),
+                    id: 'dontExport',
+                    title: Ox._('Don\'t Export')
+                })
+                .bindEvent({
+                    click: function() {
+                        that.close();
+                    }
+                }),
                 Ox.Button({
-                        disabled: enabledLayers.length == 0,
-                        id: 'export',
-                        title: Ox._('Export')
-                    })
-                    .bindEvent({
-                        click: exportAnnotations
-                    })
+                    disabled: enabledLayers.length == 0,
+                    id: 'export',
+                    title: Ox._('Export')
+                })
             ],
             closeButton: true,
             content: $content,
@@ -75,19 +76,38 @@ pandora.ui.exportAnnotationsDialog = function(options) {
 
     updateStatus();
 
-    function exportAnnotations() {
-        Ox.print(
-            Ox.formatSRT(annotations[$layerSelect.value()].map(function(annotation) {
-                return {
-                    'in': annotation['in'],
-                    out: annotation.out,
-                    text: annotation.value
-                        .replace(/\n/g, ' ')
-                        .replace(/\s+/g, ' ')
-                        .replace(/<br>/g, '\n')
-                };
-            }))
-        );
+    if (enabledLayers.length) {
+        addLink();
+        updateLink();
+    }
+
+    function addLink() {
+        var layer = $layerSelect.value();
+        $link = $('<a>').attr({
+            target: '_blank'
+        });
+        updateLink();
+        $(that.find('.OxButton')[3]).wrap($link);
+    }
+
+    function updateLink() {
+        var layer = $layerSelect.value();
+        $link.attr({
+            download: options.title + ' - '
+                + Ox.getObjectById(layers, layer).title + '.srt',
+            href: 'data:text/plain;base64,' + btoa(
+                Ox.formatSRT(annotations[layer].map(function(annotation) {
+                    return {
+                        'in': annotation['in'],
+                        out: annotation.out,
+                        text: annotation.value
+                            .replace(/\n/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .replace(/<br>\s+?/g, '\n')
+                    };
+                }))
+            )
+        })
     }
 
     function updateStatus() {
