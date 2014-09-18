@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 
-pandora.ui.importAnnotationsDialog = function(duration) {
+pandora.ui.importAnnotationsDialog = function(options) {
 
     var layers = pandora.site.layers.filter(function(layer) {
             return layer.canAddAnnotations[pandora.user.level];
@@ -11,8 +11,7 @@ pandora.ui.importAnnotationsDialog = function(duration) {
             return {id: language.code, title: language.name};
         }), 'title'),
 
-        $content = Ox.Element()
-            .css({margin: '16px'}),
+        $content = Ox.Element().css({margin: '16px'}),
 
         $layerSelect = Ox.Select({
             items: layers,
@@ -80,11 +79,12 @@ pandora.ui.importAnnotationsDialog = function(duration) {
                         id: 'import',
                         title: Ox._('Import')
                     }).bindEvent({
-                        click: addAnnotations
+                        click: importAnnotations
                     })
             ],
             closeButton: true,
             content: $content,
+            fixedSize: true,
             height: 144,
             keys: {
                 escape: 'dontImport'
@@ -96,7 +96,17 @@ pandora.ui.importAnnotationsDialog = function(duration) {
 
     updateLanguageSelect();
 
-    function addAnnotations() {
+    function disableButtons() {
+        that.disableButtons();
+        that.disableCloseButton();
+    }
+
+    function enableButtons() {
+        that.enableButtons();
+        that.enableCloseButton();
+    }
+
+    function importAnnotations() {
 
         var annotations = [],
             language = $languageSelect.value(),
@@ -111,7 +121,7 @@ pandora.ui.importAnnotationsDialog = function(duration) {
                 annotations = parseSRT(this.result);
             }
             if (annotations.length) {
-                setStatus(Ox._(
+                $status.html(Ox._(
                     'Importing {0} annotation'
                     + (annotations.length == 1 ? '' : 's') + '...',
                     [annotations.length]
@@ -139,41 +149,29 @@ pandora.ui.importAnnotationsDialog = function(duration) {
                     if (result.data.taskId) {
                         pandora.wait(result.data.taskId, function(result) {
                             if (result.data.status == 'SUCCESS') {
-                                setStatus(Ox._('Import succeeded.'));
+                                $status.html(Ox._('Import succeeded.'));
                                 Ox.Request.clearCache(pandora.user.ui.item);
                                 pandora.$ui.contentPanel.replaceElement(
                                     1, pandora.$ui.item = pandora.ui.item()
                                 );
                             } else {
-                                setStatus(Ox._('Import failed.'));
+                                $status.html(Ox._('Import failed.'));
                             }
                             enableButtons();
                         });
                     } else {
-                        setStatus(Ox._('Import failed.'));
+                        $status.html(Ox._('Import failed.'));
                         enableButtons();
                     }
                 });
             } else {
-                setStatus(Ox._('No valid annotations found.'));
+                $status.html(Ox._('No valid annotations found.'));
                 enableButtons();
             }
         };
 
-        setTimeout(function() {
-            reader.readAsText(file);
-        }, 250);
+        reader.readAsText(file);
 
-    }
-
-    function disableButtons() {
-        that.disableButtons();
-        that.disableCloseButton();
-    }
-
-    function enableButtons() {
-        that.enableButtons();
-        that.enableCloseButton();
     }
 
     function parseSRT(srt) {
@@ -181,13 +179,9 @@ pandora.ui.importAnnotationsDialog = function(duration) {
             return !Ox.isUndefined(annotation['in'])
                 && !Ox.isUndefined(annotation.out)
                 && annotation['in'] <= annotation.out
-                && annotation.out <= duration
+                && annotation.out <= options.duration
                 && annotation.text;
         });
-    }
-
-    function setStatus(status) {
-        $status.html(status);
     }
 
     function updateLanguageSelect() {
