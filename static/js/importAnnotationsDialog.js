@@ -50,6 +50,7 @@ pandora.ui.importAnnotationsDialog = function(options) {
         })
         .bindEvent({
             change: function(data) {
+                status.empty();
                 that[
                     data.value.length ? 'enableButton' : 'disableButton'
                 ]('import');
