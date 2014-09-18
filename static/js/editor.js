@@ -172,7 +172,12 @@ pandora.ui.editor = function(data) {
                 pandora.$ui.embedVideoDialog = pandora.ui.embedVideoDialog().open();
             },
             exportannotations: function() {
-                pandora.$ui.exportAnnotationsDialog = pandora.ui.exportAnnotationsDialog().open();
+                pandora.api.get({
+                    id: ui.item,
+                    keys: ['title']
+                }, function(result) {
+                    pandora.$ui.exportAnnotationsDialog = pandora.ui.exportAnnotationsDialog({title: result.data.title}).open();
+                })
             },
             find: function(data) {
                 pandora.UI.set({itemFind: data.find});
