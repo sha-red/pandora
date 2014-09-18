@@ -66,21 +66,21 @@ pandora.ui.importAnnotationsDialog = function(options) {
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
-                        id: 'dontImport',
-                        title: Ox._('Don\'t Import')
-                    })
-                    .bindEvent({
-                        click: function() {
-                            that.close();
-                        }
-                    }),
+                    id: 'dontImport',
+                    title: Ox._('Don\'t Import')
+                })
+                .bindEvent({
+                    click: function() {
+                        that.close();
+                    }
+                }),
                 Ox.Button({
-                        disabled: true,
-                        id: 'import',
-                        title: Ox._('Import')
-                    }).bindEvent({
-                        click: importAnnotations
-                    })
+                    disabled: true,
+                    id: 'import',
+                    title: Ox._('Import')
+                }).bindEvent({
+                    click: importAnnotations
+                })
             ],
             closeButton: true,
             content: $content,
