@@ -22,7 +22,7 @@ pandora.ui.editor = function(data) {
             cuts: data.cuts || [],
             duration: data.duration,
             enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= data.rightslevel || data.editable,
-            enableExport: true,
+            enableExport: pandora.site.capabilities.canExportAnnotations[pandora.user.level] || data.editable,
             enableImport: pandora.site.capabilities.canImportAnnotations[pandora.user.level] || data.editable,
             enableSetPosterFrame: !pandora.site.media.importFrames && data.editable,
             enableSubtitles: ui.videoSubtitles,
