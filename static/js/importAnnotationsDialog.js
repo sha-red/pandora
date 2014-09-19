@@ -39,8 +39,26 @@ pandora.ui.importAnnotationsDialog = function(options) {
         })
         .appendTo($content),
 
+        $formatSelect = Ox.Select({
+            items: [
+                {id: 'json', title: 'JSON'},
+                {id: 'srt', title: 'SRT'}
+            ],
+            label: Ox._('Format'),
+            labelWidth: 128,
+            value: 'json',
+            width: 384
+        })
+        .css({
+            marginTop: '16px'
+        })
+        .bindEvent({
+            change: updateFileInput
+        })
+        .appendTo($content),
+
         $fileInput = Ox.FileInput({
-            label: Ox._('SRT File'),
+            label: Ox._('File'),
             labelWidth: 128,
             maxFiles: 1,
             width: 384
@@ -50,7 +68,7 @@ pandora.ui.importAnnotationsDialog = function(options) {
         })
         .bindEvent({
             change: function(data) {
-                status.empty();
+                $status.empty();
                 that[
                     data.value.length ? 'enableButton' : 'disableButton'
                 ]('import');
@@ -86,7 +104,7 @@ pandora.ui.importAnnotationsDialog = function(options) {
             closeButton: true,
             content: $content,
             fixedSize: true,
-            height: 144,
+            height: 176,
             keys: {
                 escape: 'dontImport'
             },
@@ -96,6 +114,7 @@ pandora.ui.importAnnotationsDialog = function(options) {
         });
 
     updateLanguageSelect();
+    updateFileInput();
 
     function disableButtons() {
         that.disableButtons();
@@ -112,6 +131,7 @@ pandora.ui.importAnnotationsDialog = function(options) {
         var annotations = [],
             language = $languageSelect.value(),
             layer = $layerSelect.value(),
+            format = $formatSelect.value(),
             file = $fileInput.value()[0],
             reader = new FileReader();
 
@@ -119,7 +139,9 @@ pandora.ui.importAnnotationsDialog = function(options) {
 
         reader.onloadend = function(e) {
             if (this.result) {
-                annotations = parseSRT(this.result);
+                annotations = format == 'json'
+                    ? JSON.parse(this.result)
+                    : parseSRT(this.result);
             }
             if (annotations.length) {
                 $status.html(Ox._(
@@ -128,10 +150,12 @@ pandora.ui.importAnnotationsDialog = function(options) {
                     [annotations.length]
                 ));
                 annotations = annotations.map(function(annotation) {
-                    var value = Ox.sanitizeHTML(annotation.text)
-                        .replace(/<br[ /]*?>\n/g, '\n')
-                        .replace(/\n\n/g, '<br>\n')
-                        .replace(/\n/g, '<br>\n');
+                    var value = Ox.sanitizeHTML(annotation.text);
+                    if (format == 'srt') {
+                        value = value.replace(/<br[ /]*?>\n/g, '\n')
+                            .replace(/\n\n/g, '<br>\n')
+                            .replace(/\n/g, '<br>\n');
+                    }
                     if (language != pandora.site.language) {
                         value = '<span lang="' + language + '">'
                             + value + '</span>';
@@ -182,6 +206,12 @@ pandora.ui.importAnnotationsDialog = function(options) {
                 && annotation['in'] <= annotation.out
                 && annotation.out <= options.duration
                 && annotation.text;
+        });
+    }
+
+    function updateFileInput() {
+        $fileInput.options({
+            label: $formatSelect.value().toUpperCase() + ' File'
         });
     }
 
