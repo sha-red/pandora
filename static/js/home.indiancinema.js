@@ -125,9 +125,11 @@ pandora.ui.home = function() {
                 margin: '0 auto 0 auto',
                 opacity: 0
             })
-            .click(function(e) {
-                // fixme: why?
-                e.stopPropagation();
+            .on({
+                click: function(e) {
+                    // fixme: why?
+                    e.stopPropagation();
+                }
             })
             .bindEvent({
                 submit: function(data) {
