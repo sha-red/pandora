@@ -35,6 +35,7 @@
         "canEditRightsLevel": {"member": true, "staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"admin": true},
+        "canExportAnnotations": {"member": true, "staff": true, "admin": true},
         "canImportAnnotations": {"member": true, "staff": true, "admin": true},
         "canManageDocuments": {"member": true, "staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "staff": true, "admin": true},
