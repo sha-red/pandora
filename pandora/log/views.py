@@ -128,7 +128,7 @@ def findLogs(request):
         query = parse_query(data, request.user)
         qs = order_query(query['qs'], query['sort'])
         if qs.count() > 0:
-            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
+            response['data']['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
     elif 'positions' in data:
         ids = [ox.toAZ(i.id) for i in qs]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])

@@ -85,7 +85,7 @@ class Program(models.Model):
     def json(self, user, current=False):
         item_json = self.item.get_json()
         r = {
-            'item': self.item.itemId,
+            'item': self.item.public_id,
         }
         for key in ('title', 'director', 'year', 'durations', 'parts', 'rightslevel'):
             r[key] = item_json.get(key, '')

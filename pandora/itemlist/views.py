@@ -159,7 +159,7 @@ def addListItems(request):
     if 'items' in data:
         if list.editable(request.user):
             with transaction.commit_on_success():
-                for item in Item.objects.filter(itemId__in=data['items']):
+                for item in Item.objects.filter(public_id__in=data['items']):
                     list.add(item)
             response = json_response(status=200, text='items added')
         else:
@@ -216,7 +216,7 @@ def orderListItems(request):
         index = 0
         with transaction.commit_on_success():
             for i in data['ids']:
-                models.ListItem.objects.filter(list=list, item__itemId=i).update(index=index)
+                models.ListItem.objects.filter(list=list, item__public_id=i).update(index=index)
                 index += 1
     else:
         response = json_response(status=403, text='permission denied')
@@ -265,7 +265,7 @@ def addList(request):
     update_numberoflists.delay(request.user.username)
 
     if 'items' in data:
-        for item in Item.objects.filter(itemId__in=data['items']):
+        for item in Item.objects.filter(public_id__in=data['items']):
             list.add(item)
 
     if list.status == 'featured':

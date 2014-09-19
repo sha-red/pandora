@@ -40,13 +40,13 @@ def update_random_clip_sort():
             cursor.execute('CREATE INDEX "clip_random_random" ON "clip_random" ("random")')
 
 @task(ignore_results=True, queue='default')
-def update_clips(itemId):
-    item = models.Item.objects.get(itemId=itemId)
+def update_clips(public_id):
+    item = models.Item.objects.get(public_id=public_id)
     item.clips.all().update(user=item.user.id)
 
 @task(ignore_results=True, queue='default')
-def update_poster(itemId):
-    item = models.Item.objects.get(itemId=itemId)
+def update_poster(public_id):
+    item = models.Item.objects.get(public_id=public_id)
     item.make_poster(True)
     item.make_icon()
     if item.poster and os.path.exists(item.poster.path):
@@ -58,32 +58,32 @@ def update_poster(itemId):
         )
 
 @task(ignore_results=True, queue='default')
-def update_file_paths(itemId):
-    item = models.Item.objects.get(itemId=itemId)
+def update_file_paths(public_id):
+    item = models.Item.objects.get(public_id=public_id)
     for f in item.files.all():
         if f.normalize_path() != f.path:
             f.save()
 
 @task(ignore_results=True, queue='default')
-def update_external(itemId):
-    item = models.Item.objects.get(itemId=itemId)
+def update_external(public_id):
+    item = models.Item.objects.get(public_id=public_id)
     item.update_external()
 
 @task(queue="encoding")
-def update_timeline(itemId):
-    item = models.Item.objects.get(itemId=itemId)
+def update_timeline(public_id):
+    item = models.Item.objects.get(public_id=public_id)
     item.update_timeline(async=False)
 
 @task(queue="encoding")
-def rebuild_timeline(itemId):
-    i = models.Item.objects.get(itemId=itemId)
+def rebuild_timeline(public_id):
+    i = models.Item.objects.get(public_id=public_id)
     for s in i.streams():
         s.make_timeline()
     i.update_timeline(async=False)
 
 @task(queue="encoding")
-def load_subtitles(itemId):
-    item = models.Item.objects.get(itemId=itemId)
+def load_subtitles(public_id):
+    item = models.Item.objects.get(public_id=public_id)
     if item.load_subtitles():
         item.update_find()
         item.update_sort()
@@ -131,7 +131,7 @@ def update_sitemap(base_url):
         url = ET.SubElement(urlset, "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")
-        loc.text = absolute_url("%s/info" % i.itemId)
+        loc.text = absolute_url("%s/info" % i.public_id)
         # This date should be in W3C Datetime format, can be %Y-%m-%d
         lastmod = ET.SubElement(url, "lastmod")
         lastmod.text = i.modified.strftime("%Y-%m-%d")
@@ -144,14 +144,14 @@ def update_sitemap(base_url):
         if i.rendered:
             video = ET.SubElement(url, "video:video")
             #el = ET.SubElement(video, "video:content_loc")
-            #el.text = absolute_url("%s/video" % i.itemId)
+            #el.text = absolute_url("%s/video" % i.public_id)
             el = ET.SubElement(video, "video:player_loc")
             el.attrib['allow_embed'] = 'no'
-            el.text = absolute_url("%s/player" % i.itemId)
+            el.text = absolute_url("%s/player" % i.public_id)
             el = ET.SubElement(video, "video:title")
             el.text = i.get('title')
             el = ET.SubElement(video, "video:thumbnail_loc")
-            el.text = absolute_url("%s/96p.jpg" % i.itemId)
+            el.text = absolute_url("%s/96p.jpg" % i.public_id)
             description = i.get_item_description()
             if description:
                 el = ET.SubElement(video, "video:description")

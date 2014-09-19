@@ -138,7 +138,7 @@ def upload(request):
                 os.chmod(fr.frame.path, 0644)
             f.item.select_frame()
             f.item.save()
-            item.tasks.update_poster.delay(f.item.itemId)
+            item.tasks.update_poster.delay(f.item.public_id)
     if 'file' in request.FILES:
         if not f.available:
             if f.data:
@@ -146,7 +146,7 @@ def upload(request):
             f.data.save('data.raw', request.FILES['file'])
             f.save()
             os.chmod(f.data.path, 0644)
-            item.tasks.load_subtitles.delay(f.item.itemId)
+            item.tasks.load_subtitles.delay(f.item.public_id)
             response = json_response(text='file saved')
         else:
             response = json_response(status=403, text='permissino denied')
@@ -176,11 +176,11 @@ def addMedia(request):
         f = models.File.objects.get(oshash=oshash)
         if f.available:
             response['status']['text'] = 'file exists'
-        response['data']['item'] = f.item.itemId
-        response['data']['itemUrl'] = request.build_absolute_uri('/%s' % f.item.itemId)
+        response['data']['item'] = f.item.public_id
+        response['data']['itemUrl'] = request.build_absolute_uri('/%s' % f.item.public_id)
     else:
         if 'item' in data:
-            i = Item.objects.get(itemId=data['item'])
+            i = Item.objects.get(public_id=data['item'])
         else:
             title = ox.parse_movie_path(os.path.splitext(data['filename'])[0])['title']
             i = Item()
@@ -204,8 +204,8 @@ def addMedia(request):
         f.info['extension'] = extension
         f.parse_info()
         f.save()
-        response['data']['item'] = i.itemId
-        response['data']['itemUrl'] = request.build_absolute_uri('/%s' % i.itemId)
+        response['data']['item'] = i.public_id
+        response['data']['itemUrl'] = request.build_absolute_uri('/%s' % i.public_id)
     return render_to_json_response(response)
 actions.register(addMedia, cache=False)
 
@@ -231,7 +231,7 @@ def firefogg_upload(request):
                 def save_chunk(chunk, offset, done):
                     return f.save_chunk_stream(chunk, offset, resolution, format, done)
                 response = process_chunk(request, save_chunk)
-                response['resultUrl'] = request.build_absolute_uri('/%s'%f.item.itemId)
+                response['resultUrl'] = request.build_absolute_uri('/%s'%f.item.public_id)
                 if response.get('done'):
                     f.uploading = False
                     if response['result'] == 1:
@@ -262,7 +262,7 @@ def firefogg_upload(request):
                     Item.objects.filter(id=f.item.id).update(rendered=False)
                 response = {
                     'uploadUrl': '/api/upload/?id=%s&profile=%s' % (f.oshash, profile),
-                    'url': request.build_absolute_uri('/%s' % f.item.itemId),
+                    'url': request.build_absolute_uri('/%s' % f.item.public_id),
                     'result': 1
                 }
                 return render_to_json_response(response)
@@ -340,19 +340,19 @@ def moveMedia(request):
         change file / item link
         takes {
             ids: ids of files
-            item: new itemId
+            item: new public_id
         }
 
         returns {
         }
     '''
     data = json.loads(request.POST['data'])
-    if Item.objects.filter(itemId=data['item']).count() == 1:
-        i = Item.objects.get(itemId=data['item'])
+    if Item.objects.filter(public_id=data['item']).count() == 1:
+        i = Item.objects.get(public_id=data['item'])
     else:
-        data['itemId'] = data.pop('item').strip()
-        if len(data['itemId']) != 7:
-            del data['itemId']
+        data['public_id'] = data.pop('item').strip()
+        if len(data['public_id']) != 7:
+            del data['public_id']
             if 'director' in data and isinstance(data['director'], basestring):
                 if data['director'] == '':
                     data['director'] = []
@@ -360,24 +360,24 @@ def moveMedia(request):
                     data['director'] = data['director'].split(', ')
             i = get_item(data, user=request.user)
         else:
-            i = get_item({'imdbId': data['itemId']}, user=request.user)
-    changed = [i.itemId]
+            i = get_item({'imdbId': data['public_id']}, user=request.user)
+    changed = [i.public_id]
     for f in models.File.objects.filter(oshash__in=data['ids']):
-        if f.item.id != i.itemId and f.editable(request.user):
-            if f.item.itemId not in changed:
-                changed.append(f.item.itemId)
+        if f.item.id != i.public_id and f.editable(request.user):
+            if f.item.public_id not in changed:
+                changed.append(f.item.public_id)
             f.item = i 
             f.save()
-    for itemId in changed:
-        c = Item.objects.get(itemId=itemId)
+    for public_id in changed:
+        c = Item.objects.get(public_id=public_id)
         if c.files.count() == 0 and settings.CONFIG['itemRequiresVideo']:
             c.delete()
         else:
             c.rendered = False
             c.save()
-            item.tasks.update_timeline.delay(itemId)
+            item.tasks.update_timeline.delay(public_id)
     response = json_response(text='updated')
-    response['data']['item'] = i.itemId
+    response['data']['item'] = i.public_id
     return render_to_json_response(response)
 actions.register(moveMedia, cache=False)
 
@@ -497,7 +497,7 @@ def _order_query(qs, sort, prefix=''):
         if operator != '-':
             operator = ''
         key = {
-            'id': 'item__itemId',
+            'id': 'item__public_id',
             'users': 'instances__volume__user__username',
             'resolution': 'width',
             'path': 'sort_path'
@@ -673,7 +673,7 @@ def getMediaInfo(request):
             id: oshash of stream file
         }
         returns {
-            item: itemId,
+            item: public_id,
             file: oshash of source file
         }
     '''
@@ -691,7 +691,7 @@ def getMediaInfo(request):
     if f:
         response['data'] = {
             'file': f.oshash,
-            'item': f.item.itemId
+            'item': f.item.public_id
         }
     return render_to_json_response(response)
 actions.register(getMediaInfo)

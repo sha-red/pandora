@@ -48,7 +48,7 @@ def _order_query(qs, sort, prefix='sort__'):
         if operator != '-':
             operator = ''
         key = {
-            'id': 'itemId',
+            'id': 'public_id',
             'index': 'listitem__index'
         }.get(e['key'], e['key'])
         if key not in ('listitem__index', ):
@@ -208,7 +208,7 @@ Positions
             response['data']['items'] = qs.count()
     elif 'position' in query:
         qs = _order_query(query['qs'], query['sort'])
-        ids = [j['itemId'] for j in qs.values('itemId')]
+        ids = [j['public_id'] for j in qs.values('public_id')]
         data['conditions'] = data['conditions'] + {
             'value': query['position'],
             'key': query['sort'][0]['key'],
@@ -217,10 +217,10 @@ Positions
         query = parse_query(data, request.user)
         qs = _order_query(query['qs'], query['sort'])
         if qs.count() > 0:
-            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
+            response['data']['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
     elif 'positions' in query:
         qs = _order_query(query['qs'], query['sort'])
-        ids = [j['itemId'] for j in qs.values('itemId')]
+        ids = [j['public_id'] for j in qs.values('public_id')]
         response['data']['positions'] = utils.get_positions(ids, query['positions'])
     elif 'keys' in query:
         response['data']['items'] = []
@@ -262,7 +262,7 @@ Positions
                 for p in _p:
                     r[p] = m.get(p, '')
             if 'clip_qs' in query:
-                r['clips'] = get_clips(query['clip_qs'].filter(item__itemId=m['id']))
+                r['clips'] = get_clips(query['clip_qs'].filter(item__public_id=m['id']))
             return r
         qs = qs[query['range'][0]:query['range'][1]]
         #response['data']['items'] = [m.get_json(_p) for m in qs]
@@ -383,7 +383,7 @@ def findId(request):
     response = json_response({})
     response['data']['items'] = []
     if 'id' in data:
-        qs = models.Item.objects.filter(itemId=data['id'])
+        qs = models.Item.objects.filter(public_id=data['id'])
         if qs.count() == 1:
             response['data']['items'] = [
                 i.get_json(['title', 'director', 'year', 'id']) for i in qs
@@ -473,7 +473,7 @@ def get(request):
     response = json_response({})
     data = json.loads(request.POST['data'])
     data['keys'] = data.get('keys', [])
-    item = get_object_or_404_json(models.Item, itemId=data['id'])
+    item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.access(request.user):
         info = item.get_json(data['keys'])
         if not data['keys'] or 'stream' in data['keys']:
@@ -550,7 +550,7 @@ def edit(request):
     '''
     update_clips = False
     data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Item, itemId=data['id'])
+    item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.editable(request.user):
         item.log()
         response = json_response(status=200, text='ok')
@@ -572,7 +572,7 @@ def edit(request):
         if r:
             r.wait()
         if update_clips:
-            tasks.update_clips.delay(item.itemId)
+            tasks.update_clips.delay(item.public_id)
         response['data'] = item.get_json()
     else:
         response = json_response(status=403, text='permission denied')
@@ -592,7 +592,7 @@ def remove(request):
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Item, itemId=data['id'])
+    item = get_object_or_404_json(models.Item, public_id=data['id'])
     user = request.user
     if user.get_profile().capability('canRemoveItems') == True or \
            user.is_staff or \
@@ -617,11 +617,11 @@ def setPosterFrame(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Item, itemId=data['id'])
+    item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.editable(request.user):
         item.poster_frame = data['position']
         item.save()
-        tasks.update_poster(item.itemId)
+        tasks.update_poster(item.public_id)
         response = json_response()
     else:
         response = json_response(status=403, text='permissino denied')
@@ -644,7 +644,7 @@ def setPoster(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Item, itemId=data['id'])
+    item = get_object_or_404_json(models.Item, public_id=data['id'])
     response = json_response()
     if item.editable(request.user):
         valid_sources = [p['source'] for p in item.get_posters()]
@@ -653,7 +653,7 @@ def setPoster(request):
             if item.poster:
                 item.poster.delete()
             item.save()
-            tasks.update_poster(item.itemId)
+            tasks.update_poster(item.public_id)
             response = json_response()
             response['data']['posterAspect'] = item.poster_width/item.poster_height
         else:
@@ -672,7 +672,7 @@ def updateExternalData(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Item, itemId=data['id'])
+    item = get_object_or_404_json(models.Item, public_id=data['id'])
     response = json_response()
     if item.editable(request.user):
         item.update_external()
@@ -698,8 +698,8 @@ def lookup(request):
     '''
     data = json.loads(request.POST['data'])
     if 'id' in data:
-        i = models.Item.objects.get(itemId=data['id'])
-        r = {'id': i.itemId}
+        i = models.Item.objects.get(public_id=data['id'])
+        r = {'id': i.public_id}
         for key in ('title', 'director', 'year'):
             r[key] = i.get(key)
         response = json_response(r)
@@ -710,7 +710,7 @@ actions.register(lookup)
 
 
 def frame(request, id, size, position=None):
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
     frame = None
@@ -741,7 +741,7 @@ def frame(request, id, size, position=None):
     return response
 
 def poster_frame(request, id, position):
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
     position = int(position)
@@ -767,7 +767,7 @@ def image_to_response(image, size=None):
     return HttpFileResponse(path, content_type='image/jpeg')
 
 def siteposter(request, id, size=None):
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
     poster = item.path('siteposter.jpg')
@@ -783,7 +783,7 @@ def siteposter(request, id, size=None):
     return HttpFileResponse(poster, content_type='image/jpeg')
 
 def poster(request, id, size=None):
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
     if not item.poster:
@@ -808,7 +808,7 @@ def poster(request, id, size=None):
         return response
 
 def icon(request, id, size=None):
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
     if item.icon:
@@ -820,7 +820,7 @@ def icon(request, id, size=None):
         return response
 
 def timeline(request, id, size, position=-1, format='jpg', mode=None):
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
 
@@ -849,7 +849,7 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
 
 def download(request, id, resolution=None, format='webm'):
     print 'download', id, resolution, format
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not resolution or int(resolution) not in settings.CONFIG['video']['resolutions']:
         resolution = max(settings.CONFIG['video']['resolutions'])
     else:
@@ -857,7 +857,7 @@ def download(request, id, resolution=None, format='webm'):
     if not item.access(request.user) or not item.rendered:
         return HttpResponseForbidden()
     ext = '.%s' % format
-    parts = ['%s - %s ' % (item.get('title'), settings.SITENAME), item.itemId]
+    parts = ['%s - %s ' % (item.get('title'), settings.SITENAME), item.public_id]
     if resolution != max(settings.CONFIG['video']['resolutions']):
         parts.append('.%dp' % resolution)
     parts.append(ext)
@@ -876,7 +876,7 @@ def download(request, id, resolution=None, format='webm'):
     return response
 
 def torrent(request, id, filename=None):
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
     if not item.torrent:
@@ -902,7 +902,7 @@ def video(request, id, resolution, format, index=None, track=None):
     resolutions = sorted(settings.CONFIG['video']['resolutions'])
     if resolution not in resolutions:
         raise Http404
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
     if index:
@@ -935,7 +935,7 @@ def video(request, id, resolution, format, index=None, track=None):
                 ox.format_duration(t[0] * 1000).replace(':', '.')[:-4],
                 ox.format_duration(t[1] * 1000).replace(':', '.')[:-4],
                 settings.SITENAME,
-                item.itemId,
+                item.public_id,
                 ext
             )
             response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
@@ -944,7 +944,7 @@ def video(request, id, resolution, format, index=None, track=None):
             filename = "%s - %s %s%s" % (
                 item.get('title'),
                 settings.SITENAME,
-                item.itemId,
+                item.public_id,
                 ext
             )
             response = HttpFileResponse(path, content_type=content_type)
@@ -957,7 +957,7 @@ def video(request, id, resolution, format, index=None, track=None):
     return response
 
 def srt(request, id, layer, language=None, index=None):
-    item = get_object_or_404(models.Item, itemId=id)
+    item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         response = HttpResponseForbidden()
     else:
@@ -1011,7 +1011,7 @@ def atom_xml(request):
             updated.text = item.modified.strftime("%Y-%m-%dT%H:%M:%SZ")
             add_updated = False
 
-        page_link = request.build_absolute_uri('/%s' % item.itemId)
+        page_link = request.build_absolute_uri('/%s' % item.public_id)
 
         entry = ET.Element("entry")
         title = ET.SubElement(entry, "title")
@@ -1118,9 +1118,9 @@ def oembed(request):
 
     url = request.GET['url']
     parts = urlparse(url).path.split('/')
-    itemId = parts[1]
-    item = get_object_or_404_json(models.Item, itemId=itemId)
-    embed_url = request.build_absolute_uri('/%s' % itemId)
+    public_id = parts[1]
+    item = get_object_or_404_json(models.Item, public_id=public_id)
+    embed_url = request.build_absolute_uri('/%s' % public_id)
     if url.startswith(embed_url):
         embed_url = url
     if not '#embed' in embed_url:
@@ -1148,7 +1148,7 @@ def oembed(request):
     thumbwidth -= thumbwidth % 2
     oembed['thumbnail_height'] = thumbheight
     oembed['thumbnail_width'] = thumbwidth
-    oembed['thumbnail_url'] = request.build_absolute_uri('/%s/%sp.jpg' % (item.itemId, thumbheight))
+    oembed['thumbnail_url'] = request.build_absolute_uri('/%s/%sp.jpg' % (item.public_id, thumbheight))
     if format == 'xml':
         oxml = ET.Element('oembed')
         for key in oembed:
@@ -1174,7 +1174,7 @@ def item_json(request, id):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     if not request.user.is_anonymous():
         level = request.user.get_profile().level
-    qs = models.Item.objects.filter(itemId=id, level__lte=level)
+    qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
         response = json_response(status=404, text='not found')
     else:
@@ -1187,7 +1187,7 @@ def item_xml(request, id):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     if not request.user.is_anonymous():
         level = request.user.get_profile().level
-    qs = models.Item.objects.filter(itemId=id, level__lte=level)
+    qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
         response = json_response(status=404, text='not found')
         response = render_to_json_response(response)
@@ -1226,7 +1226,7 @@ def item(request, id):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     if not request.user.is_anonymous():
         level = request.user.get_profile().level
-    qs = models.Item.objects.filter(itemId=id, level__lte=level)
+    qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
         context = RequestContext(request, {
             'base_url': request.build_absolute_uri('/'),

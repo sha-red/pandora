@@ -95,7 +95,7 @@ class MetaClip:
         data = {
             'id': ox.toAZ(self.id),
         }
-        data['item'] = self.item.itemId
+        data['item'] = self.item.public_id
         data['in'] = self.start
         data['out'] = self.end
         data['parts'] = self.item.json['parts']
@@ -149,7 +149,7 @@ class MetaClip:
 
     @property
     def public_id(self):
-        return u"%s/%0.03f-%0.03f" % (self.item.itemId, float(self.start), float(self.end))
+        return u"%s/%0.03f-%0.03f" % (self.item.public_id, float(self.start), float(self.end))
 
     def __unicode__(self):
         return self.public_id

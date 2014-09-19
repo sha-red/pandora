@@ -24,12 +24,12 @@ class Command(BaseCommand):
     def handle(self, **options):
         offset = 0
         chunk = options['all'] and 100 or options['items']
-        qs = models.Item.objects.exclude(itemId__startswith='0x')
+        qs = models.Item.objects.exclude(public_id__startswith='0x')
         count = pos = qs.count()
         while (options['all'] and offset <= count) or offset < options['items']:
             print offset, pos, count
             for i in qs.order_by('modified')[:chunk]:
-                print pos, i.itemId, i.modified
+                print pos, i.public_id, i.modified
                 i.update_external()
                 pos -= 1
             offset += chunk

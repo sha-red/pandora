@@ -100,7 +100,7 @@ def findAnnotations(request):
         query = parse_query(data, request.user)
         qs = order_query(query['qs'], query['sort'])
         if qs.count() > 0:
-            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
+            response['data']['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
     elif 'positions' in data:
         ids = [i.public_id for i in qs]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
@@ -114,7 +114,7 @@ actions.register(findAnnotations)
 def addAnnotation(request):
     '''
         takes {
-            item: itemId,
+            item: public_id,
             layer: layerId,
             in: float,
             out: float,
@@ -131,7 +131,7 @@ def addAnnotation(request):
             return render_to_json_response(json_response(status=400,
                                                          text='invalid data'))
 
-    item = get_object_or_404_json(Item, itemId=data['item'])
+    item = get_object_or_404_json(Item, public_id=data['item'])
     
     layer_id = data['layer']
     layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
@@ -155,7 +155,7 @@ actions.register(addAnnotation, cache=False)
 def addAnnotations(request):
     '''
         takes {
-            item: itemId,
+            item: public_id,
             layer: layerId,
             annotations: [{
                 in: float,
@@ -173,7 +173,7 @@ def addAnnotations(request):
             return render_to_json_response(json_response(status=400,
                                                          text='invalid data'))
 
-    item = get_object_or_404_json(Item, itemId=data['item'])
+    item = get_object_or_404_json(Item, public_id=data['item'])
     
     layer_id = data['layer']
     layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]

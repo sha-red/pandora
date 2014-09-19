@@ -51,7 +51,7 @@ def parseCondition(condition, user, owner=None):
     ...
     '''
     k = condition.get('key', '*')
-    k = {'id': 'itemId'}.get(k, k)
+    k = {'id': 'public_id'}.get(k, k)
     if not k:
         k = '*'
     v = condition['value']
@@ -135,7 +135,7 @@ def parseCondition(condition, user, owner=None):
             q = ~q
         return q
     elif key_type == "string":
-        in_find = not k.startswith('itemId')
+        in_find = not k.startswith('public_id')
         if in_find:
             value_key = 'find__value'
         else:

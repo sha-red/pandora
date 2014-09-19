@@ -58,7 +58,7 @@ def get_id(info):
             else:
                 q = q.filter(**{k:key, v:info[key]})
     if q.count() == 1:
-        return q[0].itemId
+        return q[0].public_id
     if settings.DATA_SERVICE:
         r = external_data('getId', info)
         if r['status']['code'] == 200:
@@ -95,34 +95,34 @@ def get_item(info, user=None, async=False):
     if settings.USE_IMDB:
         if 'imdbId' in info and info['imdbId']:
             try:
-                item = Item.objects.get(itemId=info['imdbId'])
+                item = Item.objects.get(public_id=info['imdbId'])
             except Item.DoesNotExist:
-                item = Item(itemId=info['imdbId'])
+                item = Item(public_id=info['imdbId'])
                 if 'title' in info and 'director' in info:
                     item.external_data = item_data
                 item.user = user
-                item.oxdbId = item.itemId
+                item.oxdbId = item.public_id
                 item.save()
                 if async:
-                    tasks.update_external.delay(item.itemId)
+                    tasks.update_external.delay(item.public_id)
                 else:
                     item.update_external()
         else:
-            itemId = get_id(info)
-            if itemId:
+            public_id = get_id(info)
+            if public_id:
                 try:
-                    item = Item.objects.get(itemId=itemId)
+                    item = Item.objects.get(public_id=public_id)
                 except Item.DoesNotExist:
-                    info['imdbId'] = itemId
+                    info['imdbId'] = public_id
                     item = get_item(info, user)
                 return item
             try:
-                item = Item.objects.get(itemId=info.get('oxdbId'))
+                item = Item.objects.get(public_id=info.get('oxdbId'))
             except Item.DoesNotExist:
                 item = Item()
                 item.user = user
                 item.data = item_data
-                item.itemId = info.get('oxdbId', item.oxdb_id())
+                item.public_id = info.get('oxdbId', item.oxdb_id())
                 try:
                     existing_item = Item.objects.get(oxdbId=item.oxdb_id())
                     item = existing_item
@@ -130,7 +130,7 @@ def get_item(info, user=None, async=False):
                     item.oxdbId = item.oxdb_id()
                     p = item.save()
                     if not p:
-                        tasks.update_poster.delay(item.itemId)
+                        tasks.update_poster.delay(item.public_id)
     else:
         qs = Item.objects.filter(find__key='title', find__value__iexact=info['title'])
         if 'year' in info:
@@ -143,7 +143,7 @@ def get_item(info, user=None, async=False):
             item.user = user
             p = item.save()
             if not p:
-                tasks.update_poster.delay(item.itemId)
+                tasks.update_poster.delay(item.public_id)
     return item
 
 class Item(models.Model):
@@ -158,7 +158,7 @@ class Item(models.Model):
     #should be set based on user
     level = models.IntegerField(db_index=True)
 
-    itemId = models.CharField(max_length=128, unique=True, blank=True)
+    public_id = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True, null=True)
     external_data = fields.DictField(default={}, editable=False)
     data = fields.DictField(default={}, editable=False)
@@ -280,7 +280,7 @@ class Item(models.Model):
                     self.data[key] = ox.escape_html(data[key])
         p = self.save()
         if not settings.USE_IMDB and filter(lambda k: k in ('title', 'director', 'year'), data):
-            p = tasks.update_poster.delay(self.itemId)
+            p = tasks.update_poster.delay(self.public_id)
         return p
 
     def log(self):
@@ -289,8 +289,8 @@ class Item(models.Model):
         c.save()
 
     def update_external(self):
-        if settings.DATA_SERVICE and not self.itemId.startswith('0x'):
-            response = external_data('getData', {'id': self.itemId})
+        if settings.DATA_SERVICE and not self.public_id.startswith('0x'):
+            response = external_data('getData', {'id': self.public_id})
             if response['status']['code'] == 200:
                 self.external_data = response['data']
                 p = self.save()
@@ -313,8 +313,8 @@ class Item(models.Model):
                         c[t]= [{'id': i, 'title': None} for i in c[t]]
                     ids = [i['id'] for i in c[t]]
                     known  = {}
-                    for l in Item.objects.filter(itemId__in=ids):
-                        known[l.itemId] = l.get('title')
+                    for l in Item.objects.filter(public_id__in=ids):
+                        known[l.public_id] = l.get('title')
                     for i in c[t]:
                         if i['id'] in known:
                             i['item'] = i['id']
@@ -330,10 +330,10 @@ class Item(models.Model):
             string = u'%s (%s)' % (ox.decode_html(self.get('title', 'Untitled')), self.get('year'))
         else:
             string = self.get('title', u'Untitled')
-        return u'[%s] %s' % (self.itemId,string)
+        return u'[%s] %s' % (self.public_id,string)
 
     def get_absolute_url(self):
-        return '/%s' % self.itemId
+        return '/%s' % self.public_id
 
     def save(self, *args, **kwargs):
         update_poster = False
@@ -343,12 +343,12 @@ class Item(models.Model):
                 self.level = settings.CONFIG['rightsLevel'][self.user.get_profile().get_level()]
             else:
                 self.level = settings.CONFIG['rightsLevel']['member']
-            if not self.itemId:
-                self.itemId = str(uuid.uuid1())
+            if not self.public_id:
+                self.public_id = str(uuid.uuid1())
             self.add_default_data()
             super(Item, self).save(*args, **kwargs)
             if not settings.USE_IMDB:
-                self.itemId = ox.toAZ(self.id)
+                self.public_id = ox.toAZ(self.id)
 
         #this does not work if another item without imdbid has the same metadata
         oxdbId = self.oxdb_id()
@@ -358,7 +358,7 @@ class Item(models.Model):
             if self.oxdbId != oxdbId:
                 q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
                 if q.count() != 0:
-                    if len(self.itemId) == 7:
+                    if len(self.public_id) == 7:
                         self.oxdbId = None
                         q[0].merge_with(self, save=False)
                     else:
@@ -372,14 +372,14 @@ class Item(models.Model):
                             q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
                 self.oxdbId = oxdbId
                 update_poster = True
-                if len(self.itemId) != 7:
+                if len(self.public_id) != 7:
                     update_ids = True
 
         #id changed, what about existing item with new id?
-        if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
-            self.itemId = self.oxdbId
+        if settings.USE_IMDB and len(self.public_id) != 7 and self.oxdbId != self.public_id:
+            self.public_id = self.oxdbId
             #FIXME: move files to new id here
-        if settings.USE_IMDB and len(self.itemId) == 7:
+        if settings.USE_IMDB and len(self.public_id) == 7:
             for key in ('title', 'year', 'director', 'season', 'episode',
                         'seriesTitle', 'episodeTitle'):
                 if key in self.data:
@@ -389,7 +389,7 @@ class Item(models.Model):
         if settings.USE_IMDB:
             defaults = filter(lambda k: 'default' in k, settings.CONFIG['itemKeys'])
             for k in defaults:
-                if len(self.itemId) == 7:
+                if len(self.public_id) == 7:
                     if k['id'] in self.data and self.data[k['id']] == k['default']:
                         del self.data[k['id']]
                 else:
@@ -414,13 +414,13 @@ class Item(models.Model):
             for c in self.clips.all(): c.save()
             for a in self.annotations.all():
                 public_id = a.public_id.split('/')[1]
-                public_id = "%s/%s" % (self.itemId, public_id)
+                public_id = "%s/%s" % (self.public_id, public_id)
                 if public_id != a.public_id:
                     a.public_id = public_id
                     a.save()
-        tasks.update_file_paths.delay(self.itemId)
+        tasks.update_file_paths.delay(self.public_id)
         if update_poster:
-            return tasks.update_poster.delay(self.itemId)
+            return tasks.update_poster.delay(self.public_id)
         return None
 
     def delete_files(self):
@@ -498,7 +498,7 @@ class Item(models.Model):
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
         if os.path.exists(poster):
             posters.append({
-                'url': '/%s/siteposter.jpg' % self.itemId,
+                'url': '/%s/siteposter.jpg' % self.public_id,
                 'width': 640,
                 'height': 1024,
                 'source': settings.URL,
@@ -529,7 +529,7 @@ class Item(models.Model):
                     'index': p,
                     'position': f['position'],
                     'selected': p == pos,
-                    'url': '/%s/posterframe%d.jpg' %(self.itemId, p),
+                    'url': '/%s/posterframe%d.jpg' %(self.public_id, p),
                     'height': f['height'],
                     'width': f['width']
                 })
@@ -564,7 +564,7 @@ class Item(models.Model):
 
     def get_json(self, keys=None):
         i = {
-            'id': self.itemId,
+            'id': self.public_id,
             'rendered': self.rendered,
             'rightslevel': self.level
         }
@@ -573,7 +573,7 @@ class Item(models.Model):
         i.update(self.external_data)
         i.update(self.data)
         if settings.USE_IMDB:
-            i['oxdbId'] = self.oxdbId or self.oxdb_id() or self.itemId
+            i['oxdbId'] = self.oxdbId or self.oxdb_id() or self.public_id
         for k in settings.CONFIG['itemKeys']:
             key = k['id']
             if not keys or key in keys:
@@ -710,7 +710,7 @@ class Item(models.Model):
 
     def oxdb_id(self):
         if not self.get('title') and not self.get('director'):
-            return self.itemId
+            return self.public_id
         return ox.get_oxid(self.get('seriesTitle', self.get('title', '')),
                            self.get('director', []),
                            self.get('seriesYear', self.get('year', '')),
@@ -884,10 +884,10 @@ class Item(models.Model):
         )
 
         #sort keys based on database, these will always be available
-        s.itemId = self.itemId.replace('0x', 'xx')
+        s.public_id = self.public_id.replace('0x', 'xx')
         s.oxdbId = self.oxdbId
         if not settings.USE_IMDB:
-            s.itemId = ox.sort_string(str(ox.fromAZ(s.itemId)))
+            s.public_id = ox.sort_string(str(ox.fromAZ(s.public_id)))
         s.modified = self.modified or datetime.now()
         s.created = self.created or datetime.now()
         s.rightslevel = self.level
@@ -1062,7 +1062,7 @@ class Item(models.Model):
         self.update_layer_facets()
 
     def path(self, name=''):
-        h = self.itemId
+        h = self.public_id
         h = (7-len(h))*'0' + h
         return os.path.join('items', h[:2], h[2:4], h[4:6], h[6:], name)
 
@@ -1157,7 +1157,7 @@ class Item(models.Model):
                 if update:
                     self.rendered = False
                     self.save()
-                    tasks.update_timeline.delay(self.itemId)
+                    tasks.update_timeline.delay(self.public_id)
                 break
         if not sets:
             self.rendered = False
@@ -1295,10 +1295,10 @@ class Item(models.Model):
         self.save()
         if self.rendered:
             if async:
-                get_sequences.delay(self.itemId)
+                get_sequences.delay(self.public_id)
             else:
-                get_sequences(self.itemId)
-            tasks.load_subtitles.delay(self.itemId)
+                get_sequences(self.public_id)
+            tasks.load_subtitles.delay(self.public_id)
 
     def save_poster(self, data):
         self.poster.name = self.path('poster.jpg')
@@ -1365,7 +1365,7 @@ class Item(models.Model):
             data['frame'] = frame
         if os.path.exists(timeline):
             data['timeline'] = timeline
-        data['oxdbId'] = self.oxdbId or self.oxdb_id() or self.itemId
+        data['oxdbId'] = self.oxdbId or self.oxdb_id() or self.public_id
         ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE, close_fds=True)
         p.communicate(json.dumps(data, default=fields.to_json))
@@ -1624,7 +1624,7 @@ attrs = {
 }
 for key in filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['itemKeys']):
     name = key['id']
-    name = {'id': 'itemId'}.get(name, name)
+    name = {'id': 'public_id'}.get(name, name)
     sort_type = key.get('sortType', key['type'])
     if isinstance(sort_type, list):
         sort_type = sort_type[0]

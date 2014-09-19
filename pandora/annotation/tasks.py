@@ -68,7 +68,7 @@ def update_matches(id, type):
 def add_annotations(data):
     from item.models import Item
     from user.models import User
-    item = Item.objects.get(itemId=data['item'])
+    item = Item.objects.get(public_id=data['item'])
     layer_id = data['layer']
     layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])
     if not layer:

@@ -213,7 +213,7 @@ def getEmbedDefaults(request):
         response['data']['edit'] = e['id']
         response['data']['editDuration'] = e['duration']
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
-    qs = Item.objects.filter(level__lte=level, rendered=True).order_by('sort__itemId')
+    qs = Item.objects.filter(level__lte=level, rendered=True).order_by('sort__public_id')
     if qs.exists():
         i = qs[0].json
         response['data']['item'] = i['id']

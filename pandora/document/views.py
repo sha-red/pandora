@@ -47,7 +47,7 @@ def addDocument(request):
         ids = [data['id']]
     if 'item' in data:
         if isinstance(data['item'], basestring):
-            item = Item.objects.get(itemId=data['item'])
+            item = Item.objects.get(public_id=data['item'])
             if item.editable(request.user):
                 for id in ids:
                     document = models.Document.get(id)
@@ -55,7 +55,7 @@ def addDocument(request):
             else:
                 response = json_response(status=403, text='permission denied')
         else:
-            for item in Item.objects.filter(itemId__in=data['item']):
+            for item in Item.objects.filter(public_id__in=data['item']):
                 if item.editable(request.user):
                     for id in ids:
                         document = models.Document.get(id)
@@ -79,7 +79,7 @@ def editDocument(request):
     '''
     response = json_response()
     data = json.loads(request.POST['data'])
-    item = 'item' in data and Item.objects.get(itemId=data['item']) or None
+    item = 'item' in data and Item.objects.get(public_id=data['item']) or None
     if data['id']:
         document = models.Document.get(data['id'])
         if document.editable(request.user, item):
@@ -230,7 +230,7 @@ def removeDocument(request):
         ids = data['ids']
     else:
         ids = [data['id']]
-    item = 'item' in data and Item.objects.get(itemId=data['item']) or None
+    item = 'item' in data and Item.objects.get(public_id=data['item']) or None
     if item:
         if item.editable(request.user):
             for id in ids:
@@ -261,7 +261,7 @@ def sortDocuments(request):
     '''
     data = json.loads(request.POST['data'])
     index = 0
-    item = Item.objects.get(itemId=data['item'])
+    item = Item.objects.get(public_id=data['item'])
     ids = data['ids']
     if item.editable(request.user):
         for i in ids:

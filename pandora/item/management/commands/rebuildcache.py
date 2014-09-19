@@ -22,7 +22,7 @@ class Command(BaseCommand):
         count = pos = models.Item.objects.count()
         while offset <= count:
             for i in models.Item.objects.all().order_by('id')[offset:offset+chunk]:
-                print pos, i.itemId
+                print pos, i.public_id
                 i.save()
                 time.sleep(1) #dont overload db
                 pos -= 1

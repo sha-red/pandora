@@ -166,7 +166,7 @@ class Document(models.Model):
                 response[key] = getattr(self, _map.get(key,key)) or ''
         if item:
             if isinstance(item, basestring):
-                item = Item.objects.get(itemId=item)
+                item = Item.objects.get(public_id=item)
             d = self.descriptions.filter(item=item)
             if d.exists():
                 if 'description' in keys and d[0].description:

@@ -74,7 +74,7 @@ class Edit(models.Model):
             clip.annotation = Annotation.objects.get(public_id=data['annotation'])
             clip.item = clip.annotation.item
         else:
-            clip.item = Item.objects.get(itemId=data['item'])
+            clip.item = Item.objects.get(public_id=data['item'])
             clip.start = data['in']
             clip.end = data['out']
         clip.index = index
@@ -246,13 +246,13 @@ class Edit(models.Model):
                 poster_frames = []
                 for i in range(0, items.count(), max(1, int(items.count()/4))):
                     poster_frames.append({
-                        'item': items[int(i)].itemId,
+                        'item': items[int(i)].public_id,
                         'position': items[int(i)].poster_frame
                     })
                 self.poster_frames = tuple(poster_frames)
                 self.save()
         for i in self.poster_frames:
-            qs = Item.objects.filter(itemId=i['item'])
+            qs = Item.objects.filter(public_id=i['item'])
             if qs.count() > 0:
                 frame = qs[0].frame(i['position'])
                 if frame:
@@ -387,7 +387,7 @@ class Clip(models.Model):
     def __unicode__(self):
         if self.annotation:
             return u'%s' % self.annotation.public_id
-        return u'%s/%0.3f-%0.3f' % (self.item.itemId, self.start, self.end)
+        return u'%s/%0.3f-%0.3f' % (self.item.public_id, self.start, self.end)
     
     def get_id(self):
         return ox.toAZ(self.id)
@@ -426,13 +426,13 @@ class Clip(models.Model):
         }
         if self.annotation:
             data['annotation'] = self.annotation.public_id
-            data['item'] = self.item.itemId
+            data['item'] = self.item.public_id
             data['in'] = self.annotation.start
             data['out'] = self.annotation.end
             data['parts'] = self.annotation.item.json['parts']
             data['durations'] = self.annotation.item.json['durations']
         else:
-            data['item'] = self.item.itemId
+            data['item'] = self.item.public_id
             data['in'] = self.start
             data['out'] = self.end
             data['parts'] = self.item.json['parts']

@@ -38,7 +38,7 @@ class Sequence(models.Model):
 
     @property
     def public_id(self):
-        return u"%s/%0.03f-%0.03f" % (self.sort.item.itemId, float(self.start), float(self.end))
+        return u"%s/%0.03f-%0.03f" % (self.sort.item.public_id, float(self.start), float(self.end))
 
     def __unicode__(self):
         return self.public_id

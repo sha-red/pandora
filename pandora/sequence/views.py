@@ -81,7 +81,7 @@ def findSequences(request):
         query = parse_query(data, request.user)
         qs = order_query(query['qs'], query['sort'])
         if qs.count() > 0:
-            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
+            response['data']['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
     elif 'positions' in data:
         qs = order_query(qs, query['sort'])
         ids = [i['public_id'] for i in qs.values('public_id')]
@@ -109,7 +109,7 @@ def getSequence(request):
     data = json.loads(request.POST['data'])
     response = json_response()
     position = float('%0.03f' % data['position'])
-    i = Item.objects.get(itemId=data['id'])
+    i = Item.objects.get(public_id=data['id'])
     qs = models.Sequence.objects.filter(
         sort_id=i.sort.pk,
         mode=models.Sequence.MODE[data['mode']], 

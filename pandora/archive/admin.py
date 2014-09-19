@@ -8,11 +8,11 @@ import models
 
 class FileAdmin(admin.ModelAdmin):
     search_fields = ['path','oshash', 'video_codec']
-    list_display = ['available', 'wanted', 'selected', '__unicode__', 'itemId']
+    list_display = ['available', 'wanted', 'selected', '__unicode__', 'public_id']
     list_display_links = ('__unicode__', )
 
-    def itemId(self, obj):
-        return '%s'%(obj.item.itemId)
+    def public_id(self, obj):
+        return '%s'%(obj.item.public_id)
 
 
 admin.site.register(models.File, FileAdmin)

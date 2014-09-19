@@ -390,7 +390,7 @@ class File(models.Model):
         for key in self.PATH_INFO:
             data[key] = self.info.get(key)
         data['users'] = list(set([i['user'] for i in data['instances']]))
-        data['item'] = self.item.itemId
+        data['item'] = self.item.public_id
         if keys:
             for k in data.keys():
                 if k not in keys:
@@ -567,8 +567,8 @@ class Instance(models.Model):
         return u"%s's %s <%s>"% (self.volume.user, self.path, self.file.oshash)
 
     @property
-    def itemId(self):
-        return File.objects.get(oshash=self.oshash).itemId
+    def public_id(self):
+        return File.objects.get(oshash=self.oshash).public_id
 
     def json(self):
         return {

@@ -19,7 +19,7 @@ class Command(BaseCommand):
     import annotations
     """
     help = 'import annotations from srt'
-    args = 'username itemId layername filename.srt'
+    args = 'username item layername filename.srt'
     option_list = BaseCommand.option_list + (
     )
 
@@ -27,13 +27,13 @@ class Command(BaseCommand):
         if len(args) != 4:
             print self.usage('import_srt')
             return 
-        username, itemId, layer_id, filename = args
+        username, public_id, layer_id, filename = args
         user = User.objects.get(username=username)
-        item = Item.objects.get(itemId=itemId)
+        item = Item.objects.get(public_id=public_id)
         layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
 
         annotations = ox.srt.load(filename)
-        print 'importing %d annotations into %s/%s' % (len(annotations), itemId, layer_id)
+        print 'importing %d annotations into %s/%s' % (len(annotations), public_id, layer_id)
         for i in range(len(annotations)-1):
             if annotations[i]['out'] == annotations[i+1]['in']:
                 annotations[i]['out'] = annotations[i]['out'] - 0.001

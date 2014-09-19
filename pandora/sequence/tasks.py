@@ -8,8 +8,8 @@ import item.models
 import extract
 
 @task(ignore_results=True, queue='encoding')
-def get_sequences(itemId):
-    i = item.models.Item.objects.get(itemId=itemId)
+def get_sequences(public_id):
+    i = item.models.Item.objects.get(public_id=public_id)
     models.Sequence.objects.filter(sort=i.sort).delete()
     position = 0
     for stream in i.streams():

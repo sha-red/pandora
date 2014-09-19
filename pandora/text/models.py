@@ -229,14 +229,14 @@ class Text(models.Model):
                 poster_frames = []
                 for i in range(0, items.count(), max(1, int(items.count()/4))):
                     poster_frames.append({
-                        'item': items[int(i)].itemId,
+                        'item': items[int(i)].public_id,
                         'position': items[int(i)].poster_frame
                     })
                 self.poster_frames = tuple(poster_frames)
                 self.save()
         for i in self.poster_frames:
             from item.models import Item
-            qs = Item.objects.filter(itemId=i['item'])
+            qs = Item.objects.filter(public_id=i['item'])
             if qs.count() > 0:
                 frame = qs[0].frame(i['position'])
                 if frame:

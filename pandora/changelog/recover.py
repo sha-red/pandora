@@ -4,14 +4,14 @@ import user.models
 import archive.models
 
 def recover_item(id):
-    if item.models.Item.objects.filter(itemId=id).exists():
+    if item.models.Item.objects.filter(public_id=id).exists():
         raise Exception('id is taken')
     qs = models.Changelog.objects.filter(value__contains='id": "%s"' % id)
     if not qs.exists():
         raise Exception('id not found')
     old = qs.order_by('-created')[0]
     i = item.models.Item()
-    i.itemId = id
+    i.public_id = id
     i.data = old.value
     created = old.value['created']
     i.user = user.models.User.objects.get(username=i.data['user'])
@@ -47,7 +47,7 @@ def recover_item(id):
         if key in i.data:
             del i.data[key]
     i.save()
-    i.itemId = id
+    i.public_id = id
     i.created = created
     i.save()
     i.update_sort()
@@ -73,7 +73,7 @@ def recover_item(id):
     return i
 
 def recover_file(id, oshash, filename):
-    i = item.models.Item.objects.get(itemId=id)
+    i = item.models.Item.objects.get(public_id=id)
     file, created = archive.models.File.objects.get_or_create(oshash=oshash)
     if created:
         file.item = i

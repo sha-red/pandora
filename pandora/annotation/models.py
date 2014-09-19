@@ -119,7 +119,7 @@ class Annotation(models.Model):
                 if not previous.public_id:
                     previous.set_public_id()
                 public_id = ox.fromAZ(previous.public_id.split('/')[-1]) + 1
-            self.public_id = "%s/%s" % (self.item.itemId, ox.toAZ(public_id))
+            self.public_id = "%s/%s" % (self.item.public_id, ox.toAZ(public_id))
             Annotation.objects.filter(id=self.id).update(public_id=self.public_id)
 
     @classmethod

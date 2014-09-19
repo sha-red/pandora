@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, id, height, position, **options):
         position = float(position)
-        i = models.Item.objects.get(itemId=id)
+        i = models.Item.objects.get(public_id=id)
         path = i.frame(position, height)
         if path:
             print path

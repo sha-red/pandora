@@ -71,13 +71,13 @@ def update_files(user, volume, files):
 
     #remove deleted files
     removed = models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files)
-    ids = [i['itemId'] for i in Item.objects.filter(
-           files__instances__in=removed.filter(file__selected=True)).distinct().values('itemId')]
+    ids = [i['public_id'] for i in Item.objects.filter(
+           files__instances__in=removed.filter(file__selected=True)).distinct().values('public_id')]
     removed.delete()
     for f in files:
         update_or_create_instance(volume, f)
     for i in ids:
-        i = Item.objects.get(itemId=i)
+        i = Item.objects.get(public_id=i)
         i.update_selected()
 
 @task(ignore_results=True, queue='default')

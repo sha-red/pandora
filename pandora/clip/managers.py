@@ -59,9 +59,9 @@ def parseCondition(condition, user):
         return Q()
 
     if k == 'id':
-        itemId, points = v.split('/')
+        public_id, points = v.split('/')
         points = [float('%0.03f'%float(p)) for p in points.split('-')]
-        q = Q(item__itemId=itemId, start=points[0], end=points[1])
+        q = Q(item__public_id=public_id, start=points[0], end=points[1])
         return exclude and ~q or q
 
     elif k.endswith('__id'):
