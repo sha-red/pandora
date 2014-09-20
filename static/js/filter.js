@@ -253,7 +253,7 @@ pandora.ui.filter = function(id) {
                     }
                 }
             })
-            .appendTo(that.$bar.$element);
+            .appendTo(that.$bar);
     Ox.UI.SCROLLBAR_SIZE < 16 && $($menu.find('input')[0]).css({
         marginRight: '-3px',
         marginTop: '1px',
