@@ -81,7 +81,7 @@ pandora.ui.mainPanel = function() {
                 }
             },
             pandora_showsidebar: function(data) {
-                data.value == that.options('elements')[0].collapsed && that.toggle(0);
+                data.value == that.options('elements')[0].collapsed && that.toggleElement(0);
             },
             pandora_text: function(data) {
                 if (data.value != data.previousValue) {
