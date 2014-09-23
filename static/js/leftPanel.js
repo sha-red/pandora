@@ -54,7 +54,7 @@ pandora.ui.leftPanel = function(section) {
                 }
             },
             pandora_showinfo: function(data) {
-                data.value == that.options('elements')[2].collapsed && that.toggle(2);
+                data.value == that.options('elements')[2].collapsed && that.toggleElement(2);
             }
         });
     return that;
