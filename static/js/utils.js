@@ -1876,7 +1876,7 @@ pandora.hasEventsLayer = function() {
 };
 
 pandora.hasFocusedInput = function() {
-    var focused = Ox.Focus.focused();
+    var focused = Ox.Focus.focusedElement();
     return focused && Ox.UI.elements[focused].is('.OxInput');
 };
 
