@@ -22,7 +22,7 @@ pandora.ui.editPanel = function(isEmbed) {
 
     function enableDragAndDrop() {
         pandora.enableDragAndDrop(
-            Ox.UI.elements[that.find('.OxIconList').data('oxid')],
+            Ox.elements[that.find('.OxIconList').data('oxid')],
             edit.editable
         );
     }

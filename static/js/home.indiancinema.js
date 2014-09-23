@@ -567,7 +567,7 @@ pandora.ui.home = function() {
                             key = Ox.KEYS[e.keyCode];
                         if (
                             focused === null
-                            || !Ox.UI.elements[focused].hasClass('OxInput')
+                            || !Ox.elements[focused].hasClass('OxInput')
                         ) {
                             if (key == 'left' && selected > 0) {
                                 selectItem(selected - 1);
