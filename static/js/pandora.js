@@ -389,7 +389,7 @@ appPanel
                 Ox.Theme(pandora.user.ui.theme);
                 if (isEmbed) {
                     pandora.$ui.embedPanel = pandora.ui.embedPanel().display();
-                    Ox.$parent.onMessage({
+                    Ox.$parent.bindMessage({
                         settheme: function(data) {
                             if (Ox.contains(pandora.site.themes, data.theme)) {
                                 Ox.Theme(data.theme);
