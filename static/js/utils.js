@@ -1952,7 +1952,7 @@ pandora.logEvent = function(data, event, element) {
         'playing', 'position', 'progress', 'request'
     ], event) && !Ox.startsWith(event, 'pandora_')) {
         try {
-            data = JSON.stringify(data)
+            data = JSON.stringify(data);
         } catch(e) {}
         Ox.print(
             'EVENT',
