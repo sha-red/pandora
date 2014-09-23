@@ -448,8 +448,8 @@ pandora.ui.textPDF = function(text) {
                 src: url,
                 width: '100%'
             })
-            .onMessage(function(event, data) {
-                if (event == 'edit') {
+            .bindMessage({
+                edit: function(data) {
                     pandora.ui.insertEmbedDialog(data.src, function(url) {
                         data.src = url;
                         var embed = text.embeds.filter(function(embed) {
@@ -470,7 +470,8 @@ pandora.ui.textPDF = function(text) {
                             $iframe.postMessage('update', data);
                         });
                     }).open();
-                } else if (event == 'page') {
+                },
+                page: function(data) {
                     pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text), {
                         'position': data.page
                     });
