@@ -381,7 +381,7 @@ pandora.ui.documentsPanel = function(options) {
                 $listPanel.replaceElement(1, $list = renderList());
             },
             pandora_showdocument: function(data) {
-                isItemView && that.toggle(1);
+                isItemView && that.toggleElement(1);
             }
         });
 

@@ -49,10 +49,10 @@ pandora.ui.contentPanel = function() {
                 !pandora.user.ui.item && that.replaceElement(1, pandora.$ui.list = pandora.ui.list());
             },
             pandora_showbrowser: function(data) {
-                data.value == that.options('elements')[0].collapsed && that.toggle(0);
+                data.value == that.options('elements')[0].collapsed && that.toggleElement(0);
             },
             pandora_showfilters: function(data) {
-                data.value == that.options('elements')[0].collapsed && that.toggle(0);
+                data.value == that.options('elements')[0].collapsed && that.toggleElement(0);
             }
         });
     return that;
