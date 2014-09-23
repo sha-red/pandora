@@ -196,7 +196,7 @@ pandora.ui.browser = function() {
                 // gain focus if we're on page load or if we've just switched
                 // to an item and the not-yet-garbage-collected list still has
                 // focus
-                if (Ox.Focus.focused() === null || (
+                if (!Ox.Focus.focusedElement() || (
                     pandora.$ui.list && pandora.$ui.list.hasFocus()
                 )) {
                     that.gainFocus();
