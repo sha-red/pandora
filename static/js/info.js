@@ -40,7 +40,10 @@ pandora.ui.info = function() {
         pandora.$ui.listInfo && pandora.$ui.listInfo.remove();
         pandora.$ui.posterInfo && pandora.$ui.posterInfo.remove();
         pandora.$ui.videoPreview && pandora.$ui.videoPreview.remove();
-        that.empty();              
+        that.empty();
+        delete pandora.$ui.listInfo;
+        delete pandora.$ui.posterInfo;
+        delete pandora.$ui.videoPreview;
     }
 
     function getId() {
@@ -164,6 +167,7 @@ pandora.ui.info = function() {
     };
 
     that.updateListInfo = function() {
+        emptyInfo();
         that.empty().append(
             pandora.$ui.listInfo = pandora.ui.listInfo()
         );
@@ -179,7 +183,7 @@ pandora.ui.listInfo = function() {
         folderItem = folderItems.slice(0, -1),
         list = pandora.user.ui.section == 'items' ? pandora.user.ui._list : ui[folderItem.toLowerCase()],
         canEditFeaturedLists = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
-        that = $('<div>').css({padding: '16px', textAlign: 'center'}),
+        that = Ox.Element().css({padding: '16px', textAlign: 'center'}),
         $icon = Ox.Element('<img>')
             .attr({
                 src: list
