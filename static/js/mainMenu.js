@@ -722,25 +722,29 @@ pandora.ui.mainMenu = function() {
             }
         });
 
-    Ox.Event.bind('key', function(data, event, element) {
-        var key = event.replace(/^key\./, '');
-        if (key == 'alt_control_f') {
+    Ox.Event.bind({
+        key_alt_control_f: function() {
             if (!pandora.hasDialogOrScreen() && pandora.getItemIdAndPosition()) {
                 pandora.$ui.similarClipsDialog = pandora.ui.similarClipsDialog().open();
             }
-        } else if (key == 'alt_control_shift_a') {
+        },
+        key_alt_control_shift_a: function() {
             if (!pandora.hasDialogOrScreen() && !ui.item) {
                 pandora.$ui.filters.clearFilters();
             }
-        } else if (key == 'alt_control_shift_f') {
+        },
+        key_alt_control_shift_f: function() {
             Ox.Fullscreen.toggle();
-        } else if (key == 'backtick') {
+        },
+        key_backtick: function() {
             changeFocus(1);
-        } else if (key == 'control_comma') {
+        },
+        key_control_comma: function() {
             if (!pandora.hasDialogOrScreen()) {
                 pandora.UI.set({page: 'preferences'});
             }
-        } else if (key == 'control_f') {
+        },
+        key_control_f: function() {
             if (!pandora.hasDialogOrScreen()) {
                 if (ui._findState.key != 'advanced') {
                     setTimeout(function() {
@@ -750,21 +754,26 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 }
             }
-        } else if (key == 'control_m') {
+        },
+        key_control_m: function() {
             if (!pandora.hasDialogOrScreen() && !that.isSelected()) {
                 that.options('menus')[0].element.trigger('click');
             }
-        } else if (key == 'control_p') {
+        },
+        key_control_p: function() {
             window.open(document.location.href + '#?print=true', '_blank');
-        } else if (key == 'control_shift_f') {
+        },
+        key_control_shift_f: function() {
             if (!pandora.hasDialogOrScreen()) {
                 pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
             }
-        } else if (key == 'control_shift_slash') {
+        },
+        key_control_shift_slash: function() {
             if (!pandora.hasDialogOrScreen()) {
                 pandora.UI.set({page: 'api'});
             }
-        } else if (key == 'control_shift_w') {
+        },
+        key_control_shift_w: function() {
             if (!pandora.hasDialogOrScreen()) {
                 if (ui.section == 'items') {
                     if (ui.item) {
@@ -776,18 +785,22 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set(ui.section.slice(0, -1), '');
                 }
             }
-        } else if (key == 'control_shift_z') {
+        },
+        key_control_shift_z: function() {
             pandora.redoHistory();
-        } else if (key == 'control_slash') {
+        },
+        key_control_slash: function() {
             if (!pandora.hasDialogOrScreen()) {
                 pandora.UI.set({page: 'help'});
             }
-        } else if (key == 'control_space') {
+        },
+        key_control_space: function() {
             if (!pandora.hasDialogOrScreen()) {
                 pandora.UI.set({'part.tv': ui._list});
                 pandora.UI.set({page: 'tv'});
             }
-        } else if (key == 'control_w') {
+        },
+        key_control_w: function() {
             if (!pandora.hasDialogOrScreen() && ui.section == 'items') {
                 if (ui.item) {
                     pandora.UI.set({item: ''});
@@ -795,25 +808,35 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({find: {conditions: [], operator: '&'}});
                 }
             }
-        } else if (key == 'control_z') {
+        },
+        key_control_z: function() {
             pandora.undoHistory();
-        } else if (key == 'shift_a') {
+        },
+        key_shift_a: function() {
             hasAnnotations() && pandora.UI.set({showAnnotations: !ui.showAnnotations});
-        } else if (key == 'shift_b') {
+        },
+        key_shift_b: function() {
             ui.item && pandora.UI.set({showBrowser: !ui.showBrowser});
-        } else if (key == 'shift_backtick') {
+        },
+        key_shift_backtick: function() {
             changeFocus(-1);
-        } else if (key == 'shift_c') {
+        },
+        key_shift_c: function() {
             hasClips() && pandora.UI.set({showClips: !ui.showClips});
-        } else if (key == 'shift_d') {
+        },
+        key_shift_d: function() {
             hasDocument() && pandora.UI.set({showDocument: !ui.showDocument});
-        } else if (key == 'shift_f') {
+        },
+        key_shift_f: function() {
             !ui.item && pandora.UI.set({showFilters: !ui.showFilters});
-        } else if (key == 'shift_i') {
+        },
+        key_shift_i: function() {
             ui.showSidebar && pandora.UI.set({showInfo: !ui.showInfo});
-        } else if (key == 'shift_s') {
+        },
+        key_shift_s: function() {
             pandora.UI.set({showSidebar: !ui.showSidebar});
-        } else if (key == 'shift_t') {
+        },
+        key_shift_t: function() {
             hasTimeline() && pandora.UI.set({showTimeline: !ui.showTimeline});
         }
     });
