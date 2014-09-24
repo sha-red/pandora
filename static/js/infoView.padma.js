@@ -784,6 +784,9 @@ pandora.ui.infoView = function(data) {
     };
 
     that.bindEvent({
+        mousedown: function() {
+            that.gainFocus()
+        },
         pandora_icons: that.reload,
         pandora_showsiteposters: function() {
             ui.icons == 'posters' && that.reload();
