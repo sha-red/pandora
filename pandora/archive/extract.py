@@ -365,6 +365,7 @@ def melt_frame_cmd(video, frame, position, height=128, info=None):
     if not info:
         info = ox.avinfo(video)
     fps = float(AspectRatio(info['video'][0]['framerate']))
+    position = int(position * fps)
     format = frame.split('.')[-1]
     vcodec = 'mjpeg' if format == 'jpg' else 'png'
     cmd = [
@@ -372,14 +373,13 @@ def melt_frame_cmd(video, frame, position, height=128, info=None):
         '-silent',
         video,
         'in=%d' % position, 'out=%d' % position,
-        '-consumer' 'avformat:%s' % frame,
+        '-consumer', 'avformat:%s' % frame,
         'vcodec=%s' % vcodec
     ]
     if height:
         dar = AspectRatio(info['video'][0]['display_aspect_ratio'])
         width = int(dar * height)
         width += width % 2
-        position = int(position * fps)
         cmd += ['-s', '%sx%s' % (width, height)]
     return cmd
 
