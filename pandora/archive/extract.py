@@ -342,7 +342,7 @@ def frame(video, frame, position, height=128, redo=False, info=None):
                 if settings.USE_MELT:
                     cmd = melt_frame_cmd(video, frame, position, height, info)
                 else:
-                    cmd = melt_frame_cmd(video, frame, position, height)
+                    cmd = avconv_frame_cmd(video, frame, position, height)
             else:
                 cmd = ['oxframe', '-i', video, '-o', frame,
                     '-p', str(position), '-y', str(height)]
