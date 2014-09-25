@@ -364,7 +364,7 @@ pandora.ui.documentsPanel = function(options) {
                     resizable: true,
                     resize: [192, 256, 320, 384],
                     tooltip: 'document <span class="OxBright">'
-                        + Ox.SYMBOLS.SHIFT + 'D</span>'
+                        + Ox.SYMBOLS.shift + 'D</span>'
                 }
             ],
             orientation: 'horizontal'

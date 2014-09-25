@@ -83,7 +83,7 @@ pandora.ui.editPanel = function(isEmbed) {
             clipRatio: pandora.site.video.previewRatio,
             clips: Ox.clone(edit.clips),
             clipSize: listSize,
-            clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'C</span>',
+            clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.shift + 'C</span>',
             clipView: ui.edits[ui.edit].view,
             controlsTooltips: {
                 open: Ox._('Open in {0} View', [Ox._(Ox.getObjectById(
@@ -142,7 +142,7 @@ pandora.ui.editPanel = function(isEmbed) {
                 ),
             subtitles: getSubtitles(edit.clips),
             timeline: ui.videoTimeline,
-            timelineTooltip: Ox._('timeline') + ' <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'T</span>',
+            timelineTooltip: Ox._('timeline') + ' <span class="OxBright">' + Ox.SYMBOLS.shift + 'T</span>',
             video: getVideos(),
             volume: ui.videoVolume,
             width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
@@ -399,7 +399,7 @@ pandora.ui.editPanel = function(isEmbed) {
             clipRatio: pandora.site.video.previewRatio,
             clipSize: listSize,
             clips: Ox.clone(edit.clips),
-            clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'C</span>',
+            clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.shift + 'C</span>',
             clipView: ui.edits[ui.edit].view,
             controlsBottom: [
                 'play', 'volume', 'scale', 'timeline', 'position', 'settings'

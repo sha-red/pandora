@@ -16,7 +16,7 @@ pandora.ui.leftPanel = function(section) {
                     element: pandora.$ui.info = pandora.ui.info(),
                     size: pandora.getInfoHeight(true),
                     tooltip: Ox._('info') + ' <span class="OxBright">'
-                        + Ox.SYMBOLS.SHIFT + 'I</span>'
+                        + Ox.SYMBOLS.shift + 'I</span>'
                 }
             ],
             id: 'leftPanel',

@@ -13,7 +13,7 @@ pandora.ui.editor = function(data) {
             annotationsSize: ui.annotationsSize,
             annotationsSort: ui.annotationsSort,
             annotationsTooltip: Ox._('annotations')
-                + ' <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'A</span>',
+                + ' <span class="OxBright">' + Ox.SYMBOLS.shift + 'A</span>',
             audioTrack: data.audioTrack,
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
