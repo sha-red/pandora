@@ -563,12 +563,8 @@ pandora.ui.home = function() {
                             .appendTo($featureBox[i]);
                     });
                     self.keydown = function(e) {
-                        var focused = Ox.Focus.focused(),
-                            key = Ox.KEYS[e.keyCode];
-                        if (
-                            focused === null
-                            || !Ox.elements[focused].hasClass('OxInput')
-                        ) {
+                        var key = Ox.KEYS[e.keyCode];
+                        if (!Ox.Focus.focusedElementIsInput()) {
                             if (key == 'left' && selected > 0) {
                                 selectItem(selected - 1);
                             } else if (key == 'up' && selected > 0) {
@@ -697,7 +693,7 @@ pandora.ui.home = function() {
     }
 
     that.fadeInScreen = function() {
-        that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500, function() {
+        that.appendTo(Ox.$body).animate({opacity: 1}, 500, function() {
             that.find('*').animate({opacity: 1}, 250, function() {
                 $findInput.focusInput(true);
                 showFeatures();
@@ -719,7 +715,7 @@ pandora.ui.home = function() {
     that.showScreen = function(callback) {
         var $elements = that.find('*'), count = 0;
         $box.css({top: window.innerHeight / 2 - 40 + 'px'});
-        that.css({opacity: 1}).appendTo(Ox.UI.$body);
+        that.css({opacity: 1}).appendTo(Ox.$body);
         $findInput.focusInput(true);
         $box.animate({top: '80px'}, 500, function() {
             $elements.animate({opacity: 1}, 250, function() {

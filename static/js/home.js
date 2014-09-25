@@ -256,7 +256,7 @@ pandora.ui.home = function() {
     }
 
     that.fadeInScreen = function() {
-        that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500, function() {
+        that.appendTo(Ox.$body).animate({opacity: 1}, 500, function() {
             that.find(':not(#logo)').animate({opacity: 1}, 250, function() {
                 $findInput.focusInput(true);
             });
@@ -285,7 +285,7 @@ pandora.ui.home = function() {
     that.showScreen = function(callback) {
         var $elements = that.find(':not(.logo)'), count = 0;
         $logo.css({width: '320px'});
-        that.css({opacity: 1}).appendTo(Ox.UI.$body);
+        that.css({opacity: 1}).appendTo(Ox.$body);
         that.find(':not(#logo)').css({opacity: 1});
         $elements.animate({opacity: 1}, 500, function() {
             if (callback && ++count == $elements.length) {
