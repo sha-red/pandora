@@ -5,7 +5,7 @@ pandora.ui.namesDialog = function() {
     // FIXME: add cache invalidation
 
     var height = Math.round((window.innerHeight - 48) * 0.9),
-        width = 576 + Ox.UI.SCROLLBAR_SIZE,
+        width = 576 + Ox.SCROLLBAR_SIZE,
 
         $findInput = Ox.Input({
                 changeOnKeypress: true,
@@ -162,7 +162,7 @@ pandora.ui.namesDialog = function() {
             })
             .bindEvent({
                 resizeend: function(data) {
-                    var width = (data.width - 64 - Ox.UI.SCROLLBAR_SIZE) / 2;
+                    var width = (data.width - 64 - Ox.SCROLLBAR_SIZE) / 2;
                     [
                         {id: 'name', width: Math.ceil(width)},
                         {id: 'sortname', width: Math.floor(width)}

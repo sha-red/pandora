@@ -249,7 +249,7 @@ pandora.ui.list = function() {
             unique: 'id',
             width: window.innerWidth
                 - ui.showSidebar * ui.sidebarSize - 1
-                - Ox.UI.SCROLLBAR_SIZE
+                - Ox.SCROLLBAR_SIZE
         })
         .addClass('OxMedia')
         .bindEvent({
@@ -541,10 +541,10 @@ pandora.ui.list = function() {
                 // fixme: doesn't update title icon, passes useless options
                 if (hasIcons()) {
                     if (ui.listView == 'list') {
-                        src = Ox.UI.getImageURL(
+                        src = Ox.getImageURL(
                             data.value == 'posters' ? 'symbolSetPoster' : 'symbolIcon'
                         );
-                        previousSrc = Ox.UI.getImageURL(
+                        previousSrc = Ox.getImageURL(
                             data.previousValue == 'posters' ? 'symbolSetPoster' : 'symbolIcon'
                         );
                         that.find('img[src="' + previousSrc + '"]').attr({src: src});

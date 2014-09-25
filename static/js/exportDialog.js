@@ -7,7 +7,7 @@ pandora.ui.exportDialog = function(options) {
                 style: 'square',
                 type: 'textarea',
                 value: options.data,
-                width: 512 - Ox.UI.SCROLLBAR_SIZE
+                width: 512 - Ox.SCROLLBAR_SIZE
             }),
 
         that = Ox.Dialog({

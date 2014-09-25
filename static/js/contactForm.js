@@ -154,7 +154,7 @@ pandora.ui.contactForm = function() {
             pandora.$ui.siteDialog
             ? parseInt(pandora.$ui.siteDialog.css('width'))
             : Math.round(window.innerWidth * 0.75)
-        ) - 304 - Ox.UI.SCROLLBAR_SIZE, 512);
+        ) - 304 - Ox.SCROLLBAR_SIZE, 512);
     }
 
     that.resizeElement = function() {

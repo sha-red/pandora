@@ -179,7 +179,7 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel = Ox.TabPanel({
             content: function(id) {
-                var chartWidth = dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE,
+                var chartWidth = dialogWidth - 32 - Ox.SCROLLBAR_SIZE,
                     mode = $guestsCheckbox.options('value') ? 'all' : 'registered',
                     top = 16,
                     $content = Ox.Element()
@@ -381,7 +381,7 @@ pandora.ui.statisticsDialog = function() {
                                         ).append(
                                             $('<img>')
                                                 .attr({
-                                                    src: Ox.UI.PATH + 'png/' + key
+                                                    src: Ox.UI_PATH + 'png/' + key
                                                         + name.replace(/ /g, '') + '128.png'
                                                 })
                                                 .css({
@@ -457,7 +457,7 @@ pandora.ui.statisticsDialog = function() {
                                     $element.append(
                                         $('<img>')
                                             .attr({
-                                                src: Ox.UI.PATH + 'png/' + key
+                                                src: Ox.UI_PATH + 'png/' + key
                                                     + value.replace(/ /g, '') + '128.png'
                                             })
                                             .css({

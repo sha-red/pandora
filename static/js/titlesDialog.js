@@ -3,7 +3,7 @@
 pandora.ui.titlesDialog = function() {
 
     var height = Math.round((window.innerHeight - 48) * 0.9),
-        width = 512 + Ox.UI.SCROLLBAR_SIZE,
+        width = 512 + Ox.SCROLLBAR_SIZE,
 
         $findInput = Ox.Input({
                 changeOnKeypress: true,
@@ -151,7 +151,7 @@ pandora.ui.titlesDialog = function() {
             })
             .bindEvent({
                 resizeend: function(data) {
-                    var width = (data.width - Ox.UI.SCROLLBAR_SIZE) / 2;
+                    var width = (data.width - Ox.SCROLLBAR_SIZE) / 2;
                     [
                         {id: 'title', width: Math.ceil(width)},
                         {id: 'sorttitle', width: Math.floor(width)}

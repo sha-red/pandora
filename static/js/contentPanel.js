@@ -25,7 +25,7 @@ pandora.ui.contentPanel = function() {
                     collapsed: !pandora.user.ui.showBrowser,
                     collapsible: true,
                     element: pandora.$ui.browser = pandora.ui.browser(),
-                    size: 112 + Ox.UI.SCROLLBAR_SIZE,
+                    size: 112 + Ox.SCROLLBAR_SIZE,
                     tooltip: Ox._('{0} browser', [Ox._(pandora.site.itemName.singular.toLowerCase())])
                         + ' <span class="OxBright">'
                         + Ox.SYMBOLS.SHIFT + 'B</span>'

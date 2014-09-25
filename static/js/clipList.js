@@ -195,7 +195,7 @@ pandora.ui.clipList = function(videoRatio) {
                     if ($video) {
                         // trigger singleclick
                         $video.trigger('mousedown');
-                        Ox.UI.$window.trigger('mouseup');
+                        Ox.$window.trigger('mouseup');
                     }
                 }
                 that.closePreview();

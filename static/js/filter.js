@@ -35,7 +35,7 @@ pandora.ui.filter = function(id) {
                                         .addClass('flagname')
                                         .css({
                                             float: 'left',
-                                            width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE,
+                                            width: pandora.user.ui.filterSizes[i] - 68 - Ox.SCROLLBAR_SIZE,
                                             textOverflow: 'ellipsis',
                                             overflowX: 'hidden'
                                         })
@@ -46,7 +46,7 @@ pandora.ui.filter = function(id) {
                     operator: filter.type == 'string' ? '+' : '-',
                     title: title,
                     visible: true,
-                    width: pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE
+                    width: pandora.user.ui.filterSizes[i] - 44 - Ox.SCROLLBAR_SIZE
                 },
                 {
                     align: 'right',
@@ -184,7 +184,7 @@ pandora.ui.filter = function(id) {
                 ],
                 type: 'image',
             })
-            .css(Ox.UI.SCROLLBAR_SIZE == 16 ? {
+            .css(Ox.SCROLLBAR_SIZE == 16 ? {
                 right: 0,
                 width: '14px'
             } : {
@@ -254,7 +254,7 @@ pandora.ui.filter = function(id) {
                 }
             })
             .appendTo(that.$bar);
-    Ox.UI.SCROLLBAR_SIZE < 16 && $($menu.find('input')[0]).css({
+    Ox.SCROLLBAR_SIZE < 16 && $($menu.find('input')[0]).css({
         marginRight: '-3px',
         marginTop: '1px',
         width: '8px',

@@ -84,7 +84,7 @@ pandora.ui.listDialog = function(section) {
                     changeOnKeypress: true,
                     clear: true,
                     placeholder: Ox._('Find: All'),
-                    width: 128 + Ox.UI.SCROLLBAR_SIZE
+                    width: 128 + Ox.SCROLLBAR_SIZE
                 })
                 .bindEvent({
                     change: function(data) {
@@ -148,7 +148,7 @@ pandora.ui.listDialog = function(section) {
 
     function getWidth(section) {
         return section == 'general' ? 496
-            : (section == 'icon' ? 696 : 648) + Ox.UI.SCROLLBAR_SIZE;
+            : (section == 'icon' ? 696 : 648) + Ox.SCROLLBAR_SIZE;
     }
 
     return $dialog;
@@ -386,7 +386,7 @@ pandora.ui.listIconPanel = function(listData) {
                 },
                 {
                     element: $list,
-                    size: 144 + Ox.UI.SCROLLBAR_SIZE
+                    size: 144 + Ox.SCROLLBAR_SIZE
                 }
             ],
             orientation: 'horizontal'

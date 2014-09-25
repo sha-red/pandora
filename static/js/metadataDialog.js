@@ -162,7 +162,7 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function getFormWidth() {
-        return dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE;
+        return dialogWidth - 32 - Ox.SCROLLBAR_SIZE;
     }
 
     function getMetadata() {

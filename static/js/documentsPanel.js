@@ -465,7 +465,7 @@ pandora.ui.documentsPanel = function(options) {
 
     function getPreviewSize() {
         var ratio = $list.value($list.options('selected')[0], 'ratio'),
-            size = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE,
+            size = ui.documentSize - 16 - Ox.SCROLLBAR_SIZE,
             height = ratio > 1 ? size / ratio : size,
             width = ratio > 1 ? size : size * ratio,
             left = Math.floor((size - width) / 2);
@@ -523,7 +523,7 @@ pandora.ui.documentsPanel = function(options) {
                 || pandora.site.capabilities.canEditDocuments[pandora.user.level]
                 || options.editable,
             labelWidth = 80,
-            width = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE;
+            width = ui.documentSize - 16 - Ox.SCROLLBAR_SIZE;
         return isItemView
             ? Ox.Element()
                 .css({textAlign: 'center'})
@@ -778,7 +778,7 @@ pandora.ui.documentsPanel = function(options) {
 
     function resizeItem() {
         var size = getPreviewSize(),
-            width = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE;
+            width = ui.documentSize - 16 - Ox.SCROLLBAR_SIZE;
         $preview && $preview.options({
             height: size.height,
             width: size.width

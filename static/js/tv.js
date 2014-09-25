@@ -54,7 +54,7 @@ pandora.ui.tv = function() {
 
     function play() {
         var $loading = $('<img>')
-                .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
+                .attr({src: Ox.getImageURL('symbolLoadingAnimated')})
                 .css({
                     position: 'absolute',
                     left: 0, top: 0, right: 0, bottom: 0,
@@ -169,7 +169,7 @@ pandora.ui.tv = function() {
     }
 
     that.fadeInScreen = function() {
-        that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500);
+        that.appendTo(Ox.$body).animate({opacity: 1}, 500);
         play();
         return that;
     };
@@ -195,7 +195,7 @@ pandora.ui.tv = function() {
     };
 
     that.showScreen = function() {
-        that.css({opacity: 1}).appendTo(Ox.UI.$body);
+        that.css({opacity: 1}).appendTo(Ox.$body);
         play();
         return that;
     };

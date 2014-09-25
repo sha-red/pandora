@@ -423,7 +423,7 @@ pandora.URL = (function() {
             Ox.Request.cancel();
             self.isPopState = true;
             $('.OxDialog:visible').each(function() {
-                Ox.UI.elements[$(this).data('oxid')].close();
+                Ox.$elements[$(this).data('oxid')].close();
             });
             if (pandora.$ui.home) {
                 pandora.UI.set({page: ''});

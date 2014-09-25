@@ -7,7 +7,7 @@ pandora.ui.loadingIcon = function() {
             tooltip: Ox._('Click to reload {0}', [pandora.site.site.name])
         }, self)
         .attr({
-            src: Ox.UI.getImageURL('symbolRedo')
+            src: Ox.getImageURL('symbolRedo')
         })
         .css(getCSS('stop'))
         .bindEvent({
@@ -23,7 +23,7 @@ pandora.ui.loadingIcon = function() {
         if (!self.loadingInterval) {
             that.css(getCSS('start'))
                 .attr({
-                    src: Ox.UI.getImageURL('symbolLoading')
+                    src: Ox.getImageURL('symbolLoading')
                 });
             that.superStart();
         }
@@ -34,7 +34,7 @@ pandora.ui.loadingIcon = function() {
             that.superStop(function() {
                 that.css(getCSS('stop'))
                     .attr({
-                        src: Ox.UI.getImageURL('symbolRedo')
+                        src: Ox.getImageURL('symbolRedo')
                     });
             });
         }

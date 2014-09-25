@@ -5,7 +5,7 @@ pandora.ui.folderBrowserList = function(id, section) {
     // but resizeFolders will set them to different widths
     section = pandora.user.ui.section;
     var ui = pandora.user.ui,
-        columnWidth = (ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - (section != 'texts' ? 96 : 48)) / 2,
+        columnWidth = (ui.sidebarSize - Ox.SCROLLBAR_SIZE - (section != 'texts' ? 96 : 48)) / 2,
         i = Ox.getIndexById(pandora.site.sectionFolders[section], id),
         folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1),
@@ -27,7 +27,7 @@ pandora.ui.folderBrowserList = function(id, section) {
                     /*
                     format: function() {
                         return $('<img>').attr({
-                            src: Ox.UI.getImageURL('symbolIcon')
+                            src: Ox.getImageURL('symbolIcon')
                         }).css({
                             width: '10px',
                             height: '10px',
@@ -78,7 +78,7 @@ pandora.ui.folderBrowserList = function(id, section) {
                     format: function(value, data) {
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImageURL(
+                                src: Ox.getImageURL(
                                     value == 'static' ? 'symbolClick'
                                     : value == 'smart' ? 'symbolFind'
                                     : value == 'html' ? 'symbolFile'
@@ -110,7 +110,7 @@ pandora.ui.folderBrowserList = function(id, section) {
                     format: function(value) {
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImageURL(
+                                src: Ox.getImageURL(
                                     'symbol' + (id == 'favorite' ? 'Like' : 'Star')
                                 )
                             })

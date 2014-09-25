@@ -10,8 +10,8 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
 
     var advanced = pandora.user.ui.showAdvancedEmbedOptions,
         dialogHeight = 344,
-        dialogWidth = 416 + Ox.UI.SCROLLBAR_SIZE,
-        formWidth = dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE,
+        dialogWidth = 416 + Ox.SCROLLBAR_SIZE,
+        formWidth = dialogWidth - 32 - Ox.SCROLLBAR_SIZE,
 
         that = Ox.Dialog({
                 buttons: [

@@ -101,7 +101,7 @@ pandora.ui.usersDialog = function() {
                         format: function(value, data) {
                             return $('<img>')
                                 .attr({
-                                    src: Ox.UI.getImageURL('symbolCheck')
+                                    src: Ox.getImageURL('symbolCheck')
                                 })
                                 .css({
                                     width: '10px',
@@ -123,7 +123,7 @@ pandora.ui.usersDialog = function() {
                         format: function(value) {
                             return $('<img>')
                                 .attr({
-                                    src: Ox.UI.getImageURL('symbolMail')
+                                    src: Ox.getImageURL('symbolMail')
                                 })
                                 .css({
                                     width: '10px',
@@ -222,7 +222,7 @@ pandora.ui.usersDialog = function() {
                                         .replace(/Windows (NT \d+\.\d+) \((.+)\)/, 'Windows $2 ($1)')
                                 })
                                 .attr({
-                                    src: Ox.UI.PATH + 'png/system'
+                                    src: Ox.UI_PATH + 'png/system'
                                         + system.replace(/ /g, '') + '128.png'
                                 })
                                 .css({
@@ -253,7 +253,7 @@ pandora.ui.usersDialog = function() {
                                     tooltip: value
                                 })
                                 .attr({
-                                    src: Ox.UI.PATH + 'png/browser'
+                                    src: Ox.UI_PATH + 'png/browser'
                                         + browser.replace(/ /g, '') + '128.png'
                                 })
                                 .css({
