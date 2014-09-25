@@ -5,9 +5,9 @@ pandora.ui.editPanel = function(isEmbed) {
     var ui = pandora.user.ui,
         edit,
         listSizes = [
-            144 + Ox.UI.SCROLLBAR_SIZE,
-            280 + Ox.UI.SCROLLBAR_SIZE,
-            416 + Ox.UI.SCROLLBAR_SIZE
+            144 + Ox.SCROLLBAR_SIZE,
+            280 + Ox.SCROLLBAR_SIZE,
+            416 + Ox.SCROLLBAR_SIZE
         ],
         listSize = listSizes[ui.clipColumns],
         smallTimelineCanvas,
@@ -22,7 +22,7 @@ pandora.ui.editPanel = function(isEmbed) {
 
     function enableDragAndDrop() {
         pandora.enableDragAndDrop(
-            Ox.elements[that.find('.OxIconList').data('oxid')],
+            Ox.$elements[that.find('.OxIconList').data('oxid')],
             edit.editable
         );
     }
