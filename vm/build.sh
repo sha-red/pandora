@@ -18,13 +18,13 @@ base=$(pwd)
 sudo  vmbuilder $hypervisor ubuntu --suite=trusty \
     --verbose --debug \
     --arch $arch \
-    --flavour generic \
     --dest $base/pandora \
     --hostname pandora \
     --swapsize 512 \
     --rootsize $size \
     --user pandora \
     --pass $password \
+    --addpkg linux-image-generic \
     --components main,universe,multiverse \
     --firstboot=$base/firstboot.sh \
     $extra
