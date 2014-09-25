@@ -560,7 +560,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                 });
             }, section != pandora.user.ui.section ? 2000 : 0);
             $tooltip.options({title: getTitle()}).show(data.event);
-            canMove && Ox.UI.$window.on({
+            canMove && Ox.$window.on({
                 keydown: keydown,
                 keyup: keyup
             });
@@ -593,7 +593,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                     title = $panel.children('.OxBar').children('.OxTitle')
                         .html().split(' ')[0].toLowerCase();
                     if (!pandora.user.ui.showFolder.items[title]) {
-                        Ox.UI.elements[$panel.data('oxid')].options({collapsed: false});
+                        Ox.$elements[$panel.data('oxid')].options({collapsed: false});
                     }
                 }
                 if (!scrollInterval) {
@@ -630,7 +630,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
         },
         draganddropend: function(data) {
             Ox.Log('', data, drag, '------------');
-            canMove && Ox.UI.$window.off({
+            canMove && Ox.$window.off({
                 keydown: keydown,
                 keyup: keyup
             });
@@ -769,7 +769,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                     })
                     .append(
                          $('<img>')
-                            .attr({src: Ox.UI.getImageURL(image)})
+                            .attr({src: Ox.getImageURL(image)})
                             .css({width: '16px', height: '16px'})
                     )
             )
@@ -818,7 +818,7 @@ pandora.enterFullscreen = function() {
     pandora.user.ui.showSidebar && pandora.$ui.mainPanel.size(0, 0);
     pandora.$ui.rightPanel.size(0, 0).size(2, 0);
     !pandora.user.ui.showBrowser && pandora.$ui.contentPanel.css({
-        top: (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+        top: (-112 - Ox.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
     });
     pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 0);
     pandora.$ui.player.options({
@@ -832,9 +832,9 @@ pandora.exitFullscreen = function() {
     pandora.user.ui.showSidebar && pandora.$ui.mainPanel.size(0, pandora.user.ui.sidebarSize);
     pandora.$ui.rightPanel.size(0, 24).size(2, 16);
     !pandora.user.ui.showBrowser && pandora.$ui.contentPanel.css({
-        top: 24 + (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+        top: 24 + (-112 - Ox.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
     });
-    pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
+    pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.SCROLLBAR_SIZE);
 };
 
 pandora.getAllItemsTitle = function(section) {
@@ -873,7 +873,7 @@ pandora.getClipItems = function(data) {
 pandora.getClipsItems = function(width) {
     width = width || window.innerWidth
         - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
-        - Ox.UI.SCROLLBAR_SIZE;
+        - Ox.SCROLLBAR_SIZE;
     return Math.floor((width - 8) / (128 + 8)) - 1;
 };
 
@@ -1039,7 +1039,7 @@ pandora.getFoldersWidth = function(section) {
         && pandora.getFoldersHeight(section)
             > window.innerHeight - 20 - 24 - 16 - 1 - pandora.getInfoHeight(section)
     ) {
-        width -= Ox.UI.SCROLLBAR_SIZE;
+        width -= Ox.SCROLLBAR_SIZE;
     }
     return width;
 };
@@ -1875,11 +1875,6 @@ pandora.hasEventsLayer = function() {
     });
 };
 
-pandora.hasFocusedInput = function() {
-    var focused = Ox.Focus.focusedElement();
-    return focused && Ox.UI.elements[focused].is('.OxInput');
-};
-
 pandora.hasPlacesLayer = function() {
     return pandora.site.layers.some(function(layer) {
         return layer.type == 'place';
@@ -2072,9 +2067,9 @@ pandora.resizeFilters = function(width) {
         .size(0, pandora.user.ui.filterSizes[1])
         .size(2, pandora.user.ui.filterSizes[3]);
     pandora.$ui.filters && pandora.$ui.filters.forEach(function($list, i) {
-        $list.resizeColumn('name', pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE);
+        $list.resizeColumn('name', pandora.user.ui.filterSizes[i] - 44 - Ox.SCROLLBAR_SIZE);
         if (pandora.site.flags) {
-            $list.find('.flagname').css({width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE})
+            $list.find('.flagname').css({width: pandora.user.ui.filterSizes[i] - 68 - Ox.SCROLLBAR_SIZE})
         }
     });
 };
@@ -2131,7 +2126,7 @@ pandora.resizeWindow = function() {
                 pandora.$ui.list.options({
                     width: window.innerWidth
                         - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
-                        - Ox.UI.SCROLLBAR_SIZE
+                        - Ox.SCROLLBAR_SIZE
                 });
                 if (clipsItems != previousClipsItems) {
                     Ox.Request.clearCache(); // fixme
@@ -2141,7 +2136,7 @@ pandora.resizeWindow = function() {
                 pandora.$ui.list.options({
                     width: window.innerWidth
                         - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
-                        - Ox.UI.SCROLLBAR_SIZE
+                        - Ox.SCROLLBAR_SIZE
                 });
             } else if (pandora.user.ui.listView == 'map') {
                 pandora.$ui.map && pandora.$ui.map.resizeMap();
@@ -2213,7 +2208,7 @@ pandora.selectList = function() {
                     );
                     pandora.$ui.folderList[folder]
                         .options({selected: [pandora.user.ui._list]});
-                    if (!pandora.hasDialogOrScreen() && !pandora.hasFocusedInput()) {
+                    if (!pandora.hasDialogOrScreen() && !Ox.Focus.focusedElementIsInput()) {
                         pandora.$ui.folderList[folder].gainFocus();
                     }
                 }
@@ -2259,7 +2254,7 @@ pandora.setLocale = function(locale, callback) {
 pandora.setTheme = function(theme) {
     var iframe, src;
     Ox.Theme(theme);
-    iframe = Ox.UI.elements[$('#embed').data('oxid')];
+    iframe = Ox.$elements[$('#embed').data('oxid')];
     if (iframe) {
         src = iframe.attr('src');
         if (src && Ox.parseURL(src).hostname == document.location.hostname) {
