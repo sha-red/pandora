@@ -152,6 +152,7 @@ LOGGING = {
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 AUTH_CHECK_USERNAME = True
 AVCONV_VERSION = 0
+USE_MELT=False
 
 #=========================================================================
 #Pan.do/ra related settings settings

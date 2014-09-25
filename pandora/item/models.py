@@ -1084,7 +1084,7 @@ class Item(models.Model):
                 path = os.path.join(settings.MEDIA_ROOT, stream.path(),
                                     'frames', "%dp"%height, "%s.jpg"%position)
                 if not os.path.exists(path) and stream.media:
-                    extract.frame(stream.media.path, path, position, height)
+                    extract.frame(stream.media.path, path, position, height, info=stream.info)
                 if not os.path.exists(path):
                     return None
                 return path

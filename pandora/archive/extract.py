@@ -325,7 +325,7 @@ def run_command(cmd, timeout=10):
     return p.returncode
 
 
-def frame(video, frame, position, height=128, redo=False):
+def frame(video, frame, position, height=128, redo=False, info=None):
     '''
         params:
             video     input
@@ -339,20 +339,49 @@ def frame(video, frame, position, height=128, redo=False):
         if redo or not exists(frame):
             ox.makedirs(folder)
             if video.endswith('.mp4'):
-                cmd = [
-                    AVCONV, '-y',
-                    '-ss', str(position),
-                    '-i', video,
-                    '-an', '-vframes', '1',
-                    '-vf', 'scale=-1:%s' % height
-                ]
-                if not frame.endswith('.png'):
-                    cmd += ['-f', 'mjpeg']
-                cmd += [frame]
+                if settings.USE_MELT:
+                    cmd = melt_frame_cmd(video, frame, position, height, info)
+                else:
+                    cmd = melt_frame_cmd(video, frame, position, height)
             else:
                 cmd = ['oxframe', '-i', video, '-o', frame,
                     '-p', str(position), '-y', str(height)]
             run_command(cmd)
+
+def avconv_frame_cmd(video, frame, position, height=128):
+    cmd = [
+        AVCONV, '-y',
+        '-ss', str(position),
+        '-i', video,
+        '-an', '-vframes', '1',
+        '-vf', 'scale=-1:%s' % height
+    ]
+    if not frame.endswith('.png'):
+        cmd += ['-f', 'mjpeg']
+    cmd += [frame]
+    return cmd
+
+def melt_frame_cmd(video, frame, position, height=128, info=None):
+    if not info:
+        info = ox.avinfo(video)
+    fps = float(AspectRatio(info['video'][0]['framerate']))
+    format = frame.split('.')[-1]
+    vcodec = 'mjpeg' if format == 'jpg' else 'png'
+    cmd = [
+        'melt',
+        '-silent',
+        video,
+        'in=%d' % position, 'out=%d' % position,
+        '-consumer' 'avformat:%s' % frame,
+        'vcodec=%s' % vcodec
+    ]
+    if height:
+        dar = AspectRatio(info['video'][0]['display_aspect_ratio'])
+        width = int(dar * height)
+        width += width % 2
+        position = int(position * fps)
+        cmd += ['-s', '%sx%s' % (width, height)]
+    return cmd
 
 def frame_direct(video, target, position):
     fdir = os.path.dirname(target)
