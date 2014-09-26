@@ -110,9 +110,6 @@ pandora.ui.list = function() {
             columnresize: function(data) {
                 pandora.UI.set('listColumnWidth.' + data.id, data.width);
             },
-            resize: function(data) { // this is the resize event of the split panel
-                that.size();
-            },
             sort: function(data) {
                 pandora.UI.set({
                     listSort: [{key: data.key, operator: data.operator}]
@@ -383,6 +380,15 @@ pandora.ui.list = function() {
         that = pandora.ui.videoView();
     } else if (['map', 'calendar'].indexOf(view) > -1) {
         that = pandora.ui.navigationView(view);
+    }
+
+    if (['list', 'grid', 'clip'].indexOf(view) > -1) {
+        // react to the resize event of the split panel
+        that.bindEvent({
+            resize: function(data) {
+                that.size();
+            }
+        });
     }
 
     if (['list', 'grid', 'clips', 'timelines', 'video'].indexOf(view) > -1) {
