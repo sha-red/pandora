@@ -222,7 +222,7 @@ pandora.ui.usersDialog = function() {
                                         .replace(/Windows (NT \d+\.\d+) \((.+)\)/, 'Windows $2 ($1)')
                                 })
                                 .attr({
-                                    src: Ox.UI_PATH + 'png/system'
+                                    src: Ox.UI.PATH + 'png/system'
                                         + system.replace(/ /g, '') + '128.png'
                                 })
                                 .css({
@@ -253,7 +253,7 @@ pandora.ui.usersDialog = function() {
                                     tooltip: value
                                 })
                                 .attr({
-                                    src: Ox.UI_PATH + 'png/browser'
+                                    src: Ox.UI.PATH + 'png/browser'
                                         + browser.replace(/ /g, '') + '128.png'
                                 })
                                 .css({

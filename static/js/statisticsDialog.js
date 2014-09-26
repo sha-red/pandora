@@ -381,7 +381,7 @@ pandora.ui.statisticsDialog = function() {
                                         ).append(
                                             $('<img>')
                                                 .attr({
-                                                    src: Ox.UI_PATH + 'png/' + key
+                                                    src: Ox.UI.PATH + 'png/' + key
                                                         + name.replace(/ /g, '') + '128.png'
                                                 })
                                                 .css({
@@ -457,7 +457,7 @@ pandora.ui.statisticsDialog = function() {
                                     $element.append(
                                         $('<img>')
                                             .attr({
-                                                src: Ox.UI_PATH + 'png/' + key
+                                                src: Ox.UI.PATH + 'png/' + key
                                                     + value.replace(/ /g, '') + '128.png'
                                             })
                                             .css({
