@@ -216,7 +216,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
     updateStatusbar(0);
 
     function selectItem(data) {
-        var id = data.id || '';
+        var id = data ? data.id : '';
         if (id && id[0] != '_') {
             $status.html(Ox._('Loading...'));
             $list.options({
