@@ -27,7 +27,6 @@ To run pan.do/ra you need to install and setup:
             python-setuptools python-pip python-virtualenv ipython \
             python-dev python-imaging python-numpy python-psycopg2 \
             python-geoip python-html5lib python-lxml \
-            python-gst0.10 gstreamer0.10-plugins-good gstreamer0.10-plugins-bad \
             postgresql postgresql-contrib rabbitmq-server \
             ffmpeg2theora libav-tools libavcodec-extra-53 melt \
             python-ox oxframe imagemagick poppler-utils mkvtoolnix gpac

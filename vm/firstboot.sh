@@ -45,9 +45,6 @@ apt-get install -y \
     python-lxml \
     python-html5lib \
     python-ox \
-    python-gst0.10 \
-    gstreamer0.10-plugins-good \
-    gstreamer0.10-plugins-bad \
     oxframe \
     $LIBAVCODEC_EXTRA \
     libav-tools \
