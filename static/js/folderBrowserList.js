@@ -5,7 +5,7 @@ pandora.ui.folderBrowserList = function(id, section) {
     // but resizeFolders will set them to different widths
     section = pandora.user.ui.section;
     var ui = pandora.user.ui,
-        columnWidth = (ui.sidebarSize - Ox.SCROLLBAR_SIZE - (section != 'texts' ? 96 : 48)) / 2,
+        columnWidth = (ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - (section != 'texts' ? 96 : 48)) / 2,
         i = Ox.getIndexById(pandora.site.sectionFolders[section], id),
         folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1),

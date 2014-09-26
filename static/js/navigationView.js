@@ -8,9 +8,9 @@ pandora.ui.navigationView = function(type, videoRatio) {
         isEmbed = pandora.isEmbedURL(),
         itemName = type == 'map' ? 'place' : 'event',
         listSizes = [
-            144 + Ox.SCROLLBAR_SIZE,
-            280 + Ox.SCROLLBAR_SIZE,
-            416 + Ox.SCROLLBAR_SIZE
+            144 + Ox.UI.SCROLLBAR_SIZE,
+            280 + Ox.UI.SCROLLBAR_SIZE,
+            416 + Ox.UI.SCROLLBAR_SIZE
         ],
         listSize = listSizes[ui.clipColumns - 1],
 
@@ -112,7 +112,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 },
                 {
                     element: $listPanel,
-                    size: 188 + Ox.SCROLLBAR_SIZE
+                    size: 188 + Ox.UI.SCROLLBAR_SIZE
                 }
             ],
             orientation: 'vertical'
@@ -127,7 +127,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 // 20 px menu + 24 px toolbar + 1px resizbar + 16px statusbar (if !item)
                 height: isEmbed ? window.innerHeight - 40
                     : !ui.item ? window.innerHeight - ui.showFilters * ui.filtersSize - 61
-                    : window.innerHeight - ui.showBrowser * (112 + Ox.SCROLLBAR_SIZE) - 45,
+                    : window.innerHeight - ui.showBrowser * (112 + Ox.UI.SCROLLBAR_SIZE) - 45,
                 places: function(data, callback) {
                     var itemsQuery;
                     if (!ui.item) {
@@ -190,7 +190,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                     // 20 px menu + 24 px toolbar + 1px resizbar + 16px statusbar (if !item)
                     height: !ui.item
                         ? window.innerHeight - ui.showFilters * ui.filtersSize - 61
-                        : window.innerHeight - ui.showBrowser * (112 + Ox.SCROLLBAR_SIZE) - 45,
+                        : window.innerHeight - ui.showBrowser * (112 + Ox.UI.SCROLLBAR_SIZE) - 45,
                     range: [-5000, 5000],
                     selected: ui.calendarSelection,
                     showControls: ui.showCalendarControls,
@@ -253,7 +253,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
     }
 
     function getSortSelectWidth(width) {
-        return Math.min(144, width - 32 + Ox.SCROLLBAR_SIZE);
+        return Math.min(144, width - 32 + Ox.UI.SCROLLBAR_SIZE);
     }
 
     function updateStatusbar(items) {

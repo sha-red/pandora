@@ -43,14 +43,14 @@ pandora.ui.filterDialog = function() {
                     })
             ],
             content: pandora.$ui.filterForm = pandora.ui.filterForm({mode: 'find'}),
-            maxWidth: 648 + Ox.SCROLLBAR_SIZE,
+            maxWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
             minHeight: 264,
-            minWidth: 648 + Ox.SCROLLBAR_SIZE,
+            minWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
             height: 264,
             // keys: {enter: 'save', escape: 'cancel'},
             removeOnClose: true,
             title: Ox._('Advanced Find'),
-            width: 648 + Ox.SCROLLBAR_SIZE
+            width: 648 + Ox.UI.SCROLLBAR_SIZE
         }),
 
         $updateCheckbox = Ox.Checkbox({

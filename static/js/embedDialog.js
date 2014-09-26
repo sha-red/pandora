@@ -14,9 +14,9 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         formWidth = 612,
         iframeHeight = Ox.last(pandora.site.video.resolutions),
         iframeWidth = Math.round(iframeHeight * pandora.site.video.previewRatio),
-        listWidth = 128 + Ox.SCROLLBAR_SIZE,
+        listWidth = 128 + Ox.UI.SCROLLBAR_SIZE,
         labelWidth = 192,
-        dialogWidth = listWidth + formWidth + 32 + Ox.SCROLLBAR_SIZE,
+        dialogWidth = listWidth + formWidth + 32 + Ox.UI.SCROLLBAR_SIZE,
         dialogHeight = 384,
         linkPlaceholder = '...',
         options = {},
@@ -107,7 +107,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 {
                     id: 'title',
                     visible: true,
-                    width: 128 - Ox.SCROLLBAR_SIZE
+                    width: 128 - Ox.UI.SCROLLBAR_SIZE
                 }
             ],
             items: views,
@@ -143,7 +143,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
 
         $panel = Ox.SplitPanel({
             elements: [
-                {element: $list, size: 128 + Ox.SCROLLBAR_SIZE},
+                {element: $list, size: 128 + Ox.UI.SCROLLBAR_SIZE},
                 {element: $form}
             ],
             orientation: 'horizontal'

@@ -63,7 +63,7 @@ pandora.ui.idDialog = function(data) {
     getIds();
 
     function getFormWidth() {
-        return dialogWidth - 32 - Ox.SCROLLBAR_SIZE;
+        return dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE;
     }
 
     function getIds() {

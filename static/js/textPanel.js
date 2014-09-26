@@ -395,7 +395,7 @@ pandora.ui.textHTML = function(text) {
         return window.innerWidth
             - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
             - pandora.user.ui.embedSize - 1
-            - 32 - Ox.SCROLLBAR_SIZE;
+            - 32 - Ox.UI.SCROLLBAR_SIZE;
     }
 
     function scrollTo(position) {

@@ -33,10 +33,10 @@ pandora.ui.helpDialog = function() {
             keys: {escape: 'close'},
             maximizeButton: true,
             minHeight: 256,
-            minWidth: 544 + 2 * Ox.SCROLLBAR_SIZE,
+            minWidth: 544 + 2 * Ox.UI.SCROLLBAR_SIZE,
             removeOnClose: true,
             title: Ox._('Help'),
-            width: 672 + 2 * Ox.SCROLLBAR_SIZE
+            width: 672 + 2 * Ox.UI.SCROLLBAR_SIZE
         })
         .bindEvent({
             close: function() {
@@ -78,7 +78,7 @@ pandora.ui.helpDialog = function() {
                     {
                         id: 'title',
                         visible: true,
-                        width: 128 - Ox.SCROLLBAR_SIZE
+                        width: 128 - Ox.UI.SCROLLBAR_SIZE
                     }
                 ],
                 items: pandora.site.help.map(function(value, index) {
@@ -107,7 +107,7 @@ pandora.ui.helpDialog = function() {
 
         $panel = Ox.SplitPanel({
             elements: [
-                {element: $list, size: 128 + Ox.SCROLLBAR_SIZE},
+                {element: $list, size: 128 + Ox.UI.SCROLLBAR_SIZE},
                 {element: $text}
             ],
             orientation: 'horizontal'
@@ -120,7 +120,7 @@ pandora.ui.helpDialog = function() {
     });
 
     function getImageSize() {
-        var width = that.options('width') - 160 - 2 * Ox.SCROLLBAR_SIZE,
+        var width = that.options('width') - 160 - 2 * Ox.UI.SCROLLBAR_SIZE,
             height = Math.round(width * 5/8);
         return {width: width, height: height};
     }

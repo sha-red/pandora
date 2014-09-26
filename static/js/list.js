@@ -246,7 +246,7 @@ pandora.ui.list = function() {
             unique: 'id',
             width: window.innerWidth
                 - ui.showSidebar * ui.sidebarSize - 1
-                - Ox.SCROLLBAR_SIZE
+                - Ox.UI.SCROLLBAR_SIZE
         })
         .addClass('OxMedia')
         .bindEvent({

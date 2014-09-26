@@ -818,7 +818,7 @@ pandora.enterFullscreen = function() {
     pandora.user.ui.showSidebar && pandora.$ui.mainPanel.size(0, 0);
     pandora.$ui.rightPanel.size(0, 0).size(2, 0);
     !pandora.user.ui.showBrowser && pandora.$ui.contentPanel.css({
-        top: (-112 - Ox.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+        top: (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
     });
     pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 0);
     pandora.$ui.player.options({
@@ -832,9 +832,9 @@ pandora.exitFullscreen = function() {
     pandora.user.ui.showSidebar && pandora.$ui.mainPanel.size(0, pandora.user.ui.sidebarSize);
     pandora.$ui.rightPanel.size(0, 24).size(2, 16);
     !pandora.user.ui.showBrowser && pandora.$ui.contentPanel.css({
-        top: 24 + (-112 - Ox.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+        top: 24 + (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
     });
-    pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.SCROLLBAR_SIZE);
+    pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
 };
 
 pandora.getAllItemsTitle = function(section) {
@@ -873,7 +873,7 @@ pandora.getClipItems = function(data) {
 pandora.getClipsItems = function(width) {
     width = width || window.innerWidth
         - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
-        - Ox.SCROLLBAR_SIZE;
+        - Ox.UI.SCROLLBAR_SIZE;
     return Math.floor((width - 8) / (128 + 8)) - 1;
 };
 
@@ -1039,7 +1039,7 @@ pandora.getFoldersWidth = function(section) {
         && pandora.getFoldersHeight(section)
             > window.innerHeight - 20 - 24 - 16 - 1 - pandora.getInfoHeight(section)
     ) {
-        width -= Ox.SCROLLBAR_SIZE;
+        width -= Ox.UI.SCROLLBAR_SIZE;
     }
     return width;
 };
@@ -2067,9 +2067,9 @@ pandora.resizeFilters = function(width) {
         .size(0, pandora.user.ui.filterSizes[1])
         .size(2, pandora.user.ui.filterSizes[3]);
     pandora.$ui.filters && pandora.$ui.filters.forEach(function($list, i) {
-        $list.resizeColumn('name', pandora.user.ui.filterSizes[i] - 44 - Ox.SCROLLBAR_SIZE);
+        $list.resizeColumn('name', pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE);
         if (pandora.site.flags) {
-            $list.find('.flagname').css({width: pandora.user.ui.filterSizes[i] - 68 - Ox.SCROLLBAR_SIZE})
+            $list.find('.flagname').css({width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE})
         }
     });
 };
@@ -2126,7 +2126,7 @@ pandora.resizeWindow = function() {
                 pandora.$ui.list.options({
                     width: window.innerWidth
                         - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
-                        - Ox.SCROLLBAR_SIZE
+                        - Ox.UI.SCROLLBAR_SIZE
                 });
                 if (clipsItems != previousClipsItems) {
                     Ox.Request.clearCache(); // fixme
@@ -2136,7 +2136,7 @@ pandora.resizeWindow = function() {
                 pandora.$ui.list.options({
                     width: window.innerWidth
                         - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
-                        - Ox.SCROLLBAR_SIZE
+                        - Ox.UI.SCROLLBAR_SIZE
                 });
             } else if (pandora.user.ui.listView == 'map') {
                 pandora.$ui.map && pandora.$ui.map.resizeMap();

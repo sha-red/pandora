@@ -22,7 +22,7 @@ pandora.ui.infoView = function(data) {
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         isEditable = canEdit && data.id.slice(0, 2) == '0x',
-        listWidth = 144 + Ox.SCROLLBAR_SIZE,
+        listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
         margin = 16,
         statisticsWidth = 128,
 
