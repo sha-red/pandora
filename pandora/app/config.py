@@ -204,7 +204,7 @@ def update_static():
     oxjs_build = os.path.join(settings.STATIC_ROOT, 'oxjs/tools/build/build.py')
     if os.path.exists(oxjs_build):
         print 'update oxjs'
-        if os.path.exists(os.path.join(settings.STATIC_ROOT, 'oxjs/build/Ox.Geo/json/Ox.Geo.json')):
+        if os.path.exists(os.path.join(settings.STATIC_ROOT, 'oxjs/min/Geo/json/Geo.json')):
             geo = '-nogeo'
         else:
             geo = ''
@@ -244,7 +244,7 @@ def update_static():
     for f in (pandora_js, pandora_json):
         os.system('gzip -9 -c "%s" > "%s.gz"' % (f, f))
 
-    for root, folders, files in os.walk(os.path.join(settings.STATIC_ROOT, 'oxjs/build')):
+    for root, folders, files in os.walk(os.path.join(settings.STATIC_ROOT, 'oxjs/min')):
             for f in files:
                 if os.path.splitext(f)[-1] in ('.js', '.json'):
                     f = os.path.join(root, f)

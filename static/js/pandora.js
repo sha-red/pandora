@@ -133,7 +133,7 @@ appPanel
             images.loadingIcon.style.OUserSelect = 'none';
             images.loadingIcon.style.WebkitUserSelect = 'none';
             images.loadingIcon.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'build')
-                + '/Ox.UI/themes/' + theme + '/svg/symbolLoading.svg';
+                + '/UI/themes/' + theme + '/svg/symbolLoading.svg';
             callback(images);
         };
         images.logo.src = '/static/png/logo.png';
@@ -196,7 +196,7 @@ appPanel
         } else {
             script.onload = callback;
         }
-        script.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'build') + '/Ox.js?' + getPandoraVersion();
+        script.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'min') + '/Ox.js?' + getPandoraVersion();
         script.type = 'text/javascript';
         head.appendChild(script);
     }
