@@ -12,7 +12,7 @@ pandora.ui.printView = function(data) {
         );
     
     $($loading.find('img')[0]).attr({
-        src: Ox.getImageURL('symbolLoadingAnimated', null, 'oxlight')
+        src: Ox.UI.getImageURL('symbolLoadingAnimated', null, 'oxlight')
     });
     Ox.$body.css({
         background: 'rgb(255, 255, 255)',

@@ -88,7 +88,7 @@ pandora.ui.folderList = function(id, section) {
                 format: function(value, data) {
                     return $('<img>')
                         .attr({
-                            src: Ox.getImageURL(
+                            src: Ox.UI.getImageURL(
                                 value == 'static' ? 'symbolClick'
                                 : value == 'smart' ? 'symbolFind'
                                 : value == 'html' ? 'symbolFile'
@@ -120,7 +120,7 @@ pandora.ui.folderList = function(id, section) {
                     var symbols = {personal: 'Publish', favorite: 'Like', featured: 'Star'};
                     return $('<img>')
                         .attr({
-                            src: Ox.getImageURL(
+                            src: Ox.UI.getImageURL(
                                 'symbol' + symbols[id]
                             )
                         })
@@ -171,7 +171,7 @@ pandora.ui.folderList = function(id, section) {
             {
                 format: function() {
                     return $('<img>').attr({
-                            src: Ox.getImageURL('symbolVolume')
+                            src: Ox.UI.getImageURL('symbolVolume')
                         }).css({
                             width: '10px',
                             height: '10px',
@@ -206,7 +206,7 @@ pandora.ui.folderList = function(id, section) {
                 format: function(value, data) {
                     return $('<img>')
                         .attr({
-                            src: Ox.getImageURL(data.mounted ? 'symbolSync' : 'symbolEdit')
+                            src: Ox.UI.getImageURL(data.mounted ? 'symbolSync' : 'symbolEdit')
                         })
                         .css({
                             width: '10px',
@@ -227,7 +227,7 @@ pandora.ui.folderList = function(id, section) {
                 format: function(value, data) {
                     return $('<img>')
                         .attr({
-                            src: Ox.getImageURL('symbolMount')
+                            src: Ox.UI.getImageURL('symbolMount')
                         })
                         .css({
                             width: '10px',

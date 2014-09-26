@@ -769,7 +769,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                     })
                     .append(
                          $('<img>')
-                            .attr({src: Ox.getImageURL(image)})
+                            .attr({src: Ox.UI.getImageURL(image)})
                             .css({width: '16px', height: '16px'})
                     )
             )

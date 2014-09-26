@@ -103,7 +103,7 @@ Ox.load('UI', {
                                     }
                                 })
                             );
-                            Ox.hideScreen();
+                            Ox.UI.hideScreen();
                         });
                         return that;
                     },
@@ -111,7 +111,7 @@ Ox.load('UI', {
                         var that = Ox.Element();
                         pandora.user.ui.item = options.item;
                         pandora.api.get({id: options.item, keys: videoKeys}, function(result) {
-                            Ox.hideScreen();
+                            Ox.UI.hideScreen();
                             var data = getVideoOptions(result.data),
                                 ui = pandora.user.ui;
                             that.append(pandora.player = Ox.VideoTimelinePlayer({

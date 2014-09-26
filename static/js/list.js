@@ -547,10 +547,10 @@ pandora.ui.list = function() {
                 // fixme: doesn't update title icon, passes useless options
                 if (hasIcons()) {
                     if (ui.listView == 'list') {
-                        src = Ox.getImageURL(
+                        src = Ox.UI.getImageURL(
                             data.value == 'posters' ? 'symbolSetPoster' : 'symbolIcon'
                         );
-                        previousSrc = Ox.getImageURL(
+                        previousSrc = Ox.UI.getImageURL(
                             data.previousValue == 'posters' ? 'symbolSetPoster' : 'symbolIcon'
                         );
                         that.find('img[src="' + previousSrc + '"]').attr({src: src});

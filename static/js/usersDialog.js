@@ -101,7 +101,7 @@ pandora.ui.usersDialog = function() {
                         format: function(value, data) {
                             return $('<img>')
                                 .attr({
-                                    src: Ox.getImageURL('symbolCheck')
+                                    src: Ox.UI.getImageURL('symbolCheck')
                                 })
                                 .css({
                                     width: '10px',
@@ -123,7 +123,7 @@ pandora.ui.usersDialog = function() {
                         format: function(value) {
                             return $('<img>')
                                 .attr({
-                                    src: Ox.getImageURL('symbolMail')
+                                    src: Ox.UI.getImageURL('symbolMail')
                                 })
                                 .css({
                                     width: '10px',

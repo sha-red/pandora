@@ -54,7 +54,7 @@ pandora.ui.tv = function() {
 
     function play() {
         var $loading = $('<img>')
-                .attr({src: Ox.getImageURL('symbolLoadingAnimated')})
+                .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
                 .css({
                     position: 'absolute',
                     left: 0, top: 0, right: 0, bottom: 0,
