@@ -459,7 +459,6 @@ class Item(models.Model):
         streams = [s.get(resolution, format).media.path for s in self.streams()]
         if len(streams) > 1:
             if format == "webm":
-                first = True
                 cmd = ['mkvmerge', '-o', output]
                 cmd += [streams[0]] + ['+' + s for s in streams[1:]]
                 p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
@@ -1461,7 +1460,6 @@ class Item(models.Model):
             return
         #otherwise add empty 5 seconds annotation every minute
         duration = sum([s.duration for s in self.streams()])
-        start = 0
         layer = subtitles['id']
         #FIXME: allow annotations from no user instead?
         user = User.objects.all().order_by('id')[0]
