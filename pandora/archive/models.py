@@ -322,7 +322,6 @@ class File(models.Model):
 
     def save_chunk_stream(self, chunk, offset, resolution, format, done):
         if not self.available:
-            config = settings.CONFIG['video']
             stream, created = Stream.objects.get_or_create(
                         file=self, resolution=resolution, format=format)
             name = stream.path(stream.name())
@@ -406,9 +405,7 @@ class File(models.Model):
             return map(int, [pos/2, pos, pos+pos/2])
         if settings.CONFIG['media'].get('importFrames') and self.data:
             filename = self.data.path
-            prefix = os.path.dirname(filename)
             info = self.info
-            oshash = info['oshash']
 
             for pos in video_frame_positions(info['duration']):
                 position = float(pos)
@@ -467,7 +464,7 @@ class File(models.Model):
             for i, a in enumerate(audio[1:]):
                 media = self.data.path
                 info = ox.avinfo(media)
-                language = parse_language(a.get('language'))
+                lang = language = parse_language(a.get('language'))
                 n = 2
                 while language in languages:
                     language = '%s%d' % (lang, n)
