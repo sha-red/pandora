@@ -132,7 +132,7 @@ appPanel
             images.loadingIcon.style.MSUserSelect = 'none';
             images.loadingIcon.style.OUserSelect = 'none';
             images.loadingIcon.style.WebkitUserSelect = 'none';
-            images.loadingIcon.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'build')
+            images.loadingIcon.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'min')
                 + '/UI/themes/' + theme + '/svg/symbolLoading.svg';
             callback(images);
         };
