@@ -136,6 +136,7 @@ def upload(request):
                     fr.frame.delete()
                 fr.frame.save(name, frame)
                 os.chmod(fr.frame.path, 0644)
+                fr.save()
             f.item.select_frame()
             f.item.save()
             item.tasks.update_poster.delay(f.item.public_id)
