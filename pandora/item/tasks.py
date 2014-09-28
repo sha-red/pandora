@@ -195,7 +195,8 @@ def update_sitemap(base_url):
         priority = ET.SubElement(url, "priority")
         priority.text = '1.0' if t.status == 'featured' else '0.75'
 
+    data = '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset)
     with open(sitemap[:-3], 'wb') as f:
-        f.write('<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset))
+        f.write(data)
     with gzip.open(sitemap, 'wb') as f:
-        f.write('<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset))
+        f.write(data)
