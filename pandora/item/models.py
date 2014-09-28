@@ -1383,8 +1383,8 @@ class Item(models.Model):
                         frames.append({
                             'position': offset + ff.position,
                             'path': ff.frame.path,
-                            'width': ff.frame.width,
-                            'height': ff.frame.height
+                            'width': ff.width,
+                            'height': ff.height
                         })
                 offset += f.duration
         else:

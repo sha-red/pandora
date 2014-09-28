@@ -590,14 +590,14 @@ class Frame(models.Model):
     file = models.ForeignKey(File, related_name="frames")
     position = models.FloatField()
     frame = models.ImageField(default=None, null=True, upload_to=frame_path)
+    width = models.IntegerField(default = 0)
+    height = models.IntegerField(default = 0)
 
-    '''
     def save(self, *args, **kwargs):
-        name = "%d.jpg" % self.position
-        if file.name != name:
-            #FIXME: frame path should be renamed on save to match current position
+        if self.frame:
+            self.width = self.frame.width
+            self.height = self.frame.height
         super(Frame, self).save(*args, **kwargs)
-    '''
 
     def __unicode__(self):
         return u'%s/%s' % (self.file, self.position)
