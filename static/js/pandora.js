@@ -439,7 +439,7 @@ appPanel
                 ]
             ),
             images = browsers.map(function(browser) {
-                return Ox.PATH + 'Ox.UI/png/browser' + browser.name.replace(' ', '') + '128.png';
+                return Ox.PATH + 'UI/png/browser' + browser.name.replace(' ', '') + '128.png';
             }),
             $loadingScreen = $('#loadingScreen');
         Ox.getFile(images, function() {
@@ -486,7 +486,7 @@ appPanel
                     .append(
                         $('<img>')
                             .attr({
-                                src: Ox.PATH + 'Ox.UI/png/browser' + browser.name.replace(' ', '') + '128.png'
+                                src: Ox.PATH + 'UI/png/browser' + browser.name.replace(' ', '') + '128.png'
                             })
                             .css({width: '32px', height: '32px', border: 0, margin: '4px'})
                     )
