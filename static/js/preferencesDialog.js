@@ -75,6 +75,18 @@ pandora.ui.preferencesDialog = function() {
                                     value: Ox.toTitleCase(pandora.user.level),
                                     width: 320
                                 }),
+                            ].concat(
+                                pandora.user.groups.length ? [
+                                    Ox.Input({
+                                        disabled: true,
+                                        id: 'groups',
+                                        label: Ox._('Groups'),
+                                        labelWidth: 120,
+                                        value: pandora.user.groups.join(', '),
+                                        width: 320
+                                    })
+                                ] : []
+                            ).concat([
                                 Ox.Checkbox({
                                         id: 'newsletter',
                                         label: Ox._('Newsletter'),
@@ -95,7 +107,7 @@ pandora.ui.preferencesDialog = function() {
                                         }
                                     })
                                 
-                            ]
+                            ])
                         })
                         .css({position: 'absolute', left: '96px', top: '16px'})
                     );
