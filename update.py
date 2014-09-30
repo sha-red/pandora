@@ -62,6 +62,7 @@ if __name__ == "__main__":
             run('./manage.py', 'syncdb')
             print '\nRunning "./manage.py migrate"\n'
             run('./manage.py', 'migrate')
+            run('./manage.py', 'sqlfindindex')
             run('./manage.py', 'sync_itemsort')
             reload_notice(base)
         else:
