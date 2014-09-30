@@ -13,8 +13,9 @@ class Migration(SchemaMigration):
         db.rename_column('item_item', 'itemId', 'public_id')
 
         # Rename field 'ItemSort.itemId' to 'ItemSort.public_id'
-        db.rename_column('item_itemsort', 'itemId', 'public_id')
-
+        itemsort = orm['item.ItemSort']
+        if 'itemId' in [f.name for f in itemsort._meta.fields]:
+            db.rename_column('item_itemsort', 'itemId', 'public_id')
 
     def backwards(self, orm):
 
