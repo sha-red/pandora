@@ -78,9 +78,7 @@ pandora.ui.statisticsDialog = function() {
         .bindEvent({
             resizeend: function(data) {
                 dialogWidth = data.width;
-                $tabPanel.$element.replaceElement(1,
-                    $tabPanel.options('content')($tabPanel.selected())
-                );
+                $tabPanel.reloadPanel();
             }
         }),
 
@@ -171,9 +169,7 @@ pandora.ui.statisticsDialog = function() {
             .css({float: 'left', margin: '4px'})
             .bindEvent({
                 change: function() {
-                    $tabPanel.$element.replaceElement(1,
-                        $tabPanel.options('content')($tabPanel.selected())
-                    );
+                    $tabPanel.reloadPanel();
                 }
             });
 
