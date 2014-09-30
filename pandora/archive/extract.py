@@ -211,6 +211,7 @@ def stream(video, target, profile, info, avconv=None, audio_track=0):
                     '-vcodec', 'libx264',
                     '-preset:v', 'medium',
                     '-profile:v', 'baseline',
+                    '-level', '3.0',
                 ]
             else:
                 video_settings += [
