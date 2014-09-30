@@ -65,7 +65,8 @@ pandora.ui.usersDialog = function() {
                 items: [
                     {id: 'all', title: Ox._('Find: All')},
                     {id: 'username', title: Ox._('Find: Username')},
-                    {id: 'email', title: Ox._('Find: E-Mail Address')}
+                    {id: 'email', title: Ox._('Find: E-Mail Address')},
+                    {id: 'group', title: Ox._('Find: Group')}
                 ],
                 overlap: 'right',
                 type: 'image'
@@ -964,8 +965,9 @@ pandora.ui.usersDialog = function() {
             query = {
                 conditions: value
                     ? [].concat(
-                        key != 'email' ? [{key: 'username', value: value, operator: '='}] : [],
-                        key != 'username' ? [{key: 'email', value: value, operator: '='}] : []
+                        Ox.contains(['username', 'all'], key) ? [{key: 'username', value: value, operator: '='}] : [],
+                        Ox.contains(['email', 'all'], key) ? [{key: 'email', value: value, operator: '='}] : [],
+                        Ox.contains(['group', 'all'], key) ? [{key: 'group', value: value, operator: '='}] : []
                     )
                     : [].concat(
                         !guests ? [{key: 'level', value: 'guest', operator: '!='}] : [],

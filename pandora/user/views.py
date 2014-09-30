@@ -477,7 +477,7 @@ def findUsers(request):
         }
 
         possible query keys:
-            username, email, lastLogin, browser
+            username, email, lastLogin, browser, groups
         
         returns {
             items: [

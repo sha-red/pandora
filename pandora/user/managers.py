@@ -9,6 +9,8 @@ def parseCondition(condition, user):
     k = {
         'email': 'user__email',
         'user': 'username',
+        'group': 'user__groups__name',
+        'groups': 'user__groups__name',
     }.get(k, k)
     v = condition['value']
     op = condition.get('operator')
