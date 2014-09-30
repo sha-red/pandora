@@ -822,7 +822,7 @@ def getGroups(request):
         takes {}
         returns {
             groups: [
-                {name:, users...}
+                {id:, name:, users:...}
             ]
         }
 
@@ -832,6 +832,7 @@ def getGroups(request):
     response['data']['groups'] = []
     for g in Group.objects.all().order_by('name'):
         response['data']['groups'].append({
+            'id': ox.toAZ(g.id),
             'name': g.name,
             'users': g.user_set.count()
         })
@@ -845,6 +846,7 @@ def addGroup(request):
             name: string
         }
         returns {
+            id: string,
             name: string
             users: int
         }
@@ -854,6 +856,7 @@ def addGroup(request):
     data = json.loads(request.POST['data'])
     g, created = Group.objects.get_or_create(name=data['name'])
     response['data'] = {
+        'id': ox.toAZ(g.id),
         'name': g.name,
         'users': g.user_set.count()
     }
@@ -861,10 +864,37 @@ def addGroup(request):
 actions.register(addGroup)
 
 @capability_required_json('canManageUsers')
+def editGroup(request):
+    '''
+        takes {
+            id: string,
+            name: string
+            
+        }
+        returns {
+            name: string
+            users: int
+        }
+
+    '''
+    response = json_response(status=200, text='ok')
+    data = json.loads(request.POST['data'])
+    g = Group.objects.get(id=ox.fromAZ(data['id']))
+    g.name = data['name']
+    g.save()
+    response['data'] = {
+        'id': ox.toAZ(g.id),
+        'name': g.name,
+        'users': g.user_set.count()
+    }
+    return render_to_json_response(response)
+actions.register(editGroup)
+
+@capability_required_json('canManageUsers')
 def removeGroup(request):
     '''
         takes {
-            name: string
+            id: string
         }
         returns {
         }
@@ -872,7 +902,7 @@ def removeGroup(request):
     '''
     response = json_response(status=200, text='ok')
     data = json.loads(request.POST['data'])
-    g = Group.objects.get(name=data['name'])
+    g = Group.objects.get(id=ox.fromAZ(data['id']))
     for i in g.items.all():
         i.groups.remove(g)
     for u in g.user_set.all():
