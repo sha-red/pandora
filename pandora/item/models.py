@@ -886,7 +886,7 @@ class Item(models.Model):
         #sort keys based on database, these will always be available
         s.public_id = self.public_id.replace('0x', 'xx')
         s.oxdbId = self.oxdbId
-        if not settings.USE_IMDB:
+        if not settings.USE_IMDB and s.public_id.isupper() and s.public_id.isalpha():
             s.public_id = ox.sort_string(str(ox.fromAZ(s.public_id)))
         s.modified = self.modified or datetime.now()
         s.created = self.created or datetime.now()
