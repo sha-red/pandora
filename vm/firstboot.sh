@@ -114,7 +114,9 @@ $MANAGE update_static
 $MANAGE collectstatic -l --noinput
 
 cp /srv/pandora/etc/init/* /etc/init/
-
+if [ "$LXC" == "yes" ]; then
+    sed -i s/127.0.0.1/0.0.0.0/g /etc/init/pandora.conf
+fi
 /srv/pandora/ctl start
 
 #logrotate
