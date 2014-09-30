@@ -59,6 +59,12 @@ apt-get install -y \
     postgresql \
     postgresql-contrib
 
+mkdir -p /home/pandora/.ox/bin
+wget -O /home/pandora/.ox/bin/ffmpeg https://firefogg.org/bin/ffmpeg.linux
+wget -O /home/pandora/.ox/bin/ffmpeg2theora https://firefogg.org/bin/ffmpeg2theora.linux
+chmod +x /home/pandora/.ox/bin/*
+
+
 sudo -u postgres createuser -S -D -R pandora
 sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
 echo "CREATE EXTENSION pg_trgm;" | sudo -u postgres psql pandora
