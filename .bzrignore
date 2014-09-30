@@ -20,3 +20,4 @@ config.jsonc
 ./static/png/icon.png
 ./static/png/logo.png
 ._*
+static/django_extensions
