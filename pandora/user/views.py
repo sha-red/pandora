@@ -351,7 +351,8 @@ def editUser(request):
         if isinstance(groups, list):
             groups = filter(lambda g: g.strip(), groups)
             groups = [ox.escape_html(g) for g in groups]
-            user.groups.exclude(name__in=groups).delete()
+            for g in user.groups.exclude(name__in=groups):
+                user.groups.remove(g)
             current_groups = [g.name for g in user.groups.all()]
             for g in filter(lambda g: g not in current_groups, groups):
                 group, created = Group.objects.get_or_create(name=g) 
@@ -814,3 +815,69 @@ def statistics(request):
     response['data'] = stats
     return render_to_json_response(response)
 actions.register(statistics, cache=False)
+
+@capability_required_json('canManageUsers')
+def getGroups(request):
+    '''
+        takes {}
+        returns {
+            groups: [
+                {name:, users...}
+            ]
+        }
+
+    '''
+    response = json_response(status=200, text='ok')
+    data = json.loads(request.POST['data'])
+    response['data']['groups'] = []
+    for g in Group.objects.all().order_by('name'):
+        response['data']['groups'].append({
+            'name': g.name,
+            'users': g.user_set.count()
+        })
+    return render_to_json_response(response)
+actions.register(getGroups)
+
+@capability_required_json('canManageUsers')
+def addGroup(request):
+    '''
+        takes {
+            name: string
+        }
+        returns {
+            name: string
+            users: int
+        }
+
+    '''
+    response = json_response(status=200, text='ok')
+    data = json.loads(request.POST['data'])
+    g, created = Group.objects.get_or_create(name=data['name'])
+    response['data'] = {
+        'name': g.name,
+        'users': g.user_set.count()
+    }
+    return render_to_json_response(response)
+actions.register(addGroup)
+
+@capability_required_json('canManageUsers')
+def removeGroup(request):
+    '''
+        takes {
+            name: string
+        }
+        returns {
+        }
+
+    '''
+    response = json_response(status=200, text='ok')
+    data = json.loads(request.POST['data'])
+    g = Group.objects.get(name=data['name'])
+    for i in g.items.all():
+        i.groups.remove(g)
+    for u in g.user_set.all():
+        u.groups.remove(g)
+    g.delete()
+    return render_to_json_response(response)
+actions.register(removeGroup)
+

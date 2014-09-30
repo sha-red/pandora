@@ -230,7 +230,8 @@ class Item(models.Model):
             if isinstance(groups, list):
                 groups = filter(lambda g: g.strip(), groups)
                 groups = [ox.escape_html(g) for g in groups]
-                self.groups.exclude(name__in=groups).delete()
+                for g in self.groups.exclude(name__in=groups):
+                    self.groups.remove(g)
                 current_groups = [g.name for g in self.groups.all()]
                 for g in filter(lambda g: g not in current_groups, groups):
                     group, created = Group.objects.get_or_create(name=g)
