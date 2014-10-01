@@ -205,7 +205,6 @@ pandora.ui.groupsDialog = function(options) {
     function updateLabel(id) {
         Ox.Request.clearCache('getGroup');
         pandora.api.getGroup({id: id}, function(result) {
-            Ox.print('GROUP', result.data, Ox.getIndexById(groups, id));
             $labels[Ox.getIndexById(groups, id)].options({
                 title: getLabelTitle(result.data)
             });
