@@ -76,8 +76,17 @@ pandora.ui.groupsDialog = function(options) {
     }
 
     function editGroup(id, name) {
+        var index = Ox.getIndexById(groups, id),
+            previousName = groups[index].name;
         // disableElements();
         pandora.api.editGroup({id: id, name: name}, function(result) {
+            name = result.data.name;
+            if (Ox.contains(selectedGroups, previousName)) {
+                selectedGroups.splice(
+                    selectedGroups.indexOf(previousName), 1, name
+                );
+                that.triggerEvent('groups', {groups: selectedGroups});
+            }
             renderGroups();
         });
     }
@@ -92,7 +101,7 @@ pandora.ui.groupsDialog = function(options) {
     function getLabelTitle(group) {
         return (group.items ? Ox.formatNumber(group.items) : Ox._('No'))
             + ' ' + Ox._(group.items == 1 ? 'item' : 'items') + ', '
-            + (group.users ? Ox.formatNumber(group.users) : Ox._('No'))
+            + (group.users ? Ox.formatNumber(group.users) : Ox._('no'))
             + ' ' + Ox._(group.users == 1 ? 'user' : 'users');
     }
 
