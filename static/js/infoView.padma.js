@@ -411,6 +411,7 @@ pandora.ui.infoView = function(data) {
     // User and Groups ---------------------------------------------------------
 
     ['user', 'groups'].forEach(function(key) {
+        var $input;
         (canEdit || data[key] && data[key].length) && $('<div>')
             .css({marginBottom: '4px'})
             .append(formatKey(key, 'statistics'))
@@ -418,17 +419,33 @@ pandora.ui.infoView = function(data) {
                 $('<div>')
                     .css({margin: '2px 0 0 -1px'}) // fixme: weird
                     .append(
-                        Ox.Editable({
+                        $input = Ox.Editable({
                             placeholder: key == 'groups' ? formatLight(Ox._('No Groups')) : '',
-                            editable: canEdit,
+                            editable: key == 'user' && canEdit,
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: key == 'user' ? data[key] : data[key].join(', ')
                         })
-                        .bindEvent({
+                        .bindEvent(Ox.extend({
                             submit: function(event) {
                                 editMetadata(key, event.value);
                             }
-                        })
+                        }, key == 'groups' ? {
+                            doubleclick: function() {
+                                pandora.$ui.groupsDialog = pandora.ui.groupsDialog({
+                                        id: data.id,
+                                        name: data.title,
+                                        type: 'item'
+                                    })
+                                    .bindEvent({
+                                        groups: function(data) {
+                                            $input.options({
+                                                value: data.groups.join(', ')
+                                            });
+                                        }
+                                    })
+                                    .open();
+                            }
+                        } : {}))
                     )
             )
             .appendTo($statistics);
