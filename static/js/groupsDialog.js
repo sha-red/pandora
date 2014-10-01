@@ -188,7 +188,7 @@ pandora.ui.groupsDialog = function(options) {
                     width: 552
                 })
                 .css({
-                    margin: '4px'
+                    margin: '16px 4px 4px 4px'
                 })
                 .appendTo($content);
             groups.forEach(renderGroup);
@@ -198,7 +198,7 @@ pandora.ui.groupsDialog = function(options) {
                 })
                 .css({
                     float: 'left',
-                    margin: '4px 4px 4px 428px'
+                    margin: '4px 4px 16px 428px'
                 })
                 .bindEvent({
                     click: addGroup
