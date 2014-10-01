@@ -431,6 +431,13 @@ pandora.ui.infoView = function(data) {
                             }
                         }, key == 'groups' ? {
                             doubleclick: function() {
+                                setTimeout(function() {
+                                    if (window.getSelection) {
+                                        window.getSelection().removeAllRanges();
+                                    } else if (document.selection) {
+                                        document.selection.empty();
+                                    }
+                                });
                                 pandora.$ui.groupsDialog = pandora.ui.groupsDialog({
                                         id: data.id,
                                         name: data.title,
