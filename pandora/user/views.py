@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import random
 random.seed()
+import re
 
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext, loader
@@ -24,6 +25,23 @@ from item import utils
 import models
 from decorators import capability_required_json
 import persona
+
+
+def get_user_or_404(data):
+    if 'id' in data:
+        u = get_object_or_404_json(User, id=ox.fromAZ(data['id']))
+    else:
+        u = get_object_or_404_json(User, username=data['username'])
+    return u
+
+
+def get_group_or_404(data):
+    if 'id' in data:
+        g = get_object_or_404_json(Group, id=ox.fromAZ(data['id']))
+    else:
+        g = get_object_or_404_json(Group, name=data['name'])
+    return g
+
 
 def signin(request):
     '''
@@ -330,6 +348,7 @@ def editUser(request):
     response = json_response()
     data = json.loads(request.POST['data'])
     user = get_object_or_404_json(User, pk=ox.fromAZ(data['id']))
+
     profile = user.get_profile()
     if 'disabled' in data:
         user.is_active = not data['disabled']
@@ -369,6 +388,7 @@ def editUser(request):
     return render_to_json_response(response)
 actions.register(editUser, cache=False)
 
+
 @capability_required_json('canManageUsers')
 def removeUser(request):
     '''
@@ -379,10 +399,11 @@ def removeUser(request):
     '''
     response = json_response()
     data = json.load(request.POST['data'])
-    user = get_object_or_404_json(User, username=data['username'])
-    user.delete()
+    u = get_user_or_404(data)
+    u.delete()
     return render_to_json_response(response)
 actions.register(removeUser, cache=False)
+
 
 def findUser(request):
     '''
@@ -427,6 +448,7 @@ def parse_query(data, user):
     query['qs'] = models.SessionData.objects.find(query, user)
     return query
 
+
 def order_query(qs, sort):
     order_by = []
     for e in sort:
@@ -456,6 +478,7 @@ def order_query(qs, sort):
     if order_by:
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
+
 
 @capability_required_json('canManageUsers')
 def findUsers(request):
@@ -549,6 +572,26 @@ Positions
         response['data']['guests'] = qs.filter(level=0).count()
     return render_to_json_response(response)
 actions.register(findUsers)
+
+
+@capability_required_json('canManageUsers')
+def getUser(request):
+    '''
+        takes {
+            id: string or username: string,
+            keys: []
+        }
+        returns {
+            id: string,
+            ...
+        }
+    '''
+    response = json_response()
+    data = json.loads(request.POST['data'])
+    u = get_user_or_404(data)
+    response['data'] = u.data.get().json(data.get('keys', []), request.user)
+    return render_to_json_response(response)
+actions.register(getUser)
 
 @login_required_json
 def mail(request):
@@ -731,6 +774,7 @@ def reset_ui(request):
         request.session['ui'] = '{}'
     return redirect('/')
 
+
 def resetUI(request):
     '''
         reset user ui settings to defaults
@@ -749,6 +793,7 @@ def resetUI(request):
         request.session['ui'] = '{}'
     return render_to_json_response(response)
 actions.register(resetUI, cache=False)
+
 
 def setUI(request):
     '''
@@ -801,6 +846,7 @@ def setUI(request):
     return render_to_json_response(response)
 actions.register(setUI, cache=False)
 
+
 @capability_required_json('canManageUsers')
 def statistics(request):
     '''
@@ -816,13 +862,23 @@ def statistics(request):
     return render_to_json_response(response)
 actions.register(statistics, cache=False)
 
+
+def group_json(g):
+    return {
+        'id': ox.toAZ(g.id),
+        'name': g.name,
+        'users': g.user_set.count(),
+        'items': g.items.count(),
+    }
+
+
 @capability_required_json('canManageUsers')
 def getGroups(request):
     '''
         takes {}
         returns {
             groups: [
-                {id:, name:, users:...}
+                {id: string, name: string, users: int, items: int}
             ]
         }
 
@@ -831,13 +887,34 @@ def getGroups(request):
     data = json.loads(request.POST['data'])
     response['data']['groups'] = []
     for g in Group.objects.all().order_by('name'):
-        response['data']['groups'].append({
-            'id': ox.toAZ(g.id),
-            'name': g.name,
-            'users': g.user_set.count()
-        })
+        response['data']['groups'].append(group_json(g))
     return render_to_json_response(response)
 actions.register(getGroups)
+
+
+@capability_required_json('canManageUsers')
+def getGroup(request):
+    '''
+        takes {
+            id: string
+                or
+            name: string
+        }
+        returns {
+            id: string,
+            name: string
+            users: int
+            items: int
+        }
+
+    '''
+    response = json_response(status=200, text='ok')
+    data = json.loads(request.POST['data'])
+    g = get_group_or_404(data)
+    response['data'] = group_json(g)
+    return render_to_json_response(response)
+actions.register(getGroup, cache=False)
+
 
 @capability_required_json('canManageUsers')
 def addGroup(request):
@@ -849,19 +926,24 @@ def addGroup(request):
             id: string,
             name: string
             users: int
+            items: int
         }
 
     '''
     response = json_response(status=200, text='ok')
     data = json.loads(request.POST['data'])
-    g, created = Group.objects.get_or_create(name=data['name'])
-    response['data'] = {
-        'id': ox.toAZ(g.id),
-        'name': g.name,
-        'users': g.user_set.count()
-    }
+    created = False
+    n = 1
+    name = data['name']
+    _name = re.sub(' \[\d+\]$', '', name).strip()
+    while not created:
+        g, created = Group.objects.get_or_create(name=name)
+        n += 1
+        name = u'%s [%d]' % (_name, n) 
+    response['data'] = group_json(g)
     return render_to_json_response(response)
-actions.register(addGroup)
+actions.register(addGroup, cache=False)
+
 
 @capability_required_json('canManageUsers')
 def editGroup(request):
@@ -882,13 +964,10 @@ def editGroup(request):
     g = Group.objects.get(id=ox.fromAZ(data['id']))
     g.name = data['name']
     g.save()
-    response['data'] = {
-        'id': ox.toAZ(g.id),
-        'name': g.name,
-        'users': g.user_set.count()
-    }
+    response['data'] = group_json(g)
     return render_to_json_response(response)
-actions.register(editGroup)
+actions.register(editGroup, cache=False)
+
 
 @capability_required_json('canManageUsers')
 def removeGroup(request):
@@ -902,12 +981,11 @@ def removeGroup(request):
     '''
     response = json_response(status=200, text='ok')
     data = json.loads(request.POST['data'])
-    g = Group.objects.get(id=ox.fromAZ(data['id']))
+    g = get_group_or_404(data)
     for i in g.items.all():
         i.groups.remove(g)
     for u in g.user_set.all():
         u.groups.remove(g)
     g.delete()
     return render_to_json_response(response)
-actions.register(removeGroup)
-
+actions.register(removeGroup, cache=False)
