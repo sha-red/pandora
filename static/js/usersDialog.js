@@ -622,7 +622,8 @@ pandora.ui.usersDialog = function() {
     }
 
     function renderEditForm() {
-        var user = $list.value($list.options('selected')[0]);
+        var user = $list.value($list.options('selected')[0]),
+            $groupsLabel;
         return Ox.Form({
             items: [
                 Ox.Checkbox({
@@ -694,17 +695,48 @@ pandora.ui.usersDialog = function() {
                             });
                         }
                     }),
-                Ox.Input({
-                        id: 'groups',
-                        label: Ox._('Groups'),
-                        labelWidth: 80,
-                        value: user.groups ? user.groups.join(', ') : '',
-                        width: formWidth - 16
-                    })
-                    .bindEvent({
-                        submit: function(data) {
-
-                        }
+                Ox.FormElementGroup({
+                        elements: [
+                            Ox.Label({
+                                overlap: 'right',
+                                textAlign: 'right',
+                                title: Ox._('Groups'),
+                                width: 80
+                            }),
+                            Ox.FormElementGroup({
+                                elements: [
+                                    $groupsLabel = Ox.Label({
+                                        title: user.groups ? user.groups.join(', ') : '',
+                                        width: formWidth - 112
+                                    }),
+                                    Ox.Button({
+                                        overlap: 'left',
+                                        title: 'edit',
+                                        tooltip: Ox._('Edit Groups'),
+                                        type: 'image'
+                                    })
+                                    .bindEvent({
+                                        click: function() {
+                                            pandora.$ui.groupsDialog = pandora.ui.groupsDialog({
+                                                    id: user.id,
+                                                    name: user.username,
+                                                    type: 'user'
+                                                })
+                                                .bindEvent({
+                                                    groups: function(data) {
+                                                        var groups = data.groups.join(', ');
+                                                        $list.value(user.id, 'groups', groups);
+                                                        $groupsLabel.options({title: groups});
+                                                    }
+                                                })
+                                                .open();
+                                        }
+                                    })
+                                ],
+                                float: 'right'
+                            })
+                        ],
+                        float: 'left'
                     }),
                 Ox.Input({
                     height: dialogHeight - 184,
@@ -727,8 +759,6 @@ pandora.ui.usersDialog = function() {
                     data.level = event.data.value;
                 } else if (event.id == 'newsletter') {
                     data.newsletter = event.data.value;
-                } else if (event.id == 'groups') {
-                    data.groups = event.data.value.split(', ');
                 } else {
                     data[event.id] = event.data.value;
                 }
