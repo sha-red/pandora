@@ -560,9 +560,9 @@
     ],
     "totals": [
         {"id": "items"},
-        {"id": "files", "admin": true},
-        {"id": "duration", "admin": true},
-        {"id": "size", "admin": true},
+        {"id": "files", "capability": "canSeeMedia"},
+        {"id": "duration", "capability": "canSeeMedia"},
+        {"id": "size", "capability": "canSeeMedia"},
         {"id": "pixels"}
     ],
     "tv": {

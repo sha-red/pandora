@@ -282,10 +282,9 @@ Positions
             Sum('pixels'),
             Sum('size')
         )
-        level = 'guest' if request.user.is_anonymous() else request.user.get_profile().get_level()
         totals = [i['id']
             for i in settings.CONFIG['totals']
-            if not i.get('admin', False) or level in ('admin', 'staff')
+            if not 'capability' in i or has_capability(request.user, i['capability'])
         ]
         if 'duration' in totals:
             response['data']['duration'] = r['duration__sum']
