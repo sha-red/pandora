@@ -704,7 +704,6 @@
         {"name": "Restricted", "color": [255, 192, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
-    "sendReferrer": false,
     "site": {
         "description": "0xDB is an experimental - and to some degree imaginary - movie database. It is intended to help us rethink the future of cinema on the Internet, just as it tries to push the boundaries of what we understand as \"web applications\". What 0xDB proposes is an entirely new approach to visualizing and navigating moving images, and we hope that it can serve as a point of reference for individuals and institutions who are dealing with large collections of films.",
         // FIXME: "from" and "to" would be more intuitive as keys here
@@ -719,6 +718,7 @@
         "https": true,
         "id": "0xdb",
         "name": "0xDB",
+        "sendReferrer": false,
         "url": "0xDB.org",
         "videoprefix": ""
     },

@@ -55,7 +55,7 @@ def redirect_url(request, url):
     if request.META['QUERY_STRING']:
         url += "?" + request.META['QUERY_STRING']
 
-    if settings.CONFIG.get('sendReferrer', False):
+    if settings.CONFIG['site'].get('sendReferrer', False):
         return redirect(url)
     else:
         return HttpResponse('<script>document.location.href=%s;</script>'%json.dumps(url))

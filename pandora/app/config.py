@@ -62,6 +62,8 @@ def load_config():
         config['site']['dontValidateUser'] = not settings.AUTH_CHECK_USERNAME
         if not 'folderdepth' in config['site']:
             config['site']['folderdepth'] = settings.USE_IMDB and 4 or 3
+        if 'sendReferrer' in config and not 'sendReferrer' in config['site']:
+            config['site']['sendReferrer'] = config.pop('sendReferrer')
 
         # enable default filters if needed
         default_filters = [f['id'] for f in config['user']['ui']['filters']]

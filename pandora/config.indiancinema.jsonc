@@ -717,7 +717,6 @@
         {"name": "Under Copyright", "color": [255, 212, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
-    "sendReferrer": true,
     "site": {
         "description": "Indiancine.ma is an annotated online archive of Indian film. It is intended to serve as a shared resource for film scholars and enthusiasts in India and beyond.",
         // FIXME: "from" and "to" would be more intuitive as keys here
@@ -733,6 +732,7 @@
         "https": true,
         "id": "indiancinema",
         "name": "Indiancine.ma",
+        "sendReferrer": true,
         "url": "indiancine.ma",
         "videoprefix": ""
     },

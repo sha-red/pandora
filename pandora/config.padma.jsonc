@@ -601,7 +601,6 @@
         {"name": "Restricted", "color": [255, 192, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
-    "sendReferrer": true,
     "site": {
         "description": "Pad.ma is an online archive of densely text-annotated video material, primarily footage and not finished films. The entire collection is searchable and viewable online, and is free to download for non-commercial use.",
         "email": {
@@ -615,6 +614,7 @@
         "https": true,
         "id": "padma",
         "name": "Pad.ma",
+        "sendReferrer": true,
         "url": "pad.ma",
         "videoprefix": ""
     },

@@ -516,7 +516,6 @@
         {"name": "Restricted", "color": [255, 192, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
-    "sendReferrer": true,
     "site": {
         "description": "This is a demo of pan.do/ra - a free, open source media archive. It allows you to manage large, decentralized collections of video, to collaboratively create metadata and time-based annotations, and to serve your archive as a cutting-edge web application.",
         "email": {
@@ -530,6 +529,7 @@
         "https": false,
         "id": "pandora",
         "name": "Demo",
+        "sendReferrer": true,
         "url": "pandora.local",
         "videoprefix": ""
     },
