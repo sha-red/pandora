@@ -275,11 +275,12 @@ def firefogg_upload(request):
 @login_required_json
 def direct_upload(request):
     if 'id' in request.GET:
-        file = models.File.objects.get(oshash=request.GET['id'])
+        oshash = request.GET['id']
     else:
         oshash = request.POST['id']
     response = json_response(status=400, text='this request requires POST')
     if 'chunk' in request.FILES:
+        file = models.File.objects.get(oshash=oshash)
         if file.editable(request.user):
             response = process_chunk(request, file.save_chunk)
             response['resultUrl'] = request.build_absolute_uri(file.item.get_absolute_url())
