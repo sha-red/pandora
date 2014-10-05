@@ -97,6 +97,8 @@ if __name__ == "__main__":
             run('./bin/pip', 'install', '-r', 'requirements.txt')
         if old < 3770:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
+        if old < 4379:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
 
         if len(sys.argv) == 1:
@@ -146,6 +148,8 @@ if __name__ == "__main__":
             run('./manage.py', 'compile_pyc')
         if pandora_old_revno != pandora_new_revno:
             os.chdir(base)
+            if pandora_old_revno < '4379':
+                run('./bin/pip', 'install', 'six>=1.5.2')
             run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
         if not development:
             print 'pan.do/ra is at the latest stable release, you can run "./update.py dev" to update to the development version'
