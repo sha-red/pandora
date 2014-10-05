@@ -11,7 +11,7 @@ if os.path.exists(activate_this):
 
 import sys
 import subprocess
-import ox
+import urllib2
 import json
 from os.path import join, exists
 
@@ -25,9 +25,12 @@ def get(*cmd):
     stdout, error = p.communicate()
     return stdout
 
+def get_json(url):
+    return json.loads(urllib2.urlopen(url).read())
+
 def get_release():
     try:
-        return json.loads(ox.net.read_url('https://pan.do/json/release.json'))
+        return get_json('https://pan.do/json/release.json')
     except:
         print "failed to load https://pan.do/ra, check your internet connection"
         sys.exit(1)
@@ -148,8 +151,6 @@ if __name__ == "__main__":
             run('./manage.py', 'compile_pyc')
         if pandora_old_revno != pandora_new_revno:
             os.chdir(base)
-            if pandora_old_revno < '4379':
-                run('./bin/pip', 'install', 'six>=1.5.2')
             run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
         if not development:
             print 'pan.do/ra is at the latest stable release, you can run "./update.py dev" to update to the development version'
