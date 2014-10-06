@@ -1769,7 +1769,7 @@ pandora.getVideoOptions = function(data) {
             options.subtitlesLayer
                 ? data.layers[options.subtitlesLayer].map(function(subtitle, i) {
                     return {
-                        'in': i == 0 ? 0 : subtitles[i - 1].out,
+                        'in': i == 0 ? 0 : data.layers[options.subtitlesLayer][i - 1].out,
                         out: subtitle['in']
                     };
                 }).concat(
