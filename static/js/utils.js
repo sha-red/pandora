@@ -1766,7 +1766,7 @@ pandora.getVideoOptions = function(data) {
     
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
-            options.subtitlesLayer
+            options.subtitlesLayer && data.layers[options.subtitlesLayer].length
                 ? data.layers[options.subtitlesLayer].map(function(subtitle, i) {
                     return {
                         'in': i == 0 ? 0 : data.layers[options.subtitlesLayer][i - 1].out,
