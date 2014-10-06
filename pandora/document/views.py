@@ -26,7 +26,7 @@ def get_document_or_404_json(id):
         raise HttpErrorJson(response)
 
 @login_required_json
-def addDocument(request):
+def addDocument(request, data):
     '''
         add document(s) to item
         takes {
@@ -40,7 +40,6 @@ def addDocument(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     if 'ids' in data:
         ids = data['ids']
     else:
@@ -64,7 +63,7 @@ def addDocument(request):
 actions.register(addDocument, cache=False)
 
 @login_required_json
-def editDocument(request):
+def editDocument(request, data):
     '''
         takes {
             id: string
@@ -78,7 +77,6 @@ def editDocument(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     item = 'item' in data and Item.objects.get(public_id=data['item']) or None
     if data['id']:
         document = models.Document.get(data['id'])
@@ -136,7 +134,7 @@ def parse_query(data, user):
     return query
 
 
-def findDocuments(request):
+def findDocuments(request, data):
     '''
         takes {
             query: {
@@ -165,7 +163,6 @@ def findDocuments(request):
             items: [object]
         }
     '''
-    data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
 
     #order
@@ -190,7 +187,7 @@ def findDocuments(request):
     return render_to_json_response(response)
 actions.register(findDocuments)
 
-def getDocument(request):
+def getDocument(request, data):
     '''
         takes {
             id: string,
@@ -201,7 +198,6 @@ def getDocument(request):
         }
     '''
     response = json_response({})
-    data = json.loads(request.POST['data'])
     data['keys'] = data.get('keys', [])
     document = get_document_or_404_json(data['id'])
     response['data'] = document.json(keys=data['keys'], user=request.user)
@@ -209,7 +205,7 @@ def getDocument(request):
 actions.register(getDocument)
 
 @login_required_json
-def removeDocument(request):
+def removeDocument(request, data):
     '''
         takes {
             id: string,
@@ -223,7 +219,6 @@ def removeDocument(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
 
     if 'ids' in data:
@@ -250,7 +245,7 @@ def removeDocument(request):
 actions.register(removeDocument, cache=False)
 
 @login_required_json
-def sortDocuments(request):
+def sortDocuments(request, data):
     '''
         takes {
             item: string
@@ -259,7 +254,6 @@ def sortDocuments(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     index = 0
     item = Item.objects.get(public_id=data['item'])
     ids = data['ids']

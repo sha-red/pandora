@@ -93,7 +93,7 @@ def robots_txt(request, url):
         'text/plain'
     )
 
-def getPage(request):
+def getPage(request, data):
     '''
         takes {
             name: pagename
@@ -103,7 +103,6 @@ def getPage(request):
             text:
         }
     '''
-    data = json.loads(request.POST['data'])
     if isinstance(data, basestring):
         name = data
     else:
@@ -118,7 +117,7 @@ actions.register(getPage)
 
 
 @login_required_json
-def editPage(request):
+def editPage(request, data):
     '''
         takes {
             name: pagename
@@ -130,7 +129,6 @@ def editPage(request):
         }
     '''
     if request.user.get_profile().capability('canEditSitePages'):
-        data = json.loads(request.POST['data'])
         page, created = models.Page.objects.get_or_create(name=data['name'])
         if not created:
             page.log()
@@ -143,7 +141,7 @@ def editPage(request):
 actions.register(editPage)
 
 
-def init(request):
+def init(request, data):
     '''
         takes {}
         returns {
@@ -162,7 +160,7 @@ def init(request):
     return render_to_json_response(response)
 actions.register(init)
 
-def embedURL(request):
+def embedURL(request, data):
     '''
         
         takes {
@@ -175,13 +173,12 @@ def embedURL(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response({})
     response['data'] = ox.get_embed_code(data['url'], data.get('maxwidth'), data.get('maxheight'))
     return render_to_json_response(response)
 actions.register(embedURL)
 
-def getEmbedDefaults(request):
+def getEmbedDefaults(request, data):
     '''
         takes {}
     returns {
@@ -202,7 +199,6 @@ def getEmbedDefaults(request):
     from itemlist.models import List
     from edit.models import Edit
     from text.models import Text
-    data = json.loads(request.POST['data'])
     response = json_response({})
     qs = Document.objects.filter(uploading=False).order_by('id')
     if qs.exists():

@@ -43,7 +43,7 @@ def get_group_or_404(data):
     return g
 
 
-def signin(request):
+def signin(request, data):
     '''
         takes {
             username: string,
@@ -60,7 +60,6 @@ def signin(request):
             }
         }
     '''
-    data = json.loads(request.POST['data'])
     if 'assertion' in data:
         response = persona.signin(request)
     elif 'username' in data and 'password' in data:
@@ -106,7 +105,7 @@ def signin(request):
 actions.register(signin, cache=False)
 
 
-def signout(request):
+def signout(request, data):
     '''
         takes {}
 
@@ -130,7 +129,7 @@ def signout(request):
 actions.register(signout, cache=False)
 
 
-def signup(request):
+def signup(request, data):
     '''
         takes {
             username: string,
@@ -148,7 +147,6 @@ def signup(request):
             }
         }
     '''
-    data = json.loads(request.POST['data'])
     if 'username' in data and 'password' in data:
         data['username'] = data['username'].strip()
         if 'email' in data:
@@ -215,7 +213,7 @@ def signup(request):
 actions.register(signup, cache=False)
 
 
-def resetPassword(request):
+def resetPassword(request, data):
     '''
         takes {
             username: string,
@@ -231,7 +229,6 @@ def resetPassword(request):
             }
         }
     '''
-    data = json.loads(request.POST['data'])
     if 'code' in data and 'password' in data:
         if not data['password']:
             response = json_response({
@@ -268,7 +265,7 @@ def resetPassword(request):
 actions.register(resetPassword, cache=False)
 
 
-def requestToken(request):
+def requestToken(request, data):
     '''
         takes {
             username: string,
@@ -283,7 +280,6 @@ def requestToken(request):
             username: user
         }
     '''
-    data = json.loads(request.POST['data'])
     user = None
     if 'username' in data:
         try:
@@ -334,7 +330,7 @@ actions.register(requestToken, cache=False)
 
 
 @capability_required_json('canManageUsers')
-def editUser(request):
+def editUser(request, data):
     '''
         takes {
             key: value
@@ -346,7 +342,6 @@ def editUser(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     user = get_object_or_404_json(User, pk=ox.fromAZ(data['id']))
 
     profile = user.get_profile()
@@ -390,7 +385,7 @@ actions.register(editUser, cache=False)
 
 
 @capability_required_json('canManageUsers')
-def removeUser(request):
+def removeUser(request, data):
     '''
         takes {
             username: username
@@ -398,14 +393,13 @@ def removeUser(request):
         returns {}
     '''
     response = json_response()
-    data = json.load(request.POST['data'])
     u = get_user_or_404(data)
     u.delete()
     return render_to_json_response(response)
 actions.register(removeUser, cache=False)
 
 
-def findUser(request):
+def findUser(request, data):
     '''
         takes {
             key: string, //username, email
@@ -418,7 +412,6 @@ def findUser(request):
             users: [object]
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response(status=200, text='ok')
     #keys = data.get('keys')
     #if not keys:
@@ -481,7 +474,7 @@ def order_query(qs, sort):
 
 
 @capability_required_json('canManageUsers')
-def findUsers(request):
+def findUsers(request, data):
     '''
         takes {
             query: {
@@ -545,7 +538,6 @@ Positions
             positions:  ids of places for which positions are required
     '''
     response = json_response(status=200, text='ok')
-    data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
     qs = order_query(query['qs'], query['sort'])
     if 'keys' in data:
@@ -575,7 +567,7 @@ actions.register(findUsers)
 
 
 @capability_required_json('canManageUsers')
-def getUser(request):
+def getUser(request, data):
     '''
         takes {
             id: string or username: string,
@@ -587,14 +579,13 @@ def getUser(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     u = get_user_or_404(data)
     response['data'] = u.data.get().json(data.get('keys', []), request.user)
     return render_to_json_response(response)
 actions.register(getUser)
 
 @login_required_json
-def mail(request):
+def mail(request, data):
     '''
         takes {
             to: [string], // array of usernames to send mail to
@@ -610,7 +601,6 @@ def mail(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     p = request.user.get_profile()
     if p.capability('canSendMail'):
         email_from = '"%s" <%s>' % (settings.SITENAME, settings.CONFIG['site']['email']['system'])
@@ -658,7 +648,7 @@ def mail(request):
     return render_to_json_response(response)
 actions.register(mail, cache=False)
 
-def contact(request):
+def contact(request, data):
     '''
         takes {
             email: string,
@@ -669,7 +659,6 @@ def contact(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     name = data.get('name', '')
     email = data.get('email', '')
     if request.user.is_authenticated():
@@ -731,7 +720,7 @@ def getPositionById(list, key):
 
 
 @login_required_json
-def editPreferences(request):
+def editPreferences(request, data):
     '''
         takes {
             key: value
@@ -739,7 +728,6 @@ def editPreferences(request):
         keys: email, password
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     errors = {}
     change = False
     response = json_response()
@@ -775,7 +763,7 @@ def reset_ui(request):
     return redirect('/')
 
 
-def resetUI(request):
+def resetUI(request, data):
     '''
         reset user ui settings to defaults
         takes {
@@ -795,7 +783,7 @@ def resetUI(request):
 actions.register(resetUI, cache=False)
 
 
-def setUI(request):
+def setUI(request, data):
     '''
         takes {
             key.subkey: value
@@ -806,7 +794,6 @@ def setUI(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     if request.user.is_authenticated():
         profile = request.user.get_profile()
         ui = profile.ui
@@ -848,8 +835,12 @@ actions.register(setUI, cache=False)
 
 
 @capability_required_json('canManageUsers')
-def statistics(request):
+def statistics(request, data):
     '''
+        takes {}
+        returns {
+            ...
+        }
     '''
     response = json_response()
     from app.models import Settings
@@ -873,7 +864,7 @@ def group_json(g):
 
 
 @capability_required_json('canManageUsers')
-def getGroups(request):
+def getGroups(request, data):
     '''
         takes {}
         returns {
@@ -884,7 +875,6 @@ def getGroups(request):
 
     '''
     response = json_response(status=200, text='ok')
-    data = json.loads(request.POST['data'])
     response['data']['groups'] = []
     for g in Group.objects.all().order_by('name'):
         response['data']['groups'].append(group_json(g))
@@ -893,7 +883,7 @@ actions.register(getGroups)
 
 
 @capability_required_json('canManageUsers')
-def getGroup(request):
+def getGroup(request, data):
     '''
         takes {
             id: string
@@ -909,7 +899,6 @@ def getGroup(request):
 
     '''
     response = json_response(status=200, text='ok')
-    data = json.loads(request.POST['data'])
     g = get_group_or_404(data)
     response['data'] = group_json(g)
     return render_to_json_response(response)
@@ -917,7 +906,7 @@ actions.register(getGroup, cache=False)
 
 
 @capability_required_json('canManageUsers')
-def addGroup(request):
+def addGroup(request, data):
     '''
         takes {
             name: string
@@ -931,7 +920,6 @@ def addGroup(request):
 
     '''
     response = json_response(status=200, text='ok')
-    data = json.loads(request.POST['data'])
     created = False
     n = 1
     name = data['name']
@@ -946,7 +934,7 @@ actions.register(addGroup, cache=False)
 
 
 @capability_required_json('canManageUsers')
-def editGroup(request):
+def editGroup(request, data):
     '''
         takes {
             id: string,
@@ -960,7 +948,6 @@ def editGroup(request):
 
     '''
     response = json_response(status=200, text='ok')
-    data = json.loads(request.POST['data'])
     g = Group.objects.get(id=ox.fromAZ(data['id']))
     g.name = data['name']
     g.save()
@@ -970,7 +957,7 @@ actions.register(editGroup, cache=False)
 
 
 @capability_required_json('canManageUsers')
-def removeGroup(request):
+def removeGroup(request, data):
     '''
         takes {
             id: string
@@ -980,7 +967,6 @@ def removeGroup(request):
 
     '''
     response = json_response(status=200, text='ok')
-    data = json.loads(request.POST['data'])
     g = get_group_or_404(data)
     for i in g.items.all():
         i.groups.remove(g)

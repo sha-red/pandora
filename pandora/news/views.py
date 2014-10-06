@@ -12,7 +12,7 @@ from ox.django.api import actions
 
 import models
 
-def getNews(request):
+def getNews(request, data):
     '''
         takes {
             id: string
@@ -30,7 +30,6 @@ def getNews(request):
             items: [object]
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
     if 'id' in data:
         news = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))
@@ -42,7 +41,7 @@ def getNews(request):
 actions.register(getNews)
 
 @login_required_json
-def addNews(request):
+def addNews(request, data):
     '''
         takes {
             title: string,
@@ -54,8 +53,6 @@ def addNews(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
-
     news = models.News()
     for key in ('title', 'text', 'date'):
         if key in data:
@@ -66,14 +63,13 @@ def addNews(request):
 actions.register(addNews, cache=False)
 
 @login_required_json
-def removeNews(request):
+def removeNews(request, data):
     '''
         takes {
             ids: []
         }
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     response = json_response({})
     news = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))
     if news.editable(request.user):
@@ -85,7 +81,7 @@ def removeNews(request):
 actions.register(removeNews, cache=False)
 
 @login_required_json
-def editNews(request):
+def editNews(request, data):
     '''
         takes {
             id: string,
@@ -99,7 +95,6 @@ def editNews(request):
         }
     '''
     response = json_response({})
-    data = json.loads(request.POST['data'])
     n = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))
     if n.editable(request.user):
         for key in ('title', 'text', 'date'):

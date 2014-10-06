@@ -27,8 +27,7 @@ from chunk import process_chunk
 
 
 @login_required_json
-def removeVolume(request):
-    data = json.loads(request.POST['data'])
+def removeVolume(request, data):
     user = request.user
     try:
         volume = models.Volume.objects.get(user=user, name=data['volume'])
@@ -42,7 +41,7 @@ actions.register(removeVolume, cache=False)
 
 
 @login_required_json
-def update(request):
+def update(request, data):
     '''
         2 steps:
             send files
@@ -67,7 +66,6 @@ def update(request):
             file: list  // list of files that should be uploaded as is
         }
     '''
-    data = json.loads(request.POST['data'])
     user = request.user
     upload_only = data.get('upload', False)
 
@@ -109,7 +107,7 @@ actions.register(update, cache=False)
 
 
 @login_required_json
-def upload(request):
+def upload(request, data=None):
     '''
         takes {
             id: string
@@ -156,7 +154,7 @@ actions.register(upload, cache=False)
 
 
 @login_required_json
-def addMedia(request):
+def addMedia(request, data):
     '''
         takes {
             id: oshash
@@ -169,7 +167,6 @@ def addMedia(request):
         }
     '''
     response = json_response({})
-    data = json.loads(request.POST['data'])
     oshash = data.pop('id')
     if not request.user.get_profile().capability('canAddItems'):
         response = json_response(status=403, text='permission denied')
@@ -324,9 +321,8 @@ def direct_upload(request):
 
 
 @login_required_json
-def taskStatus(request):
+def taskStatus(request, data):
     #FIXME: should check if user has permissions to get status
-    data = json.loads(request.POST['data'])
     if 'taskId' in data:
         task_id = data['taskId']
     else:
@@ -337,7 +333,7 @@ actions.register(taskStatus, cache=False)
 
 
 @login_required_json
-def moveMedia(request):
+def moveMedia(request, data):
     '''
         change file / item link
         takes {
@@ -348,7 +344,6 @@ def moveMedia(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     if Item.objects.filter(public_id=data['item']).count() == 1:
         i = Item.objects.get(public_id=data['item'])
     else:
@@ -384,7 +379,7 @@ def moveMedia(request):
 actions.register(moveMedia, cache=False)
 
 @login_required_json
-def editMedia(request):
+def editMedia(request, data):
     '''
         change file / item link
         takes {
@@ -398,8 +393,6 @@ def editMedia(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
-
     ignore = []
     save_items = []
     dont_ignore = []
@@ -443,8 +436,7 @@ actions.register(editMedia, cache=False)
 
 
 @login_required_json
-def removeMedia(request):
-    data = json.loads(request.POST['data'])
+def removeMedia(request, data):
     response = json_response()
     if request.user.get_profile().get_level() == 'admin':
         qs = models.File.objects.filter(oshash__in=data['ids'], instances__id=None)
@@ -461,7 +453,7 @@ def removeMedia(request):
     return render_to_json_response(response)
 actions.register(removeMedia, cache=False)
 
-def getPath(request):
+def getPath(request, data):
     '''
         change file / item link
         takes {
@@ -472,7 +464,6 @@ def getPath(request):
             id: path
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
     ids = data['id']
     if isinstance(ids, basestring):
@@ -517,7 +508,7 @@ def _order_query(qs, sort, prefix=''):
     return qs
 
 
-def findMedia(request):
+def findMedia(request, data):
     '''
         takes {
             'query': query,
@@ -591,7 +582,6 @@ Positions
             }
         }
     '''
-    data = json.loads(request.POST['data'])
     if not data.get('sort'):
         data['sort'] = [{'key': 'path', 'operator': '+'}]
     query = parse_query(data, request.user)
@@ -655,7 +645,7 @@ Positions
 
 actions.register(findMedia)
 
-def parsePath(request): #parse path and return info
+def parsePath(request, data): #parse path and return info
     '''
         takes {
             path: string
@@ -664,12 +654,12 @@ def parsePath(request): #parse path and return info
             imdb: string
         }
     '''
-    path = json.loads(request.POST['data'])['path']
+    path = data['path']
     response = json_response(ox.parse_movie_path(path))
     return render_to_json_response(response)
 actions.register(parsePath)
 
-def getMediaInfo(request):
+def getMediaInfo(request, data):
     '''
         takes {
             id: oshash of stream file
@@ -679,7 +669,6 @@ def getMediaInfo(request):
             file: oshash of source file
         }
     '''
-    data = json.loads(request.POST['data'])
     f = None
     qs = models.Stream.objects.filter(oshash=data['id'])
     if qs.count() > 0:

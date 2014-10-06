@@ -97,7 +97,7 @@ def parse_query(data, user):
     #group by only allows sorting by name or number of itmes
     return query
 
-def find(request):
+def find(request, data):
     '''
         Example: 
             find({
@@ -183,7 +183,6 @@ Positions
             }
         }
     '''
-    data = json.loads(request.POST['data'])
     if settings.JSON_DEBUG:
         print json.dumps(data, indent=2)
     query = parse_query(data, request.user)
@@ -305,7 +304,7 @@ Positions
 actions.register(find)
 
 
-def autocomplete(request):
+def autocomplete(request, data):
     '''
         takes {
             key: string,
@@ -318,7 +317,6 @@ def autocomplete(request):
             items: [string, ...] //array of matching values
         }
     '''
-    data = json.loads(request.POST['data'])
     if not 'range' in data:
         data['range'] = [0, 10]
     op = data.get('operator', '=')
@@ -369,7 +367,7 @@ def autocomplete(request):
     return render_to_json_response(response)
 actions.register(autocomplete)
 
-def findId(request):
+def findId(request, data):
     '''
         takes {
             'id': string
@@ -378,7 +376,6 @@ def findId(request):
             'year': int
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response({})
     response['data']['items'] = []
     if 'id' in data:
@@ -398,7 +395,7 @@ def findId(request):
 actions.register(findId)
 
 
-def getMetadata(request):
+def getMetadata(request, data):
     '''
         takes {
             id: string,
@@ -411,7 +408,6 @@ def getMetadata(request):
         }
 
     '''
-    data = json.loads(request.POST['data'])
     response = json_response({})
     if settings.DATA_SERVICE:
         '''
@@ -431,7 +427,7 @@ def getMetadata(request):
     return render_to_json_response(response)
 actions.register(getMetadata)
 
-def getIds(request):
+def getIds(request, data):
     '''
         takes {
             title: string,
@@ -448,7 +444,6 @@ def getIds(request):
             }]
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response({})
     if settings.DATA_SERVICE:
         r = models.external_data('getIds', data)
@@ -459,7 +454,7 @@ def getIds(request):
     return render_to_json_response(response)
 actions.register(getIds)
 
-def get(request):
+def get(request, data):
     '''
         takes {
             id: string,
@@ -470,7 +465,6 @@ def get(request):
         }
     '''
     response = json_response({})
-    data = json.loads(request.POST['data'])
     data['keys'] = data.get('keys', [])
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.access(request.user):
@@ -501,7 +495,7 @@ def get(request):
 actions.register(get)
 
 @login_required_json
-def add(request):
+def add(request, data):
     '''
         takes {
             title: string, //(optional)
@@ -516,7 +510,6 @@ def add(request):
     if not request.user.get_profile().capability('canAddItems'):
         response = json_response(status=403, text='permissino denied')
     else:
-        data = json.loads(request.POST['data'])
         data['title'] = data.get('title', 'Untitled')
         i = models.Item()
         i.data['title'] = data['title']
@@ -532,7 +525,7 @@ def add(request):
 actions.register(add, cache=False)
 
 @login_required_json
-def edit(request):
+def edit(request, data):
     '''
         edit item with id, you can pass one or many key/value pairs,
         returns all key/values for edited item.
@@ -548,7 +541,6 @@ def edit(request):
         }
     '''
     update_clips = False
-    data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.editable(request.user):
         item.log()
@@ -579,7 +571,7 @@ def edit(request):
 actions.register(edit, cache=False)
 
 @login_required_json
-def remove(request):
+def remove(request, data):
     '''
         remove item with id, return status is 200/removed on sucess or 403/permission deinied.
         takes {
@@ -590,7 +582,6 @@ def remove(request):
         }
     '''
     response = json_response({})
-    data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     user = request.user
     if user.get_profile().capability('canRemoveItems') == True or \
@@ -606,7 +597,7 @@ def remove(request):
     return render_to_json_response(response)
 actions.register(remove, cache=False)
 
-def setPosterFrame(request):
+def setPosterFrame(request, data):
     '''
         takes {
             id: string,
@@ -615,7 +606,6 @@ def setPosterFrame(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.editable(request.user):
         item.poster_frame = data['position']
@@ -628,7 +618,7 @@ def setPosterFrame(request):
 actions.register(setPosterFrame, cache=False)
 
 
-def setPoster(request):
+def setPoster(request, data):
     '''
         takes {
             id: string,
@@ -642,7 +632,6 @@ def setPoster(request):
             }
         }
     '''
-    data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     response = json_response()
     if item.editable(request.user):
@@ -662,7 +651,7 @@ def setPoster(request):
     return render_to_json_response(response)
 actions.register(setPoster, cache=False)
 
-def updateExternalData(request):
+def updateExternalData(request, data):
     '''
         takes {
             id: string,
@@ -670,7 +659,6 @@ def updateExternalData(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     response = json_response()
     if item.editable(request.user):
@@ -680,7 +668,7 @@ def updateExternalData(request):
     return render_to_json_response(response)
 actions.register(updateExternalData, cache=False)
 
-def lookup(request):
+def lookup(request, data):
     '''
         takes {
             title: string,
@@ -695,7 +683,6 @@ def lookup(request):
             id: string
         }
     '''
-    data = json.loads(request.POST['data'])
     if 'id' in data:
         i = models.Item.objects.get(public_id=data['id'])
         r = {'id': i.public_id}

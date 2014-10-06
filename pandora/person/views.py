@@ -15,7 +15,7 @@ import models
 import tasks
 
 @admin_required_json
-def editName(request):
+def editName(request, data):
     '''
         takes {
             id: id,
@@ -27,7 +27,6 @@ def editName(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     person = get_object_or_404_json(models.Person, pk=ox.fromAZ(data['id']))
     response = json_response()
     if 'sortname' in data:
@@ -39,7 +38,7 @@ def editName(request):
     return render_to_json_response(response)
 actions.register(editName, cache=False)
 
-def sortName(request):
+def sortName(request, data):
     '''
         get sort name(s) for given name or names
         takes {
@@ -50,7 +49,6 @@ def sortName(request):
             name: sortName
         }
     '''
-    data = json.loads(request.POST['data'])
     names = data.get('names', [])
     if 'name' in data:
         names.append(data['name'])
@@ -89,7 +87,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-def findNames(request):
+def findNames(request, data):
     '''
         takes {
             query: {
@@ -142,7 +140,6 @@ def findNames(request):
               items: [string]
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
 
     query = parse_query(data, request.user)

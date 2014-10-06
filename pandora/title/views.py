@@ -15,7 +15,7 @@ from item import utils
 import models
 
 @admin_required_json
-def editTitle(request):
+def editTitle(request, data):
     '''
         takes {
             id: string
@@ -26,7 +26,6 @@ def editTitle(request):
             id: string
         }
     '''
-    data = json.loads(request.POST['data'])
     title = get_object_or_404_json(models.Title, pk=ox.fromAZ(data['id']))
     response = json_response()
     if 'sorttitle' in data:
@@ -66,7 +65,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-def findTitles(request):
+def findTitles(request, data):
     '''
         takes {
             query: {
@@ -122,7 +121,6 @@ def findTitles(request):
           returns {items: [object]}
 
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
 
     query = parse_query(data, request.user)

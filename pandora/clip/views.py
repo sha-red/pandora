@@ -71,7 +71,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-def findClips(request):
+def findClips(request, data):
     '''
         takes {
             query: {
@@ -93,7 +93,6 @@ def findClips(request):
             items: [object]
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
 
     query = parse_query(data, request.user)

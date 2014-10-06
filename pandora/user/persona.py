@@ -18,8 +18,7 @@ import requests
 import models
 
 
-def signin(request):
-    data = json.loads(request.POST['data'])
+def signin(request, data):
     response = json_response({
         'errors': {
             'email': 'Failed to verify email'

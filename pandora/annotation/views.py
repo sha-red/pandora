@@ -61,7 +61,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-def findAnnotations(request):
+def findAnnotations(request, data):
     '''
         takes {
             query: {
@@ -82,7 +82,6 @@ def findAnnotations(request):
             annotations = [{..}, {...}, ...]
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
 
     query = parse_query(data, request.user)
@@ -111,7 +110,7 @@ actions.register(findAnnotations)
 
 
 @login_required_json
-def addAnnotation(request):
+def addAnnotation(request, data):
     '''
         takes {
             item: public_id,
@@ -125,7 +124,6 @@ def addAnnotation(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     for key in ('item', 'layer', 'in', 'out', 'value'):
         if key not in data:
             return render_to_json_response(json_response(status=400,
@@ -152,7 +150,7 @@ def addAnnotation(request):
 actions.register(addAnnotation, cache=False)
 
 @login_required_json
-def addAnnotations(request):
+def addAnnotations(request, data):
     '''
         takes {
             item: public_id,
@@ -167,7 +165,6 @@ def addAnnotations(request):
             taskId: string
         }
     '''
-    data = json.loads(request.POST['data'])
     for key in ('item', 'layer', 'annotations'):
         if key not in data:
             return render_to_json_response(json_response(status=400,
@@ -189,7 +186,7 @@ def addAnnotations(request):
 actions.register(addAnnotations, cache=False)
 
 @login_required_json
-def removeAnnotation(request):
+def removeAnnotation(request, data):
     '''
         takes {
             id: annotationId
@@ -198,7 +195,6 @@ def removeAnnotation(request):
         }
     '''
     response = json_response({})
-    data = json.loads(request.POST['data'])
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
         a.log()
@@ -210,7 +206,7 @@ actions.register(removeAnnotation, cache=False)
 
 
 @login_required_json
-def editAnnotation(request):
+def editAnnotation(request, data):
     '''
         takes {
             id:,
@@ -224,7 +220,6 @@ def editAnnotation(request):
         }
     '''
     response = json_response({})
-    data = json.loads(request.POST['data'])
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
         a.log()

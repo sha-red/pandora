@@ -25,7 +25,7 @@ def get_edit_or_404_json(id):
     return get_object_or_404_json(models.Edit, user__username=username, name=name)
 
 @login_required_json
-def addClips(request):
+def addClips(request, data):
     '''
         takes {
             edit: string,
@@ -43,7 +43,6 @@ def addClips(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['edit'])
     clips = []
     if edit.editable(request.user):
@@ -65,7 +64,7 @@ actions.register(addClips, cache=False)
 
 
 @login_required_json
-def removeClips(request):
+def removeClips(request, data):
     '''
        takes {
            edit: string
@@ -75,7 +74,6 @@ def removeClips(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['edit'])
     if 'id' in data:
         ids = [data['id']]
@@ -92,7 +90,7 @@ def removeClips(request):
 actions.register(removeClips, cache=False)
 
 @login_required_json
-def editClip(request):
+def editClip(request, data):
     '''
        takes {
            id: string,
@@ -103,7 +101,6 @@ def editClip(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     clip = get_object_or_404_json(models.Clip, pk=ox.fromAZ(data['id']))
     valid = True
     if clip.edit.editable(request.user):
@@ -129,7 +126,7 @@ def editClip(request):
 actions.register(editClip, cache=False)
 
 @login_required_json
-def orderClips(request):
+def orderClips(request, data):
     '''
        takes {
            edit: string
@@ -138,7 +135,6 @@ def orderClips(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['edit'])
     response = json_response()
     ids = map(ox.fromAZ, data['ids'])
@@ -187,7 +183,7 @@ def _order_clips(edit, sort):
     qs = qs.distinct()
     return qs
 
-def sortClips(request):
+def sortClips(request, data):
     '''
        takes {
            edit: string
@@ -196,7 +192,6 @@ def sortClips(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['edit'])
     response = json_response()
     clips = _order_clips(edit, data['sort'])
@@ -204,7 +199,7 @@ def sortClips(request):
     return render_to_json_response(response)
 actions.register(sortClips, cache=False)
 
-def getEdit(request):
+def getEdit(request, data):
     '''
         takes {
             id:
@@ -215,7 +210,6 @@ def getEdit(request):
             clips:
         }
     '''
-    data = json.loads(request.POST['data'])
     if 'id' in data:
         response = json_response()
         edit = get_edit_or_404_json(data['id'])
@@ -229,7 +223,7 @@ def getEdit(request):
 actions.register(getEdit)
 
 @login_required_json
-def addEdit(request):
+def addEdit(request, data):
     '''
         takes {
             [name],
@@ -240,7 +234,6 @@ def addEdit(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
     if not name:
@@ -284,7 +277,7 @@ def addEdit(request):
 actions.register(addEdit, cache=False)
 
 @login_required_json
-def editEdit(request):
+def editEdit(request, data):
     '''
         takes {
             id
@@ -293,7 +286,6 @@ def editEdit(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['id'])
     response = json_response()
     if edit.editable(request.user):
@@ -309,7 +301,7 @@ def editEdit(request):
 actions.register(editEdit, cache=False)
 
 @login_required_json
-def removeEdit(request):
+def removeEdit(request, data):
     '''
         takes {
             ...
@@ -318,7 +310,6 @@ def removeEdit(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['id'])
     response = json_response()
     if edit.editable(request.user):
@@ -358,7 +349,7 @@ def parse_query(data, user):
     return query
 
 
-def findEdits(request):
+def findEdits(request, data):
     '''
         takes {
             query: {
@@ -387,7 +378,6 @@ def findEdits(request):
             items: [object]
         }
     '''
-    data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
 
     #order
@@ -423,14 +413,13 @@ def findEdits(request):
 actions.register(findEdits)
 
 @login_required_json
-def subscribeToEdit(request):
+def subscribeToEdit(request, data):
     '''
         takes {
             id: string,
         }
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['id'])
     user = request.user
     if edit.status == 'public' and \
@@ -447,7 +436,7 @@ actions.register(subscribeToEdit, cache=False)
 
 
 @login_required_json
-def unsubscribeFromEdit(request):
+def unsubscribeFromEdit(request, data):
     '''
         takes {
             id: string,
@@ -455,7 +444,6 @@ def unsubscribeFromEdit(request):
         }
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['id'])
     user = request.user
     edit.subscribed_users.remove(user)
@@ -466,7 +454,7 @@ actions.register(unsubscribeFromEdit, cache=False)
 
 
 @login_required_json
-def sortEdits(request):
+def sortEdits(request, data):
     '''
         takes {
             section: 'personal',
@@ -477,7 +465,6 @@ def sortEdits(request):
 
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     position = 0
     section = data['section']
     section = {

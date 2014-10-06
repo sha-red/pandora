@@ -17,7 +17,7 @@ from item import utils
 import models
 
 @login_required_json
-def addPlace(request):
+def addPlace(request, data):
     '''
         takes {
             name: "",
@@ -38,7 +38,6 @@ def addPlace(request):
         }
     '''
     #FIXME: check permissions
-    data = json.loads(request.POST['data'])
     exists = False
     existing_names = []
     existing_geoname = ''
@@ -96,7 +95,7 @@ actions.register(addPlace, cache=False)
 
 
 @login_required_json
-def editPlace(request):
+def editPlace(request, data):
     '''
         takes {
             id: string,
@@ -107,7 +106,6 @@ def editPlace(request):
             names: []
         }
     '''
-    data = json.loads(request.POST['data'])
     place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data['id']))
     names = data.get('name', [])
     if isinstance(names, basestring):
@@ -161,14 +159,13 @@ actions.register(editPlace, cache=False)
 
 
 @login_required_json
-def removePlace(request):
+def removePlace(request, data):
     '''
         takes {
             id: string,
         }
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     if isinstance(data, dict):
         data = data['id']
     place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data))
@@ -209,7 +206,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-def findPlaces(request):
+def findPlaces(request, data):
     '''
         takes {
             query: {
@@ -276,7 +273,6 @@ Positions
                https://wiki.0x2620.org/wiki/pandora/QuerySyntax
         positions:  ids of places for which positions are required
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
 
     query = parse_query(data, request.user)
@@ -311,7 +307,7 @@ Positions
     return render_to_json_response(response)
 actions.register(findPlaces)
 
-def getPlaceNames(request):
+def getPlaceNames(request, data):
     '''
         takes {}
         returns {

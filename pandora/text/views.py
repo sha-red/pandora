@@ -27,7 +27,7 @@ def get_text_or_404_json(id):
     return get_object_or_404_json(models.Text, user__username=username, name=name)
 
 @login_required_json
-def addText(request):
+def addText(request, data):
     '''
         takes {
             name: value,
@@ -38,7 +38,6 @@ def addText(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
     if not name:
@@ -71,7 +70,7 @@ def addText(request):
     return render_to_json_response(response)
 actions.register(addText, cache=False)
 
-def getText(request):
+def getText(request, data):
     '''
         takes {
             id: textid,
@@ -84,7 +83,6 @@ def getText(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     public_id = data['id']
     if public_id == '':
         qs = models.Text.objects.filter(name='')
@@ -111,7 +109,7 @@ actions.register(getText)
 
 
 @login_required_json
-def editText(request):
+def editText(request, data):
     '''
         takes {
             id:
@@ -125,7 +123,6 @@ def editText(request):
         }
     '''
     response = json_response()
-    data = json.loads(request.POST['data'])
     if data['id']:
         public_id = data['id'].split(':')
         username = public_id[0]
@@ -183,7 +180,7 @@ def parse_query(data, user):
     return query
 
 
-def findTexts(request):
+def findTexts(request, data):
     '''
         takes {
             query: {
@@ -212,7 +209,6 @@ def findTexts(request):
             items: [object]
         }
     '''
-    data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
 
     #order
@@ -249,7 +245,7 @@ actions.register(findTexts)
 
 
 @login_required_json
-def removeText(request):
+def removeText(request, data):
     '''
         takes {
             id: string,
@@ -257,7 +253,6 @@ def removeText(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     text = get_text_or_404_json(data['id'])
     response = json_response()
     if text.editable(request.user):
@@ -269,14 +264,13 @@ actions.register(removeText, cache=False)
 
 
 @login_required_json
-def subscribeToText(request):
+def subscribeToText(request, data):
     '''
         takes {
             id: string,
         }
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     text = get_text_or_404_json(data['id'])
     user = request.user
     if text.status == 'public' and \
@@ -293,7 +287,7 @@ actions.register(subscribeToText, cache=False)
 
 
 @login_required_json
-def unsubscribeFromText(request):
+def unsubscribeFromText(request, data):
     '''
         takes {
             id: string,
@@ -301,7 +295,6 @@ def unsubscribeFromText(request):
         }
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     text = get_text_or_404_json(data['id'])
     user = request.user
     text.subscribed_users.remove(user)
@@ -312,7 +305,7 @@ actions.register(unsubscribeFromText, cache=False)
 
 
 @login_required_json
-def sortTexts(request):
+def sortTexts(request, data):
     '''
         takes {
             section: 'personal',
@@ -323,7 +316,6 @@ def sortTexts(request):
 
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     position = 0
     section = data['section']
     section = {

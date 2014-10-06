@@ -9,7 +9,7 @@ from ox.django.shortcuts import render_to_json_response, json_response
 from itemlist.views import get_list_or_404_json
 from ox.django.api import actions
 
-def tv(request):
+def tv(request, data):
     '''
         takes {
             list: string
@@ -21,7 +21,6 @@ def tv(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     if 'list' in data and data['list']:
         list = get_list_or_404_json(data['list'])
         if list.accessible(request.user):

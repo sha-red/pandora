@@ -16,7 +16,7 @@ from item import utils
 import models
 
 @login_required_json
-def addEvent(request):
+def addEvent(request, data):
     '''
        takes {
            name: string,
@@ -27,7 +27,6 @@ def addEvent(request):
             id: string
         }
     '''
-    data = json.loads(request.POST['data'])
     existing_names = []
     exists = False
     names = [data['name']] + data.get('alternativeNames', [])
@@ -66,7 +65,7 @@ actions.register(addEvent, cache=False)
 
 
 @login_required_json
-def editEvent(request):
+def editEvent(request, data):
     '''
         takes {
             id: string,
@@ -79,7 +78,6 @@ def editEvent(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     event = get_object_or_404_json(models.Event, pk=ox.fromAZ(data['id']))
     if event.editable(request.user):
         conflict = False
@@ -120,7 +118,7 @@ actions.register(editEvent, cache=False)
 
 
 @login_required_json
-def removeEvent(request):
+def removeEvent(request, data):
     '''
         remove Event with given id
         takes {
@@ -128,7 +126,6 @@ def removeEvent(request):
         }
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     event = get_object_or_404_json(models.Event, pk=ox.fromAZ(data['id']))
     if event.editable(request.user):
         event.delete()
@@ -166,7 +163,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-def findEvents(request):
+def findEvents(request, data):
     '''
         takes {
             query: object,
@@ -208,8 +205,6 @@ Positions
         ids:  ids of events for which positions are required
     '''
     response = json_response(status=200, text='ok')
-
-    data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
     qs = order_query(query['qs'], query['sort'])
     qs = qs.distinct()
@@ -237,7 +232,7 @@ Positions
     return render_to_json_response(response)
 actions.register(findEvents)
 
-def getEventNames(request):
+def getEventNames(request, data):
     '''
         takes {
         }

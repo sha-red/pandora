@@ -48,7 +48,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-def findSequences(request):
+def findSequences(request, data):
     '''
         takes {
             query: ...
@@ -61,7 +61,6 @@ def findSequences(request):
             items: [object]
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
 
     query = parse_query(data, request.user)
@@ -91,7 +90,7 @@ def findSequences(request):
     return render_to_json_response(response)
 actions.register(findSequences)
 
-def getSequence(request):
+def getSequence(request, data):
     '''
         takes {
             id
@@ -106,7 +105,6 @@ def getSequence(request):
             out
         }
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
     position = float('%0.03f' % data['position'])
     i = Item.objects.get(public_id=data['id'])

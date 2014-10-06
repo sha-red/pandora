@@ -55,7 +55,7 @@ def parse_query(data, user):
     return query
 
 
-def findLists(request):
+def findLists(request, data):
     '''
         takes {
             query: {
@@ -84,7 +84,6 @@ def findLists(request):
             items: [{name: string, user: string, featured: bool, public...}]
         }
     '''
-    data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
 
     #order
@@ -119,7 +118,7 @@ def findLists(request):
     return render_to_json_response(response)
 actions.register(findLists)
 
-def getList(request):
+def getList(request, data):
     '''
         takes {
             id: listid
@@ -130,7 +129,6 @@ def getList(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     if 'id' in data:
         response = json_response()
         list = get_list_or_404_json(data['id'])
@@ -144,7 +142,7 @@ def getList(request):
 actions.register(getList)
 
 @login_required_json
-def addListItems(request):
+def addListItems(request, data):
     '''
         takes {
             list: listId,
@@ -154,7 +152,6 @@ def addListItems(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['list'])
     if 'items' in data:
         if list.editable(request.user):
@@ -173,7 +170,7 @@ actions.register(addListItems, cache=False)
 
 
 @login_required_json
-def removeListItems(request):
+def removeListItems(request, data):
     '''
         takes {
              list: listId,
@@ -183,7 +180,6 @@ def removeListItems(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['list'])
     if 'items' in data:
         if list.editable(request.user):
@@ -200,7 +196,7 @@ def removeListItems(request):
 actions.register(removeListItems, cache=False)
 
 @login_required_json
-def orderListItems(request):
+def orderListItems(request, data):
     '''
        takes {
            list: string
@@ -209,7 +205,6 @@ def orderListItems(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['list'])
     response = json_response()
     if list.editable(request.user) and list.type == 'static':
@@ -225,7 +220,7 @@ actions.register(orderListItems, cache=False)
 
 
 @login_required_json
-def addList(request):
+def addList(request, data):
     '''
         takes {
             name: value,
@@ -245,7 +240,6 @@ def addList(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
     if not name:
@@ -285,7 +279,7 @@ actions.register(addList, cache=False)
 
 
 @login_required_json
-def editList(request):
+def editList(request, data):
     '''
         takes {
             id: listId,
@@ -301,7 +295,6 @@ def editList(request):
             ...
         }
     '''
-    data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['id'])
     if list.editable(request.user):
         response = json_response()
@@ -313,7 +306,7 @@ def editList(request):
 actions.register(editList, cache=False)
 
 @login_required_json
-def removeList(request):
+def removeList(request, data):
     '''
         takes {
             id: listId,
@@ -321,7 +314,6 @@ def removeList(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['id'])
     response = json_response()
     if list.editable(request.user):
@@ -334,7 +326,7 @@ actions.register(removeList, cache=False)
 
 
 @login_required_json
-def subscribeToList(request):
+def subscribeToList(request, data):
     '''
         takes {
             id: listId,
@@ -342,7 +334,6 @@ def subscribeToList(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['id'])
     user = request.user
     if list.status == 'public' and \
@@ -359,7 +350,7 @@ actions.register(subscribeToList, cache=False)
 
 
 @login_required_json
-def unsubscribeFromList(request):
+def unsubscribeFromList(request, data):
     '''
         takes {
             id: listId,
@@ -368,7 +359,6 @@ def unsubscribeFromList(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['id'])
     user = request.user
     list.subscribed_users.remove(user)
@@ -379,7 +369,7 @@ actions.register(unsubscribeFromList, cache=False)
 
 
 @login_required_json
-def sortLists(request):
+def sortLists(request, data):
     '''
         takes {
             section: 'personal',
@@ -390,7 +380,6 @@ def sortLists(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     position = 0
     section = data['section']
     section = {

@@ -15,7 +15,7 @@ from item import utils
 import models
 
 
-def log(request):
+def log(request, data):
     '''
         takes {
             url: string,
@@ -25,7 +25,6 @@ def log(request):
         returns {
         }
     '''
-    data = json.loads(request.POST['data'])
     if request.user.is_authenticated():
         user = request.user
     else:
@@ -48,14 +47,13 @@ actions.register(log, cache=False)
 
 
 @admin_required_json
-def removeLogs(request):
+def removeLogs(request, data):
     '''
         takes {
             ids: [string]
         }
         returns {}
     '''
-    data = json.loads(request.POST['data'])
     models.Log.objects.filter(id__in=[ox.fromAZ(i) for i in data['ids']]).delete()
     response = json_response()
     return render_to_json_response(response)
@@ -86,7 +84,7 @@ def order_query(qs, sort):
     return qs
 
 @admin_required_json
-def findLogs(request):
+def findLogs(request, data):
     '''
         takes {
             query: {
@@ -108,7 +106,6 @@ def findLogs(request):
         }
 
     '''
-    data = json.loads(request.POST['data'])
     response = json_response()
 
     query = parse_query(data, request.user)
