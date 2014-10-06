@@ -1243,7 +1243,7 @@ class Item(models.Model):
         self.save()
 
     def audio_tracks(self):
-        tracks = [f['language'] for f in self.files.filter(selected=True).values('language') if f['language']]
+        tracks = [f['language'] for f in self.files.filter(selected=True).filter(Q(is_video=True)|Q(is_audio=True)).values('language') if f['language']]
         return sorted(set(tracks))
 
     def streams(self, track=None):
