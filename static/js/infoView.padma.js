@@ -807,6 +807,10 @@ pandora.ui.infoView = function(data) {
         toggleIconSize();
     };
 
+    that.resizeElement = function() {
+        // overwrite splitpanel resize
+    };
+
     that.bindEvent({
         mousedown: function() {
             that.gainFocus()
