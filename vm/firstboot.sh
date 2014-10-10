@@ -192,23 +192,9 @@ EOF
 chmod +x /usr/local/bin/fixtime
 fi
 
-if [ "$ID" == "systemd" ]; then
 cat > /usr/local/bin/genissue <<EOF
-#!/bin/bash
-echo Welcome to pan.do/ra. Connect via one of these URLs:
-echo 
-for ip in \$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print \$1 }'); do
-    echo "  http://\$ip/"
-done
-echo
-EOF
-chmod +x /usr/local/bin/genissue
-/usr/local/bin/genissue > /etc/issue
-
-else
-cat > /usr/local/bin/genissue <<EOF
-#!/bin/bash
-HOST=\$(rgrep .local /var/log/syslog | grep "Host name is" | tail -n 1 | awk '{print \$12}' | sed 's/\.$//')
+#!/bin/sh
+HOST=\$(ps ax | grep avahi-daemon | grep local | sed "s/.*\[\(.*\)\].*/\1/g" | sed 's/\.$//')
 echo Welcome to pan.do/ra. Connect via one of these URLs:
 echo 
 if [ -n "\$HOST" ]; then
@@ -238,8 +224,8 @@ cat >> /etc/rc.local << EOF
 /usr/local/bin/fixtime &
 EOF
 fi
+
 chmod +x /etc/rc.local
-fi
 
 cat > /home/pandora/.vimrc <<EOF
 set nocompatible
