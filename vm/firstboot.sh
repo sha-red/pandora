@@ -1,12 +1,31 @@
 #!/bin/bash
 LXC=`grep -q lxc /proc/1/environ && echo 'yes' || echo 'no'`
-
+if [ -e /etc/os-release ]; then
+    . /etc/os-release
+else
+    ID=unknown
+fi
+UBUNTU_VERSION="$VERSION_ID"
 export DEBIAN_FRONTEND=noninteractive
-apt-get install -y \
-    update-manager-core \
-    software-properties-common
-[[ `lsb_release -sr` == "12.04" ]] && apt-get install -y python-software-properties
-add-apt-repository -y ppa:j/pandora
+if [ "$ID" == "debian" ]; then
+    SYSTEMD="yes"
+    echo "deb http://ppa.launchpad.net/j/pandora/ubuntu trusty main" > /etc/apt/sources.list.d/j-pandora.list
+    gpg --keyserver subkeys.pgp.net --recv-keys 01975EF3
+    gpg -a --export 01975EF3 | apt-key add -
+else
+    SYSTEMD="no"
+    if [ "$UBUNTU_VERSION" == "12.04" ]; then
+        EXTRA=python-software-properties
+    else
+        EXTRA=""
+    fi
+    apt-get install -y \
+        update-manager-core \
+        software-properties-common \
+        $EXTRA
+
+    add-apt-repository -y ppa:j/pandora
+fi
 apt-get update
 
 if [ "$LXC" == "no" ]; then
@@ -15,7 +34,7 @@ apt-get install -y \
     ntp
 fi
 
-if [[ `lsb_release -sr` == "12.04" ]]; then
+if [ "$UBUNTU_VERSION" == "12.04" ]; then
     LIBAVCODEC_EXTRA=libavcodec-extra-53
 else
     LIBAVCODEC_EXTRA=libavcodec-extra
@@ -63,6 +82,7 @@ mkdir -p /home/pandora/.ox/bin
 wget -O /home/pandora/.ox/bin/ffmpeg https://firefogg.org/bin/ffmpeg.linux
 wget -O /home/pandora/.ox/bin/ffmpeg2theora https://firefogg.org/bin/ffmpeg2theora.linux
 chmod +x /home/pandora/.ox/bin/*
+chown -R pandora.pandora /home/pandora/.ox
 
 
 sudo -u postgres createuser -S -D -R pandora
@@ -119,9 +139,20 @@ chown -R pandora:pandora /srv/pandora
 $MANAGE update_static
 $MANAGE collectstatic -l --noinput
 
-cp /srv/pandora/etc/init/* /etc/init/
-if [ "$LXC" == "yes" ]; then
-    sed -i s/127.0.0.1/0.0.0.0/g /etc/init/pandora.conf
+if [ "$SYSTEMD" == "yes" ]; then
+    cp /srv/pandora/etc/systemd/*.service /lib/systemd/system/
+    cp /srv/pandora/etc/tmpfiles.d/*.conf /usr/lib/tmpfiles.d/
+    if [ "$LXC" == "yes" ]; then
+        sed -i s/127.0.0.1/0.0.0.0/g /lib/systemd/system/pandora.service
+    fi
+    for service in pandora pandora-tasks pandora-encoding pandora-cron; do
+        systemctl enable ${service}.service
+    done
+else
+    cp /srv/pandora/etc/init/* /etc/init/
+    if [ "$LXC" == "yes" ]; then
+        sed -i s/127.0.0.1/0.0.0.0/g /etc/init/pandora.conf
+    fi
 fi
 /srv/pandora/ctl start
 
@@ -161,12 +192,26 @@ EOF
 chmod +x /usr/local/bin/fixtime
 fi
 
+if [ "$ID" == "systemd" ]; then
+cat > /usr/local/bin/genissue <<EOF
+#!/bin/bash
+echo Welcome to pan.do/ra. Connect via one of these URLs:
+echo 
+for ip in \$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print \$1 }'); do
+    echo "  http://\$ip/"
+done
+echo
+EOF
+chmod +x /usr/local/bin/genissue
+/usr/local/bin/genissue > /etc/issue
+
+else
 cat > /usr/local/bin/genissue <<EOF
 #!/bin/bash
 HOST=\$(rgrep .local /var/log/syslog | grep "Host name is" | tail -n 1 | awk '{print \$12}' | sed 's/\.$//')
 echo Welcome to pan.do/ra. Connect via one of these URLs:
 echo 
-if [ -n "$HOST" ]; then
+if [ -n "\$HOST" ]; then
     echo "  http://\$HOST/"
 fi
 for ip in \$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print \$1 }'); do
@@ -194,6 +239,7 @@ cat >> /etc/rc.local << EOF
 EOF
 fi
 chmod +x /etc/rc.local
+fi
 
 cat > /home/pandora/.vimrc <<EOF
 set nocompatible

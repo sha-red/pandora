@@ -1,0 +1,24 @@
+[Unit]
+Description=pandora daemon
+
+[Service]
+Type=simple
+Restart=always
+User=pandora
+Group=pandora
+PIDFile=/run/pandora/pandora.pid
+WorkingDirectory=/srv/pandora/pandora
+StandardOutput=syslog
+StandardError=syslog
+ExecStartPre=/srv/pandora/pandora/manage.py compile_pyc
+ExecStart=/srv/pandora/bin/gunicorn_django \
+    -p /run/pandora/pandora.pid \
+    --bind 127.0.0.1:2620 \
+    --timeout 90 \
+    --max-requests 1000 \
+    --log-level info \
+    --workers 5
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

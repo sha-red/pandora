@@ -1,0 +1,21 @@
+[Unit]
+Description=pandora tasks daemon
+
+[Service]
+Type=simple
+Restart=always
+User=pandora
+Group=pandora
+PIDFile=/run/pandora/tasks.pid
+WorkingDirectory=/srv/pandora/pandora
+StandardOutput=syslog
+StandardError=syslog
+ExecStart=/srv/pandora/bin/python /srv/pandora/pandora/manage.py \
+    celeryd \
+    -Q default,celery -n pandora-default \
+    --pidfile /run/pandora/tasks.pid \
+    -l INFO
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

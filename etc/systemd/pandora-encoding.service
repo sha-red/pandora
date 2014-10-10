@@ -1,0 +1,21 @@
+[Unit]
+Description=pandora encoding daemon
+
+[Service]
+Type=simple
+Restart=always
+User=pandora
+Group=pandora
+PIDFile=/run/pandora/encoding.pid
+WorkingDirectory=/srv/pandora/pandora
+StandardOutput=syslog
+StandardError=syslog
+ExecStart=/srv/pandora/bin/python /srv/pandora/pandora/manage.py \
+    celeryd \
+    -Q encoding -n pandora-encoding \
+    --pidfile /run/pandora/encoding.pid \
+    -l INFO
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
