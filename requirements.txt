@@ -10,7 +10,7 @@ django-celery==3.0.23
 #use fork fixing some postgresql issues
 -e git://github.com/bit/django-extensions.git#egg=django_extensions
 -e git+git://github.com/dcramer/django-devserver#egg=django_devserver
-gunicorn>=0.14.3
+gunicorn>=0.14.3,<0.19
 html5lib
 South
 requests>=2.0.0
