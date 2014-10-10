@@ -68,6 +68,10 @@ def avconv_version():
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     version = stderr.split(' ')[2].split('-')[0]
+    try:
+        version = int(version.split('.')[0])
+    except:
+        pass
     return version
 
 def stream(video, target, profile, info, avconv=None, audio_track=0):
@@ -206,7 +210,7 @@ def stream(video, target, profile, info, avconv=None, audio_track=0):
                 '-qdiff', '4'
             ]
             '''
-            if settings.AVCONV_VERSION >= '9':
+            if settings.AVCONV_VERSION >= 9:
                 video_settings += [
                     '-vcodec', 'libx264',
                     '-preset:v', 'medium',
