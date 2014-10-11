@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 if [ "$ID" == "debian" ]; then
     SYSTEMD="yes"
     echo "deb http://ppa.launchpad.net/j/pandora/ubuntu trusty main" > /etc/apt/sources.list.d/j-pandora.list
-    gpg --keyserver subkeys.pgp.net --recv-keys 01975EF3
+    gpg --keyserver keyserver.ubuntu.com --recv-keys 01975EF3
     gpg -a --export 01975EF3 | apt-key add -
 else
     SYSTEMD="no"
@@ -141,10 +141,11 @@ $MANAGE collectstatic -l --noinput
 
 if [ "$SYSTEMD" == "yes" ]; then
     cp /srv/pandora/etc/systemd/*.service /lib/systemd/system/
-    cp /srv/pandora/etc/tmpfiles.d/*.conf /usr/lib/tmpfiles.d/
+    cp /srv/pandora/etc/tmpfiles.d/pandora.conf /usr/lib/tmpfiles.d/
     if [ "$LXC" == "yes" ]; then
         sed -i s/127.0.0.1/0.0.0.0/g /lib/systemd/system/pandora.service
     fi
+    systemd-tmpfiles --create /usr/lib/tmpfiles.d/pandora.conf >/dev/null || true
     for service in pandora pandora-tasks pandora-encoding pandora-cron; do
         systemctl enable ${service}.service
     done
