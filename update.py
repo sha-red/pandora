@@ -55,7 +55,7 @@ repos = {
 }
 
 def reload_notice(base):
-    print '\nYou might need to restart pandora to finish the update:\n\t"sudo %s/ctl reload"\n' % base
+    print '\nPlease restart pan.do/ra to finish the update:\n\t"sudo %s/ctl reload"\n' % base
 
 if __name__ == "__main__":
     base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
@@ -152,11 +152,11 @@ if __name__ == "__main__":
         if pandora_old_revno != pandora_new_revno:
             os.chdir(base)
             run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
-        if not development:
-            print 'pan.do/ra is at the latest stable release, you can run "./update.py dev" to update to the development version'
         os.chdir(join(base, 'pandora'))
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
             print 'Database has changed, please make a backup and run ./update.py db'
+        elif not development:
+            print 'pan.do/ra is at the latest stable release,\nyou can run "./update.py dev" to update to the development version'
         elif current != new:
             reload_notice(base)
