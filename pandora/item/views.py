@@ -559,6 +559,13 @@ def edit(request, data):
                     item.user = new_user
                     update_clips = True
             del data['user']
+        if 'groups' in data:
+            if not request.user.get_profile().capability('canManageUsers'):
+                # Users wihtout canManageUsers can only add/remove groups they are not in
+                groups = set([g.name for g in item.groups.all()])
+                user_groups = set([g.name for g in request.user.groups.all()])
+                other_groups = list(groups - user_groups)
+                data['groups'] = [g for g in data['groups'] if g in user_groups] + other_groups
         r = item.edit(data)
         if r:
             r.wait()
