@@ -430,7 +430,7 @@ pandora.ui.infoView = function(data) {
                                 editMetadata(key, event.value);
                             }
                         }, key == 'groups' ? {
-                            doubleclick: function() {
+                            doubleclick: canEdit ? function() {
                                 setTimeout(function() {
                                     if (window.getSelection) {
                                         window.getSelection().removeAllRanges();
@@ -451,7 +451,7 @@ pandora.ui.infoView = function(data) {
                                         }
                                     })
                                     .open();
-                            }
+                            } : function() {}
                         } : {}))
                     )
             )

@@ -863,7 +863,7 @@ def group_json(g):
     }
 
 
-@capability_required_json('canManageUsers')
+@login_required_json
 def getGroups(request, data):
     '''
         takes {}
@@ -882,7 +882,7 @@ def getGroups(request, data):
 actions.register(getGroups)
 
 
-@capability_required_json('canManageUsers')
+@login_required_json
 def getGroup(request, data):
     '''
         takes {

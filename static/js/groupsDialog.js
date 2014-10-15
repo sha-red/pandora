@@ -21,6 +21,7 @@ pandora.ui.groupsDialog = function(options) {
             width: 584 + Ox.UI.SCROLLBAR_SIZE
         }),
 
+        canManageGroups = pandora.site.capabilities.canManageUsers[pandora.user.level],
         isItem = options.type == 'item',
 
         $content,
@@ -124,6 +125,7 @@ pandora.ui.groupsDialog = function(options) {
         var $group = $groups[index] = Ox.$('<div>')
             .appendTo($content);
         $checkboxes[index] = Ox.Checkbox({
+                disabled: !canManageGroups && !Ox.contains(pandora.user.groups, group.name),
                 value: Ox.contains(selectedGroups, group.name)
             })
             .css({
@@ -137,6 +139,7 @@ pandora.ui.groupsDialog = function(options) {
             })
             .appendTo($group);
         $inputs[index] = Ox.Input({
+                disabled: !canManageGroups,
                 value: group.name,
                 width: 192
             })
@@ -158,8 +161,9 @@ pandora.ui.groupsDialog = function(options) {
                 float: 'left',
                 margin: '4px'
             })
-            .appendTo($group),
+            .appendTo($group);
         $removeButtons[index] = Ox.Button({
+                disabled: !canManageGroups,
                 title: Ox._('Remove Group'),
                 width: 128
             })
@@ -178,6 +182,12 @@ pandora.ui.groupsDialog = function(options) {
     function renderGroups(focusInput) {
         Ox.Request.clearCache('getGroups');
         pandora.api.getGroups(function(result) {
+            if (!canManageGroups) {
+                result.data.groups = result.data.groups.filter(function(group) {
+                    return Ox.contains(pandora.user.groups, group.name) ||
+                        Ox.contains(selectedGroups, group.name);
+                });
+            }
             groups = Ox.sortBy(result.data.groups, 'name');
             $content = Ox.Element().css({margin: '12px'});
             $label = Ox.Label({
@@ -193,6 +203,7 @@ pandora.ui.groupsDialog = function(options) {
                 .appendTo($content);
             groups.forEach(renderGroup);
             $addButton = Ox.Button({
+                    disabled: !canManageGroups,
                     title: Ox._('Add Group'),
                     width: 128
                 })
