@@ -277,6 +277,8 @@ class Item(models.Model):
                             i = ox.escape_html(i)
                         return i
                     self.data[key] = [cleanup(i) for i in data[key]]
+                elif isinstance(data[key], int) or isinstance(data[key], float):
+                    self.data[key] = data[key]
                 else:
                     self.data[key] = ox.escape_html(data[key])
         p = self.save()
