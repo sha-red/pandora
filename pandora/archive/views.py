@@ -493,7 +493,8 @@ def _order_query(qs, sort, prefix=''):
             'id': 'item__public_id',
             'users': 'instances__volume__user__username',
             'resolution': 'width',
-            'path': 'sort_path'
+            'path': 'sort_path',
+            'partTitle': 'part_title',
         }.get(e['key'], e['key'])
         #if operator=='-' and '%s_desc'%key in models.ItemSort.descending_fields:
         #    key = '%s_desc' % key
