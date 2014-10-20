@@ -10,8 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 if [ "$ID" == "debian" ]; then
     SYSTEMD="yes"
     echo "deb http://ppa.launchpad.net/j/pandora/ubuntu trusty main" > /etc/apt/sources.list.d/j-pandora.list
-    gpg --keyserver keyserver.ubuntu.com --recv-keys 01975EF3
-    gpg -a --export 01975EF3 | apt-key add -
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 01975EF3
 else
     SYSTEMD="no"
     if [ "$UBUNTU_VERSION" == "12.04" ]; then
@@ -255,6 +254,7 @@ vmap <C-C> "+y
 
 filetype plugin indent on
 syntax on
+au BufNewFile,BufRead *.jsonc        setf javascript
 
 nmap <C-H> :tabprev<CR>
 nmap <C-L> :tabnext<CR>
