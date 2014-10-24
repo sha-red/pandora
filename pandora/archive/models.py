@@ -469,7 +469,7 @@ class File(models.Model):
                 while language in languages:
                     language = '%s%d' % (lang, n)
                     n += 1
-                profile = '%s.%s' % (resolution, config['formats'][0])
+                profile = '%sp.%s' % (resolution, config['formats'][0])
                 target = os.path.join(tmp, language + '_' + profile)
                 ok, error = extract.stream(media, target, profile, info, ffmpeg,
                         audio_track=i+1)
@@ -477,7 +477,7 @@ class File(models.Model):
                     tinfo = ox.avinfo(target)
                     del tinfo['path']
                     f = File(oshash=tinfo['oshash'], item=self.item)
-                    f.path = self.path
+                    f.path = self.path.rsplit('.', 1)[0] + config['formats'][0]
                     f.info = tinfo
                     f.info['language'] = language
                     f.info['extension'] = config['formats'][0]
