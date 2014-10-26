@@ -237,6 +237,8 @@ class Annotation(models.Model):
 
         if layer or (keys and 'layer' in keys):
             j['layer'] = self.layer
+        if keys and 'item' in keys:
+            j['item'] = self.item.public_id
         if keys:
             _j = {}
             for key in keys:

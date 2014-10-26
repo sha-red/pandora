@@ -58,7 +58,7 @@ def order_query(qs, sort):
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
-        qs = qs.order_by(*order_by, nulls_last=True)
+        qs = qs.order_by(*order_by, nulls_last=True).exclude(value='')
     return qs
 
 def findAnnotations(request, data):
