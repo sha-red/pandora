@@ -234,6 +234,7 @@ pandora.ui.editPanel = function(isEmbed) {
                 pandora.UI.set(editsKey('clip'), data.ids[0]);
             },
             openlink: function(data) {
+                that.options({paused: true});
                 pandora.UI.set('videoPoints.' + data.item, data.annotation ? {
                     annotation: data.annotation.split('/')[1],
                     'in': data['in'],
