@@ -1000,7 +1000,7 @@ class Item(models.Model):
     def update_layer_facet(self, key):
         current_values = [a['value']
             for a in self.annotations.filter(layer=key).distinct().values('value')]
-        current_values = [ox.decode_html(v) for v in current_values]
+        current_values = [ox.decode_html(ox.strip_tags(v)) for v in current_values]
         saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
         removed_values = filter(lambda i: i not in current_values, saved_values)
         if removed_values:
@@ -1049,7 +1049,7 @@ class Item(models.Model):
                 else:
                     current_values = [unicode(current_values)]
             current_values = list(set(current_values))
-            current_values = [ox.decode_html(v) for v in current_values]
+            current_values = [ox.decode_html(ox.strip_tags(v)) for v in current_values]
             saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
             removed_values = filter(lambda i: i not in current_values, saved_values)
             if removed_values:
