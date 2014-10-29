@@ -1228,6 +1228,7 @@ class Item(models.Model):
         torrent = '%s.torrent' % base
         url = "http://%s%s" % (settings.CONFIG['site']['url'], url)
         meta = {
+            'filesystem_encoding': 'utf-8',
             'target': torrent,
             'url-list': url,
         }
