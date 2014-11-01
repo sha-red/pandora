@@ -429,7 +429,13 @@ pandora.ui.textHTML = function(text) {
         scrollToPosition();
         return that;
     };
-
+    that.bindEvent({
+        mousedown: function() {
+            setTimeout(function() {
+                !Ox.Focus.focusedElementIsInput() && that.gainFocus();
+            });
+        }
+    });
     return that;
 
 };
