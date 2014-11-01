@@ -233,7 +233,7 @@ class Document(models.Model):
 
     def get_info(self):
         if self.extension == 'pdf':
-            self.thumbnail()
+            self.thumbnail(1024)
             if self.pages == -1:
                 self.width = -1
                 self.height = -1
