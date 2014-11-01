@@ -244,7 +244,7 @@ class Document(models.Model):
 
     def get_ratio(self):
         if self.extension == 'pdf':
-            image = self.thumbnail()
+            image = self.thumbnail(1024)
             try:
                 size = Image.open(image).size
             except:
