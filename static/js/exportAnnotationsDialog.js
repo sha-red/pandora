@@ -34,8 +34,7 @@ pandora.ui.exportAnnotationsDialog = function(options) {
             change: function() {
                 updateStatus();
                 that.enableButton('export');
-                !$link && addLink();
-                updateLink();
+                !$link ? addLink() : updateLink();
             }
         })
         .appendTo($content),
@@ -100,10 +99,10 @@ pandora.ui.exportAnnotationsDialog = function(options) {
 
     function addLink() {
         var $button = $(Ox.last(that.find('.OxButton')))
-        updateLink();
         $button.wrap($('<a>'));
         // On wrap, a reference to the link would *not* be the link in the DOM
         $link = $($button.parent());
+        updateLink();
     }
 
     function updateLink() {
