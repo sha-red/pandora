@@ -359,38 +359,35 @@ pandora.ui.editPanel = function(isEmbed) {
     }
 
     function renderEdits() {
-        that = Ox.IconList({
-            borderRadius: 16,
-            defaultRatio: 1,
-            draggable: true,
-            item: function(data, sort, size) {
-                size = size || 128;
-                var ui = pandora.user.ui,
-                    url = pandora.getMediaURL('/edit/' + data.id + '/icon' + size + '.jpg?' + data.modified),
-                    info = Ox.formatDuration(data.duration);
-                return {
-                    height: size,
-                    id: data.id,
-                    title: data.name,
-                    info: info,
-                    url: url,
-                    width: size,
-                };
-            },
-            items: function(data, callback) {
-                pandora.api.findEdits(data, callback);
-                return Ox.clone(data, true);
-            },
-            keys: ['id', 'modified', 'name', 'duration'],
-            size: 128,
-            sort: [{key: 'id', operator: '+'}],
-            unique: 'id'
-        })
-        .addClass('OxMedia')
-        .bindEvent({
-            open: function(data) {
-                pandora.UI.set('edit', data.ids[0]);
-            }
+        that.css({
+            'overflow-y': 'auto'
+        });
+        var $content = Ox.Element()
+                .css({padding: '16px'})
+                .appendTo(that),
+            isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level];
+        pandora.api.getPage({name: 'edits'}, function(result) {
+            Ox.EditableContent({
+                    clickLink: pandora.clickLink,
+                    editable: isEditable,
+                    tooltip: isEditable ? pandora.getEditTooltip() : '',
+                    type: 'textarea',
+                    placeholder: isEditable ? Ox._('Doubleclick to insert text') : '',
+                    value: result.data.text
+                })
+                .css({
+                    width: '100%'
+                })
+                .bindEvent({
+                    submit: function(data) {
+                        Ox.Request.clearCache('getPage');
+                        pandora.api.editPage({
+                            name: 'edits',
+                            text: data.value
+                        });
+                    }
+                })
+                .appendTo($content);
         });
     }
 
