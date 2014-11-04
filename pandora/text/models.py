@@ -66,7 +66,7 @@ class Text(models.Model):
             return cls.objects.get(user__username=username, name=name)
     
     def get_absolute_url(self):
-        return '/texts/%s' % quote(self.get_id().replace('_', '\t').replace(' ', '_')).replace('/', '%2F')
+        return '/texts/%s' % quote(self.get_id().replace('_', '\t').replace(' ', '_').encode('utf-8')).replace('/', '%2F')
 
     def get_absolute_pdf_url(self):
         return '%s/text.pdf' % self.get_absolute_url()
