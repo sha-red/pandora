@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 import time
 import math
+import shutil
 from glob import glob
 
 import numpy as np
@@ -283,12 +284,17 @@ def stream(video, target, profile, info, avconv=None, audio_track=0):
           + video_settings
 
     if format == 'webm':
-        cmd += ['-f', 'webm', target]
+        enc_target = target + '.tmp.webm'
+    else:
+        enc_target = target
+
+    if format == 'webm':
+        cmd += ['-f', 'webm', enc_target]
     elif format == 'mp4':
         #mp4 needs postprocessing(qt-faststart), write to temp file
-        cmd += ["%s.mp4" % target]
+        cmd += ["%s.mp4" % enc_target]
     else:
-        cmd += [target]
+        cmd += [enc_target]
 
     #print cmd
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
@@ -298,20 +304,24 @@ def stream(video, target, profile, info, avconv=None, audio_track=0):
     stdout, stderr = p.communicate()
 
     if p.returncode != 0:
-        t = "%s.mp4" % target if format == 'mp4' else target
+        t = "%s.mp4" % enc_target if format == 'mp4' else enc_target
         if os.path.exists(t):
             os.unlink(t)
+        if os.path.exists(target):
+            os.unlink(target)
         stdout = stdout.replace('\r\n', '\n').replace('\r', '\n')
         return False, stdout
     if format == 'mp4':
-        cmd = ['qt-faststart', "%s.mp4" % target, target]
+        cmd = ['qt-faststart', "%s.mp4" % enc_target, enc_target]
         #print cmd
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                                   stdout=open('/dev/null', 'w'),
                                   stderr=subprocess.STDOUT,
                                   close_fds=True)
         p.communicate()
-        os.unlink("%s.mp4" % target)
+        os.unlink("%s.mp4" % enc_target)
+    if p.returncode == 0 and enc_target != target:
+        shutil.move(enc_target, target)
     return True, None
 
 
