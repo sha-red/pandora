@@ -11,10 +11,12 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 
 from ox.django.api import actions
 from item import utils
+from user.decorators import capability_required_json
 
 import models
 
-@admin_required_json
+
+@capability_required_json('canManageTitlesAndNames')
 def editTitle(request, data):
     '''
         takes {

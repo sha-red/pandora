@@ -13,8 +13,9 @@ from item import utils
 
 import models
 import tasks
+from user.decorators import capability_required_json
 
-@admin_required_json
+@capability_required_json('canManageTitlesAndNames')
 def editName(request, data):
     '''
         takes {
