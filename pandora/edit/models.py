@@ -316,7 +316,7 @@ class Edit(models.Model):
         _map = {
             'posterFrames': 'poster_frames'
         }
-        if 'clips' in keys or 'duration' in keys:
+        if 'clips' in keys:
             clips = self.get_clips_json(user)
 
         for key in keys:
@@ -330,7 +330,11 @@ class Edit(models.Model):
             elif key == 'clips':
                 response[key] = clips
             elif key == 'duration':
-                response[key] = sum([c['duration'] for c in clips])
+                if self.type == 'static':
+                    response[key] = sum([(c['annotation__end'] or c['end']) - (c['annotation__start'] or c['start'])
+                        for c in self.get_clips(user).values('start', 'end', 'annotation__start', 'annotation__end')])
+                else:
+                    response[key] = sum([c['end'] - c['start'] for c in self.get_clips(user).values('start', 'end')])
             elif key == 'editable':
                 response[key] = self.editable(user)
             elif key == 'user':
