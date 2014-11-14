@@ -390,13 +390,14 @@ def melt_frame_cmd(video, frame, position, height=128, info=None):
         video,
         'in=%d' % position, 'out=%d' % position,
         '-consumer', 'avformat:%s' % frame,
-        'vcodec=%s' % vcodec
+        'vcodec=%s' % vcodec,
+        'progressive=1'
     ]
     if height:
         dar = AspectRatio(info['video'][0]['display_aspect_ratio'])
         width = int(dar * height)
         width += width % 2
-        cmd += ['-s', '%sx%s' % (width, height)]
+        cmd += ['s=%sx%s' % (width, height)]
     return cmd
 
 def frame_direct(video, target, position):
