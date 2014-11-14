@@ -482,18 +482,21 @@ class Item(models.Model):
         return streams[0] if streams else None
 
     def get_posters(self):
-        url = self.prefered_poster_url()
-        external_posters = self.external_data.get('posters', {})
-        services = external_posters.keys()
         index = []
-        for service in settings.POSTER_PRECEDENCE:
-            if service in services:
-                index.append(service)
-        for service in services:
-            if service not in index:
-                index.append(service)
-        if settings.URL not in index:
-            index.append(settings.URL)
+        if settings.DATA_SERVICE:
+            url = self.prefered_poster_url()
+            external_posters = self.external_data.get('posters', {})
+            services = external_posters.keys()
+            for service in settings.POSTER_PRECEDENCE:
+                if service in services:
+                    index.append(service)
+            for service in services:
+                if service not in index:
+                    index.append(service)
+            if settings.URL not in index:
+                index.append(settings.URL)
+        else:
+            external_posters = []
 
         posters = []
         poster = self.path('siteposter.jpg')
@@ -1310,14 +1313,15 @@ class Item(models.Model):
             f.write(data)
 
     def prefered_poster_url(self):
-        external_posters = self.external_data.get('posters', {})
-        service = self.poster_source
-        if service and service != settings.URL and service in external_posters:
-            return external_posters[service][0]['url']
-        if not service:
-            for service in settings.POSTER_PRECEDENCE:
-                if service in external_posters:
-                    return external_posters[service][0]['url']
+        if settings.DATA_SERVICE:
+            external_posters = self.external_data.get('posters', {})
+            service = self.poster_source
+            if service and service != settings.URL and service in external_posters:
+                return external_posters[service][0]['url']
+            if not service:
+                for service in settings.POSTER_PRECEDENCE:
+                    if service in external_posters:
+                        return external_posters[service][0]['url']
         return None
 
     def make_timeline(self):
