@@ -1394,16 +1394,17 @@ class Item(models.Model):
         else:
             if 'videoRatio' in self.json and self.sort.duration:
                 width, height = self.json['resolution']
-                pos = self.sort.duration / 2
-                for p in map(int, [pos/2, pos, pos+pos/2]):
-                    path = self.frame(p, height)
-                    if path:
-                        frames.append({
-                            'position': p,
-                            'path': path,
-                            'width': width,
-                            'height': height,
-                        })
+                if width and height:
+                    pos = self.sort.duration / 2
+                    for p in map(int, [pos/2, pos, pos+pos/2]):
+                        path = self.frame(p, height)
+                        if path:
+                            frames.append({
+                                'position': p,
+                                'path': path,
+                                'width': width,
+                                'height': height,
+                            })
         return frames
 
     def select_frame(self):
