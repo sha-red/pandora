@@ -69,6 +69,7 @@ pandora.ui.importAnnotationsDialog = function(options) {
         .bindEvent({
             change: function(data) {
                 $status.empty();
+                data.value.length && $formatSelect.options({value: Ox.last(data.value[0].name.split('.'))});
                 that[
                     data.value.length ? 'enableButton' : 'disableButton'
                 ]('import');
