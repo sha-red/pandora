@@ -1686,12 +1686,15 @@ pandora.getSpan = function(state, val, callback) {
                 if (result.data.items.length) {
                     span = result.data.items[0];
                     annotation = span.id.split('/')[1];
-                    type == 'annotation' && pandora.UI.set('videoPoints.' + state.item, {
-                        annotation: annotation,
-                        'in': span['in'],
-                        out: span.out,
-                        position: span['in']
-                    });
+                    // This is an optimization to make sure the video view
+                    // immediately loads at the correct position
+                    if (type == 'annotation') {
+                        pandora.user.ui.videoPoints[state.item] = {
+                            'in': span['in'],
+                            out: span.out,
+                            position: span['in']
+                        };
+                    }
                 }
                 callback(
                     !span ? ''
