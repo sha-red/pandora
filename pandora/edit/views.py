@@ -27,20 +27,26 @@ def get_edit_or_404_json(id):
 @login_required_json
 def addClips(request, data):
     '''
-        takes {
-            edit: string,
-            index: int,
-            clips: []
-                item: string,
+    Adds one or more clips to an edit
+    takes {
+        edit: string (edit id),
+        index: int (position, optional),
+        clips: [
+            {
+                item: string (item id),
                 in: float,
                 out: float,
-                annotation: string
-        }
-        add clips with item/in/out or annotation to edit with id
-        clips are added at index or end if index is not provided
-        (annoation id is in the form item/annotation)
-        returns {
-        }
+            },
+            {
+                annotation: string ("item_id/annotation_id")
+            }
+            ...
+        ]
+    }
+    returns {}
+    Clips are either {item, in, out} or {annotation}. If index is missing,
+    clips will be inserted at the end of the edit.
+    FIXME: Does this really return nothing?
     '''
     response = json_response()
     edit = get_edit_or_404_json(data['edit'])

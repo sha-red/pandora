@@ -112,17 +112,18 @@ actions.register(findAnnotations)
 @login_required_json
 def addAnnotation(request, data):
     '''
-        takes {
-            item: public_id,
-            layer: layerId,
-            in: float,
-            out: float,
-            value: string
-        }
-        returns {
-            id: string, //id of new annotation
-            ...
-        }
+    Adds a single annotation
+    takes {
+        item: string, (item id)
+        layer: string, (annotation layer id)
+        in: float,
+        out: float,
+        value: string
+    }
+    returns {
+        id: string, (annotation id)
+        ...
+    }
     '''
     for key in ('item', 'layer', 'in', 'out', 'value'):
         if key not in data:
@@ -152,18 +153,23 @@ actions.register(addAnnotation, cache=False)
 @login_required_json
 def addAnnotations(request, data):
     '''
-        takes {
-            item: public_id,
-            layer: layerId,
-            annotations: [{
+    Adds multiple annotations
+    takes {
+        item: string (item id),
+        layer: string (annotation layer id), 
+        annotations: [
+            {
                 in: float,
                 out: float,
                 value: string
-            }, ...]
-        }
-        returns {
-            taskId: string
-        }
+            },
+            ...
+        ]
+    }
+    returns {
+        taskId: string
+    }
+    FIXME: Explain what to do with task id
     '''
     for key in ('item', 'layer', 'annotations'):
         if key not in data:

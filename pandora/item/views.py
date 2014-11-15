@@ -497,16 +497,16 @@ actions.register(get)
 @login_required_json
 def add(request, data):
     '''
-        takes {
-            title: string, //(optional)
-        }
-        returns {
-            id:
-            name:
-            ...
-        }
+    Adds a new item (without video)
+    takes {
+        title: string (optional)
+    }
+    returns {
+        id: string,
+        title: string,
+        ...
+    }
     '''
-
     if not request.user.get_profile().capability('canAddItems'):
         response = json_response(status=403, text='permissino denied')
     else:
