@@ -329,12 +329,14 @@ pandora.ui.listInfo = function() {
     }
 
     function getIconCSS() {
-        var size = Math.round(pandora.user.ui.sidebarSize / 2);
-        return {
+        var list = pandora.user.ui.section == 'items' ? pandora.user.ui._list : ui[folderItem.toLowerCase()],
+            size = Math.round(pandora.user.ui.sidebarSize / 2);
+        return Ox.extend({
             width: size + 'px',
-            height: size + 'px',
+            height: size + 'px'
+        }, list ? {
             borderRadius: Math.round(size / 4) + 'px'
-        };
+        } : {});
     }
 
     that.resizeInfo = function() {
