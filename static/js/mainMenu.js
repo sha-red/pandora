@@ -484,7 +484,7 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'advancedfind') {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 } else if (data.id == 'clearquery') {
-                    pandora.UI.set({find: conditions: [], operator: '&'});
+                    pandora.UI.set({find: {conditions: [], operator: '&'}});
                 } else if (data.id == 'clearfilters') {
                     pandora.$ui.filters.clearFilters();
                 } else if (data.id == 'findsimilar') {
