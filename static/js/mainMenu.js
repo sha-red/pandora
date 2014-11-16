@@ -736,7 +736,7 @@ pandora.ui.mainMenu = function() {
             Ox.Fullscreen.toggle();
         },
         key_alt_control_shift_f: function() {
-            pandora.UI.set(find: {conditions: [], operator: '&'});
+            pandora.UI.set({find: {conditions: [], operator: '&'}});
         },
         key_backtick: function() {
             changeFocus(1);
