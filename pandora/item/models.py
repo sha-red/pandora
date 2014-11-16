@@ -1197,11 +1197,13 @@ class Item(models.Model):
         size = 0
         duration = 0.0
         if streams.count() == 1:
-            url =  "%s/torrent/%s.webm" % (self.get_absolute_url(),
-                                           quote(filename.encode('utf-8')))
-            video = "%s.webm" % base
             v = streams[0]
             media_path = v.media.path
+            extension = media_path.split('.')[-1]
+            url =  "%s/torrent/%s.%s" % (self.get_absolute_url(),
+                                         quote(filename.encode('utf-8')),
+                                         extension)
+            video = "%s.%s" % (base, extension)
             if isinstance(media_path, unicode):
                 media_path = media_path.encode('utf-8')
             if isinstance(video, unicode):
@@ -1215,9 +1217,10 @@ class Item(models.Model):
             part = 1
             ox.makedirs(base)
             for v in streams:
-                video = "%s/%s.Part %d.webm" % (base, filename, part)
-                part += 1
                 media_path = v.media.path
+                extension = media_path.split('.')[-1]
+                video = "%s/%s.Part %d.%s" % (base, filename, part, extension)
+                part += 1
                 if isinstance(media_path, unicode):
                     media_path = media_path.encode('utf-8')
                 if isinstance(video, unicode):
