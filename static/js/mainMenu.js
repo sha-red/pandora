@@ -723,17 +723,12 @@ pandora.ui.mainMenu = function() {
 
     Ox.Event.bind({
         key_alt_control_f: function() {
-            if (!pandora.hasDialogOrScreen() && pandora.getItemIdAndPosition()) {
-                pandora.$ui.similarClipsDialog = pandora.ui.similarClipsDialog().open();
-            }
+            Ox.Fullscreen.toggle();
         },
         key_alt_control_shift_a: function() {
             if (!pandora.hasDialogOrScreen() && !ui.item) {
                 pandora.$ui.filters.clearFilters();
             }
-        },
-        key_alt_control_f: function() {
-            Ox.Fullscreen.toggle();
         },
         key_alt_control_shift_f: function() {
             pandora.UI.set({find: {conditions: [], operator: '&'}});
