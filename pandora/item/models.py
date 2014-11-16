@@ -193,6 +193,12 @@ class Item(models.Model):
             return self.data[key]
         if self.external_data and key in self.external_data:
             return self.external_data[key]
+        item_key = utils.get_by_id(settings.CONFIG['itemKeys'], key)
+        if item_key and 'value' in item_key \
+            and item_key['value'].get('type') == 'map' \
+            and self.get(item_key['value']['key']):
+            value = re.compile(item_key['value']['map']).findall(self.get(item_key['value']['key']))
+            return value[0] if value else default
         return default
 
     def access(self, user):
@@ -1051,6 +1057,16 @@ class Item(models.Model):
                     current_values = []
                 else:
                     current_values = [unicode(current_values)]
+            filter_map = utils.get_by_id(settings.CONFIG['itemKeys'], key).get('filterMap')
+            if filter_map:
+                filter_map = re.compile(filter_map)
+                _current_values = []
+                for value in current_values:
+                    value = filter_map.findall(value)
+                    if value:
+                        _current_values.append(value[0])
+                current_values = _current_values
+
             current_values = list(set(current_values))
             current_values = [ox.decode_html(ox.strip_tags(v)) for v in current_values]
             saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
