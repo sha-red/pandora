@@ -94,10 +94,6 @@ pandora.ui.mainMenu = function() {
                             { id: 'resetcolumns', title: Ox._('Reset Layout'), disabled: true }
                         ] },
                         { id: 'filters', title: Ox._('Filters'), disabled: ui.section != 'items', items: [
-                            { id: 'clearfilters', title: Ox._('Clear Filters'), disabled: Ox.sum(ui._filterState.map(function(filterState) {
-                                return filterState.selected.length;
-                            })) == 0, keyboard: 'shift alt control a' },
-                            {},
                             { group: 'filters', min: 5, max: 5, items: pandora.site.filters.map(function(filter) {
                                 return Ox.extend({
                                     checked: Ox.getIndexById(ui.filters, filter.id) > -1
@@ -173,7 +169,7 @@ pandora.ui.mainMenu = function() {
                             title: Ox._((fullscreenState ? 'Exit' : 'Enter') + ' Fullscreen'),
                             disabled: fullscreenState === void 0,
                             keyboard: /^Mac/.test(window.navigator.platform)
-                                ? 'shift alt control f'
+                                ? 'shift alt f'
                                 : 'F11'
 
                         },
@@ -458,8 +454,6 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'clearhistory') {
                     fromMenu = true;
                     pandora.history.clear();
-                } else if (data.id == 'clearfilters') {
-                    pandora.$ui.filters.clearFilters();
                 } else if (data.id == 'resetfilters') {
                     pandora.UI.set({
                         filters: pandora.site.user.ui.filters
@@ -489,6 +483,10 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.embedDialog = pandora.ui.embedDialog().open();
                 } else if (data.id == 'advancedfind') {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
+                } else if (data.id == 'clearquery') {
+                    pandora.UI.set({find: conditions: [], operator: '&'});
+                } else if (data.id == 'clearfilters') {
+                    pandora.$ui.filters.clearFilters();
                 } else if (data.id == 'findsimilar') {
                     pandora.$ui.similarClipsDialog = pandora.ui.similarClipsDialog().open();
                 } else if (data.id == 'documents') {
@@ -575,6 +573,7 @@ pandora.ui.mainMenu = function() {
                 that[action]('deletelist');
                 that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
                 that.replaceMenu('itemMenu', getItemMenu());
+                that[ui.find.conditions.length ? 'enableItem' : 'disableItem']('clearquery');
                 that[Ox.sum(ui._filterState.map(function(filterState) {
                     return filterState.selected.length;
                 })) > 0 ? 'enableItem' : 'disableItem']('clearfilters');
@@ -733,8 +732,11 @@ pandora.ui.mainMenu = function() {
                 pandora.$ui.filters.clearFilters();
             }
         },
-        key_alt_control_shift_f: function() {
+        key_alt_control_f: function() {
             Ox.Fullscreen.toggle();
+        },
+        key_alt_control_shift_f: function() {
+            pandora.UI.set(find: {conditions: [], operator: '&'});
         },
         key_backtick: function() {
             changeFocus(1);
@@ -927,7 +929,12 @@ pandora.ui.mainMenu = function() {
             ], disabled: ui.section != 'items' },
             { id: 'advancedfind', title: Ox._('Advanced Find...'), keyboard: 'shift control f', disabled: ui.section != 'items' },
             {},
-            { id: 'findsimilar', title: Ox._('Find Similar Clips...'), keyboard: 'alt control f', disabled: !pandora.getItemIdAndPosition() }
+            { id: 'clearquery', title: Ox._('Clear Query'), disabled: ui.section != 'items' || ui.find.conditions.length == 0, keyboard: 'shift alt control f' },
+            { id: 'clearfilters', title: Ox._('Clear Filters'), disabled: ui.section != 'items' || Ox.sum(ui._filterState.map(function(filterState) {
+                return filterState.selected.length;
+            })) == 0, keyboard: 'shift alt control a' },
+            {},
+            { id: 'findsimilar', title: Ox._('Find Similar Clips...'), disabled: !pandora.getItemIdAndPosition() }
         ] };
     }
 
