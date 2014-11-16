@@ -67,7 +67,6 @@ apt-get install -y \
     $LIBAVCODEC_EXTRA \
     libav-tools \
     ffmpeg2theora \
-    melt \
     mkvtoolnix \
     gpac \
     imagemagick \

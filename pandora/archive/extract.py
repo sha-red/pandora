@@ -355,8 +355,8 @@ def frame(video, frame, position, height=128, redo=False, info=None):
         if redo or not exists(frame):
             ox.makedirs(folder)
             if video.endswith('.mp4'):
-                if settings.USE_MELT:
-                    cmd = melt_frame_cmd(video, frame, position, height, info)
+                if settings.FFMPEG:
+                    cmd = ffmpeg_frame_cmd(video, frame, position, height)
                 else:
                     cmd = avconv_frame_cmd(video, frame, position, height)
             else:
@@ -377,27 +377,15 @@ def avconv_frame_cmd(video, frame, position, height=128):
     cmd += [frame]
     return cmd
 
-def melt_frame_cmd(video, frame, position, height=128, info=None):
-    if not info:
-        info = ox.avinfo(video)
-    fps = float(AspectRatio(info['video'][0]['framerate']))
-    position = int(position * fps)
-    format = frame.split('.')[-1]
-    vcodec = 'mjpeg' if format == 'jpg' else 'png'
+def ffmpeg_frame_cmd(video, frame, position, height=128):
     cmd = [
-        'melt',
-        '-silent',
-        video,
-        'in=%d' % position, 'out=%d' % position,
-        '-consumer', 'avformat:%s' % frame,
-        'vcodec=%s' % vcodec,
-        'progressive=1'
+        settings.FFMPEG, '-y',
+        '-ss', str(position),
+        '-i', video,
+        '-an', '-frames:v', '1',
+        '-vf', 'scale=-1:%s' % height,
+        frame
     ]
-    if height:
-        dar = AspectRatio(info['video'][0]['display_aspect_ratio'])
-        width = int(dar * height)
-        width += width % 2
-        cmd += ['s=%sx%s' % (width, height)]
     return cmd
 
 def frame_direct(video, target, position):
