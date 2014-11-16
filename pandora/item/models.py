@@ -288,7 +288,7 @@ class Item(models.Model):
                 else:
                     self.data[key] = ox.escape_html(data[key])
         p = self.save()
-        if not settings.USE_IMDB and filter(lambda k: k in ('title', 'director', 'year'), data):
+        if not settings.USE_IMDB and filter(lambda k: k in self.poster_keys, data):
             p = tasks.update_poster.delay(self.public_id)
         return p
 
@@ -1608,6 +1608,7 @@ def delete_item(sender, **kwargs):
 pre_delete.connect(delete_item, sender=Item)
 
 Item.facet_keys = []
+Item.poster_keys = []
 for key in settings.CONFIG['itemKeys']:
     if 'autocomplete' in key and not 'autocompleteSortKey' in key or \
             key.get('filter'):
@@ -1615,7 +1616,8 @@ for key in settings.CONFIG['itemKeys']:
     elif key.get('type') == 'layer' and \
         utils.get_by_id(settings.CONFIG['layers'], key['id']).get('type') == 'string':
         Item.facet_keys.append(key['id'])
-
+    if key['id'] in ('title', 'director', 'year') or key.get('poster'):
+        Item.poster_keys.append(key['id'])
 
 Item.person_keys = []
 for key in settings.CONFIG['itemKeys']:
