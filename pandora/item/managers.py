@@ -132,7 +132,7 @@ def parseCondition(condition, user, owner=None):
     elif key_type == 'boolean':
         q = Q(**{'find__key': k, 'find__value': v})
         if exclude:
-            q = ~q
+            q = ~Q(id__in=models.Item.objects.filter(q))
         return q
     elif key_type == "string":
         in_find = not k.startswith('public_id')
@@ -158,7 +158,7 @@ def parseCondition(condition, user, owner=None):
         else:
             q = Q(**{value_key: v})
         if exclude:
-            q = ~q
+            q = ~Q(id__in=models.Item.objects.filter(q))
         return q
     elif k == 'list':
         q = Q(id=0)
