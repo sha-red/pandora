@@ -158,12 +158,8 @@ class Annotation(models.Model):
             self.sortvalue = None
             self.languages = None
 
-        #no clip or update clip
-        if self.layer in settings.CONFIG.get('clipLayers', []):
-            if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
-                self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
-        elif self.clip:
-            self.clip = None
+        if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
+            self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
 
         super(Annotation, self).save(*args, **kwargs)
         if set_public_id:
