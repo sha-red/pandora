@@ -43,7 +43,7 @@ pandora.ui.filter = function(id) {
                                 )
                             : value
                     },
-                    operator: filter.type == 'string' ? '+' : '-',
+                    operator: filter.type == 'string' || filter.type == 'layer' ? '+' : '-',
                     title: title,
                     visible: true,
                     width: pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE
