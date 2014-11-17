@@ -6,7 +6,7 @@ from django.conf import settings
 
 from ox.utils import json
 from ox.django.decorators import login_required_json
-from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response, HttpErrorJson
 
 
 from ox.django.api import actions
@@ -16,6 +16,14 @@ from item.models import Item
 
 import models
 from tasks import update_item, add_annotations
+
+def get_annotation_or_404_json(id):
+    try:
+        return models.Annotation.get(id)
+    except models.Annotation.DoesNotExist:
+        response = {'status': {'code': 404,
+                               'text': 'Annotation not found'}}
+        raise HttpErrorJson(response)
 
 def parse_query(data, user):
     query = {}
@@ -108,6 +116,22 @@ def findAnnotations(request, data):
     return render_to_json_response(response)
 actions.register(findAnnotations)
 
+def getAnnotation(request, data):
+    '''
+        takes {
+            id: string,
+            keys: [string]
+        }
+        returns {
+            key: value
+        }
+    '''
+    response = json_response({})
+    data['keys'] = data.get('keys', [])
+    annotation = get_annotation_or_404_json(data['id'])
+    response['data'] = annotation.json(keys=data['keys'], user=request.user)
+    return render_to_json_response(response)
+actions.register(getAnnotation)
 
 @login_required_json
 def addAnnotation(request, data):

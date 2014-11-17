@@ -110,6 +110,10 @@ class Annotation(models.Model):
                 return True
         return False
 
+    @classmethod
+    def get(cls, id):
+        return cls.objects.get(public_id=id)
+
     def set_public_id(self):
         if self.id:
             public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count() + 1
