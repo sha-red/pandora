@@ -49,7 +49,7 @@ class MetaClip:
             else:
                 self.sortvalue = None
             self.findvalue = '\n'.join(filter(None, [a.findvalue for a in self.annotations.all()]))
-            for l in settings.CONFIG['clipLayers']:
+            for l in [k['id'] for k in settings.CONFIG['layers']]:
                 setattr(self, l, self.annotations.filter(layer=l).count()>0)
         models.Model.save(self, *args, **kwargs)
 
@@ -73,11 +73,11 @@ class MetaClip:
                     del j[key]
             #needed here to make item find with clips work
             if 'annotations' in keys:
-                annotations = self.annotations.filter(layer__in=settings.CONFIG['clipLayers'])
+                #annotations = self.annotations.filter(layer__in=settings.CONFIG['clipLayers'])
+                annotations = self.annotations.all()
                 if qs:
                     annotations = annotations.filter(qs)
-                j['annotations'] = [a.json(keys=['value', 'id', 'layer'])
-                                    for a in annotations]
+                j['annotations'] = [a.json(keys=['value', 'id', 'layer']) for a in annotations]
             if 'layers' in keys:
                 j['layers'] = self.get_layers()
             if 'cuts' in keys:
@@ -184,7 +184,7 @@ attrs = {
     'sortvalue': models.CharField(max_length=1000, null=True, db_index=True),
     'findvalue': models.TextField(null=True, db_index=settings.DB_GIN_TRGM),
 }
-for name in settings.CONFIG['clipLayers']:
+for name in [k['id'] for k in settings.CONFIG['layers']]:
     attrs[name] = models.BooleanField(default=False, db_index=True)
 
 Clip = type('Clip', (MetaClip,models.Model), attrs)

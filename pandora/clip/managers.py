@@ -7,7 +7,7 @@ from django.conf import settings
 
 from ox.django.query import QuerySet
 
-from item.utils import decode_id
+from item.utils import decode_id, get_by_id
 
 
 def parseCondition(condition, user):
@@ -38,7 +38,7 @@ def parseCondition(condition, user):
     op = condition.get('operator')
     if not op:
         op = ''
-    if k in settings.CONFIG.get('clipLayers', []):
+    if get_by_id(settings.CONFIG['layers'], k):
         return parseCondition({'key': 'annotations__findvalue',
                                'value': v,
                                'operator': op}, user) \
@@ -144,7 +144,8 @@ class ClipManager(Manager):
         return QuerySet(self.model)
 
     def filter_annotations(self, data, user):
-        keys = settings.CONFIG['clipLayers'] + ['annotations', 'text', '*']
+        layer_ids = [k['id'] for k in settings.CONFIG['layers']]
+        keys = layer_ids + ['annotations', 'text', '*']
         conditions = data.get('query', {}).get('conditions', [])
         conditions = filter(lambda c: c['key'] in keys, conditions)
         operator = data.get('query', {}).get('operator', '&')
@@ -163,7 +164,7 @@ class ClipManager(Manager):
             if isinstance(v, unicode):
                 v = unicodedata.normalize('NFKD', v).lower()
             q = Q(**{key: v})
-            if condition['key'] in settings.CONFIG['clipLayers']:
+            if condition['key'] in layer_ids:
                 q = q & Q(layer=condition['key'])
             return q
         conditions = map(parse, conditions)
@@ -208,7 +209,8 @@ class ClipManager(Manager):
         if conditions:
             qs = qs.filter(conditions)
         if 'keys' in data:
-            for l in filter(lambda k: k in settings.CONFIG['clipLayers'], data['keys']):
+            layer_ids = [k['id'] for k in settings.CONFIG['layers']]
+            for l in filter(lambda k: k in layer_ids, data['keys']):
                 qs = qs.filter(**{l: True})
         #anonymous can only see public clips
         if not user or user.is_anonymous():
