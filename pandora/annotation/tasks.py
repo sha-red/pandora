@@ -100,7 +100,7 @@ def update_item(id):
     #cleanup orphaned clips
     Clip.objects.filter(item__id=a.item.id, annotations__id=None).delete()
     #update facets if needed
-    with transaction.commit_on_sucess():
+    with transaction.commit_on_success():
         if filter(lambda f: f['id'] == a.layer and f.get('filter'), settings.CONFIG['itemKeys']):
             a.item.update_layer_facet(a.layer)
         Item.objects.filter(id=a.item.id).update(modified=a.modified)
