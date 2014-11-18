@@ -99,6 +99,44 @@ def parse_query(data, user):
 
 def find(request, data):
     '''
+    Finds items
+    takes {
+        clipsQuery: ...,
+        keys: [string], // list of keys to return (optional)
+        positions: [string], // list of item ids (optional)
+        query: { // query object
+            conditions: [{ // list of condition objects
+                key: string,
+                operator: string, // comparison operator, see below
+                value: string
+            }, { // or query objects (nested subconditions)
+                query: {
+                    conditions: [{}],
+                    operator: string
+                }
+            }],
+            operator: string // logical operator, '&' or '|'
+        },
+        sort: [{ // list of sort objects
+            key: string, // item key
+            operator: string // sort order, '+' or '-'
+        }],
+        range: [int, int] // from, to
+    }
+    returns {
+        items: [{
+            id: string, // item id
+            ...
+        }]
+    } or { // if `keys` is missing
+        items: int // total number of items
+    } or { // if `positions` is set
+        ...
+    }
+    Comparison operators are '=' (contains) '==' (is), '^' (starts with),
+    '$' (ends with), '<', '<=', '>', or '>=', each optionally prefixed with '!'
+    (not).
+
         Example: 
             find({
                 query:{
@@ -109,13 +147,6 @@ def find(request, data):
                 range: [0, 10],
                 sort: [{key: 'title', operator: '+'}]
             })
-
-        takes {
-            'query': query,
-            'sort': array,
-            'range': array
-            clipsQuery: ...
-        }
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -306,16 +337,16 @@ actions.register(find)
 
 def autocomplete(request, data):
     '''
-        takes {
-            key: string,
-            value: string,
-            operator: string // '=', '==', '^', '$'
-            query: object // item query to limit results
-            range: [int, int]
-        }
-        returns {
-            items: [string, ...] //array of matching values
-        }
+    takes {
+        key: string,
+        value: string,
+        operator: string // '=', '==', '^', '$'
+        query: object // item query to limit results
+        range: [int, int]
+    }
+    returns {
+        items: [string, ...] // array of matching values
+    }
     '''
     if not 'range' in data:
         data['range'] = [0, 10]
@@ -369,12 +400,12 @@ actions.register(autocomplete)
 
 def findId(request, data):
     '''
-        takes {
-            'id': string
-            'title': string
-            'director': [string]
-            'year': int
-        }
+    takes {
+        'id': string
+        'title': string
+        'director': [string]
+        'year': int
+    }
     '''
     response = json_response({})
     response['data']['items'] = []
@@ -397,16 +428,16 @@ actions.register(findId)
 
 def getMetadata(request, data):
     '''
-        takes {
-            id: string,
-            keys: [string]
-        }
+    Gets metadata from an external service
+    takes {
+        id: string,
+        keys: [string]
+    }
 
-        returns {
-           key: value
-           ..
-        }
-
+    returns {
+       key: value
+       ..
+    }
     '''
     response = json_response({})
     if settings.DATA_SERVICE:
