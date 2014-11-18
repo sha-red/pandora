@@ -24,6 +24,7 @@
         "canAddItems": {"staff": true, "admin": true},
         "canDownloadVideo": {"guest": -1, "member": -1, "friend": -1, "staff": -1, "admin": -1},
         "canEditAnnotations": {"staff": true, "admin": true},
+        "canEditEntities": {"staff": true, "admin": true},
         "canEditDocuments": {"staff": true, "admin": true},
         "canEditEvents": {"staff": true, "admin": true},
         "canEditFeaturedEdits": {"staff": true, "admin": true},

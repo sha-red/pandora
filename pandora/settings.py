@@ -128,6 +128,7 @@ INSTALLED_APPS = (
     'urlalias',
     'tv',
     'document',
+    'entity',
 )
 
 # Log errors into db
