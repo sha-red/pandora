@@ -71,24 +71,35 @@ def order_query(qs, sort):
 
 def findAnnotations(request, data):
     '''
-        takes {
-            query: {
-                conditions: [],
-                operator: '&'
-            },
-            itemsQuery: {
-                conditions: [],
-                operator: '&'
-            },
-            keys: [],
-            position: int,
-            positions: [],
-            range: [in, out],
-            sort: []
-        }
-        returns {
-            annotations = [{..}, {...}, ...]
-        }
+    takes {
+        query: {
+            conditions: [{
+                key: string,
+                operator: string,
+                value: string
+            }],
+            operator: string // '&' or '|'
+        },
+        itemsQuery: {
+            conditions: [{
+                key: string,
+                operator: string,
+                value: string
+            }],
+            operator: string // '&' or '|'
+        },
+        keys: [],
+        position: int,
+        positions: [],
+        range: [int, int],
+        sort: []
+    }
+    returns {
+        annotations: [{
+            id: string,
+            ...
+        }]
+    }
     '''
     response = json_response()
 
@@ -118,13 +129,15 @@ actions.register(findAnnotations)
 
 def getAnnotation(request, data):
     '''
-        takes {
-            id: string,
-            keys: [string]
-        }
-        returns {
-            key: value
-        }
+    Gets data for an annotation
+    takes {
+        id: string, // annotation id
+        keys: [string] // list of keys to return
+    }
+    returns {
+        key: value,
+        ...
+    }
     '''
     response = json_response({})
     data['keys'] = data.get('keys', [])
@@ -218,11 +231,13 @@ actions.register(addAnnotations, cache=False)
 @login_required_json
 def removeAnnotation(request, data):
     '''
-        takes {
-            id: annotationId
-        }
-        returns {
-        }
+    Removes an annotation
+    takes {
+        id: string // annotation id
+    }
+    returns {
+    }
+    FIXME: returns nothing?
     '''
     response = json_response({})
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
@@ -238,16 +253,17 @@ actions.register(removeAnnotation, cache=False)
 @login_required_json
 def editAnnotation(request, data):
     '''
-        takes {
-            id:,
-            in: float,
-            out: float,
-            value: string,
-        }
-        returns {
-            id:
-            ...
-        }
+    Edits an annotation
+    takes {
+        id: string, // annotation id
+        in: float, // in point in seconds, optional
+        out: float, // out point in seconds, optional
+        value: string // annotation value, optional
+    }
+    returns {
+        id: string, // annotation id
+        ...
+    }
     '''
     response = json_response({})
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
