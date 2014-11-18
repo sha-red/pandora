@@ -4,7 +4,7 @@ from __future__ import division, with_statement
 import re
 import unicodedata
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -162,34 +162,36 @@ class Annotation(models.Model):
             self.sortvalue = None
             self.languages = None
 
-        if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
-            self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
+        with transaction.commit_on_success():
+            if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
+                self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
 
-        super(Annotation, self).save(*args, **kwargs)
-        if set_public_id:
-            self.set_public_id()
+            super(Annotation, self).save(*args, **kwargs)
+            if set_public_id:
+                self.set_public_id()
 
-        if self.clip:
-            Clip.objects.filter(**{
-                'id': self.clip.id,
-                self.layer: False
-            }).update(**{self.layer: True})
-            #update clip.findvalue
-            self.clip.save()
+            if self.clip:
+                Clip.objects.filter(**{
+                    'id': self.clip.id,
+                    self.layer: False
+                }).update(**{self.layer: True})
+                #update clip.findvalue
+                self.clip.save()
 
-        #editAnnotations needs to be in snyc
-        if layer.get('type') == 'place' or layer.get('hasPlaces'):
-            update_matches(self.id, 'place')
-        if layer.get('type') == 'event' or layer.get('hasEvents'):
-            update_matches(self.id, 'event')
+            #editAnnotations needs to be in snyc
+            if layer.get('type') == 'place' or layer.get('hasPlaces'):
+                update_matches(self.id, 'place')
+            if layer.get('type') == 'event' or layer.get('hasEvents'):
+                update_matches(self.id, 'event')
 
     def delete(self, *args, **kwargs):
-        super(Annotation, self).delete(*args, **kwargs)
-        if self.clip and self.clip.annotations.count() == 0:
-            self.clip.delete()
-        self.item.update_find()
-        self.item.update_sort()
-        self.item.update_facets()
+        with transaction.commit_on_success():
+            super(Annotation, self).delete(*args, **kwargs)
+            if self.clip and self.clip.annotations.count() == 0:
+                self.clip.delete()
+            self.item.update_find()
+            self.item.update_sort()
+            self.item.update_facets()
 
     def cleanup_undefined_relations(self):
         layer = self.get_layer()

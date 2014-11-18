@@ -100,12 +100,13 @@ def update_item(id):
     #cleanup orphaned clips
     Clip.objects.filter(item__id=a.item.id, annotations__id=None).delete()
     #update facets if needed
-    if filter(lambda f: f['id'] == a.layer and f.get('filter'), settings.CONFIG['itemKeys']):
-        a.item.update_layer_facet(a.layer)
-    Item.objects.filter(id=a.item.id).update(modified=a.modified)
-    a.item.modified = a.modified
-    a.item.update_find()
-    a.item.update_sort()
-    a.item.update_facets()
-    if a.item.update_languages():
-        a.item.save()
+    with transaction.commit_on_sucess():
+        if filter(lambda f: f['id'] == a.layer and f.get('filter'), settings.CONFIG['itemKeys']):
+            a.item.update_layer_facet(a.layer)
+        Item.objects.filter(id=a.item.id).update(modified=a.modified)
+        a.item.modified = a.modified
+        a.item.update_find()
+        a.item.update_sort()
+        a.item.update_facets()
+        if a.item.update_languages():
+            a.item.save()
