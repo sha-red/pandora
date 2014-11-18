@@ -170,7 +170,7 @@ def find(request, data):
               items: [objects]
           }
 
-Groups
+    Groups
         takes {
             'query': query,
             'key': string,
@@ -198,7 +198,7 @@ Groups
               items: int
           }
 
-Positions
+    Positions
         takes {
             'query': query,
             'positions': [],
