@@ -711,7 +711,7 @@ pandora.ui.documentsPanel = function(options) {
                     id: data.id,
                     info: info,
                     title: data.name,
-                    url: '/documents/' + data.id + '/256p.jpg',
+                    url: pandora.getMediaURL('/documents/' + data.id + '/256p.jpg'),
                     width: Math.round(data.ratio > 1 ? size : size * data.ratio)
                 };
             },
