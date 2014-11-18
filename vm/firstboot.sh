@@ -10,7 +10,22 @@ export DEBIAN_FRONTEND=noninteractive
 if [ "$ID" == "debian" ]; then
     SYSTEMD="yes"
     echo "deb http://ppa.launchpad.net/j/pandora/ubuntu trusty main" > /etc/apt/sources.list.d/j-pandora.list
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 01975EF3
+    apt-key add - << EOF
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1
+
+mI0ESXYhEgEEALl9jDTdmgpApPbjN+7b85dC92HisPUp56ifEkKJOBj0X5HhRqxs
+Wjx/zlP4/XJGrHnxJyrdPxjSwAXz7bNdeggkN4JWdusTkr5GOXvggQnng0X7f/rX
+oJwoEGtYOCODLPs6PC0qjh5yPzJVeiRsKUOZ7YVNnwNwdfS4D8RZvtCrABEBAAG0
+FExhdW5jaHBhZCBQUEEgZm9yIGpeiLYEEwECACAFAkl2IRICGwMGCwkIBwMCBBUC
+CAMEFgIDAQIeAQIXgAAKCRAohRM8AZde82FfA/9OB/64/YLaCpizHZ8f6DK3rGgF
+e6mX3rFK8yOKGGL06316VhDzfzMiZSauUZ0t+lKHR/KZYeSaFwEoUoblTG/s4IIo
+9aBMHWhVXJW6eifKUmTGqEn2/0UxoWQq2C3F6njMkCaP+ALOD5uzaSYGdjqAUAwS
+pAAGSEQ4uz6bYSeM4Q==
+=SM2a
+-----END PGP PUBLIC KEY BLOCK-----
+EOF
+
 else
     SYSTEMD="no"
     if [ "$UBUNTU_VERSION" == "12.04" ]; then
