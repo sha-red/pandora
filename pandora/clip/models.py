@@ -81,7 +81,7 @@ class MetaClip:
             if 'layers' in keys:
                 j['layers'] = self.get_layers()
             if 'cuts' in keys:
-                j['cuts'] = tuple([c for c in self.item.get('cuts') if c > self.start and c < self.end])
+                j['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
             for key in keys:
                 if key not in self.clip_keys and key not in j:
                     value = self.item.get(key) or self.item.json.get(key)
@@ -105,7 +105,7 @@ class MetaClip:
             if value:
                 data[key] = value
         data['duration'] = data['out'] - data['in']
-        data['cuts'] = tuple([c for c in self.item.get('cuts') if c > self.start and c < self.end])
+        data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
         data['layers'] = self.get_layers(user)
         return data
 
