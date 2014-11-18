@@ -138,14 +138,14 @@ def addAnnotation(request, data):
     '''
     Adds a single annotation
     takes {
-        item: string, (item id)
-        layer: string, (annotation layer id)
-        in: float,
-        out: float,
-        value: string
+        item: string, // item id
+        layer: string, // annotation layer id
+        in: float, // in point in seconds
+        out: float, // out point in seconds
+        value: string // annotation value
     }
     returns {
-        id: string, (annotation id)
+        id: string, // annotation id
         ...
     }
     '''
@@ -179,13 +179,13 @@ def addAnnotations(request, data):
     '''
     Adds multiple annotations
     takes {
-        item: string (item id),
-        layer: string (annotation layer id), 
+        item: string, // item id
+        layer: string, // annotation layer id
         annotations: [
             {
-                in: float,
-                out: float,
-                value: string
+                in: float, // in point in seconds
+                out: float, // out point in seconds
+                value: string // annotation value
             },
             ...
         ]

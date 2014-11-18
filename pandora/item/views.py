@@ -499,7 +499,7 @@ def add(request, data):
     '''
     Adds a new item (without video)
     takes {
-        title: string (optional)
+        title: string, // optional
     }
     returns {
         id: string,
