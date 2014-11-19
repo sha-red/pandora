@@ -149,7 +149,7 @@ pandora.ui.entitiesDialog = function(options) {
         }),
 
         $deselectButton = Ox.Button({
-            title: 'close'
+            title: 'close',
             tooltip: Ox._('Done'),
             type: 'image'
         })
@@ -160,12 +160,12 @@ pandora.ui.entitiesDialog = function(options) {
         .hide()
         .bindEvent({
             click: function() {
-                pandora.UI.set({
+                pandora.UI.set(
                     'entitiesSelection.' + type,
                     []
-                });
+                );
             }
-        })
+        }),
 
         $itemBar = Ox.Bar({size: 24})
             .append($itemMenu)
