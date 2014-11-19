@@ -54,20 +54,27 @@ pandora.ui.entitiesDialog = function(options) {
             ],
             items: function(options, callback) {
                 pandora.api.findEntities({
+                    keys: options.keys,
                     query: {
                         conditions: [
                             {key: 'type', operator: '==', value: type}
                         ].concat(options.query.conditions),
                         operator: '&'
                     },
-                    sort: options.sort,
-                    range: options.range
+                    range: options.range,
+                    sort: options.sort
                 }, callback);
             },
             sort: [{key: 'name', operator: '+'}],
             scrollbarVisible: true,
             unique: 'id',
-            width: 256
+            width: 256 - Ox.SCROLLBAR_SIZE
+        })
+        .bindEvent({
+            init: function(data) {
+                // FIXME: not localized
+                $listStatus.html(Ox.formatCount(data.items, 'entity', 'entities'))
+            }
         }),
 
         $listStatus = Ox.Element()
@@ -92,7 +99,7 @@ pandora.ui.entitiesDialog = function(options) {
 
         $leftPanel = Ox.SplitPanel({
             elements: [
-                {element: $listbar, size: 24},
+                {element: $toolbar, size: 24},
                 {element: $listPanel}
             ],
             orientation: 'vertical'
@@ -110,6 +117,7 @@ pandora.ui.entitiesDialog = function(options) {
             type: 'image'
         })
         .css({
+            float: 'left',
             margin: '4px'
         })
         .bindEvent({
@@ -120,7 +128,7 @@ pandora.ui.entitiesDialog = function(options) {
                     // ...
                 }
             }
-        })
+        }),
 
         $itemBar = Ox.Bar({size: 24})
             .append($itemMenu),
