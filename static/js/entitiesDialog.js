@@ -34,7 +34,7 @@ pandora.ui.entitiesDialog = function(options) {
             width: 122
         })
         .css({
-            float: 'left',
+            float: 'right',
             margin: '4px 4px 4px 2px'
         })
         .bindEvent({
@@ -57,7 +57,7 @@ pandora.ui.entitiesDialog = function(options) {
         $list = Ox.TableList({
             columns: [
                 {id: 'id', title: 'ID', operator: '+'},
-                {id: 'name', title: 'Name', operator: '+', visible: true, width: 256}
+                {id: 'name', title: 'Name', operator: '+', visible: true, width: 256 - Ox.SCROLLBAR_SIZE}
             ],
             items: function(options, callback) {
                 pandora.api.findEntities({
@@ -106,6 +106,11 @@ pandora.ui.entitiesDialog = function(options) {
                 {element: $listStatusbar, size: 16}
             ],
             orientation: 'vertical'
+        })
+        .bindEvent({
+            resize: function() {
+                // ...
+            }
         }),
 
         $entity = Ox.Element(),
@@ -191,6 +196,11 @@ pandora.ui.entitiesDialog = function(options) {
                 {element: $itemStatusbar, size: 16}
             ],
             orientation: 'vertical'
+        })
+        .bindEvent({
+            resize: function() {
+                // ...
+            }
         }),
 
         $content = Ox.SplitPanel({
