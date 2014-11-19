@@ -16,7 +16,7 @@ pandora.ui.entitiesDialog = function(options) {
                     title: type.title
                 };
             }),
-            width: 248
+            width: 122
         })
         .bindEvent({
             change: function(data) {
@@ -24,19 +24,18 @@ pandora.ui.entitiesDialog = function(options) {
             }
         })
         .css({
-            margin: '4px'
+            float: 'left',
+            margin: '4px 2px 4px 4px'
         }),
-
-        $toolbar = Ox.Bar({size: 24})
-            .append($entitiesSelect),
 
         $findInput = Ox.Input({
             clear: true,
             placeholder: 'Find',
-            width: 248
+            width: 122
         })
         .css({
-            margin: '4px'
+            float: 'left'
+            margin: '4px 4px 4px 2px'
         })
         .bindEvent({
             change: function(data) {
@@ -52,6 +51,7 @@ pandora.ui.entitiesDialog = function(options) {
         }),
 
         $listBar = Ox.Bar({size: 24})
+            .append($entitiesSelect)
             .append($findInput),
 
         $list = Ox.TableList({
@@ -108,20 +108,21 @@ pandora.ui.entitiesDialog = function(options) {
             orientation: 'vertical'
         }),
 
-        $leftPanel = Ox.SplitPanel({
-            elements: [
-                {element: $toolbar, size: 24},
-                {element: $listPanel}
-            ],
-            orientation: 'vertical'
-        }),
-
         $entity = Ox.Element(),
 
         $itemMenu = Ox.MenuButton({
             items: [
-                {'id': 'add', title: Ox._('Add Entity'), keyboard: 'control n'},
-                {'id': 'delete', title: Ox._('Delete Entity...'), keyboard: 'delete'}
+                {
+                    'id': 'add',
+                    title: Ox._('Add Entity'),
+                    keyboard: 'control n'
+                },
+                {
+                    'id': 'delete',
+                    title: Ox._('Delete Entity...'),
+                    disabled: true,
+                    keyboard: 'delete'
+                }
             ],
             title: 'set',
             tooltip: Ox._('Options'),
@@ -193,7 +194,7 @@ pandora.ui.entitiesDialog = function(options) {
         $content = Ox.SplitPanel({
             elements: [
                 {
-                    element: $leftPanel,
+                    element: $listPanel,
                     resizable: true,
                     resize: [256, 384, 512],
                     size: 256
