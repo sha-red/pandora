@@ -7,6 +7,19 @@ pandora.ui.documentsDialog = function() {
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
 
+        // FIXME: user may not have the manage entites capability
+        $switchButton = Ox.Button({
+                title: Ox._('Manage Entities...')
+            })
+            .bindEvent({
+                click: function() {
+                    that.close();
+                    (pandora.$ui.entitiesDialog || (
+                        pandora.$ui.entitiesDialog = pandora.ui.entitiesDialog()
+                    )).open();
+                }
+            }),
+
         $doneButton = Ox.Button({
                 id: 'done',
                 title: Ox._('Done'),
@@ -23,7 +36,7 @@ pandora.ui.documentsDialog = function() {
         }),
 
         that = Ox.Dialog({
-                buttons: [$doneButton],
+                buttons: [$switchButton, {}, $doneButton],
                 closeButton: true,
                 content: $content,
                 height: dialogHeight,
