@@ -135,7 +135,9 @@ pandora.ui.entitiesDialog = function(options) {
         .bindEvent({
             click: function(data) {
                 if (data.id == 'add') {
-                    pandora.api.addEntity({}, function(result) {
+                    pandora.api.addEntity({
+                        type: type
+                    }, function(result) {
                         Ox.print('$$$$', result);
                         Ox.Request.clearCache('findEntities');
                         $list.reloadList().options({
