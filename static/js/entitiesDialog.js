@@ -34,7 +34,7 @@ pandora.ui.entitiesDialog = function(options) {
             width: 122
         })
         .css({
-            float: 'left'
+            float: 'left',
             margin: '4px 4px 4px 2px'
         })
         .bindEvent({
