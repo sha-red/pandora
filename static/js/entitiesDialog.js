@@ -79,8 +79,12 @@ pandora.ui.entitiesDialog = function(options) {
         })
         .bindEvent({
             init: function(data) {
-                // FIXME: not localized
-                $listStatus.html(Ox.formatCount(data.items, 'entity', 'entities'))
+                var text = Ox.formatCount(
+                    data.items,
+                    Ox._('entity'),
+                    Ox._('entities')
+                )
+                $listStatus.html(text[0].toUpperCase() + text.slice(1));
             }
         }),
 
@@ -117,7 +121,7 @@ pandora.ui.entitiesDialog = function(options) {
         $itemMenu = Ox.MenuButton({
             items: [
                 {'id': 'add', title: Ox._('Add Entity'), keyboard: 'control n'},
-                {'id': 'delete', title: Ox._('Delete Entity'), keyboard: 'delete'}
+                {'id': 'delete', title: Ox._('Delete Entity...'), keyboard: 'delete'}
             ],
             title: 'set',
             tooltip: Ox._('Options'),
@@ -130,15 +134,41 @@ pandora.ui.entitiesDialog = function(options) {
         .bindEvent({
             click: function(data) {
                 if (data.id == 'add') {
-                    // ...
+                    pandora.api.addEntity({}, function(result) {
+                        Ox.print('$$$$', result);
+                        Ox.Request.clearCache('findEntities');
+                        $list.reloadList().options({
+                            selected: [result.data.id]
+                        });
+                    })
                 } else if (data.id == 'delete') {
                     // ...
                 }
             }
         }),
 
+        $deselectButton = Ox.Button({
+            title: 'close'
+            tooltip: Ox._('Done'),
+            type: 'image'
+        })
+        .css({
+            float: 'right',
+            margin: '4px'
+        })
+        .hide()
+        .bindEvent({
+            click: function() {
+                pandora.UI.set({
+                    'entitiesSelection.' + type,
+                    []
+                });
+            }
+        })
+
         $itemBar = Ox.Bar({size: 24})
-            .append($itemMenu),
+            .append($itemMenu)
+            .append($deselectButton),
 
         $itemStatus = Ox.Element()
         .css({
