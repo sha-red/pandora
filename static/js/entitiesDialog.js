@@ -39,8 +39,15 @@ pandora.ui.entitiesDialog = function(options) {
             margin: '4px'
         })
         .bindEvent({
-            submit: function() {
-                
+            change: function(data) {
+                $list.options({
+                    query: {
+                        conditions: [
+                            {key: 'name', operator: '=', value: data.value}
+                        ],
+                        operator: '&'
+                    }
+                });
             }
         }),
 
