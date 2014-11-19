@@ -39,31 +39,46 @@ def addEntity(request, data):
     '''
     existing_names = []
     exists = False
-    names = [data['name']] + data.get('alternativeNames', [])
-    for name in names:
-        name = ox.decode_html(name)
-        if models.Entity.objects.filter(type=data['type'],
-                name_find__icontains=u'|%s|'%name).count() != 0:
-            exists = True
-            existing_names.append(name)
-    if not exists:
-        data['name'] = ox.escape_html(data['name'])
-        entity = models.Entity(name=data['name'])
-        for key in ('type', 'alternativeNames'):
-            if key in data and data[key]:
-                value = data[key]
-                if isinstance(value, basestring):
-                    value = ox.escape_html(value)
-                if key == 'alternativeNames':
-                    value = tuple([ox.escape_html(v) for v in value])
-                setattr(entity, key, value)
+    if 'name' in data:
+        names = [data['name']] + data.get('alternativeNames', [])
+        for name in names:
+            name = ox.decode_html(name)
+            if models.Entity.objects.filter(type=data['type'],
+                    name_find__icontains=u'|%s|'%name).count() != 0:
+                exists = True
+                existing_names.append(name)
+        if not exists:
+            data['name'] = ox.escape_html(data['name'])
+            entity = models.Entity(name=data['name'])
+            entity.user = request.user
+            for key in ('type', 'alternativeNames'):
+                if key in data and data[key]:
+                    value = data[key]
+                    if isinstance(value, basestring):
+                        value = ox.escape_html(value)
+                    if key == 'alternativeNames':
+                        value = tuple([ox.escape_html(v) for v in value])
+                    setattr(entity, key, value)
+            entity.matches = 0
+            entity.save()
+            response = json_response(status=200, text='created')
+            response['data'] = entity.json()
+        else:
+            response = json_response(status=409, text='name exists')
+            response['data']['names'] = existing_names
+    else:
+        type = data['type']
+        name = 'Unnamed'
+        num = 1
+        while models.Entity.objects.filter(name=name, type=type).count()>0:
+            num += 1
+            name = 'Unnamed [%d]' % num
+        entity = models.Entity(name=name, type=type)
+        entity.user = request.user
         entity.matches = 0
         entity.save()
         response = json_response(status=200, text='created')
         response['data'] = entity.json()
-    else:
-        response = json_response(status=409, text='name exists')
-        response['data']['names'] = existing_names
     return render_to_json_response(response)
 actions.register(addEntity, cache=False)
 

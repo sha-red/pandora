@@ -22,6 +22,8 @@ class Entity(models.Model):
     class Meta:
         unique_together = ("type", "name")
 
+    user = models.ForeignKey(User, related_name='entities', null=True, default=None)
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -81,7 +83,7 @@ class Entity(models.Model):
             if key == 'name':
                 data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
                 if not data['name']:
-                    data['name'] = "Untitled"
+                    data['name'] = "Unnamed"
                 name = data['name']
                 num = 1
                 while Entity.objects.filter(name=name, type=self.type).exclude(id=self.id).count()>0:
@@ -102,11 +104,12 @@ class Entity(models.Model):
     def json(self, keys=None, user=None):
         if not keys:
             keys=[
+                'alternativeNames',
                 'editable',
                 'id',
-                'type',
                 'name',
-                'alternativeNames',
+                'type',
+                'user',
             ] + self.data.keys()
         response = {}
         for key in keys:
@@ -114,6 +117,8 @@ class Entity(models.Model):
                 response[key] = self.get_id()
             elif key == 'editable':
                 response[key] = self.editable(user)
+            elif key == 'user':
+                response[key] = self.user and self.user.username
             elif key in ('name', 'alternativeNames', 'type'):
                 response[key] = getattr(self, key)
             elif key in self.data:
