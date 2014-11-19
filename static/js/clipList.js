@@ -75,7 +75,7 @@ pandora.ui.clipList = function(videoRatio) {
                 var itemsQuery, query;
                 if (!ui.item) {
                     itemsQuery = ui.find;
-                    query = {conditions: [], operator: '&'};
+                    query = {conditions: [], operator: itemsQuery.operator};
                     // if the item query contains a layer condition,
                     // then this condition is added to the clip query
                     addConditions(query, itemsQuery.conditions);
