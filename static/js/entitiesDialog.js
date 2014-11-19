@@ -83,7 +83,7 @@ pandora.ui.entitiesDialog = function(options) {
 
         $listPanel = Ox.SplitPanel({
             elements: [
-                {element: $findbar, size: 24},
+                {element: $listBar, size: 24},
                 {element: $list},
                 {element: $listStatusbar, size: 16}
             ],
