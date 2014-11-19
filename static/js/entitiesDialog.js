@@ -31,7 +31,7 @@ pandora.ui.entitiesDialog = function(options) {
                     }
                 })
             ],
-            closeButton: true
+            closeButton: true,
             content: Ox.LoadingScreen().start(),
             height: dialogHeight,
             maximizeButton: true,
