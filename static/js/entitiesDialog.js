@@ -49,7 +49,7 @@ pandora.ui.entitiesDialog = function(options) {
 
         $list = Ox.TableList({
             columns: [
-                {id: 'id', title: 'ID', operator: '+'}
+                {id: 'id', title: 'ID', operator: '+'},
                 {id: 'name', title: 'Name', operator: '+', visible: true, width: 256}
             ],
             items: function(options, callback) {
