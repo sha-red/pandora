@@ -7,6 +7,165 @@ pandora.ui.entitiesDialog = function(options) {
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
 
+        type = pandora.site.entities[0].id,
+
+        $entitiesSelect = Ox.Select({
+            items: pandora.site.entities.map(function(type) {
+                return {
+                    id: type.id,
+                    title: type.title
+                };
+            }),
+            width: 248
+        })
+        .bindEvent({
+            change: function(data) {
+                // ...
+            }
+        })
+        .css({
+            margin: '4px'
+        }),
+
+        $toolbar = Ox.Bar({size: 24})
+            .append($entitiesSelect),
+
+        $findInput = Ox.Input({
+            clear: true,
+            placeholder: 'Find',
+            width: 248
+        })
+        .css({
+            margin: '4px'
+        })
+        .bindEvent({
+            submit: function() {
+                
+            }
+        }),
+
+        $listBar = Ox.Bar({size: 24})
+            .append($findInput),
+
+        $list = Ox.TableList({
+            columns: [
+                {id: 'id', title: 'ID', operator: '+'}
+                {id: 'name', title: 'Name', operator: '+', visible: true, width: 256}
+            ],
+            items: function(options, callback) {
+                pandora.api.findEntities({
+                    query: {
+                        conditions: [
+                            {key: 'type', operator: '==', value: type}
+                        ].concat(options.query.conditions),
+                        operator: '&'
+                    },
+                    sort: options.sort,
+                    range: options.range
+                }, callback);
+            },
+            sort: [{key: 'name', operator: '+'}],
+            scrollbarVisible: true,
+            unique: 'id',
+            width: 256
+        }),
+
+        $listStatus = Ox.Element()
+        .css({
+            fontSize: '9px',
+            marginTop: '2px',
+            textAlign: 'center'
+        })
+        .html(Ox._('Loading...')),
+
+        $listStatusbar = Ox.Bar({size: 16})
+            .append($listStatus),
+
+        $listPanel = Ox.SplitPanel({
+            elements: [
+                {element: $findbar, size: 24},
+                {element: $list},
+                {element: $listStatusbar, size: 16}
+            ],
+            orientation: 'vertical'
+        }),
+
+        $leftPanel = Ox.SplitPanel({
+            elements: [
+                {element: $listbar, size: 24},
+                {element: $listPanel}
+            ],
+            orientation: 'vertical'
+        }),
+
+        $entity = Ox.Element(),
+
+        $itemMenu = Ox.MenuButton({
+            items: [
+                {'id': 'add', title: Ox._('Add Entity'), keyboard: 'control n'},
+                {'id': 'delete', title: Ox._('Delete Entity'), keyboard: 'delete'}
+            ],
+            title: 'set',
+            tooltip: Ox._('Options'),
+            type: 'image'
+        })
+        .css({
+            margin: '4px'
+        })
+        .bindEvent({
+            click: function(data) {
+                if (data.id == 'add') {
+                    // ...
+                } else if (data.id == 'delete') {
+                    // ...
+                }
+            }
+        })
+
+        $itemBar = Ox.Bar({size: 24})
+            .append($itemMenu),
+
+        $itemStatus = Ox.Element()
+        .css({
+            fontSize: '9px',
+            marginTop: '2px',
+            textAlign: 'center'
+        })
+        .html(Ox._('No entity selected')),
+
+        $itemStatusbar = Ox.Bar({size: 16})
+            .append($itemStatus),
+
+        $itemPanel = Ox.SplitPanel({
+            elements: [
+                {element: $itemBar, size: 24},
+                {element: Ox.Element()},
+                {element: $itemStatusbar, size: 16}
+            ],
+            orientation: 'vertical'
+        }),
+
+        $content = Ox.SplitPanel({
+            elements: [
+                {
+                    element: $leftPanel,
+                    resizable: true,
+                    resize: [256, 384, 512],
+                    size: 256
+                },
+                {
+                    element: $entity
+                },
+                {
+                    element: $itemPanel,
+                    resizable: true,
+                    resize: [256, 384, 512],
+                    size: 256
+                }
+            ],
+            orientation: 'horizontal'
+        }),
+
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
@@ -32,7 +191,7 @@ pandora.ui.entitiesDialog = function(options) {
                 })
             ],
             closeButton: true,
-            content: Ox.LoadingScreen().start(),
+            content: $content,
             height: dialogHeight,
             maximizeButton: true,
             minHeight: 256,
@@ -44,67 +203,7 @@ pandora.ui.entitiesDialog = function(options) {
         })
         .bindEvent({
             // resize: ...
-        }),
-
-        $toolbar = Ox.Bar({size: 24}),
-
-        $findbar = Ox.Bar({size: 24}),
-
-        $statusbar = Ox.Bar({size: 16}),
-
-        $listPanel = Ox.SplitPanel({
-            elements: [
-                {element: $findbar, size: 24},
-                {element: Ox.Element()},
-                {element: $statusbar, size: 16}
-            ],
-            orientation: 'vertical'
-        }),
-
-        $leftPanel = Ox.SplitPanel({
-            elements: [
-                {element: $toolbar, size: 24},
-                {element: $listPanel}
-            ],
-            orientation: 'vertical'
-        }),
-
-        $entity = Ox.Element(),
-
-        $titlebar = Ox.Bar({size: 24}),
-
-        $rightPanel = Ox.SplitPanel({
-            elements: [
-                {element: $titlebar, size: 24},
-                {element: $form}
-            ],
-            orientation: 'vertical'
-        }),
-
-        $content = Ox.SplitPanel({
-            elements: [
-                {
-                    element: $leftPanel,
-                    resizable: true,
-                    resize: [256, 384, 512],
-                    size: 256
-                },
-                {
-                    element: $entity
-                },
-                {
-                    element: $rightPanel,
-                    resizable: true,
-                    resize: [256, 384, 512],
-                    size: 256
-                }
-            ],
-            orientation: 'horizontal'
         });
-
-    Ox.noop(function() {
-        that.options({content: $content});
-    });
 
     return that;
 
