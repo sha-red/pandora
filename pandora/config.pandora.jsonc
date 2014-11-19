@@ -90,6 +90,7 @@
         {"id": "player", "title": "Player"},
         {"id": "editor", "title": "Editor"},
         {"id": "documents", "title": "Documents"},
+        {"id": "entities", "title": "Entities"},
         {"id": "edits", "title": "Edits"},
         {"id": "texts", "title": "Texts"},
         {"id": "embeds", "title": "Embeds"}
