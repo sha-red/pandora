@@ -55,7 +55,7 @@ pandora.ui.entitiesDialog = function(options) {
         $listPanel = Ox.SplitPanel({
             elements: [
                 {element: $findbar, size: 24},
-                {element: Ox.Element},
+                {element: Ox.Element()},
                 {element: $statusbar, size: 16}
             ],
             orientation: 'vertical'
