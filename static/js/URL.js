@@ -404,7 +404,7 @@ pandora.URL = (function() {
             getSort: pandora.getSort,
             getSpan: pandora.getSpan,
             pages: [].concat(
-                ['home', 'software', 'api', 'help', 'tv', 'documents'],
+                ['home', 'software', 'api', 'help', 'tv', 'documents', 'entities'],
                 pandora.site.sitePages.map(function(page) {
                     return page.id;
                 }),
