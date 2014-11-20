@@ -100,7 +100,7 @@ pandora.ui.entitiesDialog = function(options) {
             },
             select: function(data) {
                 var text = Ox.formatCount(
-                    data.ids,
+                    data.ids.length,
                     Ox._('entity'),
                     Ox._('entities')
                 ) + ' ' + Ox._('selected');
@@ -343,7 +343,7 @@ pandora.ui.entitiesDialog = function(options) {
                             width: 240 - Ox.SCROLLBAR_SIZE
                         })
                         .css({
-                            margin: index == 0 ? '4px' : '16px 4px 4px 4px'
+                            margin: (index == 0 ? 4 : 16) + 'px 4px 8px 4px'
                         })
                         .appendTo($form),
                     $input;
