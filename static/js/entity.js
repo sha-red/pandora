@@ -3,7 +3,7 @@
 'use strict';
 
 pandora.ui.entity = function(options, callback) {
-    // options: {id, view}
+    // options: {id, view}, view: 'annotation' or 'entity'
     pandora.api.getEntity({
         id: options.id
     }, function(response) {
@@ -16,7 +16,7 @@ pandora.ui.entity = function(options, callback) {
                     return Ox.isEmpty(value)
                         || Ox.isNull(value)
                         || Ox.isUndefined(value)
-                        ? Ox._(parts[1] || 'unknown')
+                        ? Ox._(parts[1] || '<span class="OxLight">unknown</a>')
                         : Ox.isArray(value) ? value.join('; ')
                         : value;
                 });
