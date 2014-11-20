@@ -390,7 +390,7 @@ pandora.ui.entitiesDialog = function(options) {
     }
 
     function updateForm() {
-        var width = $content.options('elements')[2].size - 8;
+        var width = $content.options('elements')[2].size - 16 - Ox.SCROLLBAR_SIZE;
         $labels.forEach(function($label) {
             $label.options({width: width});
         });
@@ -401,8 +401,8 @@ pandora.ui.entitiesDialog = function(options) {
 
     function updateList() {
         var width = $content.options('elements')[0].size;
-        $entitiesSelect.options({width: Math.ceil((size - 12) / 2)});
-        $findInput.options({width: Math.floor((size - 12) / 2)});
+        $entitiesSelect.options({width: Math.ceil((width - 12) / 2)});
+        $findInput.options({width: Math.floor((width - 12) / 2)});
         $list.size();
     }
 
