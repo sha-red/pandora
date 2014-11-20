@@ -297,7 +297,9 @@ pandora.ui.entitiesDialog = function(options) {
     }
 
     function renderEntity() {
-        var id = ui.entitiesSelection['type'][0];
+        var id = ui.entitiesSelection['type']
+            ? ui.entitiesSelection['type'][0]
+            : null;
         if (!id) {
             $entity.empty();
             return;
@@ -315,7 +317,9 @@ pandora.ui.entitiesDialog = function(options) {
     }
 
     function renderForm() {
-        var id = ui.entitiesSelection['type'][0];
+        var id = ui.entitiesSelection['type']
+            ? ui.entitiesSelection['type'][0]
+            : null;
         if (!id) {
             $form.empty();
             return;
