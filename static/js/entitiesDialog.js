@@ -345,17 +345,17 @@ pandora.ui.entitiesDialog = function(options) {
                         .css({margin: '2px 2px 4px 2px'})
                         .appendTo($form),
                     $input;
-                if (key.type == 'document') {
+                if (key.type === 'document') {
                     $input = Ox.Input({autovalidate: /^[A-Z]+?$/});
-                } else if (key.type == 'float') {
+                } else if (key.type === 'float') {
                     $input = Ox.Input({type: 'float'});
-                } else if (key.type == 'int') {
+                } else if (key.type === 'int') {
                     $input = Ox.Input({type: 'int'});
-                } else if (key.type == 'string') {
+                } else if (key.type === 'string') {
                     $input = Ox.Input();
-                } else if (key.type[0] == 'string') {
+                } else if (key.type[0] === 'string') {
                     $input = Ox.ArrayInput();
-                } else if (key.type == 'text') {
+                } else if (key.type === 'text') {
                     $input = Ox.Input({
                         height: 248 - Ox.SCROLLBAR_SIZE,
                         type: 'textarea'
@@ -381,6 +381,10 @@ pandora.ui.entitiesDialog = function(options) {
                 $inputs.push($input);
             });
         });
+    }
+
+    function selectEntities() {
+        // ...
     }
 
     function updateForm() {
