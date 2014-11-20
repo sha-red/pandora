@@ -102,7 +102,7 @@ pandora.ui.entitiesDialog = function(options) {
                 var text = Ox.formatCount(
                     data.ids,
                     Ox._('entity'),
-                    OX._('entities')
+                    Ox._('entities')
                 ) + ' ' + Ox._('selected');
                 selected = data.ids;
                 renderEntity();
