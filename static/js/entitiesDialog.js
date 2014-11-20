@@ -10,6 +10,8 @@ pandora.ui.entitiesDialog = function(options) {
         selected = [],
         type = pandora.site.entities[0].id,
 
+        ui = pandora.user.ui,
+
         $entitiesSelect = Ox.Select({
             items: pandora.site.entities.map(function(type) {
                 return {
