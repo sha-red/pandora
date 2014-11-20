@@ -285,6 +285,19 @@ pandora.ui.entitiesDialog = function(options) {
             // resize: ...
         });
 
+    function deleteEntities() {
+        pandora.ui.deleteEntityDialog(
+            $list.options('selected').map(function(id) {
+                return $list.value(id);
+            }),
+            function() {
+                Ox.Request.clearCache();
+                // ...
+                $list.reloadList();
+            }
+        ).open();
+    }
+
     function renderEntity() {
         var id = selected[0];
         if (!id) {
