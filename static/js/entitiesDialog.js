@@ -206,7 +206,7 @@ pandora.ui.entitiesDialog = function(options) {
         $form = Ox.Element()
         .css({
             overflowY: 'scroll',
-            padding: '2px'
+            padding: '4px'
         }),
 
         $itemStatus = Ox.Element()
@@ -337,12 +337,14 @@ pandora.ui.entitiesDialog = function(options) {
             }
             var keys = Ox.getObjectById(pandora.site.entities, type).keys;
             $form.empty()
-            keys.forEach(function(key) {
+            keys.forEach(function(key, index) {
                 var $label = Ox.Label({
                             title: Ox._(key.title),
-                            width: 248 - Ox.SCROLLBAR_SIZE
+                            width: 240 - Ox.SCROLLBAR_SIZE
                         })
-                        .css({margin: '2px 2px 4px 2px'})
+                        .css({
+                            margin: index == 0 ? '4px' : '16px 4px 4px 4px'
+                        })
                         .appendTo($form),
                     $input;
                 if (key.type === 'document') {
@@ -357,16 +359,16 @@ pandora.ui.entitiesDialog = function(options) {
                     $input = Ox.ArrayInput();
                 } else if (key.type === 'text') {
                     $input = Ox.Input({
-                        height: 248 - Ox.SCROLLBAR_SIZE,
+                        height: 240 - Ox.SCROLLBAR_SIZE,
                         type: 'textarea'
                     });
                 }
                 $input.options({
                         disabled: key.id == 'id',
                         value: result.data[key.id],
-                        width: 248 - Ox.SCROLLBAR_SIZE
+                        width: 240 - Ox.SCROLLBAR_SIZE
                     })
-                    .css({margin: '2px 2px 16px 2px'})
+                    .css({margin: '4px'})
                     .bindEvent({
                         change: function(data) {
                             pandora.api.editEntity(Ox.extend({
