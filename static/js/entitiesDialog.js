@@ -81,6 +81,7 @@ pandora.ui.entitiesDialog = function(options) {
                     }
                 }), callback);
             },
+            selected: ui.entitiesSelection[type] || [],
             sort: [{key: 'name', operator: '+'}],
             scrollbarVisible: true,
             unique: 'id',
@@ -96,16 +97,7 @@ pandora.ui.entitiesDialog = function(options) {
                 $listStatus.html(text[0].toUpperCase() + text.slice(1));
             },
             select: function(data) {
-                var text = Ox.formatCount(
-                    data.ids.length,
-                    Ox._('entity'),
-                    Ox._('entities')
-                ) + ' ' + Ox._('selected');
-                selected = data.ids;
-                renderEntity();
-                $deselectButton[data.ids.length ? 'show' : 'hide']();
-                renderForm();
-                $itemStatus.html(text[0].toUpperCase() + text.slice(1));
+                pandora.UI.set('entitiesSelection.' + type, data.ids);
             }
         }),
 
@@ -162,7 +154,6 @@ pandora.ui.entitiesDialog = function(options) {
                     pandora.api.addEntity({
                         type: type
                     }, function(result) {
-                        Ox.print('$$$$', result);
                         Ox.Request.clearCache('findEntities');
                         $list.reloadList().options({
                             selected: [result.data.id]
@@ -186,10 +177,7 @@ pandora.ui.entitiesDialog = function(options) {
         .hide()
         .bindEvent({
             click: function() {
-                pandora.UI.set(
-                    'entitiesSelection.' + type,
-                    []
-                );
+                pandora.UI.set('entitiesSelection.' + type, []);
             }
         }),
 
@@ -288,6 +276,9 @@ pandora.ui.entitiesDialog = function(options) {
         })
         .bindEvent({
             // resize: ...
+            pandora_entitiesselection: function() {
+                selectEntities();
+            }
         });
 
     function deleteEntities() {
@@ -304,7 +295,7 @@ pandora.ui.entitiesDialog = function(options) {
     }
 
     function renderEntity() {
-        var id = selected[0];
+        var id = ui.entitiesSelection['type'][0];
         if (!id) {
             $entity.empty();
             return;
@@ -314,7 +305,7 @@ pandora.ui.entitiesDialog = function(options) {
             type: type,
             view: 'entity'
         }, function(html) {
-            if (id != selected[0]) {
+            if (id != ui.entitiesSelection['type'][0]) {
                 return;
             }
             $entity.html(html);
@@ -322,7 +313,7 @@ pandora.ui.entitiesDialog = function(options) {
     }
 
     function renderForm() {
-        var id = selected[0];
+        var id = ui.entitiesSelection['type'][0];
         if (!id) {
             $form.empty();
             return;
@@ -330,7 +321,7 @@ pandora.ui.entitiesDialog = function(options) {
         pandora.api.getEntity({
             id: id
         }, function(result) {
-            if (id != selected[0]) {
+            if (id != ui.entitiesSelection['type'][0]) {
                 return;
             }
             var keys = Ox.getObjectById(pandora.site.entities, type).keys;
@@ -384,7 +375,18 @@ pandora.ui.entitiesDialog = function(options) {
     }
 
     function selectEntities() {
-        // ...
+        var text = Ox.formatCount(
+            data.ids.length,
+            Ox._('entity'),
+            Ox._('entities')
+        ) + ' ' + Ox._('selected');
+        renderEntity();
+        $itemMenu.setItemTitle('delete', Ox._('Delete {0}...', [
+            Ox._(ui.entitiesSelection[type].length < 2 ? 'Entity' : 'Entities')
+        ]));
+        $deselectButton[data.ids.length ? 'show' : 'hide']();
+        renderForm();
+        $itemStatus.html(text[0].toUpperCase() + text.slice(1));
     }
 
     function updateForm() {
