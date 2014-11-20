@@ -341,7 +341,7 @@ pandora.ui.entitiesDialog = function(options) {
                     $input = Ox.Input({height: 248, type: 'textarea'});
                 }
                 $input.options({
-                        value: data.key
+                        value: data.key,
                         width: 248
                     })
                     .bindEvent({
