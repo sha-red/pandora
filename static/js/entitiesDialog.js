@@ -42,9 +42,9 @@ pandora.ui.entitiesDialog = function(options) {
             change: function(data) {
                 $list.options({
                     query: {
-                        conditions: [
+                        conditions: data.value ? [
                             {key: 'name', operator: '=', value: data.value}
-                        ],
+                        ] : [],
                         operator: '&'
                     }
                 });
@@ -196,7 +196,11 @@ pandora.ui.entitiesDialog = function(options) {
 
         $inputs = [],
 
-        $form = Ox.Element(),
+        $form = Ox.Element()
+        .css({
+            overflowY: 'scroll',
+            padding: '2px'
+        }),
 
         $itemStatus = Ox.Element()
         .css({
@@ -329,11 +333,9 @@ pandora.ui.entitiesDialog = function(options) {
             keys.forEach(function(key) {
                 var $label = Ox.Label({
                             title: Ox._(key.title),
-                            width: 248
+                            width: 248 - Ox.SCROLLBAR_SIZE
                         })
-                        .css({
-                            margin: '4px'
-                        })
+                        .css({margin: '2px'})
                         .appendTo($form),
                     $input;
                 if (key.type == 'document') {
@@ -347,12 +349,17 @@ pandora.ui.entitiesDialog = function(options) {
                 } else if (key.type[0] == 'string') {
                     $input = Ox.ArrayInput();
                 } else if (key.type == 'text') {
-                    $input = Ox.Input({height: 248, type: 'textarea'});
+                    $input = Ox.Input({
+                        height: 248 - Ox.SCROLLBAR_SIZE,
+                        type: 'textarea'
+                    });
                 }
                 $input.options({
-                        value: data.key,
-                        width: 248
+                        disabled: key == 'id',
+                        value: data[key],
+                        width: 248 - Ox.SCROLLBAR_SIZE
                     })
+                    .css({margin: '2px'})
                     .bindEvent({
                         change: function(data) {
                             pandora.api.editEntity(Ox.extend({
