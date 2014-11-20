@@ -30,9 +30,9 @@ pandora.ui.entitiesDialog = function(options) {
         }),
 
         $findInput = Ox.Input({
+            changeOnKeypress: true,
             clear: true,
             placeholder: 'Find',
-            submitOnKeypress: true,
             width: 122
         })
         .css({
@@ -72,18 +72,14 @@ pandora.ui.entitiesDialog = function(options) {
                 }
             ],
             items: function(options, callback) {
-                pandora.api.findEntities({
-                    keys: options.keys,
-                    positions: options.positions,
+                pandora.api.findEntities(Ox.extend(Ox.clone(options), {
                     query: {
                         conditions: [
                             {key: 'type', operator: '==', value: type}
                         ].concat(options.query.conditions),
                         operator: '&'
-                    },
-                    range: options.range,
-                    sort: options.sort
-                }, callback);
+                    }
+                }), callback);
             },
             sort: [{key: 'name', operator: '+'}],
             scrollbarVisible: true,
