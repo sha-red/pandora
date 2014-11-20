@@ -74,6 +74,7 @@ pandora.ui.entitiesDialog = function(options) {
             items: function(options, callback) {
                 pandora.api.findEntities({
                     keys: options.keys,
+                    positions: options.positions,
                     query: {
                         conditions: [
                             {key: 'type', operator: '==', value: type}
@@ -106,6 +107,7 @@ pandora.ui.entitiesDialog = function(options) {
                 ) + ' ' + Ox._('selected');
                 selected = data.ids;
                 renderEntity();
+                $deselectButton[data.ids.length ? 'show' : 'hide']();
                 renderForm();
                 $itemStatus.html(text[0].toUpperCase() + text.slice(1));
             }
