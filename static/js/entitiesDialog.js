@@ -124,9 +124,7 @@ pandora.ui.entitiesDialog = function(options) {
             orientation: 'vertical'
         })
         .bindEvent({
-            resize: function() {
-                // ...
-            }
+            resize: updateList
         }),
 
         $entity = Ox.Element(),
@@ -220,9 +218,7 @@ pandora.ui.entitiesDialog = function(options) {
             orientation: 'vertical'
         })
         .bindEvent({
-            resize: function() {
-                // ...
-            }
+            resize: updateForm
         }),
 
         $content = Ox.SplitPanel({
@@ -371,6 +367,23 @@ pandora.ui.entitiesDialog = function(options) {
                 $inputs.push($input);
             });
         });
+    }
+
+    function updateForm() {
+        var width = $content.options('elements')[2].size - 8;
+        $labels.forEach(function($label) {
+            $label.options({width: width});
+        });
+        $inputs.forEach(function($input) {
+            $input.options({width: width});
+        })
+    }
+
+    function updateList() {
+        var width = $content.options('elements')[0].size;
+        $entitiesSelect.options({width: Math.ceil((size - 12) / 2)});
+        $findInput.options({width: Math.floor((size - 12) / 2)});
+        $list.size();
     }
 
     return that;
