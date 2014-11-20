@@ -297,8 +297,8 @@ pandora.ui.entitiesDialog = function(options) {
     }
 
     function renderEntity() {
-        var id = ui.entitiesSelection['type']
-            ? ui.entitiesSelection['type'][0]
+        var id = ui.entitiesSelection[type]
+            ? ui.entitiesSelection[type][0]
             : null;
         if (!id) {
             $entity.empty();
@@ -309,7 +309,7 @@ pandora.ui.entitiesDialog = function(options) {
             type: type,
             view: 'entity'
         }, function(html) {
-            if (id != ui.entitiesSelection['type'][0]) {
+            if (id != ui.entitiesSelection[type][0]) {
                 return;
             }
             $entity.html(html);
