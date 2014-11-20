@@ -299,8 +299,7 @@ pandora.createLinks = function($element) {
                 if ($target.is('a') or $target == $element) {
                     break;
                 }
-                e.target = $target.parent();
-                $target = $(e.target);
+                $target = $($target.parent());
             }
             if (
                 $target.is('a')
@@ -308,10 +307,10 @@ pandora.createLinks = function($element) {
                 && !$($target.parent()).is('.OxEditableContent')
             ) {
                 e.preventDefault();
-                if (isExternalLink(e.target)) {
-                    pandora.openLink(e.target.href);
+                if (isExternalLink($target[0])) {
+                    pandora.openLink($target[0].href);
                 } else {
-                    pandora.clickLink(e);
+                    pandora.clickLink({target: $target[0]});
                 }
             }
             return false;
