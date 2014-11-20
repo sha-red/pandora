@@ -18,7 +18,7 @@ def parseCondition(condition, user, item=None):
     if item and k == 'description':
         item_conditions = condition.copy()
         item_conditions['key'] = 'items__itemproperties__description'
-        return parseCondition(condition, user) | parseCondition(item_condition, user)
+        return parseCondition(condition, user) | parseCondition(item_conditions, user)
 
     v = condition['value']
     op = condition.get('operator')
