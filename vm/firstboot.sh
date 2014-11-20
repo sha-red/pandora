@@ -7,10 +7,8 @@ else
 fi
 UBUNTU_VERSION="$VERSION_ID"
 export DEBIAN_FRONTEND=noninteractive
-if [ "$ID" == "debian" ]; then
-    SYSTEMD="yes"
-    echo "deb http://ppa.launchpad.net/j/pandora/ubuntu trusty main" > /etc/apt/sources.list.d/j-pandora.list
-    apt-key add - << EOF
+echo "deb http://ppa.launchpad.net/j/pandora/ubuntu trusty main" > /etc/apt/sources.list.d/j-pandora.list
+apt-key add - << EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1
 
@@ -26,6 +24,8 @@ pAAGSEQ4uz6bYSeM4Q==
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
 
+if [ "$ID" == "debian" ]; then
+    SYSTEMD="yes"
 else
     SYSTEMD="no"
     if [ "$UBUNTU_VERSION" == "12.04" ]; then
@@ -37,8 +37,6 @@ else
         update-manager-core \
         software-properties-common \
         $EXTRA
-
-    add-apt-repository -y ppa:j/pandora
 fi
 apt-get update
 
