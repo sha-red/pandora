@@ -3,13 +3,13 @@
 'use strict';
 
 pandora.ui.entity = function(options, callback) {
-    // options: {id, type, view}
-    Ox.get(
-        '/static/html/entities.' + options.type + '.' + options.view + '.html',
-        function(html) {
-            pandora.api.getEntity({
-                id: options.id
-            }, function(data) {
+    // options: {id, view}
+    pandora.api.getEntity({
+        id: options.id
+    }, function(data) {
+        Ox.get(
+            '/static/html/entities.' + data.type + '.' + options.view + '.html',
+            function(html) {
                 html = html.replace(/\{(.+?)\}/g, function() {
                     var parts = arguments[1].split('|'),
                         value = data[parts[0]];
@@ -21,7 +21,7 @@ pandora.ui.entity = function(options, callback) {
                         : value;
                 });
                 callback(html);
-            });
-        }
-    );
+            }
+        );
+    });
 };
