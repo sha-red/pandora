@@ -295,6 +295,12 @@ pandora.createLinks = function($element) {
     $element.on({
         click: function(e) {
             var $target = $(e.target);
+            while (true) {
+                if ($target.is('a') or $target == $element) {
+                    break;
+                }
+                $target = $($target.parent());
+            }
             if (
                 $target.is('a')
                 && !$($target.parent()).is('.OxEditable')
