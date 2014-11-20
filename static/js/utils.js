@@ -1472,8 +1472,7 @@ pandora.getPart = function(state, str, callback) {
             callback();
         }
     } else if (state.page == 'documents') {
-        var split = str.split('/')[0],
-            id = split;
+        var id = str.split('/')[0];
         if (id) {
             pandora.api.findDocuments({
                 query: {
@@ -1484,6 +1483,26 @@ pandora.getPart = function(state, str, callback) {
                 if (result.data.items) {
                     state.part = str;
                     //fixme set page/zoom/center here
+                } else {
+                    state.page = '';
+                }
+                callback();
+            });
+        } else {
+            state.page = '';
+            callback();
+        }
+    } else if (state.page == 'entities') {
+        var id = str;
+        if (id) {
+            pandora.api.findEntities({
+                query: {
+                    conditions: [{key: 'id', value: id, operator: '=='}],
+                    operator: '&'
+                }
+            }, function(result) {
+                if (result.data.items) {
+                    state.part = str;
                 } else {
                     state.page = '';
                 }
