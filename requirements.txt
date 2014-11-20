@@ -1,4 +1,5 @@
--e git+https://github.com/django/django.git@stable/1.4.x#egg=django
+#-e git+https://github.com/django/django.git@stable/1.4.x#egg=django
+Django<1.5
 -e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
 -e bzr+http://code.0x2620.org/oxtimelines/#egg=oxtimelines
 simplejson
@@ -6,10 +7,9 @@ chardet
 celery==3.0.24
 django-celery==3.0.23
 #django_extensions
-#-e git+https://github.com/django-extensions/django-extensions.git#egg=django_extensions
 #use fork fixing some postgresql issues
--e git://github.com/bit/django-extensions.git#egg=django_extensions
--e git+git://github.com/dcramer/django-devserver#egg=django_devserver
+-e contrib/django_extensions
+django_devserver
 gunicorn>=0.14.3,<0.19
 html5lib
 South
