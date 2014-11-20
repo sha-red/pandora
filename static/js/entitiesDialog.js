@@ -162,7 +162,7 @@ pandora.ui.entitiesDialog = function(options) {
                         });
                     })
                 } else if (data.id == 'delete') {
-                    // ...
+                    deleteEntities();
                 }
             }
         }),
