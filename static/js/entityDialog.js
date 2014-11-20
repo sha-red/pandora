@@ -34,6 +34,9 @@ pandora.ui.entityDialog = function(options) {
             }
         });
 
+    setTitle();
+    setContent();
+
     function setContent() {
         pandora.entity({
             id: ui.entity,
@@ -46,8 +49,8 @@ pandora.ui.entityDialog = function(options) {
     function setTitle() {
         pandora.api.getEntity({
             id: ui.entity
-        }, function(data) {
-            that.options({title: data.name});
+        }, function(result) {
+            that.options({title: result.data.name});
         });
     }
 
