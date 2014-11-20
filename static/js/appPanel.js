@@ -79,6 +79,14 @@ pandora.ui.appPanel = function() {
             } else {
                 pandora.UI.set({page: ''});
             }
+        } else if (page == 'entities') {
+            if (pandora.user.ui.part.entities) {
+                pandora.openEntitiesDialog({
+                    ids: [pandora.user.ui.part.entities.split('/')[0]]
+                });
+            } else {
+                pandora.UI.set({page: ''});
+            }
         } else {
             // open dialog
             Ox.forEach(dialogPages, function(pages, dialog) {
