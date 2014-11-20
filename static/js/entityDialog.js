@@ -4,5 +4,53 @@
 
 pandora.ui.entityDialog = function(options) {
 
+    var ui = pandora.user.ui,
+
+        $content = Ox.Element(),
+
+        that = Ox.Dialog({
+            closeButton: true,
+            content: $content, 
+            fixedSize: true,
+            focus: false,
+            height: 384,
+            padding: 0,
+            removeOnClose: true,
+            title: '',
+            width: 512,
+        })
+        .bindEvent({
+            close: function() {
+                pandora.UI.set({entity: ''});
+                delete pandora.$ui.entityDialog;
+            },
+            pandora_entity: function(data) {
+                if (data.value) {
+                    setTitle();
+                    setContent();
+                } else {
+                    that.close();
+                }
+            }
+        });
+
+    function setContent() {
+        pandora.entity({
+            id: ui.entity,
+            view: 'entity'
+        }, function(html) {
+            $content.html(html);
+        });
+    }
+
+    function setTitle() {
+        pandora.api.getEntity({
+            id: ui.entity
+        }, function(data) {
+            that.options({title: data.name});
+        });
+    }
+
+    return that;
 
 };
