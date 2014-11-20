@@ -313,6 +313,7 @@ pandora.ui.entitiesDialog = function(options) {
                 return;
             }
             $entity.html(html);
+            pandora.createLinks($entity);
         });
     }
 
