@@ -299,7 +299,8 @@ pandora.createLinks = function($element) {
                 if ($target.is('a') or $target == $element) {
                     break;
                 }
-                $target = $($target.parent());
+                e.target = e.target.parent();
+                $target = $(e.target);
             }
             if (
                 $target.is('a')
