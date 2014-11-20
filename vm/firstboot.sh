@@ -110,7 +110,8 @@ rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 bzr branch http://code.0x2620.org/pandora /srv/pandora
 bzr branch http://code.0x2620.org/oxjs /srv/pandora/static/oxjs
 virtualenv --system-site-packages /srv/pandora
-/srv/pandora/bin/pip install -r /srv/pandora/requirements.txt
+cd /srv/pandora
+./bin/pip install -r /srv/pandora/requirements.txt
 
 HOST=$(hostname -s)
 HOST_CONFIG="/srv/pandora/pandora/config.$HOST.jsonc"
