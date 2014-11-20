@@ -13,6 +13,7 @@ from django.db.models.signals import pre_delete
 import ox
 
 from clip.models import Clip
+from entity.models import Entity
 from changelog.models import Changelog
 
 from item.utils import sort_string, get_by_key
@@ -224,18 +225,24 @@ class Annotation(models.Model):
         if self.languages:
             j['languages'] = self.languages.split(',')
         l = self.get_layer()
-        if l['type'] == 'place':
-            qs = self.places.all()
+        if l['type'] == 'entity':
+            qs = Entity.objects.filter(id=ox.fromAZ(self.value))
             if qs.count() > 0:
-                j['place'] = qs[0].json(user=user)
+                j['entity'] = qs[0].json(user=user)
             else:
-                j['place'] = {}
+                j['entity'] = {}
         elif l['type'] == 'event':
             qs = self.events.all()
             if qs.count() > 0:
                 j['event'] = qs[0].json(user=user)
             else:
                 j['event'] = {}
+        elif l['type'] == 'place':
+            qs = self.places.all()
+            if qs.count() > 0:
+                j['place'] = qs[0].json(user=user)
+            else:
+                j['place'] = {}
 
         if layer or (keys and 'layer' in keys):
             j['layer'] = self.layer

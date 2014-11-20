@@ -49,7 +49,7 @@ def addEntity(request, data):
                 existing_names.append(name)
         if not exists:
             data['name'] = ox.escape_html(data['name'])
-            entity = models.Entity(name=data['name'])
+            entity = models.Entity(name=data['name'], type=data['type'])
             entity.user = request.user
             for key in ('type', 'alternativeNames'):
                 if key in data and data[key]:

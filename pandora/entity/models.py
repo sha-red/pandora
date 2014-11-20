@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import Max
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete
+from django.conf import settings
 
 import ox
 from ox.django import fields
@@ -44,7 +45,7 @@ class Entity(models.Model):
         self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
         self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
         super(Entity, self).save(*args, **kwargs)
-        #self.update_matches()
+        self.update_matches()
 
     def __unicode__(self):
         return self.get_id()
@@ -134,7 +135,11 @@ class Entity(models.Model):
         url = unquote(urls[0])
         if url != urls[0]:
             urls.append(url)
-        matches = self.items.count()
+        entity_layers = [l['id'] for l in settings.CONFIG['layers'] if l['type'] == 'entity']
+        if entity_layers:
+            matches = annotation.models.Annotation.objects.filter(layer__in=entity_layers, value=self.get_id()).count()
+        else:
+            matches = 0
         for url in urls:
             matches += annotation.models.Annotation.objects.filter(value__contains=url).count()
             matches += item.models.Item.objects.filter(data__contains=url).count()
