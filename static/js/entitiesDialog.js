@@ -390,7 +390,7 @@ pandora.ui.entitiesDialog = function(options) {
         $itemMenu.setItemTitle('delete', Ox._('Delete {0}...', [
             Ox._(ui.entitiesSelection[type].length < 2 ? 'Entity' : 'Entities')
         ]));
-        $deselectButton[data.ids.length ? 'show' : 'hide']();
+        $deselectButton[ui.entitiesSelection[type].length ? 'show' : 'hide']();
         renderForm();
         $itemStatus.html(text[0].toUpperCase() + text.slice(1));
     }
