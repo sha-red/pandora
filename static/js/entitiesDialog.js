@@ -7,6 +7,7 @@ pandora.ui.entitiesDialog = function(options) {
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
 
+        selected = [],
         type = pandora.site.entities[0].id,
 
         $entitiesSelect = Ox.Select({
@@ -56,8 +57,18 @@ pandora.ui.entitiesDialog = function(options) {
 
         $list = Ox.TableList({
             columns: [
-                {id: 'id', title: 'ID', operator: '+'},
-                {id: 'name', title: 'Name', operator: '+', visible: true, width: 256 - Ox.SCROLLBAR_SIZE}
+                {
+                    id: 'id',
+                    title: 'ID',
+                    operator: '+'
+                },
+                {
+                    id: 'name',
+                    title: 'Name',
+                    operator: '+',
+                    visible: true,
+                    width: 256 - Ox.SCROLLBAR_SIZE
+                }
             ],
             items: function(options, callback) {
                 pandora.api.findEntities({
@@ -85,6 +96,11 @@ pandora.ui.entitiesDialog = function(options) {
                     Ox._('entities')
                 )
                 $listStatus.html(text[0].toUpperCase() + text.slice(1));
+            },
+            select: function(data) {
+                selected = data.ids;
+                renderEntity();
+                renderForm();
             }
         }),
 
@@ -178,6 +194,12 @@ pandora.ui.entitiesDialog = function(options) {
             .append($itemMenu)
             .append($deselectButton),
 
+        $labels = [],
+
+        $inputs = [],
+
+        $form = Ox.Element(),
+
         $itemStatus = Ox.Element()
         .css({
             fontSize: '9px',
@@ -192,7 +214,7 @@ pandora.ui.entitiesDialog = function(options) {
         $itemPanel = Ox.SplitPanel({
             elements: [
                 {element: $itemBar, size: 24},
-                {element: Ox.Element()},
+                {element: $form},
                 {element: $itemStatusbar, size: 16}
             ],
             orientation: 'vertical'
@@ -262,6 +284,80 @@ pandora.ui.entitiesDialog = function(options) {
         .bindEvent({
             // resize: ...
         });
+
+    function renderEntity() {
+        var id = selected[0];
+        if (!id) {
+            $entity.empty();
+            return;
+        }
+        pandora.ui.entity({
+            id: id,
+            type: type,
+            view: 'entity'
+        }, function(html) {
+            if (id != selected[0]) {
+                return;
+            }
+            $entity.html(html);
+        });
+    }
+
+    function renderForm() {
+        var id = selected[0];
+        if (!id) {
+            $form.empty();
+            return;
+        }
+        pandora.api.getEntity({
+            id: id
+        }, function(data) {
+            if (id != selected[0]) {
+                return;
+            }
+            var keys = Ox.getObjectById(pandora.site.entities, type).keys;
+            $form.empty()
+            keys.forEach(function(key) {
+                var $label = Ox.Label({
+                            title: Ox._(key.title),
+                            width: 248
+                        })
+                        .css({
+                            margin: '4px'
+                        })
+                        .appendTo($form),
+                    $input;
+                if (key.type == 'document') {
+                    $input = Ox.Input({autovalidate: /[A-Z]/});
+                } else if (key.type == 'float') {
+                    $input = Ox.Input({type: 'float'});
+                } else if (key.type == 'int') {
+                    $input = Ox.Input({type: 'int'});
+                } else if (key.type == 'string') {
+                    $input = Ox.Input();
+                } else if (key.type[0] == 'string') {
+                    $input = Ox.ArrayInput();
+                } else if (key.type == 'text') {
+                    $input = Ox.Input({height: 248, type: 'textarea'});
+                }
+                $input.options({
+                        value: data.key
+                        width: 248
+                    })
+                    .bindEvent({
+                        change: function(data) {
+                            pandora.api.editEntity(Ox.extend({
+                                id: id
+                            }, key.id, data.value), function(result) {
+                                // ...
+                            });
+                        }
+                    });
+                $labels.push($label);
+                $inputs.push($input);
+            });
+        });
+    }
 
     return that;
 
