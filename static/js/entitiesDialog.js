@@ -32,6 +32,7 @@ pandora.ui.entitiesDialog = function(options) {
         $findInput = Ox.Input({
             clear: true,
             placeholder: 'Find',
+            submitOnKeypress: true,
             width: 122
         })
         .css({
@@ -98,9 +99,15 @@ pandora.ui.entitiesDialog = function(options) {
                 $listStatus.html(text[0].toUpperCase() + text.slice(1));
             },
             select: function(data) {
+                var text = Ox.formatCount(
+                    data.ids,
+                    Ox._('entity'),
+                    OX._('entities')
+                ) + ' ' + Ox._('selected');
                 selected = data.ids;
                 renderEntity();
                 renderForm();
+                $itemStatus.html(text[0].toUpperCase() + text.slice(1));
             }
         }),
 
@@ -335,11 +342,11 @@ pandora.ui.entitiesDialog = function(options) {
                             title: Ox._(key.title),
                             width: 248 - Ox.SCROLLBAR_SIZE
                         })
-                        .css({margin: '2px'})
+                        .css({margin: '2px 2px 4px 2px'})
                         .appendTo($form),
                     $input;
                 if (key.type == 'document') {
-                    $input = Ox.Input({autovalidate: /[A-Z]/});
+                    $input = Ox.Input({autovalidate: /^[A-Z]+?$/});
                 } else if (key.type == 'float') {
                     $input = Ox.Input({type: 'float'});
                 } else if (key.type == 'int') {
@@ -355,11 +362,11 @@ pandora.ui.entitiesDialog = function(options) {
                     });
                 }
                 $input.options({
-                        disabled: key == 'id',
-                        value: data[key],
+                        disabled: key.id == 'id',
+                        value: data[key.id],
                         width: 248 - Ox.SCROLLBAR_SIZE
                     })
-                    .css({margin: '2px'})
+                    .css({margin: '2px 2px 4px 2px'})
                     .bindEvent({
                         change: function(data) {
                             pandora.api.editEntity(Ox.extend({
