@@ -331,7 +331,7 @@ pandora.ui.entitiesDialog = function(options) {
         }
         pandora.api.getEntity({
             id: id
-        }, function(data) {
+        }, function(result) {
             if (id != selected[0]) {
                 return;
             }
@@ -363,7 +363,7 @@ pandora.ui.entitiesDialog = function(options) {
                 }
                 $input.options({
                         disabled: key.id == 'id',
-                        value: data[key.id],
+                        value: result.data[key.id],
                         width: 248 - Ox.SCROLLBAR_SIZE
                     })
                     .css({margin: '2px 2px 4px 2px'})
