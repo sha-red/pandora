@@ -317,8 +317,8 @@ pandora.ui.entitiesDialog = function(options) {
     }
 
     function renderForm() {
-        var id = ui.entitiesSelection['type']
-            ? ui.entitiesSelection['type'][0]
+        var id = ui.entitiesSelection[type]
+            ? ui.entitiesSelection[type][0]
             : null;
         if (!id) {
             $form.empty();
@@ -387,6 +387,9 @@ pandora.ui.entitiesDialog = function(options) {
             Ox._('entities')
         ) + ' ' + Ox._('selected');
         renderEntity();
+        $itemMenu[
+            ui.entitiesSelection[type].length ? 'enableItem' : 'disableItem'
+        ]('delete');
         $itemMenu.setItemTitle('delete', Ox._('Delete {0}...', [
             Ox._(ui.entitiesSelection[type].length < 2 ? 'Entity' : 'Entities')
         ]));
