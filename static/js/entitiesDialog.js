@@ -327,7 +327,7 @@ pandora.ui.entitiesDialog = function(options) {
         pandora.api.getEntity({
             id: id
         }, function(result) {
-            if (id != ui.entitiesSelection['type'][0]) {
+            if (id != ui.entitiesSelection[type][0]) {
                 return;
             }
             var keys = Ox.getObjectById(pandora.site.entities, type).keys;
