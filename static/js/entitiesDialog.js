@@ -366,7 +366,7 @@ pandora.ui.entitiesDialog = function(options) {
                         value: result.data[key.id],
                         width: 248 - Ox.SCROLLBAR_SIZE
                     })
-                    .css({margin: '2px 2px 4px 2px'})
+                    .css({margin: '2px 2px 16px 2px'})
                     .bindEvent({
                         change: function(data) {
                             pandora.api.editEntity(Ox.extend({
