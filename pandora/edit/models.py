@@ -8,6 +8,7 @@ import shutil
 from glob import glob
 import subprocess
 from urllib import quote
+import tempfile
 
 import ox
 from ox.django.fields import DictField, TupleField
@@ -355,6 +356,7 @@ class Edit(models.Model):
         for clip in self.clips.all().order_by('index'):
             data = clip.json()
             clips.append(os.path.join(tmp, '%06d.webm' % data['index']))
+            path = clip.item.streams()[0].media.path
             cmd = ['avconv', '-i', path,
                    '-ss', data['in'], '-t', data['out'],
                    '-vcodec', 'copy', '-acodec', 'copy',
