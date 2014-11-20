@@ -274,7 +274,7 @@ def file(request, id, name=None):
 
 def thumbnail(request, id, size=256, page=None):
     size = int(size)
-    document = models.Document.get(id)
+    document = get_document_or_404_json(id)
     return HttpFileResponse(document.thumbnail(size, page=page))
 
 @login_required_json
