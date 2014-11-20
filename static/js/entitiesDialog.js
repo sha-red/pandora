@@ -365,7 +365,8 @@ pandora.ui.entitiesDialog = function(options) {
                                 // ...
                             });
                         }
-                    });
+                    })
+                    .appendTo($form);
                 $labels.push($label);
                 $inputs.push($input);
             });
