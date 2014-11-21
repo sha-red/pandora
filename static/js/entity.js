@@ -2,7 +2,7 @@
 
 'use strict';
 
-pandora.ui.entity = function(options, callback) {
+pandora.entity = function(options, callback) {
     // options: {id, view}, view: 'annotation' or 'entity'
     pandora.api.getEntity({
         id: options.id

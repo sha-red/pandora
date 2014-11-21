@@ -313,7 +313,7 @@ pandora.ui.entitiesDialog = function(options) {
             $entity.empty();
             return;
         }
-        pandora.ui.entity({
+        pandora.entity({
             id: id,
             type: type,
             view: 'entity'
