@@ -131,7 +131,8 @@ pandora.ui.entitiesDialog = function(options) {
             resize: updateList
         }),
 
-        $entity = Ox.Element(),
+        $entity = Ox.Element()
+            .css({overflowY: 'auto'}),
 
         $itemMenu = Ox.MenuButton({
             items: [
@@ -379,7 +380,9 @@ pandora.ui.entitiesDialog = function(options) {
                             pandora.api.editEntity(Ox.extend({
                                 id: id
                             }, key.id, data.value), function(result) {
-                                // ...
+                                if (key.id == 'name') {
+                                    $list.value(id, {name: result.data.name});
+                                }
                             });
                         }
                     })
