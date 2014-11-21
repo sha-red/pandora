@@ -383,7 +383,13 @@ pandora.ui.documentsPanel = function(options) {
             pandora_showdocument: function(data) {
                 isItemView && that.toggleElement(1);
             }
-        });
+        })
+        .bindEvent(
+            'pandora_documentsselection.' + (
+                isItemView ? ui.item.toLowerCase() : ''
+            ),
+            selectDocuments
+        );
 
     if (isItemView) {
         pandora.$ui.documentsList = $list;
@@ -394,11 +400,6 @@ pandora.ui.documentsPanel = function(options) {
     setTimeout(function() {
         $findInput.options({width: getFindInputWidth()});
     });
-
-    that.bindEvent(
-        'pandora_documentsselection.' + (isItemView ? ui.item.toLowerCase() : ''),
-        selectDocuments
-    );
 
     function addDocuments() {
         var ids = ui.documentsSelection[''];
@@ -748,8 +749,8 @@ pandora.ui.documentsPanel = function(options) {
         .bindEventOnce({
             load: function() {
                 listLoaded = true;
-                selectDocuments();
                 !ui.showBrowser && $list.gainFocus();
+                setTimeout(selectDocuments);
             }
         });
     }
