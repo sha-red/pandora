@@ -187,7 +187,7 @@
             "title": "Runtime", 
             "type": "time",
             "columnWidth": 60,
-            "format": {"type": "duration", "args": [0, "short"]},
+            "format": {"type": "duration", "args": [0]},
             "sort": true
         },
         {
