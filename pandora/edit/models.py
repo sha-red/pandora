@@ -319,12 +319,13 @@ class Edit(models.Model):
         }
         if 'clips' in keys:
             clips = self.get_clips_json(user)
+        clips_qs = self.get_clips(user)
 
         for key in keys:
             if key == 'id':
                 response[key] = self.get_id()
             elif key == 'items':
-                response[key] = self.get_clips(user).count()
+                response[key] = clips_qs.count()
             elif key == 'query':
                 if not self.query.get('static', False):
                     response[key] = self.query
@@ -333,9 +334,9 @@ class Edit(models.Model):
             elif key == 'duration':
                 if self.type == 'static':
                     response[key] = sum([(c['annotation__end'] or c['end']) - (c['annotation__start'] or c['start'])
-                        for c in self.get_clips(user).values('start', 'end', 'annotation__start', 'annotation__end')])
+                        for c in clips_qs.values('start', 'end', 'annotation__start', 'annotation__end')])
                 else:
-                    response[key] = sum([c['end'] - c['start'] for c in self.get_clips(user).values('start', 'end')])
+                    response[key] = sum([c['end'] - c['start'] for c in clips_qs.values('start', 'end')])
             elif key == 'editable':
                 response[key] = self.editable(user)
             elif key == 'user':
