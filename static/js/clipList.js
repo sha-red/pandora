@@ -165,7 +165,7 @@ pandora.ui.clipList = function(videoRatio) {
                 var id = data.ids[0],
                     item = !ui.item ? id.split('/')[0] : ui.item,
                     annotations = that.value(id, 'annotations') || [],
-                    annotation = annotations.length ? annotations[0].id : null;
+                    annotation = annotations.length ? annotations[0].id : null,
                     points = {
                         annotation: annotation ? annotation.split('/')[1] : '',
                         'in': that.value(id, 'in'),
