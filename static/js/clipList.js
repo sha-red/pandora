@@ -138,7 +138,8 @@ pandora.ui.clipList = function(videoRatio) {
             copy: function(data) {
                 var items = data.ids.map(function(id) {
                     var item = !ui.item ? id.split('/')[0] : ui.item,
-                        annotation = that.value(id, 'annotations')[0].id;
+                        annotations = that.value(id, 'annotations') || [],
+                        annotation = annotations.length ? annotations[0].id : null;
                     return annotation || item + '/' + that.value(id, 'in') + '-' + that.value(id, 'out');
                 })
                 pandora.clipboard.copy(items, 'clip');
@@ -146,7 +147,8 @@ pandora.ui.clipList = function(videoRatio) {
             copyadd: function(data) {
                 var items = data.ids.map(function(id) {
                     var item = !ui.item ? id.split('/')[0] : ui.item,
-                        annotation = that.value(id, 'annotations')[0].id;
+                        annotations = that.value(id, 'annotations') || [],
+                        annotation = annotations.length ? annotations[0].id : null;
                     return annotation || item + '/' + that.value(id, 'in') + '-' + that.value(id, 'out');
                 })
                 pandora.clipboard.add(items, 'clip');
@@ -162,7 +164,8 @@ pandora.ui.clipList = function(videoRatio) {
             open: function(data) {
                 var id = data.ids[0],
                     item = !ui.item ? id.split('/')[0] : ui.item,
-                    annotation = that.value(id, 'annotations')[0].id,
+                    annotations = that.value(id, 'annotations') || [],
+                    annotation = annotations.length ? annotations[0].id : null;
                     points = {
                         annotation: annotation ? annotation.split('/')[1] : '',
                         'in': that.value(id, 'in'),
