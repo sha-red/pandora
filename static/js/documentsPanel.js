@@ -750,15 +750,16 @@ pandora.ui.documentsPanel = function(options) {
             load: function() {
                 listLoaded = true;
                 !ui.showBrowser && $list.gainFocus();
-                select();
-                function select() {
-                    if (
-                        $list.options('selected').length == 0
-                        || $list.value($list.options('selected')[0])
-                    ) {
+                if ($list.options('selected').length == 0) {
+                    selectDocuments()
+                } else {
+                    selectDocumentsLater();
+                }
+                function selectDocumentsLater() {
+                    if ($list.value($list.options('selected')[0])) {
                         selectDocuments();
                     } else {
-                        setTimeout(select, 100);
+                        setTimeout(selectDocumentsLater, 100);
                     }
                 }
             }
