@@ -1332,6 +1332,12 @@ class Item(models.Model):
         poster = self.poster.path
         with open(poster, 'w') as f:
             f.write(data)
+        self.poster_height = self.poster.height
+        self.poster_width = self.poster.width
+        if self.json.get('posterRatio') != self.poster_width / self.poster_height:
+            self.json = self.get_json()
+            Item.objects.filter(id=self.id).update(json=self.json,
+                poster_width=self.poster_width, poster_height=self.poster_height)
 
     def prefered_poster_url(self):
         if settings.DATA_SERVICE:
