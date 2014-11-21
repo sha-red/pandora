@@ -483,7 +483,7 @@ pandora.createLinks = function($element) {
         } else if (type == 'clip' && ui.section == 'edits') {
             // FIXME: update edit list (once it has item count)
             if (Ox.contains(object.targets, ui.edit)) {
-                pandora.$ui.editPanel.updatePanel();
+                pandora.$ui.editPanel && pandora.$ui.editPanel.updatePanel();
             }
         }
         callback && callback();
@@ -668,7 +668,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                             : [pandora.user.ui.edit, drag.target.id];
                         pandora.doHistory(drag.action, data.ids, targets, function() {
                             Ox.print('FIXME, reload clipslist on move');
-                            pandora.$ui.editPanel.updatePanel();
+                            pandora.$ui.editPanel && pandora.$ui.editPanel.updatePanel();
                             cleanup(250);
                         });
                     } 
