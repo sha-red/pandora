@@ -358,6 +358,7 @@ pandora.ui.home = function() {
                         borderBottomLeftRadius: '32px',
                         padding: '8px 8px 8px 130px',
                         overflowY: 'auto',
+                        lineHeight: '14px',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'normal'
                     })
