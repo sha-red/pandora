@@ -437,7 +437,7 @@ pandora.ui.listIconPanel = function(listData) {
                     height: size,
                     id: data.id,
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
-                    title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                    title: pandora.getItemTitle(data),
                     url: pandora.getMediaURL('/' + data.id + '/icon' + size + '.jpg?' + data.modified),
                     width: size
                 };
@@ -453,7 +453,7 @@ pandora.ui.listIconPanel = function(listData) {
                     }
                 }), callback);
             },
-            keys: ['director', 'duration', 'id', 'modified', 'posterFrame', 'title', 'videoRatio', 'year'],
+            keys: ['duration', 'id', 'modified', 'posterFrame', 'videoRatio'].concat(pandora.site.itemTitleKeys),
             max: 1,
             min: 1,
             //orientation: 'vertical',

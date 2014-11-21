@@ -105,7 +105,7 @@ pandora.ui.browser = function() {
                     height: ratio <= 1 ? size : size / ratio,
                     id: data.id,
                     info: info,
-                    title: data.title + (data.director && data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                    title: pandora.getItemTitle(data),
                     url: url,
                     width: ratio >= 1 ? size : size * ratio
                 };
@@ -115,7 +115,7 @@ pandora.ui.browser = function() {
                     query: pandora.user.ui.find
                 }), callback);
             },
-            keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
+            keys: ['id', 'modified', 'posterRatio'].concat(pandora.site.itemTitleKeys),
             max: 1,
             min: 1,
             orientation: 'horizontal',

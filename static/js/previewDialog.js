@@ -58,7 +58,7 @@ pandora.ui.previewDialog = function() {
     that.update = function() {
         pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);
         pandora.requests.preview = pandora.api.find({
-            keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
+            keys: ['id', 'modified', 'posterRatio'].concat(pandora.site.itemTitleKeys),
             query: {
                 conditions: [{
                     key: 'id',
@@ -73,11 +73,7 @@ pandora.ui.previewDialog = function() {
                     ? pandora.site.posters.ratio
                     : item.posterRatio,
                 size = getSize(posterRatio),
-                title = item.title + (
-                    item.director.length ? ' (' + item.director.join(', ') + ')' : ''
-                ) + (
-                    item.year ? ' ' + item.year : ''
-                );
+                title = pandora.getItemTitle(item, true);
             $image = $('<img>')
                 .attr({src: pandora.getMediaURL('/' + item.id + '/' + (
                     pandora.user.ui.showSitePosters ? 'siteposter' : 'poster'

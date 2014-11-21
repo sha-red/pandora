@@ -1281,18 +1281,6 @@ pandora.getItemIdAndPosition = function() {
     return ret;
 }
 
-pandora.getItemTitle = function(itemData) {
-    return (itemData.title || Ox._('Untitled')) + (
-        Ox.len(itemData.director) || itemData.year
-        ? ' (' + (
-            Ox.len(itemData.director)
-            ? itemData.director
-            : [Ox._('Unknown Director')]
-        ).join(', ') + ')'
-        : ''
-    ) + (itemData.year ? ' ' + itemData.year : '')
-};
-
 pandora.getLargeClipTimelineURL = function(item, inPoint, outPoint, type, callback) {
     var fps = 25,
         width = Math.ceil((outPoint - inPoint) * fps),

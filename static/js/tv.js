@@ -98,12 +98,7 @@ pandora.ui.tv = function() {
                     title: pandora.site.site.name + ' &mdash; ' + (
                             list || Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
                         ) + ' &mdash; '
-                        + result.data.title
-                        + (
-                            result.data.director
-                            ? ' (' + result.data.director.join(', ') + ') '
-                            : ''
-                        ) + result.data.year,
+                        + pandora.getItemTitle(result.data, true),
                     video: videoOptions.video,
                     volume: pandora.user.ui.videoVolume
                 })

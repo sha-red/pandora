@@ -40,7 +40,7 @@ pandora.ui.embedGrid = function() {
                     height: Math.round(ratio <= 1 ? size : size / ratio),
                     id: data.id,
                     info: info,
-                    title: data.title + (data.director && data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                    title: pandora.getItemTitle(data),
                     url: url,
                     width: Math.round(ratio >= 1 ? size : size * ratio)
                 };
@@ -51,7 +51,7 @@ pandora.ui.embedGrid = function() {
                 }), callback);
                 return Ox.clone(data, true);
             },
-            keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
+            keys: ['id', 'modified', 'posterRatio'].concat(pandora.site.itemTitleKeys),
             max: 1,
             selected: ui.listSelection,
             size: 128,

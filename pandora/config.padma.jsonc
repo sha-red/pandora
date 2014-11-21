@@ -515,6 +515,7 @@
         "plural": "Videos"
     },
     "itemRequiresVideo": true,
+    "itemTitleKeys": ["title", "director", "year"],
     "itemViews": [
         {"id": "info", "title": "Info"},
         {"id": "player", "title": "Player"},

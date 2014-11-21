@@ -79,7 +79,7 @@ def load_config():
 
         #add missing defaults
         for section in (
-            'capabilities', 'cantPlay', 'itemName', 'media', 'posters',
+            'capabilities', 'cantPlay', 'itemName', 'itemTitleKeys', 'media', 'posters',
             'site', 'tv', 'user.ui', 'user.ui.part', 'user.ui.showFolder',
             'menuExtras', 'languages'
         ):

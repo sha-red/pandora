@@ -80,7 +80,7 @@ pandora.ui.info = function() {
             that.append(pandora.$ui.listInfo = pandora.ui.listInfo());
             previousView == 'video' && resizeInfo();
         } else if (view == 'poster') {
-            pandora.api.get({id: id, keys: ['director', 'modified', 'posterRatio', 'title']}, function(result) {
+            pandora.api.get({id: id, keys: ['modified', 'posterRatio'].concat(pandora.site.itemTitleKeys)}, function(result) {
                 var ratio = result.data.posterRatio,
                     height = pandora.getInfoHeight(true);
                 emptyInfo();
@@ -379,11 +379,7 @@ pandora.ui.posterInfo = function(data) {
                 textOverflow: 'ellipsis',
                 overflow: 'hidden'
             })
-            .html(
-                data.title + (
-                    Ox.len(data.director) ? ' (' + data.director.join(', ') + ')' : ''
-                )
-            ),
+            .html(pandora.getItemTitle(data)),
         that = Ox.SplitPanel({
             elements: [
                 {

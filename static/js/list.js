@@ -152,7 +152,7 @@ pandora.ui.list = function() {
                     height: Math.round(ratio <= 1 ? size : size / ratio),
                     id: data.id,
                     info: info,
-                    title: data.title + (data.director && data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                    title: pandora.getItemTitle(data),
                     url: url,
                     width: Math.round(ratio >= 1 ? size : size * ratio)
                 };
@@ -163,7 +163,7 @@ pandora.ui.list = function() {
                 }), callback);
                 return Ox.clone(data, true);
             },
-            keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
+            keys: ['id', 'modified', 'posterRatio'].concat(pandora.site.itemTitleKeys),
             selected: ui.listSelection,
             size: 128,
             sort: ui.listSort,
@@ -209,7 +209,7 @@ pandora.ui.list = function() {
                         height: Math.round(ratio <= 1 ? size : size / ratio),
                         id: data.id,
                         info: info,
-                        title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                        title: pandora.getItemTitle(data),
                         url: url,
                         width: Math.round(ratio >= 1 ? size : size * ratio)
                     },
@@ -239,7 +239,7 @@ pandora.ui.list = function() {
                 });
                 return Ox.clone(data, true);
             },
-            keys: ['clips', 'director', 'duration', 'id', 'modified', 'posterRatio', 'title', 'videoRatio', 'year'],
+            keys: ['clips', 'duration', 'id', 'modified', 'posterRatio', 'videoRatio'].concat(pandora.site.itemTitleKeys),
             selected: ui.listSelection,
             size: 192,
             sort: ui.listSort,
@@ -296,7 +296,7 @@ pandora.ui.list = function() {
                         height: Math.round(ratio <= 1 ? size : size / ratio),
                         id: data.id,
                         info: info,
-                        title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                        title: pandora.getItemTitle(data),
                         url: url,
                         width: Math.round(ratio >= 1 ? size : size * ratio)
                     },
@@ -356,7 +356,7 @@ pandora.ui.list = function() {
                 }} : {})), callback);
                 return Ox.clone(data, true);
             },
-            keys: ['clips', 'director', 'duration', 'id', 'modified', 'posterRatio', 'rendered', 'title', 'year'],
+            keys: ['clips', 'duration', 'id', 'modified', 'posterRatio', 'rendered'].concat(pandora.site.itemTitleKeys),
             selected: ui.listSelection,
             size: 192,
             sort: ui.listSort,

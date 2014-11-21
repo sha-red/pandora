@@ -14,10 +14,10 @@ pandora.ui.item = function() {
         id: pandora.user.ui.item,
         keys: isVideoView ? [
             'audioTracks',
-            'cuts', 'director', 'duration', 'durations', 'editable', 'layers',
+            'cuts', 'duration', 'durations', 'editable', 'layers',
             'modified', 'parts', 'posterFrame', 'rendered', 'rightslevel',
-            'size', 'title', 'videoRatio', 'year'
-        ] : []
+            'size', 'videoRatio',
+        ].concat(pandora.site.itemTitleKeys) : []
     }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
 
         if (pandora.user.ui.item != item) {
@@ -32,7 +32,7 @@ pandora.ui.item = function() {
         }
 
         pandora.$ui.itemTitle
-            .options({title: '<b>' + pandora.getItemTitle(result.data) + '</b>'})
+            .options({title: '<b>' + pandora.getItemTitle(result.data, true) + '</b>'})
             .show();
 
         // fixme: layers have value, subtitles has text?
