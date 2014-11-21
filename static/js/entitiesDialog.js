@@ -383,6 +383,8 @@ pandora.ui.entitiesDialog = function(options) {
                                 if (key.id == 'name') {
                                     $list.value(id, {name: result.data.name});
                                 }
+                                Ox.Request.clearCache('getEntity');
+                                renderEntity();
                             });
                         }
                     })
