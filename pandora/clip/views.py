@@ -124,12 +124,13 @@ def findClips(request, data):
                 values.append('layer')
             if query['filter']:
                 qs = qs.filter(query['filter'])
+            for i in response['data']['items']:
+                if not key in i:
+                    i[key] = []
             for a in qs.values(*values):
                 public_id = clip_public_id(a)
                 for i in response['data']['items']:
                     if i['id'] == public_id:
-                        if not key in i:
-                            i[key] = []
                         l = {
                             'id': a['public_id'],
                             'value': a['value'],
@@ -143,7 +144,7 @@ def findClips(request, data):
             if 'annotations' in keys:
                 aqs = Annotation.objects.filter(layer__in=settings.CONFIG['clipLayers'],
                                                 clip__in=ids)
-                add_annotations('annotations',aqs , True)
+                add_annotations('annotations', aqs , True)
             layer_ids = [k['id'] for k in settings.CONFIG['layers']]
             for layer in filter(lambda l: l in keys, layer_ids):
                 aqs = Annotation.objects.filter(layer=layer, clip__in=ids)
