@@ -81,9 +81,7 @@ pandora.ui.appPanel = function() {
             }
         } else if (page == 'entities') {
             if (pandora.user.ui.part.entities) {
-                pandora.openEntitiesDialog({
-                    ids: [pandora.user.ui.part.entities.split('/')[0]]
-                });
+                pandora.$ui.entityDialog = pandora.ui.entityDialog().open();
             } else {
                 pandora.UI.set({page: ''});
             }
