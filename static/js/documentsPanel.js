@@ -756,7 +756,7 @@ pandora.ui.documentsPanel = function(options) {
                     selectDocumentsLater();
                 }
                 function selectDocumentsLater() {
-                    if ($list.value($list.options('selected')[0])) {
+                    if (!Ox.isEmpty($list.value($list.options('selected')[0]))) {
                         selectDocuments();
                     } else {
                         setTimeout(selectDocumentsLater, 100);
