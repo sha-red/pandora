@@ -446,7 +446,7 @@ pandora.createLinks = function($element) {
             pandora.api.addClips({
                 clips: pandora.getClipData(items),
                 edit: target,
-                index: pandora.$ui.editPanel.getPasteIndex()
+                index: pandora.$ui.editPanel ? pandora.$ui.editPanel.getPasteIndex() : null
             }, function(result) {
                 // adding clips creates new ids, so mutate items in history
                 items.splice.apply(items, [0, items.length].concat(pandora.getClipItems(result.data.clips)));
