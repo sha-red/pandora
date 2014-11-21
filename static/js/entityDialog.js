@@ -6,18 +6,19 @@ pandora.ui.entityDialog = function(options) {
 
     var ui = pandora.user.ui,
 
-        $content = Ox.Element(),
+        $content = Ox.Element()
+            .css({overflowY: 'auto'}),
 
         that = Ox.Dialog({
             closeButton: true,
             content: $content, 
             fixedSize: true,
             focus: false,
-            height: 384,
+            height: 416,
             padding: 0,
             removeOnClose: true,
             title: '',
-            width: 512,
+            width: 560,
         })
         .bindEvent({
             close: function() {
