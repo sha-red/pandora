@@ -170,11 +170,8 @@ DATABASES = {
 
 #rabbitmq connection settings
 CELERY_RESULT_BACKEND = "database"
-BROKER_HOST = "127.0.0.1"
-BROKER_PORT = 5672
-BROKER_USER = "pandora"
-BROKER_PASSWORD = "box"
-BROKER_VHOST = "/pandora"
+BROKER_URL = 'amqp://pandora:box@localhost:5672//pandora'
+
 SEND_CELERY_ERROR_EMAILS = False
 
 #with apache x-sendfile or lighttpd set this to True

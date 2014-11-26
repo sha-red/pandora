@@ -128,7 +128,7 @@ DATABASES = {
         'PASSWORD': '',
     }
 }
-BROKER_PASSWORD = "$RABBITPWD"
+BROKER_URL = 'amqp://pandora:$RABBITPWD@localhost:5672//pandora'
 XACCELREDIRECT = True
 
 DEBUG = False

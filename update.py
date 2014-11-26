@@ -102,6 +102,25 @@ if __name__ == "__main__":
             run('./bin/pip', 'install', '-r', 'requirements.txt')
         if old < 4379:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
+        if old < 4549:
+            import pandora.settings
+            with open('pandora/local_settings.py', 'r') as f:
+                local_settings = f.read()
+            if not 'BROKER_URL' in local_settings:
+                broker_url = 'amqp://%s:%s@%s:%s/%s' % (
+                    getattr(pandora.settings, 'BROKER_USER', 'pandora'),
+                    getattr(pandora.settings, 'BROKER_PASSWORD', 'box'),
+                    getattr(pandora.settings, 'BROKER_HOST', '127.0.0.1'),
+                    getattr(pandora.settings, 'BROKER_PORT', 5672),
+                    getattr(pandora.settings, 'BROKER_VHOST', '/pandora'),
+                )
+                local_settings = [
+                    l for l in local_settings.split('\n') if not l.startswith('BROKER_')
+                ] + [
+                    'BROKER_URL = "%s"' % broker_url, ''
+                ]
+                with open('pandora/local_settings.py', 'w') as f:
+                    f.write('\n'.join(local_settings))
     else:
 
         if len(sys.argv) == 1:
