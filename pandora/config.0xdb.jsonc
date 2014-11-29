@@ -39,6 +39,7 @@
         "canExportAnnotations": {},
         "canImportAnnotations": {},
         "canManageDocuments": {"staff": true, "admin": true},
+        "canManageEntities": {"staff": true, "admin": true},
         "canManagePlacesAndEvents": {"staff": true, "admin": true},
         "canManageTitlesAndNames": {"staff": true, "admin": true},
         "canManageUsers": {"staff": true, "admin": true},
