@@ -1098,7 +1098,7 @@ class Item(models.Model):
             if stream.duration + offset < position:
                 offset += stream.duration
             else:
-                if not stream.file.is_video or not stream.file.info['video']:
+                if not stream.file.is_video or not stream.file.info.get('video'):
                     return None
                 position = position - offset
                 if not height:
