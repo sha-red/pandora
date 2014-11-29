@@ -195,6 +195,7 @@ class Item(models.Model):
             return self.external_data[key]
         item_key = utils.get_by_id(settings.CONFIG['itemKeys'], key)
         if item_key and 'value' in item_key \
+            and isinstance(item_key['value'], dict) \
             and item_key['value'].get('type') == 'map' \
             and self.get(item_key['value']['key']):
             value = re.compile(item_key['value']['map']).findall(self.get(item_key['value']['key']))
