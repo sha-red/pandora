@@ -5,9 +5,20 @@
 */
 
 {
+    /*
+        "annotations" configures the annotation panel.
+        - showUsers: If true, include list of users in menu, so that
+          annotations by specific users can be turned on and off
+    */
     "annotations": {
         "showUsers": true
     },
+    /*
+        "cantPlay" sets the UI for videos that a user is not allowed to play.
+            icon: symbol name (see https://oxjs.org/#examples/symbols/live)
+            link: loaded on click
+            text: shown on hover
+    */
     "cantPlay": {
         "icon": "NoCopyright",
         "link": "/rights",
@@ -75,7 +86,14 @@
         included in find annotations.
     */
     "clipLayers": ["subtitles", "keywords", "notes"],
+    /*
+        "flags" sets if in filters, countries and languages have a flag icon.
+    */
     "flags": false,
+    /*
+        "help" specifies the sections of the help dialog.
+        There isn't much of a point in making changes to this.
+    */
     "help": [
         {"id": "help", "title": "Help"},
         {"id": "accounts", "title": "Accounts"},
@@ -635,8 +653,21 @@
         "singular": "Movie",
         "plural": "Movies"
     },
+    /*
+        "itemRequiresVideo" specifies if items without video can be created.
+        If true, the only way to add an item is to upload a video.
+    */
     "itemRequiresVideo": false,
+    /*
+        "itemTitleKeys" list of itemKeys used to compose the title
+        via pandora.getItemTitle
+    */
     "itemTitleKeys": ["title", "director", "year"],
+    /*
+        "itemViews" is an ordered list of available item views.
+        Implemented views are "info", "documents", "player", "editor",
+        "timeline", "clips", "map", "calendar", "data" and "media".
+    */
     "itemViews": [
         {"id": "info", "title": "Info"},
         {"id": "documents", "title": "Documents"},
@@ -649,9 +680,22 @@
         {"id": "data", "title": "Data"},
         {"id": "media", "title": "Media"}
     ],
+    /*
+        "language" is the default language for annotations of type "text".
+        Text in other languages can be added via markup, for example:
+            <span lang="fr">Voilà!</span>
+    */
     "language": "en",
+    /*
+        "languages" is the list of languages that the interface can be set to.
+        Currently, localization exists for "ar", "el", "en" and "hi". (???)
+    */
     "languages": ["ar", "el", "en", "hi"],
     // fixme: should be renamed to annotationLayers
+    /*
+        "layers" define what annotation tracks are present.
+        (...)
+    */
     "layers": [
         {
             "id": "keywords",
@@ -685,6 +729,8 @@
             "type": "text"
         }
     ],
+    /*
+    */
     "listViews": [
         {"id": "list", "title": "as List"},
         {"id": "grid", "title": "as Grid"},
@@ -695,30 +741,44 @@
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],
+    /*
+    */
     "media": {
         "importPosters": false,
         "importFrames": false
     },
+    /*
+    */
     "menuExtras": [
         "user",
         //"locale",
         "reload"
     ],
+    /*
+    */
     "personalLists": [
         {"title": "Favorites"},
         {"title": "Black & White Films", "query": {"conditions": [{"key": "color", "value": "Black and White", "operator": "=="}], "operator": "&"}},
         {"title": "Silent Films", "query": {"conditions": [{"key": "language", "value": "None", "operator": "=="}, {"key": "sound", "value": "Silent", "operator": "=="}], "operator": "|"}}
     ],
+    /*
+    */
     "posters": {
         "ratio": 0.6875
     },
+    /*
+    */
     "rightsLevel": {"member": 3, "researcher": 3, "staff": 3, "admin": 3},
+    /*
+    */
     "rightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},
         {"name": "Out of Copyright", "color": [212, 255, 128]},
         {"name": "Under Copyright", "color": [255, 212, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
+    /*
+    */
     "site": {
         "description": "Indiancine.ma is an annotated online archive of Indian film. It is intended to serve as a shared resource for film scholars and enthusiasts in India and beyond.",
         // FIXME: "from" and "to" would be more intuitive as keys here
@@ -738,6 +798,8 @@
         "url": "indiancine.ma",
         "videoprefix": ""
     },
+    /*
+    */
     "sitePages": [
         {"id": "about", "title": "About"},
         {"id": "news", "title": "News"},
@@ -746,21 +808,31 @@
         {"id": "copyrights", "title": "Copyrights"},
         {"id": "contact", "title": "Contact"}
     ],
+    /*
+    */
     "sites": [
         {"name": "Pad.ma", "url": "pad.ma", "https": true},
         {"name": "OxDB", "url": "0xdb.org", "https": true}
     ],
+    /*
+    */
     "textRightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
+    /*
+    */
     "themes": ["oxlight", "oxmedium", "oxdark"],
+    /*
+    */
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
         {"id": "slitscan", "title": "Slit-Scan"},
         {"id": "keyframes", "title": "Keyframes"},
         {"id": "audio", "title": "Waveform"}
     ],
+    /*
+    */
     "totals": [
         {"id": "items"},
         {"id": "runtime"},
@@ -769,9 +841,13 @@
         {"id": "size", "capability": "canSeeMedia"},
         {"id": "pixels"}
     ],
+    /*
+    */
     "tv": {
         "showLogo": false
     },
+    /*
+    */
     "user": {
         "level": "guest",
         "newsletter": true,
@@ -913,7 +989,11 @@
         "volumes": []
     },
     // fixme: this should include colors
+    /*
+    */
     "userLevels": ["guest", "member", "researcher", "staff", "admin"],
+    /*
+    */
     "video": {
         "torrent": false,
         "formats": ["webm", "mp4"],

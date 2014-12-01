@@ -4,9 +4,20 @@
     You can edit this file.
 */
 {
+    /*
+        "annotations" configures the annotation panel.
+        - showUsers: If true, include list of users in menu, so that
+          annotations by specific users can be turned on and off
+    */
     "annotations": {
         "showUsers": false
     },
+    /*
+        "cantPlay" sets the UI for videos that a user is not allowed to play.
+            icon: symbol name (see https://oxjs.org/#examples/symbols/live)
+            link: loaded on click
+            text: shown on hover
+    */
     "cantPlay": {
         "icon": "NoCopyright",
         "link": "/rights",
@@ -75,7 +86,14 @@
         included in find annotations.
     */
     "clipLayers": ["subtitles"],
+    /*
+        "flags" sets if in filters, countries and languages have a flag icon.
+    */
     "flags": true,
+    /*
+        "help" specifies the sections of the help dialog.
+        There isn't much of a point in making changes to this.
+    */
     "help": [
         {"id": "help", "title": "Help"},
         {"id": "accounts", "title": "Accounts"},
@@ -620,8 +638,21 @@
         "singular": "Movie",
         "plural": "Movies"
     },
+    /*
+        "itemRequiresVideo" specifies if items without video can be created.
+        If true, the only way to add an item is to upload a video.
+    */
     "itemRequiresVideo": true,
+    /*
+        "itemTitleKeys" list of itemKeys used to compose the title
+        via pandora.getItemTitle
+    */
     "itemTitleKeys": ["title", "director", "year"],
+    /*
+        "itemViews" is an ordered list of available item views.
+        Implemented views are "info", "documents", "player", "editor",
+        "timeline", "clips", "map", "calendar", "data" and "media".
+    */
     "itemViews": [
         {"id": "info", "title": "Info"},
         {"id": "player", "title": "Player"},
@@ -633,9 +664,22 @@
         {"id": "data", "title": "Data"},
         {"id": "media", "title": "Media"}
     ],
+    /*
+        "language" is the default language for annotations of type "text".
+        Text in other languages can be added via markup, for example:
+            <span lang="fr">Voilà!</span>
+    */
     "language": "en",
+    /*
+        "languages" is the list of languages that the interface can be set to.
+        Currently, localization exists for "ar", "el", "en" and "hi". (???)
+    */
     "languages": ["ar", "el", "en", "hi"],
     // fixme: should be renamed to annotationLayers
+    /*
+        "layers" define what annotation tracks are present.
+        (...)
+    */
     "layers": [
         {
             "id": "privatenotes",
@@ -667,6 +711,8 @@
             "type": "text"
         }
     ],
+    /*
+    */
     "listViews": [
         {"id": "list", "title": "as List"},
         {"id": "grid", "title": "as Grid"},
@@ -680,26 +726,38 @@
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],
+    /*
+    */
     "media": {
         "importPosters": true,
         "importFrames": true
     },
+    /*
+    */
     "menuExtras": [
         "user",
         //"persona",
         //"locale",
         "reload"
     ],
+    /*
+    */
     "personalLists": [
         {"title": "Favorites"},
         {"title": "1960s", "query": {"conditions": [{"key": "year", "value": ["1960", "1970"], "operator": "="}], "operator": "&"}}
         //{"title": "Movies with Video", "query": {"conditions": [{"key": "canplayvideo", "value": "true", "operator": "="}], "operator": "&"}},
         //{"title": "Movies with Clips", "query": {"conditions": [{"key": "canplayclips", "value": "true", "operator": "="}], "operator": "&"}}
     ],
+    /*
+    */
     "posters": {
         "ratio": 0.625
     },
+    /*
+    */
     "rightsLevel": {"member": 4, "staff": 3, "admin": 2},
+    /*
+    */
     "rightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},
         {"name": "Relaxed", "color": [192, 255, 128]},
@@ -707,6 +765,8 @@
         {"name": "Restricted", "color": [255, 192, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
+    /*
+    */
     "site": {
         "description": "0xDB is an experimental - and to some degree imaginary - movie database. It is intended to help us rethink the future of cinema on the Internet, just as it tries to push the boundaries of what we understand as \"web applications\". What 0xDB proposes is an entirely new approach to visualizing and navigating moving images, and we hope that it can serve as a point of reference for individuals and institutions who are dealing with large collections of films.",
         // FIXME: "from" and "to" would be more intuitive as keys here
@@ -725,6 +785,8 @@
         "url": "0xDB.org",
         "videoprefix": ""
     },
+    /*
+    */
     "sitePages": [
         {"id": "about", "title": "About"},
         {"id": "news", "title": "News"},
@@ -734,21 +796,31 @@
         {"id": "rights", "title": "Rights Management"},
         {"id": "contact", "title": "Contact"}
     ],
+    /*
+    */
     "sites": [
         {"name": "Indiancine.ma", "url": "indiancine.ma", "https": true},
         {"name": "Pad.ma", "url": "pad.ma", "https": true}
     ],
+    /*
+    */
     "textRightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
+    /*
+    */
     "themes": ["oxlight", "oxmedium", "oxdark"],
+    /*
+    */
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
         {"id": "slitscan", "title": "Slit-Scan"},
         {"id": "keyframes", "title": "Keyframes"},
         {"id": "audio", "title": "Waveform"}
     ],
+    /*
+    */
     "totals": [
         {"id": "items"},
         {"id": "runtime"},
@@ -757,9 +829,13 @@
         {"id": "size", "capability": "canSeeMedia"},
         {"id": "pixels"}
     ],
+    /*
+    */
     "tv": {
         "showLogo": false
     },
+    /*
+    */
     "user": {
         "level": "guest",
         "newsletter": true,
@@ -901,7 +977,11 @@
         "volumes": []
     },
     // fixme: this should include colors
+    /*
+    */
     "userLevels": ["guest", "member", "friend", "staff", "admin"],
+    /*
+    */
     "video": {
         "torrent": true,
         "formats": ["webm", "mp4"],
