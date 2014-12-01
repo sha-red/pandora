@@ -396,20 +396,20 @@ pandora.ui.entitiesDialog = function(options) {
     }
 
     function selectEntities() {
-        var text = Ox.formatCount(
-            ui.entitiesSelection[type].length,
-            Ox._('entity'),
-            Ox._('entities')
-        ) + ' ' + Ox._('selected');
+        var entitiesLength = ui.entitiesSelection[type]
+                ? ui.entitiesSelection[type].length
+                : 0,
+            text = Ox.formatCount(entitiesLength, Ox._('entity'), Ox._('entities'))
+                + ' ' + Ox._('selected');
         $list.options({selected: ui.entitiesSelection[type] || []})
         renderEntity();
         $itemMenu[
-            ui.entitiesSelection[type].length ? 'enableItem' : 'disableItem'
+            entitiesLength ? 'enableItem' : 'disableItem'
         ]('delete');
         $itemMenu.setItemTitle('delete', Ox._('Delete {0}...', [
-            Ox._(ui.entitiesSelection[type].length < 2 ? 'Entity' : 'Entities')
+            Ox._(entitiesLength < 2 ? 'Entity' : 'Entities')
         ]));
-        $deselectButton[ui.entitiesSelection[type].length ? 'show' : 'hide']();
+        $deselectButton[entitiesLength ? 'show' : 'hide']();
         renderForm();
         $itemStatus.html(text[0].toUpperCase() + text.slice(1));
     }
