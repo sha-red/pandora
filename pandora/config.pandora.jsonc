@@ -1,12 +1,23 @@
 /*
-    Pan.do/ra Settings
-
+    pan.do/ra Configuration
+    -----------------------
     You can edit this file.
 */
 {
+    /*
+        "annotations" configures the annotation panel.
+        - showUsers: If true, include list of users in menu, so that
+          annotations by specific users can be turned on and off
+    */
     "annotations": {
         "showUsers": false
     },
+    /*
+        "cantPlay" sets the UI for videos that a user is not allowed to play.
+            icon: symbol name (see https://oxjs.org/#examples/symbols/live)
+            link: loaded on click
+            text: shown on hover
+    */
     "cantPlay": {
         "icon": "",
         "link": "",
@@ -79,7 +90,14 @@
         "entities" are ...
     */
     "entities": [],
+    /*
+        "flags" sets if in filters, countries and languages have a flag icon.
+    */
     "flags": false,
+    /*
+        "help" specifies the sections of the help dialog.
+        There isn't much of a point in making changes to this.
+    */
     "help": [
         {"id": "help", "title": "Help"},
         {"id": "accounts", "title": "Accounts"},
@@ -434,12 +452,29 @@
             "sort": true
         }
     ],
+    /*
+        "itemName" specifies the name of items ("movies", "videos", etc).
+        Note that anything excessively long may cause layout errors.
+    */
     "itemName": {
         "singular": "Video",
         "plural": "Videos"
     },
+    /*
+        "itemRequiresVideo" specifies if items without video can be created.
+        If true, the only way to add an item is to upload a video.
+    */
     "itemRequiresVideo": true,
+    /*
+        "itemTitleKeys" list of itemKeys used to compose the title
+        via pandora.getItemTitle
+    */
     "itemTitleKeys": ["title", "director", "year"],
+    /*
+        "itemViews" is an ordered list of available item views.
+        Implemented views are "info", "documents", "player", "editor",
+        "timeline", "clips", "map", "calendar", "data" and "media".
+    */
     "itemViews": [
         {"id": "info", "title": "Info"},
         {"id": "player", "title": "Player"},
@@ -452,8 +487,21 @@
         {"id": "data", "title": "Data"},
         {"id": "media", "title": "Media"}
     ],
+    /*
+        "language" is the default language for annotations of type "text".
+        Text in other languages can be added via markup, for example:
+            <span lang="fr">Voilà!</span>
+    */
     "language": "en",
+    /*
+        "languages" is the list of languages that the interface can be set to.
+        Currently, localization exists for "ar", "el", "en" and "hi". (???)
+    */
     "languages": ["ar", "el", "en", "hi"],
+    /*
+        "layers" define what annotation tracks are present.
+        (...)
+    */
     "layers": [
         {
             "id": "keywords",
@@ -493,6 +541,8 @@
             "type": "text"
         }
     ],
+    /*
+    */
     "listViews": [
         {"id": "list", "title": "as List"},
         {"id": "grid", "title": "as Grid"},
@@ -503,27 +553,41 @@
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],
+    /*
+    */
     "media": {
         "importPosters": false,
         "importFrames": false 
     },
+    /*
+    */
     "menuExtras": [
         "user",
         //"locale",
         "reload"
     ],
+    /*
+    */
     "personalLists": [
         {"title": "Favorites"}
     ],
+    /*
+    */
     "posters": {
         "ratio": 0.625
     },
+    /*
+    */
     "rightsLevel": {"member": 2, "staff": 2, "admin": 2},
+    /*
+    */
     "rightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},
         {"name": "Restricted", "color": [255, 192, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
+    /*
+    */
     "site": {
         "description": "This is a demo of pan.do/ra - a free, open source media archive. It allows you to manage large, decentralized collections of video, to collaboratively create metadata and time-based annotations, and to serve your archive as a cutting-edge web application.",
         "email": {
@@ -541,6 +605,8 @@
         "url": "pandora.local",
         "videoprefix": ""
     },
+    /*
+    */
     "sitePages": [
         {"id": "about", "title": "About"},
         {"id": "news", "title": "News"},
@@ -550,22 +616,32 @@
         {"id": "license", "title": "License"},
         {"id": "contact", "title": "Contact"}
     ],
+    /*
+    */
     "sites": [
         {"name": "0xDB", "url": "0xdb.org", "https": true},
         {"name": "Pad.ma", "url": "pad.ma", "https": true},
         {"name": "Indiancine.ma", "url": "indiancine.ma", "https": true}
     ],
+    /*
+    */
     "textRightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
+    /*
+    */
     "themes": ["oxlight", "oxmedium", "oxdark"],
+    /*
+    */
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
         {"id": "slitscan", "title": "Slit-Scan"},
         {"id": "keyframes", "title": "Keyframes"},
         {"id": "audio", "title": "Waveform"}
     ],
+    /*
+    */
     "totals": [
         {"id": "items"},
         {"id": "files", "capability": "canSeeMedia"},
@@ -573,9 +649,13 @@
         {"id": "size", "capability": "canSeeMedia"},
         {"id": "pixels"}
     ],
+    /*
+    */
     "tv": {
         "showLogo": false
     },
+    /*
+    */
     "user": {
         "level": "guest",
         "ui": {
@@ -716,7 +796,11 @@
         "username": "",
         "volumes": []
     },
+    /*
+    */
     "userLevels": ["guest", "member", "staff", "admin"],
+    /*
+    */
     "video": {
         "torrent": true,
         //supported formats: webm, mp4
