@@ -289,7 +289,7 @@ pandora.ui.entitiesDialog = function(options) {
         }, function(result) {
             Ox.Request.clearCache('findEntities');
             $list.reloadList();
-            pandora.UI.set('entitiesSelection.' + type, data.ids);
+            pandora.UI.set('entitiesSelection.' + type, [result.data.id]);
         });
     }
 
@@ -344,7 +344,8 @@ pandora.ui.entitiesDialog = function(options) {
             var keys = Ox.getObjectById(pandora.site.entities, type).keys;
             $form.empty()
             keys.forEach(function(key, index) {
-                var $label = Ox.Label({
+                var defaultValue = void 0,
+                    $label = Ox.Label({
                             title: Ox._(key.title),
                             width: 240 - Ox.SCROLLBAR_SIZE
                         })
@@ -363,6 +364,7 @@ pandora.ui.entitiesDialog = function(options) {
                     $input = Ox.Input();
                 } else if (key.type[0] === 'string') {
                     $input = Ox.ArrayInput();
+                    defaultValue = [];
                 } else if (key.type === 'text') {
                     $input = Ox.Input({
                         height: 240 - Ox.SCROLLBAR_SIZE,
@@ -371,7 +373,7 @@ pandora.ui.entitiesDialog = function(options) {
                 }
                 $input.options({
                         disabled: key.id == 'id',
-                        value: result.data[key.id],
+                        value: result.data[key.id] || defaultValue,
                         width: 240 - Ox.SCROLLBAR_SIZE
                     })
                     .css({margin: '4px'})
