@@ -8,7 +8,9 @@ from ox.django.api import actions
 from ox.django.decorators import login_required_json
 from ox.django.http import HttpFileResponse
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response, HttpErrorJson
+
 from django import forms
+from django.conf import settings
 from django.db.models import Sum
 
 from item import utils
@@ -81,6 +83,49 @@ def addEntity(request, data):
         response['data'] = entity.json()
     return render_to_json_response(response)
 actions.register(addEntity, cache=False)
+
+def autocompleteEntities(request, data):
+    '''
+    takes {
+        type: string,
+        name: string,
+        operator: string // '=', '==', '^', '$'
+        range: [int, int]
+    }
+    returns {
+        items: [{id, name,...}, ...] // array of matching entities
+    }
+    '''
+    if not 'range' in data:
+        data['range'] = [0, 10]
+    op = data.get('operator', '=')
+
+    entity = utils.get_by_id(settings.CONFIG['entities'], data['type'])
+    order_by = entity.get('autocompleteSort', False)
+    if order_by:
+        for o in order_by:
+            if o['operator'] != '-':
+                o['operator'] = '' 
+        order_by = ','.join(['%(operator)s%(key)s' % o for o in order_by])
+    else:
+        order_by = '-matches'
+
+    qs = models.Entity.objects.filter(type=data['type'])
+    if data['name']:
+        if op == '=':
+            qs = qs.filter(name_find__icontains=data['name'])
+        elif op == '==':
+            qs = qs.filter(name_find__icontains=u'|%s|'%data['name'])
+        elif op == '^':
+            qs = qs.filter(name_find__icontains=u'|%s'%data['name'])
+        elif op == '$':
+            qs = qs.filter(name_find__icontains=u'%s|'%data['name'])
+    qs = qs.order_by(order_by)
+    qs = qs[data['range'][0]:data['range'][1]]
+    response = json_response({})
+    response['data']['items'] = [e.json() for e in qs]
+    return render_to_json_response(response)
+actions.register(autocompleteEntities)
 
 @login_required_json
 def editEntity(request, data):
