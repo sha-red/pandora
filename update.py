@@ -1,11 +1,11 @@
 #!/usr/bin/python
 import os
 
-root_dir = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
-os.chdir(root_dir)
+base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
+os.chdir(base)
 
 #using virtualenv's activate_this.py to reorder sys.path
-activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
+activate_this = os.path.join(base, 'bin', 'activate_this.py')
 if os.path.exists(activate_this):
     execfile(activate_this, dict(__file__=activate_this))
 
@@ -58,7 +58,6 @@ def reload_notice(base):
     print '\nPlease restart pan.do/ra to finish the update:\n\t"sudo %s/ctl reload"\n' % base
 
 if __name__ == "__main__":
-    base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
     if len(sys.argv) == 2 and sys.argv[1] in ('database', 'db'):
         os.chdir(join(base, 'pandora'))
         if get('./manage.py', 'south_installed').strip() == 'yes':
