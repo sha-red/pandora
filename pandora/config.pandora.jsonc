@@ -75,6 +75,10 @@
         included in find annotations. // FIXME: the last bit is not implemented.
     */
     "clipLayers": ["publicnotes", "keywords", "subtitles"],
+    /*
+        "entities" are ...
+    */
+    "entities": [],
     "flags": false,
     "help": [
         {"id": "help", "title": "Help"},
@@ -608,6 +612,9 @@
             ],
             "editView": "list",
             "embedSize": 256,
+            "entity": "",
+            "entitiesSelection": {},
+            "entitiesType": "",
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "country", "sort": [{"key": "items", "operator": "-"}]},
