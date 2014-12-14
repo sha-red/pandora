@@ -40,6 +40,7 @@ pandora.ui.embedPlayer = function() {
             sizes = getSizes();
 
         options.height = sizes.videoHeight;
+        video.subtitles = getSubtitles(video);
 
         if (options.title) {
             $title = Ox.Element()
@@ -102,7 +103,7 @@ pandora.ui.embedPlayer = function() {
                 resolution: ui.videoResolution,
                 scaleToFill: ui.videoScale == 'fill',
                 showIconOnLoad: true,
-                subtitles: getSubtitles(options),
+                subtitles: video.subtitles,
                 timeline: options.playInToOut ? function(size, i) {
                     return pandora.getMediaURL('/' + options.item
                         + '/timelineantialias'
