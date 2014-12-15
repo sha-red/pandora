@@ -329,8 +329,10 @@ pandora.ui.entitiesDialog = function(options) {
 
     function renderForm() {
         var id = ui.entitiesSelection[type]
-            ? ui.entitiesSelection[type][0]
-            : null;
+                ? ui.entitiesSelection[type][0]
+                : null,
+            width = $content.options('elements')[2].size
+                - 16 - Ox.SCROLLBAR_SIZE;
         if (!id) {
             $form.empty();
             return;
@@ -347,7 +349,7 @@ pandora.ui.entitiesDialog = function(options) {
                 var defaultValue = void 0,
                     $label = Ox.Label({
                             title: Ox._(key.title),
-                            width: 240 - Ox.SCROLLBAR_SIZE
+                            width: width
                         })
                         .css({
                             margin: (index == 0 ? 4 : 16) + 'px 4px 8px 4px'
@@ -367,14 +369,14 @@ pandora.ui.entitiesDialog = function(options) {
                     defaultValue = [];
                 } else if (key.type === 'text') {
                     $input = Ox.Input({
-                        height: 240 - Ox.SCROLLBAR_SIZE,
+                        height: width,
                         type: 'textarea'
                     });
                 }
                 $input.options({
                         disabled: key.id == 'id',
                         value: result.data[key.id] || defaultValue,
-                        width: 240 - Ox.SCROLLBAR_SIZE
+                        width: width
                     })
                     .css({margin: '4px'})
                     .bindEvent({
