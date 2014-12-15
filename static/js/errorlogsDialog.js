@@ -2,7 +2,7 @@
 
 'use strict';
 
-pandora.ui.logsDialog = function() {
+pandora.ui.errorlogsDialog = function() {
 
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),

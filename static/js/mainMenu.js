@@ -206,7 +206,8 @@ pandora.ui.mainMenu = function() {
                         { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
                         {},
                         { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
-                        { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] }
+                        { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
+                        { id: 'changelog', title: Ox._('Changelog...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] }
                     ] },
                     { id: 'helpMenu', title: Ox._('Help'), items: [
                         { id: 'help', title: Ox._('Help...'), keyboard: 'control ?' },
@@ -514,6 +515,8 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.usersDialog = pandora.ui.usersDialog().open();
                 } else if (data.id == 'statistics') {
                     pandora.$ui.statisticsDialog = pandora.ui.statisticsDialog().open();
+                } else if (data.id == 'changelog') {
+                    pandora.$ui.changelogDialog = pandora.ui.changelogDialog().open();
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'cache') {
@@ -538,7 +541,7 @@ pandora.ui.mainMenu = function() {
                     Ox.Event[pandora.localStorage('enableEventLogging') ? 'bind' : 'unbind'](pandora.logEvent);
                     that.setItemTitle('eventlogging', Ox._((pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging'));
                 } else if (data.id == 'errorlogs') {
-                    pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
+                    pandora.$ui.errorlogsDialog = pandora.ui.errorlogsDialog().open();
                 } else if (data.id == 'tests') {
                     pandora.tests();
                 }

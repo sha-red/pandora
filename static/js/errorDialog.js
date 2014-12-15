@@ -47,7 +47,7 @@ pandora.ui.errorDialog = function(data) {
                             .bindEvent({
                                 click: function() {
                                     that.close();
-                                    pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
+                                    pandora.$ui.errorlogsDialog = pandora.ui.errorlogsDialog().open();
                                 }
                             }),
                         {}
