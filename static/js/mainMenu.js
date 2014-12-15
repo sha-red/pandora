@@ -207,6 +207,7 @@ pandora.ui.mainMenu = function() {
                         {},
                         { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
                         { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
+                        {},
                         { id: 'changelog', title: Ox._('Changelog...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] }
                     ] },
                     { id: 'helpMenu', title: Ox._('Help'), items: [
