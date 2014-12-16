@@ -17,7 +17,7 @@ pandora.ui.changelogDialog = function() {
             .bindEvent({
                 click: function() {
                     $reloadButton.options({disabled: true});
-                    Ox.Request.clearCache('FIXME');
+                    Ox.Request.clearCache('findChangeLogs');
                     $list.reloadList(true);
                 }
             }),
@@ -117,7 +117,7 @@ pandora.ui.changelogDialog = function() {
                 columnsMovable: true,
                 columnsResizable: true,
                 columnsVisible: true,
-                items: pandora.api.findErrorLogs,
+                items: pandora.api.findChangeLogs,
                 keys: ['line'],
                 scrollbarVisible: true,
                 sort: [{key: 'created', operator: '-'}],
@@ -128,12 +128,6 @@ pandora.ui.changelogDialog = function() {
                     $status.html(Ox.toTitleCase(
                         Ox.formatCount(data.items, 'entry', 'entries')
                     ));
-                },
-                'delete': function(data) {
-                    pandora.api.removeErrorLogs({ids: data.ids}, function(result) {
-                        Ox.Request.clearCache('findErrorLogs');
-                        $list.reloadList();
-                    });
                 },
                 load: function() {
                     $reloadButton.options({disabled: false});
@@ -198,7 +192,7 @@ pandora.ui.changelogDialog = function() {
             minWidth: 512,
             padding: 0,
             removeOnClose: true,
-            title: Ox._('Error Logs'),
+            title: Ox._('Changelog'),
             width: width
         }),
 
@@ -217,7 +211,7 @@ pandora.ui.changelogDialog = function() {
 
     that.superClose = that.close;
     that.close = function() {
-        Ox.Request.clearCache('FIXME');
+        Ox.Request.clearCache('findChangeLogs');
         that.superClose();
     };
 
@@ -244,7 +238,7 @@ pandora.ui.changelogDialog = function() {
             };
         $list.options({
             items: function(data, callback) {
-                return pandora.api.FIXME(Ox.extend(data, {
+                return pandora.api.findChangeLogs(Ox.extend(data, {
                     query: query
                 }), callback);
             }
