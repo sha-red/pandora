@@ -226,10 +226,10 @@ class Annotation(models.Model):
             j['languages'] = self.languages.split(',')
         l = self.get_layer()
         if l['type'] == 'entity':
-            entity = Entity.get_by_name(self.value)
-            if entity > 0:
+            try:
+                entity = Entity.get(self.value)
                 j['entity'] = entity.json(user=user)
-            else:
+            except:
                 j['entity'] = {}
         elif l['type'] == 'event':
             qs = self.events.all()
