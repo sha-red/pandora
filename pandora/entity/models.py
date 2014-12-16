@@ -48,7 +48,7 @@ class Entity(models.Model):
         if entity.get('sortType') == 'person' and self.name:
             self.name_sort = get_name_sort(self.name)[:255].lower()
         else:
-            self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
+            self.name_sort = ox.sort_string(self.name or u'')[:255].lower() or None
         self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
         super(Entity, self).save(*args, **kwargs)
         self.update_matches()
@@ -123,6 +123,7 @@ class Entity(models.Model):
                 'editable',
                 'id',
                 'name',
+                'sortName',
                 'type',
                 'user',
             ] + self.data.keys()
@@ -136,6 +137,8 @@ class Entity(models.Model):
                 response[key] = self.user and self.user.username
             elif key in ('name', 'alternativeNames', 'type'):
                 response[key] = getattr(self, key)
+            elif key == 'sortName':
+                response[key] = self.name_sort
             elif key in self.data:
                 response[key] = self.data[key]
         return response

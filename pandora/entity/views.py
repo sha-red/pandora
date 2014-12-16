@@ -184,7 +184,7 @@ def _order_query(qs, sort, item=None):
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'name', 'operator':'+'}, {'key':'type', 'operator':'+'}]
+    query['sort'] = [{'key':'name', 'operator':'+'}]
     for key in ('keys', 'group', 'range', 'position', 'positions', 'sort'):
         if key in data:
             query[key] = data[key]
