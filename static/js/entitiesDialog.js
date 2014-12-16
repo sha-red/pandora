@@ -75,6 +75,11 @@ pandora.ui.entitiesDialog = function(options) {
                     operator: '+',
                     visible: true,
                     width: 256 - Ox.SCROLLBAR_SIZE
+                },
+                {
+                    id: 'sortName',
+                    title: 'Sort Name',
+                    operator: '+'
                 }
             ],
             items: function(options, callback) {
@@ -87,7 +92,7 @@ pandora.ui.entitiesDialog = function(options) {
                     }
                 }), callback);
             },
-            sort: [{key: 'name', operator: '+'}],
+            sort: [{key: 'sortName', operator: '+'}],
             scrollbarVisible: true,
             unique: 'id',
             width: 256 - Ox.SCROLLBAR_SIZE
