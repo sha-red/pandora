@@ -15,6 +15,8 @@ from django.conf import settings
 import ox
 from ox.django import fields
 
+from person.models import get_name_sort
+from item.utils import get_by_id
 import managers
 
 
@@ -42,7 +44,11 @@ class Entity(models.Model):
 
 
     def save(self, *args, **kwargs):
-        self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
+        entity = get_by_id(settings.CONFIG['entities'])
+        if entity.get('sortType') == 'person' and self.name:
+            self.name_sort = get_name_sort(self.name)[:255].lower()
+        else:
+            self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
         self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
         super(Entity, self).save(*args, **kwargs)
         self.update_matches()
