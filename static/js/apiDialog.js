@@ -169,35 +169,26 @@ pandora.ui.apiDialog = function() {
         if (id && actions[id]) {
             $text.html('<h1><b>' + id + '</b><h1><br>');
             var code = actions[id].code[1],
-                f = actions[id].code[0],
-                line = Math.round(Ox.last(f.split(':')) || 0),
+                source = actions[id].code[0],
+                line = Math.round(Ox.last(source.split(':')) || 0),
                 doc = actions[id].doc.replace('/\n/<br>\n/g'),
                 $code, $doc;
-
             $doc = Ox.SyntaxHighlighter({
                     source: doc,
                 })
                 .appendTo($text);
-
-            Ox.Button({
-                    title: Ox._('Source ({0})', [f]),
-                }).bindEvent({
-                    click: function() {
-                        $code.toggle();
-                    }
-                })
-                .css({
-                    margin: '4px'
-                })
+            $('<div>')
+                .html('<tt>' + source + '</tt>')
                 .appendTo($text);
             $code = Ox.SyntaxHighlighter({
-                showLineNumbers: true,
-                source: code,
-                offset: line
-            })
-            .css({
-                borderWidth: '1px',
-            }).appendTo($text);
+                    showLineNumbers: true,
+                    source: code.replace(/\s+?'''.+?'''\n/g, ''),
+                    offset: line
+                })
+                .css({
+                    borderWidth: '1px',
+                })
+                .appendTo($text);
         } else {
             $text.empty().append(getIndex());
         }
