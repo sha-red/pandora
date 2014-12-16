@@ -162,7 +162,6 @@ pandora.ui.changelogDialog = function() {
                             width: width - 48
                         })
                         .open();
-                    }
                 }
             }),
 
