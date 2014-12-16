@@ -226,9 +226,9 @@ class Annotation(models.Model):
             j['languages'] = self.languages.split(',')
         l = self.get_layer()
         if l['type'] == 'entity':
-            qs = Entity.objects.filter(id=ox.fromAZ(self.value))
-            if qs.count() > 0:
-                j['entity'] = qs[0].json(user=user)
+            entity = Entity.get_by_name(self.value)
+            if entity > 0:
+                j['entity'] = entity.json(user=user)
             else:
                 j['entity'] = {}
         elif l['type'] == 'event':

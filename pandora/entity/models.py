@@ -55,6 +55,14 @@ class Entity(models.Model):
         return cls.objects.get(pk=ox.fromAZ(id))
 
     @classmethod
+    def get_by_name(cls, name, default=None):
+        qs = cls.objects.filter(name_find__icontains=u'|%s|'%name)
+        if qs.count():
+            return qs[0]
+        else:
+            return default
+
+    @classmethod
     def get_or_create(model, name):
         qs = model.objects.filter(name_find__icontains=u'|%s|'%name)
         if qs.count() == 0:
