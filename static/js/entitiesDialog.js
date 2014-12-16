@@ -20,6 +20,7 @@ pandora.ui.entitiesDialog = function(options) {
                     title: type.title
                 };
             }),
+            value: type,
             width: 122
         })
         .bindEvent({
