@@ -13,6 +13,8 @@ from ox.django.api import actions
 
 from item import utils
 from item.models import Item
+from item.utils import get_by_id
+from entity.models import Entity
 
 import models
 from tasks import update_item, add_annotations
@@ -170,14 +172,18 @@ def addAnnotation(request, data):
     item = get_object_or_404_json(Item, public_id=data['item'])
     
     layer_id = data['layer']
-    layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
+    layer = get_by_id(settings.CONFIG['layers'], layer_id)
     if layer['canAddAnnotations'].get(request.user.get_profile().get_level()):
+        if layer['type'] == 'entity':
+            value = Entity.get_by_name(data['value']).get_id()
+        else:
+            value = data['value']
         annotation = models.Annotation(
             item=item,
             layer=layer_id,
             user=request.user,
             start=float(data['in']), end=float(data['out']),
-            value=data['value'])
+            value=value)
         annotation.save()
         update_item.delay(annotation.id)
         response = json_response(annotation.json())
@@ -216,7 +222,7 @@ def addAnnotations(request, data):
     item = get_object_or_404_json(Item, public_id=data['item'])
     
     layer_id = data['layer']
-    layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
+    layer = get_by_id(settings.CONFIG['layers'], layer_id)
     if item.editable(request.user) \
         and layer['canAddAnnotations'].get(request.user.get_profile().get_level()):
         response = json_response()
@@ -268,13 +274,18 @@ def editAnnotation(request, data):
     response = json_response({})
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
+        layer = get_by_id(settings.CONFIG['layers'], a.layer)
         a.log()
         for key in ('value', 'in', 'out'):
+            if key == 'value' and layer['type'] == 'entity':
+                value = Entity.get_by_name(data['value']).get_id()
+            else:
+                value = data[key]
             if key in data:
                 setattr(a, {
                     'in': 'start',
                     'out': 'end'
-                }.get(key,key), data[key])
+                }.get(key,key), value)
         a.save()
         #update sort/find tables async
         update_item.delay(a.id)

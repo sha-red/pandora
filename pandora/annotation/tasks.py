@@ -67,6 +67,7 @@ def update_matches(id, type):
 @task(ignore_results=False, queue='default')
 def add_annotations(data):
     from item.models import Item
+    from entity.models import Entity
     from user.models import User
     item = Item.objects.get(public_id=data['item'])
     layer_id = data['layer']
@@ -75,12 +76,16 @@ def add_annotations(data):
         return False
     user = User.objects.get(username=data['user'])
     for a in data['annotations']:
+        if layer['type'] == 'entity':
+            value = Entity.get_by_name(a['value']).get_id()
+        else:
+            value = a['value']
         annotation = models.Annotation(
             item=item,
             layer=layer_id,
             user=user,
             start=float(a['in']), end=float(a['out']),
-            value=a['value'])
+            value=value)
         annotation.save()
     #update facets if needed
     if layer_id in item.facet_keys:
