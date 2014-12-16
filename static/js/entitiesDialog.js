@@ -246,7 +246,7 @@ pandora.ui.entitiesDialog = function(options) {
                 paddingTop: '32px',
                 textAlign: 'center'
             })
-            .html(Ox._('No entities defined.'))),
+            .html(Ox._('No entities defined.')),
 
         that = Ox.Dialog({
             buttons: [
