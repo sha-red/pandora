@@ -87,8 +87,8 @@ actions.register(addEntity, cache=False)
 def autocompleteEntities(request, data):
     '''
     takes {
-        type: string,
-        name: string,
+        key: string,
+        value: string,
         operator: string // '=', '==', '^', '$'
         range: [int, int]
     }
@@ -100,7 +100,7 @@ def autocompleteEntities(request, data):
         data['range'] = [0, 10]
     op = data.get('operator', '=')
 
-    entity = utils.get_by_id(settings.CONFIG['entities'], data['type'])
+    entity = utils.get_by_id(settings.CONFIG['entities'], data['key'])
     order_by = entity.get('autocompleteSort', False)
     if order_by:
         for o in order_by:
@@ -110,16 +110,16 @@ def autocompleteEntities(request, data):
     else:
         order_by = '-matches'
 
-    qs = models.Entity.objects.filter(type=data['type'])
-    if data['name']:
+    qs = models.Entity.objects.filter(type=data['key'])
+    if data['value']:
         if op == '=':
-            qs = qs.filter(name_find__icontains=data['name'])
+            qs = qs.filter(name_find__icontains=data['value'])
         elif op == '==':
-            qs = qs.filter(name_find__icontains=u'|%s|'%data['name'])
+            qs = qs.filter(name_find__icontains=u'|%s|'%data['value'])
         elif op == '^':
-            qs = qs.filter(name_find__icontains=u'|%s'%data['name'])
+            qs = qs.filter(name_find__icontains=u'|%s'%data['value'])
         elif op == '$':
-            qs = qs.filter(name_find__icontains=u'%s|'%data['name'])
+            qs = qs.filter(name_find__icontains=u'%s|'%data['value'])
     qs = qs.order_by(order_by)
     qs = qs[data['range'][0]:data['range'][1]]
     response = json_response({})
