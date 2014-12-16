@@ -23,7 +23,10 @@ pandora.ui.entitiesDialog = function(options) {
         })
         .bindEvent({
             change: function(data) {
-                // ...
+                Ox.print('@@@@', data);
+                type = data.value;
+                pandora.UI.set({entitiesType: type});
+                $list.reloadList();
             }
         })
         .css({
