@@ -16,7 +16,7 @@ pandora.ui.editor = function(data) {
                 + ' <span class="OxBright">' + Ox.SYMBOLS.shift + 'A</span>',
             audioTrack: data.audioTrack,
             autocomplete: function(key, value, callback) {
-                pandora.api.autocompleteEntity({
+                pandora.api.autocompleteEntities({
                     key: key,
                     operator: '=',
                     value: value
