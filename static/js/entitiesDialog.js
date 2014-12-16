@@ -87,6 +87,7 @@ pandora.ui.entitiesDialog = function(options) {
                     }
                 }), callback);
             },
+            sort: [{key: 'name', operator: '+'}],
             scrollbarVisible: true,
             unique: 'id',
             width: 256 - Ox.SCROLLBAR_SIZE
