@@ -22,10 +22,13 @@ pandora.ui.entityDialog = function() {
         })
         .bindEvent({
             close: function() {
-                pandora.UI.set({entity: ''});
+                pandora.UI.set({
+                    entity: '',
+                    page: ''
+                });
                 delete pandora.$ui.entityDialog;
             },
-            pandora_entity: function(data) {
+            'pandora_part.entities': function(data) {
                 if (data.value) {
                     setTitle();
                     setContent();
@@ -39,8 +42,8 @@ pandora.ui.entityDialog = function() {
     setContent();
 
     function setContent() {
-        ui.entity && pandora.entity({
-            id: ui.entity,
+        ui.part.entities && pandora.entity({
+            id: ui.part.entities,
             view: 'entity'
         }, function(html) {
             $content.html(html);
@@ -49,7 +52,7 @@ pandora.ui.entityDialog = function() {
 
     function setTitle() {
         ui.entity && pandora.api.getEntity({
-            id: ui.entity
+            id: ui.part.entities
         }, function(result) {
             that.options({title: result.data.name});
         });
