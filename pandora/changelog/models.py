@@ -11,3 +11,6 @@ class Changelog(models.Model):
 
     def __unicode__(self):
         return u'%s %s' %(self.type, self.created)
+
+    def json(self):
+        return self.value
