@@ -32,15 +32,15 @@ import tasks
 from .timelines import join_tiles
 from data_api import external_data
 
-from archive import extract
 from annotation.models import Annotation
-from clip.models import Clip
+from archive import extract
 from changelog.models import Changelog
-import archive.models
-
+from clip.models import Clip
+from entity.models import Entity
 from person.models import get_name_sort
-from title.models import get_title_sort
 from sequence.tasks import get_sequences
+from title.models import get_title_sort
+import archive.models
 
 def get_id(info):
     q = Item.objects.all()
@@ -1010,6 +1010,10 @@ class Item(models.Model):
     def update_layer_facet(self, key):
         current_values = [a['value']
             for a in self.annotations.filter(layer=key).distinct().values('value')]
+        layer = utils.get_by_id(settings.CONFIG['layers'], key)
+        if layer.get('type') == 'entity':
+            current_values = [a['name']
+                for a in Entity.objects.filter(id__in=[ox.fromAZ(i) for i in current_values]).values('name')]
         current_values = [ox.decode_html(ox.strip_tags(v.replace('<br>', ' '))) for v in current_values]
         saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
         removed_values = filter(lambda i: i not in current_values, saved_values)
