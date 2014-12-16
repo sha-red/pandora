@@ -108,7 +108,7 @@ def autocompleteEntities(request, data):
                 o['operator'] = '' 
         order_by = ','.join(['%(operator)s%(key)s' % o for o in order_by])
     else:
-        order_by = '-matches'
+        order_by = 'name_sort'
 
     qs = models.Entity.objects.filter(type=data['key'])
     if data['value']:
@@ -121,9 +121,21 @@ def autocompleteEntities(request, data):
         elif op == '$':
             qs = qs.filter(name_find__icontains=u'%s|'%data['value'])
     qs = qs.order_by(order_by)
-    qs = qs[data['range'][0]:data['range'][1]]
+    if op != '$':
+        value_lower = data['value'].lower()
+        matches = []
+        leading_matches = []
+        for v in [e.name for e in qs]:
+            if v.lower().startswith(value_lower):
+                leading_matches.append(v)
+            else:
+                matches.append(v)
+        values = leading_matches + matches
+    else:
+        values = [e.name for e in qs]
+    values  = values[data['range'][0]:data['range'][1]]
     response = json_response({})
-    response['data']['items'] = [e.json() for e in qs]
+    response['data']['items'] = values
     return render_to_json_response(response)
 actions.register(autocompleteEntities)
 
