@@ -8,9 +8,10 @@ pandora.ui.entitiesDialog = function(options) {
         dialogWidth = Math.round(window.innerWidth * 0.9),
 
         selected = [],
-        type = pandora.site.entities[0].id,
-
         ui = pandora.user.ui,
+        type = ui.entitiesType || (
+            pandora.site.entities.length ? pandora.site.entities[0].id : ''
+        ),
 
         $entitiesSelect = Ox.Select({
             items: pandora.site.entities.map(function(type) {
@@ -23,7 +24,6 @@ pandora.ui.entitiesDialog = function(options) {
         })
         .bindEvent({
             change: function(data) {
-                Ox.print('@@@@', data);
                 type = data.value;
                 pandora.UI.set({entitiesType: type});
                 $list.reloadList();
@@ -221,7 +221,7 @@ pandora.ui.entitiesDialog = function(options) {
             resize: updateForm
         }),
 
-        $content = Ox.SplitPanel({
+        $content = pandora.site.entities.length ? Ox.SplitPanel({
             elements: [
                 {
                     element: $listPanel,
@@ -240,7 +240,13 @@ pandora.ui.entitiesDialog = function(options) {
                 }
             ],
             orientation: 'horizontal'
-        }),
+        }) : Ox.Element()
+            .css({
+                fontSize: '12px',
+                paddingTop: '32px',
+                textAlign: 'center'
+            })
+            .html(Ox._('No entities defined.'))),
 
         that = Ox.Dialog({
             buttons: [
