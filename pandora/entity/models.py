@@ -44,7 +44,7 @@ class Entity(models.Model):
 
 
     def save(self, *args, **kwargs):
-        entity = get_by_id(settings.CONFIG['entities'])
+        entity = get_by_id(settings.CONFIG['entities'], self.type)
         if entity.get('sortType') == 'person' and self.name:
             self.name_sort = get_name_sort(self.name)[:255].lower()
         else:
