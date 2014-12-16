@@ -15,7 +15,7 @@ from item import utils
 import models
 
 
-def log(request, data):
+def logError(request, data):
     '''
         takes {
             url: string,
@@ -43,11 +43,11 @@ def log(request, data):
         l.save()
     response = json_response()
     return render_to_json_response(response)
-actions.register(log, cache=False)
+actions.register(logError, cache=False)
 
 
 @admin_required_json
-def removeLogs(request, data):
+def removeErrorLogs(request, data):
     '''
         takes {
             ids: [string]
@@ -57,7 +57,7 @@ def removeLogs(request, data):
     models.Log.objects.filter(id__in=[ox.fromAZ(i) for i in data['ids']]).delete()
     response = json_response()
     return render_to_json_response(response)
-actions.register(removeLogs, cache=False)
+actions.register(removeErrorLogs, cache=False)
 
 def parse_query(data, user):
     query = {}
@@ -84,7 +84,7 @@ def order_query(qs, sort):
     return qs
 
 @admin_required_json
-def findLogs(request, data):
+def findErrorLogs(request, data):
     '''
         takes {
             query: {
@@ -132,4 +132,4 @@ def findLogs(request, data):
     else:
         response['data']['items'] = qs.count()
     return render_to_json_response(response)
-actions.register(findLogs)
+actions.register(findErrorLogs)

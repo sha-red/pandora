@@ -203,7 +203,7 @@ pandora.ui.uploadVideoDialog = function(data) {
                     that.close();
                 } else {
                     $status.html(Ox._('Upload failed.'));
-                    pandora.api.log({
+                    pandora.api.logError({
                         text: data.responseText,
                         url: '/' + item,
                         line: 1
@@ -257,7 +257,7 @@ pandora.ui.uploadVideoDialog = function(data) {
                                     that.close();
                                 } else {
                                     $status.html(cancelled ? Ox._('Upload cancelled.') : Ox._('Upload failed.'));
-                                    !cancelled && pandora.api.log({
+                                    !cancelled && pandora.api.logError({
                                         text: data.responseText,
                                         url: '/' + item,
                                         line: 1

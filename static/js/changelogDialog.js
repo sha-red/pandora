@@ -117,7 +117,7 @@ pandora.ui.changelogDialog = function() {
                 columnsMovable: true,
                 columnsResizable: true,
                 columnsVisible: true,
-                items: pandora.api.findLogs,
+                items: pandora.api.findErrorLogs,
                 keys: ['line'],
                 scrollbarVisible: true,
                 sort: [{key: 'created', operator: '-'}],
@@ -130,8 +130,8 @@ pandora.ui.changelogDialog = function() {
                     ));
                 },
                 'delete': function(data) {
-                    pandora.api.removeLogs({ids: data.ids}, function(result) {
-                        Ox.Request.clearCache('findLogs');
+                    pandora.api.removeErrorLogs({ids: data.ids}, function(result) {
+                        Ox.Request.clearCache('findErrorLogs');
                         $list.reloadList();
                     });
                 },

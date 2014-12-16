@@ -17,7 +17,7 @@ pandora.ui.errorlogsDialog = function() {
             .bindEvent({
                 click: function() {
                     $reloadButton.options({disabled: true});
-                    Ox.Request.clearCache('findLogs');
+                    Ox.Request.clearCache('findErrorLogs');
                     $list.reloadList(true);
                 }
             }),
@@ -118,7 +118,7 @@ pandora.ui.errorlogsDialog = function() {
                 columnsMovable: true,
                 columnsResizable: true,
                 columnsVisible: true,
-                items: pandora.api.findLogs,
+                items: pandora.api.findErrorLogs,
                 keys: ['line'],
                 scrollbarVisible: true,
                 sort: [{key: 'created', operator: '-'}],
@@ -131,8 +131,8 @@ pandora.ui.errorlogsDialog = function() {
                     ));
                 },
                 'delete': function(data) {
-                    pandora.api.removeLogs({ids: data.ids}, function(result) {
-                        Ox.Request.clearCache('findLogs');
+                    pandora.api.removeErrorLogs({ids: data.ids}, function(result) {
+                        Ox.Request.clearCache('findErrorLogs');
                         $list.reloadList();
                     });
                 },
@@ -226,7 +226,7 @@ pandora.ui.errorlogsDialog = function() {
 
     that.superClose = that.close;
     that.close = function() {
-        Ox.Request.clearCache('findLogs');
+        Ox.Request.clearCache('findErrorLogs');
         that.superClose();
     };
 
@@ -253,7 +253,7 @@ pandora.ui.errorlogsDialog = function() {
             };
         $list.options({
             items: function(data, callback) {
-                return pandora.api.findLogs(Ox.extend(data, {
+                return pandora.api.findErrorLogs(Ox.extend(data, {
                     query: query
                 }), callback);
             }
