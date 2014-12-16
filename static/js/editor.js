@@ -15,6 +15,15 @@ pandora.ui.editor = function(data) {
             annotationsTooltip: Ox._('annotations')
                 + ' <span class="OxBright">' + Ox.SYMBOLS.shift + 'A</span>',
             audioTrack: data.audioTrack,
+            autocomplete: function(key, value, callback) {
+                pandora.api.autocompleteEntity({
+                    key: key,
+                    operator: '=',
+                    value: value
+                }, function(result) {
+                    callback(result.data.items);
+                })
+            },
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
             censoredTooltip: Ox._(pandora.site.cantPlay.text),
