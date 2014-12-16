@@ -2,7 +2,7 @@
 
 'use strict';
 
-pandora.ui.entityDialog = function(options) {
+pandora.ui.entityDialog = function() {
 
     var ui = pandora.user.ui,
 
@@ -39,7 +39,7 @@ pandora.ui.entityDialog = function(options) {
     setContent();
 
     function setContent() {
-        pandora.entity({
+        ui.entity && pandora.entity({
             id: ui.entity,
             view: 'entity'
         }, function(html) {
@@ -48,7 +48,7 @@ pandora.ui.entityDialog = function(options) {
     }
 
     function setTitle() {
-        pandora.api.getEntity({
+        ui.entity && pandora.api.getEntity({
             id: ui.entity
         }, function(result) {
             that.options({title: result.data.name});
