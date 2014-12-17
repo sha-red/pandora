@@ -17,7 +17,9 @@ pandora.ui.entityDialog = function() {
                 })
                 .bindEvent({
                     click: function() {
+                        var part = ui.part.entities;
                         that.close();
+                        ui.set({'part.entities': part});
                         pandora.$ui.entitiesDialog = pandora.ui.entitiesDialog().open();
                     }
                 }),
