@@ -75,24 +75,23 @@ pandora.ui.errorlogsDialog = function() {
                     },
                     {
                         format: function(value) {
-                            return Ox.encodeHTMLEntities(value);
-                        },
-                        id: 'user',
-                        operator: '+',
-                        title: Ox._('User'),
-                        visible: true,
-                        width: 72
-                    },
-                    {
-                        align: 'right',
-                        format: function(value) {
                             return Ox.formatDate(value, "%Y-%m-%d %H:%M:%S");
                         },
                         id: 'created',
                         operator: '-',
                         title: Ox._('Date'),
                         visible: true,
-                        width: 144
+                        width: 160
+                    },
+                    {
+                        format: function(value) {
+                            return Ox.encodeHTMLEntities(value);
+                        },
+                        id: 'user',
+                        operator: '+',
+                        title: Ox._('User'),
+                        visible: true,
+                        width: 160
                     },
                     {
                         format: function(value, data) {
