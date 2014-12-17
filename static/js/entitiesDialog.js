@@ -7,11 +7,11 @@ pandora.ui.entitiesDialog = function(options) {
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
 
-        selected = [],
         ui = pandora.user.ui,
         type = ui.entitiesType || (
             pandora.site.entities.length ? pandora.site.entities[0].id : ''
         ),
+        selected = ui.entitiesSelection[type] || [];
 
         $entitiesSelect = Ox.Select({
             items: pandora.site.entities.map(function(type) {
@@ -89,6 +89,7 @@ pandora.ui.entitiesDialog = function(options) {
             },
             sort: [{key: 'name', operator: '+'}],
             scrollbarVisible: true,
+            selected: selected,
             unique: 'id',
             width: 256 - Ox.SCROLLBAR_SIZE
         })
