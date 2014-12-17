@@ -161,8 +161,3 @@ class Event(models.Model):
             j[key] = getattr(self, key)
         j['nameSort'] = self.name_sort
         return j
-
-    def log(self):
-        c = Changelog(type='event')
-        c.value = self.json()
-        c.save()

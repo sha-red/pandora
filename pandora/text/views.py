@@ -19,6 +19,7 @@ from django.template import RequestContext
 from item import utils
 from archive.chunk import process_chunk
 import models
+from changelog.models import add_changelog
 
 def get_text_or_404_json(id):
     id = id.split(':')
@@ -67,6 +68,7 @@ def addText(request, data):
     pos.save()
     response = json_response(status=200, text='created')
     response['data'] = text.json(user=request.user)
+    add_changelog(request, data, text.get_id())
     return render_to_json_response(response)
 actions.register(addText, cache=False)
 
@@ -144,6 +146,7 @@ def editText(request, data):
     if text.editable(request.user):
         text.edit(data, request.user)
         response['data'] = text.json(user=request.user)
+        add_changelog(request, data, text.get_id())
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
@@ -256,6 +259,7 @@ def removeText(request, data):
     text = get_text_or_404_json(data['id'])
     response = json_response()
     if text.editable(request.user):
+        add_changelog(request, data, text.get_id())
         text.delete()
     else:
         response = json_response(status=403, text='not allowed')
@@ -281,6 +285,7 @@ def subscribeToText(request, data):
             qs = models.Position.objects.filter(user=user, section='public')
             pos.position = qs.aggregate(Max('position'))['position__max'] + 1
             pos.save()
+        add_changelog(request, data, text.get_id())
     response = json_response()
     return render_to_json_response(response)
 actions.register(subscribeToText, cache=False)
@@ -300,6 +305,7 @@ def unsubscribeFromText(request, data):
     text.subscribed_users.remove(user)
     models.Position.objects.filter(text=text, user=user, section='public').delete()
     response = json_response()
+    add_changelog(request, data, text.get_id())
     return render_to_json_response(response)
 actions.register(unsubscribeFromText, cache=False)
 

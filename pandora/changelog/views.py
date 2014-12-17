@@ -21,8 +21,7 @@ def parse_query(data, user):
     for key in ('keys', 'group', 'list', 'range', 'sort', 'query'):
         if key in data:
             query[key] = data[key]
-    #query['qs'] = models.Changelog.objects.find(query, user)
-    query['qs'] = models.Changelog.all()
+    query['qs'] = models.Log.objects.find(query, user)
     return query
 
 def order_query(qs, sort):
@@ -53,7 +52,7 @@ def findChangeLogs(request, data):
                 ]
                 operator: ","
             },
-            sort: [{key: 'created', operator: '+'}],
+            sort: [{key: 'date', operator: '+'}],
             range: [int, int]
             keys: [string]
         }

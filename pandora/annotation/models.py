@@ -265,11 +265,6 @@ class Annotation(models.Model):
                 del j['id']
         return j
 
-    def log(self):
-        c = Changelog(type='annotation')
-        c.value = self.json(layer=True)
-        c.save()
-
     def __unicode__(self):
         return u"%s %s-%s" %(self.public_id, self.start, self.end)
 

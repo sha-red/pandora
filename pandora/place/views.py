@@ -13,6 +13,7 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 
 from ox.django.api import actions
 from item import utils
+from changelog.models import add_changelog
 
 import models
 
@@ -84,6 +85,10 @@ def addPlace(request, data):
         place.save()
         place.update_matches()
         response = json_response(place.json())
+        # add name/alternativeNames again for changelog
+        data['name'] = place.name
+        data['alternativeNames'] = place.alternativeNames
+        add_changelog(request, data, place.get_id())
     else:
         response = json_response(status=409,
                                  text='%s exists'%(existing_names and 'Name' or 'Geoname'))
@@ -146,6 +151,7 @@ def editPlace(request, data):
             if 'name' in data or 'alternativeNames' in data:
                 place.update_matches()
             response = json_response(place.json())
+            add_changelog(request, data)
         else:
             response = json_response(status=409,
                                      text='%s exists'%(conflict_names and 'Name' or 'Geoname'))
@@ -170,6 +176,7 @@ def removePlace(request, data):
         data = data['id']
     place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data))
     if place.editable(request.user):
+        add_changelog(request, data)
         place.delete()
         response = json_response(status=200, text='deleted')
     else:

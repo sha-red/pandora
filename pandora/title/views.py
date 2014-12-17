@@ -12,6 +12,7 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 from ox.django.api import actions
 from item import utils
 from user.decorators import capability_required_json
+from changelog.models import add_changelog
 
 import models
 
@@ -35,6 +36,7 @@ def editTitle(request, data):
         title.sorttitle = unicodedata.normalize('NFKD', title.sorttitle)
         title.edited = True
     title.save()
+    add_changelog(request, data, title.get_id())
     response['data'] = title.json()
     return render_to_json_response(response)
 actions.register(editTitle, cache=False)

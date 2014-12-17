@@ -9,6 +9,7 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 
 
 from ox.django.api import actions
+from changelog.models import add_changelog
 
 import models
 
@@ -59,6 +60,7 @@ def addNews(request, data):
             setattr(news, key, data[key])
     news.save()
     response = json_response(news.json())
+    add_changelog(request, data, news.get_id())
     return render_to_json_response(response)
 actions.register(addNews, cache=False)
 
@@ -66,13 +68,14 @@ actions.register(addNews, cache=False)
 def removeNews(request, data):
     '''
         takes {
-            ids: []
+            id: id
         }
         returns {}
     '''
     response = json_response({})
     news = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))
     if news.editable(request.user):
+        add_changelog(request, data)
         news.delete()
         response = json_response(status=200, text='news removed')
     else:
@@ -102,6 +105,7 @@ def editNews(request, data):
                 setattr(n, key, data[key])
         n.save()
         response['data'] = n.json()
+        add_changelog(request, data)
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)

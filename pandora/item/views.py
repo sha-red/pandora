@@ -32,6 +32,7 @@ from archive.models import File, Stream
 from archive import extract
 from clip.models import Clip 
 from user.models import has_capability
+from changelog.models import add_changelog
 
 from ox.django.api import actions
 
@@ -552,6 +553,7 @@ def add(request, data):
             i.make_poster(True)
         response = json_response(status=200, text='created')
         response['data'] = i.get_json()
+        add_changelog(request, data)
     return render_to_json_response(response)
 actions.register(add, cache=False)
 
@@ -574,7 +576,6 @@ def edit(request, data):
     update_clips = False
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.editable(request.user):
-        item.log()
         response = json_response(status=200, text='ok')
         if 'rightslevel' in data:
             if request.user.get_profile().capability('canEditRightsLevel') == True:
@@ -603,6 +604,7 @@ def edit(request, data):
         if update_clips:
             tasks.update_clips.delay(item.public_id)
         response['data'] = item.get_json()
+        add_changelog(request, data)
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
@@ -626,7 +628,7 @@ def remove(request, data):
            user.is_staff or \
            item.user == user or \
            item.groups.filter(id__in=user.groups.all()).count() > 0:
-        item.log()
+        add_changelog(request, data)
         #FIXME: is this cascading enough or do we end up with orphan files etc.
         item.delete()
         response = json_response(status=200, text='removed')
@@ -650,6 +652,7 @@ def setPosterFrame(request, data):
         item.save()
         tasks.update_poster(item.public_id)
         response = json_response()
+        add_changelog(request, data)
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
@@ -682,6 +685,7 @@ def setPoster(request, data):
             tasks.update_poster(item.public_id)
             response = json_response()
             response['data']['posterAspect'] = item.poster_width/item.poster_height
+            add_changelog(request, data)
         else:
             response = json_response(status=403, text='invalid poster url')
     else:

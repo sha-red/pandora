@@ -19,14 +19,6 @@ class Page(models.Model):
     def __unicode__(self):
         return self.name
 
-    def log(self):
-        c = Changelog(type='page')
-        c.value = {
-            'name': self.name,
-            'text': self.text,
-        }
-        c.save()
-
 class Settings(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)

@@ -14,6 +14,7 @@ from item import utils
 from item.models import Item
 from itemlist.models import List
 from archive.chunk import process_chunk
+from changelog.models import add_changelog
 
 import models
 
@@ -51,6 +52,7 @@ def addDocument(request, data):
                 for id in ids:
                     document = models.Document.get(id)
                     document.add(item)
+                add_changelog(request, data, item.public_id)
             else:
                 response = json_response(status=403, text='permission denied')
         else:
@@ -59,6 +61,7 @@ def addDocument(request, data):
                     for id in ids:
                         document = models.Document.get(id)
                         document.add(item)
+            add_changelog(request, data, data['item'])
     return render_to_json_response(response)
 actions.register(addDocument, cache=False)
 
@@ -81,6 +84,7 @@ def editDocument(request, data):
     if data['id']:
         document = models.Document.get(data['id'])
         if document.editable(request.user, item):
+            add_changelog(request, data)
             document.edit(data, request.user, item)
             document.save()
             response['data'] = document.json(user=request.user, item=item)
@@ -228,12 +232,14 @@ def removeDocument(request, data):
     item = 'item' in data and Item.objects.get(public_id=data['item']) or None
     if item:
         if item.editable(request.user):
+            add_changelog(request, data, item.public_id)
             for id in ids:
                 document = models.Document.get(id)
                 document.remove(item)
         else:
             response = json_response(status=403, text='not allowed')
     else:
+        add_changelog(request, data, ids)
         for id in ids:
             document = models.Document.get(id)
             if document.editable(request.user):
@@ -263,6 +269,7 @@ def sortDocuments(request, data):
             models.ItemProperties.objects.filter(item=item, document=document).update(index=index)
             index += 1
         response = json_response()
+        add_changelog(request, data, item.public_id)
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)

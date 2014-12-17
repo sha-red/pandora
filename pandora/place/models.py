@@ -155,8 +155,3 @@ class Place(models.Model):
                              for key in ('south', 'west', 'north', 'east')])) > 0
 
         super(Place, self).save(*args, **kwargs)
-
-    def log(self):
-        c = Changelog(type='place')
-        c.value = self.json()
-        c.save()

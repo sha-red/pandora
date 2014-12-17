@@ -12,6 +12,7 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 
 from ox.django.api import actions
 from item import utils
+from changelog.models import add_changelog
 
 import models
 
@@ -57,6 +58,7 @@ def addEvent(request, data):
         event.update_matches()
         response = json_response(status=200, text='created')
         response['data'] = event.json()
+        add_changelog(request, data, event.get_id())
     else:
         response = json_response(status=409, text='name exists')
         response['data']['names'] = existing_names
@@ -108,6 +110,7 @@ def editEvent(request, data):
                 event.update_matches()
             response = json_response(status=200, text='updated')
             response['data'] = event.json()
+            add_changelog(request, data)
         else:
             response = json_response(status=409, text='Event name conflict')
             response['data']['names'] = conflict_names
@@ -128,6 +131,7 @@ def removeEvent(request, data):
     '''
     event = get_object_or_404_json(models.Event, pk=ox.fromAZ(data['id']))
     if event.editable(request.user):
+        add_changelog(request, data)
         event.delete()
         response = json_response(status=200, text='removed')
     else:

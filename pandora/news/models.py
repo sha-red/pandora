@@ -24,16 +24,13 @@ class News(models.Model):
 
     def save(self, *args, **kwargs):
         super(News, self).save(*args, **kwargs)
-        self.log()
 
-    def log(self):
-        c = Changelog(type='news')
-        c.value = self.json()
-        c.save()
+    def get_id(self):
+        return ox.toAZ(self.id)
 
     def json(self, keys=None):
         j = {
-            'id': ox.toAZ(self.id),
+            'id': self.get_id(),
             'date': self.date,
             'title': self.title,
             'text': self.text,

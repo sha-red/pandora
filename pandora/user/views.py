@@ -21,6 +21,7 @@ import ox
 from ox.django.api import actions
 from item.models import Access, Item
 from item import utils 
+from changelog.models import add_changelog
 
 import models
 from decorators import capability_required_json
@@ -379,6 +380,7 @@ def editUser(request, data):
         user.username = data['username']
     user.save()
     profile.save()
+    add_changelog(request, data, user.username)
     response['data'] = user.data.get().json()
     return render_to_json_response(response)
 actions.register(editUser, cache=False)
@@ -394,6 +396,7 @@ def removeUser(request, data):
     '''
     response = json_response()
     u = get_user_or_404(data)
+    add_changelog(request, data, u.username)
     u.delete()
     return render_to_json_response(response)
 actions.register(removeUser, cache=False)
@@ -929,6 +932,7 @@ def addGroup(request, data):
         n += 1
         name = u'%s [%d]' % (_name, n) 
     response['data'] = group_json(g)
+    add_changelog(request, data, g.name)
     return render_to_json_response(response)
 actions.register(addGroup, cache=False)
 
@@ -951,6 +955,7 @@ def editGroup(request, data):
     g = Group.objects.get(id=ox.fromAZ(data['id']))
     g.name = data['name']
     g.save()
+    add_changelog(request, data, g.name)
     response['data'] = group_json(g)
     return render_to_json_response(response)
 actions.register(editGroup, cache=False)
@@ -972,6 +977,7 @@ def removeGroup(request, data):
         i.groups.remove(g)
     for u in g.user_set.all():
         u.groups.remove(g)
+    add_changelog(request, data, g.name)
     g.delete()
     return render_to_json_response(response)
 actions.register(removeGroup, cache=False)

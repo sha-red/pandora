@@ -15,6 +15,7 @@ from item import utils
 from item.models import Item
 from item.utils import get_by_id
 from entity.models import Entity
+from changelog.models import add_changelog
 
 import models
 from tasks import update_item, add_annotations
@@ -186,6 +187,7 @@ def addAnnotation(request, data):
             value=value)
         annotation.save()
         update_item.delay(annotation.id)
+        add_changelog(request, data, annotation.public_id)
         response = json_response(annotation.json())
         response['data']['editable'] = True
     else:
@@ -228,6 +230,7 @@ def addAnnotations(request, data):
         response = json_response()
         data['user'] = request.user.username
         t = add_annotations.delay(data)
+        add_changelog(request, data, item.public_id)
         response['data']['taskId'] = t.task_id
     else:
         response = json_response(status=403, text='permission denied')
@@ -248,7 +251,7 @@ def removeAnnotation(request, data):
     response = json_response({})
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
-        a.log()
+        add_changelog(request, data, a.public_id)
         a.delete()
     else:
         response = json_response(status=403, text='permission denied')
@@ -275,7 +278,7 @@ def editAnnotation(request, data):
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
         layer = get_by_id(settings.CONFIG['layers'], a.layer)
-        a.log()
+        add_changelog(request, data)
         for key in ('value', 'in', 'out'):
             if key == 'value' and layer['type'] == 'entity':
                 value = Entity.get_by_name(data['value']).get_id()

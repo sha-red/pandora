@@ -17,6 +17,7 @@ from ox.utils import json, ET
 import models
 
 from user.models import init_user
+from changelog.models import add_changelog
 
 from ox.django.api import actions
 
@@ -130,10 +131,9 @@ def editPage(request, data):
     '''
     if request.user.get_profile().capability('canEditSitePages'):
         page, created = models.Page.objects.get_or_create(name=data['name'])
-        if not created:
-            page.log()
         page.text = ox.sanitize_html(data['text'])
         page.save()
+        add_changelog(request, data, page.name)
         response = json_response({'name': page.name, 'text': page.text})
     else:
         response = json_response(status=403, text='permission denied')

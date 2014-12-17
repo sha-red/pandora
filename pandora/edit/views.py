@@ -15,6 +15,7 @@ from ox.django.api import actions
 from django.conf import settings
 
 from item import utils
+from changelog.models import add_changelog
 
 import models
 
@@ -62,6 +63,7 @@ def addClips(request, data):
                     return render_to_json_response(response)
                 else:
                     clips.append(clip.json(request.user))
+        add_changelog(request, data, edit.get_id())
         response['data']['clips'] = clips
     else:
         response = json_response(status=403, text='permission denied')
@@ -89,6 +91,7 @@ def removeClips(request, data):
     if edit.editable(request.user):
         for clip in edit.clips.filter(id__in=ids):
             clip.delete()
+        add_changelog(request, data, edit.get_id())
         response['data'] = edit.json(user=request.user)
     else:
         response = json_response(status=403, text='permission denied')
@@ -126,6 +129,7 @@ def editClip(request, data):
         if valid:
             clip.save()
             response['data'] = clip.json(user=request.user)
+            add_changelog(request, data, clip.get_id())
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
@@ -151,6 +155,7 @@ def orderClips(request, data):
                 for i in ids:
                     models.Clip.objects.filter(edit=edit, id=i).update(index=index)
                     index += 1
+            add_changelog(request, data, edit.get_id())
         else:
             response = json_response(status=500, text='sorting smart lists not possible')
     else:
@@ -279,6 +284,7 @@ def addEdit(request, data):
     pos.save()
     response = json_response(status=200, text='created')
     response['data'] = edit.json(user=request.user)
+    add_changelog(request, data, edit.get_id())
     return render_to_json_response(response)
 actions.register(addEdit, cache=False)
 
@@ -301,6 +307,7 @@ def editEdit(request, data):
             'id', 'name', 'posterFrames', 'status',
             'subscribed', 'user'
         ], user=request.user)
+        add_changelog(request, data, edit.get_id())
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
@@ -319,6 +326,7 @@ def removeEdit(request, data):
     edit = get_edit_or_404_json(data['id'])
     response = json_response()
     if edit.editable(request.user):
+        add_changelog(request, data, edit.get_id())
         edit.delete()
     else:
         response = json_response(status=403, text='not allowed')
@@ -436,6 +444,7 @@ def subscribeToEdit(request, data):
             qs = models.Position.objects.filter(user=user, section='public')
             pos.position = qs.aggregate(Max('position'))['position__max'] + 1
             pos.save()
+        add_changelog(request, data, edit.get_id())
     response = json_response()
     return render_to_json_response(response)
 actions.register(subscribeToEdit, cache=False)
@@ -455,6 +464,7 @@ def unsubscribeFromEdit(request, data):
     edit.subscribed_users.remove(user)
     models.Position.objects.filter(edit=edit, user=user, section='public').delete()
     response = json_response()
+    add_changelog(request, data, edit.get_id())
     return render_to_json_response(response)
 actions.register(unsubscribeFromEdit, cache=False)
 

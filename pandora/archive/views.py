@@ -20,6 +20,7 @@ from item.models import get_item, Item
 from item.views import parse_query
 import item.tasks
 from ox.django.api import actions
+from changelog.models import add_changelog
 
 import models
 import tasks
@@ -375,6 +376,7 @@ def moveMedia(request, data):
             item.tasks.update_timeline.delay(public_id)
     response = json_response(text='updated')
     response['data']['item'] = i.public_id
+    add_changelog(request, data, i.public_id)
     return render_to_json_response(response)
 actions.register(moveMedia, cache=False)
 
@@ -431,6 +433,7 @@ def editMedia(request, data):
     if save_items:
         for i in Item.objects.filter(id__in=list(set(save_items))):
             i.save()
+    add_changelog(request, data, [f['id'] for f in response['data']['files']])
     return render_to_json_response(response)
 actions.register(editMedia, cache=False)
 
@@ -448,6 +451,7 @@ def removeMedia(request, data):
                 i.update_timeline()
             else:
                 i.save()
+        add_changelog(request, data, data['ids'])
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)

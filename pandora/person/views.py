@@ -14,6 +14,7 @@ from item import utils
 import models
 import tasks
 from user.decorators import capability_required_json
+from changelog.models import add_changelog
 
 @capability_required_json('canManageTitlesAndNames')
 def editName(request, data):
@@ -35,6 +36,7 @@ def editName(request, data):
         person.edited = True
     person.save()
     tasks.update_file_paths.delay(person.id)
+    add_changelog(request, data)
     response['data'] = person.json()
     return render_to_json_response(response)
 actions.register(editName, cache=False)

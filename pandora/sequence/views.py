@@ -9,6 +9,7 @@ from ox.django.api import actions
 
 from item.models import Item
 from item import utils
+from changelog.models import add_changelog
 
 import models
 

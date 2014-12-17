@@ -293,11 +293,6 @@ class Item(models.Model):
             p = tasks.update_poster.delay(self.public_id)
         return p
 
-    def log(self):
-        c = Changelog(type='item')
-        c.value = self.json
-        c.save()
-
     def update_external(self):
         if settings.DATA_SERVICE and not self.public_id.startswith('0x'):
             response = external_data('getData', {'id': self.public_id})

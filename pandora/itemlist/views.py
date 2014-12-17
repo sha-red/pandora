@@ -18,6 +18,7 @@ from ox.django.api import actions
 from item import utils
 from item.models import Item
 from user.tasks import update_numberoflists
+from changelog.models import add_changelog
 
 def get_list_or_404_json(id):
     id = id.split(':')
@@ -159,6 +160,7 @@ def addListItems(request, data):
                 for item in Item.objects.filter(public_id__in=data['items']):
                     list.add(item)
             response = json_response(status=200, text='items added')
+            add_changelog(request, data, data['list'])
         else:
             response = json_response(status=403, text='not allowed')
     elif 'query' in data:
@@ -185,6 +187,7 @@ def removeListItems(request, data):
         if list.editable(request.user):
             list.remove(items=data['items'])
             response = json_response(status=200, text='items removed')
+            add_changelog(request, data, data['list'])
         else:
             response = json_response(status=403, text='not allowed')
     elif 'query' in data:
@@ -274,6 +277,7 @@ def addList(request, data):
     pos.save()
     response = json_response(status=200, text='created')
     response['data'] = list.json()
+    add_changelog(request, data, list.get_id())
     return render_to_json_response(response)
 actions.register(addList, cache=False)
 
@@ -300,6 +304,7 @@ def editList(request, data):
         response = json_response()
         list.edit(data, request.user)
         response['data'] = list.json(user=request.user)
+        add_changelog(request, data)
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
@@ -317,6 +322,7 @@ def removeList(request, data):
     list = get_list_or_404_json(data['id'])
     response = json_response()
     if list.editable(request.user):
+        add_changelog(request, data)
         list.delete()
         update_numberoflists.delay(request.user.username)
     else:
@@ -344,6 +350,7 @@ def subscribeToList(request, data):
             qs = models.Position.objects.filter(user=user, section='public')
             pos.position = qs.aggregate(Max('position'))['position__max'] + 1
             pos.save()
+        add_changelog(request, data)
     response = json_response()
     return render_to_json_response(response)
 actions.register(subscribeToList, cache=False)
@@ -364,6 +371,7 @@ def unsubscribeFromList(request, data):
     list.subscribed_users.remove(user)
     models.Position.objects.filter(list=list, user=user, section='public').delete()
     response = json_response()
+    add_changelog(request, data)
     return render_to_json_response(response)
 actions.register(unsubscribeFromList, cache=False)
 

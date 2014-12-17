@@ -16,6 +16,7 @@ from django.db.models import Sum
 from item import utils
 from item.models import Item
 from itemlist.models import List
+from changelog.models import add_changelog
 
 import models
 
@@ -64,6 +65,7 @@ def addEntity(request, data):
             entity.matches = 0
             entity.save()
             response = json_response(status=200, text='created')
+            add_changelog(request, data, entity.get_id())
             response['data'] = entity.json()
         else:
             response = json_response(status=409, text='name exists')
@@ -159,6 +161,7 @@ def editEntity(request, data):
         entity.edit(data)
         entity.save()
         response['data'] = entity.json(user=request.user)
+        add_changelog(request, data)
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
@@ -282,6 +285,7 @@ def removeEntity(request, data):
         else:
             response = json_response(status=403, text='not allowed')
             break
+    add_changelog(request, data, ids)
     return render_to_json_response(response)
 actions.register(removeEntity, cache=False)
 
