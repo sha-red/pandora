@@ -57,8 +57,8 @@ pandora.openDocumentDialog = function(options) {
 
 pandora.ui.documentDialog = function(options) {
 
-    var dialogHeight = Math.round((window.innerHeight - 48) * 0.9) + 24,
-        dialogWidth = Math.round(window.innerWidth * 0.9),
+    var dialogHeight = Math.round((window.innerHeight - 48) * 0.9) - 24,
+        dialogWidth = Math.round(window.innerWidth * 0.9) - 48,
         isItemView = !pandora.$ui.documentsDialog,
         items = options.items,
         item = items[options.index],
