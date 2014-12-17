@@ -77,7 +77,10 @@ def add_annotations(data):
     user = User.objects.get(username=data['user'])
     for a in data['annotations']:
         if layer['type'] == 'entity':
-            value = Entity.get_by_name(a['value']).get_id()
+            try:
+                value = Entity.get_by_name(a['value']).get_id()
+            except Entity.DoesNotExist:
+                continue
         else:
             value = a['value']
         annotation = models.Annotation(

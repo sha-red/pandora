@@ -176,7 +176,12 @@ def addAnnotation(request, data):
     layer = get_by_id(settings.CONFIG['layers'], layer_id)
     if layer['canAddAnnotations'].get(request.user.get_profile().get_level()):
         if layer['type'] == 'entity':
-            value = Entity.get_by_name(data['value']).get_id()
+            try:
+                value = Entity.get_by_name(data['value']).get_id()
+            except Entity.DoesNotExist:
+                response = json_response({})
+                response['status']['text'] = 'unkown entity'
+                return render_to_json_response(response)
         else:
             value = data['value']
         annotation = models.Annotation(
@@ -278,10 +283,15 @@ def editAnnotation(request, data):
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
         layer = get_by_id(settings.CONFIG['layers'], a.layer)
-        add_changelog(request, data)
         for key in ('value', 'in', 'out'):
             if key == 'value' and layer['type'] == 'entity':
-                value = Entity.get_by_name(data['value']).get_id()
+                try:
+                    value = Entity.get_by_name(data['value']).get_id()
+                except Entity.DoesNotExist:
+                    response['data'] = a.json()
+                    response['data']['editable'] = True
+                    response['status']['text'] = 'unkown entity'
+                    return render_to_json_response(response)
             else:
                 value = data[key]
             if key in data:
@@ -289,6 +299,7 @@ def editAnnotation(request, data):
                     'in': 'start',
                     'out': 'end'
                 }.get(key,key), value)
+        add_changelog(request, data)
         a.save()
         #update sort/find tables async
         update_item.delay(a.id)
