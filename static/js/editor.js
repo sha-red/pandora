@@ -19,6 +19,7 @@ pandora.ui.editor = function(data) {
                 pandora.api.autocompleteEntities({
                     key: key,
                     operator: '=',
+                    range: [0, 20],
                     value: value
                 }, function(result) {
                     callback(result.data.items);
