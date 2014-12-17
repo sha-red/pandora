@@ -74,40 +74,46 @@ pandora.ui.changelogDialog = function() {
                     },
                     {
                         format: function(value) {
-                            return Ox.encodeHTMLEntities(value);
-                        },
-                        id: 'user',
-                        operator: '+',
-                        title: Ox._('User'),
-                        visible: true,
-                        width: 72
-                    },
-                    {
-                        align: 'right',
-                        format: function(value) {
                             return Ox.formatDate(value, "%Y-%m-%d %H:%M:%S");
                         },
                         id: 'created',
                         operator: '-',
                         title: Ox._('Date'),
                         visible: true,
-                        width: 144
-                    },
-                    {
-                        format: function(value, data) {
-                            return formatURL(value, data.line);
-                        },
-                        id: 'changeid',
-                        operator: '+',
-                        title: Ox._('ID'),
-                        visible: true,
-                        width: 320
+                        width: 160
                     },
                     {
                         format: function(value) {
                             return Ox.encodeHTMLEntities(value);
                         },
-                        id: 'text',
+                        id: 'user',
+                        operator: '+',
+                        title: Ox._('User'),
+                        visible: true,
+                        width: 160
+                    },
+                    {
+                        id: 'action',
+                        operator: '+',
+                        title: Ox._('Action'),
+                        visible: true,
+                        width: 160
+                    },
+                    {
+                        format: function(value, data) {
+                            return value; // FIXME: TODO
+                        },
+                        id: 'changeid',
+                        operator: '+',
+                        title: Ox._('ID'),
+                        visible: true,
+                        width: 80
+                    },
+                    {
+                        format: function(value) {
+                            return Ox.encodeHTMLEntities(JSON.stringify(value));
+                        },
+                        id: 'data',
                         operator: '+',
                         title: Ox._('Data'),
                         visible: true,
@@ -118,7 +124,6 @@ pandora.ui.changelogDialog = function() {
                 columnsResizable: true,
                 columnsVisible: true,
                 items: pandora.api.findChangeLogs,
-                keys: ['line'],
                 scrollbarVisible: true,
                 sort: [{key: 'created', operator: '-'}],
                 unique: 'id'
