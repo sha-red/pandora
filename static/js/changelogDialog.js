@@ -140,6 +140,7 @@ pandora.ui.changelogDialog = function() {
                 },
                 open: function(data) {
                     var value = $list.value(Ox.last(data.ids)),
+                        FIXME = Ox.print(value),
                         $dialog = Ox.Dialog({
                             buttons: [
                                 Ox.Button({
