@@ -224,8 +224,8 @@ pandora.ui.mainMenu = function() {
                             { id: 'debugmode', title: Ox._((pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode') },
                             { id: 'eventlogging', title: Ox._((pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging')},
                             {},
-                            { id: 'errorlogs', title: Ox._('View Error Logs...')},
                             { id: 'tests', title: Ox._('Run Tests')}
+                            { id: 'errorlogs', title: Ox._('Error Logs...')},
                         ] }
                     ]
                     : []
@@ -541,10 +541,10 @@ pandora.ui.mainMenu = function() {
                     }
                     Ox.Event[pandora.localStorage('enableEventLogging') ? 'bind' : 'unbind'](pandora.logEvent);
                     that.setItemTitle('eventlogging', Ox._((pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging'));
-                } else if (data.id == 'errorlogs') {
-                    pandora.$ui.errorlogsDialog = pandora.ui.errorlogsDialog().open();
                 } else if (data.id == 'tests') {
                     pandora.tests();
+                } else if (data.id == 'errorlogs') {
+                    pandora.$ui.errorlogsDialog = pandora.ui.errorlogsDialog().open();
                 }
             },
             pandora_edit: function() {
