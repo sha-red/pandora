@@ -224,8 +224,8 @@ pandora.ui.mainMenu = function() {
                             { id: 'debugmode', title: Ox._((pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode') },
                             { id: 'eventlogging', title: Ox._((pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging')},
                             {},
-                            { id: 'tests', title: Ox._('Run Tests')}
-                            { id: 'errorlogs', title: Ox._('Error Logs...')},
+                            { id: 'tests', title: Ox._('Run Tests')},
+                            { id: 'errorlogs', title: Ox._('Error Logs...')}
                         ] }
                     ]
                     : []
