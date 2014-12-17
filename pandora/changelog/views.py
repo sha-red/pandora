@@ -52,7 +52,7 @@ def findChangeLogs(request, data):
                 ]
                 operator: ","
             },
-            sort: [{key: 'date', operator: '+'}],
+            sort: [{key: 'created', operator: '+'}],
             range: [int, int]
             keys: [string]
         }
