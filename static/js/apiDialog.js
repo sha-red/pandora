@@ -182,7 +182,7 @@ pandora.ui.apiDialog = function() {
                 .appendTo($text);
             $code = Ox.SyntaxHighlighter({
                     showLineNumbers: true,
-                    source: code.replace(/\s+?'''.+?'''\n/g, ''),
+                    source: code.replace(/\s*?'''.+?'''\n/g, ''),
                     offset: line
                 })
                 .css({
