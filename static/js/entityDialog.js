@@ -17,7 +17,7 @@ pandora.ui.entityDialog = function() {
                 })
                 .bindEvent({
                     click: function() {
-                        var id = [ui.part.entities];
+                        var id = ui.part.entities;
                         that.close();
                         pandora.api.getEntity({
                             id: id
