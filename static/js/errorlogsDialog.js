@@ -233,15 +233,6 @@ pandora.ui.errorlogsDialog = function() {
         return Ox.encodeHTMLEntities(url.split('?')[0]) + ':' + line;
     }
 
-    function renderLog(logData) {
-        var $checkbox;
-        return Ox.Element()
-            .css({
-                padding: '8px'
-            })
-            .append($('<pre>').html(logData.text));
-    }
-
     function updateList(key, value) {
         var query = {
                 conditions: [].concat(
