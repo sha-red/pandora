@@ -17,10 +17,16 @@ pandora.ui.entityDialog = function() {
                 })
                 .bindEvent({
                     click: function() {
-                        var part = ui.part.entities;
+                        var id = [ui.part.entities];
                         that.close();
-                        pandora.UI.set({'part.entities': part});
-                        // FIXME: Also set ui.entitiesType
+                        pandora.api.getEntity({
+                            id: id
+                        }, function(result) {
+                            var type = result.data.type;
+                            pandora.UI.set(Ox.extend({
+                                entitiesType: type
+                            }, 'entitiesSelection.' + type, [id]));
+                        });
                         pandora.$ui.entitiesDialog = pandora.ui.entitiesDialog().open();
                     }
                 }),
