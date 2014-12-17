@@ -158,9 +158,7 @@ pandora.ui.changelogDialog = function() {
                                 $('<pre>')
                                     .addClass('OxSelectable')
                                     .css({margin: '16px'})
-                                    .text(
-                                        JSON.stringify(JSON.parse(value.data), null, '    ')
-                                    )
+                                    .text(JSON.stringify(value.data, null, '    '))
                             ),
                             height: height - 48,
                             keys: {enter: 'close', escape: 'close'},
