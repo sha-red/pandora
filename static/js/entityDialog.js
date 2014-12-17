@@ -10,11 +10,34 @@ pandora.ui.entityDialog = function() {
             .css({overflowY: 'auto'}),
 
         that = Ox.Dialog({
+            buttons: (ui.canManageEntities ? [
+                Ox.Button({
+                    id: 'edit',
+                    title: Ox._('Edit Entity...')
+                })
+                .bindEvent({
+                    click: function() {
+                        that.close();
+                        pandora.$ui.entitiesDialog = pandora.ui.entitiesDialog().open();
+                    }
+                }),
+                {}
+            ] : []).concat([
+                Ox.Button({
+                    id: 'close',
+                    title: Ox._('Close')
+                })
+                .bindEvent({
+                    click: function() {
+                        that.close();
+                    }
+                })
+            ]),
             closeButton: true,
             content: $content, 
             fixedSize: true,
-            focus: false,
             height: 416,
+            keyboard: {escape: 'close'},
             padding: 0,
             removeOnClose: true,
             title: '',
@@ -51,7 +74,7 @@ pandora.ui.entityDialog = function() {
     }
 
     function setTitle() {
-        ui.entity && pandora.api.getEntity({
+        ui.part.entities && pandora.api.getEntity({
             id: ui.part.entities
         }, function(result) {
             that.options({title: result.data.name});
