@@ -73,6 +73,7 @@ pandora.ui.entityDialog = function() {
             view: 'entity'
         }, function(html) {
             $content.html(html);
+            pandora.createLinks($content);
         });
     }
 
