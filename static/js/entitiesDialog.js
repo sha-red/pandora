@@ -11,7 +11,7 @@ pandora.ui.entitiesDialog = function(options) {
         type = ui.entitiesType || (
             pandora.site.entities.length ? pandora.site.entities[0].id : ''
         ),
-        selected = ui.entitiesSelection[type] || [];
+        selected = ui.entitiesSelection[type] || [],
 
         $entitiesSelect = Ox.Select({
             items: pandora.site.entities.map(function(type) {
