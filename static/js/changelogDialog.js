@@ -165,7 +165,7 @@ pandora.ui.changelogDialog = function() {
                             keys: {enter: 'close', escape: 'close'},
                             maximizeButton: true,
                             removeOnClose: true,
-                            title: [value.user, value.action, value.changeid].join(' &mdash; ')),
+                            title: [value.user, value.action, value.changeid].join(' &mdash; '),
                             width: width - 48
                         })
                         .open();
