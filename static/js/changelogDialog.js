@@ -26,7 +26,8 @@ pandora.ui.changelogDialog = function() {
                 items: [
                     {id: 'all', title: Ox._('Find: All')},
                     {id: 'user', title: Ox._('Find: User')},
-                    {id: 'url', title: Ox._('Find: ID')}
+                    {id: 'action', title: Ox._('Find: Action')},
+                    {id: 'changeid', title: Ox._('Find: ID')}
                 ],
                 overlap: 'right',
                 type: 'image',
@@ -235,10 +236,13 @@ pandora.ui.changelogDialog = function() {
 
     function updateList(key, value) {
         var query = {
-                conditions: [].concat(
-                    key != 'changeid' ? [{key: 'user', value: value, operator: '='}] : [],
-                    key != 'user' ? [{key: 'changeid', value: value, operator: '='}] : []
-                ),
+                conditions: key == 'all' ? [
+                    {key: 'user', value: value, operator: '='},
+                    {key: 'action', value: value, operator: '='},
+                    {key: 'changeid', value: value, operator: '='}
+                ] : [
+                    {key: key, value: value, operator: '='}
+                ],
                 operator: key == 'all' ? '|' : '&'
             };
         $list.options({
