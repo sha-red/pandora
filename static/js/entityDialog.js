@@ -10,7 +10,7 @@ pandora.ui.entityDialog = function() {
             .css({overflowY: 'auto'}),
 
         that = Ox.Dialog({
-            buttons: (ui.capabilities.canManageEntities ? [
+            buttons: (pandora.site.capabilities.canManageEntities[pandora.user.level] ? [
                 Ox.Button({
                     id: 'edit',
                     title: Ox._('Edit Entity...')
