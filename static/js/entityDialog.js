@@ -37,7 +37,7 @@ pandora.ui.entityDialog = function() {
             content: $content, 
             fixedSize: true,
             height: 416,
-            keyboard: {escape: 'close'},
+            keys: {escape: 'close'},
             padding: 0,
             removeOnClose: true,
             title: '',
