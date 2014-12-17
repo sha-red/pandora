@@ -153,12 +153,19 @@ pandora.ui.changelogDialog = function() {
                                 })
                             ],
                             closeButton: true,
-                            content: Ox.Element(), // FIXME
+                            content: $('<code>').append(
+                                $('<pre>')
+                                    .addClass('OxSelectable')
+                                    .css({margin: '16px'})
+                                    .text(
+                                        JSON.stringify(JSON.parse(value.data), null, '    ')
+                                    )
+                            ),
                             height: height - 48,
                             keys: {enter: 'close', escape: 'close'},
                             maximizeButton: true,
                             removeOnClose: true,
-                            title: formatURL(value.url, value.line),
+                            title: [value.user, value.action, value.changeid].join(' &mdash; ')),
                             width: width - 48
                         })
                         .open();
@@ -220,19 +227,6 @@ pandora.ui.changelogDialog = function() {
         Ox.Request.clearCache('findChangeLogs');
         that.superClose();
     };
-
-    function formatURL(url, line) {
-        return Ox.encodeHTMLEntities(url.split('?')[0]) + ':' + line;
-    }
-
-    function renderLog(logData) {
-        var $checkbox;
-        return Ox.Element()
-            .css({
-                padding: '8px'
-            })
-            .append($('<pre>').html(logData.text));
-    }
 
     function updateList(key, value) {
         var query = {
