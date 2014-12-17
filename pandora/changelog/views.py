@@ -10,6 +10,7 @@ from ox.django.shortcuts import render_to_json_response, json_response
 from ox.django.api import actions
 
 from item import utils
+from user.decorators import capability_required_json
 
 import models
 
@@ -38,7 +39,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-@admin_required_json
+@capability_required_json('canManageUsers')
 def findChangeLogs(request, data):
     '''
         takes {
