@@ -108,7 +108,7 @@ pandora.ui.changelogDialog = function() {
                         operator: '+',
                         title: Ox._('ID'),
                         visible: true,
-                        width: 80
+                        width: 160
                     },
                     {
                         format: function(value) {
