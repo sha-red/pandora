@@ -333,7 +333,7 @@ def taskStatus(request, data):
         status: string, // status, 'PENDING' or 'OK'
         result: object // result data
     }
-    note: To be deprecated, will be wrapped in regular API call
+    notes: To be deprecated, will be wrapped in regular API call
     '''
     #FIXME: should check if user has permissions to get status
     if 'taskId' in data:

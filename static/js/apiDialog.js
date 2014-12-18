@@ -128,7 +128,6 @@ pandora.ui.apiDialog = function() {
         notes: Notes
         see: action, action, ...
         */
-        string = ;
         var $doc = Ox.SyntaxHighlighter({
             source: string.replace(
                 /\n(?=(takes \{|returns \{|note: |see: ))/g, '\n\n'
