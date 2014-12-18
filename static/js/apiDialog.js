@@ -129,7 +129,7 @@ pandora.ui.apiDialog = function() {
         see: action, action, ...
         */
         var $doc = Ox.SyntaxHighlighter({
-                    source: string.replace(
+                    source: '\n' + string.replace(
                         /\n(?=(takes \{|returns \{|note: |see: ))/g, '\n\n'
                     ).replace(
                         /(takes|returns|notes|see)(?=( \{|: ))/g, 'BOLD$1BOLD'
