@@ -244,14 +244,16 @@ actions.register(getEdit)
 @login_required_json
 def addEdit(request, data):
     '''
-        takes {
-            [name],
-            [type]
-        }
-        returns {
-            id
-            ...
-        }
+    Adds an edit
+    takes {
+        name: string, // name (optional)
+        type: string // 'static' or 'smart'
+    }
+    returns {
+        id: string // edit id
+        ... // more edit properties
+    }
+    see: editEdit, findEdit, removeEdit, sortEdits
     '''
     data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
@@ -299,12 +301,18 @@ actions.register(addEdit, cache=False)
 @login_required_json
 def editEdit(request, data):
     '''
-        takes {
-            id
-        }
-        returns {
-            ...
-        }
+    Edits an edit (yes!)
+    takes {
+        id: string, // edit id
+        key: value, // property id and new value
+        ... // more key/value pairs
+    }
+    returns {
+        id: string, // edit id
+        key: value, // property id and new value
+        ... // more key/value pairs
+    }
+    see: addEdit, findEdit, removeEdit, sortEdits
     '''
     edit = get_edit_or_404_json(data['id'])
     response = json_response()
@@ -324,12 +332,12 @@ actions.register(editEdit, cache=False)
 @login_required_json
 def removeEdit(request, data):
     '''
-        takes {
-            ...
-        }
-        returns {
-            ...
-        }
+    Removes an edit
+    takes {
+        id: string // edit id
+    }
+    returns {}
+    see: addEdit, editEdit findEdit, sortEdits
     '''
     edit = get_edit_or_404_json(data['id'])
     response = json_response()
@@ -373,32 +381,27 @@ def parse_query(data, user):
 
 def findEdits(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            sort: [{key: 'name', operator: '+'}],
-            range: [0, 100]
-            keys: []
-        }
+    Finds edits for a given query
+    takes {
+        query: object, // query object, see `find`
+        sort: [], // list of sort objects, see `find`
+        range: [int, int], // range of results
+        keys: [string] // list of properties to return
+    }
 
-        possible query keys:
-            name, user, featured, subscribed
+    possible query keys:
+        name, user, featured, subscribed
 
-        possible keys:
-            name, user, featured, subscribed, query
+    possible keys:
+        name, user, featured, subscribed, query
 
-        }
-        returns {
-            items: [object]
-        }
+    }
+    returns {
+        items: [object]
+    }
+    notes: Possible query keys are 'featured', 'name', 'subscribed' and 'user',
+    possible keys are 'featured', 'name', 'query', 'subscribed' and 'user'.
+    see: editEdits, find, removeEdit, sortEdits
     '''
     query = parse_query(data, request.user)
 
@@ -437,10 +440,13 @@ actions.register(findEdits)
 @login_required_json
 def subscribeToEdit(request, data):
     '''
-        takes {
-            id: string,
-        }
-        returns {}
+    Adds an edit to favorites
+    takes {
+        id: string, // edit id
+        user: string // username (admin-only)
+    }
+    returns {}
+    see: unsubscribeFromEdit
     '''
     edit = get_edit_or_404_json(data['id'])
     user = request.user
@@ -461,11 +467,12 @@ actions.register(subscribeToEdit, cache=False)
 @login_required_json
 def unsubscribeFromEdit(request, data):
     '''
-        takes {
-            id: string,
-            user: username(only admins)
-        }
-        returns {}
+    takes {
+        id: string, // edit id
+        user: string // username (admin-only)
+    }
+    returns {}
+    see: subscribeToEdit
     '''
     edit = get_edit_or_404_json(data['id'])
     user = request.user
@@ -480,14 +487,13 @@ actions.register(unsubscribeFromEdit, cache=False)
 @login_required_json
 def sortEdits(request, data):
     '''
-        takes {
-            section: 'personal',
-            ids: [1,2,4,3]
-        }
-            known sections: 'personal', 'public', 'featured'
-            featured can only be edited by admins
-
-        returns {}
+    takes {
+        section: string, // 'personal', 'favorite' or 'featured'
+        ids: [string] // ordered list of edit ids
+    }
+    returns {}
+    notes: Sorting featured edits requires a specific per-user capability
+    see: editEdits, findEdits, removeEdit
     '''
     position = 0
     section = data['section']

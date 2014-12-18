@@ -29,16 +29,13 @@ def get_document_or_404_json(id):
 @login_required_json
 def addDocument(request, data):
     '''
-        add document(s) to item
-        takes {
-            item: string or [string]
-
-            id: string
-            or
-            ids: [string]
-        }
-        returns {
-        }
+    Adds one or more documents to one or more items
+    takes {
+        item: string or [string], // one or more item ids
+        id: string or [string] // one or more document ids
+    }
+    returns {}
+    see: editDocument, findDocument, getDocument, removeDocument, sortDocuments
     '''
     response = json_response()
     if 'ids' in data:
@@ -68,16 +65,20 @@ actions.register(addDocument, cache=False)
 @login_required_json
 def editDocument(request, data):
     '''
-        takes {
-            id: string
-            name: string
-            description: string
-            item(optional): edit descriptoin per item
-        }
-        returns {
-            id:
-            ...
-        }
+    takes {
+        id: string, // document id
+        name: string, // new document name
+        description: string // new document description
+        item: string // item id (optional)
+    }
+    returns {
+        id:
+        ...
+    }
+    notes: If `item` is present, this will not edit the global description of
+    the document, but its specific description in the context of the given
+    item.
+    see: addDocument, findDocument, getDocument, removeDocument, sortDocuments
     '''
     response = json_response()
     item = 'item' in data and Item.objects.get(public_id=data['item']) or None
@@ -140,32 +141,22 @@ def parse_query(data, user):
 
 def findDocuments(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            sort: [{key: 'name', operator: '+'}],
-            range: [0, 100]
-            keys: []
-        }
-
-        possible query keys:
-            name, user, extension, size
-
-        possible keys:
-            name, user, extension, size
-
-        }
-        returns {
-            items: [object]
-        }
+    takes {
+        query: object, // query object, see `find`
+        sort: [object], // list of sort objects, see `find`
+        range: [int, int], // range of results, per current sort order
+        keys: [string] // list of keys to return
+    }
+    returns {
+        items: [{ // list of documents
+            key: value, // item key and value
+            ... // more key/value pairs
+        }]
+    }
+    Notes: Query keys and keys to be returned can be 'extension', 'name',
+    'size' and 'user'.
+    see: addDocument, editDocument, find, getDocument, removeDocument,
+    sortDocuments
     '''
     query = parse_query(data, request.user)
 
@@ -193,13 +184,16 @@ actions.register(findDocuments)
 
 def getDocument(request, data):
     '''
-        takes {
-            id: string,
-            keys: [string]
-        }
-        returns {
-            key: value
-        }
+    Gets a document by id
+    takes {
+        id: string, // document id
+        keys: [string] // list of properties to return
+    }
+    returns {
+        key: value, // document key and value
+        ... // more key/value pairs
+    }
+    see: addDocument, editDocument, findDocument, removeDocument, sortDocuments
     '''
     response = json_response({})
     data['keys'] = data.get('keys', [])
@@ -211,17 +205,15 @@ actions.register(getDocument)
 @login_required_json
 def removeDocument(request, data):
     '''
-        takes {
-            id: string,
-            or
-            ids: [string]
-            item: string
-        }
-
-        if item is passed, remove relation to item
-        otherwise remove document
-        returns {
-        }
+    Removes one or more documents, either from an item or from the database
+    takes {
+        id or ids: string or [string], // one or more document ids
+        item: string // item id (optional)
+    }
+    returns {}
+    notes: If `item` is present, this removes the documents from that item.
+    Otherwise, it removes the documents from the database.
+    see: addDocument, editDocument, findDocument, getDocument, sortDocuments
     '''
     response = json_response()
 
@@ -253,12 +245,13 @@ actions.register(removeDocument, cache=False)
 @login_required_json
 def sortDocuments(request, data):
     '''
-        takes {
-            item: string
-            ids: [string]
-        }
-        returns {
-        }
+    Sets the sort order for the documents related to a given item
+    takes {
+        item: string, // item id
+        ids: [string] // list of document ids
+    }
+    returns {}
+    see: addDocument, editDocument, findDocument, removeDocument, sortDocuments
     '''
     index = 0
     item = Item.objects.get(public_id=data['item'])

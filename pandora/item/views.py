@@ -103,7 +103,7 @@ def find(request, data):
     Finds items for a given query
     takes {
         clipsQuery: object, // clips query object (optional)
-        group: string, // item key to group elements by
+        group: string, // item key to group results by (optional)
         keys: [string], // list of keys to return, [] for all (optional)
         positions: [string], // list of item ids (optional)
         query: { // query object
@@ -125,34 +125,34 @@ def find(request, data):
             operator: string // sort order, '+' or '-'
         }]
     }
-    returns { // if `keys` is present (returns items)
-        items: [
+    returns { // if `keys` is present
+        items: [ // returns list of matching items
             {
                 id: string, // item id
                 ... // more item properties
             },
             ... // more items
         ]
-    } or { // if `clipsQuery` is present (returns clips)
-        clips: [
+    } or { // if `clipsQuery` is present
+        clips: [ // returns list of matching clips
             {
                 id: string, // clip id
                 ... // more clip properties
             },
             ... // more clips
         ]
-    } or { if `group` is present (returns results for filters)
-        items: [
+    } or { // if `group` is present
+        items: [ // returns results for filters
             {
                 name: string, // value for item key specified as group
                 items: int // number of matches
             },
             ... // more group objects
         ]
-    } or { // if `keys` is missing (returns totals)
-        items: int // total number of items
-    } or { // if `positions` is present (returns positions of given items)
-        positions: {
+    } or { // if `keys` is missing
+        items: int // returns total number of items
+    } or { // if `positions` is present ()
+        positions: { // returns positions of given items
             id: position, // position of the item, per current sort order
             ... // more id/position pairs
         }
@@ -160,7 +160,7 @@ def find(request, data):
     notes: Comparison operators are '=' (contains) '==' (is), '^' (starts with),
     '$' (ends with), '<', '<=', '>', or '>=', each optionally prefixed with '!'
     (not).
-    see: add, edit, remove
+    see: add, edit, get, lookup, remove, upload
     '''
     if settings.JSON_DEBUG:
         print json.dumps(data, indent=2)
@@ -288,13 +288,14 @@ def autocomplete(request, data):
     takes {
         key: string,
         value: string,
-        operator: string // '=', '==', '^', '$'
-        query: object // item query to limit results
+        operator: string, // '=', '==', '^', '$'
+        query: object, // item query to limit results, see `find`
         range: [int, int]
     }
     returns {
         items: [string, ...] // array of matching values
     }
+    see: autocompleteEntities
     '''
     if not 'range' in data:
         data['range'] = [0, 10]
@@ -348,6 +349,7 @@ actions.register(autocomplete)
 
 def findId(request, data):
     '''
+    Undocumented
     takes {
         'id': string
         'title': string
@@ -378,14 +380,16 @@ def getMetadata(request, data):
     '''
     Gets metadata from an external service
     takes {
-        id: string,
-        keys: [string]
+        id: string, // item id
+        keys: [string] // list of item keys to return
     }
-
     returns {
-       key: value
-       ..
+       key: value // item key and value
+       ... // more key/value pairs
     }
+    notes: This can be used to populate metadata from a remote source, like
+    IMDb.
+    see: getIds, updateExternalData
     '''
     response = json_response({})
     if settings.DATA_SERVICE:
@@ -408,20 +412,23 @@ actions.register(getMetadata)
 
 def getIds(request, data):
     '''
-        takes {
-            title: string,
-            director: [string],
-            year: int
-        }
-
-        returns {
-            items: [{
-                tite: string,
-                director: [string],
-                year: int,
-                originalTitle: string
-            }]
-        }
+    Gets ids from an external service
+    takes {
+        title: string, // title
+        director: [string], // list of directors
+        year: int // year
+    }
+    returns {
+        items: [{
+            title: string, // title
+            director: [string], // list of directors
+            year: int, // year
+            originalTitle: string // original title
+        }]
+    }
+    notes: This can be used to populate metadata from a remote source, like
+    IMDb.
+    see: getMetadata, updateExternalData
     '''
     response = json_response({})
     if settings.DATA_SERVICE:
@@ -435,13 +442,16 @@ actions.register(getIds)
 
 def get(request, data):
     '''
-        takes {
-            id: string,
-            keys: [string]
-        }
-        returns {
-            key: value
-        }
+    Gets an item by id
+    takes {
+        id: string, // item id
+        keys: [string] // item properties to return
+    }
+    returns {
+        key: value, // item key and value
+        ... // more key/value pairs
+    }
+    see: add, edit, find, lookup, remove, upload
     '''
     response = json_response({})
     data['keys'] = data.get('keys', [])
@@ -478,14 +488,14 @@ def add(request, data):
     '''
     Adds a new item (without video)
     takes {
-        title: string, // item title (optional)
+        title: string, // title (optional)
     }
     returns {
         id: string, // item id
-        title: string, // item title
+        title: string, // title
         ... // more item properties
     }
-    see: edit, find, get, remove, upload
+    see: edit, find, get, lookup, remove, upload
     '''
     if not request.user.get_profile().capability('canAddItems'):
         response = json_response(status=403, text='permissino denied')
@@ -511,14 +521,14 @@ def edit(request, data):
     Edits metadata of an item
     takes {
         id: string, // item id
-        key: value, // property id and new value
+        key: value, // item key and new value
         ... // more key/value pairs
     }
     returns {
-        key: value // property id and new value
+        key: value // item key and new value
         ... // more key/value pairs
     }
-    see: add, find, get, remove, upload
+    see: add, find, get, lookup, remove, upload
     '''
     update_clips = False
     item = get_object_or_404_json(models.Item, public_id=data['id'])
@@ -561,13 +571,12 @@ actions.register(edit, cache=False)
 def remove(request, data):
     '''
     Removes an item
-    remove item with id, return status is 200/removed on sucess or 403/permission deinied.
     takes {
         id: string // item id
     }
     returns {}
     notes: The return status is 200 for success or 403 for permission denied.
-    see: add, edit, find, get, upload
+    see: add, edit, find, get, lookup, upload
     '''
     response = json_response({})
     item = get_object_or_404_json(models.Item, public_id=data['id'])
@@ -593,6 +602,7 @@ def setPosterFrame(request, data):
         position: float // position in seconds
     }
     returns {}
+    see: setPoster
     '''
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.editable(request.user):
@@ -621,6 +631,7 @@ def setPoster(request, data):
             width: int // width in px
         }
     }
+    see: setPosterFrame
     '''
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     response = json_response()
@@ -649,6 +660,9 @@ def updateExternalData(request, data):
         id: string // item id
     }
     returns {}
+    notes: This can be used to populate metadata from a remote source, like
+    IMDb.
+    see: getIds, getMetadata
     '''
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     response = json_response()
@@ -674,6 +688,7 @@ def lookup(request, data):
         title: string, // title
         year: string // year
     }
+    see: add, edit, find, get, remove, upload
     '''
     if 'id' in data:
         i = models.Item.objects.get(public_id=data['id'])
