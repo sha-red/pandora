@@ -162,6 +162,7 @@ pandora.ui.apiDialog = function() {
             }
             $doc.html(parts.join('<b>notes</b>' + colon));
         }
+        Ox.print('DEBUG', $doc.html())
         parts = $doc.html().split('<b>see</b>' + colon);
         if (parts.length == 2) {
             parts[1] = parts[1].replace(/\n\s+?/, '').split(comma).map(
