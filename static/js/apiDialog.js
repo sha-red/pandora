@@ -195,8 +195,8 @@ pandora.ui.apiDialog = function() {
                 + ' pandora_client</a> to automate certain tasks.</p>\n'
                 + '<p>To get started, just open the console and paste the'
                 + ' following snippet. For the first ten items that are'
-                + ' both shorter than one hour and whose title does not'
-                + ' start with "X" (sorted by duration, then title, both'
+                + ' both shorter than one hour and whose title starts with'
+                + ' either "a" or "the" (sorted by duration, then title, both'
                 + ' in ascending order), it will return their duration,'
                 + ' id and title properties.</p>',
             [pandora.site.site.name]))
@@ -207,7 +207,13 @@ pandora.ui.apiDialog = function() {
                         + "    query: {\n"
                         + "        conditions: [\n"
                         + "            {key: 'duration', operator: '<', value: '01:00:00'},\n"
-                        + "            {key: 'title', operator: '!=', value: 'x*'}\n"
+                        + "            {\n"
+                        + "                conditions: [\n"
+                        + "                    {key: 'title', operator: '=', value: 'a*'}\n"
+                        + "                    {key: 'title', operator: '=', value: 'the*'}\n"
+                        + "                ],\n"
+                        + "                operator: '|'\n"
+                        + "            }\n"
                         + "        ],\n"
                         + "        operator: '&'\n"
                         + "    },\n"
