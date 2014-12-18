@@ -46,20 +46,21 @@ def get_group_or_404(data):
 
 def signin(request, data):
     '''
-        takes {
-            username: string,
-            password: string
+    Sign in
+    takes {
+        username: string,
+        password: string
+    }
+    returns {
+        errors: {
+            username: 'Unknown Username',
+            password: 'Incorrect Password'
         }
-
-        returns {
-            errors: {
-                username: 'Unknown Username',
-                password: 'Incorrect Password'
-            }
-            user: {
-                ...
-            }
+        user: {
+            ...
         }
+    }
+    see: signout, signup
     '''
     if 'assertion' in data:
         response = persona.signin(request)
@@ -108,13 +109,15 @@ actions.register(signin, cache=False)
 
 def signout(request, data):
     '''
-        takes {}
-
-        returns {
-            user: {
-                default user
-            }
+    Sign out
+    takes {}
+    returns {
+        user: { // default user
+            key: value, // user data
+            ... // more user daa
         }
+    }
+    see: signin, signup
     '''
     response = json_response(text='ok')
     if request.user.is_authenticated():
@@ -132,21 +135,23 @@ actions.register(signout, cache=False)
 
 def signup(request, data):
     '''
-        takes {
-            username: string,
-            password: string,
-            email: string
-        }
+    Sign up
+    takes {
+        username: string,
+        password: string,
+        email: string
+    }
 
-        returns {
-            errors: {
-                username: 'Unknown Username',
-                password: 'Incorrect Password'
-            }
-            user: {
-                ...
-            }
+    returns {
+        errors: {
+            username: 'Unknown Username',
+            password: 'Incorrect Password'
         }
+        user: {
+            ...
+        }
+    }
+    see: signin, signout
     '''
     if 'username' in data and 'password' in data:
         data['username'] = data['username'].strip()
@@ -216,19 +221,20 @@ actions.register(signup, cache=False)
 
 def resetPassword(request, data):
     '''
-        takes {
-            username: string,
-            password: string,
-            code: string
+    Resets password for a given user
+    takes {
+        username: string,
+        password: string,
+        code: string
+    }
+    returns {
+        errors: {
+            code: 'Incorrect Code'
         }
-
-        returns {
-            errors: {
-                code: 'Incorrect Code'
-            }
-            user {
-            }
+        user {
         }
+    }
+    see: ...
     '''
     if 'code' in data and 'password' in data:
         if not data['password']:
@@ -268,18 +274,18 @@ actions.register(resetPassword, cache=False)
 
 def requestToken(request, data):
     '''
-        takes {
-            username: string,
-            email: string
+    Requests a password reset token
+    takes {
+        username: string,
+        email: string
+    }
+    returns {
+        errors: {
+            username: 'Unknown Username'
+            email: 'Unknown Email'
         }
-
-        returns {
-            errors: {
-                username: 'Unknown Username'
-                email: 'Unknown Email'
-            }
-            username: user
-        }
+        username: user
+    }
     '''
     user = None
     if 'username' in data:
@@ -333,14 +339,14 @@ actions.register(requestToken, cache=False)
 @capability_required_json('canManageUsers')
 def editUser(request, data):
     '''
-        takes {
-            key: value
-        }
-        required key: id 
-        optional keys: username, email, level, notes
-
-        returns {
-        }
+    Edits a user
+    takes {
+        key: value
+    }
+    required key: id 
+    optional keys: username, email, level, notes
+    returns {
+    }
     '''
     response = json_response()
     user = get_object_or_404_json(User, pk=ox.fromAZ(data['id']))
@@ -389,10 +395,10 @@ actions.register(editUser, cache=False)
 @capability_required_json('canManageUsers')
 def removeUser(request, data):
     '''
-        takes {
-            username: username
-        }
-        returns {}
+    takes {
+        username: username
+    }
+    returns {}
     '''
     response = json_response()
     u = get_user_or_404(data)
@@ -404,16 +410,17 @@ actions.register(removeUser, cache=False)
 
 def findUser(request, data):
     '''
-        takes {
-            key: string, //username, email
-            value: string,
-            operator: "==" // "==", "="
-            keys: [string]
-        }
+    takes {
+        key: string, //username, email
+        value: string,
+        operator: "==" // "==", "="
+        keys: [string]
+    }
 
-        returns {
-            users: [object]
-        }
+    returns {
+        users: [object]
+    }
+    see: editUser
     '''
     response = json_response(status=200, text='ok')
     #keys = data.get('keys')
@@ -539,6 +546,7 @@ Positions
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             positions:  ids of places for which positions are required
+    see: editUser
     '''
     response = json_response(status=200, text='ok')
     query = parse_query(data, request.user)
@@ -653,14 +661,14 @@ actions.register(mail, cache=False)
 
 def contact(request, data):
     '''
-        takes {
-            email: string,
-            subject: string,
-            message: string
-        }
-
-        returns {
-        }
+    Sends a message to the contact address
+    takes {
+        email: string,
+        subject: string,
+        message: string
+    }
+    returns {
+    }
     '''
     name = data.get('name', '')
     email = data.get('email', '')
@@ -725,11 +733,12 @@ def getPositionById(list, key):
 @login_required_json
 def editPreferences(request, data):
     '''
-        takes {
-            key: value
-        }
-        keys: email, password
-        returns {}
+    Edits the current user's preferences
+    takes {
+        key: value
+    }
+    keys: email, password
+    returns {}
     '''
     errors = {}
     change = False
@@ -768,12 +777,10 @@ def reset_ui(request):
 
 def resetUI(request, data):
     '''
-        reset user ui settings to defaults
-        takes {
-        }
-
-        returns {
-        }
+    Resets the user's UI settings to the default state
+    takes {}
+    returns {}
+    see: setUI
     '''
     response = json_response()
     if request.user.is_authenticated():
@@ -788,14 +795,14 @@ actions.register(resetUI, cache=False)
 
 def setUI(request, data):
     '''
-        takes {
-            key.subkey: value
-        }
-        you can set nested keys
-            api.setUI({"lists|my|ListView": "icons"})
-
-        returns {
-        }
+    Sets one or more UI settings for the current user
+    takes {
+        key: value, // property and new value
+        ... // more key/value pairs
+    }
+    returns {}
+    notes: To set nested keys, use {'foo.bar.baz': value}
+    see: resetUI
     '''
     if request.user.is_authenticated():
         profile = request.user.get_profile()
@@ -840,10 +847,11 @@ actions.register(setUI, cache=False)
 @capability_required_json('canManageUsers')
 def statistics(request, data):
     '''
-        takes {}
-        returns {
-            ...
-        }
+    Gets usage statistics
+    takes {}
+    returns {
+        ... // undocumented
+    }
     '''
     response = json_response()
     from app.models import Settings
@@ -869,13 +877,14 @@ def group_json(g):
 @login_required_json
 def getGroups(request, data):
     '''
-        takes {}
-        returns {
-            groups: [
-                {id: string, name: string, users: int, items: int}
-            ]
-        }
-
+    Gets user groups
+    takes {}
+    returns {
+        groups: [
+            {id: string, name: string, users: int, items: int}
+        ]
+    }
+    see: addGroup, editGroup, getGroups, removeGroup
     '''
     response = json_response(status=200, text='ok')
     response['data']['groups'] = []
@@ -888,18 +897,19 @@ actions.register(getGroups)
 @login_required_json
 def getGroup(request, data):
     '''
-        takes {
-            id: string
-                or
-            name: string
-        }
-        returns {
-            id: string,
-            name: string
-            users: int
-            items: int
-        }
-
+    Gets user group
+    takes {
+        id: string
+            or
+        name: string
+    }
+    returns {
+        id: string,
+        name: string
+        users: int
+        items: int
+    }
+    see: addGroup, editGroup, getGroups, removeGroup
     '''
     response = json_response(status=200, text='ok')
     g = get_group_or_404(data)
@@ -911,16 +921,17 @@ actions.register(getGroup, cache=False)
 @capability_required_json('canManageUsers')
 def addGroup(request, data):
     '''
-        takes {
-            name: string
-        }
-        returns {
-            id: string,
-            name: string
-            users: int
-            items: int
-        }
-
+    Adds user group
+    takes {
+        name: string
+    }
+    returns {
+        id: string,
+        name: string
+        users: int
+        items: int
+    }
+    see: editGroup, getGroup, getGroups, removeGroup
     '''
     response = json_response(status=200, text='ok')
     created = False
@@ -940,16 +951,17 @@ actions.register(addGroup, cache=False)
 @capability_required_json('canManageUsers')
 def editGroup(request, data):
     '''
-        takes {
-            id: string,
-            name: string
-            
-        }
-        returns {
-            name: string
-            users: int
-        }
-
+    Edits user group
+    takes {
+        id: string,
+        name: string
+        
+    }
+    returns {
+        name: string
+        users: int
+    }
+    see: addGroup, getGroup, getGroups, removeGroup
     '''
     response = json_response(status=200, text='ok')
     g = Group.objects.get(id=ox.fromAZ(data['id']))
@@ -964,12 +976,13 @@ actions.register(editGroup, cache=False)
 @capability_required_json('canManageUsers')
 def removeGroup(request, data):
     '''
-        takes {
-            id: string
-        }
-        returns {
-        }
-
+    Removes user group
+    takes {
+        id: string
+    }
+    returns {
+    }
+    see: addGroup, editGroup, getGroup, getGroups
     '''
     response = json_response(status=200, text='ok')
     g = get_group_or_404(data)
