@@ -142,7 +142,7 @@ pandora.ui.apiDialog = function() {
             .replace(/(takes \{|returns \{|note: |see: )/g, '<b>$1</b>')
             .replace(/`(\w+?)`/g, '<b>$1</b>')
         );
-        parts = $doc.html.split('<b>notes: </b>');
+        parts = $doc.html().split('<b>notes: </b>');
         if (len(parts) == 2) {
             parts_ = parts[1].split('<b>see: </b>');
             if (len(parts_) == 2) {
@@ -153,7 +153,7 @@ pandora.ui.apiDialog = function() {
             }
             $doc.html(parts.join('<b>notes: </b>'));
         }
-        parts = $doc.html.split('<b>see: </b>');
+        parts = $doc.html().split('<b>see: </b>');
         if (len(parts) == 2) {
             parts[1] = parts[1].replace(/\n\s+?/, '').split(', ').map(
                 function(action) {
