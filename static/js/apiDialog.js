@@ -139,10 +139,8 @@ pandora.ui.apiDialog = function() {
                 })
                 .css({backgroundColor: 'rgba(0, 0, 0, 0)'}),
             parts, parts_,
-            colon = '</span><span class="OxOperator">:</span>'
-                + '<span class="OxWhitespace">&nbsp;</span>',
-            comma = '<span class="OxOperator">,</span>'
-                + '<span class="OxWhitespace">&nbsp;</span>',
+            colon = '</span><span class="OxOperator">:</span>',
+            comma = '<span class="OxOperator">,</span>',
             linebreak = '<span class="OxLinebreak"><br></span>',
             whitespace = '<span class="OxWhitespace">&nbsp;</span>';
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
@@ -153,30 +151,23 @@ pandora.ui.apiDialog = function() {
         $doc.html(
             $doc.html().replace(/BOLD(\w+)BOLD/g, '<b>$1</b>')
         );
-        parts = $doc.html().split('<b>notes</b>' + colon);
-        if (parts.length == 2) {
-            parts_ = parts[1].split('<b>see</b>' + colon);
-            if (parts_.length == 2) {
-                parts_[0] = parts_[0]
-                    .replace(new RegExp(linebreak), whitespace);
-                parts[1] = parts_.join('<b>see</b>' + colon);
-            } else {
-                parts[1] = parts[1].replace(/\n\s+?/g, ' ');
-            }
-            $doc.html(parts.join('<b>notes</b>' + colon));
-        }
-        parts = $doc.html().split('<b>see</b>' + colon);
+        parts = $doc.html().split('<b>see</b>' + colon + whitespace);
         if (parts.length == 2) {
             parts[1] = parts[1]
-                .replace(new RegExp(linebreak), whitespace)
-                .split(comma)
-                .map(function(action) {
-                    action = Ox.stripTags(action);
-                    return '<span class="OxMethod"><a href="/api/'
-                        + action + '">' + action + '</a></span>';
+                .split(comma + linebreak)
+                .map(function(part) {
+                    return part
+                        .split(comma + whitespace)
+                        .map(function(action) {
+                            action = Ox.stripTags(action);
+                            return '<span class="OxMethod"><a href="/api/'
+                                + action + '">' + action + '</a></span>';
+                        })
+                        .join(comma + whitespace);
+                    
                 })
-                .join(comma);
-            $doc.html(parts.join('<b>see</b>' + colon));
+                .join(comma + linebreack);
+            $doc.html(parts.join('<b>see</b>' + colon + whitespace));
         }
         pandora.createLinks($doc);
         return $doc;
