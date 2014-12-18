@@ -111,6 +111,62 @@ pandora.ui.apiDialog = function() {
         
     });
 
+    function getDoc(string) {
+        /*
+        API Documentation format:
+        Description
+        takes {
+            key: value, // comment
+            key: value, // comment
+            ...
+        }
+        returns {
+            key: value, // comment
+            key: value, // comment
+            ...
+        }
+        notes: Notes
+        see: action, action, ...
+        */
+        string = ;
+        var $doc = Ox.SyntaxHighlighter({
+            source: string.replace(
+                /\n(?=(takes \{|returns \{|note: |see: ))/g, '\n\n'
+            ),
+            parts, parts_;
+        });
+        ['Keyword', 'Method', 'Property'].forEach(function(type) {
+            $doc.find('.Ox' + type).removeClass('Ox' + type);
+        });
+        $doc.html(
+            $doc.html()
+            .replace(/(takes \{|returns \{|note: |see: )/g, '<b>$1</b>')
+            .replace(/`(\w+?)`/g, '<b>$1</b>')
+        );
+        parts = $doc.html.split('<b>notes: </b>');
+        if (len(parts) == 2) {
+            parts_ = parts[1].split('<b>see: </b>');
+            if (len(parts_) == 2) {
+                parts_[0] = parts_[0].replace(/\n\s+?/g, ' ');
+                parts[1] = parts_.join('<b>see: </b>');
+            } else {
+                parts[1] = parts[1].replace(/\n\s+?/g, ' ');
+            }
+            $doc.html(parts.join('<b>notes: </b>'));
+        }
+        parts = $doc.html.split('<b>see: </b>');
+        if (len(parts) == 2) {
+            parts[1] = parts[1].replace(/\n\s+?/, '').split(', ').map(
+                function(action) {
+                    return '<a href="/api/' + action + '">' + action + '</a>';
+                }
+            ).join(', ');
+            $doc.html(parts.join('<b>see: </b>'));
+        }
+        pandora.createLinks($doc);
+        return $doc;
+    }
+
     function getIndex() {
         var $index = Ox.Element()
             .html(Ox._(
@@ -171,18 +227,9 @@ pandora.ui.apiDialog = function() {
             var code = actions[id].code[1],
                 source = actions[id].code[0],
                 line = Math.round(Ox.last(source.split(':')) || 0),
-                doc = actions[id].doc.replace(/\n(?=(takes \{|returns \{|NOTE: ))/g, '\n\n'),
                 $code, $doc;
-            $doc = Ox.SyntaxHighlighter({
-                    source: doc,
-                })
-                .css({
-                    backgroundColor: 'rgba(0, 0, 0, 0)'
-                })
+            $doc = getDoc(id)
                 .appendTo($text);
-            ['Keyword', 'Method', 'Property'].forEach(function(type) {
-                $doc.find('.Ox' + type).removeClass('Ox' + type);
-            });
             $('<div>')
                 .html('<br><b><tt>' + source + '</tt></b>')
                 .appendTo($text);
