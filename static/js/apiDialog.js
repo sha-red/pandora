@@ -177,6 +177,9 @@ pandora.ui.apiDialog = function() {
                     source: doc,
                 })
                 .appendTo($text);
+            ['Keyword', 'Method', 'Property'].forEach(function(type) {
+                $doc.find('.Ox' + type).removeClass('Ox' + type);
+            });
             $('<div>')
                 .html('<br><b><tt>' + source + '</tt></b>')
                 .appendTo($text);
