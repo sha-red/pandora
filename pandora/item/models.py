@@ -1199,6 +1199,8 @@ class Item(models.Model):
             return ox.torrent.bencode(data)
 
     def make_torrent(self):
+        if settings.CONFIG['video'].get('torrent') == False:
+            return
         streams = self.streams()
         if streams.count() == 0:
             return
