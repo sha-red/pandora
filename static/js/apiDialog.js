@@ -166,8 +166,9 @@ pandora.ui.apiDialog = function() {
         if (parts.length == 2) {
             parts[1] = parts[1].replace(/\n\s+?/, '').split(comma).map(
                 function(action) {
+                    action = Ox.stripTags(action);
                     return '<span class="OxMethod"><a href="/api/'
-                        + Ox.stripTags(action) + '">' + action + '</a></span>';
+                        + action + '">' + action + '</a></span>';
                 }
             ).join(comma);
             $doc.html(parts.join('<b>see</b>' + colon));
