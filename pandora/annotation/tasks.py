@@ -74,6 +74,8 @@ def add_annotations(data):
     layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])
     if not layer:
         return False
+    else:
+        layer = layer[0]
     user = User.objects.get(username=data['user'])
     for a in data['annotations']:
         if layer['type'] == 'entity':
