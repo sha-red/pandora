@@ -228,6 +228,7 @@ class Item(models.Model):
         return False
 
     def edit(self, data):
+        data = data.copy()
         #FIXME: how to map the keys to the right place to write them to?
         if 'id' in data:
             #FIXME: check if id is valid and exists and move/merge items accordingly

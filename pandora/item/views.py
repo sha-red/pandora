@@ -545,13 +545,13 @@ def edit(request, data):
                 user_groups = set([g.name for g in request.user.groups.all()])
                 other_groups = list(groups - user_groups)
                 data['groups'] = [g for g in data['groups'] if g in user_groups] + other_groups
+        add_changelog(request, data)
         r = item.edit(data)
         if r:
             r.wait()
         if update_clips:
             tasks.update_clips.delay(item.public_id)
         response['data'] = item.get_json()
-        add_changelog(request, data)
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
