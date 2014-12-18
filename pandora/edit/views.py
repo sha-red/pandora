@@ -141,6 +141,7 @@ actions.register(editClip, cache=False)
 @login_required_json
 def orderClips(request, data):
     '''
+    Updates manual ordering of clips within an edit
     takes {
         edit: string, // edit id
         ids: [string] // clip ids in new order
@@ -200,6 +201,7 @@ def _order_clips(edit, sort):
 
 def sortClips(request, data):
     '''
+    Updates sort order of clips within an edit
     takes {
         edit: string, // edit id
         sort: object // sort
