@@ -160,6 +160,10 @@ def find(request, data):
     notes: Comparison operators are '=' (contains) '==' (is), '^' (starts with),
     '$' (ends with), '<', '<=', '>', or '>=', each optionally prefixed with '!'
     (not).
+    Leaving out `keys` or passing `positions` can be useful when building a
+    responsive GUI: First leave out `keys` to get totals as fast as possible,
+    then pass `positions` to get the positions of previously selected items,
+    finally make the query with `keys` and an appropriate range.
     see: add, edit, get, lookup, remove, upload
     '''
     if settings.JSON_DEBUG:

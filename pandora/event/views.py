@@ -19,14 +19,16 @@ import models
 @login_required_json
 def addEvent(request, data):
     '''
-       takes {
-           name: string,
-           start: string,
-           end: string
-        }
-        returns {
-            id: string
-        }
+    Adds a calendar event
+    takes {
+        name: string,
+        start: string,
+        end: string
+    }
+    returns {
+        id: string
+    }
+    see: editEvent, findEvents, removeEvents
     '''
     existing_names = []
     exists = False
@@ -69,16 +71,18 @@ actions.register(addEvent, cache=False)
 @login_required_json
 def editEvent(request, data):
     '''
-        takes {
-            id: string,
-            name: string,
-            start: string,
-            end: string
-        }
-        returns {
-            id: string,
-            ...
-        }
+    Edits a calendar event
+    takes {
+        id: string,
+        name: string,
+        start: string,
+        end: string
+    }
+    returns {
+        id: string,
+        ...
+    }
+    see: addEvent, findEvents, removeEvent
     '''
     event = get_object_or_404_json(models.Event, pk=ox.fromAZ(data['id']))
     if event.editable(request.user):
@@ -123,11 +127,12 @@ actions.register(editEvent, cache=False)
 @login_required_json
 def removeEvent(request, data):
     '''
-        remove Event with given id
-        takes {
-            id: event id
-        }
-        returns {}
+    Removes a calendar event
+    takes {
+        id: event id
+    }
+    returns {}
+    see: addEvent, editEvent, findEvents
     '''
     event = get_object_or_404_json(models.Event, pk=ox.fromAZ(data['id']))
     if event.editable(request.user):
@@ -169,11 +174,12 @@ def order_query(qs, sort):
 
 def findEvents(request, data):
     '''
-        takes {
-            query: object,
-            sort: array
-            range': [int, int]
-        }
+    Finds calendar events
+    takes {
+        query: object,
+        sort: array
+        range': [int, int]
+    }
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -238,11 +244,12 @@ actions.register(findEvents)
 
 def getEventNames(request, data):
     '''
-        takes {
-        }
-        returns {
-            items: [{name: string, matches: int}]
-        }
+    Undocumented
+    takes {
+    }
+    returns {
+        items: [{name: string, matches: int}]
+    }
     '''
     response = json_response({})
     layers = [l['id'] for l in filter(lambda l: l['type'] == 'event',

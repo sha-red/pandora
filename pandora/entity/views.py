@@ -31,14 +31,14 @@ def get_entity_or_404_json(id):
 @login_required_json
 def addEntity(request, data):
     '''
-        add entity
-        takes {
-            type:
-            name:
-            alternativeNames
-        }
-        returns {
-        }
+    Adds an entity
+    takes {
+        type: string,
+        name: string,
+        alternativeNames: [string]
+    }
+    returns {}
+    see: editEntity, findEntities, getEntity, removeEntity
     '''
     existing_names = []
     exists = False
@@ -97,6 +97,7 @@ def autocompleteEntities(request, data):
     returns {
         items: [{id, name,...}, ...] // array of matching entities
     }
+    see: autocomplete
     '''
     if not 'range' in data:
         data['range'] = [0, 10]
@@ -144,16 +145,18 @@ actions.register(autocompleteEntities)
 @login_required_json
 def editEntity(request, data):
     '''
-        takes {
-            id: string
-            name: string
-            description: string
-            item(optional): edit descriptoin per item
-        }
-        returns {
-            id:
-            ...
-        }
+    Edits an entity
+    takes {
+        id: string
+        name: string
+        description: string
+        item(optional): edit descriptoin per item
+    }
+    returns {
+        id:
+        ...
+    }
+    see: addEntity, findEntities, getEntity, removeEntity
     '''
     response = json_response()
     entity = get_entity_or_404_json(data['id'])
@@ -197,32 +200,25 @@ def parse_query(data, user):
 
 def findEntities(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'name',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            sort: [{key: 'name', operator: '+'}],
-            range: [0, 100]
-            keys: []
-        }
+    Finds entities for a given query
+    takes {
+        query: object, // query object, see `find`
+        sort: [object], // list of sort objects, see `find`
+        range: [int, int], // range of results
+        keys: [string] // list of properties to return
+    }
 
-        possible query keys:
-            name, type
+    possible query keys:
+        name, type
 
-        possible keys:
-            name, type, alternativeNames
+    possible keys:
+        name, type, alternativeNames
 
-        }
-        returns {
-            items: [object]
-        }
+    }
+    returns {
+        items: [object]
+    }
+    see: addEntity, editEntity, getEntity, removeEntity
     '''
     query = parse_query(data, request.user)
 
@@ -246,13 +242,15 @@ actions.register(findEntities)
 
 def getEntity(request, data):
     '''
-        takes {
-            id: string,
-            keys: [string]
-        }
-        returns {
-            key: value
-        }
+    Gets an entity by id
+    takes {
+        id: string,
+        keys: [string]
+    }
+    returns {
+        key: value
+    }
+    see: addEntity, editEntity, findEntities, removeEntity
     '''
     response = json_response({})
     data['keys'] = data.get('keys', [])
@@ -264,13 +262,15 @@ actions.register(getEntity)
 @login_required_json
 def removeEntity(request, data):
     '''
-        takes {
-            id: string,
-            or
-            ids: [string]
-        }
-        returns {
-        }
+    Removes an entity
+    takes {
+        id: string,
+        or
+        ids: [string]
+    }
+    returns {
+    }
+    see: addEntity, editEntity, findEntities, getEntity
     '''
     response = json_response()
 

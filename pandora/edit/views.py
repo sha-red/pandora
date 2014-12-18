@@ -45,8 +45,9 @@ def addClips(request, data):
         ]
     }
     returns {}
-    notes: Clips are either {item, in, out} or {annotation}. If index is
-    missing, clips will be inserted at the end of the edit.
+    notes: Clips are either {item, in, out} (by value) or {annotation} (by
+    reference). If `index` is missing, clips will be inserted at the end of the
+    edit.
     see: editClip, orderClips, removeClips, sortClips
     '''
     response = json_response()

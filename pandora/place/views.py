@@ -20,23 +20,24 @@ import models
 @login_required_json
 def addPlace(request, data):
     '''
-        takes {
-            name: "",
-            alternativeNames: [],
-            geoname: "",
-            countryCode: '',
-            south: float,
-            west: float,
-            north: float,
-            east: float,
-            lat: float,
-            lng: float,
-            area: float,
-            type: ""
-        }
-        returns {
-            id: string
-        }
+    Adds a place
+    takes {
+        name: "",
+        alternativeNames: [],
+        geoname: "",
+        countryCode: '',
+        south: float,
+        west: float,
+        north: float,
+        east: float,
+        lat: float,
+        lng: float,
+        area: float,
+        type: ""
+    }
+    returns {
+        id: string
+    }
     '''
     #FIXME: check permissions
     exists = False
@@ -102,14 +103,15 @@ actions.register(addPlace, cache=False)
 @login_required_json
 def editPlace(request, data):
     '''
-        takes {
-            id: string,
-            name: string
-            north: int
-        }
-        returns {
-            names: []
-        }
+    Edits a place
+    takes {
+        id: string,
+        name: string
+        north: int
+    }
+    returns {
+        names: []
+    }
     '''
     place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data['id']))
     names = data.get('name', [])
@@ -167,10 +169,12 @@ actions.register(editPlace, cache=False)
 @login_required_json
 def removePlace(request, data):
     '''
-        takes {
-            id: string,
-        }
-        returns {}
+    Removes a place
+    takes {
+        id: string,
+    }
+    returns {}
+    see: addPlace, editPlace, findPlaces
     '''
     if isinstance(data, dict):
         data = data['id']
@@ -215,61 +219,61 @@ def order_query(qs, sort):
 
 def findPlaces(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            itemsQuery: {
-                //see find request
-            },
-            sort: [{key: 'name', operator: '+'}],
-            range: [int, int]
-            keys: [string]
-        }
+    takes {
+        query: {
+            conditions: [
+                {
+                    key: 'user',
+                    value: 'something',
+                    operator: '='
+                }
+            ]
+            operator: ","
+        },
+        itemsQuery: {
+            //see find request
+        },
+        sort: [{key: 'name', operator: '+'}],
+        range: [int, int]
+        keys: [string]
+    }
 
-        possible query keys:
-            name, geoname, user
+    possible query keys:
+        name, geoname, user
 
-        itemsQuery can be used to limit the resuts to matches in those items.
-                  Uses the same query syntax as used in the find request.
+    itemsQuery can be used to limit the resuts to matches in those items.
+              Uses the same query syntax as used in the find request.
 
-        possible keys:
-            name, geoname, user
-        
-        returns {
-            items: [object]
-        }
-        takes {
-            query: object,
-            sort: [object]
-            range: [int, int]
-        }
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            sort: array of key, operator dics
-                [
-                    {
-                        key: "year",
-                        operator: "-"
-                    },
-                    {
-                        key: "director",
-                        operator: ""
-                    }
-                ]
-            range:       result range, array [from, to]
+    possible keys:
+        name, geoname, user
+    
+    returns {
+        items: [object]
+    }
+    takes {
+        query: object,
+        sort: [object]
+        range: [int, int]
+    }
+        query: query object, more on query syntax at
+               https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+        sort: array of key, operator dics
+            [
+                {
+                    key: "year",
+                    operator: "-"
+                },
+                {
+                    key: "director",
+                    operator: ""
+                }
+            ]
+        range:       result range, array [from, to]
 
-        with keys, items is list of dicts with requested properties:
-        returns {
-            items: [string]    
-        }
+    with keys, items is list of dicts with requested properties:
+    returns {
+        items: [string]    
+    }
 
 Positions
         takes {
@@ -316,10 +320,11 @@ actions.register(findPlaces)
 
 def getPlaceNames(request, data):
     '''
-        takes {}
-        returns {
-            items: [{name: string, matches: int}]
-        }
+    Undocumented
+    takes {}
+    returns {
+        items: [{name: string, matches: int}]
+    }
     '''
     response = json_response({})
     layers = [l['id'] for l in filter(lambda l: l['type'] == 'place',

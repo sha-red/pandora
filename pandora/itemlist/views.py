@@ -58,32 +58,24 @@ def parse_query(data, user):
 
 def findLists(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            sort: [{key: 'name', operator: '+'}],
-            range: [0, 100]
-            keys: []
-        }
+    takes {
+        query: object, // query object, see `find`
+        sort: [], // list of sort objects, see `find`
+        range: [int, int], // range of results
+        keys: [string] // properties to return
+    }
 
-        possible query keys:
-            name, user, featured, subscribed
+    possible query keys:
+        name, user, featured, subscribed
 
-        possible keys:
-            name, user, featured, subscribed, query
+    possible keys:
+        name, user, featured, subscribed, query
 
-        }
-        returns {
-            items: [{name: string, user: string, featured: bool, public...}]
-        }
+    }
+    returns {
+        items: [{name: string, user: string, featured: bool, public...}]
+    }
+    see: addList, editList, getList, removeList, sortLists
     '''
     query = parse_query(data, request.user)
 
@@ -121,14 +113,16 @@ actions.register(findLists)
 
 def getList(request, data):
     '''
-        takes {
-            id: listid
-        }
-        returns {
-            id:
-            section:
-            ...
-        }
+    Gets a list by id
+    takes {
+        id: listid
+    }
+    returns {
+        id:
+        section:
+        ...
+    }
+    see: addList, editList, findLists, removeList, sortLists
     '''
     if 'id' in data:
         response = json_response()
@@ -145,13 +139,14 @@ actions.register(getList)
 @login_required_json
 def addListItems(request, data):
     '''
-        takes {
-            list: listId,
-            items: [itemId],
-            query: ...
-        }
-        returns {
-        }
+    Adds one or more items to a list
+    takes {
+        list: listId,
+        items: [itemId],
+        query: ...
+    }
+    returns {
+    }
     '''
     list = get_list_or_404_json(data['list'])
     if 'items' in data:
@@ -174,13 +169,14 @@ actions.register(addListItems, cache=False)
 @login_required_json
 def removeListItems(request, data):
     '''
-        takes {
-             list: listId,
-             items: [itemId],
-             quert: ...
-        }
-        returns {
-        }
+    Removes one or more items from a list
+    takes {
+         list: listId,
+         items: [itemId],
+         quert: ...
+    }
+    returns {
+    }
     '''
     list = get_list_or_404_json(data['list'])
     if 'items' in data:
@@ -201,12 +197,14 @@ actions.register(removeListItems, cache=False)
 @login_required_json
 def orderListItems(request, data):
     '''
-       takes {
-           list: string
-           ids: [string]
-        }
-        returns {
-        }
+    Sets the manual order of items in a given list
+    takes {
+       list: string
+       ids: [string]
+    }
+    returns {
+    }
+    notes: There is no UI for this yet.
     '''
     list = get_list_or_404_json(data['list'])
     response = json_response()
@@ -225,23 +223,25 @@ actions.register(orderListItems, cache=False)
 @login_required_json
 def addList(request, data):
     '''
-        takes {
-            name: value,
-        }
-        possible keys to create list:
-            name
-            description
-            type
-            query
-            items
-            view
-            sort
+    Adds a new list
+    takes {
+        name: value,
+    }
+    possible keys to create list:
+        name
+        description
+        type
+        query
+        items
+        view
+        sort
 
-        returns {
-            id: string,
-            name: string,
-            ...
-        }
+    returns {
+        id: string,
+        name: string,
+        ...
+    }
+    see: editList, findLists, getList, removeList, sortLists
     '''
     data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
@@ -285,19 +285,21 @@ actions.register(addList, cache=False)
 @login_required_json
 def editList(request, data):
     '''
-        takes {
-            id: listId,
-            key: value,
-        }
-        keys: name, status, query, position, posterFrames
-        if you change status you have to provide position of list
+    Edits a list
+    takes {
+        id: listId,
+        key: value,
+    }
+    keys: name, status, query, position, posterFrames
+    if you change status you have to provide position of list
 
-        posterFrames:
-            array with objects that have item/position
-        returns {
-            id: string,
-            ...
-        }
+    posterFrames:
+        array with objects that have item/position
+    returns {
+        id: string,
+        ...
+    }
+    see: addList, findLists, getList, removeList, sortLists
     '''
     list = get_list_or_404_json(data['id'])
     if list.editable(request.user):
@@ -313,11 +315,12 @@ actions.register(editList, cache=False)
 @login_required_json
 def removeList(request, data):
     '''
-        takes {
-            id: listId,
-        }
-        returns {
-        }
+    Removes a list
+    takes {
+        id: string // list id
+    }
+    returns {}
+    see: addList, editList, findLists, getList, sortLists
     '''
     list = get_list_or_404_json(data['id'])
     response = json_response()
@@ -334,11 +337,12 @@ actions.register(removeList, cache=False)
 @login_required_json
 def subscribeToList(request, data):
     '''
-        takes {
-            id: listId,
-        }
-        returns {
-        }
+    Adds a list to favorites
+    takes {
+        id: listId,
+    }
+    returns {}
+    see: unsubscribeFromList
     '''
     list = get_list_or_404_json(data['id'])
     user = request.user
@@ -359,12 +363,13 @@ actions.register(subscribeToList, cache=False)
 @login_required_json
 def unsubscribeFromList(request, data):
     '''
-        takes {
-            id: listId,
-            user: username(only admins)
-        }
-        returns {
-        }
+    Removes a list from favorites
+    takes {
+        id: listId,
+        user: username(only admins)
+    }
+    returns {}
+    see: subscribeToList
     '''
     list = get_list_or_404_json(data['id'])
     user = request.user
@@ -379,14 +384,14 @@ actions.register(unsubscribeFromList, cache=False)
 @login_required_json
 def sortLists(request, data):
     '''
-        takes {
-            section: 'personal',
-            ids: [1,2,4,3]
-        }
-        known sections: 'personal', 'public', 'featured'
-        featured can only be edited by admins
-        returns {
-        }
+    Set order of lists
+    takes {
+        section: 'personal',
+        ids: [1,2,4,3]
+    }
+    known sections: 'personal', 'public', 'featured'
+    featured can only be edited by admins
+    returns {}
     '''
     position = 0
     section = data['section']
