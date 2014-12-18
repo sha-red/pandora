@@ -138,6 +138,7 @@ pandora.ui.apiDialog = function() {
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
             $doc.find('.Ox' + type).removeClass('Ox' + type);
         });
+        Ox.print('DEBUG', $doc.html())
         $doc.html(
             $doc.html()
             .replace(/(takes \{|returns \{|note: |see: )/g, '<b>$1</b>')
