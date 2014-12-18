@@ -232,17 +232,17 @@ pandora.ui.apiDialog = function() {
 
     that.select = function(id) {
         if (id && actions[id]) {
-            $text.html(
-                '<h1 style="padding-left: 4px"><b><tt>'
-                + id + '</tt></b><h1><br>'
-            );
             var code = actions[id].code[1],
                 source = actions[id].code[0],
                 line = Math.round(Ox.last(source.split(':')) || 0),
+                $title = $('<h1>')
+                    .css({paddingLeft: '4px'})
+                    .html('<b><tt>' + id + '</tt></b>')
+                .appendTo($text);
                 $doc = getDoc(actions[id].doc).appendTo($text),
                 $source = $('<div>')
-                    .css({padding: '4px'})
-                    .html('<br><b><tt>' + source + '</tt></b>')
+                    .css({paddingLeft: '4px'})
+                    .html('<br><b><tt>source: ' + source + '</tt></b>')
                     .appendTo($text),
                 $code = Ox.SyntaxHighlighter({
                         source: code.replace(/\s*?'''[\s\S]+?'''/g, ''),
