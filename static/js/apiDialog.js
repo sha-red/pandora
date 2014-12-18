@@ -167,14 +167,17 @@ pandora.ui.apiDialog = function() {
 
     that.select = function(id) {
         if (id && actions[id]) {
-            $text.html('<h1><b>' + id + '</b><h1><br>');
+            $text.html('<h1><b><tt>' + id + '</tt></b><h1><br>');
             var code = actions[id].code[1],
                 source = actions[id].code[0],
                 line = Math.round(Ox.last(source.split(':')) || 0),
-                doc = actions[id].doc.replace('/\n/<br>\n/g'),
+                doc = actions[id].doc.replace(/\n(?=(takes|returns) \{)/g, '\n\n'),
                 $code, $doc;
             $doc = Ox.SyntaxHighlighter({
                     source: doc,
+                })
+                .css({
+                    backgroundColor: 'rgba(0, 0, 0, 0)'
                 })
                 .appendTo($text);
             ['Keyword', 'Method', 'Property'].forEach(function(type) {
@@ -185,9 +188,9 @@ pandora.ui.apiDialog = function() {
                 .appendTo($text);
             $code = Ox.SyntaxHighlighter({
                     source: code.replace(/\s*?'''[\s\S]+?'''/g, ''),
-                    offset: line
                 })
                 .css({
+                    backgroundColor: 'rgba(0, 0, 0, 0)',
                     borderWidth: '1px',
                 })
                 .appendTo($text);
