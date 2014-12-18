@@ -139,7 +139,9 @@ pandora.ui.apiDialog = function() {
                 })
                 .css({backgroundColor: 'rgba(0, 0, 0, 0)'}),
             parts, parts_,
-            separator = '<span class="OxOperator">,</span>'
+            colon = '<span class="OxOperator">:</span>'
+                + '<span class="OxWhitespace">&nbsp;</span>';
+            comma = '<span class="OxOperator">,</span>'
                 + '<span class="OxWhitespace">&nbsp;</span>';
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
             $doc.find('.Ox' + type).removeClass('Ox' + type);
@@ -147,26 +149,26 @@ pandora.ui.apiDialog = function() {
         $doc.html(
             $doc.html().replace(/BOLD(\w+)BOLD/g, '<b>$1</b>')
         );
-        parts = $doc.html().split('<b>notes</b>');
+        parts = $doc.html().split('<b>notes</b>' + colon);
         if (parts.length == 2) {
-            parts_ = parts[1].split('<b>see</b>');
+            parts_ = parts[1].split('<b>see</b>' + colon);
             if (parts_.length == 2) {
                 parts_[0] = parts_[0].replace(/\n\s+?/g, ' ');
-                parts[1] = parts_.join('<b>see</b>');
+                parts[1] = parts_.join('<b>see</b>' + colon);
             } else {
                 parts[1] = parts[1].replace(/\n\s+?/g, ' ');
             }
-            $doc.html(parts.join('<b>notes</b>'));
+            $doc.html(parts.join('<b>notes</b>' + colon));
         }
-        parts = $doc.html().split('<b>see</b>');
+        parts = $doc.html().split('<b>see</b>' + colon);
         if (parts.length == 2) {
-            parts[1] = parts[1].replace(/\n\s+?/, '').split(separator).map(
+            parts[1] = parts[1].replace(/\n\s+?/, '').split(comma).map(
                 function(action) {
                     return '<a href="/api/' + Ox.stripTags(action) + '">'
                         + action + '</a>';
                 }
-            ).join(separator);
-            $doc.html(parts.join('<b>see</b>'));
+            ).join(comma);
+            $doc.html(parts.join('<b>see</b>' + colon));
         }
         pandora.createLinks($doc);
         return $doc;
