@@ -140,7 +140,7 @@ pandora.ui.apiDialog = function() {
                 .css({backgroundColor: 'rgba(0, 0, 0, 0)'}),
             parts, parts_,
             colon = '<span class="OxOperator">:</span>'
-                + '<span class="OxWhitespace">&nbsp;</span>';
+                + '<span class="OxWhitespace">&nbsp;</span>',
             comma = '<span class="OxOperator">,</span>'
                 + '<span class="OxWhitespace">&nbsp;</span>';
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
