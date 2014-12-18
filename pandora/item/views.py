@@ -100,120 +100,67 @@ def parse_query(data, user):
 
 def find(request, data):
     '''
-    Finds items
+    Finds items for a given query
     takes {
-        clipsQuery: ...,
-        keys: [string], // list of keys to return (optional)
+        clipsQuery: object, // clips query object (optional)
+        group: string, // item key to group elements by
+        keys: [string], // list of keys to return, [] for all (optional)
         positions: [string], // list of item ids (optional)
         query: { // query object
-            conditions: [{ // list of condition objects
-                key: string,
+            conditions: [{ // list of condition objects...
+                key: string, // item key
                 operator: string, // comparison operator, see below
-                value: string
-            }, { // or query objects (nested subconditions)
+                value: string // value
+            }, { // ... or query objects (nested subconditions)
                 query: {
-                    conditions: [{}],
-                    operator: string
+                    conditions: [object, ...], // list of condition objects
+                    operator: string // comparison operator, see below
                 }
             }],
             operator: string // logical operator, '&' or '|'
         },
+        range: [int, int] // items to return, per current sort order
         sort: [{ // list of sort objects
             key: string, // item key
             operator: string // sort order, '+' or '-'
-        }],
-        range: [int, int] // from, to
-    }
-    returns {
-        items: [{
-            id: string, // item id
-            ...
         }]
-    } or { // if `keys` is missing
-        items: int // total number of items
-    } or { // if `positions` is set
-        ...
     }
-    Comparison operators are '=' (contains) '==' (is), '^' (starts with),
+    returns { // if `keys` is present (returns items)
+        items: [
+            {
+                id: string, // item id
+                ... // more item properties
+            },
+            ... // more items
+        ]
+    } or { // if `clipsQuery` is present (returns clips)
+        clips: [
+            {
+                id: string, // clip id
+                ... // more clip properties
+            },
+            ... // more clips
+        ]
+    } or { if `group` is present (returns results for filters)
+        items: [
+            {
+                name: string, // value for item key specified as group
+                items: int // number of matches
+            },
+            ... // more group objects
+        ]
+    } or { // if `keys` is missing (returns totals)
+        items: int // total number of items
+    } or { // if `positions` is present (returns positions of given items)
+        positions: {
+            id: position, // position of the item, per current sort order
+            ... // more id/position pairs
+        }
+    }
+    notes: Comparison operators are '=' (contains) '==' (is), '^' (starts with),
     '$' (ends with), '<', '<=', '>', or '>=', each optionally prefixed with '!'
     (not).
-
-        Example: 
-            find({
-                query:{
-                    conditions:[{ key: '*', value: 'paris', operator: '='}],
-                    operator:'&'
-                },
-                keys: ['title', 'id'],
-                range: [0, 10],
-                sort: [{key: 'title', operator: '+'}]
-            })
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            sort: array of key, operator dics
-                [
-                    {
-                        key: "year",
-                        operator: "-"
-                    },
-                    {
-                        key: "director",
-                        operator: ""
-                    }
-                ]
-            range:       result range, array [from, to]
-            keys:  array of keys to return
-            group:    group elements by, country, genre, director...
-
-        with keys, items is list of dicts with requested properties:
-          returns {
-              items: [objects]
-          }
-
-    Groups
-        takes {
-            'query': query,
-            'key': string,
-            'group': string,
-            'range': array
-            clips: {}
-        }
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            range:       result range, array [from, to]
-            keys:  array of keys to return
-            group:    group elements by, country, genre, director...
-
-        possible values for keys: name, items
-
-        with keys
-        items contains list of {'name': string, 'items': int}:
-        returns {
-            items: [objects]
-        }
-
-        without keys: return number of items in given query
-          returns {
-              items: int
-          }
-
-    Positions
-        takes {
-            'query': query,
-            'positions': [],
-            'sort': array
-        }
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            positions: ids of items for which positions are required
-        returns {
-            positions: {
-                id: position
-            }
-        }
+    see: add, edit, remove
     '''
     if settings.JSON_DEBUG:
         print json.dumps(data, indent=2)
@@ -561,18 +508,17 @@ actions.register(add, cache=False)
 @login_required_json
 def edit(request, data):
     '''
-        edit item with id, you can pass one or many key/value pairs,
-        returns all key/values for edited item.
-
-        takes {
-            id: string,
-            key: value,
-            ...
-        }
-        returns {
-            key: value
-            ..
-        }
+    Edits metadata of an item
+    takes {
+        id: string, // item id
+        key: value, // property id and new value
+        ... // more key/value pairs
+    }
+    returns {
+        key: value // property id and new value
+        ... // more key/value pairs
+    }
+    see: add, find, get, remove, upload
     '''
     update_clips = False
     item = get_object_or_404_json(models.Item, public_id=data['id'])
@@ -614,13 +560,14 @@ actions.register(edit, cache=False)
 @login_required_json
 def remove(request, data):
     '''
-        remove item with id, return status is 200/removed on sucess or 403/permission deinied.
-        takes {
-            id: string
-        }
-
-        returns {
-        }
+    Removes an item
+    remove item with id, return status is 200/removed on sucess or 403/permission deinied.
+    takes {
+        id: string // item id
+    }
+    returns {}
+    notes: The return status is 200 for success or 403 for permission denied.
+    see: add, edit, find, get, upload
     '''
     response = json_response({})
     item = get_object_or_404_json(models.Item, public_id=data['id'])
@@ -640,12 +587,12 @@ actions.register(remove, cache=False)
 
 def setPosterFrame(request, data):
     '''
-        takes {
-            id: string,
-            position: float
-        }
-        returns {
-        }
+    Sets the poster frame for an item
+    takes {
+        id: string, // item id
+        position: float // position in seconds
+    }
+    returns {}
     '''
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.editable(request.user):
@@ -662,17 +609,18 @@ actions.register(setPosterFrame, cache=False)
 
 def setPoster(request, data):
     '''
-        takes {
-            id: string,
-            source: string // url
+    Sets the poster for an item
+    takes {
+        id: string, // item id
+        source: string // poster url
+    }
+    returns {
+        poster: {
+            height: int, // height in px
+            url: string, // poster url
+            width: int // width in px
         }
-        returns {
-            poster: {
-                url: string,
-                width: int,
-                height: int
-            }
-        }
+    }
     '''
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     response = json_response()
@@ -696,11 +644,11 @@ actions.register(setPoster, cache=False)
 
 def updateExternalData(request, data):
     '''
-        takes {
-            id: string,
-        }
-        returns {
-        }
+    Updates metadata from an external service
+    takes {
+        id: string // item id
+    }
+    returns {}
     '''
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     response = json_response()
@@ -713,18 +661,19 @@ actions.register(updateExternalData, cache=False)
 
 def lookup(request, data):
     '''
-        takes {
-            title: string,
-            director: [string],
-            year: string,
-            id: string
-        }
-        returns {
-            title: string,
-            director: [string],
-            year: string,
-            id: string
-        }
+    Looks up an item given partial metadata
+    takes {
+        director: [string], // directors (optional)
+        id: string, // item id (optional)
+        title: string, // title (optional)
+        year: string // year (optional)
+    }
+    returns {
+        director: [string], // director
+        id: string, // item id
+        title: string, // title
+        year: string // year
+    }
     '''
     if 'id' in data:
         i = models.Item.objects.get(public_id=data['id'])

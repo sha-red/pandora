@@ -31,7 +31,7 @@ def addClips(request, data):
     Adds one or more clips to an edit
     takes {
         edit: string, // edit id,
-        index: integer, // position within edit (optional),
+        index: int, // position within edit (optional),
         clips: [
             {
                 item: string, // item id

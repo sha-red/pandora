@@ -74,35 +74,24 @@ def order_query(qs, sort):
 
 def findAnnotations(request, data):
     '''
+    Finds annotations for a given query
     takes {
-        query: {
-            conditions: [{
-                key: string,
-                operator: string,
-                value: string
-            }],
-            operator: string // '&' or '|'
-        },
-        itemsQuery: {
-            conditions: [{
-                key: string,
-                operator: string,
-                value: string
-            }],
-            operator: string // '&' or '|'
-        },
-        keys: [],
+        query: object, // annotation query object, see `find`
+        itemsQuery: object, // item query object, see `find`
+        keys: [string, string, ...], // list of keys to return, see `find`
         position: int,
-        positions: [],
-        range: [int, int],
-        sort: []
+        positions: [string, string], // list of item ids, see `find`
+        range: [int, int], // items to return, per current sort order, see `find`
+        sort: [] // list of sort object, see `find`
     }
     returns {
         annotations: [{
-            id: string,
-            ...
+            id: string, // annotation id
+            ... // more annotation properties
         }]
     }
+    see: addAnnotation, addAnnotations, editAnnotation, getAnnotation,
+    removeAnnotation
     '''
     response = json_response()
 
@@ -138,8 +127,8 @@ def getAnnotation(request, data):
         keys: [string] // list of keys to return
     }
     returns {
-        key: value,
-        ...
+        key: value, // property id and value
+        ... // more key/value pairs
     }
     '''
     response = json_response({})
@@ -164,7 +153,7 @@ def addAnnotation(request, data):
         id: string, // annotation id
         ... // more annotation properties
     }
-    see: addAnnotation, editAnnotation, findAnnotations, getAnnotation,
+    see: addAnnotations, editAnnotation, findAnnotations, getAnnotation,
     getTaskStatus, removeAnnotation
     '''
     for key in ('item', 'layer', 'in', 'out', 'value'):
@@ -252,9 +241,9 @@ def removeAnnotation(request, data):
     takes {
         id: string // annotation id
     }
-    returns {
-    }
-    FIXME: returns nothing?
+    returns {}
+    see: addAnnotation, addAnnotations, editAnnotation, findAnnotations,
+    getAnnotation
     '''
     response = json_response({})
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
@@ -279,8 +268,10 @@ def editAnnotation(request, data):
     }
     returns {
         id: string, // annotation id
-        ...
+        ... // more annotation properties
     }
+    see: addAnnotation, addAnnotations, findAnnotations, getAnnotation,
+    removeAnnotation
     '''
     response = json_response({})
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
