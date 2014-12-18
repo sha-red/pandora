@@ -145,7 +145,7 @@ pandora.ui.apiDialog = function() {
             $doc.find('.Ox' + type).removeClass('Ox' + type);
         });
         $doc.html(
-            $doc.html().replace(/X(\w+)X/g, '<b>$1</b>')
+            $doc.html().replace(/BOLD(\w+)BOLD/g, '<b>$1</b>')
         );
         parts = $doc.html().split('<b>notes</b>');
         if (parts.length == 2) {
