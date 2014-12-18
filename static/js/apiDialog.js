@@ -131,39 +131,42 @@ pandora.ui.apiDialog = function() {
         var $doc = Ox.SyntaxHighlighter({
                     source: string.replace(
                         /\n(?=(takes \{|returns \{|note: |see: ))/g, '\n\n'
+                    ).replace(
+                        /(takes|returns|note|see)(?=( \{|: ))/g, 'BOLD$1BOLD'
+                    ).replace(
+                        /`/g, 'BOLD'
                     )
                 })
                 .css({backgroundColor: 'rgba(0, 0, 0, 0)'}),
-            parts, parts_;
+            parts, parts_,
+            str = '<span class="OxOperator">,</span>'
+                + '<span class="OxWhitespace">&nbsp;</span>';
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
             $doc.find('.Ox' + type).removeClass('Ox' + type);
         });
         Ox.print('DEBUG', $doc.html())
         $doc.html(
-            $doc.html()
-            .replace(/(takes \{|returns \{|note: |see: )/g, '<b>$1</b>')
-            .replace(/`(?=\w)/g, '<b>')
-            .replace(/`(?=\W)/g, '</b>')
+            $doc.html().replace(/X(\w+)X/g, '<b>$1</b>')
         );
-        parts = $doc.html().split('<b>notes: </b>');
+        parts = $doc.html().split('<b>notes</b>');
         if (parts.length == 2) {
-            parts_ = parts[1].split('<b>see: </b>');
+            parts_ = parts[1].split('<b>see</b>');
             if (len(parts_) == 2) {
                 parts_[0] = parts_[0].replace(/\n\s+?/g, ' ');
-                parts[1] = parts_.join('<b>see: </b>');
+                parts[1] = parts_.join('<b>see</b>');
             } else {
                 parts[1] = parts[1].replace(/\n\s+?/g, ' ');
             }
-            $doc.html(parts.join('<b>notes: </b>'));
+            $doc.html(parts.join('<b>notes</b>'));
         }
-        parts = $doc.html().split('<b>see: </b>');
+        parts = $doc.html().split('<b>see</b>');
         if (parts.length == 2) {
-            parts[1] = parts[1].replace(/\n\s+?/, '').split(', ').map(
+            parts[1] = parts[1].replace(/\n\s+?/, '').split(str).map(
                 function(action) {
                     return '<a href="/api/' + action + '">' + action + '</a>';
                 }
-            ).join(', ');
-            $doc.html(parts.join('<b>see: </b>'));
+            ).join(str);
+            $doc.html(parts.join('<b>see</b>'));
         }
         pandora.createLinks($doc);
         return $doc;
