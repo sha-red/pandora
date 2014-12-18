@@ -142,7 +142,9 @@ pandora.ui.apiDialog = function() {
             colon = '</span><span class="OxOperator">:</span>'
                 + '<span class="OxWhitespace">&nbsp;</span>',
             comma = '<span class="OxOperator">,</span>'
-                + '<span class="OxWhitespace">&nbsp;</span>';
+                + '<span class="OxWhitespace">&nbsp;</span>',
+            linebreak = '<span class="OxLinebreak"><br></span>',
+            whitespace = '<span class="OxWhitespace">&nbsp;</span>';
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
             $doc.find('.Ox' + type)
                 .removeClass('Ox' + type)
@@ -155,7 +157,8 @@ pandora.ui.apiDialog = function() {
         if (parts.length == 2) {
             parts_ = parts[1].split('<b>see</b>' + colon);
             if (parts_.length == 2) {
-                parts_[0] = parts_[0].replace(/\n\s+?/g, ' ');
+                parts_[0] = parts_[0]
+                    .replace(new RegExp(linebreak), whitespace);
                 parts[1] = parts_.join('<b>see</b>' + colon);
             } else {
                 parts[1] = parts[1].replace(/\n\s+?/g, ' ');
@@ -164,13 +167,15 @@ pandora.ui.apiDialog = function() {
         }
         parts = $doc.html().split('<b>see</b>' + colon);
         if (parts.length == 2) {
-            parts[1] = parts[1].replace(/\n\s+?/, '').split(comma).map(
-                function(action) {
+            parts[1] = parts[1]
+                .replace(new RegExp(linebreak), whitespace)
+                .split(comma)
+                .map(function(action) {
                     action = Ox.stripTags(action);
                     return '<span class="OxMethod"><a href="/api/'
                         + action + '">' + action + '</a></span>';
-                }
-            ).join(comma);
+                })
+                .join(comma);
             $doc.html(parts.join('<b>see</b>' + colon));
         }
         pandora.createLinks($doc);
@@ -233,6 +238,7 @@ pandora.ui.apiDialog = function() {
 
     that.select = function(id) {
         if (id && actions[id]) {
+            $text.empty();
             var code = actions[id].code[1],
                 source = actions[id].code[0],
                 line = Math.round(Ox.last(source.split(':')) || 0),
