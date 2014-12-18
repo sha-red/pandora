@@ -238,7 +238,7 @@ pandora.ui.apiDialog = function() {
                 $title = $('<h1>')
                     .css({paddingLeft: '4px'})
                     .html('<b><tt>' + id + '</tt></b>')
-                .appendTo($text);
+                    .appendTo($text),
                 $doc = getDoc(actions[id].doc).appendTo($text),
                 $source = $('<div>')
                     .css({paddingLeft: '4px'})
