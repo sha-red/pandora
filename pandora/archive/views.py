@@ -44,28 +44,29 @@ actions.register(removeVolume, cache=False)
 @login_required_json
 def update(request, data):
     '''
-        2 steps:
-            send files
-                {volume: 'Videos', files: [{oshash:, path:, mtime:, ,,}]}
-            send info about changed/new files
-                {volume: 'Videos', info: {oshash: {...}]}
+    Undocumented
+    2 steps:
+        send files
+            {volume: 'Videos', files: [{oshash:, path:, mtime:, ,,}]}
+        send info about changed/new files
+            {volume: 'Videos', info: {oshash: {...}]}
 
-        call volume/files first and fill in requested info after that
+    call volume/files first and fill in requested info after that
 
-        takes {
-            volume: '',
-            files: [
-                {oshash:, path:, mtime:, },
-                ...
-            ],
-            info: {oshash: object}
-        }
+    takes {
+        volume: '',
+        files: [
+            {oshash:, path:, mtime:, },
+            ...
+        ],
+        info: {oshash: object}
+    }
 
-        returns {
-            info: list, // list of files that need info
-            data: list, // list of flies that should be encoded to highest profile and uploaded
-            file: list  // list of files that should be uploaded as is
-        }
+    returns {
+        info: list, // list of files that need info
+        data: list, // list of flies that should be encoded to highest profile and uploaded
+        file: list  // list of files that should be uploaded as is
+    }
     '''
     user = request.user
     upload_only = data.get('upload', False)
@@ -110,16 +111,17 @@ actions.register(update, cache=False)
 @login_required_json
 def upload(request, data=None):
     '''
-        takes {
-            id: string
-            frame: [] //multipart frames
-            file: [] //multipart file
-        }
-
-        returns {
-            info: object,
-            rename: object
-        }
+    Uploads one or more media files for a given item
+    takes {
+        id: string // item id
+        frame: [] // one or more frames
+        file: [] // one or more files
+    }
+    returns {
+        info: object, // undocumented
+        rename: object // undocumented
+    }
+    see: add, edit, find, get, lookup, remove
     '''
     response = json_response({})
     f = get_object_or_404_json(models.File, oshash=request.POST['id'])
@@ -157,15 +159,17 @@ actions.register(upload, cache=False)
 @login_required_json
 def addMedia(request, data):
     '''
-        takes {
-            id: oshash
-            filename: string,
-            item: string
-            info: {}
-        }
-        returns {
-            item: id,
-        }
+    Adds media files to a given item
+    takes {
+        filename: string, // undocumented
+        id: oshash, // undocumented
+        info: {}, // undocumented
+        item: string // item id
+    }
+    returns {
+        item: id // item id
+    }
+    see: editMedia, moveMedia, removeMedia
     '''
     response = json_response({})
     oshash = data.pop('id')
@@ -333,7 +337,7 @@ def taskStatus(request, data):
         status: string, // status, 'PENDING' or 'OK'
         result: object // result data
     }
-    notes: To be deprecated, will be wrapped in regular API call
+    notes: To be deprecated, will be wrapped in regular API call.
     '''
     #FIXME: should check if user has permissions to get status
     if 'taskId' in data:
@@ -348,14 +352,14 @@ actions.register(taskStatus, cache=False)
 @login_required_json
 def moveMedia(request, data):
     '''
-        change file / item link
-        takes {
-            ids: ids of files
-            item: new public_id
-        }
-
-        returns {
-        }
+    Move media files from one item to another
+    takes {
+        ids: ids of files
+        item: new public_id
+    }
+    returns {}
+    notes: This will *not* (yet) shift the corresponding annotations.
+    see: addMedia, editMedia, findMedia, removeMedia
     '''
     if Item.objects.filter(public_id=data['item']).count() == 1:
         i = Item.objects.get(public_id=data['item'])
@@ -395,17 +399,21 @@ actions.register(moveMedia, cache=False)
 @login_required_json
 def editMedia(request, data):
     '''
-        change file / item link
-        takes {
-            files: [
-                {id:, key1: value1, key2: value2}
-                ...
-            ]
-        }
-        possible keys: part, partTitle, language, ignore, extension, version, episodes
-
-        returns {
-        }
+    Edits one or more media files
+    takes {
+        files: [
+            {
+                id: string, // file id
+                key: value, // property id and new value
+                ... more key/value pairs
+            },
+            // more media files
+        ]
+    }
+    returns {}
+    notes: Possible keys are 'episodes', 'extension', 'ignore', 'language',
+    'part', 'partTitle' and 'version'.
+    see: addMedia, findMedia, moveMedia, removeMedia
     '''
     ignore = []
     save_items = []
@@ -452,6 +460,12 @@ actions.register(editMedia, cache=False)
 
 @login_required_json
 def removeMedia(request, data):
+    '''
+    Removes one or more media files from a given item
+    takes {} // undocumented
+    returns {} // undocumented
+    see: addMedia, editMedia, findMedia, moveMedia
+    '''
     response = json_response()
     if request.user.get_profile().get_level() == 'admin':
         qs = models.File.objects.filter(oshash__in=data['ids'], instances__id=None)
@@ -471,14 +485,14 @@ actions.register(removeMedia, cache=False)
 
 def getPath(request, data):
     '''
-        change file / item link
-        takes {
-            id: [hash of file]
-        }
-
-        returns {
-            id: path
-        }
+    Undocumented
+    change file / item link
+    takes {
+        id: [hash of file]
+    }
+    returns {
+        id: path
+    }
     '''
     response = json_response()
     ids = data['id']
@@ -527,77 +541,16 @@ def _order_query(qs, sort, prefix=''):
 
 def findMedia(request, data):
     '''
-        takes {
-            'query': query,
-            'sort': array,
-            'range': array
-        }
-
-            query: item query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-                   get media for all items matching the given query
-
-            sort: array of key, operator dics
-                [
-                    {
-                        key: "year",
-                        operator: "-"
-                    },
-                    {
-                        key: "director",
-                        operator: ""
-                    }
-                ]
-            range:       result range, array [from, to]
-            keys:  array of keys to return
-            group:    group elements by, country, genre, director...
-
-        with keys, items is list of dicts with requested properties:
-          returns {
-              items: [object]
-          }
-
-Groups
-        takes {
-            'query': query,
-            'key': string,
-            'group': string,
-            'range': array
-        }
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            range:       result range, array [from, to]
-            keys:  array of keys to return
-            group:    group elements by, country, genre, director...
-
-        possible values for keys: path, items
-
-        with keys
-        items contains list of {'path': string, 'items': int}:
-        returns {
-            items: [object]
-        }
-
-        without keys: return number of items in given query
-          returns {
-              items: int
-          }
-
-Positions
-        takes {
-            'query': query,
-            'positions': [string]
-        }
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            positions:  ids of items for which positions are required
-        returns {
-            positions: {
-                id: position
-            }
-        }
+    Finds media files
+    takes {
+        query: object, // query object, see `find`
+        sort: array, // list of sort objects, see `find`
+        range: [int, int] // range of results to return
+    }
+    returns {
+        items: [object] // list of items
+    }
+    see: addMedia, editMedia, moveMedia, removeMedia
     '''
     if not data.get('sort'):
         data['sort'] = [{'key': 'path', 'operator': '+'}]
@@ -664,12 +617,13 @@ actions.register(findMedia)
 
 def parsePath(request, data): #parse path and return info
     '''
-        takes {
-            path: string
-        }
-        returns {
-            imdb: string
-        }
+    Parses a path
+    takes {
+        path: string // undocumented
+    }
+    returns {
+        imdb: string // undocumented
+    }
     '''
     path = data['path']
     response = json_response(ox.parse_movie_path(path))
@@ -678,13 +632,14 @@ actions.register(parsePath)
 
 def getMediaInfo(request, data):
     '''
-        takes {
-            id: oshash of stream file
-        }
-        returns {
-            item: public_id,
-            file: oshash of source file
-        }
+    Gets media file info, undocumented
+    takes {
+        id: string // oshash of media file
+    }
+    returns {
+        item: string, // item id
+        file: string // oshash of source file
+    }
     '''
     f = None
     qs = models.Stream.objects.filter(oshash=data['id'])

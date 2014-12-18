@@ -15,21 +15,25 @@ import models
 
 def getNews(request, data):
     '''
-        takes {
-            id: string
-        }
-
-        returns {
-            id: string,
-            ...
-        }
-
-        if not id is passed, return all news items
-
-        takes {}
-        returns {
-            items: [object]
-        }
+    Gets one or all news items
+    takes {
+        id: string // news item id (optional)
+    }
+    returns { // if `id` is present
+        id: string, // news item id
+        key: value, // property id and value
+        ... // more key/value pairs
+    } or { // if `id` is missing
+        items: [
+            {
+                id: string, // news item id
+                key: value, // property id and value
+                ... // more key/value pairs
+            },
+            ... // more news items
+        ]
+    }
+    see: addNews, editNews, removeNews
     '''
     response = json_response()
     if 'id' in data:
@@ -44,15 +48,17 @@ actions.register(getNews)
 @login_required_json
 def addNews(request, data):
     '''
-        takes {
-            title: string,
-            date: string,
-            text: text,
-        }
-        returns {
-            id: string,
-            ...
-        }
+    Adds a new news item
+    takes {
+        date: string, // date (format undocumented)
+        text: text, // text
+        title: string // title
+    }
+    returns {
+        id: string, // news item id
+        ... // more key/value pairs
+    }
+    see: editNews, getNews, removeNews
     '''
     news = models.News()
     for key in ('title', 'text', 'date'):
@@ -67,10 +73,12 @@ actions.register(addNews, cache=False)
 @login_required_json
 def removeNews(request, data):
     '''
-        takes {
-            id: id
-        }
-        returns {}
+    Removes a news item
+    takes {
+        id: string // news item id
+    }
+    returns {}
+    see: addNews, editNews, getNews
     '''
     response = json_response({})
     news = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))
@@ -86,16 +94,18 @@ actions.register(removeNews, cache=False)
 @login_required_json
 def editNews(request, data):
     '''
-        takes {
-            id: string,
-            title: string,
-            text: string,
-            date: string
-        }
-        returns {
-            id: string
-            ...
-        }
+    Edits a news item
+    takes {
+        date: string, // date (format undocumented)
+        id: string, // news item id
+        text: string, // text
+        title: string // title
+    }
+    returns {
+        id: string
+        ...
+    }
+    see: addNews, getNews, removeNews
     '''
     response = json_response({})
     n = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))

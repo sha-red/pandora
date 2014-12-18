@@ -19,14 +19,14 @@ import models
 @login_required_json
 def addEvent(request, data):
     '''
-    Adds a calendar event
+    Adds a new calendar event
     takes {
-        name: string,
-        start: string,
-        end: string
+        end: string, // 'YYYY-MM-DD HH:MM:SS', arbitrary precision
+        name: string, // name
+        start: string // 'YYYY-MM-DD HH:MM:SS', arbitrary precision
     }
     returns {
-        id: string
+        id: string // event id
     }
     see: editEvent, findEvents, removeEvents
     '''
@@ -73,14 +73,15 @@ def editEvent(request, data):
     '''
     Edits a calendar event
     takes {
-        id: string,
-        name: string,
-        start: string,
-        end: string
+        end: string, // 'YYYY-MM-DD HH:MM:SS', arbitrary precision
+        id: string, // event id
+        name: string, // event name
+        start: string // 'YYYY-MM-DD HH:MM:SS', arbitrary precision
     }
     returns {
-        id: string,
-        ...
+        id: string, // event id
+        key: value, // property id and value
+        ... // more key/value pairs
     }
     see: addEvent, findEvents, removeEvent
     '''
@@ -176,43 +177,14 @@ def findEvents(request, data):
     '''
     Finds calendar events
     takes {
-        query: object,
-        sort: array
-        range': [int, int]
+        query: object, // query object, see `find`
+        sort: [object], // list of sort objects, see `find`
+        range: [int, int] // range of results to return
     }
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            itemsQuery: {
-                //see find request
-            },
-            sort: array of key, operator dics
-                [
-                    {
-                        key: "year",
-                        operator: "-"
-                    },
-                    {
-                        key: "director",
-                        operator: ""
-                    }
-                ]
-            range:       result range, array [from, to]
-
-        itemsQuery can be used to limit the resuts to matches in those items.
-        
-        with keys, items is list of dicts with requested properties:
-          returns {'status': {'code': int, 'text': string},
-                'data': {items: array}}
-
-Positions
-        takes {
-            query: object,
-            ids: [string]
-        }
-        query: query object, more on query syntax at
-               https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-        ids:  ids of events for which positions are required
+    returns {
+        items: [object] // list of items
+    }
+    see: addEvent, editEvent, removeEvent
     '''
     response = json_response(status=200, text='ok')
     query = parse_query(data, request.user)

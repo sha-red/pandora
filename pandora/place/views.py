@@ -20,7 +20,7 @@ import models
 @login_required_json
 def addPlace(request, data):
     '''
-    Adds a place
+    Adds a new place
     takes {
         name: "",
         alternativeNames: [],

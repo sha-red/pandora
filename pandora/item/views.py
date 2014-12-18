@@ -499,6 +499,7 @@ def add(request, data):
         title: string, // title
         ... // more item properties
     }
+    notes: To allow for this, set config option `itemRequiresVideo` to false
     see: edit, find, get, lookup, remove, upload
     '''
     if not request.user.get_profile().capability('canAddItems'):

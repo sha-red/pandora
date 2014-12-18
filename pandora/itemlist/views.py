@@ -141,12 +141,12 @@ def addListItems(request, data):
     '''
     Adds one or more items to a list
     takes {
-        list: listId,
-        items: [itemId],
-        query: ...
+        list: string, // list id
+        items: [string], // either list of item ids
+        query: object // or query object, see `find`
     }
-    returns {
-    }
+    returns {}
+    see: find, orderListItems, removeListItems
     '''
     list = get_list_or_404_json(data['list'])
     if 'items' in data:
@@ -171,12 +171,12 @@ def removeListItems(request, data):
     '''
     Removes one or more items from a list
     takes {
-         list: listId,
-         items: [itemId],
-         quert: ...
+         list: string, // list id
+         items: [itemId], // either list of item ids
+         query: object // or query object, see `find`
     }
-    returns {
-    }
+    returns {}
+    see: addListItems, find, orderListItems
     '''
     list = get_list_or_404_json(data['list'])
     if 'items' in data:
@@ -197,14 +197,14 @@ actions.register(removeListItems, cache=False)
 @login_required_json
 def orderListItems(request, data):
     '''
-    Sets the manual order of items in a given list
+    Sets the manual orderings of items in a given list
     takes {
-       list: string
-       ids: [string]
+       list: string, // list id
+       ids: [string] // ordered list of item ids
     }
-    returns {
-    }
+    returns {}
     notes: There is no UI for this yet.
+    see: addListItems, removeListItems
     '''
     list = get_list_or_404_json(data['list'])
     response = json_response()
@@ -225,22 +225,16 @@ def addList(request, data):
     '''
     Adds a new list
     takes {
-        name: value,
+        name: value, // list name (optional)
+        ... // more key/value pairs
     }
-    possible keys to create list:
-        name
-        description
-        type
-        query
-        items
-        view
-        sort
-
     returns {
-        id: string,
-        name: string,
-        ...
+        id: string, // list id
+        name: string, // list name
+        ... // more key/value pairs
     }
+    notes: Possible keys are 'description', 'items', 'name', 'query', 'sort',
+    'type' and 'view'.
     see: editList, findLists, getList, removeList, sortLists
     '''
     data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
@@ -287,18 +281,18 @@ def editList(request, data):
     '''
     Edits a list
     takes {
-        id: listId,
-        key: value,
+        id: string, // list id
+        key: value, // property id and new value
+        ... // more key/value pairs
     }
-    keys: name, status, query, position, posterFrames
-    if you change status you have to provide position of list
-
-    posterFrames:
-        array with objects that have item/position
     returns {
-        id: string,
-        ...
+        id: string, // list id
+        ... // more key/value pairs
     }
+    notes: Possible keys are 'name', 'position', 'posterFrames', 'query' and
+    'status'. 'posterFrames' is an array of {item, position}. If you change
+    'status', you have to pass 'position' (the position of the list in its new
+    list folder).
     see: addList, findLists, getList, removeList, sortLists
     '''
     list = get_list_or_404_json(data['id'])
@@ -339,7 +333,8 @@ def subscribeToList(request, data):
     '''
     Adds a list to favorites
     takes {
-        id: listId,
+        id: string, // list id
+        user: string // username (admin-only)
     }
     returns {}
     see: unsubscribeFromList
@@ -365,8 +360,8 @@ def unsubscribeFromList(request, data):
     '''
     Removes a list from favorites
     takes {
-        id: listId,
-        user: username(only admins)
+        id: string, // list id
+        user: string // username (admin-only)
     }
     returns {}
     see: subscribeToList
@@ -386,12 +381,12 @@ def sortLists(request, data):
     '''
     Set order of lists
     takes {
-        section: 'personal',
-        ids: [1,2,4,3]
+        section: string, // lists section
+        ids: [string] // ordered list of lists
     }
-    known sections: 'personal', 'public', 'featured'
-    featured can only be edited by admins
     returns {}
+    notes: Possible sections are 'personal', 'favorite' and 'featured'. Setting
+    the order of featured lists requires the appropriate capability.
     '''
     position = 0
     section = data['section']
