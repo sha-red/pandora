@@ -166,7 +166,7 @@ pandora.ui.apiDialog = function() {
                         .join(comma + whitespace);
                     
                 })
-                .join(comma + linebreack);
+                .join(comma + linebreak);
             $doc.html(parts.join('<b>see</b>' + colon + whitespace));
         }
         pandora.createLinks($doc);
