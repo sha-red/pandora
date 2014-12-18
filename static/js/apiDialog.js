@@ -171,7 +171,7 @@ pandora.ui.apiDialog = function() {
             var code = actions[id].code[1],
                 source = actions[id].code[0],
                 line = Math.round(Ox.last(source.split(':')) || 0),
-                doc = actions[id].doc.replace(/\n(?=(takes|returns) \{)/g, '\n\n'),
+                doc = actions[id].doc.replace(/\n(?=(takes \{|returns \{|NOTE: ))/g, '\n\n'),
                 $code, $doc;
             $doc = Ox.SyntaxHighlighter({
                     source: doc,
