@@ -129,10 +129,11 @@ pandora.ui.apiDialog = function() {
         see: action, action, ...
         */
         var $doc = Ox.SyntaxHighlighter({
-                source: string.replace(
-                    /\n(?=(takes \{|returns \{|note: |see: ))/g, '\n\n'
-                )
-            }),
+                    source: string.replace(
+                        /\n(?=(takes \{|returns \{|note: |see: ))/g, '\n\n'
+                    )
+                })
+                .css({backgroundColor: 'rgba(0, 0, 0, 0)'}),
             parts, parts_;
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
             $doc.find('.Ox' + type).removeClass('Ox' + type);
