@@ -235,23 +235,24 @@ pandora.ui.apiDialog = function() {
             var code = actions[id].code[1],
                 source = actions[id].code[0],
                 line = Math.round(Ox.last(source.split(':')) || 0),
-                $title = $('<h1>')
-                    .css({paddingLeft: '4px'})
-                    .html('<b><tt>' + id + '</tt></b>')
-                    .appendTo($text),
-                $doc = getDoc(actions[id].doc).appendTo($text),
-                $source = $('<div>')
-                    .css({paddingLeft: '4px'})
-                    .html('<br><b><tt>source: ' + source + '</tt></b>')
-                    .appendTo($text),
-                $code = Ox.SyntaxHighlighter({
-                        source: code.replace(/\s*?'''[\s\S]+?'''/g, ''),
-                    })
-                    .css({
-                        backgroundColor: 'rgba(0, 0, 0, 0)',
-                        borderWidth: '1px',
-                    })
-                    .appendTo($text);
+                $code;
+            $('<h1>')
+                .css({paddingLeft: '4px'})
+                .html('<b><tt>' + id + '</tt></b>')
+                .appendTo($text),
+            getDoc(actions[id].doc).appendTo($text),
+            $('<div>')
+                .css({paddingLeft: '4px'})
+                .html('<br><b><tt>source: ' + source + '</tt></b>')
+                .appendTo($text),
+            $code = Ox.SyntaxHighlighter({
+                    source: code.replace(/\s*?'''[\s\S]+?'''/g, ''),
+                })
+                .css({
+                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                    borderWidth: '1px',
+                })
+                .appendTo($text);
             // fix decorators
             $code.find('.OxError')
                 .removeClass('OxError')
