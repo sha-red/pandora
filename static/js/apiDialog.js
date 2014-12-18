@@ -149,18 +149,18 @@ pandora.ui.apiDialog = function() {
         $doc.html(
             $doc.html().replace(/BOLD([\w:]+)BOLD/g, '<b>$1</b>')
         );
-        parts = $doc.html().split('<b>notes</b>');
+        parts = $doc.html().split('<b>notes:</b>');
         if (parts.length == 2) {
-            parts_ = parts[1].split('<b>see</b>');
+            parts_ = parts[1].split('<b>see:</b>');
             if (parts_.length == 2) {
                 parts_[0] = parts_[0].replace(/\n\s+?/g, ' ');
-                parts[1] = parts_.join('<b>see</b>');
+                parts[1] = parts_.join('<b>see:</b>');
             } else {
                 parts[1] = parts[1].replace(/\n\s+?/g, ' ');
             }
-            $doc.html(parts.join('<b>notes</b>'));
+            $doc.html(parts.join('<b>notes:</b>'));
         }
-        parts = $doc.html().split('<b>see</b>');
+        parts = $doc.html().split('<b>see:</b>');
         if (parts.length == 2) {
             parts[1] = parts[1].replace(/\n\s+?/, '').split(separator).map(
                 function(action) {
@@ -168,7 +168,7 @@ pandora.ui.apiDialog = function() {
                         + action + '</a>';
                 }
             ).join(separator);
-            $doc.html(parts.join('<b>see</b>'));
+            $doc.html(parts.join('<b>see:</b>'));
         }
         pandora.createLinks($doc);
         return $doc;
