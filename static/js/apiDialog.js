@@ -178,11 +178,10 @@ pandora.ui.apiDialog = function() {
                 })
                 .appendTo($text);
             $('<div>')
-                .html('<br><b><tt>' + source.split(':')[0] + '</tt></b>')
+                .html('<br><b><tt>' + source + '</tt></b>')
                 .appendTo($text);
             $code = Ox.SyntaxHighlighter({
-                    showLineNumbers: true,
-                    source: code.replace(/\s*?'''[\s\S]+?'''\n/g, ''),
+                    source: code.replace(/\s*?'''[\s\S]+?'''/g, ''),
                     offset: line
                 })
                 .css({
