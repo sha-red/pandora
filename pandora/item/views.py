@@ -531,13 +531,14 @@ def add(request, data):
     '''
     Adds a new item (without video)
     takes {
-        title: string, // optional
+        title: string, // item title (optional)
     }
     returns {
-        id: string,
-        title: string,
-        ...
+        id: string, // item id
+        title: string, // item title
+        ... // more item properties
     }
+    see: edit, find, get, remove, upload
     '''
     if not request.user.get_profile().capability('canAddItems'):
         response = json_response(status=403, text='permissino denied')

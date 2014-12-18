@@ -30,24 +30,23 @@ def addClips(request, data):
     '''
     Adds one or more clips to an edit
     takes {
-        edit: string (edit id),
-        index: int (position, optional),
+        edit: string, // edit id,
+        index: integer, // position within edit (optional),
         clips: [
             {
-                item: string (item id),
-                in: float,
-                out: float,
+                item: string, // item id
+                in: float, // in point in seconds
+                out: float, // out point in seconds
             },
             {
-                annotation: string ("item_id/annotation_id")
+                annotation: string, // 'item_id/annotation_id'
             }
-            ...
+            ... // more clips
         ]
     }
     returns {}
-    Clips are either {item, in, out} or {annotation}. If index is missing,
-    clips will be inserted at the end of the edit.
-    FIXME: Does this really return nothing?
+    notes: Clips are either {item, in, out} or {annotation}. If index is
+    missing, clips will be inserted at the end of the edit.
     '''
     response = json_response()
     edit = get_edit_or_404_json(data['edit'])
