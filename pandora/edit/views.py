@@ -468,6 +468,7 @@ actions.register(subscribeToEdit, cache=False)
 @login_required_json
 def unsubscribeFromEdit(request, data):
     '''
+    Removes an edit from favorites
     takes {
         id: string, // edit id
         user: string // username (admin-only)
