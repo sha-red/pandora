@@ -47,6 +47,7 @@ def addClips(request, data):
     returns {}
     notes: Clips are either {item, in, out} or {annotation}. If index is
     missing, clips will be inserted at the end of the edit.
+    see: editClip, orderClips, removeClips, sortClips
     '''
     response = json_response()
     edit = get_edit_or_404_json(data['edit'])
@@ -73,12 +74,13 @@ actions.register(addClips, cache=False)
 @login_required_json
 def removeClips(request, data):
     '''
-       takes {
-           edit: string
-           ids: [string]
-        }
-        returns {
-        }
+    Removes one or more clips from an edit
+    takes {
+        edit: string, // edit id
+        ids: [string] // clip ids
+    }
+    returns {}
+    see: addClips, editClip, orderClips, sortClips
     '''
     response = json_response()
     edit = get_edit_or_404_json(data['edit'])
@@ -100,13 +102,15 @@ actions.register(removeClips, cache=False)
 @login_required_json
 def editClip(request, data):
     '''
-       takes {
-           id: string,
-           in: float,
-           out: float
-        }
-        returns {
-        }
+    Edits a clip within an edit
+    takes {
+        id: string, // clip id
+        in: float, // in point in seconds
+        out: float // out point in seconds
+    }
+    returns {
+    }
+    see: addClips, orderClips, removeClips, sortClips
     '''
     response = json_response()
     clip = get_object_or_404_json(models.Clip, pk=ox.fromAZ(data['id']))
@@ -137,12 +141,13 @@ actions.register(editClip, cache=False)
 @login_required_json
 def orderClips(request, data):
     '''
-       takes {
-           edit: string
-           ids: [string]
-        }
-        returns {
-        }
+    takes {
+        edit: string, // edit id
+        ids: [string] // clip ids in new order
+    }
+    returns {
+    }
+    see: addClips, editClip, removeClip, sortClips
     '''
     edit = get_edit_or_404_json(data['edit'])
     response = json_response()
@@ -195,12 +200,14 @@ def _order_clips(edit, sort):
 
 def sortClips(request, data):
     '''
-       takes {
-           edit: string
-           sort: obect
-        }
-        returns {
-        }
+    takes {
+        edit: string, // edit id
+        sort: object // sort
+    }
+    returns {
+    }
+    note: sort is [{key: string, operator: string}], operator can be '+' or '-'
+    see: addClips, editClip, orderClips, removeClips
     '''
     edit = get_edit_or_404_json(data['edit'])
     response = json_response()
@@ -211,14 +218,14 @@ actions.register(sortClips, cache=False)
 
 def getEdit(request, data):
     '''
-        takes {
-            id:
-            keys: []
-        }
-        returns {
-            id:
-            clips:
-        }
+    takes {
+        id:
+        keys: []
+    }
+    returns {
+        id:
+        clips:
+    }
     '''
     if 'id' in data:
         response = json_response()
