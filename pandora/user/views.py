@@ -739,7 +739,7 @@ def getPositionById(list, key):
 @login_required_json
 def editPreferences(request, data):
     '''
-    Edits the current user's preferences
+    Edits the preferences of the current user
     takes {
         key: value
     }
@@ -783,7 +783,7 @@ def reset_ui(request):
 
 def resetUI(request, data):
     '''
-    Resets the user's UI settings to the default state
+    Resets the UI settings to the default state
     takes {}
     returns {}
     see: setUI
