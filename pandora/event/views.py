@@ -130,7 +130,7 @@ def removeEvent(request, data):
     '''
     Removes a calendar event
     takes {
-        id: event id
+        id: string // event id
     }
     returns {}
     see: addEvent, editEvent, findEvents

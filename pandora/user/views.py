@@ -223,18 +223,17 @@ def resetPassword(request, data):
     '''
     Resets password for a given user
     takes {
-        username: string,
-        password: string,
-        code: string
+        username: string, // username
+        password: string, // password
+        code: string // token
     }
     returns {
         errors: {
-            code: 'Incorrect Code'
-        }
-        user {
-        }
+            code: 'Incorrect Code' // on error
+        },
+        user: object // on success
     }
-    see: ...
+    see: resetPassword
     '''
     if 'code' in data and 'password' in data:
         if not data['password']:
@@ -276,16 +275,17 @@ def requestToken(request, data):
     '''
     Requests a password reset token
     takes {
-        username: string,
-        email: string
+        username: string, // either username
+        email: string // or e-mail address
     }
     returns {
         errors: {
-            username: 'Unknown Username'
-            email: 'Unknown Email'
+            username: 'Unknown Username', // on error
+            email: 'Unknown Email' // on error
         }
-        username: user
+        username: string // on success
     }
+    see: requestToken
     '''
     user = None
     if 'username' in data:
@@ -341,12 +341,13 @@ def editUser(request, data):
     '''
     Edits a user
     takes {
-        key: value
+        id: string, // user id
+        key: value, // property id and new value
+        ... // more key/value pairs
     }
-    required key: id 
-    optional keys: username, email, level, notes
-    returns {
-    }
+    returns {}
+    notes: Possible keys are 'email', 'id', 'level', 'notes', 'username'
+    see: removeUser
     '''
     response = json_response()
     user = get_object_or_404_json(User, pk=ox.fromAZ(data['id']))
@@ -395,10 +396,14 @@ actions.register(editUser, cache=False)
 @capability_required_json('canManageUsers')
 def removeUser(request, data):
     '''
+    Removes a user
     takes {
-        username: username
+        username: string // username
     }
     returns {}
+    notes: Note that this will only disable the user account -- annotations
+    will not be removed.
+    see: editUser, findUser
     '''
     response = json_response()
     u = get_user_or_404(data)
@@ -410,17 +415,18 @@ actions.register(removeUser, cache=False)
 
 def findUser(request, data):
     '''
+    Finds users for a given query
     takes {
-        key: string, //username, email
-        value: string,
-        operator: "==" // "==", "="
-        keys: [string]
+        key: string, // username, email
+        value: string, // search string
+        operator: "==" // "==" or "="
+        keys: [string] // list of properties to return
     }
-
     returns {
-        users: [object]
+        users: [object] // list of users
     }
-    see: editUser
+    notes: Possible keys ... undocumented
+    see: editUser, removeUser
     '''
     response = json_response(status=200, text='ok')
     #keys = data.get('keys')

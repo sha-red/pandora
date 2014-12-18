@@ -289,15 +289,16 @@ actions.register(find)
 
 def autocomplete(request, data):
     '''
+    Returns autocomplete strings for a given item key and search string
     takes {
-        key: string,
-        value: string,
+        key: string, // item key
+        value: string, // search string
         operator: string, // '=', '==', '^', '$'
         query: object, // item query to limit results, see `find`
-        range: [int, int]
+        range: [int, int] // range of tesults to return
     }
     returns {
-        items: [string, ...] // array of matching values
+        items: [string, ...] // list of matching strings
     }
     see: autocompleteEntities
     '''

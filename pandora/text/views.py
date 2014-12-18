@@ -30,14 +30,16 @@ def get_text_or_404_json(id):
 @login_required_json
 def addText(request, data):
     '''
-        takes {
-            name: value,
-        }
-        returns {
-            id:
-            name:
-            ...
-        }
+    Adds a new text
+    takes {
+        name: string // text name
+    }
+    returns {
+        id: string, // text id
+        name: string // text name
+        ... more key/value pairs
+    }
+    see: editText, findTexts, getText, removeText, sortTexts
     '''
     data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
@@ -74,15 +76,17 @@ actions.register(addText, cache=False)
 
 def getText(request, data):
     '''
-        takes {
-            id: textid,
-            keys: []
-        }
-        returns {
-            id:
-            text:
-            ...
-        }
+    Gets a text by id
+    takes {
+        id: string, // text id
+        keys: [string] // list of properties to return
+    }
+    returns {
+        id: string, // text id
+        key: value, // property and value
+        ... // more key/value pairs
+    }
+    see: addText, findTexts, editText, removeText, sortTexts
     '''
     response = json_response()
     public_id = data['id']
@@ -113,16 +117,17 @@ actions.register(getText)
 @login_required_json
 def editText(request, data):
     '''
-        takes {
-            id:
-            text:
-            public: boolean
-        }
-        returns {
-            id:
-            text:
-            ...
-        }
+    Edits a text
+    takes {
+        id: string, // text id
+        text: string, // text
+        public: boolean // if true, text is publix
+    }
+    returns {
+        id: string, // text id
+        ... // more key/value pairs
+    }
+    see: addText, findTexts, getText, removeText, sortTexts
     '''
     response = json_response()
     if data['id']:
@@ -185,32 +190,19 @@ def parse_query(data, user):
 
 def findTexts(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            sort: [{key: 'name', operator: '+'}],
-            range: [0, 100]
-            keys: []
-        }
-
-        possible query keys:
-            name, user, featured, subscribed
-
-        possible keys:
-            name, user, featured, subscribed, query
-
-        }
-        returns {
-            items: [object]
-        }
+    Finds texts for a given query
+    takes {
+        keys: [], // list of keys to return, see `find`
+        query: object, // query object, see `find`
+        range: [int, int], // range of items to return
+        sort: [object], list of sort objects, see `find`
+    }
+    returns {
+        items: [object] // list of text objects
+    }
+    notes: Possible query keys are 'featured', 'name', 'subscribed' and 'user',
+    possible keys are 'featured', 'name', 'query', 'subscribed' and 'user'.
+    see: addText, editText, getText, removeText, sortTexts
     '''
     query = parse_query(data, request.user)
 
@@ -250,11 +242,12 @@ actions.register(findTexts)
 @login_required_json
 def removeText(request, data):
     '''
-        takes {
-            id: string,
-        }
-        returns {
-        }
+    Removes a text
+    takes {
+        id: string // text id
+    }
+    returns {}
+    see: addText, editText, findTexts, getText, sortTexts
     '''
     text = get_text_or_404_json(data['id'])
     response = json_response()
@@ -270,10 +263,13 @@ actions.register(removeText, cache=False)
 @login_required_json
 def subscribeToText(request, data):
     '''
-        takes {
-            id: string,
-        }
-        returns {}
+    Adds a text to favorites
+    takes {
+        id: string, // text id
+        user: string // username (admin-only)
+    }
+    returns {}
+    see: unsubscribeFromText
     '''
     text = get_text_or_404_json(data['id'])
     user = request.user
@@ -294,11 +290,13 @@ actions.register(subscribeToText, cache=False)
 @login_required_json
 def unsubscribeFromText(request, data):
     '''
-        takes {
-            id: string,
-            user: username(only admins)
-        }
-        returns {}
+    Removes a text from favorites
+    takes {
+        id: string // text id
+        user: string // username (admin-only)
+    }
+    returns {}
+    see: subscribeToText
     '''
     text = get_text_or_404_json(data['id'])
     user = request.user
@@ -313,14 +311,14 @@ actions.register(unsubscribeFromText, cache=False)
 @login_required_json
 def sortTexts(request, data):
     '''
-        takes {
-            section: 'personal',
-            ids: [1,2,4,3]
-        }
-            known sections: 'personal', 'public', 'featured'
-            featured can only be edited by admins
-
-        returns {}
+    Sets manual ordering of texts in a given folder
+    takes {
+        section: string, // 'personal', 'favorite' or 'featured'
+        ids: [string] // ordered list of text ids
+    }
+    returns {}
+    notes: Sorting featured texts requires the appropriate capability.
+    see: addText, findTexts, getText, editText, removeText
     '''
     position = 0
     section = data['section']

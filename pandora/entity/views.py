@@ -88,14 +88,15 @@ actions.register(addEntity, cache=False)
 
 def autocompleteEntities(request, data):
     '''
+    Returns entities for a given entity type and search string
     takes {
-        key: string,
-        value: string,
+        key: string, // entity type
+        value: string, // search string
         operator: string // '=', '==', '^', '$'
-        range: [int, int]
+        range: [int, int] // range of results to return
     }
     returns {
-        items: [{id, name,...}, ...] // array of matching entities
+        items: [{id, name, ...}, ...] // list of matching entities
     }
     see: autocomplete
     '''
