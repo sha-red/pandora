@@ -139,7 +139,7 @@ pandora.ui.apiDialog = function() {
                 })
                 .css({backgroundColor: 'rgba(0, 0, 0, 0)'}),
             parts, parts_,
-            colon = '<span class="OxOperator">:</span>'
+            colon = '</span><span class="OxOperator">:</span>'
                 + '<span class="OxWhitespace">&nbsp;</span>',
             comma = '<span class="OxOperator">,</span>'
                 + '<span class="OxWhitespace">&nbsp;</span>';
@@ -162,7 +162,6 @@ pandora.ui.apiDialog = function() {
             }
             $doc.html(parts.join('<b>notes</b>' + colon));
         }
-        Ox.print('DEBUG', $doc.html())
         parts = $doc.html().split('<b>see</b>' + colon);
         if (parts.length == 2) {
             parts[1] = parts[1].replace(/\n\s+?/, '').split(comma).map(
@@ -233,23 +232,30 @@ pandora.ui.apiDialog = function() {
 
     that.select = function(id) {
         if (id && actions[id]) {
-            $text.html('<h1><b><tt>' + id + '</tt></b><h1><br>');
+            $text.html(
+                '<h1 style="padding-left: 4px"><b><tt>'
+                + id + '</tt></b><h1><br>'
+            );
             var code = actions[id].code[1],
                 source = actions[id].code[0],
                 line = Math.round(Ox.last(source.split(':')) || 0),
-                $code,
-                $doc = getDoc(actions[id].doc).appendTo($text);
-            $('<div>')
-                .html('<br><b><tt>' + source + '</tt></b>')
-                .appendTo($text);
-            $code = Ox.SyntaxHighlighter({
-                    source: code.replace(/\s*?'''[\s\S]+?'''/g, ''),
-                })
-                .css({
-                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                    borderWidth: '1px',
-                })
-                .appendTo($text);
+                $doc = getDoc(actions[id].doc).appendTo($text),
+                $source = $('<div>')
+                    .css({padding: '4px'})
+                    .html('<br><b><tt>' + source + '</tt></b>')
+                    .appendTo($text),
+                $code = Ox.SyntaxHighlighter({
+                        source: code.replace(/\s*?'''[\s\S]+?'''/g, ''),
+                    })
+                    .css({
+                        backgroundColor: 'rgba(0, 0, 0, 0)',
+                        borderWidth: '1px',
+                    })
+                    .appendTo($text);
+            // fix decorators
+            $code.find('.OxError')
+                .removeClass('OxError')
+                .addClass('OxOperator');
         } else {
             $text.empty().append(getIndex());
         }
