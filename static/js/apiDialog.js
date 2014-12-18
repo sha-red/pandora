@@ -142,7 +142,8 @@ pandora.ui.apiDialog = function() {
         $doc.html(
             $doc.html()
             .replace(/(takes \{|returns \{|note: |see: )/g, '<b>$1</b>')
-            .replace(/`(\w+?)`/g, '<b>$1</b>')
+            .replace(/`(?=\w)/g, '<b>')
+            .replace(/`(?=\W)/g, '</b>')
         );
         parts = $doc.html().split('<b>notes: </b>');
         if (parts.length == 2) {
