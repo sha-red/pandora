@@ -132,14 +132,14 @@ pandora.ui.apiDialog = function() {
                     source: string.replace(
                         /\n(?=(takes \{|returns \{|note: |see: ))/g, '\n\n'
                     ).replace(
-                        /(takes|returns|note|see)(?=( \{|: ))/g, 'BOLD$1BOLD'
+                        /(takes|returns|notes|see)(?=( \{|: ))/g, 'BOLD$1BOLD'
                     ).replace(
                         /`/g, 'BOLD'
                     )
                 })
                 .css({backgroundColor: 'rgba(0, 0, 0, 0)'}),
             parts, parts_,
-            str = '<span class="OxOperator">,</span>'
+            separator = '<span class="OxOperator">,</span>'
                 + '<span class="OxWhitespace">&nbsp;</span>';
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
             $doc.find('.Ox' + type).removeClass('Ox' + type);
@@ -160,11 +160,12 @@ pandora.ui.apiDialog = function() {
         }
         parts = $doc.html().split('<b>see</b>');
         if (parts.length == 2) {
-            parts[1] = parts[1].replace(/\n\s+?/, '').split(str).map(
+            parts[1] = parts[1].replace(/\n\s+?/, '').split(separator).map(
                 function(action) {
-                    return '<a href="/api/' + action + '">' + action + '</a>';
+                    return '<a href="/api/' + Ox.stripTags(action) + '">'
+                        + action + '</a>';
                 }
-            ).join(str);
+            ).join(separator);
             $doc.html(parts.join('<b>see</b>'));
         }
         pandora.createLinks($doc);
