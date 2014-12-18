@@ -144,7 +144,9 @@ pandora.ui.apiDialog = function() {
             comma = '<span class="OxOperator">,</span>'
                 + '<span class="OxWhitespace">&nbsp;</span>';
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
-            $doc.find('.Ox' + type).removeClass('Ox' + type);
+            $doc.find('.Ox' + type)
+                .removeClass('Ox' + type)
+                .addClass('OxIdentifier');
         });
         $doc.html(
             $doc.html().replace(/BOLD(\w+)BOLD/g, '<b>$1</b>')
