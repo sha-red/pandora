@@ -132,7 +132,7 @@ pandora.ui.apiDialog = function() {
                 source: string.replace(
                     /\n(?=(takes \{|returns \{|note: |see: ))/g, '\n\n'
                 )
-            })
+            }),
             parts, parts_;
         ['Keyword', 'Method', 'Property'].forEach(function(type) {
             $doc.find('.Ox' + type).removeClass('Ox' + type);
