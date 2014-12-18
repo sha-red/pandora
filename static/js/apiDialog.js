@@ -239,12 +239,12 @@ pandora.ui.apiDialog = function() {
             $('<h1>')
                 .css({paddingLeft: '4px'})
                 .html('<b><tt>' + id + '</tt></b>')
-                .appendTo($text),
+                .appendTo($text);
             getDoc(actions[id].doc).appendTo($text),
             $('<div>')
                 .css({paddingLeft: '4px'})
                 .html('<br><b><tt>source: ' + source + '</tt></b>')
-                .appendTo($text),
+                .appendTo($text);
             $code = Ox.SyntaxHighlighter({
                     source: code.replace(/\s*?'''[\s\S]+?'''/g, ''),
                 })
