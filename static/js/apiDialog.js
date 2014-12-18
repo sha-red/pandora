@@ -227,7 +227,7 @@ pandora.ui.apiDialog = function() {
                 source = actions[id].code[0],
                 line = Math.round(Ox.last(source.split(':')) || 0),
                 $code,
-                $doc = getDoc(actions[id]).appendTo($text);
+                $doc = getDoc(actions[id].doc).appendTo($text);
             $('<div>')
                 .html('<br><b><tt>' + source + '</tt></b>')
                 .appendTo($text);
