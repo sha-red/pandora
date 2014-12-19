@@ -48,17 +48,15 @@ def signin(request, data):
     '''
     Sign in
     takes {
-        username: string,
-        password: string
+        username: string, // username
+        password: string // password
     }
     returns {
         errors: {
-            username: 'Unknown Username',
-            password: 'Incorrect Password'
+            username: 'Unknown Username', // in case of error
+            password: 'Incorrect Password' // in case of error
         }
-        user: {
-            ...
-        }
+        user: object // user data, in case of success
     }
     see: signout, signup
     '''
@@ -112,10 +110,7 @@ def signout(request, data):
     Sign out
     takes {}
     returns {
-        user: { // default user
-            key: value, // user data
-            ... // more user daa
-        }
+        user: object // default user data
     }
     see: signin, signup
     '''
@@ -137,19 +132,16 @@ def signup(request, data):
     '''
     Sign up
     takes {
-        username: string,
-        password: string,
-        email: string
+        username: string, // username
+        password: string, // password
+        email: string // e-mail address
     }
-
     returns {
         errors: {
-            username: 'Unknown Username',
-            password: 'Incorrect Password'
+            username: 'Username already exists', // in case of error
+            password: 'E-mail address already exists' // in case of error
         }
-        user: {
-            ...
-        }
+        user: object // user data, in case of success
     }
     see: signin, signout
     '''
@@ -166,7 +158,7 @@ def signup(request, data):
         elif User.objects.filter(email__iexact=data['email']).count() > 0:
             response = json_response({
                 'errors': {
-                    'email': 'Email address already exists'
+                    'email': 'E-mail address already exists'
                 }
             })
         elif not data['password']:
@@ -233,7 +225,7 @@ def resetPassword(request, data):
         },
         user: object // on success
     }
-    see: resetPassword
+    see: requestToken
     '''
     if 'code' in data and 'password' in data:
         if not data['password']:
@@ -285,7 +277,7 @@ def requestToken(request, data):
         }
         username: string // on success
     }
-    see: requestToken
+    see: resetPassword
     '''
     user = None
     if 'username' in data:
@@ -347,7 +339,7 @@ def editUser(request, data):
     }
     returns {}
     notes: Possible keys are 'email', 'id', 'level', 'notes', 'username'
-    see: removeUser
+    see: findUser, findUsers, getUser, removeUser
     '''
     response = json_response()
     user = get_object_or_404_json(User, pk=ox.fromAZ(data['id']))
@@ -403,7 +395,7 @@ def removeUser(request, data):
     returns {}
     notes: Note that this will only disable the user account -- annotations
     will not be removed.
-    see: editUser, findUser
+    see: editUser, findUser, findUsers, getUser
     '''
     response = json_response()
     u = get_user_or_404(data)
@@ -415,18 +407,17 @@ actions.register(removeUser, cache=False)
 
 def findUser(request, data):
     '''
-    Finds users for a given query
+    Finds users by username or e-mail address
     takes {
-        key: string, // username, email
+        key: string, // 'username' or 'email'
         value: string, // search string
-        operator: "==" // "==" or "="
+        operator: string // '=' (partial match) or '==' (exact match)
         keys: [string] // list of properties to return
     }
     returns {
         users: [object] // list of users
     }
-    notes: Possible keys ... undocumented
-    see: editUser, removeUser
+    see: editUser, findUsers, getUser, removeUser
     '''
     response = json_response(status=200, text='ok')
     #keys = data.get('keys')
@@ -492,67 +483,19 @@ def order_query(qs, sort):
 @capability_required_json('canManageUsers')
 def findUsers(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            sort: [{key: 'username', operator: '+'}],
-            range: [0, 100]
-            keys: []
-        }
-
-        possible query keys:
-            username, email, lastLogin, browser, groups
-        
-        returns {
-            items: [
-                {name:, user:, featured:, public...}
-            ]
-        }
-
-        takes {
-            query: query,
-            sort: array,
-            range: array
-        }
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            sort: array of key, operator dics
-                [
-                    {
-                        key: "year",
-                        operator: "-"
-                    },
-                    {
-                        key: "director",
-                        operator: ""
-                    }
-                ]
-            range:       result range, array [from, to]
-
-        with keys, items is list of dicts with requested properties:
-        returns {
-            items: [object]
-        }
-
-Positions
-        takes {
-            query: query,
-            positions: []
-        }
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            positions:  ids of places for which positions are required
-    see: editUser
+    Finds users for a given query
+    takes {
+        query: object, // query object, see `find`
+        sort: [object], // list of sort objects, see `find`
+        range: [int, int], // range of results to return
+        keys: [string] // list of properties to return
+    }
+    returns {
+        items: [object] // list of user objects
+    }
+    notes: Possible query keys are 'browser', 'email', 'groups', 'lastLogin'
+    and 'username'.
+    see: editUser, findUser, getUser, removeUser
     '''
     response = json_response(status=200, text='ok')
     query = parse_query(data, request.user)
@@ -586,14 +529,17 @@ actions.register(findUsers)
 @capability_required_json('canManageUsers')
 def getUser(request, data):
     '''
-        takes {
-            id: string or username: string,
-            keys: []
-        }
-        returns {
-            id: string,
-            ...
-        }
+    Gets a user by id or username
+    takes {
+        id: string, // either user id
+        username: string, // or username
+        keys: [string] // list of properties to return
+    }
+    returns {
+        id: string, // user id
+        ... // more key/value pairs
+    }
+    see: editUser, findUser, findUsers, removeUser
     '''
     response = json_response()
     u = get_user_or_404(data)
@@ -604,18 +550,15 @@ actions.register(getUser)
 @login_required_json
 def mail(request, data):
     '''
-        takes {
-            to: [string], // array of usernames to send mail to
-            subject: string,
-            message: string
-        }
-
-        message can contain {username} or {email},
-        this will be replace with the user/email
-        the mail is sent to.
-
-        returns {
-        }
+    takes {
+        to: [string], // list of usernames of recipients
+        subject: string, // subject
+        message: string // message
+    }
+    returns {}
+    notes: The message can contain '{username}' or '{email}', which will be
+    replaced with the individual value.
+    see: contact
     '''
     response = json_response()
     p = request.user.get_profile()
@@ -741,9 +684,10 @@ def editPreferences(request, data):
     '''
     Edits the preferences of the current user
     takes {
-        key: value
+        key: value, // property id and new value
+        ... // more properties
     }
-    keys: email, password
+    notes: Possible keys are 'email' and 'password'.
     returns {}
     '''
     errors = {}
