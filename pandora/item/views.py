@@ -151,7 +151,7 @@ def find(request, data):
         ]
     } or { // if `keys` is missing
         items: int // returns total number of items
-    } or { // if `positions` is present ()
+    } or { // if `positions` is present
         positions: { // returns positions of given items
             id: position, // position of the item, per current sort order
             ... // more id/position pairs
