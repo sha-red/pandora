@@ -20,5 +20,5 @@ class Command(BaseCommand):
         elif len(args) == 2:
             target = args[0]
             base = args[1]
-        print('update docs', target, 'base', base)
+        print('update documentation in ', target, 'based on', base)
         documentation.update(target, base)
