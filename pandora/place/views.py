@@ -233,7 +233,7 @@ def findPlaces(request, data):
     }
     notes: Possible query keys are 'geoname', 'name' and 'user'. Possible
     itemsQuery keys are all item keys, as defined in the config.
-    see: addPlace, editPlace, removePlace
+    see: addPlace, editPlace, find, removePlace
     '''
     response = json_response()
 
