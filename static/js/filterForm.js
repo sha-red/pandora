@@ -19,10 +19,14 @@ pandora.ui.filterForm = function(options) {
         that.append(
             that.$filter = Ox.Filter({
                 findKeys: pandora.site.itemKeys.map(function(itemKey) {
-                    var key = Ox.clone(itemKey, true);
+                    var key = Ox.clone(itemKey, true),
+                        layerType;
+                    if (key.type == 'layer') {
+                        layerType = Ox.getObjectById(pandora.site.layers, key.id).type;
+                    }
                     key.title = Ox._(key.title);
                     key.type = key.type == 'layer'
-                        ? Ox.getObjectById(pandora.site.layers, key.id).type
+                        ? (layerType == 'entity' ? 'string' : layerType)
                         : key.type;
                     if (key.format && key.format.type == 'ColorPercent') {
                         key.format.type = 'percent';
