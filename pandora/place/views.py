@@ -20,24 +20,24 @@ import models
 @login_required_json
 def addPlace(request, data):
     '''
-    Adds a new place
+    Adds a new place to the map
     takes {
-        name: "",
-        alternativeNames: [],
-        geoname: "",
-        countryCode: '',
-        south: float,
-        west: float,
-        north: float,
-        east: float,
-        lat: float,
-        lng: float,
-        area: float,
-        type: ""
+        name: string, // place name
+        alternativeNames: [string], // list of alternative names
+        geoname: string, // full geoname (like '23 Main St, Foo, Switzerland')
+        countryCode: string, // two-letter country code (like 'ch')
+        south: float, // southern edge of the bounding box in degrees
+        west: float, // western edge of the bounding box in degrees
+        north: float, // northern edge of the bounding box in degrees
+        east: float, // eastern edge of the bounding box in degrees
+        type: string // place type
     }
     returns {
         id: string
     }
+    notes: Possible types are 'country', 'region', 'city', 'borough', 'street',
+    'building' and 'feature'.
+    see: editPlace, findPlaces, removePlace
     '''
     #FIXME: check permissions
     exists = False
@@ -105,13 +105,14 @@ def editPlace(request, data):
     '''
     Edits a place
     takes {
-        id: string,
-        name: string
-        north: int
+        id: string, // place id
+        name: string, // place name
+        ... // more place properties
     }
     returns {
-        names: []
+        names: [] // list of names, in case of collision with existing data
     }
+    see: addPlace, findPlaces, removePlace
     '''
     place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data['id']))
     names = data.get('name', [])
@@ -169,9 +170,9 @@ actions.register(editPlace, cache=False)
 @login_required_json
 def removePlace(request, data):
     '''
-    Removes a place
+    Removes a place from the map
     takes {
-        id: string,
+        id: string // place id
     }
     returns {}
     see: addPlace, editPlace, findPlaces
@@ -219,70 +220,20 @@ def order_query(qs, sort):
 
 def findPlaces(request, data):
     '''
+    Finds places for a given query
     takes {
-        query: {
-            conditions: [
-                {
-                    key: 'user',
-                    value: 'something',
-                    operator: '='
-                }
-            ]
-            operator: ","
-        },
-        itemsQuery: {
-            //see find request
-        },
-        sort: [{key: 'name', operator: '+'}],
-        range: [int, int]
-        keys: [string]
+        query: object, // query object to find places, see `find`
+        itemsQuery: object // query object to limit results to items, see `find`
+        sort: [object], // list of sort objects, see `find`
+        range: [int, int], // range of results to return
+        keys: [string] // list of properties to return
     }
-
-    possible query keys:
-        name, geoname, user
-
-    itemsQuery can be used to limit the resuts to matches in those items.
-              Uses the same query syntax as used in the find request.
-
-    possible keys:
-        name, geoname, user
-    
     returns {
-        items: [object]
+        items: [object] // list of place objects
     }
-    takes {
-        query: object,
-        sort: [object]
-        range: [int, int]
-    }
-        query: query object, more on query syntax at
-               https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-        sort: array of key, operator dics
-            [
-                {
-                    key: "year",
-                    operator: "-"
-                },
-                {
-                    key: "director",
-                    operator: ""
-                }
-            ]
-        range:       result range, array [from, to]
-
-    with keys, items is list of dicts with requested properties:
-    returns {
-        items: [string]    
-    }
-
-Positions
-        takes {
-            query: object,
-            positions: [string]
-        }
-        query: query object, more on query syntax at
-               https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-        positions:  ids of places for which positions are required
+    notes: Possible query keys are 'geoname', 'name' and 'user'. Possible
+    itemsQuery keys are all item keys, as defined in the config.
+    see: addPlace, editPlace, removePlace
     '''
     response = json_response()
 
@@ -320,11 +271,18 @@ actions.register(findPlaces)
 
 def getPlaceNames(request, data):
     '''
-    Undocumented
+    Gets place names and matches
     takes {}
     returns {
-        items: [{name: string, matches: int}]
+        items: [
+            {
+                name: string, // place name
+                matches: int // number of matches in annotations
+            },
+            ... // more places
+        ]
     }
+    see: getEventNames
     '''
     response = json_response({})
     layers = [l['id'] for l in filter(lambda l: l['type'] == 'place',

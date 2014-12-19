@@ -669,12 +669,12 @@ def contact(request, data):
     '''
     Sends a message to the contact address
     takes {
-        email: string,
-        subject: string,
-        message: string
+        email: string, // sender
+        subject: string, // subject
+        message: string // message
     }
-    returns {
-    }
+    returns {}
+    see: mail
     '''
     name = data.get('name', '')
     email = data.get('email', '')
@@ -856,7 +856,7 @@ def statistics(request, data):
     Gets usage statistics
     takes {}
     returns {
-        ... // undocumented
+        ... // various statistics
     }
     '''
     response = json_response()
@@ -883,14 +883,20 @@ def group_json(g):
 @login_required_json
 def getGroups(request, data):
     '''
-    Gets user groups
+    Gets all user groups
     takes {}
     returns {
         groups: [
-            {id: string, name: string, users: int, items: int}
+            {
+                id: string, // group id
+                name: string, // group name
+                users: int, // number of users in this group
+                items: int // number of items in this groups
+            },
+            ... // more groups
         ]
     }
-    see: addGroup, editGroup, getGroups, removeGroup
+    see: addGroup, editGroup, getGroup, removeGroup
     '''
     response = json_response(status=200, text='ok')
     response['data']['groups'] = []
@@ -903,17 +909,16 @@ actions.register(getGroups)
 @login_required_json
 def getGroup(request, data):
     '''
-    Gets user group
+    Gets a user group by id or name
     takes {
-        id: string
-            or
-        name: string
+        id: string // either group id
+        name: string // or group name
     }
     returns {
-        id: string,
-        name: string
-        users: int
-        items: int
+        id: string, // group id
+        name: string, // group name
+        users: int, // number of users in this group
+        items: int // number of items in this group
     }
     see: addGroup, editGroup, getGroups, removeGroup
     '''
@@ -927,15 +932,15 @@ actions.register(getGroup, cache=False)
 @capability_required_json('canManageUsers')
 def addGroup(request, data):
     '''
-    Adds user group
+    Adds a new user group
     takes {
-        name: string
+        name: string // group name
     }
     returns {
-        id: string,
-        name: string
-        users: int
-        items: int
+        id: string, // group id
+        name: string, // group name
+        users: int, // number of users in this group
+        items: int // number of items in this group
     }
     see: editGroup, getGroup, getGroups, removeGroup
     '''
@@ -957,15 +962,16 @@ actions.register(addGroup, cache=False)
 @capability_required_json('canManageUsers')
 def editGroup(request, data):
     '''
-    Edits user group
+    Edits a user group
     takes {
-        id: string,
-        name: string
-        
+        id: string, // group id
+        name: string // group name
     }
     returns {
-        name: string
-        users: int
+        id: string, // group id
+        name: string, // group name
+        users: int, // number of users in this group
+        items: int // number of items in this group
     }
     see: addGroup, getGroup, getGroups, removeGroup
     '''
@@ -982,12 +988,11 @@ actions.register(editGroup, cache=False)
 @capability_required_json('canManageUsers')
 def removeGroup(request, data):
     '''
-    Removes user group
+    Removes a user group
     takes {
-        id: string
+        id: string // group id
     }
-    returns {
-    }
+    returns {}
     see: addGroup, editGroup, getGroup, getGroups
     '''
     response = json_response(status=200, text='ok')

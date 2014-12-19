@@ -72,8 +72,8 @@ def editDocument(request, data):
         item: string // item id (optional)
     }
     returns {
-        id:
-        ...
+        id: string, // document id
+        ... // more document properties
     }
     notes: If `item` is present, this will not edit the global description of
     the document, but its specific description in the context of the given

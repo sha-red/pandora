@@ -164,6 +164,7 @@ def find(request, data):
     responsive GUI: First leave out `keys` to get totals as fast as possible,
     then pass `positions` to get the positions of previously selected items,
     finally make the query with `keys` and an appropriate range.
+    For more examples, see the <a href="https://wiki.0x2620.org/wiki/pandora/QuerySyntax">0x2620.org wiki</a>.
     see: add, edit, get, lookup, remove, upload
     '''
     if settings.JSON_DEBUG:
@@ -500,7 +501,7 @@ def add(request, data):
         title: string, // title
         ... // more item properties
     }
-    notes: To allow for this, set config option `itemRequiresVideo` to false
+    notes: To allow for this, set config option `itemRequiresVideo` to false.
     see: edit, find, get, lookup, remove, upload
     '''
     if not request.user.get_profile().capability('canAddItems'):

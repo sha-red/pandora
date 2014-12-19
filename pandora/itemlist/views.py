@@ -139,7 +139,7 @@ actions.register(getList)
 @login_required_json
 def addListItems(request, data):
     '''
-    Adds one or more items to a list
+    Adds one or more items to a static list
     takes {
         list: string, // list id
         items: [string], // either list of item ids
@@ -169,7 +169,7 @@ actions.register(addListItems, cache=False)
 @login_required_json
 def removeListItems(request, data):
     '''
-    Removes one or more items from a list
+    Removes one or more items from a static list
     takes {
          list: string, // list id
          items: [itemId], // either list of item ids

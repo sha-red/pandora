@@ -19,7 +19,7 @@ import models
 @login_required_json
 def addEvent(request, data):
     '''
-    Adds a new calendar event
+    Adds a new event to the calendar
     takes {
         end: string, // 'YYYY-MM-DD HH:MM:SS', arbitrary precision
         name: string, // name
@@ -128,7 +128,7 @@ actions.register(editEvent, cache=False)
 @login_required_json
 def removeEvent(request, data):
     '''
-    Removes a calendar event
+    Removes an event from the calendar
     takes {
         id: string // event id
     }
@@ -175,7 +175,7 @@ def order_query(qs, sort):
 
 def findEvents(request, data):
     '''
-    Finds calendar events
+    Finds calendar events for a given query
     takes {
         query: object, // query object, see `find`
         sort: [object], // list of sort objects, see `find`
@@ -216,12 +216,18 @@ actions.register(findEvents)
 
 def getEventNames(request, data):
     '''
-    Undocumented
-    takes {
-    }
+    Gets event names and matches
+    takes {}
     returns {
-        items: [{name: string, matches: int}]
+        items: [
+            {
+                name: string, // event name
+                matches: int // number of matches in annotations
+            },
+            ... // more events
+        ]
     }
+    see: getPlaceNames
     '''
     response = json_response({})
     layers = [l['id'] for l in filter(lambda l: l['type'] == 'event',

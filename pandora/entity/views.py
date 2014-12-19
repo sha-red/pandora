@@ -33,9 +33,10 @@ def addEntity(request, data):
     '''
     Adds an entity
     takes {
-        type: string,
-        name: string,
-        alternativeNames: [string]
+        type: string, // entity type, as defined in config
+        name: string, // name
+        alternativeNames: [string], // list of alternative names
+        ... // more entity properties, as defined in config
     }
     returns {}
     see: editEntity, findEntities, getEntity, removeEntity
@@ -148,14 +149,14 @@ def editEntity(request, data):
     '''
     Edits an entity
     takes {
-        id: string
-        name: string
-        description: string
-        item(optional): edit descriptoin per item
+        id: string, // entity id
+        name: string, // entity name
+        description: string, // entity description
+        ... // more properties, as defined in config
     }
     returns {
-        id:
-        ...
+        id: string // entity id
+        ... // more entity properties
     }
     see: addEntity, findEntities, getEntity, removeEntity
     '''

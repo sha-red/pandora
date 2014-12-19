@@ -28,7 +28,7 @@ def get_edit_or_404_json(id):
 @login_required_json
 def addClips(request, data):
     '''
-    Adds one or more clips to an edit
+    Adds one or more clips to a static edit
     takes {
         edit: string, // edit id,
         index: int, // position within edit (optional),
@@ -75,7 +75,7 @@ actions.register(addClips, cache=False)
 @login_required_json
 def removeClips(request, data):
     '''
-    Removes one or more clips from an edit
+    Removes one or more clips from a static edit
     takes {
         edit: string, // edit id
         ids: [string] // clip ids
@@ -109,8 +109,7 @@ def editClip(request, data):
         in: float, // in point in seconds
         out: float // out point in seconds
     }
-    returns {
-    }
+    returns {}
     see: addClips, orderClips, removeClips, sortClips
     '''
     response = json_response()
@@ -245,7 +244,7 @@ actions.register(getEdit)
 @login_required_json
 def addEdit(request, data):
     '''
-    Adds an edit
+    Adds a new edit
     takes {
         name: string, // name (optional)
         type: string // 'static' or 'smart'

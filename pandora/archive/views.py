@@ -161,8 +161,8 @@ def addMedia(request, data):
     '''
     Adds media files to a given item
     takes {
-        filename: string, // undocumented
-        id: oshash, // undocumented
+        filename: string, // filename
+        id: string, // oshash of the file
         info: {}, // undocumented
         item: string // item id
     }
