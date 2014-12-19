@@ -17,13 +17,14 @@ import models
 
 def logError(request, data):
     '''
-        takes {
-            url: string,
-            line: string,
-            text: string
-        }
-        returns {
-        }
+    Logs an error
+    takes {
+        url: string, // URL
+        line: string, // line number
+        text: string // error text
+    }
+    returns {}
+    see: findErrorLogs, removeErrorLogs
     '''
     if request.user.is_authenticated():
         user = request.user
@@ -49,10 +50,12 @@ actions.register(logError, cache=False)
 @admin_required_json
 def removeErrorLogs(request, data):
     '''
-        takes {
-            ids: [string]
-        }
-        returns {}
+    Removes entries from the error log
+    takes {
+        ids: [string] // list of error ids
+    }
+    returns {}
+    see: findErrorLogs, logError
     '''
     models.Log.objects.filter(id__in=[ox.fromAZ(i) for i in data['ids']]).delete()
     response = json_response()
@@ -86,25 +89,17 @@ def order_query(qs, sort):
 @admin_required_json
 def findErrorLogs(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            sort: [{key: 'created', operator: '+'}],
-            range: [int, int]
-            keys: [string]
-        }
-        returns {
-            items: [object]
-        }
-
+    Finds error logs for a given query
+    takes {
+        query: object, // query object, see `find`
+        sort: [object], // list of sort objects, see `find`
+        range: [int, int], // range of results to return
+        keys: [string] // list of properties to return
+    }
+    returns {
+        items: [object]
+    }
+    see: find, logError, removeErrorLogs
     '''
     response = json_response()
 

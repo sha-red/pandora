@@ -20,14 +20,16 @@ import models
 @capability_required_json('canManageTitlesAndNames')
 def editTitle(request, data):
     '''
-        takes {
-            id: string
-            sorttitle: string
-        }
-        can contain any of the allowed keys for title 
-        returns {
-            id: string
-        }
+    Edits the sort title for a given title
+    takes {
+        id: string, // name id
+        sorttitle: string // sort title
+    }
+    returns {
+        id: string, // title id
+        ... // more properties
+    }
+    see: findTitles
     '''
     title = get_object_or_404_json(models.Title, pk=ox.fromAZ(data['id']))
     response = json_response()
@@ -71,59 +73,20 @@ def order_query(qs, sort):
 
 def findTitles(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            itemsQuery: {
-                //see find request
-            },
-            sort: [{key: 'title', operator: '+'}],
-            range: [0, 100]
-            keys: []
-        }
-
-        possible query keys:
-            title, numberoftitles
-
-        possible keys:
-            title, sorttitle, numberoftitles
-        
-        returns {
-            items: [object]
-        }
-
-        takes {
-            query: object,
-            sort: [object],
-            range: [int, int]
-        }
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            sort: array of key, operator dics
-                [
-                    {
-                        key: "year",
-                        operator: "-"
-                    },
-                    {
-                        key: "director",
-                        operator: ""
-                    }
-                ]
-            range:       result range, array [from, to]
-
-        with keys, items is list of dicts with requested properties:
-          returns {items: [object]}
-
+    Finds titles for a given query
+    takes {
+        query: object, // query object, see `find`
+        itemsQuery: object, // limit to matched items, query object, see `find`
+        sort: [object], // list of sort objects, see `find`
+        range: [int, int], // range of results to return
+        keys: [string] // list of properties to return
+    }
+    returns {
+        items: [object] // list of title objects
+    }
+    notes: Possible query keys are 'numberoftitles' and 'title', possible keys
+    are 'numberoftitles', 'sorttitle' and 'title'.
+    see: editTitle, find
     '''
     response = json_response()
 

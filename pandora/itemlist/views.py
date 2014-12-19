@@ -58,24 +58,19 @@ def parse_query(data, user):
 
 def findLists(request, data):
     '''
+    Finds lists for a given query
     takes {
         query: object, // query object, see `find`
         sort: [], // list of sort objects, see `find`
-        range: [int, int], // range of results
-        keys: [string] // properties to return
-    }
-
-    possible query keys:
-        name, user, featured, subscribed
-
-    possible keys:
-        name, user, featured, subscribed, query
-
+        range: [int, int], // range of results to return
+        keys: [string] // list of properties to return
     }
     returns {
-        items: [{name: string, user: string, featured: bool, public...}]
+        items: [object] // list of list objects
     }
-    see: addList, editList, getList, removeList, sortLists
+    notes: Possible query keys are 'featured', 'name', 'subscribed' and 'user',
+    possible keys are 'featured', 'name', 'query', 'subscribed' and 'user'.
+    see: addList, editList, find, getList, removeList, sortLists
     '''
     query = parse_query(data, request.user)
 

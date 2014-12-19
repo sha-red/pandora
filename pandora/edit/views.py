@@ -206,8 +206,7 @@ def sortClips(request, data):
         edit: string, // edit id
         sort: object // sort
     }
-    returns {
-    }
+    returns {}
     note: sort is [{key: string, operator: string}], operator can be '+' or '-'
     see: addClips, editClip, orderClips, removeClips
     '''
@@ -220,14 +219,16 @@ actions.register(sortClips, cache=False)
 
 def getEdit(request, data):
     '''
+    Gets an edit by id
     takes {
-        id:
-        keys: []
+        id: string, // edit id
+        keys: [string] // list of properties to return
     }
     returns {
-        id:
-        clips:
+        id: string, // edit id
+        clips: [object] // list of clips in this edit
     }
+    see: addEdit, editEdits, findEdits, removeEdit, sortEdits
     '''
     if 'id' in data:
         response = json_response()
@@ -253,7 +254,7 @@ def addEdit(request, data):
         id: string // edit id
         ... // more edit properties
     }
-    see: editEdit, findEdit, removeEdit, sortEdits
+    see: editEdit, findEdit, getEdit, removeEdit, sortEdits
     '''
     data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
@@ -312,7 +313,7 @@ def editEdit(request, data):
         key: value, // property id and new value
         ... // more key/value pairs
     }
-    see: addEdit, findEdit, removeEdit, sortEdits
+    see: addEdit, findEdit, getEdit, removeEdit, sortEdits
     '''
     edit = get_edit_or_404_json(data['id'])
     response = json_response()
@@ -337,7 +338,7 @@ def removeEdit(request, data):
         id: string // edit id
     }
     returns {}
-    see: addEdit, editEdit findEdit, sortEdits
+    see: addEdit, editEdit, findEdit, getEdit, sortEdits
     '''
     edit = get_edit_or_404_json(data['id'])
     response = json_response()
@@ -388,20 +389,12 @@ def findEdits(request, data):
         range: [int, int], // range of results
         keys: [string] // list of properties to return
     }
-
-    possible query keys:
-        name, user, featured, subscribed
-
-    possible keys:
-        name, user, featured, subscribed, query
-
-    }
     returns {
-        items: [object]
+        items: [object] // list of edit objects
     }
     notes: Possible query keys are 'featured', 'name', 'subscribed' and 'user',
     possible keys are 'featured', 'name', 'query', 'subscribed' and 'user'.
-    see: editEdits, find, removeEdit, sortEdits
+    see: addEdit, editEdits, find, getEdit, removeEdit, sortEdits
     '''
     query = parse_query(data, request.user)
 
@@ -494,7 +487,7 @@ def sortEdits(request, data):
     }
     returns {}
     notes: Sorting featured edits requires a specific per-user capability
-    see: editEdits, findEdits, removeEdit
+    see: addEdit, editEdits, findEdits, getEdit, removeEdit
     '''
     position = 0
     section = data['section']

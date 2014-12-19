@@ -19,15 +19,17 @@ from changelog.models import add_changelog
 @capability_required_json('canManageTitlesAndNames')
 def editName(request, data):
     '''
-        takes {
-            id: id,
-            sortname: string
-        }
-        returns {
-            id: string,
-            name: string
-            ...
-        }
+    Edits the sort name for a given name
+    takes {
+        id: string, // name id
+        sortname: string // sort name
+    }
+    returns {
+        id: string, // name id
+        name: string // name
+        ... // more properties
+    }
+    see: findNames, sortName
     '''
     person = get_object_or_404_json(models.Person, pk=ox.fromAZ(data['id']))
     response = json_response()
@@ -43,14 +45,16 @@ actions.register(editName, cache=False)
 
 def sortName(request, data):
     '''
-        get sort name(s) for given name or names
-        takes {
-            names: [string]
-            name: string
-        }
-        returns {
-            name: sortName
-        }
+    Gets the sort name for one or more names
+    takes {
+        name: string, // either name
+        names: [string] // or list of names
+    }
+    returns {
+        name: sortName, // sort name for this name
+        ... // more results
+    }
+    see editName, findNames
     '''
     names = data.get('names', [])
     if 'name' in data:
@@ -92,56 +96,20 @@ def order_query(qs, sort):
 
 def findNames(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            itemsQuery: {
-                //see find request
-            },
-            sort: [{key: 'name', operator: '+'}],
-            range: [0, 100]
-            keys: []
-        }
-
-        possible query keys:
-            name, numberofnames
-
-        possible keys:
-            name, sortname, numberofnames
-        
-        returns {
-            items: [{name:, user:, featured:, public...}]
-        }
-        param data
-            {'query': query, 'sort': array, 'range': array}
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            sort: array of key, operator dics
-                [
-                    {
-                        key: "year",
-                        operator: "-"
-                    },
-                    {
-                        key: "director",
-                        operator: ""
-                    }
-                ]
-            range:       result range, array [from, to]
-
-        with keys, items is list of dicts with requested properties:
-        returns {
-              items: [string]
-        }
+    Finds names for a given query
+    takes {
+        query: object, // query object, see `find`
+        itemsQuery: object, // limit to matched items, query object, see `find`
+        sort: [object], // list of sort objects, see `find`
+        range: [int, int], // range of results to return
+        keys: [string] // list of properties to return
+    }
+    returns {
+        items: [object] // list of name objects
+    }
+    notes: Possible query keys are 'name' and 'numberofnames', possible keys
+    are 'name', 'numberofnames' and 'sortname'.
+    see: editName, find, sortName
     '''
     response = json_response()
 

@@ -42,25 +42,17 @@ def order_query(qs, sort):
 @capability_required_json('canManageUsers')
 def findChangeLogs(request, data):
     '''
-        takes {
-            query: {
-                conditions: [
-                    {
-                        key: 'user',
-                        value: 'something',
-                        operator: '='
-                    }
-                ]
-                operator: ","
-            },
-            sort: [{key: 'created', operator: '+'}],
-            range: [int, int]
-            keys: [string]
-        }
-        returns {
-            items: [object]
-        }
-
+    Finds changelog entries for a given query
+    takes {
+        query: object, // query object, see `find`
+        sort: [object], // list of sort objects, see `find`
+        range: [int, int], // range of results to return
+        keys: [string] // list of properties to return
+    }
+    returns {
+        items: [object] // list of changelog entries
+    }
+    see: find
     '''
     response = json_response()
 

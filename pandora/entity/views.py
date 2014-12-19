@@ -209,18 +209,12 @@ def findEntities(request, data):
         range: [int, int], // range of results
         keys: [string] // list of properties to return
     }
-
-    possible query keys:
-        name, type
-
-    possible keys:
-        name, type, alternativeNames
-
-    }
     returns {
         items: [object]
     }
-    see: addEntity, editEntity, getEntity, removeEntity
+    notes: Possible query keys are 'name' and 'type', possible keys are
+    'alternativeNames', 'name' and 'type'.
+    see: addEntity, editEntity, find, getEntity, removeEntity
     '''
     query = parse_query(data, request.user)
 

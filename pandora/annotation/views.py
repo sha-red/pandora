@@ -90,7 +90,7 @@ def findAnnotations(request, data):
             ... // more annotation properties
         }]
     }
-    see: addAnnotation, addAnnotations, editAnnotation, getAnnotation,
+    see: addAnnotation, addAnnotations, editAnnotation, find, getAnnotation,
     removeAnnotation
     '''
     response = json_response()

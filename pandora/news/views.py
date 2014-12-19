@@ -102,8 +102,8 @@ def editNews(request, data):
         title: string // title
     }
     returns {
-        id: string
-        ...
+        id: string // news item id
+        ... // more properties
     }
     see: addNews, getNews, removeNews
     '''

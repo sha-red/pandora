@@ -184,7 +184,7 @@ def findEvents(request, data):
     returns {
         items: [object] // list of items
     }
-    see: addEvent, editEvent, removeEvent
+    see: addEvent, editEvent, find, removeEvent
     '''
     response = json_response(status=200, text='ok')
     query = parse_query(data, request.user)

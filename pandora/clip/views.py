@@ -74,25 +74,19 @@ def order_query(qs, sort):
 
 def findClips(request, data):
     '''
-        takes {
-            query: {
-                conditions: [object],
-                operator: string // '&' or '|'
-            },
-            itemsQuery: {
-                conditions: [],
-                operator: string // '&' or '|'
-            },
-            keys: [string],
-            position: int,
-            positions: [string],
-            range: [int, int],
-            sort: []
-        }
-
-        returns {
-            items: [object]
-        }
+    Finds clips for a given query
+    takes {
+        query: object, // find clips, query object, see `find`
+        itemsQuery: object, // limit to matching items, query object, see `find`
+        keys: [string], // list of properties to return
+        positions: [int], // list of positions
+        range: [int, int], // range of results to return
+        sort: [object] // list of sort objects, see `find`
+    }
+    returns {
+        items: [object] // list of clip objects
+    }
+    see: find
     '''
     response = json_response()
 

@@ -96,13 +96,15 @@ def robots_txt(request, url):
 
 def getPage(request, data):
     '''
-        takes {
-            name: pagename
-        }
-        returns {
-            name:
-            text:
-        }
+    Gets the text/html for a given site page (like 'About')
+    takes {
+        name: string // page id
+    }
+    returns {
+        name: string, // page id
+        text: string // text/html
+    }
+    see: editPage
     '''
     if isinstance(data, basestring):
         name = data
@@ -120,14 +122,16 @@ actions.register(getPage)
 @login_required_json
 def editPage(request, data):
     '''
-        takes {
-            name: pagename
-            text: text
-        }
-        returns {
-            name:
-            text:
-        }
+    Edits a site page (like 'About')
+    takes {
+        name: string, // page id
+        text: string // new text/html
+    }
+    returns {
+        name: string, // page id
+        text: string // new text/html
+    }
+    see: getPage
     '''
     if request.user.get_profile().capability('canEditSitePages'):
         page, created = models.Page.objects.get_or_create(name=data['name'])
@@ -143,10 +147,12 @@ actions.register(editPage)
 
 def init(request, data):
     '''
-        takes {}
-        returns {
-            user: object
-        }
+    Makes an init request
+    takes {}
+    returns {
+        site: object, // site data
+        user: object // user data
+    }
     '''
     response = json_response({})
     config = copy.deepcopy(settings.CONFIG)
@@ -162,16 +168,16 @@ actions.register(init)
 
 def embedURL(request, data):
     '''
-        
-        takes {
-            url
-            maxwidth
-            maxheight
-        }
-        returns {
-            html
-            ...
-        }
+    Returns HTML to embed a given URL
+    takes {
+        url: string, // URL
+        maxwidth: int, // max width in px
+        maxheight: int // max height in px
+    }
+    returns {
+        html: string // HTML
+    }
+    see: getEmbedDefaults
     '''
     response = json_response({})
     response['data'] = ox.get_embed_code(data['url'], data.get('maxwidth'), data.get('maxheight'))
@@ -180,19 +186,21 @@ actions.register(embedURL)
 
 def getEmbedDefaults(request, data):
     '''
-        takes {}
+    Returns embed default values
+    takes {}
     returns {
-        document: str // first document, sorted by id
-        edit: str // first edit, sorted by name
-        editDuration: float // duration of that edit
-        item: str // first item, sorted by id
+        document: string, // first document, sorted by id
+        edit: string, // first edit, sorted by name
+        editDuration: float, // duration of that edit
+        item: string, // first item, sorted by id
         itemDuration: float // duration of that item
         itemRatio: float // video ratio of that item
-        list: str // first list, sorted by name
-        text: str // first text, sorted by name
+        list: string // first list, sorted by name
+        text: string // first text, sorted by name
         videoRatio: float // pandora.site.video.previewRatio
         videoResolution: int // largest value in pandora.site.video.resolutions
     }
+    see: embedURL
     '''
     from document.models import Document
     from item.models import Item

@@ -169,7 +169,7 @@ def addMedia(request, data):
     returns {
         item: id // item id
     }
-    see: editMedia, moveMedia, removeMedia
+    see: editMedia, findMedia, moveMedia, removeMedia
     '''
     response = json_response({})
     oshash = data.pop('id')
@@ -399,7 +399,7 @@ actions.register(moveMedia, cache=False)
 @login_required_json
 def editMedia(request, data):
     '''
-    Edits one or more media files
+    Edits data for one or more media files
     takes {
         files: [
             {
@@ -550,7 +550,7 @@ def findMedia(request, data):
     returns {
         items: [object] // list of items
     }
-    see: addMedia, editMedia, moveMedia, removeMedia
+    see: addMedia, editMedia, find, moveMedia, removeMedia
     '''
     if not data.get('sort'):
         data['sort'] = [{'key': 'path', 'operator': '+'}]

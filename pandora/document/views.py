@@ -65,6 +65,7 @@ actions.register(addDocument, cache=False)
 @login_required_json
 def editDocument(request, data):
     '''
+    Edits data for a document
     takes {
         id: string, // document id
         name: string, // new document name
@@ -141,6 +142,7 @@ def parse_query(data, user):
 
 def findDocuments(request, data):
     '''
+    Finds documents for a given query
     takes {
         query: object, // query object, see `find`
         sort: [object], // list of sort objects, see `find`
