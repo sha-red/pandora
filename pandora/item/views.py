@@ -357,10 +357,10 @@ def findId(request, data):
     '''
     Undocumented
     takes {
-        'id': string
-        'title': string
-        'director': [string]
-        'year': int
+        id: string
+        title: string
+        director: [string]
+        year: int
     }
     '''
     response = json_response({})
