@@ -29,6 +29,11 @@ from chunk import process_chunk
 
 @login_required_json
 def removeVolume(request, data):
+    '''
+    Removes a volume
+    takes {} // undocumented
+    returns {} // undocumented
+    '''
     user = request.user
     try:
         volume = models.Volume.objects.get(user=user, name=data['volume'])
@@ -352,10 +357,10 @@ actions.register(taskStatus, cache=False)
 @login_required_json
 def moveMedia(request, data):
     '''
-    Move media files from one item to another
+    Moves one or more media files from one item to another
     takes {
-        ids: ids of files
-        item: new public_id
+        ids: [string], // list of file ids
+        item: id // target item id
     }
     returns {}
     notes: This will *not* (yet) shift the corresponding annotations.

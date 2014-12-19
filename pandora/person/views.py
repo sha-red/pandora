@@ -54,7 +54,7 @@ def sortName(request, data):
         name: sortName, // sort name for this name
         ... // more results
     }
-    see editName, findNames
+    see: editName, findNames
     '''
     names = data.get('names', [])
     if 'name' in data:

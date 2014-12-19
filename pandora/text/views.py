@@ -202,7 +202,7 @@ def findTexts(request, data):
     }
     notes: Possible query keys are 'featured', 'name', 'subscribed' and 'user',
     possible keys are 'featured', 'name', 'query', 'subscribed' and 'user'.
-    see: addText, editText, getText, removeText, sortTexts
+    see: addText, editText, find, getText, removeText, sortTexts
     '''
     query = parse_query(data, request.user)
 
@@ -317,7 +317,8 @@ def sortTexts(request, data):
         ids: [string] // ordered list of text ids
     }
     returns {}
-    notes: Sorting featured texts requires the appropriate capability.
+    notes: Setting the order of featured texts requires the appropriate
+    capability.
     see: addText, findTexts, getText, editText, removeText
     '''
     position = 0

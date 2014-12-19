@@ -141,13 +141,12 @@ actions.register(editClip, cache=False)
 @login_required_json
 def orderClips(request, data):
     '''
-    Updates manual ordering of clips within an edit
+    Sets the manual ordering of clips within a given edit
     takes {
         edit: string, // edit id
         ids: [string] // clip ids in new order
     }
-    returns {
-    }
+    returns {}
     see: addClips, editClip, removeClip, sortClips
     '''
     edit = get_edit_or_404_json(data['edit'])
@@ -207,7 +206,7 @@ def sortClips(request, data):
         sort: object // sort
     }
     returns {}
-    note: sort is [{key: string, operator: string}], operator can be '+' or '-'
+    notes: sort is [{key: string, operator: string}], operator can be '+' or '-'
     see: addClips, editClip, orderClips, removeClips
     '''
     edit = get_edit_or_404_json(data['edit'])
@@ -486,7 +485,8 @@ def sortEdits(request, data):
         ids: [string] // ordered list of edit ids
     }
     returns {}
-    notes: Sorting featured edits requires a specific per-user capability
+    notes: Setting the order of featured edits requires the appropriate
+    capability.
     see: addEdit, editEdits, findEdits, getEdit, removeEdit
     '''
     position = 0

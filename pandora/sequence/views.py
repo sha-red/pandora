@@ -51,16 +51,17 @@ def order_query(qs, sort):
 
 def findSequences(request, data):
     '''
-        takes {
-            query: ...
-            itemsQuery: ...
-        }
-
-        one of your conditions has to be key: 'mode', value: [shape,color], operator: '=='
-
-        returns {
-            items: [object]
-        }
+    Finds sequences for a given query
+    takes {
+        query: object // query object, see `find`
+        itemsQuery: object // limit to matching items, query object, see `find`
+    }
+    returns {
+        items: [object] // list of sequences
+    }
+    notes: One of the query conditions has to be {key: 'mode', operator: '==',
+    value: 'color' or 'shape'}.
+    see: find, getSequence
     '''
     response = json_response()
 
@@ -93,18 +94,19 @@ actions.register(findSequences)
 
 def getSequence(request, data):
     '''
-        takes {
-            id
-            mode 
-            position
-        }
-
-        returns {
-            id
-            mode
-            in
-            out
-        }
+    Gets a sequence by id
+    takes {
+        id: string, // sequence id
+        mode: string, // sequence mode ('color' or 'shape')
+        position: int // position in seconds
+    }
+    returns {
+        id: string, // sequence id
+        mode: string, // sequence mode ('color' or 'shape')
+        in: int, // in point in seconds
+        out: int // out point in seconds
+    }
+    see: findSequences
     '''
     response = json_response()
     position = float('%0.03f' % data['position'])

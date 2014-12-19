@@ -240,11 +240,12 @@ def getEntity(request, data):
     '''
     Gets an entity by id
     takes {
-        id: string,
-        keys: [string]
+        id: string, // entity id
+        keys: [string] // list of properties to return
     }
     returns {
-        key: value
+        key: value, // property id and value
+        ... // more key/value pairs
     }
     see: addEntity, editEntity, findEntities, removeEntity
     '''
@@ -258,14 +259,12 @@ actions.register(getEntity)
 @login_required_json
 def removeEntity(request, data):
     '''
-    Removes an entity
+    Removes one or more entities
     takes {
-        id: string,
-        or
-        ids: [string]
+        id: string, // either entity id
+        ids: [string] // or list of entity ids
     }
-    returns {
-    }
+    returns {}
     see: addEntity, editEntity, findEntities, getEntity
     '''
     response = json_response()

@@ -11,15 +11,16 @@ from ox.django.api import actions
 
 def tv(request, data):
     '''
-        takes {
-            list: string
-        }
-        returns {
-            item: string,
-            position: float,
-            title: string,
-            ...
-        }
+    Gets TV program for a given list
+    takes {
+        list: string // list name
+    }
+    returns {
+        item: string, // current item
+        position: float, // current position in seconds
+        title: string, // item title
+        ... // more item properties
+    }
     '''
     if 'list' in data and data['list']:
         list = get_list_or_404_json(data['list'])

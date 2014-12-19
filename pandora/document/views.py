@@ -250,7 +250,7 @@ def sortDocuments(request, data):
     Sets the sort order for the documents related to a given item
     takes {
         item: string, // item id
-        ids: [string] // list of document ids
+        ids: [string] // ordered list of document ids
     }
     returns {}
     see: addDocument, editDocument, findDocument, removeDocument, sortDocuments

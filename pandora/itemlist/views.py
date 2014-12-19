@@ -110,12 +110,12 @@ def getList(request, data):
     '''
     Gets a list by id
     takes {
-        id: listid
+        id: string // list id
     }
     returns {
-        id:
-        section:
-        ...
+        id: string, // list id
+        section: string, // lists section (like 'personal')
+        ... // more key/value pairs
     }
     see: addList, editList, findLists, removeList, sortLists
     '''
@@ -374,7 +374,7 @@ actions.register(unsubscribeFromList, cache=False)
 @login_required_json
 def sortLists(request, data):
     '''
-    Set order of lists
+    Sets the order of lists in a given section
     takes {
         section: string, // lists section
         ids: [string] // ordered list of lists
@@ -382,6 +382,7 @@ def sortLists(request, data):
     returns {}
     notes: Possible sections are 'personal', 'favorite' and 'featured'. Setting
     the order of featured lists requires the appropriate capability.
+    see: addList, editList, findLists, getList, removeList
     '''
     position = 0
     section = data['section']

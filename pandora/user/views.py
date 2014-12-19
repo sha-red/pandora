@@ -495,7 +495,7 @@ def findUsers(request, data):
     }
     notes: Possible query keys are 'browser', 'email', 'groups', 'lastLogin'
     and 'username'.
-    see: editUser, findUser, getUser, removeUser
+    see: editUser, find, findUser, getUser, removeUser
     '''
     response = json_response(status=200, text='ok')
     query = parse_query(data, request.user)
@@ -550,6 +550,7 @@ actions.register(getUser)
 @login_required_json
 def mail(request, data):
     '''
+    Sends mail to a list of users
     takes {
         to: [string], // list of usernames of recipients
         subject: string, // subject

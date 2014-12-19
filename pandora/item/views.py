@@ -582,7 +582,7 @@ def remove(request, data):
         id: string // item id
     }
     returns {}
-    notes: The return status is 200 for success or 403 for permission denied.
+    notes: The return status code is 200 for success or 403 for permission denied.
     see: add, edit, find, get, lookup, upload
     '''
     response = json_response({})
