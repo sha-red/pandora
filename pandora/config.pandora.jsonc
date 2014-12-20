@@ -89,7 +89,6 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     "clipLayers" is the ordered list of public layers that will appear as the
     text of clips (in grid view, below the icon). Excluding a layer from this
     list means it will not be included in find annotations.
-    FIXME: the last bit is not implemented.
     */
     "clipLayers": ["publicnotes", "keywords", "subtitles"],
     /*
@@ -756,6 +755,8 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     Preferences -> Advanced. This is the place to configure various defaults,
     like the site-wide language and theme, the default list and item views, the
     default set of filters, etc.
+    Please make sure that in case you rename or remove entries that are
+    referenced in "ui", you update them here as well.
     */
     "user": {
         "level": "guest",
