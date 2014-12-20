@@ -623,6 +623,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     },
     /*
     "menuExtras" can be used to add extra functionality to the main menu bar.
+    The plug-in architecture is not yet finalized, documentation forthcoming.
     */
     "menuExtras": [
         "user",
