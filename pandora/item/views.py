@@ -120,9 +120,9 @@ def find(request, data):
             operator: string // logical operator, '&' or '|'
         },
         range: [int, int] // items to return, per current sort order
-        sort: [{ // list of sort objects
+        sort: [{ // list of sort objects, applied in the given ordering
             key: string, // item key
-            operator: string // sort order, '+' or '-'
+            operator: string // sort operator, '+' or '-'
         }]
     }
     returns { // if `keys` is present
