@@ -2,8 +2,8 @@
 -------------------------------------------------------------------------------
 pan.do/ra Configuration
 -------------------------------------------------------------------------------
-You can edit this file. Also take a look at the configuration examples
-(config.SITENAME.jsonc) that are part of the pan.do/ra distribution.
+You can edit this file. You may also want to take a look at the configuration
+examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
 */
 {
     /*
@@ -611,12 +611,18 @@ You can edit this file. Also take a look at the configuration examples
         {"id": "calendar", "title": "on Calendar"}
     ],
     /*
+    "media" defines additional media that gets added when importing items.
+        "importPosters": If true, a poster file will be imported (if present)
+        "importFrames": If true, 3 full-resolution frames per file will be
+            imported. This is useful to render high-resolution icons and
+            posters for an instance that has only low-resolution video.
     */
     "media": {
         "importPosters": false,
         "importFrames": false 
     },
     /*
+    "menuExtras" can be used to add extra functionality to the main menu bar.
     */
     "menuExtras": [
         "user",
@@ -633,6 +639,8 @@ You can edit this file. Also take a look at the configuration examples
         {"title": "Favorites"}
     ],
     /*
+    "posters" contains details about the poster icons. "ratio" is the default
+    ratio (used to display a placeholder while poster icons are loading).
     */
     "posters": {
         "ratio": 0.625
@@ -643,6 +651,8 @@ You can edit this file. Also take a look at the configuration examples
     */
     "rightsLevel": {"member": 2, "staff": 2, "admin": 2},
     /*
+    "rightsLevels" is an ordered list of rights levels, one of which will be
+    assigned to each item.
     */
     "rightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},
@@ -650,6 +660,7 @@ You can edit this file. Also take a look at the configuration examples
         {"name": "Private", "color": [255, 128, 128]}
     ],
     /*
+    "site" contains various settings for this instance. [TODO]
     */
     "site": {
         "description": "This is a demo of pan.do/ra - a free, open source media archive. It allows you to manage large, decentralized collections of video, to collaboratively create metadata and time-based annotations, and to serve your archive as a cutting-edge web application.",
