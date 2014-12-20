@@ -150,23 +150,24 @@ You can edit this file. Also take a look at the configuration examples
             this type). If type is "layer", this is a reference to the
             annotations layer with the same id.
     and can have any of the following properties:
-        "autocomplete": If true, the find element will have autocomplete
+        "autocomplete": If true, the find element will provide autocomplete
         "autocompleteSort": Sort order of autocomplete suggestions
         "capability": A capability required to see data for this key
         "columnRequired": If true, the column can't be removed from list view
-        "columnWidth": Default column width in px
+        "columnWidth": Default column width in px. If absent, no column for
+            this key can be added in list view.
         "filter": If true, one can filter results by this key
         "find": If true, this key will appear as an option in the find element
         "format": {type: string, args: [value, value, ...]}, used for special
             formatting. This will invoke Ox.formatType(args). For details, see
             https://oxjs.org/#doc/Ox.formatArea etc.
         "secondaryId": If true, loading the URL "/value" will redirect to the
-            corresponding item, in case there is an exact match.
+            corresponding item, in case there is an exact match for this key
         "sort": If true, one can sort results by this key
-        "sortOperator": Sort operator ("+" or "-"), in case it differs from the
+        "sortOperator": Sort order ("+" or "-"), in case it differs from the
             default for the key's type ("+" for strings, "-" for numbers)
         "sortType": Special sort type ("person" or "title") which can be
-            configures in "Manage Names" or "Manage Titles"
+            further configured in "Manage Names" or "Manage Titles"
         "value": {key: string, type: string}, for keys whose value is derived
             from other keys (like number of actors). Possible values for type
             are "length", "lengthperminute", "words", and "wordsperminute".
@@ -897,11 +898,8 @@ You can edit this file. Also take a look at the configuration examples
         "torrent": If true, video downloads are offered via BitTorrent
     */
     "video": {
-        //supported formats: webm, mp4
         "formats": ["webm", "mp4"],
         "previewRatio": 1.3333333333,
-        //supported resolutions are
-        //1080, 720, 480, 432, 360, 288, 240, 144, 96
         "resolutions": [240, 480],
         "torrent": true
     }
