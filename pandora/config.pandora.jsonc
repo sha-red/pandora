@@ -660,7 +660,11 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         {"name": "Private", "color": [255, 128, 128]}
     ],
     /*
-    "site" contains various settings for this instance. [TODO]
+    "site" contains various settings for this instance. In "email", "contact"
+    if the address in the contact form (to), "system" is the address used by
+    the system (from).
+    Note that "videoprefix" (subdomains to serve the video files from) gets
+    populated automatically and can be left empty.
     */
     "site": {
         "description": "This is a demo of pan.do/ra - a free, open source media archive. It allows you to manage large, decentralized collections of video, to collaboratively create metadata and time-based annotations, and to serve your archive as a cutting-edge web application.",
