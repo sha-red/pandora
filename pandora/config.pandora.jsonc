@@ -167,8 +167,9 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             default for the key's type ("+" for strings, "-" for numbers)
         "sortType": Special sort type ("person" or "title") which can be
             further configured in "Manage Names" or "Manage Titles"
-        "value": {key: string, type: string}, for keys whose value is derived
-            from other keys (like number of actors). Possible values for type
+        "value": {key: string, type: string} or {layer: string, type: string},
+            for keys whose value is derived from other keys or layers (like
+            "number of actors" or "words per minute"). Possible values for type
             are "length", "lengthperminute", "words", and "wordsperminute".
             Alternatively, "value" can be set to the string "capability", which
             results in an itemKey whose boolean value indicates the presence or
