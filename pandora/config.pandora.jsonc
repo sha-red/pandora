@@ -844,7 +844,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "showAnnotationsCalendar": true,
             "showAnnotationsMap": true,
             "showBrowser": true,
-            "showCalendarControls": true, // fixme: should be false
+            "showCalendarControls": false,
             "showClips": true,
             "showDocument": true,
             "showFilters": true,
