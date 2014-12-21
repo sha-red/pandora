@@ -165,7 +165,7 @@ def find(request, data):
     Leaving out `keys` or passing `positions` can be useful when building a
     responsive UI: First leave out `keys` to get totals as fast as possible,
     then pass `positions` to get the positions of previously selected items,
-    finally make the query with `keys` and an appropriate range.
+    finally make the query with the `keys` you need and an appropriate `range`.
     For more examples, see https://wiki.0x2620.org/wiki/pandora/QuerySyntax.
     see: add, edit, get, lookup, remove, upload
     '''
