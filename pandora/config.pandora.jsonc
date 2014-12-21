@@ -140,7 +140,8 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     ],
     /*
     "itemKeys" defines the metadata associated with each item. Required keys
-    are "*", "id" and "title".
+    are "*", "id" and "title". Adding a key with "random" as id will produce a
+    random value; this can be used for a "random" sort order.
     An itemKey must have the following properties:
         "id": The id of the key (as known by the server)
         "title": The title of the key (as displayed by the client)
@@ -149,6 +150,9 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             this type). If type is "layer", this is a reference to the
             annotations layer with the same id.
     and can have any of the following properties:
+        "additionalSort": Ordered list of {key, operator} objects, where key is
+            another itemKey and operator is "+" or "-". This can be used to
+            override user.ui.listSort when results are sorted by this key.
         "autocomplete": If true, the find element will provide autocomplete
         "autocompleteSort": Sort order of autocomplete suggestions
         "capability": A capability required to see data for this key
