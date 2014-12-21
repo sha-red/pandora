@@ -111,7 +111,7 @@ pandora.ui.apiDialog = function() {
         
     });
 
-    function getDoc(string) {
+    function getDoc(id) {
         /*
         API Documentation format:
         Description
@@ -128,13 +128,17 @@ pandora.ui.apiDialog = function() {
         notes: Notes
         see: action, action, ...
         */
-        var $doc = Ox.SyntaxHighlighter({
+        var string = actions[id].doc + '\nsource: ' + actions[id].code[0],
+            $doc = Ox.SyntaxHighlighter({
                     source: '\n' + string.replace(
-                        /\n(?=(takes \{|returns \{|notes: |see: ))/g, '\n\n'
+                        /\n(?=(takes \{|returns \{|notes: |see: |source: ))/g,
+                        '\n\n'
                     ).replace(
-                        /(takes|returns|notes|see)(?=( \{|: ))/g, 'BOLD$1BOLD'
+                        /(takes|returns|notes|see|source)(?=( \{|: ))/g,
+                        'BOLD$1BOLD'
                     ).replace(
-                        /`/g, 'BOLD'
+                        /`/g,
+                        'BOLD'
                     )
                 })
                 .css({backgroundColor: 'rgba(0, 0, 0, 0)'}),
@@ -234,23 +238,18 @@ pandora.ui.apiDialog = function() {
     }
 
     that.select = function(id) {
+        var $code;
         if (id && actions[id]) {
             $text.empty();
-            var code = actions[id].code[1],
-                source = actions[id].code[0],
-                line = Math.round(Ox.last(source.split(':')) || 0),
-                $code;
             $('<h1>')
                 .css({paddingLeft: '4px'})
                 .html('<tt><b>' + id + '</b></tt>')
                 .appendTo($text);
-            getDoc(actions[id].doc).appendTo($text),
-            $('<div>')
-                .css({paddingLeft: '4px'})
-                .html('<br><tt><b>source</b>: ' + source + '</tt>')
-                .appendTo($text);
+            getDoc(id).appendTo($text);
             $code = Ox.SyntaxHighlighter({
-                    source: code.replace(/\s*?'''[\s\S]+?'''/g, ''),
+                    source: actions[id].code[1].replace(
+                        /\s*?'''[\s\S]+?'''/g, ''
+                    ),
                 })
                 .css({
                     backgroundColor: 'rgba(0, 0, 0, 0)',
