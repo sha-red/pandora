@@ -192,7 +192,7 @@ actions.register(removeListItems, cache=False)
 @login_required_json
 def orderListItems(request, data):
     '''
-    Sets the manual orderings of items in a given list
+    Sets the manual ordering of items in a given list
     takes {
        list: string, // list id
        ids: [string] // ordered list of item ids

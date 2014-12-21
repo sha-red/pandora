@@ -200,7 +200,7 @@ def _order_clips(edit, sort):
 
 def sortClips(request, data):
     '''
-    Updates sort order of clips within an edit
+    Updates the sort order of clips within an edit
     takes {
         edit: string, // edit id
         sort: object // sort
@@ -480,6 +480,7 @@ actions.register(unsubscribeFromEdit, cache=False)
 @login_required_json
 def sortEdits(request, data):
     '''
+    Sets the order of edits in a given section
     takes {
         section: string, // 'personal', 'favorite' or 'featured'
         ids: [string] // ordered list of edit ids

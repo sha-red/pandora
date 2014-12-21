@@ -213,7 +213,7 @@ actions.register(signup, cache=False)
 
 def resetPassword(request, data):
     '''
-    Resets password for a given user
+    Resets the password for a given user
     takes {
         username: string, // username
         password: string, // password

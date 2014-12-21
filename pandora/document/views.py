@@ -247,7 +247,7 @@ actions.register(removeDocument, cache=False)
 @login_required_json
 def sortDocuments(request, data):
     '''
-    Sets the sort order for the documents related to a given item
+    Sets the sort order for the documents associated with a given item
     takes {
         item: string, // item id
         ids: [string] // ordered list of document ids

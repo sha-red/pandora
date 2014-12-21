@@ -311,7 +311,7 @@ actions.register(unsubscribeFromText, cache=False)
 @login_required_json
 def sortTexts(request, data):
     '''
-    Sets manual ordering of texts in a given folder
+    Sets the order of texts in a given section
     takes {
         section: string, // 'personal', 'favorite' or 'featured'
         ids: [string] // ordered list of text ids

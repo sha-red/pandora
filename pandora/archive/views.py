@@ -341,7 +341,7 @@ def direct_upload(request):
 @login_required_json
 def taskStatus(request, data):
     '''
-    Gets the status for a task
+    Gets the status for a given task
     takes {
         taskId: string // taskId
     }

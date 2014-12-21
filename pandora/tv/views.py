@@ -11,7 +11,7 @@ from ox.django.api import actions
 
 def tv(request, data):
     '''
-    Gets TV program for a given list
+    Gets the current TV program for a given list
     takes {
         list: string // list name
     }
