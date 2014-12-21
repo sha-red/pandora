@@ -175,6 +175,8 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             results in an itemKey whose boolean value indicates the presence or
             absence of a userLevel-dependent capability. This can be used to
             create queries and lists like "all items this user can play" etc.
+        "values": [value, value, ...] Ordered list of values, in case "type" is
+            "enum"
     */
     "itemKeys": [
         {
@@ -634,7 +636,9 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     "personalLists" specifies which pre-defined lists a new member will have
     after signup. "title" is required. If "query" is present, this defines a
     smart list. "query" can be any pan.do/ra query object, see /api/find for
-    further documentation.
+    further documentation. If you need to reference the username (for example
+    in order to include a default "My Videos" list), you can use the syntax
+    {"user": "{username}"}
     */
     "personalLists": [
         {"title": "Favorites"}
