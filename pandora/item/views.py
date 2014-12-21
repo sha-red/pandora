@@ -160,6 +160,8 @@ def find(request, data):
     notes: Comparison operators are '=' (contains) '==' (is), '^' (starts with),
     '$' (ends with), '<', '<=', '>', or '>=', each optionally prefixed with '!'
     (not).
+    To make a query for "all videos in groups that the user is in", pass
+    "groups" as key and "$my" as value.
     Leaving out `keys` or passing `positions` can be useful when building a
     responsive UI: First leave out `keys` to get totals as fast as possible,
     then pass `positions` to get the positions of previously selected items,
