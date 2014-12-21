@@ -3,7 +3,7 @@
 pan.do/ra Configuration
 -------------------------------------------------------------------------------
 You can edit this file. Most changes are effective immediately; everything that
-affects the database layout (adding a new itemKey, annotation layer etc.) will
+affects the database layout (adding a new item key, annotation layer etc.) will
 require a server restart. You may also want to take a look at the configuration
 examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
 */
@@ -97,7 +97,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     "entities" can be used to store arbitrary data. They can be referenced in
     annotations, info view, or elsewhere. Each entry defines a specific class
     of entity object, its properties and their types (for example an "actor"
-    with "name", "biography", "photo" etc). The HTML representation for
+    with "name", "biography", "portrait" etc). The HTML representation for
     entities can be customized by adding "/static/js/entity.SITENAME.js".
     Each entity has the following properties:
         "id": Unique internal ID (can be referenced in "layers")
@@ -111,7 +111,20 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     "id" and "name" keys are required. If "additionalNames" is present, these
     will act as synonyms when autocompleting values entered as annotations.
     */
-    "entities": [],
+    "entities": [
+        {
+            "id": "people",
+            "title": "People",
+            "keys": [
+                {"id": "id", "title": "ID", "type": "string"},
+                {"id": "name", "title": "Name", "type": "string"},
+                {"id": "additionalNames", "title": "Additional Names", "type": ["string"]},
+                {"id": "biography", "title": "Biography", "type": "text"},
+                {"id": "portrait", "title": "Portrait", "type": "document"}
+            ],
+            "sortType": "person"
+        }
+    ],
     /*
     If "flags" is set to true, then filters for countries and languages will
     appear with a flag icon.
