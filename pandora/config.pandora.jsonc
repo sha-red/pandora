@@ -158,7 +158,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     are "*", "id" and "title". Adding a key with "random" as id will produce a
     random value; this can be used for a "random" sort order.
     An itemKey must have the following properties:
-        "id": The unique id of the key (as known by the server)
+        "id": The unique id of the key (as used by the server)
         "title": The title of the key (as displayed by the client)
         "type": Can be "boolean", "date", "enum", "float", "hue", "integer",
             "layer", "string", "text", "time" or ["..."] (list of values of
