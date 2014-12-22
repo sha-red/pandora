@@ -52,6 +52,14 @@ pandora.ui.documentsDialog = function() {
                 resize: $content.updateSize
             });
 
+    that.superClose = that.close;
+    that.close = function() {
+        Ox.Request.clearCache('findDocuments');
+        that.superClose();
+        // needed in documentDialog to determine if isItemView
+        delete pandora.$ui.documentsDialog;
+    };
+
     function addDocuments() {
         pandora.api.addDocument({
             item: pandora.user.ui.item,
@@ -66,14 +74,6 @@ pandora.ui.documentsDialog = function() {
             }
         });
     }
-
-    that.superClose = that.close;
-    that.close = function() {
-        Ox.Request.clearCache('findDocuments');
-        that.superClose();
-        // needed in documentDialog to determine if isItemView
-        delete pandora.$ui.documentsDialog;
-    };
 
     return that;
 
