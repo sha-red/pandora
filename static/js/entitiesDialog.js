@@ -292,6 +292,13 @@ pandora.ui.entitiesDialog = function(options) {
             }
         });
 
+    that.superClose = that.close;
+    that.close = function() {
+        Ox.Request.clearCache('findEntities');
+        that.superClose();
+        delete pandora.$ui.documentsDialog;
+    };
+
     selectEntities();
 
     function addEntity() {
