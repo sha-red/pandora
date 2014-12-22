@@ -269,7 +269,7 @@ def findPlaces(request, data):
     return render_to_json_response(response)
 actions.register(findPlaces)
 
-def getPlaceNames(request, data):
+def getPlaces(request, data):
     '''
     Gets place names and matches
     takes {}
@@ -282,7 +282,7 @@ def getPlaceNames(request, data):
             ... // more places
         ]
     }
-    see: getEventNames
+    see: getEvents
     '''
     response = json_response({})
     layers = [l['id'] for l in filter(lambda l: l['type'] == 'place',
@@ -295,4 +295,4 @@ def getPlaceNames(request, data):
         'matches': i['value__count']
     } for i in items]
     return render_to_json_response(response)
-actions.register(getPlaceNames)
+actions.register(getPlaces)

@@ -53,7 +53,7 @@ pandora.ui.placesDialog = function(options) {
             height: height - 48,
             mode: pandora.site.map == 'auto' ? 'add' : 'define',
             names: pandora.hasPlacesLayer ? function(callback) {
-                pandora.api.getPlaceNames(function(result) {
+                pandora.api.getPlaces(function(result) {
                     callback(result.data.items);
                 });
             } : null,

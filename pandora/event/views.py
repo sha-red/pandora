@@ -214,7 +214,7 @@ def findEvents(request, data):
     return render_to_json_response(response)
 actions.register(findEvents)
 
-def getEventNames(request, data):
+def getEvents(request, data):
     '''
     Gets event names and matches
     takes {}
@@ -227,7 +227,7 @@ def getEventNames(request, data):
             ... // more events
         ]
     }
-    see: getPlaceNames
+    see: getPlaces
     '''
     response = json_response({})
     layers = [l['id'] for l in filter(lambda l: l['type'] == 'event',
@@ -240,4 +240,4 @@ def getEventNames(request, data):
         'matches': i['value__count']
     } for i in items]
     return render_to_json_response(response)
-actions.register(getEventNames)
+actions.register(getEvents)
