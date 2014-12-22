@@ -15,12 +15,14 @@ pandora.ui.filter = function(id) {
                     align: 'left',
                     id: 'name',
                     format: function(value) {
-                        return pandora.site.flags && ['country', 'language'].indexOf(id) > -1
+                        return filter.flag
                             ? $('<div>')
                                 .append(
                                     $('<img>')
                                         .attr({src: Ox[
-                                            id == 'country' ? 'getFlagByGeoname' : 'getFlagByLanguage'
+                                            filter.flag == 'country'
+                                                ? 'getFlagByGeoname'
+                                                : 'getFlagByLanguage'
                                         ](value, 16)})
                                         .css({
                                             float: 'left',
@@ -35,7 +37,8 @@ pandora.ui.filter = function(id) {
                                         .addClass('flagname')
                                         .css({
                                             float: 'left',
-                                            width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE,
+                                            width: pandora.user.ui.filterSizes[i]
+                                                - 68 - Ox.UI.SCROLLBAR_SIZE,
                                             textOverflow: 'ellipsis',
                                             overflowX: 'hidden'
                                         })

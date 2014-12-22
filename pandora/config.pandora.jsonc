@@ -126,11 +126,6 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         }
     ],
     /*
-    If "flags" is set to true, then filters for countries and languages will
-    appear with a flag icon.
-    */
-    "flags": false,
-    /*
     "help" specifies the sections of the help dialog.
     */
     "help": [
@@ -176,6 +171,8 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             this key can be added in list view.
         "filter": If true, one can filter results by this key
         "find": If true, this key will appear as an option in the find element
+        "flag": Can be "country" or "language". If set (and filter is true), a
+            flag icon corresponding to the field's value will be displayed.
         "format": {type: string, args: [value, value, ...]}, used for special
             formatting. This will invoke Ox.formatType(args). For details, see
             https://oxjs.org/#doc/Ox.formatArea etc.
@@ -263,6 +260,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "columnWidth": 180,
             "filter": true,
             "find": true,
+            "flag": "country",
             "sort": true
         },
         {

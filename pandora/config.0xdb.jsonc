@@ -87,10 +87,6 @@
     */
     "clipLayers": ["subtitles"],
     /*
-        "flags" sets if in filters, countries and languages have a flag icon.
-    */
-    "flags": true,
-    /*
         "help" specifies the sections of the help dialog.
         There isn't much of a point in making changes to this.
     */
@@ -177,6 +173,7 @@
             "columnWidth": 120,
             "filter": true,
             "find": true,
+            "flag": "country",
             "sort": true
         },
         {
@@ -198,6 +195,7 @@
             "columnWidth": 120,
             "filter": true,
             "find": true,
+            "flag": "language",
             "sort": true
         },
         {
