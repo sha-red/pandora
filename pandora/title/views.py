@@ -43,6 +43,29 @@ def editTitle(request, data):
     return render_to_json_response(response)
 actions.register(editTitle, cache=False)
 
+def getSortTitle(request, data):
+    '''
+    Gets the sort title for one or more titles
+    takes {
+        title: string, // either title
+        titles: [string] // or list of titles
+    }
+    returns {
+        title: sortTitle, // sort title for this title
+        ... // more results
+    }
+    see: editTitle, findTitles
+    '''
+    titles = data.get('titles', [])
+    if 'title' in data:
+        titles.append(data['title'])
+    response = json_response()
+    response['data'] = {}
+    for title in titles:
+        response['data'][title] = models.get_title_sort(title)
+    return render_to_json_response(response)
+actions.register(getSortTitle, cache=False)
+
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]

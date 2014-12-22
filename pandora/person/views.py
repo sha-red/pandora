@@ -43,7 +43,7 @@ def editName(request, data):
     return render_to_json_response(response)
 actions.register(editName, cache=False)
 
-def sortName(request, data):
+def getSortName(request, data):
     '''
     Gets the sort name for one or more names
     takes {
@@ -64,7 +64,7 @@ def sortName(request, data):
     for name in names:
         response['data'][name] = models.get_name_sort(name)
     return render_to_json_response(response)
-actions.register(sortName, cache=False)
+actions.register(getSortName, cache=False)
 
 def parse_query(data, user):
     query = {}
