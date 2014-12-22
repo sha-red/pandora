@@ -795,8 +795,7 @@
         "id": "indiancinema",
         "name": "Indiancine.ma",
         "sendReferrer": true,
-        "url": "indiancine.ma",
-        "videoprefix": ""
+        "url": "indiancine.ma"
     },
     /*
     */

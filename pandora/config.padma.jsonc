@@ -681,8 +681,7 @@
         "id": "padma",
         "name": "Pad.ma",
         "sendReferrer": true,
-        "url": "pad.ma",
-        "videoprefix": ""
+        "url": "pad.ma"
     },
     /*
     */

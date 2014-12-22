@@ -192,7 +192,8 @@ POSTER_PRECEDENCE = ()
 
 USE_IMDB = False
 
-#if you set VIDEO_PREFIX make sure cookies work accros subsomains
+#If you set VIDEO_PREFIX make sure cookies work accros subsomains
+#by setting SESSION_COOKIE_DOMAIN to ".domain.tld"
 VIDEO_PREFIX=''
 #VIDEO_PREFIX = '//video{uid}.example.com'
 MEDIA_PREFIX=''
