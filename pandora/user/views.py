@@ -796,7 +796,7 @@ actions.register(setUI, cache=False)
 
 
 @capability_required_json('canManageUsers')
-def statistics(request, data):
+def getStatistics(request, data):
     '''
     Gets usage statistics
     takes {}
@@ -813,7 +813,7 @@ def statistics(request, data):
         stats = Settings.get('statistics')
     response['data'] = stats
     return render_to_json_response(response)
-actions.register(statistics, cache=False)
+actions.register(getStatistics, cache=False)
 
 
 def group_json(g):

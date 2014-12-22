@@ -84,7 +84,7 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel;
 
-    pandora.api.statistics(function(result) {
+    pandora.api.getStatistics(function(result) {
 
         var data = result.data,
             flagCountry = {},
