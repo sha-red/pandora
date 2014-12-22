@@ -87,7 +87,7 @@ class Annotation(models.Model):
     #FIXME: here having a item,start index would be good
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name='annotations')
     item = models.ForeignKey('item.Item', related_name='annotations')
     clip = models.ForeignKey('clip.Clip', null=True, related_name='annotations')
 
