@@ -296,7 +296,7 @@ pandora.ui.entitiesDialog = function(options) {
     that.close = function() {
         Ox.Request.clearCache('findEntities');
         that.superClose();
-        delete pandora.$ui.documentsDialog;
+        delete pandora.$ui.entitiesDialog;
     };
 
     selectEntities();
