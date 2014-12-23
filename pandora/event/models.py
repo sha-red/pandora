@@ -12,7 +12,6 @@ from item.models import Item
 from item import utils
 from person.models import get_name_sort
 from title.models import get_title_sort
-from changelog.models import Changelog
 
 import managers
 

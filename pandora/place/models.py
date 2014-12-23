@@ -10,7 +10,6 @@ from ox.django import fields
 import managers
 from annotation.models import Annotation, get_matches, get_super_matches
 from item.models import Item
-from changelog.models import Changelog
 
 
 class Place(models.Model):

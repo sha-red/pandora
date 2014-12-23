@@ -14,7 +14,6 @@ import ox
 
 from clip.models import Clip
 from entity.models import Entity
-from changelog.models import Changelog
 
 from item.utils import sort_string, get_by_key
 import managers
