@@ -449,7 +449,7 @@ class Clip(models.Model):
             if value:
                 data[key] = value
         data['duration'] = data['out'] - data['in']
-        data['cuts'] = tuple([c for c in self.item.get('cuts') if c > self.start and c < self.end])
+        data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
         data['layers'] = self.get_layers(user)
         return data
 
