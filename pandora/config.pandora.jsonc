@@ -108,7 +108,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     Each key has the properties "id", "title" and "type". "type" can be
     "boolean", "number", "string", "text", "document" (reference to the id of a
     document added via "Manage Documents") or ["string"] (list of strings).
-    "id" and "name" keys are required. If "additionalNames" is present, these
+    "id" and "name" keys are required. If "alternativeNames" is present, these
     will act as synonyms when autocompleting values entered as annotations.
     */
     "entities": [
