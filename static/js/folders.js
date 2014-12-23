@@ -33,8 +33,8 @@ pandora.ui.folders = function(section) {
             if (pandora.user.level == 'guest') {
                 extras = [
                     infoButton(Ox._('Personal ' + folderItems),
-                        Ox._('To create and share your own list of {0} please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLowerCase())]),
-                        Ox._('To create and share your own {0} please sign up or sign in.', [section]))
+                        Ox._('To create and share your own lists of {0}, please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLowerCase())]),
+                        Ox._('To create and share your own {0}, please sign up or sign in.', [section]))
                 ];
             } else {
                 if (section == 'items') {
@@ -186,7 +186,7 @@ pandora.ui.folders = function(section) {
         } else if (folder.id == 'favorite') {
             if (pandora.user.level == 'guest') {
                 extras = [infoButton(Ox._('Favorite ' + folderItems),
-                    Ox._('To browse and subscribe to shared {0} from other users, please sign up or sign in.', [Ox._(folderItems.toLowerCase())]))];
+                    Ox._('To browse and subscribe to {0} shared by other users, please sign up or sign in.', [Ox._(folderItems.toLowerCase())]))];
             } else {
                 extras = [pandora.$ui.manageListsButton['favorite'] = Ox.Button({
                     selectable: true,
