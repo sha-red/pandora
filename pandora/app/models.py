@@ -6,8 +6,6 @@ import json
 
 from django.db import models
 
-from changelog.models import Changelog
-
 import monkey_patch
 
 class Page(models.Model):

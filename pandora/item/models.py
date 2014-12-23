@@ -34,7 +34,6 @@ from data_api import external_data
 
 from annotation.models import Annotation
 from archive import extract
-from changelog.models import Changelog
 from clip.models import Clip
 from entity.models import Entity
 from person.models import get_name_sort

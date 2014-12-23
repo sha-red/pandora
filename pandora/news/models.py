@@ -5,7 +5,6 @@ from __future__ import division, with_statement
 from django.db import models
 import ox
 
-from changelog.models import Changelog
 import managers
 
 
