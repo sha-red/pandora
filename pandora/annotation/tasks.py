@@ -77,6 +77,7 @@ def add_annotations(data):
     else:
         layer = layer[0]
     user = User.objects.get(username=data['user'])
+    annotation = None
     for a in data['annotations']:
         if layer['type'] == 'entity':
             try:
@@ -95,11 +96,12 @@ def add_annotations(data):
     #update facets if needed
     if layer_id in item.facet_keys:
         item.update_layer_facet(layer_id)
-    Item.objects.filter(id=item.id).update(modified=annotation.modified)
-    annotation.item.modified = annotation.modified
-    annotation.item.update_find()
-    annotation.item.update_sort()
-    annotation.item.update_facets()
+    if annotation:
+        Item.objects.filter(id=item.id).update(modified=annotation.modified)
+        annotation.item.modified = annotation.modified
+        annotation.item.update_find()
+        annotation.item.update_sort()
+        annotation.item.update_facets()
     return True
 
 @task(ignore_results=True, queue='default')
