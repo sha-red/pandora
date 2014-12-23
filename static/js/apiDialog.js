@@ -35,10 +35,10 @@ pandora.ui.apiDialog = function() {
             keys: {escape: 'close'},
             maximizeButton: true,
             minHeight: 256,
-            minWidth: 544 + Ox.UI.SCROLLBAR_SIZE,
+            minWidth: 544 + 2 + Ox.UI.SCROLLBAR_SIZE,
             removeOnClose: true,
             title: Ox._('API Documentation'),
-            width: 672 + Ox.UI.SCROLLBAR_SIZE
+            width: 672 + 2 + Ox.UI.SCROLLBAR_SIZE
         })
         .bindEvent({
             close: function() {
