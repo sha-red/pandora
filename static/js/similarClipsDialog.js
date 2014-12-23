@@ -8,6 +8,7 @@ pandora.ui.similarClipsDialog = function() {
             height: Math.round((window.innerHeight - 48) * 0.9),
             width: Math.round(window.innerWidth * 0.9)
         },
+        itemTitleKeys = pandora.site.itemTitleKeys,
         left = getLeft(),
         fixedRatio = pandora.site.video.previewRatio,
         fps = 25,
@@ -70,7 +71,7 @@ pandora.ui.similarClipsDialog = function() {
             .appendTo($toolbar),
 
         $sortSelect = Ox.Select({
-                items: ['title', 'director', 'position', 'duration'].map(function(id) {
+                items: itemTitleKeys.concat(['position', 'duration']).map(function(id) {
                     var item = Ox.getObjectById(pandora.site.itemKeys, id)
                             || Ox.getObjectById(pandora.site.clipKeys, id),
                         title = Ox._(item ? item.title : Ox.toTitleCase(id));
@@ -209,7 +210,7 @@ pandora.ui.similarClipsDialog = function() {
         $status && $status.html(Ox._('Loading...'));
         pandora.api.get({
             id: item.id,
-            keys: ['director', 'duration', 'title', 'videoRatio']
+            keys: itemTitleKeys.concat(['duration', 'videoRatio'])
         }, function(result) {
             Ox.extend(item, result.data);
             pandora.api.getSequence({
@@ -268,7 +269,7 @@ pandora.ui.similarClipsDialog = function() {
                                     }
                                 }), callback);
                             },
-                            keys: ['director', 'id', 'title', 'videoRatio'],
+                            keys: itemTitleKeys.concat(['id', 'videoRatio']),
                             max: 1,
                             orientation: 'both',
                             size: 128,
@@ -351,7 +352,7 @@ pandora.ui.similarClipsDialog = function() {
             height: height,
             id: data.id,
             info: Ox.formatDuration(data['in'], 2) + '-' + Ox.formatDuration(data.out, 2),
-            title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+            title: pandora.getItemTitle(data),
             url: pandora.getMediaURL('/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg'),
             width: width
         };
