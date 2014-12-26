@@ -197,7 +197,7 @@ pandora.ui.mainMenu = function() {
                     getFindMenu(),
                     { id: 'dataMenu', title: Ox._('Data'), items: [
                         { id: 'documents', title: Ox._('Manage Documents...'), disabled: !pandora.site.capabilities.canManageDocuments[pandora.user.level] },
-                        { id: 'entities', title: Ox._('Manage Entities...'), disabled: !pandora.site.capabilities.canManageEntities[pandora.user.level] },
+                        { id: 'entities', title: Ox._('Manage Entities...'), disabled: !pandora.site.entities.length || !pandora.site.capabilities.canManageEntities[pandora.user.level] },
                         {},
                         { id: 'titles', title: Ox._('Manage Titles...'), disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
                         { id: 'names', title: Ox._('Manage Names...'), disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
