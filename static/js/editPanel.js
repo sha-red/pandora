@@ -366,6 +366,18 @@ pandora.ui.editPanel = function(isEmbed) {
                 .css({padding: '16px'})
                 .appendTo(that),
             isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level];
+        Ox.EditableContent({
+                editable: false,
+                value: Ox._('{0} Edits', [pandora.site.site.name]),
+            })
+            .css({
+                height: '32px',
+                fontSize: '18px',
+            })
+            .appendTo($content);
+        Ox.Element()
+            .css({height: '16px'})
+            .appendTo($content);
         pandora.api.getPage({name: 'edits'}, function(result) {
             Ox.EditableContent({
                     clickLink: pandora.clickLink,
