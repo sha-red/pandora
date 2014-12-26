@@ -1609,7 +1609,7 @@ pandora.getSpan = function(state, val, callback) {
             });
         } else {
             isName = val[0] == '@';
-            isVideoView = pandora.isVideoView(state.view);
+            isVideoView = pandora.isVideoView(state.view, state.item);
             canBeAnnotation = state.item && (!state.view || isVideoView) && !isName;
             canBeEvent = !state.view || state.view == 'calendar';
             canBePlace = !state.view || state.view == 'map';
@@ -1618,7 +1618,7 @@ pandora.getSpan = function(state, val, callback) {
                 if (id) {
                     Ox.Log('URL', 'id?', id)
                     state.span = id;
-                    state.view = pandora.user.ui.videoView;
+                    state.view = state.view || pandora.user.ui.videoView;
                     callback();
                 } else {
                     getId(canBePlace ? 'place' : '', function(id) {
