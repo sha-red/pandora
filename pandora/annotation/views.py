@@ -278,17 +278,17 @@ def editAnnotation(request, data):
     if a.editable(request.user):
         layer = get_by_id(settings.CONFIG['layers'], a.layer)
         for key in ('value', 'in', 'out'):
-            if key == 'value' and layer['type'] == 'entity':
-                try:
-                    value = Entity.get_by_name(data['value']).get_id()
-                except Entity.DoesNotExist:
-                    response['data'] = a.json()
-                    response['data']['editable'] = True
-                    response['status']['text'] = 'unkown entity'
-                    return render_to_json_response(response)
-            else:
-                value = data[key]
             if key in data:
+                if key == 'value' and layer['type'] == 'entity':
+                    try:
+                        value = Entity.get_by_name(data['value']).get_id()
+                    except Entity.DoesNotExist:
+                        response['data'] = a.json()
+                        response['data']['editable'] = True
+                        response['status']['text'] = 'unkown entity'
+                        return render_to_json_response(response)
+                else:
+                    value = data[key]
                 setattr(a, {
                     'in': 'start',
                     'out': 'end'
