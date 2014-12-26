@@ -362,6 +362,7 @@ pandora.ui.editPanel = function(isEmbed) {
         that.css({
             'overflow-y': 'auto'
         });
+        Ox.Bar({size: 24}).appendTo(that);
         var $content = Ox.Element()
                 .css({padding: '16px'})
                 .appendTo(that),
