@@ -97,7 +97,7 @@ def load_config():
                         c[part] = {}
                 c = c[part]
             if isinstance(d, list):
-                if not c:
+                if not c and section not in ('entities', ):
                     c += d
                     sys.stderr.write("adding default value for %s = %s\n" % (
                         section, str(d)))
