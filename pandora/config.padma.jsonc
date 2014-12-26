@@ -50,6 +50,7 @@
         "canExportAnnotations": {"member": true, "staff": true, "admin": true},
         "canImportAnnotations": {"member": true, "staff": true, "admin": true},
         "canManageDocuments": {"member": true, "staff": true, "admin": true},
+        "canManageEntities": {"member": true, "staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "staff": true, "admin": true},
         "canManageTitlesAndNames": {"member": true, "staff": true, "admin": true},
         "canManageUsers": {"staff": true, "admin": true},
@@ -85,6 +86,7 @@
         included in find annotations. // FIXME: the last bit is not implemented.
     */
     "clipLayers": ["transcripts", "keywords", "places", "events", "descriptions"],
+    "entities": [],
     /*
         "flags" sets if in filters, countries and languages have a flag icon.
     */
@@ -108,6 +110,7 @@
         {"id": "player", "title": "Player"},
         {"id": "editor", "title": "Editor"},
         {"id": "documents", "title": "Documents"},
+        {"id": "entities", "title": "Entities"},
         {"id": "edits", "title": "Edits"},
         {"id": "texts", "title": "Texts"},
         {"id": "embeds", "title": "Embeds"}
@@ -769,6 +772,9 @@
             ],
             "editView": "list",
             "embedSize": 256,
+            "entity": "",
+            "entitiesSelection": {},
+            "entitiesType": "",
             "filters": [
                 {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "project", "sort": [{"key": "name", "operator": "+"}]},
