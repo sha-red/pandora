@@ -199,58 +199,69 @@ pandora.ui.listGeneralPanel = function(listData) {
                     submit: editName
                 })
                 .appendTo(that),
-            $itemsInput = ui.section != 'texts'
+            $select = (ui.section == 'items'
+                ? Ox.Select({
+                        items: pandora.site.listViews.map(function(view) {
+                            return {id: view.id, title: view.title};
+                        }),
+                        label: Ox._('View'),
+                        labelWidth: 80,
+                        value: listData.view,
+                        width: 320
+                    })
+                    .bindEvent({
+                        change: editView
+                    })
+                : ui.section != 'texts'
+                    ? Ox.Input({
+                            disabled: true,
+                            label: Ox._('Items'),
+                            labelWidth: 80,
+                            value: listData.items,
+                            width: 320
+                        })
+                    : Ox.Select({
+                            items: pandora.site.textRightsLevels.map(function(rightsLevel, i) {
+                                console.log(listData);
+                                return {
+                                    id: i,
+                                    title: rightsLevel.name,
+                                };
+                            }),
+                            label: Ox._('Rights Level'),
+                            labelWidth: 80,
+                            value: listData.rightslevel,
+                            width: 320
+                        })
+                        .bindEvent({
+                            change: editRightsLevel
+                        })
+                )
+                .css({position: 'absolute', left: '160px', top: '40px'})
+                .appendTo(that),
+            $statusSelect = (listData.status == 'featured'
                 ? Ox.Input({
                         disabled: true,
-                        label: Ox._('Items'),
+                        label: Ox._('Status'),
                         labelWidth: 80,
-                        value: listData.items,
+                        value: 'Featured',
                         width: 320
                     })
-                    .css({position: 'absolute', left: '160px', top: '40px'})
-                    .appendTo(that)
                 : Ox.Select({
-                        items: pandora.site.textRightsLevels.map(function(rightsLevel, i) {
-                            console.log(listData);
-                            return {
-                                id: i,
-                                title: rightsLevel.name,
-                            };
-                        }),
-                        label: Ox._('Rights Level'),
+                        items: [
+                            {id: 'private', title: Ox._('Private')},
+                            {id: 'public', title: Ox._('Public')}
+                        ],
+                        label: Ox._('Status'),
                         labelWidth: 80,
-                        value: listData.rightslevel,
+                        value: listData.status,
                         width: 320
                     })
-                    .css({position: 'absolute', left: '160px', top: '40px'})
                     .bindEvent({
-                        change: editRightsLevel
+                        change: editStatus
                     })
-                    .appendTo(that),
-            $statusSelect = listData.status == 'featured'
-                ? Ox.Input({
-                    disabled: true,
-                    label: Ox._('Status'),
-                    labelWidth: 80,
-                    value: 'Featured',
-                    width: 320
-                })
+                )
                 .css({position: 'absolute', left: '160px', top: '64px'})
-                .appendTo(that)
-                : Ox.Select({
-                    items: [
-                        {id: 'private', title: Ox._('Private')},
-                        {id: 'public', title: Ox._('Public')}
-                    ],
-                    label: Ox._('Status'),
-                    labelWidth: 80,
-                    value: listData.status,
-                    width: 320
-                })
-                .css({position: 'absolute', left: '160px', top: '64px'})
-                .bindEvent({
-                    change: editStatus
-                })
                 .appendTo(that),
             $subscribersInput = Ox.Input({
                     disabled: true,
@@ -333,7 +344,23 @@ pandora.ui.listGeneralPanel = function(listData) {
             }, function(result) {
                 Ox.Request.clearCache('getText');
                 //fixme: reload text and folder list
-                $itemsInput.value(result.data.rightslevel);
+                $select.value(result.data.rightslevel);
+            });
+        }
+        function editView(data) {
+            var view = data.value;
+            pandora.api.editList({
+                id: listData.id,
+                view: view
+            }, function(result) {
+                $select.value(result.data.view);
+                Ox.Request.clearCache('findList');
+                pandora.$ui.folderList[
+                    result.data.status == 'featured'
+                    ? 'featured'
+                    : result.data.user == pandora.user.username
+                        ? 'personal' : 'favorite'
+                ].reloadList();
             });
         }
         function getDescriptionHeight() {

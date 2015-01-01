@@ -106,7 +106,7 @@ pandora.ui.folderList = function(id, section) {
                 operator: '+',
                 tooltip: function(data) {
                     return data.type == 'static'
-                        ? (data.user == pandora.user.username ? Ox._('Edit Default View') : Ox._('Default View: ...'))
+                        ? (data.user == pandora.user.username ? Ox._('Edit {0}', [Ox._(folderItem)]) : '')
                         : data.type == 'smart'
                         ? (data.user == pandora.user.username ? Ox._('Edit Query') : Ox._('Show Query'))
                         : data.type.toUpperCase();
@@ -264,7 +264,8 @@ pandora.ui.folderList = function(id, section) {
         columns: columns,
         droppable: id != 'volumes',
         items: items,
-        keys: ['modified'].concat(section != 'texts' ? ['query', 'name'] : ['rightslevel']),
+        keys: ['modified'].concat(section != 'texts'
+            ? ['query', 'name', 'view'] : ['rightslevel']),
         max: 1,
         min: 0,
         pageLength: 1000,
@@ -314,6 +315,8 @@ pandora.ui.folderList = function(id, section) {
             } else if (data.key == 'type') {
                 if (that.value(data.id, 'type') == 'smart') {
                     pandora.$ui.listDialog = pandora.ui.listDialog('query').open();
+                } else {
+                    pandora.$ui.listDialog = pandora.ui.listDialog('general').open();
                 }
             } else if (data.key == 'status') {
                 var status = that.value(data.id, data.key) == 'private' ? 'public' : 'private';
@@ -334,7 +337,7 @@ pandora.ui.folderList = function(id, section) {
                 pandora.api['unsubscribeFrom' + folderItem]({
                     id: data.ids[0]
                 }, function(result) {
-                    Ox.Request.clearCache(); // fixme: remove
+                    Ox.Request.clearCache('findList');
                     that.reloadList();
                 });
             } else if (id == 'featured' && canEditFeatured) {
@@ -343,9 +346,9 @@ pandora.ui.folderList = function(id, section) {
                     id: data.ids[0],
                     status: 'public'
                 }, function(result) {
+                    Ox.Request.clearCache('findList');
                     // fixme: duplicated
                     if (result.data.user == pandora.user.username || result.data.subscribed) {
-                        Ox.Request.clearCache(); // fixme: remove
                         pandora.$ui.folderList[
                             result.data.user == pandora.user.username ? 'personal' : 'favorite'
                         ].reloadList();
@@ -402,10 +405,15 @@ pandora.ui.folderList = function(id, section) {
                 pandora.UI.set({
                     find: {
                         conditions: list ? [
-                            {key: 'list', value: data.ids[0], operator: '=='}
+                            {key: 'list', value: list, operator: '=='}
                         ] : [],
                         operator: '&'
-                    }
+                    },
+                    listView: list
+                        ? pandora.user.ui.lists[list]
+                            ? pandora.user.ui.lists[list].view
+                            : that.value(list).view
+                        : void 0
                 });
             } else {
                 pandora.UI.set(section.slice(0, -1), list);
