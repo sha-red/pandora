@@ -650,6 +650,7 @@ pandora.ui.mediaView = function(options) {
                             } else if (done) {
                                 Ox.Request.clearCache();
                                 pandora.updateItemContext();
+                                pandora.$ui.info && pandora.$ui.info.updateInfo();
                             }
                         }
                     });

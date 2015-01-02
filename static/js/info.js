@@ -166,6 +166,10 @@ pandora.ui.info = function() {
         }
     };
 
+    that.updateInfo = function() {
+        updateInfo();
+    };
+
     that.updateListInfo = function() {
         emptyInfo();
         that.empty().append(
