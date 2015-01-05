@@ -11,6 +11,7 @@ import tempfile
 import time
 import math
 import shutil
+from distutils.spawn import find_executable
 from glob import glob
 
 import numpy as np
@@ -21,8 +22,6 @@ from ox.utils import json
 from django.conf import settings
 
 img_extension='jpg'
-
-AVCONV = 'avconv'
 
 MAX_DISTANCE = math.sqrt(3 * pow(255, 2))
 
@@ -50,32 +49,18 @@ class AspectRatio(fractions.Fraction):
         return "%d:%d" % (self.numerator, self.denominator)
 
 def supported_formats():
-    p = subprocess.Popen(['which', AVCONV],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
-    stdout, stderr = p.communicate()
-    if not stdout.strip():
+    if not find_executable(settings.FFMPEG):
         return None
-    p = subprocess.Popen([AVCONV, '-codecs'],
+    p = subprocess.Popen([settings.FFMPEG, '-codecs'],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     return {
         'ogg': 'libtheora' in stdout and 'libvorbis' in stdout,
         'webm': 'libvpx' in stdout and 'libvorbis' in stdout,
-        'mp4': 'libx264' in stdout and 'libvo_aacenc' in stdout,
+        'mp4': 'libx264' in stdout and 'DEA.L. aac' in stdout,
     }
 
-def avconv_version():
-    p = subprocess.Popen([AVCONV],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
-    stdout, stderr = p.communicate()
-    version = stderr.split(' ')[2].split('-')[0]
-    try:
-        version = int(version.split('.')[0])
-    except:
-        pass
-    return version
-
-def stream(video, target, profile, info, avconv=None, audio_track=0):
+def stream(video, target, profile, info, audio_track=0):
     if not os.path.exists(target):
         ox.makedirs(os.path.dirname(target))
 
@@ -189,55 +174,13 @@ def stream(video, target, profile, info, avconv=None, audio_track=0):
                 '-auto-alt-ref', '1',
             ]
         if format == 'mp4':
-            #quicktime does not support bpyramid
-            '''
             video_settings += [
-                '-vcodec', 'libx264',
-                '-flags', '+loop+mv4',
-                '-cmp', '256',
-                '-partitions', '+parti4x4+parti8x8+partp4x4+partp8x8+partb8x8',
-                '-me_method', 'hex',
-                '-subq', '7',
-                '-trellis', '1',
-                '-refs', '5',
-                '-bf', '3',
-                '-flags2', '+bpyramid+wpred+mixed_refs+dct8x8',
-                '-coder', '1',
-                '-me_range', '16',
-                '-keyint_min', '25', #FIXME: should this be related to fps?
-                '-sc_threshold','40',
-                '-i_qfactor', '0.71',
-                '-qmin', '10', '-qmax', '51',
-                '-qdiff', '4'
+                '-c:v', 'libx264',
+                '-preset:v', 'medium',
+                '-profile:v', 'baseline',
+                # does not work with avconv in Ubuntu 14.04 yet
+                #'-level', '3.0',
             ]
-            '''
-            if settings.AVCONV_VERSION >= 9:
-                video_settings += [
-                    '-vcodec', 'libx264',
-                    '-preset:v', 'medium',
-                    '-profile:v', 'baseline',
-                    # does not work with avconv in Ubuntu 14.04 yet
-                    #'-level', '3.0',
-                ]
-            else:
-                video_settings += [
-                    '-vcodec', 'libx264',
-                    '-flags', '+loop+mv4',
-                    '-cmp', '256',
-                    '-partitions', '+parti4x4+parti8x8+partp4x4+partp8x8+partb8x8',
-                    '-me_method', 'hex',
-                    '-subq', '7',
-                    '-trellis', '1',
-                    '-refs', '5',
-                    '-bf', '0',
-                    '-flags2', '+mixed_refs',
-                    '-coder', '0',
-                    '-me_range', '16',
-                    '-sc_threshold', '40',
-                    '-i_qfactor', '0.71',
-                    '-qmin', '10', '-qmax', '51',
-                    '-qdiff', '4'
-                ]
         video_settings += ['-map', '0:%s,0:0'%info['video'][0]['id']]
     else:
         video_settings = ['-vn']
@@ -271,15 +214,13 @@ def stream(video, target, profile, info, avconv=None, audio_track=0):
         if audiobitrate:
             audio_settings += ['-ab', audiobitrate]
         if format == 'mp4':
-            audio_settings += ['-acodec', 'libvo_aacenc']
+            audio_settings += ['-c:a', 'aac', '-strict', '-2']
         else:
-            audio_settings += ['-acodec', 'libvorbis']
+            audio_settings += ['-c:a', 'libvorbis']
     else:
         audio_settings = ['-an']
 
-    if not avconv:
-        avconv = AVCONV
-    cmd = [avconv, '-y', '-i', video, '-threads', '4', '-map_metadata', '-1', '-sn'] \
+    cmd = [settings.FFMPEG, '-y', '-i', video, '-threads', '4', '-map_metadata', '-1', '-sn'] \
           + audio_settings \
           + video_settings
 
@@ -355,27 +296,11 @@ def frame(video, frame, position, height=128, redo=False, info=None):
         if redo or not exists(frame):
             ox.makedirs(folder)
             if video.endswith('.mp4'):
-                if settings.FFMPEG:
-                    cmd = ffmpeg_frame_cmd(video, frame, position, height)
-                else:
-                    cmd = avconv_frame_cmd(video, frame, position, height)
+                cmd = ffmpeg_frame_cmd(video, frame, position, height)
             else:
                 cmd = ['oxframe', '-i', video, '-o', frame,
                     '-p', str(position), '-y', str(height)]
             run_command(cmd)
-
-def avconv_frame_cmd(video, frame, position, height=128):
-    cmd = [
-        AVCONV, '-y',
-        '-ss', str(position),
-        '-i', video,
-        '-an', '-vframes', '1',
-        '-vf', 'scale=-1:%s' % height
-    ]
-    if not frame.endswith('.png'):
-        cmd += ['-f', 'mjpeg']
-    cmd += [frame]
-    return cmd
 
 def ffmpeg_frame_cmd(video, frame, position, height=128):
     cmd = [
@@ -383,24 +308,29 @@ def ffmpeg_frame_cmd(video, frame, position, height=128):
         '-ss', str(position),
         '-i', video,
         '-an', '-frames:v', '1',
-        '-vf', 'scale=-1:%s' % height,
+        '-vf', 'scale=-1:%s' % height if height else 'scale=iw*sar:ih',
         frame
     ]
     return cmd
+
+
+def ffmpeg_version():
+    p = subprocess.Popen([settings.FFMPEG],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+    stdout, stderr = p.communicate()
+    version = stderr.split(' ')[2].split('-')[0]
+    try:
+        version = tuple(map(int, version.split('.')))
+    except:
+        pass
+    return version
+
 
 def frame_direct(video, target, position):
     fdir = os.path.dirname(target)
     if fdir and not os.path.exists(fdir):
         os.makedirs(fdir)
-
-    pre = position - 2
-    if pre < 0:
-        pre = 0
-    else:
-        position = 2
-    cmd = [ox.file.cmd('ffmpeg'), '-y', '-ss', str(pre), '-i', video, '-ss', str(position),
-            '-vf', 'scale=iw*sar:ih',
-            '-an', '-vframes', '1', target]
+    cmd = ffmpeg_frame_cmd(video, target, position, None)
     r = run_command(cmd)
     return r == 0
 
@@ -595,13 +525,13 @@ def chop(video, start, end):
     ext = os.path.splitext(video)[1]
     choped_video = '%s/tmp%s' % (tmp, ext)
     cmd = [
-        'ffmpeg',
+        settings.FFMPEG,
         '-y',
         '-i', video,
         '-ss', '%.3f'%start,
         '-t', '%.3f'%t,
-        '-vcodec', 'copy',
-        '-acodec', 'copy',
+        '-c:v', 'copy',
+        '-c:a', 'copy',
         '-f', ext[1:],
         choped_video
     ]

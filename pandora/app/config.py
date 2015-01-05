@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 import ox.jsonc
 from ox.utils import json
 
-from archive.extract import supported_formats, AVCONV, avconv_version
+from archive.extract import supported_formats
 from item.utils import get_by_id
 
 
@@ -126,25 +126,24 @@ def load_config():
                     if f not in sformats or not sformats[f]:
                         sys.stderr.write('''WARNING:
 Your configuration contains a video format "%s" that is
-not supported by your version of avconv. Make sure you
-dont have a local version of avconv in /usr/local/bin
-and libavcodec-extra-53 and libav-tools are installed:
+not supported by your version of ffmpeg. Make sure you
+dont have a local version of ffmpeg in /usr/local/bin
+and ffmpeg is installed from ppa:j/pandora:
 
-    sudo apt-get install libavcodec-extra-53 libav-tools
-
+    sudo add-apt-repository ppa:j/pandora
+    sudo apt-get install ffmpeg
 ''' % f)
             else:
                 sys.stderr.write('''WARNING:
-You dont have "%s" installed.
-To fix this on Ubuntu 12.04, run:
+You dont have "ffmpeg" installed. To fix this on Ubuntu 14.04, run:
 
-    sudo apt-get install libavcodec-extra-53 libav-tools
+    sudo add-apt-repository ppa:j/pandora
+    sudo apt-get install ffmpeg
 
 check the README for further details.
 
-''' % AVCONV)
+''')
 
-        settings.AVCONV_VERSION = avconv_version()
         settings.CONFIG = config
         admin = len(settings.CONFIG['userLevels']) - 1
         if not 'syncdb' in sys.argv \

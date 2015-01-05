@@ -453,9 +453,6 @@ class File(models.Model):
         if self.data and len(audio) > 1:
             config = settings.CONFIG['video']
             resolution = self.stream_resolution()
-            ffmpeg = ox.file.cmd('ffmpeg')
-            if ffmpeg == 'ffmpeg':
-                ffmpeg = None
             tmp = tempfile.mkdtemp()
             if not self.info.get('language'):
                 self.info['language'] = parse_language(audio[0].get('language'))
@@ -471,8 +468,7 @@ class File(models.Model):
                     n += 1
                 profile = '%sp.%s' % (resolution, config['formats'][0])
                 target = os.path.join(tmp, language + '_' + profile)
-                ok, error = extract.stream(media, target, profile, info, ffmpeg,
-                        audio_track=i+1)
+                ok, error = extract.stream(media, target, profile, info, audio_track=i+1)
                 if ok:
                     tinfo = ox.avinfo(target)
                     del tinfo['path']
@@ -676,15 +672,12 @@ class Stream(models.Model):
 
     def encode(self):
         media = self.source.media.path if self.source else self.file.data.path
-        ffmpeg = ox.file.cmd('ffmpeg')
-        if self.source or ffmpeg == 'ffmpeg' or self.format != 'webm':
-            ffmpeg = None
 
         if not self.media:
             self.media.name = self.path(self.name())
         target = self.media.path
         info = ox.avinfo(media)
-        ok, error = extract.stream(media, target, self.name(), info, ffmpeg)
+        ok, error = extract.stream(media, target, self.name(), info)
         # file could have been moved while encoding
         # get current version from db and update
         _self = Stream.objects.get(id=self.id)

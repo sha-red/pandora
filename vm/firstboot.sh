@@ -6,6 +6,11 @@ else
     ID=unknown
 fi
 UBUNTU_VERSION="$VERSION_ID"
+if [ "$ID" == "debian" ]; then
+    SYSTEMD="yes"
+else
+    SYSTEMD="no"
+fi
 export DEBIAN_FRONTEND=noninteractive
 echo "deb http://ppa.launchpad.net/j/pandora/ubuntu trusty main" > /etc/apt/sources.list.d/j-pandora.list
 apt-key add - << EOF
@@ -24,32 +29,12 @@ pAAGSEQ4uz6bYSeM4Q==
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
 
-if [ "$ID" == "debian" ]; then
-    SYSTEMD="yes"
-else
-    SYSTEMD="no"
-    if [ "$UBUNTU_VERSION" == "12.04" ]; then
-        EXTRA=python-software-properties
-    else
-        EXTRA=""
-    fi
-    apt-get install -y \
-        update-manager-core \
-        software-properties-common \
-        $EXTRA
-fi
 apt-get update
 
 if [ "$LXC" == "no" ]; then
 apt-get install -y \
     acpid \
     ntp
-fi
-
-if [ "$UBUNTU_VERSION" == "12.04" ]; then
-    LIBAVCODEC_EXTRA=libavcodec-extra-53
-else
-    LIBAVCODEC_EXTRA=libavcodec-extra
 fi
 
 apt-get install -y \
@@ -77,8 +62,7 @@ apt-get install -y \
     python-html5lib \
     python-ox \
     oxframe \
-    $LIBAVCODEC_EXTRA \
-    libav-tools \
+    ffmpeg \
     ffmpeg2theora \
     mkvtoolnix \
     gpac \
