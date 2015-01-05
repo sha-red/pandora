@@ -63,7 +63,6 @@ apt-get install -y \
     python-ox \
     oxframe \
     ffmpeg \
-    ffmpeg2theora \
     mkvtoolnix \
     gpac \
     imagemagick \
@@ -72,13 +71,6 @@ apt-get install -y \
     postfix \
     postgresql \
     postgresql-contrib
-
-mkdir -p /home/pandora/.ox/bin
-wget -O /home/pandora/.ox/bin/ffmpeg https://firefogg.org/bin/ffmpeg.linux
-wget -O /home/pandora/.ox/bin/ffmpeg2theora https://firefogg.org/bin/ffmpeg2theora.linux
-chmod +x /home/pandora/.ox/bin/*
-chown -R pandora.pandora /home/pandora/.ox
-
 
 sudo -u postgres createuser -S -D -R pandora
 sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
