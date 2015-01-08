@@ -495,6 +495,21 @@ class File(models.Model):
                     os.unlink(target)
             shutil.rmtree(tmp)
 
+    def encoding_status(self):
+        status = {}
+        if self.encoding:
+            for s in self.streams.all():
+                status[s.name()] = u'done' if s.available else u'encoding'
+            config = settings.CONFIG['video']
+            max_resolution = self.streams.get(source=None).resolution
+            for resolution in sorted(config['resolutions'], reverse=True):
+                if resolution <= max_resolution:
+                    for f in config['formats']:
+                        name = u'%sp.%s' % (resolution, f)
+                        if name not in status:
+                            status[name] = u'queued'
+        return status
+
     def delete(self, *args, **kwargs):
         self.delete_files()
         super(File, self).delete(*args, **kwargs)
