@@ -76,7 +76,7 @@ Important: "use_your_own" is a password and you have to use the same value here 
         }
     }
     DB_GIN_TRGM = True
-    BROKER_URL = 'amqp://pandora:<use_your_own>@localhost:5672//pandora'
+    BROKER_URL = 'amqp://pandora:use_your_own@localhost:5672//pandora'
 
     #with apache x-sendfile or lighttpd set this to True
     XSENDFILE = False
