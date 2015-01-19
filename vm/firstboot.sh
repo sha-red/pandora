@@ -122,19 +122,12 @@ echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 
 mkdir /srv/pandora/data
 chown -R pandora:pandora /srv/pandora
 
-if [ "$SYSTEMD" == "yes" ]; then
-    cp /srv/pandora/etc/systemd/*.service /lib/systemd/system/
-    cp /srv/pandora/etc/tmpfiles.d/pandora.conf /usr/lib/tmpfiles.d/
-    if [ "$LXC" == "yes" ]; then
+/srv/pandora/ctl install
+
+if [ "$LXC" == "yes" ]; then
+    if [ "$SYSTEMD" == "yes" ]; then
         sed -i s/127.0.0.1/0.0.0.0/g /lib/systemd/system/pandora.service
-    fi
-    systemd-tmpfiles --create /usr/lib/tmpfiles.d/pandora.conf >/dev/null || true
-    for service in pandora pandora-tasks pandora-encoding pandora-cron; do
-        systemctl enable ${service}.service
-    done
-else
-    cp /srv/pandora/etc/init/* /etc/init/
-    if [ "$LXC" == "yes" ]; then
+    else
         sed -i s/127.0.0.1/0.0.0.0/g /etc/init/pandora.conf
     fi
 fi

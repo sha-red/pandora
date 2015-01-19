@@ -100,7 +100,8 @@ Important: "use_your_own" is a password and you have to use the same value here 
     ./manage.py init_db
 
 4) install init scripts and start daemons
-    cp /srv/pandora/etc/init/*.conf /etc/init/
+
+    /srv/pandora/ctl install
     /srv/pandora/ctl start
 
 5) Setup Webserver
