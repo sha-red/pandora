@@ -45,9 +45,9 @@ To run pan.do/ra you need to install and setup:
    exit
 
 3) Setup RabbitMQ
-Important: "use_your_own" is a password and you have to use the same value here and below for BROKER_URL
+You have to use the same password here and in BROKER_URL in local_settings.py
 
-    rabbitmqctl add_user pandora use_your_own
+    rabbitmqctl add_user pandora PASSWORD
     rabbitmqctl add_vhost /pandora
     rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 
@@ -79,7 +79,7 @@ Important: "use_your_own" is a password and you have to use the same value here 
         }
     }
     DB_GIN_TRGM = True
-    BROKER_URL = 'amqp://pandora:use_your_own@localhost:5672//pandora'
+    BROKER_URL = 'amqp://pandora:PASSWORD@localhost:5672//pandora'
 
     #with apache x-sendfile or lighttpd set this to True
     XSENDFILE = False
@@ -129,11 +129,10 @@ b) apache2 (if you need it for other sites on the same server)
     
     service apache2 reload
 
-
 Now you can open pandora in your browser, the first user to sign up will become admin.
 
 == Updating ==
-To update a pandora installation get the latest version from bzr by running
+To update pandora to the latest version run this:
   su pandora
   cd /srv/pandora
    ./update.py
