@@ -159,15 +159,11 @@ if [ "$LXC" == "yes" ]; then
 fi
 
 if [ "$LXC" == "no" ]; then
-cat > /usr/local/bin/fixtime <<EOF
-#!/bin/bash
-while [ 1 ]; do
-    /usr/sbin/ntpdate pool.ntp.org >/dev/null
-    sleep 600
-done
+cat > /etc/cron.d/ntp_fixtime <<EOF
+# /etc/cron.d/ntp_fixtime: vms can go out of sync, run ntpdate to sync time
+
+*/10 * * * *   root /usr/sbin/ntpdate pool.ntp.org >/dev/null
 EOF
-chmod +x /usr/local/bin/fixtime
-fi
 
 cat > /usr/local/bin/genissue <<EOF
 #!/bin/sh
@@ -187,22 +183,15 @@ chmod +x /usr/local/bin/genissue
 
 cat > /etc/rc.local << EOF
 #!/bin/sh -e
-#vm has one network interface and that might change, make it not persistent
+#vm has one network interface and that might change, make sure its not persistent
 rm -f /etc/udev/rules.d/70-persistent-net.rules
 
 #update issue
 /usr/local/bin/genissue > /etc/issue
 EOF
 
-if [ "$LXC" == "no" ]; then
-cat >> /etc/rc.local << EOF
-
-#vm can be suspended, this help to keep the time in sync
-/usr/local/bin/fixtime &
-EOF
-fi
-
 chmod +x /etc/rc.local
+apt-get clean
 
 cat > /home/pandora/.vimrc <<EOF
 set nocompatible
@@ -242,4 +231,3 @@ nnoremap <F2> :set invpaste paste?<CR>
 set pastetoggle=<F2>
 set showmode
 EOF
-apt-get clean
