@@ -7,17 +7,21 @@ import subprocess
 import sys
 
 def run(cmd):
-    r = subprocess.call(cmd)
-    if r != 0:
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+
+    if p.returncode != 0:
+        print stderr
         sys.exit(r)
 
 class Command(BaseCommand):
     """
     """
-    help = 'initialize pan.do/ra db'
+    help = 'initialize database'
     args = ''
 
     def handle(self, **options):
+        print 'initializing database...'
         manage_py = sys.argv[0]
         for cmd in [
             [manage_py, 'syncdb', '--noinput'],
