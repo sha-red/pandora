@@ -116,6 +116,8 @@ MANAGE="sudo -H -u pandora python manage.py"
 
 cd /srv/pandora/pandora
 $MANAGE syncdb --noinput
+$MANAGE migrate item
+$MANAGE migrate annotation
 $MANAGE migrate
 echo "DB_GIN_TRGM = True" >> /srv/pandora/pandora/local_settings.py
 $MANAGE sqlfindindex
