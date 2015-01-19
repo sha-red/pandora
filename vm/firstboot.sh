@@ -110,24 +110,17 @@ XACCELREDIRECT = True
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 JSON_DEBUG = False
+DB_GIN_TRGM = True
 EOF
 
 MANAGE="sudo -H -u pandora python manage.py"
 
 cd /srv/pandora/pandora
-$MANAGE syncdb --noinput
-$MANAGE migrate item
-$MANAGE migrate annotation
-$MANAGE migrate
-echo "DB_GIN_TRGM = True" >> /srv/pandora/pandora/local_settings.py
-$MANAGE sqlfindindex
-$MANAGE sync_itemsort
+$MANAGE init_db
 echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
 
 mkdir /srv/pandora/data
 chown -R pandora:pandora /srv/pandora
-$MANAGE update_static
-$MANAGE collectstatic -l --noinput
 
 if [ "$SYSTEMD" == "yes" ]; then
     cp /srv/pandora/etc/systemd/*.service /lib/systemd/system/
