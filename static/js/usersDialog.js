@@ -525,14 +525,9 @@ pandora.ui.usersDialog = function() {
                             click: function() {
                                 var $button = this;
                                 $button.options({disabled: true});
-                                pandora.api.findUsers({
-                                    query: {conditions: [], operator: '&'},
-                                    keys: ['email', 'username'],
-                                    range: [0, numberOfUsers],
-                                    sort: [{key: 'username', operator: '+'}]
-                                }, function(result) {
+                                getEmailAddresses(function(items) {
                                     pandora.ui.exportDialog({
-                                        data: result.data.items.filter(function(item) {
+                                        data: items.filter(function(item) {
                                             return item.email;
                                         }).map(function(item) {
                                             return Ox.encodeHTMLEntities(item.username)
@@ -587,6 +582,25 @@ pandora.ui.usersDialog = function() {
         Ox.Request.clearCache('findUsers');
         that.superClose();
     };
+
+    function getEmailAddresses(callback) {
+        pandora.api.findUsers({
+            query: {conditions: [
+                {key: 'level', value: 'guest', operator: '!='},
+                {key: 'level', value: 'robot', operator: '!='}
+            ], operator: '&'},
+            keys: ['id', 'username', 'email'],
+            range: [0, 1000000],
+            sort: [{key: 'username', operator: '+'}]
+        }, function(result) {
+            var selected = $list.options('selected');
+            callback(result.data.items.filter(function(user) {
+                return !selected.length || Ox.contains(selected, user.id);
+            }).map(function(user) {
+                return {username: user.username, email: user.email};
+            }));
+        });
+    }
 
     function getFormItemById(id) {
         var ret;
