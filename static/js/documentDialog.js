@@ -159,8 +159,8 @@ pandora.ui.documentDialog = function(options) {
                 ? Ox.PDFViewer({
                     height: dialogHeight,
                     page: settings.page,
-                    url: pandora.getMediaURL('/documents/' + item.id + '/'
-                        + item.name + '.' + item.extension),
+                    url: '/documents/' + item.id + '/'
+                        + item.name + '.' + item.extension,
                     width: dialogWidth,
                     zoom: settings.zoom
                 })
