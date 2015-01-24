@@ -520,7 +520,7 @@ def add(request, data):
             i.make_poster(True)
         response = json_response(status=200, text='created')
         response['data'] = i.get_json()
-        add_changelog(request, data)
+        add_changelog(request, data, i.public_id)
     return render_to_json_response(response)
 actions.register(add, cache=False)
 
