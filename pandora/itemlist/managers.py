@@ -16,7 +16,7 @@ def parseCondition(condition, user):
     }.get(k, k)
     if not k:
         k = 'name'
-    v = condition['value']
+    v = condition.get('value', '')
     op = condition.get('operator')
     if not op:
         op = '='
