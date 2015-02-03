@@ -331,6 +331,10 @@ class File(models.Model):
                     stream.available = True 
                     stream.info = {} 
                     stream.save()
+                    if self.info.keys() == ['extension']:
+                        self.info.update(stream.info)
+                        self.parse_info()
+                        self.save()
                 return True, stream.media.size
             return save_chunk(stream, stream.media, chunk, offset, name, done_cb)
         return False, 0
