@@ -61,13 +61,36 @@ pandora.ui.uploadVideoDialog = function(data) {
                     title: Ox._('Select Video'),
                     maxFiles: 1,
                     width: 96
+                }).css({
+                    float: 'left'
                 }).bindEvent({
                     click: function(data) {
                         if (data.files.length) {
                             cancelled = false;
-                            $actionButton.hide();
-                            $closeButton.options('title', Ox._('Cancel'));
-                            upload(data.files[0]);
+                            $actionButton.replaceWith($actionButton = Ox.Button({
+                                id: 'action',
+                                title: 'Upload',
+                                disabled: true
+                            }).css({
+                                float: 'left'
+                            }));
+                            getInfo(data.files[0], function(info) {
+                                console.log(info);
+                                $actionButton.options({
+                                    disabled: false
+                                }).bindEvent({
+                                    click: function() {
+                                        info.direct ? directUpload(data.files[0], info) : upload(data.files[0]);
+                                    }
+                                });
+                                $info.html(formatVideoInfo(info));
+                                $status.html(
+                                    info.direct
+                                    ? Ox._('Your video will be used directly.')
+                                    : Ox._('Your video will be transcoded.')
+                                );
+                            });
+                            //$closeButton.options('title', Ox._('Cancel'));
                         }
                     }
                 })
@@ -132,6 +155,17 @@ pandora.ui.uploadVideoDialog = function(data) {
         $status.html(status || '').append($progress);
     }
 
+    function directUpload(file, info) {
+        resetProgress();
+        pandora.api.addMedia({
+            filename: info.name,
+            id: info.oshash,
+            item: pandora.site.itemRequiresVideo ? undefined : pandora.user.ui.item
+        }, function(result) {
+            uploadStream(result.data.item, info, file);
+        });
+    }
+
     function encode() {
         var filename = pandora.firefogg.sourceFilename,
             info = JSON.parse(pandora.firefogg.sourceInfo),
@@ -165,6 +199,43 @@ pandora.ui.uploadVideoDialog = function(data) {
                     $progress.options({progress: progress});
                 }
             );
+        });
+    }
+
+    function getInfo(file, callback) {
+        Ox.oshash(file, function(oshash) {
+            var $video = $('<video>'),
+                url = URL.createObjectURL(file),
+                info = {
+                    audio: [],
+                    direct: false,
+                    oshash: oshash,
+                    name: file.name,
+                    size: file.size,
+                    video: []
+                };
+            $video.one('error', function(event) {
+                callback(info);
+            });
+            $video.one('loadedmetadata', function(event) {
+                info.duration = $video[0].duration;
+                if ($video[0].videoHeight > 0) {
+                    info.video.push({
+                        height: $video[0].videoHeight,
+                        width: $video[0].videoWidth
+                    });
+                }
+                if (info.duration) {
+                    info.bitrate = info.size * 8 / info.duration / 1000;
+                }
+                var format = pandora.site.video.formats[0],
+                    resolution = getResolution(info);
+                info.direct = Ox.endsWith(info.name, format)
+                    && info.video.lengh > 0
+                    && info.video[0].height <= resolution;
+                callback(info);
+            });
+            $video[0].src = url;
         });
     }
 
@@ -408,6 +479,18 @@ pandora.ui.uploadVideoDialog = function(data) {
         }
         html += '<br>' + Ox.formatValue(info.size, 'B')
             + ' / ' + Ox.formatDuration(info.duration);
+        return html; 
+    }
+
+    function formatVideoInfo(info) {
+        var html = '<b>' + info.name + '</b><br>';
+        if (info.video && info.video.length > 0) {
+            html += info.video[0].width + '×' + info.video[0].height;
+        }
+        html += '<br>' + Ox.formatValue(info.size, 'B');
+        if(info.duration) {
+            html += ' / ' + Ox.formatDuration(info.duration);
+        }
         return html; 
     }
 
