@@ -182,8 +182,10 @@ def stream(video, target, profile, info, audio_track=0):
                 #'-level', '3.0',
             ]
         video_settings += ['-map', '0:%s,0:0'%info['video'][0]['id']]
+        audio_only = False
     else:
         video_settings = ['-vn']
+        audio_only = True
 
     if info['audio']:
         if video_settings == ['-vn'] or not info['video']:
@@ -261,6 +263,15 @@ def stream(video, target, profile, info, audio_track=0):
                                   close_fds=True)
         p.communicate()
         os.unlink("%s.mp4" % enc_target)
+    elif format == 'webm' and audio_only:
+        cmd = ['mkvmerge', '-w', '-o', target, '--cues', '-1:all', enc_target]
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT,
+                                  close_fds=True)
+        p.communicate()
+        os.unlink(enc_target)
+        enc_target = target
     if p.returncode == 0 and enc_target != target:
         shutil.move(enc_target, target)
     return True, None
