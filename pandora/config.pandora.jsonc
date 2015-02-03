@@ -850,6 +850,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "part": {
                 "api": "",
                 "documents": "",
+                "entities": "",
                 "faq": "",
                 "help": "",
                 "news": "",
