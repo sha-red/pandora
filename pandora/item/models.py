@@ -1164,7 +1164,7 @@ class Item(models.Model):
             qs = qs.exclude(id__in=wanted)
         qs.update(wanted=False)
 
-    def update_selected(self):
+    def update_selected(self, update_timeline=True):
         sets = self.sets()
         for s in sets:
             if s.filter(Q(is_video=True)|Q(is_audio=True)).filter(available=False).count() == 0:
@@ -1180,7 +1180,8 @@ class Item(models.Model):
                 if update:
                     self.rendered = False
                     self.save()
-                    tasks.update_timeline.delay(self.public_id)
+                    if update_timeline:
+                        tasks.update_timeline.delay(self.public_id)
                 break
         if not sets:
             self.rendered = False
@@ -1536,7 +1537,7 @@ class Item(models.Model):
             return False
         with transaction.commit_on_success():
             layer = subtitles['id']
-            Annotation.objects.filter(layer=layer,item=self).delete()
+            Annotation.objects.filter(layer=layer, item=self).delete()
             offset = 0
             language = ''
             subtitles = self.files.filter(selected=True, is_subtitle=True, available=True)

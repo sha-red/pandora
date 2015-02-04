@@ -107,7 +107,7 @@ def process_stream(fileId):
         file = models.File.objects.get(id=fileId)
         file.encoding = False
         file.save()
-    file.item.update_selected()
+    file.item.update_selected(update_timeline=False)
     if not file.item.rendered:
         file.item.update_timeline()
     if file.item.rendered:
