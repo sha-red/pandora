@@ -59,10 +59,10 @@ Ox.PDFViewer = function(options, self) {
             .attr({
                 frameborder: 0,
                 height: self.options.height + 'px',
-                src: self.options.pdfjsURL + '?file=' + self.options.url,
+                src: self.options.pdfjsURL + '?file=' + self.options.url + '#page=' + self.options.page,
                 width: self.options.width + 'px'
             })
-            .onMessage(function(event, data) {
+            .onMessage(function(data, event) {
                 that.triggerEvent(event, data);
             })
             .appendTo(that);
@@ -77,7 +77,6 @@ Ox.PDFViewer = function(options, self) {
     }
 
     function updateSize() {
-        console.log('updateSize', self.options.width, self.options.height);
         that.css({
             height: self.options.height + 'px',
             width: self.options.width + 'px',
