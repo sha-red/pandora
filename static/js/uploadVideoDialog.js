@@ -5,7 +5,8 @@ pandora.ui.uploadVideoDialog = function(data) {
 
     var cancelled = false,
         file,
-        hasFirefogg = !(typeof Firefogg == 'undefined') && $.browser.version < "35",
+        hasFirefogg = !(typeof Firefogg == 'undefined') && (
+                $.browser.version < "35" || Firefogg().version >= 334),
         itemView = pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level] ? 'media' : 'info',
         selectFile,
         $actionButton,
