@@ -2353,8 +2353,8 @@ pandora.updateStatus = function(item) {
     function isActive() {
         return ui.item == item && [
             'info', 'player', 'editor', 'timeline'
-        ].indexOf(ui.itemView) > -1 && (
-            !pandora.$ui.uploadVideoDialog || pandora.$ui.uploadVideoDialog.is('::visible')
+        ].indexOf(ui.itemView) > -1 && !(
+            pandora.$ui.uploadVideoDialog && pandora.$ui.uploadVideoDialog.is('::visible')
         );
     }
 };

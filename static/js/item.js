@@ -53,7 +53,7 @@ pandora.ui.item = function() {
                         +'{1} view.', [result.data.title, Ox._(pandora.user.ui.itemView)])
                     )
             );
-            pandora.updateStatus(pandora.user.ui.item);
+            result.data.parts > 0 && pandora.updateStatus(pandora.user.ui.item);
         } else if (pandora.user.ui.itemView == 'info') {
             
             pandora.$ui.contentPanel.replaceElement(1,
@@ -64,7 +64,7 @@ pandora.ui.item = function() {
                         }
                     })
             );
-            !result.data.rendered && pandora.updateStatus(pandora.user.ui.item);
+            !result.data.rendered && result.data.parts > 0 && pandora.updateStatus(pandora.user.ui.item);
         
         } else if (pandora.user.ui.itemView == 'documents') {
 

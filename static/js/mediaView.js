@@ -651,6 +651,8 @@ pandora.ui.mediaView = function(options) {
                                 Ox.Request.clearCache();
                                 pandora.updateItemContext();
                                 pandora.$ui.info && pandora.$ui.info.updateInfo();
+                                pandora.$ui.mainPanel.replaceElement(1,
+                                    pandora.$ui.rightPanel = pandora.ui.rightPanel());
                             }
                         }
                     });
