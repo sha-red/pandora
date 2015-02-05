@@ -62,7 +62,6 @@ pandora.ui.documentDialog = function(options) {
         isItemView = !pandora.$ui.documentsDialog,
         items = options.items,
         item = items[options.index],
-        settings = getSettings(),
     
         $content = Ox.Element(),
 
@@ -96,7 +95,6 @@ pandora.ui.documentDialog = function(options) {
                     if (data.value) {
                         if (Ox.getObjectById(items, data.value)) {
                             item = Ox.getObjectById(items, data.value);
-                            settings = getSettings();
                             setTitle();
                             setContent();
                         } else {
@@ -142,58 +140,54 @@ pandora.ui.documentDialog = function(options) {
     setTitle();
     setContent();
 
-    function getSettings() {
-        return Ox.extend(item.extension == 'pdf' ? {
-            position: 1,
-            zoom: 'fit'
-        } : {
-            center: 'auto',
-            zoom: 'fit'
-        }, pandora.user.ui.documents[item.id] || {});
-    }
-
     function setContent() {
         $content.replaceWith(
             $content = (
                 item.extension == 'pdf'
                 ? Ox.PDFViewer({
                     height: dialogHeight,
-                    page: settings.position,
+                    page: pandora.user.ui.documents[item.id]
+                        ? pandora.user.ui.documents[item.id].position
+                        : 1,
                     url: '/documents/' + item.id + '/'
                         + item.name + '.' + item.extension,
                     width: dialogWidth,
-                    zoom: settings.zoom
+                    zoom: 'fit'
                 })
                 : Ox.ImageViewer({
-                    center: settings.center,
+                    area: pandora.user.ui.documents[item.id]
+                        ? pandora.user.ui.documents[item.id].position
+                        : [],
                     height: dialogHeight,
                     imageHeight: item.dimensions[1],
                     imagePreviewURL: pandora.getMediaURL('/documents/' + item.id + '/256p.jpg'),
                     imageURL: pandora.getMediaURL('/documents/' + item.id + '/'
                         + item.name + '.' + item.extension),
                     imageWidth: item.dimensions[0],
-                    width: dialogWidth,
-                    zoom: settings.zoom
+                    width: dialogWidth
                 })
             )
             .bindEvent({
                 center: function(data) {
-                    pandora.UI.set('documents.' + item.id, Ox.extend(settings, {
-                        center: data.center
-                    }));
+                    pandora.UI.set(
+                        'documents.' + item.id + '.position',
+                        $content.getArea()
+                    );
                 },
                 key_escape: function() {
                     pandora.$ui.documentDialog.close();
                 },
                 page: function(data) {
-                    pandora.UI.set('documents.' + item.id, Ox.extend(settings, {
-                        position: data.page
-                    }));
+                    pandora.UI.set(
+                        'documents.' + item.id + '.position',
+                        data.page
+                    );
                 },
                 zoom: function(data) {
-                    pandora.UI.set('documents.' + item.id, Ox.extend(settings, {
-                        zoom: data.zoom
-                    }));
+                    pandora.UI.set(
+                        'documents.' + item.id + '.position',
+                        $content.getArea()
+                    );
                 }
             })
         );
