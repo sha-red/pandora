@@ -171,7 +171,7 @@ pandora.ui.documentDialog = function(options) {
                 center: function(data) {
                     pandora.UI.set(
                         'documents.' + item.id,
-                        {position: $content.getArea()}
+                        {position: $content.getArea().map(Math.round)}
                     );
                 },
                 key_escape: function() {
@@ -186,7 +186,7 @@ pandora.ui.documentDialog = function(options) {
                 zoom: function(data) {
                     pandora.UI.set(
                         'documents.' + item.id,
-                        {position: $content.getArea()}
+                        {position: $content.getArea().map(Math.round)}
                     );
                 }
             })
