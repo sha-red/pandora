@@ -218,7 +218,6 @@ pandora.ui.embedPlayer = function() {
                     });
                     layer.items = items;
                 });
-                console.log('!!', video.annotations);
             }
             $annotations = Ox.AnnotationPanel(Ox.extend({
                 clickLink: pandora.clickLink,
