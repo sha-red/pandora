@@ -1468,13 +1468,13 @@ pandora.getPart = function(state, str, callback) {
     } else if (state.page == 'documents') {
         var id = str.split('/')[0];
         if (id) {
-            pandora.api.findDocuments({
-                query: {
-                    conditions: [{key: 'id', value: id, operator: '=='}],
-                    operator: '&'
-                }
+            pandora.api.getDocument({
+                id: id,
+                // send keys so that subsequent request when parsing
+                // page number etc. is already in the cache
+                keys: ['dimensions', 'extension']
             }, function(result) {
-                if (result.data.items) {
+                if (result.status.code == 200) {
                     state.part = str;
                 } else {
                     state.page = '';
@@ -1596,7 +1596,35 @@ pandora.getSpan = function(state, val, callback) {
     // event/place name (string), and in that case sets state.span, and may
     // modify state.view.
     // fixme: "subtitles:23" is still missing
-    if (state.type == pandora.site.itemName.plural.toLowerCase()) {
+    if (state.page == 'documents') {
+        pandora.api.getDocument({
+            id: state.part,
+            keys: ['dimensions', 'extension']
+        }, function(result) {
+            var dimensions = result.data.dimensions,
+                extension = result.data.extension,
+            values;
+            if (Ox.contains(['epub', 'pdf', 'txt'], extension)) {
+                state.span = Ox.limit(parseInt(val), 0, dimensions);
+            } else if (Ox.contains(['gif', 'jpg', 'png'], extension)) {
+                values = val.split(',');
+                if (values.length == 4) {
+                    state.span = values.map(function(number, index) {
+                        return Ox.limit(number, 0, dimensions[index % 2]);
+                    });
+                    spate.span = [
+                        Math.min(state.span[0], state.span[2]),
+                        Math.min(state.span[1], state.span[3]),
+                        Math.max(state.span[0], state.span[2]),
+                        Math.max(state.span[1], state.span[3]),
+                    ];
+                } else {
+                    state.span = '';
+                }
+            }
+            callback();
+        });
+    } else if (state.type == pandora.site.itemName.plural.toLowerCase()) {
         var isArray = Ox.isArray(val),
             isName, isVideoView, canBeAnnotation, canBeEvent, canBePlace;
         if (isArray) {
