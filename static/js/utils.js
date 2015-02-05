@@ -1605,14 +1605,14 @@ pandora.getSpan = function(state, val, callback) {
                 extension = result.data.extension,
             values;
             if (Ox.contains(['epub', 'pdf', 'txt'], extension)) {
-                state.span = Ox.limit(parseInt(val), 0, dimensions);
+                state.span = Ox.limit(parseInt(val), 1, dimensions);
             } else if (Ox.contains(['gif', 'jpg', 'png'], extension)) {
                 values = val.split(',');
                 if (values.length == 4) {
                     state.span = values.map(function(number, index) {
                         return Ox.limit(number, 0, dimensions[index % 2]);
                     });
-                    spate.span = [
+                    state.span = [
                         Math.min(state.span[0], state.span[2]),
                         Math.min(state.span[1], state.span[3]),
                         Math.max(state.span[0], state.span[2]),
