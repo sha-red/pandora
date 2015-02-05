@@ -207,6 +207,8 @@ pandora.ui.embedPlayer = function() {
                     var items = [];
                     layer.items.forEach(function(item) {
                         if ((
+                            item['in'] < options['in'] && item.out > options.out
+                        ) || (
                             item['in'] >= options['in'] && item['in'] <= options.out
                         ) || (
                             item.out >= options['in'] && item.out <= options.out
@@ -216,6 +218,7 @@ pandora.ui.embedPlayer = function() {
                     });
                     layer.items = items;
                 });
+                console.log('!!', video.annotations);
             }
             $annotations = Ox.AnnotationPanel(Ox.extend({
                 clickLink: pandora.clickLink,
@@ -347,7 +350,7 @@ pandora.ui.embedPlayer = function() {
                 text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n'),
                 tracks: subtitle.languages || [Ox.getLanguageNameByCode(pandora.site.language)]
             };
-        }) : []
+        }) : [];
     }
 
     function selectAnnotation(data) {
