@@ -90,6 +90,10 @@ pandora.ui.documentDialog = function(options) {
                         height: dialogHeight,
                         width: dialogWidth
                     });
+                    $content.getArea && pandora.UI.set(
+                        'documents.' + item.id,
+                        {position: $content.getArea().map(Math.round)}
+                    );
                 },
                 pandora_document: function(data) {
                     if (data.value) {
