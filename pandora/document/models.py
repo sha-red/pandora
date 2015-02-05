@@ -216,6 +216,21 @@ class Document(models.Model):
                 self.extract_page(page)
             if size:
                 path = os.path.join(folder, '%dp%d.jpg' % (size, page))
+        elif self.extension in ('jpg', 'png', 'gif'):
+            if os.path.exists(src):
+                if size and page:
+                    crop = map(int, page.split(','))
+                    path = os.path.join(folder, '%s.jpg' % ','.join(map(str, crop)))
+                    if not os.path.exists(path):
+                        img = Image.open(src).crop(crop)
+                        img.save(path)
+                    else:
+                        img = Image.open(path)
+                    src = path
+                    if size < max(img.size):
+                        path = os.path.join(folder, '%sp%s.jpg' % (size, ','.join(map(str, crop))))
+                        if not os.path.exists(path):
+                            resize_image(src, path, size=size)
         if os.path.exists(src) and not os.path.exists(path):
             image_size = max(self.width, self.height)
             if image_size == -1:
