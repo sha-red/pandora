@@ -180,7 +180,7 @@ pandora.ui.documentDialog = function(options) {
                 page: function(data) {
                     pandora.UI.set(
                         'documents.' + item.id,
-                        {position: $content.getArea()}
+                        {position: data.page}
                     );
                 },
                 zoom: function(data) {
