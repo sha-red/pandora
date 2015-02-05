@@ -1,11 +1,15 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 
-pandora.ui.embedDocumentDialog = function(id) {
+pandora.ui.embedDocumentDialog = function(id, position) {
 
     var $content = Ox.Element()
             .css({margin: '16px'})
-            .html(Ox._('To embed this document, use the following HTML:')),
+            .html(Ox._(
+                'To embed this document'
+                + (position ? ' at the current position' : '')
+                + ', use the following HTML:'
+            )),
 
         $embed = $('<textarea>')
             .css({
@@ -14,9 +18,10 @@ pandora.ui.embedDocumentDialog = function(id) {
                 marginTop: '8px'
             })
             .val(
-                '<a href="/documents/'
-                + id + '"><img src="/documents/'
-                + id + '/256p.jpg"></a>'
+                '<a href="/documents/' + id
+                + (position ? '/' + position : '')
+                + '"><img src="/documents/' + id + '/256p'
+                + (position || '') + '.jpg"></a>'
             )
             .on({
                 click: function() {
