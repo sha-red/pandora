@@ -282,10 +282,11 @@ class File(models.Model):
         srt = []
         subtitles = []
         for s in ox.srt.load(self.data.path):
-            key = '%s --> %s\n%s' % (s['in'], s['out'], s['value'])
-            if key not in subtitles:
-                subtitles.append(key)
-                srt.append(s)
+            if s['in'] <= s['out']:
+                key = '%s --> %s\n%s' % (s['in'], s['out'], s['value'])
+                if key not in subtitles:
+                    subtitles.append(key)
+                    srt.append(s)
         #subtitles should not overlap
         for i in range(1, len(srt)):
             if srt[i-1]['out'] > srt[i]['in']:
