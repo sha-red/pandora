@@ -1412,7 +1412,7 @@ pandora.getPageTitle = function(stateOrURL) {
         : null;
 };
 
-pandora.getPart = function(state, str, parts, callback) {
+pandora.getPart = function(state, str, callback) {
     if (state.page == 'api') {
         pandora.api.api(function(result) {
             if (Ox.contains(Object.keys(result.data.actions), str)) {
@@ -1476,8 +1476,6 @@ pandora.getPart = function(state, str, parts, callback) {
             }, function(result) {
                 if (result.data.items) {
                     state.part = str;
-                    //page/zoom/center get parsed in URL.js
-                    state.parts = parts;
                 } else {
                     state.page = '';
                 }
