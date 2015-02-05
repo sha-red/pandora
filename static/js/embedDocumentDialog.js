@@ -45,7 +45,7 @@ pandora.ui.embedDocumentDialog = function(id, position) {
             closeButton: true,
             content: $content,
             fixedSize: true,
-            height: 128,
+            height: 144,
             keys: {escape: 'close'},
             removeOnClose: true,
             title: Ox._('Embed Document'),
