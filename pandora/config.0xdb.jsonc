@@ -853,7 +853,6 @@
                     "columnWidth": {}
                 }
             },
-            "document": "",
             "documents": {},
             "documentSize": 256,
             "documentsSelection": {},
@@ -872,7 +871,6 @@
             ],
             "editView": "list",
             "embedSize": 256,
-            "entity": "",
             "entitiesSelection": {},
             "entitiesType": "",
             "filters": [

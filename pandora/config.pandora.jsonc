@@ -797,7 +797,6 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
                     "columnWidth": {}
                 }
             },
-            "document": "",
             "documents": {},
             "documentSize": 256,
             "documentsSelection": {},
@@ -816,7 +815,6 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             ],
             "editView": "list",
             "embedSize": 256,
-            "entity": "",
             "entitiesSelection": {},
             "entitiesType": "",
             "filters": [

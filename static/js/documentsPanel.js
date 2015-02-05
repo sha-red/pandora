@@ -740,15 +740,15 @@ pandora.ui.documentsPanel = function(options) {
                 );
             },
             key_escape: function() {
-                pandora.UI.set({document: ''});
+                pandora.UI.set({'part.documents': ''});
             },
             open: openDocuments,
             openpreview: openDocuments,
             select: function(data) {
                 pandora.UI.set(
-                    'documentsSelection.' + (isItemView ? ui.item : ''),
-                    data.ids
+                    'documentsSelection.' + (isItemView ? ui.item : ''), data.ids
                 );
+                ui.part.documents && pandora.UI.set('part.documents', data.ids[0]);
             },
             sort: function(data) {
                 pandora.UI.set({documentsSort: [data]});

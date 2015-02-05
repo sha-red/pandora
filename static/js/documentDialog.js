@@ -9,7 +9,7 @@ pandora.openDocumentDialog = function(options) {
         pandora.$ui.documentDialog && options.ids && options.ids.length == 1
         && Ox.getObjectById(pandora.$ui.documentDialog.getItems(), options.ids[0])
     ) {
-        pandora.UI.set({document: options.ids[0]});
+        pandora.UI.set({'part.documents': options.ids[0]});
     } else if (options.ids) {
         pandora.api.findDocuments({
             query: {
@@ -80,7 +80,7 @@ pandora.ui.documentDialog = function(options) {
             })
             .bindEvent({
                 close: function() {
-                    pandora.UI.set({document: ''});
+                    pandora.UI.set({'part.documents': ''});
                     delete pandora.$ui.documentDialog;
                 },
                 resize: function(data) {
@@ -95,7 +95,7 @@ pandora.ui.documentDialog = function(options) {
                         {position: $content.getArea().map(Math.round)}
                     );
                 },
-                pandora_document: function(data) {
+                'pandora_part.documents': function(data) {
                     if (data.value) {
                         if (Ox.getObjectById(items, data.value)) {
                             item = Ox.getObjectById(items, data.value);
@@ -109,7 +109,7 @@ pandora.ui.documentDialog = function(options) {
                     }
                 },
                 pandora_item: function(data) {
-                    pandora.UI.set({document: ''});
+                    pandora.UI.set({'part.documents': ''});
                 }
             }),
 
@@ -150,12 +150,9 @@ pandora.ui.documentDialog = function(options) {
             [items.length > 1 ? 'show' : 'hide']()
             .bindEvent({
                 click: function(data) {
-                    var offset = data.id == 'previous' ? -1 : 1;
-                    options.index = Ox.mod(options.index + offset, items.length);
                     pandora.$ui[
                         isItemView ? 'documents' : 'documentsDialogPanel'
-                    ].selectSelected(offset);
-                    pandora.UI.set({document: items[options.index].id});
+                    ].selectSelected(data.id == 'previous' ? -1 : 1);
                 }
             });
 

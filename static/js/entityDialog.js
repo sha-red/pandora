@@ -55,7 +55,7 @@ pandora.ui.entityDialog = function() {
         .bindEvent({
             close: function() {
                 pandora.UI.set({
-                    entity: '',
+                    'part.entities': '',
                     page: ''
                 });
                 delete pandora.$ui.entityDialog;
