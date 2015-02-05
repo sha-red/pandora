@@ -609,6 +609,14 @@ pandora.ui.documentsPanel = function(options) {
                     }),
                     Ox.Input({
                         disabled: true,
+                        id: 'id',
+                        label: Ox._('ID'),
+                        labelWidth: labelWidth,
+                        value: item.id,
+                        width: width
+                    }),
+                    Ox.Input({
+                        disabled: true,
                         id: 'extension',
                         label: Ox._('Extension'),
                         labelWidth: labelWidth,
@@ -644,7 +652,7 @@ pandora.ui.documentsPanel = function(options) {
                     Ox.Input({
                         disabled: true,
                         id: 'username',
-                        label: Ox._('Username'),
+                        label: Ox._('User'),
                         labelWidth: labelWidth,
                         value: item.user,
                         width: width
