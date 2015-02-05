@@ -144,7 +144,7 @@ pandora.ui.documentDialog = function(options) {
 
     function getSettings() {
         return Ox.extend(item.extension == 'pdf' ? {
-            page: 1,
+            position: 1,
             zoom: 'fit'
         } : {
             center: 'auto',
@@ -158,7 +158,7 @@ pandora.ui.documentDialog = function(options) {
                 item.extension == 'pdf'
                 ? Ox.PDFViewer({
                     height: dialogHeight,
-                    page: settings.page,
+                    page: settings.position,
                     url: '/documents/' + item.id + '/'
                         + item.name + '.' + item.extension,
                     width: dialogWidth,
@@ -187,7 +187,7 @@ pandora.ui.documentDialog = function(options) {
                 },
                 page: function(data) {
                     pandora.UI.set('documents.' + item.id, Ox.extend(settings, {
-                        page: data.page
+                        position: data.page
                     }));
                 },
                 zoom: function(data) {
