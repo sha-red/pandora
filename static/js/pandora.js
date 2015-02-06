@@ -22,6 +22,9 @@ appPanel
 (function() {
 
     window.onerror = function(error, url, line) {
+        if(error == 'TypeError: Attempted to assign to readonly property.') {
+            return
+        }
         try {
             !isMSIE && !/^resource:/.test(url) && pandora.api.logError({
                 text: error,
