@@ -19,6 +19,13 @@ pandora.ui.documentsPanel = function(options) {
                 width: 256
             },
             {
+                id: 'id',
+                operator: '+',
+                title: Ox._('ID'),
+                visible: true,
+                width: 64
+            },
+            {
                 format: function(value) {
                     return value.toUpperCase();
                 },
