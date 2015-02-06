@@ -1734,6 +1734,7 @@ class Facet(models.Model):
     def save(self, *args, **kwargs):
         if not self.sortvalue:
             self.sortvalue = utils.sort_string(self.value).lower()[:900]
+        self.sotvalue = self.sortvalue.lower()
         super(Facet, self).save(*args, **kwargs)
 
 class Description(models.Model):
