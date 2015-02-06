@@ -149,14 +149,16 @@ pandora.ui.editor = function(data) {
                 Ox.Log('', 'editAnnotation', data);
                 function callback(result) {
                     Ox.Log('', 'editAnnotation result', result);
-                    result.data.date = Ox.formatDate(
-                        result.data.modified.slice(0, 10), '%B %e, %Y'
-                    );
-                    result.data.languages = (
-                        result.data.languages || [pandora.site.language]
-                    ).map(function(language) {
-                        return Ox.getLanguageNameByCode(language);
-                    });
+                    if (!Ox.isEmpty(result.data)) {
+                        result.data.date = Ox.formatDate(
+                            result.data.modified.slice(0, 10), '%B %e, %Y'
+                        );
+                        result.data.languages = (
+                            result.data.languages || [pandora.site.language]
+                        ).map(function(language) {
+                            return Ox.getLanguageNameByCode(language);
+                        });
+                    }
                     that.updateAnnotation(data.id, result.data);
                     Ox.Request.clearCache();
                 };
