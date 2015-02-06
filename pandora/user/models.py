@@ -115,7 +115,7 @@ class SessionData(models.Model):
             data.ip = request.META['REMOTE_ADDR']
         if data.ip.startswith('::ffff:'):
             data.ip = data.ip[len('::ffff:'):]
-        data.useragent = request.META['HTTP_USER_AGENT'][:4096]
+        data.useragent = request.META.get('HTTP_USER_AGENT', '')[:4096]
         data.info = json.loads(request.POST.get('data', '{}'))
         screen = data.info.get('screen', {})
         if screen and 'height' in screen and 'width' in screen:
