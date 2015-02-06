@@ -63,8 +63,8 @@ class Entity(models.Model):
         return cls.objects.get(pk=ox.fromAZ(id))
 
     @classmethod
-    def get_by_name(cls, name):
-        return cls.objects.get(name_find__icontains=u'|%s|'%name)
+    def get_by_name(cls, name, type):
+        return cls.objects.get(name_find__icontains=u'|%s|'%name, type=type)
 
     @classmethod
     def get_or_create(model, name):

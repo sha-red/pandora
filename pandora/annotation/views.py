@@ -168,7 +168,7 @@ def addAnnotation(request, data):
     if layer['canAddAnnotations'].get(request.user.get_profile().get_level()):
         if layer['type'] == 'entity':
             try:
-                value = Entity.get_by_name(data['value']).get_id()
+                value = Entity.get_by_name(data['value'], layer['entity']).get_id()
             except Entity.DoesNotExist:
                 response = json_response({})
                 response['status']['text'] = 'unkown entity'
@@ -281,7 +281,7 @@ def editAnnotation(request, data):
             if key in data:
                 if key == 'value' and layer['type'] == 'entity':
                     try:
-                        value = Entity.get_by_name(data['value']).get_id()
+                        value = Entity.get_by_name(data['value'], layer['entity']).get_id()
                     except Entity.DoesNotExist:
                         response['data'] = a.json()
                         response['data']['editable'] = True

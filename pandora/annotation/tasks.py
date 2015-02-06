@@ -81,7 +81,7 @@ def add_annotations(data):
     for a in data['annotations']:
         if layer['type'] == 'entity':
             try:
-                value = Entity.get_by_name(a['value']).get_id()
+                value = Entity.get_by_name(a['value'], layer['entity']).get_id()
             except Entity.DoesNotExist:
                 continue
         else:
