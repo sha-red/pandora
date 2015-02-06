@@ -282,7 +282,7 @@ class File(models.Model):
         srt = []
         subtitles = []
         for s in ox.srt.load(self.data.path):
-            if s['in'] <= s['out']:
+            if s['in'] <= s['out'] and s['value'].strip():
                 key = '%s --> %s\n%s' % (s['in'], s['out'], s['value'])
                 if key not in subtitles:
                     subtitles.append(key)
