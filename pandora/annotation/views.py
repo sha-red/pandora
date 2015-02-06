@@ -283,8 +283,7 @@ def editAnnotation(request, data):
                     try:
                         value = Entity.get_by_name(data['value'], layer['entity']).get_id()
                     except Entity.DoesNotExist:
-                        response['data'] = a.json()
-                        response['data']['editable'] = True
+                        response = json_response({})
                         response['status']['text'] = 'unkown entity'
                         return render_to_json_response(response)
                 else:

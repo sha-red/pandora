@@ -141,6 +141,8 @@ class Entity(models.Model):
                 response[key] = self.data[key]
         return response
 
+    def html_link(self):
+        return '<a href="/entities/%s">%s</a>' % (self.get_id(), ox.escape_html(self.name))
     
     def update_matches(self):
         import annotation.models

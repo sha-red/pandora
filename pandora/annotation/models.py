@@ -228,7 +228,7 @@ class Annotation(models.Model):
             try:
                 entity = Entity.get(self.value)
                 j['entity'] = entity.json(user=user)
-                j['value'] = entity.name
+                j['value'] = entity.html_link()
             except:
                 j['entity'] = {}
         elif l['type'] == 'event':
