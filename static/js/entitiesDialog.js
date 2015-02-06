@@ -402,10 +402,11 @@ pandora.ui.entitiesDialog = function(options) {
                             pandora.api.editEntity(Ox.extend({
                                 id: id
                             }, key.id, data.value), function(result) {
-                                if (key.id == 'name') {
-                                    $list.value(id, {name: result.data.name});
-                                }
+                                Ox.Request.clearCache('findEntities');
                                 Ox.Request.clearCache('getEntity');
+                                if (key.id == 'name') {
+                                    $list.reloadList(true);
+                                }
                                 renderEntity();
                             });
                         }
