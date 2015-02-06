@@ -130,12 +130,15 @@ def autocompleteEntities(request, data):
         value_lower = data['value'].lower()
         matches = []
         leading_matches = []
+        leading_word_matches = []
         for v in [e.name for e in qs]:
             if v.lower().startswith(value_lower):
                 leading_matches.append(v)
+            elif [w for w in v.lower().split(' ') if w.strip().startswith(value_lower)]:
+                leading_word_matches.append(v)
             else:
                 matches.append(v)
-        values = leading_matches + matches
+        values = leading_matches + leading_word_matches + matches
     else:
         values = [e.name for e in qs]
     values  = values[data['range'][0]:data['range'][1]]
