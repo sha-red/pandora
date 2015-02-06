@@ -777,23 +777,32 @@ pandora.ui.documentsPanel = function(options) {
     function renderPreview() {
         var selected = $list.options('selected')[0],
             size = getPreviewSize(),
-            src = '/documents/' + selected + '/256p.jpg';
-        return Ox.ImageElement({
-            height: size.height,
-            src: src,
-            // fixme: this tends to stick around after menu click
-            // (and may not be necessary in the first place)
-            // tooltip: Ox._('Click to open document'),
-            width: size.width
-        })
-        .css({
-            borderRadius: '8px',
-            margin: size.margin,
-            cursor: 'pointer'
-        })
-        .on({
-            click: openDocuments
-        });
+            src = '/documents/' + selected + '/256p.jpg',
+            $element = Ox.ImageElement({
+                height: size.height,
+                src: src,
+                // fixme: this tends to stick around after menu click
+                // (and may not be necessary in the first place)
+                // tooltip: Ox._('Click to open document'),
+                width: size.width
+            })
+            .css({
+                borderRadius: '8px',
+                margin: size.margin,
+            })
+            .on({
+                click: function(e) {
+                    if ($(e.target).is('img')) {
+                        openDocuments();
+                    }
+                }
+            })
+            .bindEvent({
+                load: function() {
+                    $($element.children()[0]).css({cursor: 'pointer'});
+                }
+            });
+            return $element;
     }
 
     function resizeItem() {
