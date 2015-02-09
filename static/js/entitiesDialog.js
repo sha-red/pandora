@@ -289,6 +289,14 @@ pandora.ui.entitiesDialog = function(options) {
             // resize: ...
             pandora_entitiesselection: function() {
                 selectEntities();
+            },
+            pandora_entitiestype: function() {
+                type = ui.entitiesType || (
+                    pandora.site.entities.length ? pandora.site.entities[0].id : ''
+                );
+                $entitiesSelect.options({value: type});
+                $list.reloadList();
+                selectEntities();
             }
         });
 
