@@ -28,6 +28,7 @@ pandora.ui.entitiesDialog = function(options) {
                 type = data.value;
                 pandora.UI.set({entitiesType: type});
                 $list.reloadList();
+                selectEntities();
             }
         })
         .css({
