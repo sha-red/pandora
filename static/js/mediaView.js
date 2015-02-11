@@ -638,9 +638,9 @@ pandora.ui.mediaView = function(options) {
                             result.data.items.forEach(function(item) {
                                 if (self.$filesList.value(item.id, 'state') == 'encoding'
                                     && item.state != 'encoding') {
+                                    self.$filesList.value(item.id, 'state', item.state);
                                     done = true;
                                 }
-                                self.$filesList.value(item.id, 'state', item.state);
                                 if (!update && item.state == 'encoding') {
                                     update = true;
                                 }
