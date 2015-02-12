@@ -157,20 +157,18 @@ pandora.ui.apiDialog = function() {
         );
         parts = $doc.html().split('<b>see</b>' + colon + whitespace);
         if (parts.length == 2) {
-            parts[1] = parts[1]
-                .split(comma + linebreak)
-                .map(function(part) {
-                    return part
-                        .split(comma + whitespace)
-                        .map(function(action) {
-                            action = Ox.stripTags(action);
-                            return '<span class="OxMethod"><a href="/api/'
-                                + action + '">' + action + '</a></span>';
-                        })
-                        .join(comma + whitespace);
-                    
+            parts_ = parts[1].split('<b>source</b>' + colon + whitespace);
+            parts_[0] = parts_[0]
+                .split(comma + whitespace)
+                .map(function(action) {
+                    action = Ox.stripTags(action);
+                    return '<span class="OxMethod"><a href="/api/'
+                        + action + '">' + action + '</a></span>';
                 })
-                .join(comma + linebreak);
+                .join(comma + whitespace);
+            parts[1] = parts_.join(
+                linebreak + linebreak + '<b>source</b>' + colon + whitespace
+            );
             $doc.html(parts.join('<b>see</b>' + colon + whitespace));
         }
         pandora.createLinks($doc);
