@@ -525,7 +525,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function renderData() {
-        var $name, $description,
+        var $name, $description, $input,
             item = $list.value($list.options('selected')[0]),
             editable = item.user == pandora.user.username
                 || pandora.site.capabilities.canEditDocuments[pandora.user.level]
@@ -673,7 +673,64 @@ pandora.ui.documentsPanel = function(options) {
                         value: item.description,
                         width: width
                     })
-                ],
+                ].concat(
+                    pandora.site.entities && pandora.site.entities.length
+                    ? Ox.ArrayInput({
+                        getInput: function(width) {
+                            $input = Ox.FormElementGroup({
+                                elements: [
+                                    Ox.Select({
+                                        items: pandora.site.entities.map(function(entity) {
+                                            return {
+                                                id: entity.id,
+                                                title: entity.title
+                                            };
+                                        }),
+                                        overlap: 'right',
+                                        width: labelWidth
+                                    })
+                                    .bindEvent({
+                                        change: function() {
+                                            $input.value($input.value()[0], '');
+                                        }
+                                    }),
+                                    Ox.Input({
+                                        autocomplete: function(value, callback) {
+                                            pandora.api.autocompleteEntities({
+                                                key: $input.value()[0],
+                                                operator: '=',
+                                                range: [0, 10],
+                                                value: value
+                                            }, function(result) {
+                                                callback(result.data.items);
+                                            });
+                                        },
+                                        autocompleteReplace: true,
+                                        autocompleteSelect: true,
+                                        autocompleteSelectSubmit: true,
+                                        width: width - labelWidth
+                                    })
+                                ],
+                                width: width
+                            });
+                            return $input;
+                        },
+                        label: Ox._('Entities'),
+                        setWidth: function(width) {
+                            $input.options('elements')[1].options({
+                                width: width - labelWidth
+                            });
+                        },
+                        value: item.entities,
+                        width: width
+                    })
+                    .bindEvent({
+                        add: function() {
+                            $item[0].scrollTop = 1000000;
+                        }
+                    })
+                    : []
+                ),
                 width: 240
             })
             .css({margin: '12px 8px 8px 8px'})
