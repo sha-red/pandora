@@ -144,7 +144,15 @@ class Annotation(models.Model):
         layer = self.get_layer()
         if self.value:
             self.value = utils.cleanup_value(self.value, layer['type'])
-            self.findvalue = ox.decode_html(ox.strip_tags(re.sub('<br */?>\n?', ' ', self.value))).replace('\n', ' ')
+
+            findvalue = self.value
+            try:
+                l = self.get_layer()
+                if l['type'] == 'entity':
+                    findvalue = self.get_entity().name
+            except:
+                pass
+            self.findvalue = ox.decode_html(ox.strip_tags(re.sub('<br */?>\n?', ' ', findvalue))).replace('\n', ' ')
             self.findvalue = unicodedata.normalize('NFKD', self.findvalue).lower()
             sortvalue = sort_string(self.findvalue)
             while sortvalue and not unicodedata.category(sortvalue[0])[0] in ('L', 'N'):
@@ -203,8 +211,11 @@ class Annotation(models.Model):
                 if e.annotations.exclude(id=self.id).count() == 0:
                     e.delete()
 
-    def json(self, layer=False, keys=None, user=None):
+    def get_entity(self):
         from entity.models import Entity
+        return Entity.get(self.value)
+
+    def json(self, layer=False, keys=None, user=None):
         j = {
             'user': self.user.username,
         }
@@ -226,7 +237,7 @@ class Annotation(models.Model):
         l = self.get_layer()
         if l['type'] == 'entity':
             try:
-                entity = Entity.get(self.value)
+                entity = sef.get_entity()
                 j['entity'] = entity.json(user=user)
                 j['value'] = entity.html_link()
             except:
