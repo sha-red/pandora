@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
+import ox
 from ox.utils import json
 from ox.django.api import actions
 from ox.django.decorators import login_required_json
@@ -13,6 +14,7 @@ from django.db.models import Sum
 from item import utils
 from item.models import Item
 from itemlist.models import List
+from entity.models import Entity
 from archive.chunk import process_chunk
 from changelog.models import add_changelog
 
@@ -31,9 +33,11 @@ def addDocument(request, data):
     '''
     Adds one or more documents to one or more items
     takes {
-        item: string or [string], // one or more item ids
+        item: string or [string], // one or more item ids (optional)
+        entity: string or [string], // one or more entity ids (optional)
         id: string or [string] // one or more document ids
     }
+    notes: either `item` or `entity` must be provided
     returns {}
     see: editDocument, findDocument, getDocument, removeDocument, sortDocuments
     '''
@@ -59,6 +63,25 @@ def addDocument(request, data):
                         document = models.Document.get(id)
                         document.add(item)
             add_changelog(request, data, data['item'])
+    elif 'entity' in data:
+        if isinstance(data['entity'], basestring):
+            entity = Entity.get(data['entity'])
+            if entity.editable(request.user):
+                for id in ids:
+                    document = models.Document.get(id)
+                    entity.add(document)
+                add_changelog(request, data, entity.get_id())
+            else:
+                response = json_response(status=403, text='permission denied')
+        else:
+            for entity in Entity.objects.filter(id__in=map(ox.fromAZ, data['entity'])):
+                if entity.editable(request.user):
+                    for id in ids:
+                        document = models.Document.get(id)
+                        entity.add(document)
+            add_changelog(request, data, data['entity'])
+    else:
+        response = json_response(status=500, text='invalid request')
     return render_to_json_response(response)
 actions.register(addDocument, cache=False)
 
@@ -207,13 +230,15 @@ actions.register(getDocument)
 @login_required_json
 def removeDocument(request, data):
     '''
-    Removes one or more documents, either from an item or from the database
+    Removes one or more documents, either from an item/entity or from the database
     takes {
         id or ids: string or [string], // one or more document ids
         item: string // item id (optional)
+        entity: string // entity id (optional)
     }
     returns {}
     notes: If `item` is present, this removes the documents from that item.
+    If `entity` is present, this removes the documents from that entity.
     Otherwise, it removes the documents from the database.
     see: addDocument, editDocument, findDocument, getDocument, sortDocuments
     '''
@@ -224,12 +249,21 @@ def removeDocument(request, data):
     else:
         ids = [data['id']]
     item = 'item' in data and Item.objects.get(public_id=data['item']) or None
+    entity = 'entity' in data and Entity.objects.get(id=ox.fromAZ(data['entity'])) or None
     if item:
         if item.editable(request.user):
             add_changelog(request, data, item.public_id)
             for id in ids:
                 document = models.Document.get(id)
                 document.remove(item)
+        else:
+            response = json_response(status=403, text='not allowed')
+    elif entity:
+        if entity.editable(request.user):
+            add_changelog(request, data, entity.get_id())
+            for id in ids:
+                document = models.Document.get(id)
+                entity.remove(document)
         else:
             response = json_response(status=403, text='not allowed')
     else:

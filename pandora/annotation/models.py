@@ -13,7 +13,6 @@ from django.db.models.signals import pre_delete
 import ox
 
 from clip.models import Clip
-from entity.models import Entity
 
 from item.utils import sort_string, get_by_key
 import managers
@@ -205,6 +204,7 @@ class Annotation(models.Model):
                     e.delete()
 
     def json(self, layer=False, keys=None, user=None):
+        from entity.models import Entity
         j = {
             'user': self.user.username,
         }

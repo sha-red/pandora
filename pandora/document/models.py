@@ -144,12 +144,13 @@ class Document(models.Model):
                 'description',
                 'dimensions',
                 'editable',
+                'entities',
+                'extension',
                 'id',
                 'name',
-                'extension',
                 'oshash',
-                'size',
                 'ratio',
+                'size',
                 'user',
             ]
         response = {}
@@ -162,6 +163,9 @@ class Document(models.Model):
                 response[key] = self.editable(user)
             elif key == 'user':
                 response[key] = self.user.username
+            elif key == 'entities':
+                response[key] = [e.json(['id', 'type', 'name'])
+                    for e in self.entities.all().order_by('documentproperties__index')]
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key,key)) or ''
         if item:
@@ -280,7 +284,7 @@ class Document(models.Model):
         url = unquote(urls[0])
         if url != urls[0]:
             urls.append(url)
-        matches = self.items.count()
+        matches = self.items.count() + self.entities.count()
         for url in urls:
             matches += annotation.models.Annotation.objects.filter(value__contains=url).count()
             matches += item.models.Item.objects.filter(data__contains=url).count()

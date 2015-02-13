@@ -35,7 +35,6 @@ from data_api import external_data
 from annotation.models import Annotation
 from archive import extract
 from clip.models import Clip
-from entity.models import Entity
 from person.models import get_name_sort
 from sequence.tasks import get_sequences
 from title.models import get_title_sort
@@ -1003,6 +1002,7 @@ class Item(models.Model):
         s.save()
 
     def update_layer_facet(self, key):
+        from entity.models import Entity
         current_values = [a['value']
             for a in self.annotations.filter(layer=key).distinct().values('value')]
         layer = utils.get_by_id(settings.CONFIG['layers'], key)
@@ -1674,6 +1674,7 @@ for key in filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'ti
         'float': (models.FloatField, dict(null=True, blank=True, db_index=True)),
         'date': (models.DateTimeField, dict(null=True, blank=True, db_index=True))
     }[{
+        'layer': 'char',
         'string': 'char',
         'title': 'char',
         'person': 'char',

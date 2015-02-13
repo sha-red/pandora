@@ -17,6 +17,8 @@ from ox.django import fields
 
 from person.models import get_name_sort
 from item.utils import get_by_id
+from document.models import Document
+
 import managers
 
 
@@ -42,6 +44,7 @@ class Entity(models.Model):
     name_sort = models.CharField(max_length=255, null=True)
     name_find = models.TextField(default='', editable=True)
 
+    documents = models.ManyToManyField(Document, through='DocumentProperties', related_name='entities')
 
     def save(self, *args, **kwargs):
         entity = get_by_id(settings.CONFIG['entities'], self.type)
@@ -81,6 +84,16 @@ class Entity(models.Model):
 
     def get_id(self):
         return ox.toAZ(self.id)
+
+    def add(self, document):
+        p, created = DocumentProperties.objects.get_or_create(document=document, entity=self)
+        if created:
+            p.index = DocumentProperties.objects.filter(entity=self).aggregate(Max('index'))['index__max'] + 1
+            p.save()
+            p.document.update_matches()
+
+    def remove(self, document):
+        DocumentProperties.objects.filter(document=document, entity=self).delete()
 
     def editable(self, user, item=None):
         if not user or user.is_anonymous():
@@ -124,6 +137,7 @@ class Entity(models.Model):
                 'sortName',
                 'type',
                 'user',
+                'documents',
             ] + self.data.keys()
         response = {}
         for key in keys:
@@ -137,6 +151,9 @@ class Entity(models.Model):
                 response[key] = getattr(self, key)
             elif key == 'sortName':
                 response[key] = self.name_sort
+            elif key == 'documents':
+                response[key] = [ox.toAZ(d['id'])
+                    for d in self.documents.all().values('id').order_by('documentproperties__index')]
             elif key in self.data:
                 response[key] = self.data[key]
         return response
@@ -165,3 +182,20 @@ class Entity(models.Model):
             Entity.objects.filter(id=self.id).update(matches=matches)
             self.matches = matches
 
+
+class DocumentProperties(models.Model):
+
+    class Meta:
+        unique_together = ("entity", "document")
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    document = models.ForeignKey(Document)
+    entity = models.ForeignKey(Entity, related_name='documentproperties')
+    index = models.IntegerField(default=0)
+
+
+    def save(self, *args, **kwargs):
+
+        super(DocumentProperties, self).save(*args, **kwargs)
