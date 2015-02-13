@@ -237,7 +237,7 @@ class Annotation(models.Model):
         l = self.get_layer()
         if l['type'] == 'entity':
             try:
-                entity = sef.get_entity()
+                entity = self.get_entity()
                 j['entity'] = entity.json(user=user)
                 j['value'] = entity.html_link()
             except:
