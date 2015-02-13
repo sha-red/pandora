@@ -729,6 +729,56 @@ pandora.ui.documentsPanel = function(options) {
                     .bindEvent({
                         add: function() {
                             $item[0].scrollTop = 1000000;
+                        },
+                        change: function(data) {
+                            var remove = item.entities.filter(function(entity) {
+                                return data.value.filter(function(value) {
+                                    return value[0] == entity.type && value[1] == entity.name;
+                                }).length == 0;
+                            }).map(function(entity) {
+                                return entity.id;
+                            });
+                            var add = data.value.filter(function(value) {
+                                return item.entities.filter(function(entity) {
+                                    return value[0] == entity.type && value[1] == entity.name;
+                                }).length == 0;
+                            }).map(function(value) {
+                                return {
+                                    type: value[0],
+                                    name: value[1]
+                                }
+                            });
+                            remove.length && remove.forEach(function(id) {
+                                pandora.api.removeDocument({
+                                    id: item.id,
+                                    entity: id
+                                }, function(result) {
+                                    // fixme: check result
+                                });
+                            });
+                            add.length && add.forEach(function(entity) {
+                                pandora.api.findEntities({
+                                    query: {
+                                        conditions: [
+                                            {key: 'type', value: entity.type, operator: '=='},
+                                            {key: 'name', value: entity.name, operator: '=='}
+                                        ],
+                                        operator: '&'
+                                    },
+                                    keys: ['id'],
+                                    range: [0, 1]
+                                }, function(result) {
+                                    if (result.data.items && result.data.items.length) {
+                                        pandora.api.addDocument({
+                                            id: item.id,
+                                            entity: result.data.items[0].id
+                                        }, function(result) {
+                                            // fixme: check result
+                                        });
+                                    }
+
+                                });
+                            });
                         }
                     })
                     : []
