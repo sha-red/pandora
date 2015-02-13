@@ -721,7 +721,9 @@ pandora.ui.documentsPanel = function(options) {
                                 width: width - labelWidth
                             });
                         },
-                        value: item.entities,
+                        value: item.entities.map(function(entity) {
+                            return [entity.type, entity.name];
+                        }),
                         width: width
                     })
                     .bindEvent({
@@ -755,7 +757,7 @@ pandora.ui.documentsPanel = function(options) {
     function renderList() {
         var options = {
             items: pandora.api.findDocuments,
-            keys: ['description', 'dimensions', 'extension', 'id', 'name', 'ratio', 'size', 'user'],
+            keys: ['description', 'dimensions', 'extension', 'id', 'name', 'ratio', 'size', 'user', 'entities'],
             query: {
                 conditions: isItemView ? [{ key: 'item', value: ui.item, operator: '==' }] : [],
                 operator: '&'
