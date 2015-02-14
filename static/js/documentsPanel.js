@@ -676,54 +676,58 @@ pandora.ui.documentsPanel = function(options) {
                 ].concat(
                     pandora.site.entities && pandora.site.entities.length
                     ? Ox.ArrayInput({
-                        getInput: function(width) {
-                            $input = Ox.FormElementGroup({
-                                elements: [
-                                    Ox.Select({
-                                        items: pandora.site.entities.map(function(entity) {
-                                            return {
-                                                id: entity.id,
-                                                title: entity.title
-                                            };
+                        input: {
+                            get: function(width) {
+                                return Ox.FormElementGroup({
+                                    elements: [
+                                        Ox.Select({
+                                            items: pandora.site.entities.map(function(entity) {
+                                                return {
+                                                    id: entity.id,
+                                                    title: entity.title
+                                                };
+                                            }),
+                                            overlap: 'right',
+                                            width: labelWidth
+                                        })
+                                        .bindEvent({
+                                            change: function() {
+                                                $input.value($input.value()[0], '');
+                                            }
                                         }),
-                                        overlap: 'right',
-                                        width: labelWidth
-                                    })
-                                    .bindEvent({
-                                        change: function() {
-                                            $input.value($input.value()[0], '');
-                                        }
-                                    }),
-                                    Ox.Input({
-                                        autocomplete: function(value, callback) {
-                                            pandora.api.autocompleteEntities({
-                                                key: $input.value()[0],
-                                                operator: '=',
-                                                range: [0, 10],
-                                                value: value
-                                            }, function(result) {
-                                                callback(result.data.items);
-                                            });
-                                        },
-                                        autocompleteReplace: true,
-                                        autocompleteSelect: true,
-                                        autocompleteSelectSubmit: true,
-                                        width: width - labelWidth
-                                    })
-                                ],
-                                width: width
-                            });
-                            return $input;
-                        },
-                        isEmpty: function(value) {
-                            return value[1] === '';
-                        },
+                                        Ox.Input({
+                                            autocomplete: function(value, callback) {
+                                                pandora.api.autocompleteEntities({
+                                                    key: $input.value()[0],
+                                                    operator: '=',
+                                                    range: [0, 10],
+                                                    value: value
+                                                }, function(result) {
+                                                    callback(result.data.items);
+                                                });
+                                            },
+                                            autocompleteReplace: true,
+                                            autocompleteSelect: true,
+                                            autocompleteSelectSubmit: true,
+                                            width: width - labelWidth
+                                        })
+                                    ],
+                                    width: width
+                                });
+                            },
+                            getEmpty: function() {
+                                return [pandora.site.entities[0].id, ''];
+                            },
+                            isEmpty: function(value) {
+                                return value[1] === '';
+                            },
+                            setWidth: function($input, width) {
+                                $input.options('elements')[1].options({
+                                    width: width - labelWidth
+                                });
+                            }
+                        }
                         label: Ox._('Entities'),
-                        setWidth: function(width) {
-                            $input.options('elements')[1].options({
-                                width: width - labelWidth
-                            });
-                        },
                         value: item.entities.map(function(entity) {
                             return [entity.type, entity.name];
                         }),
