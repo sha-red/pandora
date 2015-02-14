@@ -327,6 +327,8 @@ def upload(request):
         if file.editable(request.user):
             response = process_chunk(request, file.save_chunk)
             response['resultUrl'] = request.build_absolute_uri(file.get_absolute_url())
+            # id is used to select document in dialog after upload
+            response['id'] = file.get_id()
             return render_to_json_response(response)
     #init upload
     else:
