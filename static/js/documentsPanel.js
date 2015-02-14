@@ -678,7 +678,7 @@ pandora.ui.documentsPanel = function(options) {
                     ? Ox.ArrayInput({
                         input: {
                             get: function(width) {
-                                return Ox.FormElementGroup({
+                                var $input = Ox.FormElementGroup({
                                     elements: [
                                         Ox.Select({
                                             items: pandora.site.entities.map(function(entity) {
@@ -714,6 +714,7 @@ pandora.ui.documentsPanel = function(options) {
                                     ],
                                     width: width
                                 });
+                                return $input;
                             },
                             getEmpty: function() {
                                 return [pandora.site.entities[0].id, ''];
