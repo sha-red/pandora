@@ -726,7 +726,7 @@ pandora.ui.documentsPanel = function(options) {
                                     width: width - labelWidth
                                 });
                             }
-                        }
+                        },
                         label: Ox._('Entities'),
                         value: item.entities.map(function(entity) {
                             return [entity.type, entity.name];
