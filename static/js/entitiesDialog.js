@@ -453,7 +453,7 @@ pandora.ui.entitiesDialog = function(options) {
         });
         $inputs.forEach(function($input) {
             $input.options({width: width});
-        })
+        });
     }
 
     function updateList() {

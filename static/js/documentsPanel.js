@@ -854,7 +854,7 @@ pandora.ui.documentsPanel = function(options) {
             })
             .css({
                 borderRadius: '8px',
-                margin: size.margin,
+                margin: size.margin
             })
             .on({
                 click: function(e) {
