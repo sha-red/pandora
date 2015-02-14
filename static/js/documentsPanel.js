@@ -715,6 +715,9 @@ pandora.ui.documentsPanel = function(options) {
                             });
                             return $input;
                         },
+                        isEmpty: function(value) {
+                            return value[1] === '';
+                        },
                         label: Ox._('Entities'),
                         setWidth: function(width) {
                             $input.options('elements')[1].options({
