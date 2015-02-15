@@ -692,7 +692,7 @@ pandora.ui.documentsPanel = function(options) {
                                         })
                                         .bindEvent({
                                             change: function() {
-                                                $input.value($input.value()[0], '');
+                                                $input.value([$input.value()[0], '']);
                                             }
                                         }),
                                         Ox.Input({
