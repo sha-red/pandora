@@ -215,6 +215,11 @@ class Annotation(models.Model):
         from entity.models import Entity
         return Entity.get(self.value)
 
+    annotation_keys = (
+        'id', 'in', 'out', 'value', 'created', 'modified',
+        'duration', 'layer', 'item', 'videoRatio', 'languages', 
+        'entity', 'event', 'place'
+    )
     def json(self, layer=False, keys=None, user=None):
         j = {
             'user': self.user.username,
@@ -269,6 +274,13 @@ class Annotation(models.Model):
                 streams = self.item.streams()
                 if streams:
                     j['videoRatio'] = streams[0].aspect_ratio
+            for key in keys:
+                if key not in self.annotation_keys and key not in j:
+                    value = self.item.get(key) or self.item.json.get(key)
+                    if not value and hasattr(self.item.sort, key):
+                        value = getattr(self.item.sort, key)
+                    if value != None:
+                        j[key] = value
         subtitles = get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
         if subtitles:
             if 'id' in j and self.layer == subtitles['id'] and not self.value:
