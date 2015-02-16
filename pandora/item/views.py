@@ -714,7 +714,9 @@ def lookup(request, data):
     if i:
         r = {'id': i.public_id}
         for key in ('title', 'director', 'year'):
-            r[key] = i.get(key)
+            value = i.get(key)
+            if value != None:
+                r[key] = value
         response = json_response(r)
     else:
         response = json_response(status=404, text='not found')
