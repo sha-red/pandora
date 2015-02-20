@@ -23,7 +23,7 @@ import models
 def get_document_or_404_json(id):
     try:
         return models.Document.get(id)
-    except models.Document.DoesNotExist:
+    except:
         response = {'status': {'code': 404,
                                'text': 'Document not found'}}
         raise HttpErrorJson(response)
