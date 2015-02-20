@@ -6,7 +6,7 @@ else
     ID=unknown
 fi
 UBUNTU_VERSION="$VERSION_ID"
-if [ "$ID" == "debian" ]; then
+if [ -d "/run/systemd/system/" ]; then
     SYSTEMD="yes"
 else
     SYSTEMD="no"
