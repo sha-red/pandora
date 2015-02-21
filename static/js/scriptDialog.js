@@ -2,7 +2,7 @@
 
 'use strict';
 
-pandora.ui.onloadDialog = function() {
+pandora.ui.scriptDialog = function() {
 
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
         dialogWidth = Math.round(window.innerWidth * 0.75),

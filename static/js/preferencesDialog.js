@@ -174,7 +174,7 @@ pandora.ui.preferencesDialog = function() {
                         })
                         .bindEvent({
                             click: function() {
-                                pandora.$ui.onloadDialog = pandora.ui.onloadDialog().open();
+                                pandora.$ui.scriptDialog = pandora.ui.scriptDialog().open();
                             }
                         })
                         .css({position: 'absolute', left: '96px', top: '40px'})
