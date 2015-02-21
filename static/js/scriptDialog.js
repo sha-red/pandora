@@ -9,9 +9,10 @@ pandora.ui.scriptDialog = function() {
         $input = Ox.Input({
                 height: dialogHeight - 32,
                 id: 'onload',
-                placeholder: Ox._('/*\nAny JavaScript you paste here will run on load.\n'
-                    + 'If you ever need to manually change or remove it, '
-                    + 'you can do so by pandora.UI.set({onload: ""}) in the console.\n*/'),
+                placeholder: Ox._(
+                    '/*\nAny JavaScript you paste here will run on load.\n'
+                    + 'If you ever need to bypass it, press escape while the site is loading.\n*/'
+                ),
                 type: 'textarea',
                 value: pandora.user.script || '',
                 width: dialogWidth - 32
