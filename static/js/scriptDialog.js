@@ -7,14 +7,14 @@ pandora.ui.scriptDialog = function() {
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
         dialogWidth = Math.round(window.innerWidth * 0.75),
         $text = Ox.$('<div>')
-            .css({height: '32px', margin: '16px'})
+            .css({height: '16px', margin: '16px'})
             .html(Ox._(
-                'Any JavaScript you paste here will run on load.<br>'
+                'Any JavaScript you paste here will run on load. '
                 + 'If you ever need to bypass it, '
                 + 'press escape while the page is loading.'
             )),
         $input = Ox.Input({
-                height: dialogHeight - 32,
+                height: dialogHeight - 64,
                 type: 'textarea',
                 value: pandora.user.script || '',
                 width: dialogWidth - 32
@@ -59,7 +59,7 @@ pandora.ui.scriptDialog = function() {
         dialogHeight = data.height;
         dialogWidth = data.width;
         $input.options({
-            height: dialogHeight - 32,
+            height: dialogHeight - 64,
             width: dialogWidth - 32
         });
     }
