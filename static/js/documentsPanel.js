@@ -693,6 +693,7 @@ pandora.ui.documentsPanel = function(options) {
                                         .bindEvent({
                                             change: function() {
                                                 $input.value([$input.value()[0], '']);
+                                                $input.options('elements')[1].focusInput();
                                             }
                                         }),
                                         Ox.Input({
