@@ -85,9 +85,8 @@ def update_info(user, info):
     user = models.User.objects.get(username=user)
     files = models.File.objects.filter(oshash__in=info.keys())
     for f in files:
-        if not f.info:
-            f.update_info(info[f.oshash], user)
-            f.save()
+        f.update_info(info[f.oshash], user)
+        f.save()
     for i in Item.objects.filter(files__in=files).distinct():
         i.update_selected()
         i.update_wanted()

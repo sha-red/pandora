@@ -8,7 +8,7 @@ from django import forms
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, Q
 
 import ox
 from ox.utils import json
@@ -95,7 +95,7 @@ def update(request, data):
         files = all_files.filter(file__available=False)
         if volume:
             files = files.filter(volume=volume)
-        response['data']['info'] = [f.file.oshash for f in all_files.filter(file__info='{}')]
+        response['data']['info'] = [f.file.oshash for f in all_files.filter(Q(file__info='{}')|Q(file__size=0))]
         response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True,
                                                                         file__available=False,
                                                                         file__wanted=True)]

@@ -208,21 +208,22 @@ class File(models.Model):
                 return p[0]['normalizedPath']
 
     def update_info(self, info, user):
-        #populate name sort with director if unknown
-        if info.get('director') and info.get('directorSort'):
-            for name, sortname in zip(info['director'], info['directorSort']):
-                get_name_sort(name, sortname)
-        #add all files in one folder to same item
-        if self.instances.all().count():
-            if info.get('isEpisode'):
-                prefix = os.path.splitext(self.instances.all()[0].path)[0]
-            else:
-                prefix = os.path.dirname(self.instances.all()[0].path) + '/'
-            qs = item.models.Item.objects.filter(files__instances__path__startswith=prefix)
-            if qs.exists():
-                self.item = qs[0]
-        if not self.item:
-            self.item = item.models.get_item(info, user)
+        if not self.info:
+            #populate name sort with director if unknown
+            if info.get('director') and info.get('directorSort'):
+                for name, sortname in zip(info['director'], info['directorSort']):
+                    get_name_sort(name, sortname)
+            #add all files in one folder to same item
+            if self.instances.all().count():
+                if info.get('isEpisode'):
+                    prefix = os.path.splitext(self.instances.all()[0].path)[0]
+                else:
+                    prefix = os.path.dirname(self.instances.all()[0].path) + '/'
+                qs = item.models.Item.objects.filter(files__instances__path__startswith=prefix)
+                if qs.exists():
+                    self.item = qs[0]
+            if not self.item:
+                self.item = item.models.get_item(info, user)
         for key in self.AV_INFO + self.PATH_INFO:
             if key in info:
                 self.info[key] = info[key]
