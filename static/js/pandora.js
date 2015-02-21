@@ -52,12 +52,15 @@ appPanel
             && !(Math.round(navigator.userAgent.match(/MSIE (\d+)/)[1]) >= 10),
         isPrint = /^#print(\?.*?)?$/.test(document.location.hash),
         legacyThemes = {classic: 'oxlight', modern: 'oxdark'},
+        loadUserScript = true,
         logoHeight,
         logoWidth,
         theme = getLocalStorage('Ox.theme')
             && JSON.parse(localStorage['Ox.theme']) || 'oxmedium';
 
     theme = legacyThemes[theme] || theme;
+
+    document.addEventListener('keydown', onKeydown);
 
     loadImages(function(images) {
         loadScreen(images);
@@ -429,7 +432,8 @@ appPanel
         });
         Ox.Fullscreen.bind('exit', pandora.UI.set);
         pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
-        pandora.loadUserScript();
+        loadUserScript && pandora.loadUserScript();
+        document.removeEventListener('keydown', onKeydown);
     }
 
     function loadBrowserMessage() {
@@ -511,6 +515,12 @@ appPanel
             });
         };
 
+    }
+
+    function onKeydown(e) {
+        if (e.keyCode == 27) {
+            loadUserScript = false;
+        }
     }
 
     function startAnimation() {
