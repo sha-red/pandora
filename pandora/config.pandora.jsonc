@@ -843,7 +843,6 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "locale": "en",
             "mapFind": "",
             "mapSelection": "",
-            "onload": "",
             "page": "",
             "part": {
                 "api": "",
@@ -916,6 +915,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "videoView": "player",
             "videoVolume": 1
         },
+        "script": "",
         "username": "",
         "volumes": []
     },

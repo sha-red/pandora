@@ -1970,9 +1970,9 @@ pandora.isVideoView = function(view, item) {
 };
 
 pandora.loadUserScript = function() {
-    if (pandora.user.ui.onload) {
+    if (pandora.user.script) {
         try {
-            eval(pandora.user.ui.onload);
+            eval(pandora.user.script);
         } catch(e) {
             Ox.print('user onload script error', e);
         }

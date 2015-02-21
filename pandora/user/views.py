@@ -708,6 +708,10 @@ def editPreferences(request, data):
     if 'password' in data:
         change = True
         request.user.set_password(data['password'])
+    if 'script' in data:
+        profile = request.user.get_profile()
+        profile.preferences['script'] = data['script']
+        profile.save()
     if change:
         request.user.save()
     if errors:

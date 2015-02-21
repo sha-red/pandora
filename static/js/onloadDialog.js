@@ -13,7 +13,7 @@ pandora.ui.onloadDialog = function() {
                     + 'If you ever need to manually change or remove it, '
                     + 'you can do so by pandora.UI.set({onload: ""}) in the console.\n*/'),
                 type: 'textarea',
-                value: pandora.user.ui.onload || '',
+                value: pandora.user.script || '',
                 width: dialogWidth - 32
             })
             .css({margin: '16px'}),
@@ -62,14 +62,14 @@ pandora.ui.onloadDialog = function() {
     }
 
     function clear() {
-        pandora.UI.set({onload: ''});
+        pandora.api.editPreferences({script: ''});
         $input.options({value: ''});
     }
 
     that.superClose = that.close;
     that.close = function() {
         var value = $input.value();
-        pandora.UI.set({onload: value || ''});
+        pandora.api.editPreferences({script: value || ''});
         that.superClose();
     };
 

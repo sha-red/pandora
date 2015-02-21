@@ -800,7 +800,6 @@
             "locale": "en",
             "mapFind": "",
             "mapSelection": "",
-            "onload": "",
             "page": "",
             "part": {
                 "api": "",
@@ -874,6 +873,7 @@
             "videoView": "player",
             "videoVolume": 1
         },
+        "script": "",
         "username": "",
         "volumes": []
     },

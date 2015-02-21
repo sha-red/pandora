@@ -350,6 +350,7 @@ def init_user(user, request=None):
         result['newsletter'] = profile.newsletter
         result['ui'] = profile.get_ui()
         result['volumes'] = [v.json() for v in user.volumes.all()] 
+        result['script'] = profile.preferences.get('script', '')
     return result
 
 def user_json(user, keys=None):
@@ -364,6 +365,7 @@ def user_json(user, keys=None):
         'newsletter': p.newsletter,
         'notes': p.notes,
         'numberoflists': user.lists.count(),
+        'script': p.preferences.get('script', ''),
         'username': user.username,
     }
     if keys:
