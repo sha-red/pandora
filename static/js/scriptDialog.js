@@ -7,7 +7,12 @@ pandora.ui.scriptDialog = function() {
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
         dialogWidth = Math.round(window.innerWidth * 0.75),
         $text = Ox.$('<div>')
-            .css({height: '16px', margin: '16px'})
+            .css({
+                height: '16px',
+                margin: '16px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+            })
             .html(Ox._(
                 'Any JavaScript you paste here will run on load. '
                 + 'If you ever need to bypass it, '
