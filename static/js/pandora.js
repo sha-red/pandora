@@ -22,8 +22,8 @@ appPanel
 (function() {
 
     window.onerror = function(error, url, line) {
-        if(error == 'TypeError: Attempted to assign to readonly property.') {
-            return
+        if (error == 'TypeError: Attempted to assign to readonly property.') {
+            return;
         }
         try {
             !isMSIE && !/^resource:/.test(url) && pandora.api.logError({
@@ -35,7 +35,7 @@ appPanel
     };
 
     // handle legacy embed and print URLs
-    if ( document.location.hash) {
+    if (document.location.hash) {
         document.location.hash = document.location.hash.replace(
             /^#\?(embed|print)=true(&)?/,
             function() {
