@@ -60,7 +60,7 @@ appPanel
 
     theme = legacyThemes[theme] || theme;
 
-    document.addEventListener('keydown', onKeydown);
+    document.addEventListener && document.addEventListener('keydown', onKeydown);
 
     loadImages(function(images) {
         loadScreen(images);
@@ -433,7 +433,7 @@ appPanel
         Ox.Fullscreen.bind('exit', pandora.UI.set);
         pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
         loadUserScript && pandora.loadUserScript();
-        document.removeEventListener('keydown', onKeydown);
+        document.removeEventListener && document.removeEventListener('keydown', onKeydown);
     }
 
     function loadBrowserMessage() {
