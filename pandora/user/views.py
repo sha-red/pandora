@@ -10,8 +10,10 @@ from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
 from django.shortcuts import redirect
+from django.db import transaction
 from django.db.models import Max
 from django.contrib.auth.models import User, Group
+from django.contrib.sessions.models import Session
 
 from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
 from ox.django.decorators import login_required_json
@@ -116,12 +118,17 @@ def signout(request, data):
     '''
     response = json_response(text='ok')
     if request.user.is_authenticated():
+        uid = request.user.id
         profile = request.user.get_profile()
         if profile.ui.get('page') == 'signout':
             profile.ui['page'] = ''
             profile.save()
         response = json_response(text='logged out')
         logout(request)
+        with transaction.commit_on_success():
+            for s in Session.objects.all():
+                if s.get_decoded().get('_auth_user_id') == uid:
+                    s.delete()
 
     response['data']['user'] = settings.CONFIG['user']
     return render_to_json_response(response)
