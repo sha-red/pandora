@@ -6,7 +6,7 @@ import re
 from glob import glob
 from urllib import quote, unquote
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete
@@ -57,6 +57,7 @@ class Entity(models.Model):
         self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
         super(Entity, self).save(*args, **kwargs)
         self.update_matches()
+        self.update_annotations()
 
     def __unicode__(self):
         return self.get_id()
@@ -182,6 +183,12 @@ class Entity(models.Model):
             Entity.objects.filter(id=self.id).update(matches=matches)
             self.matches = matches
 
+    def update_annotations(self):
+        entity_layers = [l['id'] for l in settings.CONFIG['layers'] if l['type'] == 'entity']
+        if entity_layers:
+            with transaction.commit_on_success():
+                for a in annotation.models.Annotation.objects.filter(layer__in=entity_layers, value=self.get_id()):
+                    a.save()
 
 class DocumentProperties(models.Model):
 
