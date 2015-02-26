@@ -184,6 +184,7 @@ class Entity(models.Model):
             self.matches = matches
 
     def update_annotations(self):
+        import annotation.models
         entity_layers = [l['id'] for l in settings.CONFIG['layers'] if l['type'] == 'entity']
         if entity_layers:
             with transaction.commit_on_success():
