@@ -144,7 +144,7 @@ pandora.ui.documentDialog = function(options) {
             })
             .css({
                 position: 'absolute',
-                right: '20px',
+                right: '24px',
                 top: '4px'
             })
             [items.length > 1 ? 'show' : 'hide']()
