@@ -136,22 +136,10 @@ pandora.ui.clipList = function(videoRatio) {
         .addClass('OxMedia')
         .bindEvent({
             copy: function(data) {
-                var items = data.ids.map(function(id) {
-                    var item = !ui.item ? id.split('/')[0] : ui.item,
-                        annotations = that.value(id, 'annotations') || [],
-                        annotation = annotations.length ? annotations[0].id : null;
-                    return annotation || item + '/' + that.value(id, 'in') + '-' + that.value(id, 'out');
-                })
-                pandora.clipboard.copy(items, 'clip');
+                pandora.clipboard.copy(serializeClips(data.ids), 'clip');
             },
             copyadd: function(data) {
-                var items = data.ids.map(function(id) {
-                    var item = !ui.item ? id.split('/')[0] : ui.item,
-                        annotations = that.value(id, 'annotations') || [],
-                        annotation = annotations.length ? annotations[0].id : null;
-                    return annotation || item + '/' + that.value(id, 'in') + '-' + that.value(id, 'out');
-                })
-                pandora.clipboard.add(items, 'clip');
+                pandora.clipboard.add(serializeClips(data.ids), 'clip');
             },
             gainfocus: function() {
                 pandora.$ui.mainMenu.replaceItemMenu();
@@ -290,7 +278,18 @@ pandora.ui.clipList = function(videoRatio) {
             }
         });
 
-    pandora.enableDragAndDrop(that, true, 'edits');
+    function serializeClips(ids) {
+        return ids.map(function(id) {
+            var item = !ui.item ? id.split('/')[0] : ui.item,
+                annotations = that.value(id, 'annotations') || [],
+                annotation = annotations.length ? annotations[0].id : null;
+            return annotation || item + '/' + that.value(id, 'in') + '-' + that.value(id, 'out');
+        });
+    }
+
+    pandora.enableDragAndDrop(that, true, 'edits', function($list) {
+        return serializeClips($list.options('selected'));
+    });
     return that;
 
 }

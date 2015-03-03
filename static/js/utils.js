@@ -520,7 +520,7 @@ pandora.createLinks = function($element) {
 
 }());
 
-pandora.enableDragAndDrop = function($list, canMove, section) {
+pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
 
     section = section || pandora.user.ui.section;
 
@@ -532,17 +532,18 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
 
     $list.bindEvent({
         draganddropstart: function(data) {
-            if (section != pandora.user.ui.section) {
+            var ui = pandora.user.ui;
+            if (section != ui.section) {
                 pandora.$ui.mainPanel.replaceElement(0,
                     pandora.$ui.leftPanel = pandora.ui.leftPanel(section)
                 );
             }
             drag.action = 'copy';
-            drag.ids = $list.options('selected'),
+            drag.ids = getItems ? getItems($list) : $list.options('selected');
             drag.item = drag.ids.length == 1
                 ? $list.value(drag.ids[0], 'title') || 1
                 : drag.ids.length;
-            drag.source = pandora.getListData(),
+            drag.source = pandora.getListData();
             drag.targets = {};
             //fixme instead of a fixed timeout,
             //bind to lists and update if they get new items
@@ -564,7 +565,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                         }
                     });
                 });
-            }, section != pandora.user.ui.section ? 2000 : 0);
+            }, section != ui.section ? 2000 : 0);
             $tooltip.options({title: getTitle()}).show(data.event);
             canMove && Ox.$window.on({
                 keydown: keydown,
@@ -647,7 +648,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                     if (section == 'items') {
                         var targets = drag.action == 'copy' ? drag.target.id
                             : [pandora.user.ui._list, drag.target.id];
-                        pandora.doHistory(drag.action, data.ids, targets, function() {
+                        pandora.doHistory(drag.action, drag.ids, targets, function() {
                             Ox.Request.clearCache('find');
                             pandora.api.find({
                                 query: {
@@ -666,8 +667,8 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                     } else if (section == 'edits') {
                         var targets = drag.action == 'copy' ? drag.target.id
                             : [pandora.user.ui.edit, drag.target.id];
-                        pandora.doHistory(drag.action, data.ids, targets, function() {
-                            Ox.print('FIXME, reload clipslist on move');
+                        pandora.doHistory(drag.action, drag.ids, targets, function() {
+                            Ox.print('FIXME, reload clipslist on drag', drag.ids);
                             pandora.$ui.editPanel && pandora.$ui.editPanel.updatePanel();
                             cleanup(250);
                         });
