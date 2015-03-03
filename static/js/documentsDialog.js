@@ -9,6 +9,7 @@ pandora.ui.documentsDialog = function() {
 
         // FIXME: user may not have the manage entites capability
         $switchButton = Ox.Button({
+                disabled: !pandora.site.entities.length || !pandora.site.capabilities.canManageEntities[pandora.user.level],
                 title: Ox._('Manage Entities...')
             })
             .bindEvent({
