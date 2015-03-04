@@ -143,7 +143,7 @@ pandora.URL = (function() {
                     set['part.' + state.page] = state.part;
                 }
                 if (state.span) {
-                    set['documents.' + state.part + '.position'] = state.span;
+                    set['documents.' + state.part] = {position: state.span};
                 }
                 pandora.UI.set(set);
                 callback && callback();
