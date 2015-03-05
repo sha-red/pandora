@@ -204,6 +204,24 @@ pandora.ui.mediaView = function(options) {
                 },
                 {
                     align: 'right',
+                    format: function(value) {
+                        value = value.split(':').map(function(v) {
+                            return Math.round(v);
+                        });
+                        console.log(value);
+                        return (value[1] != 1
+                            ? Ox.formatNumber(value[0] / (value[1] || 1), 2)
+                            : value[0]
+                        ) + ' fps';
+                    },
+                    id: 'framerate',
+                    operator: '-',
+                    title: Ox._('Framerate'),
+                    visible: true,
+                    width: 70
+                },
+                {
+                    align: 'right',
                     format: {type: 'duration', args: [0, 'short']},
                     id: 'duration',
                     operator: '-',
