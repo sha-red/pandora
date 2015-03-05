@@ -112,10 +112,8 @@ def find(request, data):
                 operator: string, // comparison operator, see below
                 value: string // value
             }, { // ... and/or query objects (nested subconditions)
-                query: {
-                    conditions: [object, ...], // list of condition objects
-                    operator: string // logical operator, '&' or '|'
-                }
+                conditions: [object, ...], // list of condition objects
+                operator: string // logical operator, '&' or '|'
             }],
             operator: string // logical operator, '&' or '|'
         },
