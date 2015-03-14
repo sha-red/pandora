@@ -13,7 +13,7 @@ else
 fi
 export DEBIAN_FRONTEND=noninteractive
 echo "deb http://ppa.launchpad.net/j/pandora/ubuntu trusty main" > /etc/apt/sources.list.d/j-pandora.list
-apt-key add - << EOF
+apt-key add - <<EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1
 
@@ -95,7 +95,7 @@ SITE_CONFIG="/srv/pandora/pandora/config.jsonc"
 test -e $HOST_CONFIG && cp $HOST_CONFIG $SITE_CONFIG
 test -e $SITE_CONFIG || cp /srv/pandora/pandora/config.pandora.jsonc $SITE_CONFIG
 
-cat > /srv/pandora/pandora/local_settings.py << EOF
+cat > /srv/pandora/pandora/local_settings.py <<EOF
 DATABASES = {
     'default': {
         'NAME': 'pandora',
@@ -117,7 +117,7 @@ MANAGE="sudo -H -u pandora python manage.py"
 
 cd /srv/pandora/pandora
 $MANAGE init_db
-echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
+#echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
 
 mkdir /srv/pandora/data
 chown -R pandora:pandora /srv/pandora
@@ -181,7 +181,7 @@ EOF
 chmod +x /usr/local/bin/genissue
 /usr/local/bin/genissue > /etc/issue
 
-cat > /etc/rc.local << EOF
+cat > /etc/rc.local <<EOF
 #!/bin/sh -e
 #vm has one network interface and that might change, make sure its not persistent
 rm -f /etc/udev/rules.d/70-persistent-net.rules
@@ -189,8 +189,9 @@ rm -f /etc/udev/rules.d/70-persistent-net.rules
 #update issue
 /usr/local/bin/genissue > /etc/issue
 EOF
-
 chmod +x /etc/rc.local
+fi
+
 apt-get clean
 
 cat > /home/pandora/.vimrc <<EOF
