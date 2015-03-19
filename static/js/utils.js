@@ -2262,7 +2262,7 @@ pandora.selectList = function() {
         var id = pandora.user.ui[pandora.user.ui.section.slice(0,-1)],
             section = Ox.toTitleCase(pandora.user.ui.section.slice(0, -1));
         if (id) {
-            pandora.api['get' + section]({id: id}, function(result) {
+            pandora.api['get' + section]({id: id, keys: ['id', 'status', 'user']}, function(result) {
                 var folder;
                 if (result.data.id) {
                     folder = result.data.status == 'featured' ? 'featured' : (
