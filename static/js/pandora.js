@@ -432,6 +432,8 @@ appPanel
         });
         Ox.Fullscreen.bind('exit', pandora.UI.set);
         pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
+        // allow site scripts to run after pandora is loaded
+        pandora.triggerEvent('loaded')
         loadUserScript && pandora.loadUserScript();
         document.removeEventListener && document.removeEventListener('keydown', onKeydown);
     }
