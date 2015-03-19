@@ -94,7 +94,7 @@ pandora.addFolderItem = function(section) {
                         }
                     });
                 } else {
-                    pandora.api.getEdit({id: list}, function(result) {
+                    pandora.api.getEdit({id: list, keys: ['clips']}, function(result) {
                         data.clips = result.data.clips.map(function(clip) {
                             return Ox.extend({
                                 item: clip.item
@@ -123,7 +123,7 @@ pandora.addFolderItem = function(section) {
             sortKey = Ox.getObjectById(pandora.site.itemKeys, 'votes')
                 ? 'votes' : 'timesaccessed';
         if (!isDuplicate) {
-            (isItems ? Ox.noop : pandora.api.getEdit)({id: newList}, function(result) {
+            (isItems ? Ox.noop : pandora.api.getEdit)({id: newList, keys: ['clips']}, function(result) {
                 query = isItems ? {
                     conditions: [{key: 'list', value: newList, operator: '=='}],
                     operator: '&'
@@ -1188,7 +1188,7 @@ pandora.getItem = function(state, str, callback) {
             }
         });
     } else if (state.type == 'edits') {
-        pandora.api.getEdit({id: str}, function(result) {
+        pandora.api.getEdit({id: str, keys: ['id']}, function(result) {
             if (result.status.code == 200) {
                 state.item = result.data.id;
                 callback();
@@ -1543,7 +1543,7 @@ pandora.getSort = function(state, val, callback) {
         callback();
     } else if (state.type == 'edits') {
         if (val[0].key == 'index') {
-            pandora.api.getEdit({id: state.item}, function(result) {
+            pandora.api.getEdit({id: state.item, keys: ['id', 'type']}, function(result) {
                 if (result.data.type == 'smart') {
                     if (state.sort.length > 1) {
                         state.sort = [state.sort[1]];
@@ -1675,7 +1675,7 @@ pandora.getSpan = function(state, val, callback) {
         }
     } else if (state.type == 'edits') {
         if (isArray) {
-            pandora.api.getEdit({id: state.item}, function(result) {
+            pandora.api.getEdit({id: state.item, keys: ['duration']}, function(result) {
                 state.span = val.map(function(number) {
                     return Math.min(number, result.data.duration);
                 });
