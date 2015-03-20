@@ -113,11 +113,11 @@ JSON_DEBUG = False
 DB_GIN_TRGM = True
 EOF
 
-MANAGE="sudo -H -u pandora python manage.py"
+MANAGE="sudo -H -u pandora /srv/pandora/pandora/manage.py"
 
 cd /srv/pandora/pandora
 $MANAGE init_db
-#echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
+echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
 
 mkdir /srv/pandora/data
 chown -R pandora:pandora /srv/pandora
