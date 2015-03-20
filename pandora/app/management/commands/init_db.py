@@ -12,7 +12,7 @@ def run(cmd):
 
     if p.returncode != 0:
         print stderr
-        sys.exit(r)
+        sys.exit(1)
 
 class Command(BaseCommand):
     """
