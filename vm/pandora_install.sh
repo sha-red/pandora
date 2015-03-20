@@ -115,12 +115,12 @@ EOF
 
 MANAGE="sudo -H -u pandora /srv/pandora/pandora/manage.py"
 
+mkdir /srv/pandora/data
+chown -R pandora:pandora /srv/pandora
+
 cd /srv/pandora/pandora
 $MANAGE init_db
 echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
-
-mkdir /srv/pandora/data
-chown -R pandora:pandora /srv/pandora
 
 /srv/pandora/ctl install
 

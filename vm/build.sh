@@ -26,5 +26,5 @@ sudo  vmbuilder $hypervisor ubuntu --suite=trusty \
     --pass $password \
     --addpkg linux-image-generic \
     --components main,universe,multiverse \
-    --firstboot=$base/pandora_install.sh \
+    --firstboot=$base/firstboot.sh \
     $extra
