@@ -181,7 +181,7 @@ pandora.ui.preferencesDialog = function() {
                     ).append(
                         Ox.Button({
                             title: Ox._('Manage Cache...'),
-                            disabled: !pandora.fs.enabled
+                            disabled: !pandora.fs.enabled,
                             width: 160
                         })
                         .bindEvent({
