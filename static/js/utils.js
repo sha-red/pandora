@@ -1791,15 +1791,19 @@ pandora.getMediaURL = function(url) {
     return pandora.site.site.mediaprefix + url;
 };
 
+pandora.getVideoURLName = function(id, resolution, part, track) {
+    return id + '/' + resolution + 'p' + part + (track ? '.' + track : '') + '.' + pandora.user.videoFormat;
+};
+
 pandora.getVideoURL = function(id, resolution, part, track) {
     var prefix = pandora.site.site.videoprefix
-        .replace('{id}', id)
-        .replace('{part}', part)
-        .replace('{resolution}', resolution)
-        .replace('{uid}', Ox.uid());
-    return prefix + '/' + id + '/' + resolution + 'p' + part
-        + (track ? '.' + track : '')
-        + '.' + pandora.user.videoFormat;
+            .replace('{id}', id)
+            .replace('{part}', part)
+            .replace('{resolution}', resolution)
+            .replace('{uid}', Ox.uid()),
+        local = pandora.fs && pandora.fs.getVideoURL(id, resolution, part, track);
+    return local || prefix + '/'
+        + pandora.getVideoURLName(id, resolution, part, track);
 };
 
 pandora.getVideoOptions = function(data) {

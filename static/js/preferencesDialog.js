@@ -178,6 +178,18 @@ pandora.ui.preferencesDialog = function() {
                             }
                         })
                         .css({position: 'absolute', left: '96px', top: '40px'})
+                    ).append(
+                        Ox.Button({
+                            title: Ox._('Manage Cache...'),
+                            disabled: !pandora.fs.enabled
+                            width: 160
+                        })
+                        .bindEvent({
+                            click: function() {
+                                pandora.$ui.cacheDialog = pandora.ui.cacheDialog().open();
+                            }
+                        })
+                        .css({position: 'absolute', left: '96px', top: '64px'})
                     );
                 }
                 return $content;
