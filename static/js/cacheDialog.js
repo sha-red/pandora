@@ -180,13 +180,9 @@ pandora.ui.cacheDialog = function() {
                                 if (!update) {
                                     update = true;
                                     getCachedVideos(function(files) {
-                                        Ox.print(files, item, files.filter(function(f) { return f.item == item}));
-                                        Ox.print('downloads', pandora.fs.downloads);
                                         cachedVideos = Ox.api(files);
                                         $list.reloadList(true);
                                     });
-                                } else {
-                                    Ox.print('download', data);
                                 }
                             });
                         });
