@@ -30,21 +30,26 @@ pandora.fs = (function() {
     }
 
     that.cacheVideo = function(id, callback) {
-        that.downloads = that.downloads || {};
-        that.downloads[id] = {
-            added: new Date(),
-            cancel: function() {
-            },
-            id: id + '::' + pandora.user.ui.videoResolution,
-            item: id,
-            progress: 0,
-            resolution: pandora.user.ui.videoResolution,
-            size: 0
-        };
+        if (that.getVideoURL(id, pandora.user.ui.videoResolution, 1) || that.downloads[id]) {
+            callback({progress: 1});
+            return;
+        } else {
+            that.downloads = that.downloads || {};
+            that.downloads[id] = {
+                added: new Date(),
+                cancel: function() {
+                },
+                id: id + '::' + pandora.user.ui.videoResolution,
+                item: id,
+                progress: 0,
+                resolution: pandora.user.ui.videoResolution,
+                size: 0
+            };
 
-        queue.length
-            ? queue.push([id, callback])
-            : startDownload(id, callback);
+            queue.length
+                ? queue.push([id, callback])
+                : startDownload(id, callback);
+        }
 
         function startDownload(id, callback) {
             pandora.api.get({id: id, keys: ['parts']}, function(result) {
