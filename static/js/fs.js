@@ -92,6 +92,10 @@ pandora.fs = (function() {
         if (that.downloads && that.downloads[id] && that.downloads[id].cancel) {
             that.downloads[id].cancel();
             delete that.downloads[id];
+            active = false;
+            if (queue.length) {
+                cacheVideo.apply(null, queue.shift());
+            }
         } else {
             pandora.api.get({id: id, keys: ['parts']}, function(result) {
                 var count = result.data.parts * pandora.site.video.resolutions.length, done = 0;
