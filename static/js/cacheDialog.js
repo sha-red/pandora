@@ -103,6 +103,7 @@ pandora.ui.cacheDialog = function() {
                 title: 'Cache Video...',
                 width: 128,
                 disabled: pandora.user.ui.section != 'items'
+                    || pandora.user.ui.item == ''
                     || !!pandora.fs.getVideoURL(pandora.user.ui.item, pandora.user.ui.videoResolution, 1)
             })
             .css({
