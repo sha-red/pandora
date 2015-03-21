@@ -6,6 +6,7 @@ pandora.fs = (function() {
             downloads: {},
             enabled: false,
         },
+        active,
         queue = [],
         requestedBytes = 100*1024*1024*1024; // 100GB
 
@@ -29,6 +30,40 @@ pandora.fs = (function() {
         return pandora.getVideoURLName(id, resolution, part, track).replace('/', '::');
     }
 
+    function cacheVideo(id, callback) {
+        active = true;
+        pandora.api.get({id: id, keys: ['parts']}, function(result) {
+            var parts = result.data.parts, sizes = [];
+            downloadPart(0);
+
+            function downloadPart(part) {
+                that.downloadVideoURL(id, pandora.user.ui.videoResolution, part + 1, false, function(result) {
+                    result.progress = 1/parts * (part + result.progress);
+                    that.downloads[id].progress = result.progress;
+                    if (result.cancel) {
+                        that.downloads[id].cancel = result.cancel;
+                    }
+                    if (result.total) {
+                        sizes[part] = result.total;
+                        that.downloads[id].size = Ox.sum(sizes);
+                    }
+                    if (result.url) {
+                        if (part + 1 == parts) {
+                            delete that.downloads[id];
+                            active = false;
+                            if (queue.length) {
+                                cacheVideo.apply(null, queue.shift());
+                            }
+                        } else {
+                            downloadPart(part + 1);
+                        }
+                    }
+                    callback && callback(result);
+                });
+            }
+        });
+    }
+
     that.cacheVideo = function(id, callback) {
         if (that.getVideoURL(id, pandora.user.ui.videoResolution, 1) || that.downloads[id]) {
             callback({progress: 1});
@@ -46,42 +81,11 @@ pandora.fs = (function() {
                 size: 0
             };
 
-            queue.length
+            (active || queue.length)
                 ? queue.push([id, callback])
-                : startDownload(id, callback);
+                : cacheVideo(id, callback);
         }
 
-        function startDownload(id, callback) {
-            pandora.api.get({id: id, keys: ['parts']}, function(result) {
-                var parts = result.data.parts, sizes = [];
-                downloadPart(0);
-
-                function downloadPart(part) {
-                    that.downloadVideoURL(id, pandora.user.ui.videoResolution, part + 1, false, function(result) {
-                        result.progress = 1/parts * (part + result.progress);
-                        that.downloads[id].progress = result.progress;
-                        if (result.cancel) {
-                            that.downloads[id].cancel = result.cancel;
-                        }
-                        if (result.total) {
-                            sizes[part] = result.total;
-                            that.downloads[id].size = Ox.sum(sizes);
-                        }
-                        if (result.url) {
-                            if (part + 1 == parts) {
-                                delete that.downloads[id];
-                                if (queue.length) {
-                                    startDownload.apply(null, queue.shift());
-                                }
-                            } else {
-                                downloadPart(part + 1);
-                            }
-                        }
-                        callback && callback(result);
-                    });
-                }
-            });
-        }
     };
 
     that.removeVideo = function(id, callback) {
