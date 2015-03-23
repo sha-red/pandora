@@ -463,6 +463,19 @@ def editMedia(request, data):
         for i in Item.objects.filter(files__in=files).distinct():
             i.update_selected()
             i.update_wanted()
+        ids = []
+        if ignore:
+            qs = models.File.objects.filter(oshash__in=ignore, instances__id=None, selected=True)
+            if qs.count():
+                ids += [f.item.public_id for f in qs]
+                qs.update(selected=False)
+        if dont_ignore:
+            qs = models.File.objects.filter(oshash__in=dont_ignore, instances__id=None, selected=False)
+            if qs.count():
+                ids += [f.item.public_id for f in qs]
+                qs.update(selected=True)
+        for id in list(set(ids)):
+            item.tasks.update_timeline.delay(id)
     if save_items:
         for i in Item.objects.filter(id__in=list(set(save_items))):
             i.save()
