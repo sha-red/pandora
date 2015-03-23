@@ -218,8 +218,14 @@ pandora.UI = (function() {
                 var keys = key.replace(/\\\./g, '\n').split('.').map(function(key) {
                         return key.replace(/\n/g, '.')
                     }),
+                    part,
                     ui = pandora.user.ui;
                 while (keys.length > 1) {
+                    part = part ? part + '.' + keys[0] : keys[0];
+                    if (Ox.isUndefined(ui[keys[0]])) {
+                        ui[keys[0]] = {};
+                        set[part] = {};
+                    }
                     ui = ui[keys.shift()];
                 }
                 if (!Ox.isEqual(ui[keys[0]], val)) {
