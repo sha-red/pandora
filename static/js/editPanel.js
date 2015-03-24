@@ -414,7 +414,6 @@ pandora.ui.editPanel = function(isEmbed) {
         that = Ox.VideoPlayer({
             clickLink: pandora.clickLink,
             clipRatio: pandora.site.video.previewRatio,
-            clipSize: listSize,
             clips: Ox.clone(edit.clips),
             clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.shift + 'C</span>',
             clipView: ui.edits[ui.edit].view,
