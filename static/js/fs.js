@@ -197,7 +197,7 @@ pandora.fs = (function() {
                 if (offset + blobSize < total) {
                     partialDownload(offset + blobSize + 1);
                 } else {
-                    setTimeout() {
+                    setTimeout(function() {
                         that.storeBlob(new Blob(blobs), name, callback);
                     });
                 }
