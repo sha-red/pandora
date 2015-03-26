@@ -174,6 +174,7 @@ pandora.fs = (function() {
             xhr.setRequestHeader('Range', 'bytes=' + offset + '-' + end);
             xhr.withCredentials = true;
             xhr.responseType = 'blob';
+            xhr.timeout = 1000 * 60 * 5;
             xhr.addEventListener('progress', function(event) {
                 if (event.lengthComputable) {
                     if (!total) {
@@ -196,7 +197,9 @@ pandora.fs = (function() {
                 if (offset + blobSize < total) {
                     partialDownload(offset + blobSize + 1);
                 } else {
-                    that.storeBlob(new Blob(blobs), name, callback);
+                    setTimeout() {
+                        that.storeBlob(new Blob(blobs), name, callback);
+                    });
                 }
             });
             xhr.addEventListener('error', function (event) {
