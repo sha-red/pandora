@@ -48,7 +48,10 @@ pandora.fs = (function() {
                             delete that.downloads[id];
                             active = false;
                             if (queue.length) {
-                                cacheVideo.apply(null, queue.shift());
+                                var next = queue.shift();
+                                setTimeout(function() {
+                                    cacheVideo(next[0], next[1]);
+                                });
                             }
                         } else {
                             downloadPart(part + 1);
@@ -94,7 +97,10 @@ pandora.fs = (function() {
             delete that.downloads[id];
             active = false;
             if (queue.length) {
-                cacheVideo.apply(null, queue.shift());
+                var next = queue.shift();
+                setTimeout(function() {
+                    cacheVideo(next[0], next[1]);
+                });
             }
         } else {
             pandora.api.get({id: id, keys: ['parts']}, function(result) {
