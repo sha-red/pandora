@@ -11,6 +11,7 @@ pandora.fs = (function() {
         requestedBytes = 100*1024*1024*1024; // 100GB
 
     if(window.webkitRequestFileSystem) {
+        that.enabled = true;
         window.webkitRequestFileSystem(window.PERSISTENT, requestedBytes, function(fs) {
             that.fs = fs;
             that.fs.root.createReader().readEntries(function(results) {
@@ -20,14 +21,9 @@ pandora.fs = (function() {
                     }
                 });
             });
-            that.enabled = true;
         }, function(e) {
             Ox.Log('FS', 'Error:', e);
         });
-    }
-
-    function getVideoName(id, resolution, part, track) {
-        return pandora.getVideoURLName(id, resolution, part, track).replace('/', '::');
     }
 
     function cacheVideo(id, callback) {
@@ -88,6 +84,10 @@ pandora.fs = (function() {
 
     };
 
+    that.getVideoName = function(id, resolution, part, track) {
+        return pandora.getVideoURLName(id, resolution, part, track).replace('/', '::');
+    };
+
     that.removeVideo = function(id, callback) {
         if (that.downloads && that.downloads[id] && that.downloads[id].cancel) {
             that.downloads[id].cancel();
@@ -101,7 +101,7 @@ pandora.fs = (function() {
                 var count = result.data.parts * pandora.site.video.resolutions.length, done = 0;
                 Ox.range(result.data.parts).forEach(function(part) {
                     pandora.site.video.resolutions.forEach(function(resolution) {
-                        var name = getVideoName(id, resolution, part + 1);
+                        var name = that.getVideoName(id, resolution, part + 1);
                         that.fs.root.getFile(name, {create: false}, function(fileEntry) {
                             // remove existing file
                             fileEntry.remove(function(e) {
@@ -158,7 +158,7 @@ pandora.fs = (function() {
     that.downloadVideoURL = function(id, resolution, part, track, callback) {
         //fixme: would be nice to download videos from subdomains,
         //       currently throws a cross domain error
-        var name = getVideoName(id, resolution, part, track),
+        var name = that.getVideoName(id, resolution, part, track),
             url = '/' + pandora.getVideoURLName(id, resolution, part, track),
             blobs = [], blobSize = 5*1024*1024, total;
         Ox.Log('FS', 'start downloading', url);
@@ -253,7 +253,7 @@ pandora.fs = (function() {
     };
 
     that.getVideoURL = function(id, resolution, part, track) {
-        var name = getVideoName(id, resolution, part, track);
+        var name = that.getVideoName(id, resolution, part, track);
         return that.local[name];
     };
 

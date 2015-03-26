@@ -123,6 +123,21 @@ pandora.ui.cacheDialog = function() {
             })
             .appendTo($item),
 
+        $fileButton = Ox.FileButton({
+                title: 'Select Video...',
+                width: 128,
+                disabled: pandora.user.ui.section != 'items'
+                    || pandora.user.ui.item == ''
+                    || !!pandora.fs.getVideoURL(pandora.user.ui.item, pandora.user.ui.videoResolution, 1)
+            })
+            .css({
+                margin: '8px'
+            })
+            .bindEvent({
+                click: selectVideo
+            })
+            .appendTo($item),
+
         $cacheListButton = Ox.Button({
                 title: 'Cache List...',
                 width: 128,
@@ -281,6 +296,17 @@ pandora.ui.cacheDialog = function() {
                     cachedVideos = Ox.api(files);
                     $list.reloadList(true);
                 });
+            });
+        });
+    }
+
+    function selectVideo(data) {
+        var blob = data.files[0],
+            name = pandora.fs.getVideoName(pandora.user.ui.item, pandora.user.ui.videoResolution, 1);
+        pandora.fs.storeBlob(blob, name, function() {
+            getCachedVideos(function(files) {
+                cachedVideos = Ox.api(files);
+                cachedVideos(data, callback);
             });
         });
     }
