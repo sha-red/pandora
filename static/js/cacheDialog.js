@@ -189,7 +189,7 @@ pandora.ui.cacheDialog = function() {
                         keys: ['id', 'clips']
                     }, function(result) {
                         Ox.unique(result.data.clips.map(function(clip) {
-                            return clip.item
+                            return clip.item;
                         })).forEach(function(item) {
                             var update = false;
                             pandora.fs.cacheVideo(item, function(data) {

@@ -82,7 +82,9 @@ class Edit(models.Model):
         # dont add clip if in/out are invalid
         if not clip.annotation:
             duration = clip.item.sort.duration
-            if clip.start > clip.end or clip.start >= duration or clip.end > duration:
+            if clip.start > clip.end \
+                or round(clip.start, 3) >= round(duration, 3) \
+                or round(clip.end, 3) > round(duration, 3):
                 return False
         clip.save()
         ids.insert(index, clip.id)
