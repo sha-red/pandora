@@ -85,6 +85,7 @@ pandora.ui.clipList = function(videoRatio) {
                         pandora.api.getList({id: ui._list}, function(result) {
                             if (result.data.type == 'smart') {
                                 addConditions(query, result.data.query.conditions);
+                                query.operator = result.data.query.operator;
                             }
                             findClips();
                         });
