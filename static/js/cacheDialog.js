@@ -87,7 +87,16 @@ pandora.ui.cacheDialog = function() {
             }
         }),
 
-        $statusbar = Ox.Bar({size: 16}),
+        $status = $('<div>')
+            .css({
+                width: '100%',
+                marginTop: '2px',
+                fontSize: '9px',
+                textAlign: 'center',
+                textOverflow: 'ellipsis'
+            }),
+
+        $statusbar = Ox.Bar({size: 16}).append($status),
 
         $panel = Ox.SplitPanel({
             elements: [
@@ -319,7 +328,17 @@ pandora.ui.cacheDialog = function() {
                     $list.value(file.id, 'progress', file.progress);
                 }
             });
+            updateStatus();
         });
+    }
+    function updateStatus() {
+        navigator.webkitPersistentStorage.queryUsageAndQuota(function(usage, quota) {
+            $status.html(
+                Ox.formatValue(usage, 'B', true) + ' of ' + Ox.formatValue(quota, 'B', true)
+            );
+
+        })
+    
     }
 
     return that;
