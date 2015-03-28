@@ -548,7 +548,7 @@
         "itemTitleKeys" list of itemKeys used to compose the title
         via pandora.getItemTitle
     */
-    "itemTitleKeys": ["title", "director", "year"],
+    "itemTitleKeys": ["title", "director"],
     /*
         "itemViews" is an ordered list of available item views.
         Implemented views are "info", "documents", "player", "editor",
@@ -763,7 +763,6 @@
             "editSelection": [],
             "editSort": [
                 {"key": "index", "operator": "+"},
-                {"key": "year", "operator": "+"},
                 {"key": "director", "operator": "+"},
                 {"key": "title", "operator": "+"},
                 {"key": "position", "operator": "+"},
