@@ -131,7 +131,9 @@ pandora.ui.list = function() {
                     ) + size + '.jpg?' + data.modified),
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director', 'random'].indexOf(sortKey) > -1) {
-                    info = data['year'];
+                    info = data['year'] || data['date'] || '';
+                    window.test = data;
+                    console.log('SORT', sortKey, info, data);
                 } else {
                     format = pandora.getSortKeyData(sortKey).format;
                     if (Ox.isUndefined(data[sortKey]) || Ox.isNull(data[sortKey])) {
