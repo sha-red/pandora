@@ -83,7 +83,8 @@ pandora.UI = (function() {
                     // if find has changed list
                     Ox.forEach(listSettings, function(listSetting, setting) {
                         // then for each setting that corresponds to a list setting
-                        if (!pandora.user.ui.lists[list]) {
+                        if (!pandora.user.ui.lists[list]
+                            || Ox.isUndefined(pandora.user.ui.lists[list][listSetting])) {
                             // either add the default setting
                             add[setting] = pandora.site.user.ui[setting];
                         } else {
@@ -129,6 +130,16 @@ pandora.UI = (function() {
                 } else if (!pandora.user.ui.lists[list]) {
                     // or the default setting
                     add[key] = pandora.site.user.ui[setting];
+                }
+            });
+            // set nested lisColumnWidth updates
+            Ox.forEach(args, function(value, key) {
+                if (Ox.startsWith(key, 'listColumnWidth.')) {
+                    key = 'lists.' + that.encode(list) + '.columnWidth.'
+                        + key.slice('listColumnWidth.'.length);
+                    if (!(key in add)) {
+                        add[key] = value;
+                    }
                 }
             });
 
