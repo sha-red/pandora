@@ -188,7 +188,10 @@ pandora.UI = (function() {
             Ox.forEach(editSettings, function(value, key) {
                 var editsKey = 'edits.' + that.encode(args.edit) + '.' + key;
                 add[editsKey] = editsKey in args ? args[editsKey]
-                    : pandora.user.ui.edits[args.edit] ? pandora.user.ui.edits[args.edit][key]
+                    : (
+                        pandora.user.ui.edits[args.edit]
+                        && !Ox.isUndefined(pandora.user.ui.edits[args.edit][key])
+                    ) ? pandora.user.ui.edits[args.edit][key]
                     : value;
             });
         }
@@ -217,7 +220,10 @@ pandora.UI = (function() {
                     textsSubKey = textsKey + '.' + key;
                 return textsKey in args && key in args[textsKey] ? args[textsKey][key]
                     : textsSubKey in args ? args[textSubKey]
-                    : pandora.user.ui.texts[args.text] ? pandora.user.ui.texts[args.text][key]
+                    : (
+                        pandora.user.ui.texts[args.text]
+                        && !Ox.isUndefined(pandora.user.ui.texts[args.text][key])
+                    } ? pandora.user.ui.texts[args.text][key]
                     : value;
             });
         }
