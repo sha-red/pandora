@@ -183,7 +183,8 @@ pandora.ui.editPanel = function(isEmbed) {
                 pandora.doHistory('delete', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
                     Ox.Request.clearCache('sortClips');
-                    updateClips(result.data.clips);
+                    edit.clips = result.data.clips;
+                    sortClips(updateClips);
                 });
             },
             edit: function(data) {
@@ -215,9 +216,10 @@ pandora.ui.editPanel = function(isEmbed) {
             join: function(data) {
                 var clips = [serializeClips(data.ids), serializeClips(data.join)];
                 pandora.doHistory('join', clips, ui.edit, function(result) {
-                    updateClips(edit.clips.filter(function(clip) {
+                    edit.clips = edit.clips.filter(function(clip) {
                         return !Ox.contains(data.ids, clip.id);
-                    }).concat(result.data.clips));
+                    }).concat(result.data.clips);
+                    sortClips(updateClips);
                 });
             },
             loop: function(data) {
