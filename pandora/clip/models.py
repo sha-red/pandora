@@ -98,6 +98,9 @@ class MetaClip:
         data['item'] = self.item.public_id
         data['in'] = self.start
         data['out'] = self.end
+        qs = self.annotations.all()
+        if qs.count():
+            data['annotation'] = qs[0].public_id
         data['parts'] = self.item.json['parts']
         data['durations'] = self.item.json['durations']
         for key in ('title', 'director', 'year', 'videoRatio'):
