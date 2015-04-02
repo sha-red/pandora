@@ -223,7 +223,7 @@ pandora.UI = (function() {
                     : (
                         pandora.user.ui.texts[args.text]
                         && !Ox.isUndefined(pandora.user.ui.texts[args.text][key])
-                    } ? pandora.user.ui.texts[args.text][key]
+                    ) ? pandora.user.ui.texts[args.text][key]
                     : value;
             });
         }
