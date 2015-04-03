@@ -54,7 +54,9 @@ pandora.fs = (function() {
                                 });
                             }
                         } else {
-                            downloadPart(part + 1);
+                            setTimeout(function() {
+                                downloadPart(part + 1);
+                            });
                         }
                     }
                     callback && callback(result);
