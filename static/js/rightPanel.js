@@ -21,42 +21,44 @@ pandora.ui.rightPanel = function() {
                 var clipsItems, previousClipsItems;
                 if (!pandora.user.ui.item) {
                     pandora.resizeFilters();
-                    pandora.$ui.list.size();
+                    pandora.$ui.list && pandora.$ui.list.size();
                     if (pandora.user.ui.listView == 'clips') {
-                        clipsItems = pandora.getClipsItems();
-                        previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
-                        pandora.$ui.list.options({width: data.size});
-                        if (clipsItems != previousClipsItems) {
-                            Ox.Request.clearCache(); // fixme
-                            pandora.$ui.list.reloadList(true);
+                        if (pandora.$ui.list) {
+                            clipsItems = pandora.getClipsItems();
+                            previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
+                            pandora.$ui.list.options({width: data.size});
+                            if (clipsItems != previousClipsItems) {
+                                Ox.Request.clearCache(); // fixme
+                                pandora.$ui.list.reloadList(true);
+                            }
                         }
                     } else if (pandora.user.ui.listView == 'timelines') {
-                        pandora.$ui.list.options({width: data.size});
+                        pandora.$ui.list && pandora.$ui.list.options({width: data.size});
                     } else if (pandora.user.ui.listView == 'map') {
-                        pandora.$ui.map.resizeMap();
+                        pandora.$ui.map && pandora.$ui.map.resizeMap();
                     } else if (pandora.user.ui.listView == 'calendar') {
-                        pandora.$ui.calendar.resizeCalendar();
+                        pandora.$ui.calendar && pandora.$ui.calendar.resizeCalendar();
                     } else if (pandora.user.ui.listView == 'video') {
-                        pandora.$ui.list.resize();
+                        pandora.$ui.list && pandora.$ui.list.resize();
                     }
                 } else {
-                    pandora.$ui.browser.scrollToSelection();
+                    pandora.$ui.browser && pandora.$ui.browser.scrollToSelection();
                     if (pandora.user.ui.itemView == 'documents') {
-                        pandora.$ui.documents.updateSize();
+                        pandora.$ui.documents && pandora.$ui.documents.updateSize();
                     } else if (pandora.user.ui.itemView == 'clips') {
-                        pandora.$ui.clipList.size();
+                        pandora.$ui.clipList && pandora.$ui.clipList.size();
                     } else if (pandora.user.ui.itemView == 'timeline') {
-                        pandora.$ui.timeline.options({width: data.size});
+                        pandora.$ui.timeline && pandora.$ui.timeline.options({width: data.size});
                     } else if (pandora.user.ui.itemView == 'player') {
-                        pandora.$ui.player.options({width: data.size});
+                        pandora.$ui.player && pandora.$ui.player.options({width: data.size});
                     } else if (pandora.user.ui.itemView == 'editor') {
                         pandora.$ui.editor && pandora.$ui.editor.options({width: data.size});
                     } else if (pandora.user.ui.listView == 'map') {
-                        pandora.$ui.map.resizeMap();
+                        pandora.$ui.map && pandora.$ui.map.resizeMap();
                     } else if (pandora.user.ui.listView == 'calendar') {
-                        pandora.$ui.calendar.resizeCalendar();
+                        pandora.$ui.calendar && pandora.$ui.calendar.resizeCalendar();
                     } else if (pandora.user.ui.listView == 'video') {
-                        pandora.$ui.list.size();
+                        pandora.$ui.list && pandora.$ui.list.size();
                     }
                 }
             }
