@@ -2135,9 +2135,9 @@ pandora.resizeFolders = function(section) {
     ) - 8);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getIndexById(pandora.site.sectionFolders[section], id);
-        pandora.$ui.folder[pos].css({width: width + 'px'});
+        pandora.$ui.folder[pos] && pandora.$ui.folder[pos].css({width: width + 'px'});
         $list.css({width: width + 'px'});
-        if (pandora.site.sectionFolders[section][pos].showBrowser) {
+        if (pandora.site.sectionFolders[section][pos] && pandora.site.sectionFolders[section][pos].showBrowser) {
             pandora.$ui.findListsInput[id] && pandora.$ui.findListsInput[id].options({
                 width: width - 24
             });
@@ -2146,7 +2146,7 @@ pandora.resizeFolders = function(section) {
         } else {
             $list.resizeColumn(id == 'favorite' ? 'id' : 'name', columnWidth);
         }
-        if (!pandora.user.ui.showFolder[section][id]) {
+        if (pandora.$ui.folder[pos] && !pandora.user.ui.showFolder[section][id]) {
             pandora.$ui.folder[pos].updatePanel();
         }
     });

@@ -50,7 +50,7 @@ pandora.ui.rightPanel = function() {
                     } else if (pandora.user.ui.itemView == 'player') {
                         pandora.$ui.player.options({width: data.size});
                     } else if (pandora.user.ui.itemView == 'editor') {
-                        pandora.$ui.editor.options({width: data.size});
+                        pandora.$ui.editor && pandora.$ui.editor.options({width: data.size});
                     } else if (pandora.user.ui.listView == 'map') {
                         pandora.$ui.map.resizeMap();
                     } else if (pandora.user.ui.listView == 'calendar') {
