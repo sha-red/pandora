@@ -176,7 +176,7 @@ pandora.fs = (function() {
         var name = that.getVideoName(id, resolution, part, track),
             partialName = 'partial::' + name,
             url = '/' + pandora.getVideoURLName(id, resolution, part, track),
-            blobs = [], blobSize = 5*1024*1024, total;
+            blobSize = 5*1024*1024, total;
         Ox.Log('FS', 'start downloading', url);
         that.fs.root.getFile(partialName, {create: true}, function(fileEntry) {
             fileEntry.getMetadata(function(meta) {
