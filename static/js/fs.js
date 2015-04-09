@@ -68,6 +68,7 @@ pandora.fs = (function() {
     function renameFile(old, name, callback) {
         that.fs.root.getFile(old, {}, function(fileEntry) {
             fileEntry.moveTo(that.fs.root, name);
+            callback();
         }, callback);
     }
 
