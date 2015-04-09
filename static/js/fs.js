@@ -65,6 +65,12 @@ pandora.fs = (function() {
         });
     }
 
+    function renameFile(old, name, callback) {
+        that.fs.root.getFile(old, {}, function(fileEntry) {
+            fileEntry.moveTo(that.fs.root, name);
+        }, callback);
+    }
+
     that.cacheVideo = function(id, callback) {
         if (that.getVideoURL(id, pandora.user.ui.videoResolution, 1) || that.downloads[id]) {
             callback({progress: 1});
@@ -127,10 +133,11 @@ pandora.fs = (function() {
         }
     };
 
-    that.storeBlob = function(blob, name, callback) {
+    that.storeBlob = function(blob, name, callback, append) {
         requestQuota(blob.size, function() {
             that.fs.root.getFile(name, {create: true}, function(fileEntry) {
                 fileEntry.createWriter(function(fileWriter) {
+                    append && fileWriter.seek(fileWriter.length);
                     fileWriter.onwriteend = function(e) {
                         that.local[name] = fileEntry.toURL();
                         callback({progress: 1, url: that.local[name]});
@@ -167,10 +174,15 @@ pandora.fs = (function() {
         //fixme: would be nice to download videos from subdomains,
         //       currently throws a cross domain error
         var name = that.getVideoName(id, resolution, part, track),
+            partialName = 'partial::' + name,
             url = '/' + pandora.getVideoURLName(id, resolution, part, track),
             blobs = [], blobSize = 5*1024*1024, total;
         Ox.Log('FS', 'start downloading', url);
-        partialDownload(0);
+        that.fs.root.getFile(partialName, {create: true}, function(fileEntry) {
+            fileEntry.getMetadata(function(meta) {
+                partialDownload(meta.size);
+            });
+        });
         function partialDownload(offset) {
             var end = offset + blobSize;
             if (total) {
@@ -201,14 +213,18 @@ pandora.fs = (function() {
                 }
             });
             xhr.addEventListener('load', function() {
-                blobs.push(xhr.response);
-                if (offset + blobSize < total) {
-                    partialDownload(offset + blobSize + 1);
-                } else {
-                    setTimeout(function() {
-                        that.storeBlob(new Blob(blobs), name, callback);
-                    });
-                }
+                var blob = xhr.response;
+                setTimeout(function() {
+                    that.storeBlob(blob, partialName, function(response) {
+                        if (offset + blobSize < total) {
+                            partialDownload(offset + blobSize + 1);
+                        } else {
+                            renameFile(partialName, name, function() {
+                                callback(response);
+                            });
+                        }
+                    }, true);
+                });
             });
             xhr.addEventListener('error', function (event) {
                 Ox.print('partial download failed. retrying in 1 second');
@@ -236,23 +252,27 @@ pandora.fs = (function() {
             var n = 0;
             if (results.length) {
                 results.forEach(function(fileEntry) {
-                    fileEntry.getMetadata(function(meta) {
-                        var item = fileEntry.name.split('::')[0],
-                            resolution = parseInt(fileEntry.name.split('::')[1].split('p')[0]),
-                            part = parseInt(fileEntry.name.split('::')[1].split('p')[1].split('.')[0]),
-                            key = item + '::' + resolution;
-                        if (!(that.downloads && that.downloads[item])) {
-                            files[key] = Ox.extend(files[key] || {}, {
-                                added: meta.modificationTime,
-                                id: item + '::' + resolution,
-                                item: item,
-                                progress: 1,
-                                resolution: resolution,
-                                size: files[key] ? files[key].size + meta.size: meta.size
-                            });
-                        }
+                    if (Ox.startsWith(fileEntry.name, 'partial::')) {
                         ++n == results.length && callback(Ox.values(files).concat(Ox.values(that.downloads)));
-                    });
+                    } else {
+                        fileEntry.getMetadata(function(meta) {
+                            var item = fileEntry.name.split('::')[0],
+                                resolution = parseInt(fileEntry.name.split('::')[1].split('p')[0]),
+                                part = parseInt(fileEntry.name.split('::')[1].split('p')[1].split('.')[0]),
+                                key = item + '::' + resolution;
+                            if (!(that.downloads && that.downloads[item])) {
+                                files[key] = Ox.extend(files[key] || {}, {
+                                    added: meta.modificationTime,
+                                    id: item + '::' + resolution,
+                                    item: item,
+                                    progress: 1,
+                                    resolution: resolution,
+                                    size: files[key] ? files[key].size + meta.size: meta.size
+                                });
+                            }
+                            ++n == results.length && callback(Ox.values(files).concat(Ox.values(that.downloads)));
+                        });
+                    }
                 });
             } else {
                 callback(Ox.values(that.downloads));
