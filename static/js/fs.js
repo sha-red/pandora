@@ -69,7 +69,10 @@ pandora.fs = (function() {
         that.fs.root.getFile(old, {}, function(fileEntry) {
             fileEntry.moveTo(that.fs.root, name);
             callback();
-        }, callback);
+        }, function() {
+            Ox.Log('FS', 'failed to move', old, name);
+            callback();
+        });
     }
 
     that.cacheVideo = function(id, callback) {
