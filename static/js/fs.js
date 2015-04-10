@@ -179,10 +179,14 @@ pandora.fs = (function() {
             url = '/' + pandora.getVideoURLName(id, resolution, part, track),
             blobSize = 5*1024*1024, total;
         Ox.Log('FS', 'start downloading', url);
-        that.fs.root.getFile(partialName, {create: true}, function(fileEntry) {
+        that.fs.root.getFile(partialName, {create: false}, function(fileEntry) {
             fileEntry.getMetadata(function(meta) {
+                Ox.Log('FS', 'resume from', meta.size);
                 partialDownload(meta.size);
             });
+        }, function() {
+            Ox.Log('FS', 'new download');
+            partialDownload(0);
         });
         function partialDownload(offset) {
             var end = offset + blobSize;
