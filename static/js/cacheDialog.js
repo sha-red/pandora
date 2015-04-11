@@ -74,7 +74,7 @@ pandora.ui.cacheDialog = function() {
             },
             keys: ['author'],
             scrollbarVisible: true,
-            sort: [{key: 'progress', operator: '+'}],
+            sort: [{key: 'added', operator: '-'}],
             unique: 'id'
         }).bindEvent({
             'delete': function(data) {
