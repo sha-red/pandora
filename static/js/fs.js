@@ -204,14 +204,15 @@ pandora.fs = (function() {
             partialDownload(0);
         });
         function partialDownload(offset) {
-            var end = offset + blobSize;
+            var end = offset + blobSize - 1;
             if (total) {
-                end = Math.min(end, total);
+                end = Math.min(end, total - 1);
             }
-            Ox.Log('FS', 'download part', url, offset, end);
+            var range = 'bytes=' + offset + '-' + end;
+            Ox.Log('FS', 'download part', url, offset, end, total, range);
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
-            xhr.setRequestHeader('Range', 'bytes=' + offset + '-' + end);
+            xhr.setRequestHeader('Range', range);
             xhr.withCredentials = true;
             xhr.responseType = 'blob';
             xhr.timeout = 1000 * 60 * 5;
@@ -236,8 +237,8 @@ pandora.fs = (function() {
                 var blob = xhr.response;
                 setTimeout(function() {
                     that.storeBlob(blob, partialName, function(response) {
-                        if (offset + blobSize < total) {
-                            partialDownload(offset + blobSize + 1);
+                        if (offset + blob.size < total) {
+                            partialDownload(offset + blob.size);
                         } else {
                             renameFile(partialName, name, function(fileEntry) {
                                 if (fileEntry) {
