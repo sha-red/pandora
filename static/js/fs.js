@@ -38,6 +38,10 @@ pandora.fs = (function() {
                 } else {
                     that.downloadVideoURL(id, pandora.user.ui.videoResolution, part + 1, false, function(result) {
                         result.progress = 1/parts * (part + result.progress);
+                        if (!that.downloads[id]) {
+                            result.cancel && result.cancel();
+                            return;
+                        }
                         that.downloads[id].progress = result.progress;
                         if (result.cancel) {
                             that.downloads[id].cancel = result.cancel;
@@ -53,38 +57,38 @@ pandora.fs = (function() {
                     });
                 }
                 function done() {
-                    var n = 0;
                     if (part + 1 == parts) {
-                        Ox.range(parts).forEach(function(part) {
-                            var name = that.getVideoName(id, pandora.user.ui.videoResolution, part + 1),
-                                partialName = 'partial::' + name;
-                            renameFile(partialName, name, function(fileEntry) {
-                                if (fileEntry) {
-                                    that.local[name] = fileEntry.toURL();
-                                } else {
-                                    Ox.print('rename failed');
-                                    callback && callback({progress: -1, error: 'rename failed'});
-                                }
-                                if (++n == parts) {
-                                    callback && callback({
-                                        progress: 1
-                                    });
-                                }
-                            });
-                        });
-                        delete that.downloads[id];
-                        active = false;
-                        if (queue.length) {
-                            var next = queue.shift();
-                            setTimeout(function() {
-                                cacheVideo(next[0], next[1]);
-                            });
-                        }
+                        renamePart(0);
                     } else {
                         setTimeout(function() {
                             downloadPart(part + 1);
                         });
                     }
+                }
+                function renamePart(i) {
+                    var name = that.getVideoName(id, pandora.user.ui.videoResolution, i + 1),
+                        partialName = 'partial::' + name;
+                    renameFile(partialName, name, function(fileEntry) {
+                        if (fileEntry) {
+                            Ox.Log('FS', 'renamed file', partialName, 'to', name);
+                            that.local[name] = fileEntry.toURL();
+                        } else {
+                            Ox.print('rename failed', name);
+                            callback && callback({progress: -1, error: 'rename failed'});
+                        }
+                        if (i + 1 == parts) {
+                            delete that.downloads[id];
+                            active = false;
+                            if (queue.length) {
+                                var next = queue.shift();
+                                setTimeout(function() {
+                                    cacheVideo(next[0], next[1]);
+                                }, 50);
+                            }
+                        } else {
+                            renamePart(i + 1);
+                        }
+                    });
                 }
             }
         });
@@ -92,12 +96,12 @@ pandora.fs = (function() {
 
     function renameFile(old, name, callback) {
         that.fs.root.getFile(old, {}, function(fileEntry) {
-            fileEntry.moveTo(that.fs.root, name);
-            setTimeout(function() {
-                that.fs.root.getFile(name, {}, callback, function() { callback() });
+            fileEntry.moveTo(that.fs.root, name, callback, function(error) {
+                Ox.Log('FS', 'failed to move', old, name);
+                callback();
             });
         }, function() {
-            Ox.Log('FS', 'failed to move', old, name);
+            Ox.Log('FS', 'could not find old file', old, name);
             callback();
         });
     }
@@ -134,13 +138,6 @@ pandora.fs = (function() {
         if (that.downloads && that.downloads[id] && that.downloads[id].cancel) {
             that.downloads[id].cancel();
             delete that.downloads[id];
-            active = false;
-            if (queue.length) {
-                var next = queue.shift();
-                setTimeout(function() {
-                    cacheVideo(next[0], next[1]);
-                });
-            }
         } else {
             pandora.api.get({id: id, keys: ['parts']}, function(result) {
                 var count = result.data.parts * pandora.site.video.resolutions.length, done = 0;
@@ -228,12 +225,12 @@ pandora.fs = (function() {
                             url: fileEntry.toURL()
                         })
                     } else {
-                        Ox.Log('FS', 'resume from', meta.size);
+                        Ox.Log('FS', url, 'resume from', meta.size);
                         partialDownload(meta.size);
                     }
                 });
             }, function() {
-                Ox.Log('FS', 'new download');
+                Ox.Log('FS', url, 'new download');
                 partialDownload(0);
             });
         });
@@ -284,6 +281,13 @@ pandora.fs = (function() {
                         total: total,
                         cancel: function() {
                             xhr.abort();
+                            active = false;
+                            if (queue.length) {
+                                var next = queue.shift();
+                                setTimeout(function() {
+                                    cacheVideo(next[0], next[1]);
+                                }, 50);
+                            }
                         }
                     });
                 }
