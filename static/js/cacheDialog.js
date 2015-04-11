@@ -45,7 +45,7 @@ pandora.ui.cacheDialog = function() {
                 },
                 {
                     id: 'added',
-                    operator: '+',
+                    operator: '-',
                     title: Ox._('Added'),
                     format: {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
                     visible: true,
