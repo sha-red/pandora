@@ -332,13 +332,15 @@ pandora.ui.cacheDialog = function() {
                     $list.value(file.id, 'size', file.size);
                 }
             });
-            updateStatus();
+            updateStatus(files.length);
         });
     }
-    function updateStatus() {
+    function updateStatus(items) {
         navigator.webkitPersistentStorage.queryUsageAndQuota(function(usage, quota) {
             $status.html(
-                Ox.formatValue(usage, 'B', true) + ' of ' + Ox.formatValue(quota, 'B', true)
+                Ox.formatNumber(items) + ' Items - '
+                + Ox.formatValue(usage, 'B', true)
+                + ' of ' + Ox.formatValue(quota, 'B', true)
             );
 
         })
