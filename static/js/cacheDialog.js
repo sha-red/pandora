@@ -328,6 +328,9 @@ pandora.ui.cacheDialog = function() {
                 if (!Ox.isEmpty(current) && current.progress != file.progress) {
                     $list.value(file.id, 'progress', file.progress);
                 }
+                if (!Ox.isEmpty(current) && current.size != file.size) {
+                    $list.value(file.id, 'size', file.size);
+                }
             });
             updateStatus();
         });
