@@ -33,34 +33,41 @@ pandora.fs = (function() {
             downloadPart(0);
 
             function downloadPart(part) {
-                that.downloadVideoURL(id, pandora.user.ui.videoResolution, part + 1, false, function(result) {
-                    result.progress = 1/parts * (part + result.progress);
-                    that.downloads[id].progress = result.progress;
-                    if (result.cancel) {
-                        that.downloads[id].cancel = result.cancel;
-                    }
-                    if (result.total) {
-                        sizes[part] = result.total;
-                        that.downloads[id].size = Ox.sum(sizes);
-                    }
-                    if (result.url) {
-                        if (part + 1 == parts) {
-                            delete that.downloads[id];
-                            active = false;
-                            if (queue.length) {
-                                var next = queue.shift();
-                                setTimeout(function() {
-                                    cacheVideo(next[0], next[1]);
-                                });
-                            }
-                        } else {
+                if (that.getVideoURL(id, pandora.user.ui.videoResolution, part + 1)) {
+                    done();
+                else {
+                    that.downloadVideoURL(id, pandora.user.ui.videoResolution, part + 1, false, function(result) {
+                        result.progress = 1/parts * (part + result.progress);
+                        that.downloads[id].progress = result.progress;
+                        if (result.cancel) {
+                            that.downloads[id].cancel = result.cancel;
+                        }
+                        if (result.total) {
+                            sizes[part] = result.total;
+                            that.downloads[id].size = Ox.sum(sizes);
+                        }
+                        if (result.url) {
+                            done();
+                        }
+                        callback && callback(result);
+                    });
+                }
+                function done() {
+                    if (part + 1 == parts) {
+                        delete that.downloads[id];
+                        active = false;
+                        if (queue.length) {
+                            var next = queue.shift();
                             setTimeout(function() {
-                                downloadPart(part + 1);
+                                cacheVideo(next[0], next[1]);
                             });
                         }
+                    } else {
+                        setTimeout(function() {
+                            downloadPart(part + 1);
+                        });
                     }
-                    callback && callback(result);
-                });
+                }
             }
         });
     }

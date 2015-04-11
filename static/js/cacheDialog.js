@@ -13,6 +13,7 @@ pandora.ui.cacheDialog = function() {
                 },
                 {
                     id: 'item',
+                    operator: '+',
                     title: Ox._('Item'),
                     visible: true,
                     width: 48
