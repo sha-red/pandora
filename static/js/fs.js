@@ -35,7 +35,7 @@ pandora.fs = (function() {
             function downloadPart(part) {
                 if (that.getVideoURL(id, pandora.user.ui.videoResolution, part + 1)) {
                     done();
-                else {
+                } else {
                     that.downloadVideoURL(id, pandora.user.ui.videoResolution, part + 1, false, function(result) {
                         result.progress = 1/parts * (part + result.progress);
                         that.downloads[id].progress = result.progress;
@@ -75,7 +75,9 @@ pandora.fs = (function() {
     function renameFile(old, name, callback) {
         that.fs.root.getFile(old, {}, function(fileEntry) {
             fileEntry.moveTo(that.fs.root, name);
-            callback();
+            setTimeout(function() {
+                that.fs.root.getFile(name, {}, callback, function() { callback() });
+            });
         }, function() {
             Ox.Log('FS', 'failed to move', old, name);
             callback();
@@ -150,8 +152,7 @@ pandora.fs = (function() {
                 fileEntry.createWriter(function(fileWriter) {
                     append && fileWriter.seek(fileWriter.length);
                     fileWriter.onwriteend = function(e) {
-                        that.local[name] = fileEntry.toURL();
-                        callback({progress: 1, url: that.local[name]});
+                        callback({progress: 1});
                     };
                     fileWriter.onerror = function(event) {
                         Ox.Log('FS', 'Write failed: ' + event.toString());
@@ -234,8 +235,15 @@ pandora.fs = (function() {
                         if (offset + blobSize < total) {
                             partialDownload(offset + blobSize + 1);
                         } else {
-                            renameFile(partialName, name, function() {
-                                callback(response);
+                            renameFile(partialName, name, function(fileEntry) {
+                                if (fileEntry) {
+                                    that.local[name] = fileEntry.toURL();
+                                    response.url = that.local[name];
+                                    callback(response);
+                                } else {
+                                    Ox.print('rename failed');
+                                    callback({progress: -1, error: 'rename failed'});
+                                }
                             });
                         }
                     }, true);
