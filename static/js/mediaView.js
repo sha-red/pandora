@@ -208,7 +208,6 @@ pandora.ui.mediaView = function(options) {
                         value = value.split(':').map(function(v) {
                             return Math.round(v);
                         });
-                        console.log(value);
                         return (value[1] != 1
                             ? Ox.formatNumber(value[0] / (value[1] || 1), 2)
                             : value[0]
