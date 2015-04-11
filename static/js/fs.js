@@ -53,7 +53,25 @@ pandora.fs = (function() {
                     });
                 }
                 function done() {
+                    var n = 0;
                     if (part + 1 == parts) {
+                        Ox.range(parts).forEach(function(part) {
+                            var name = that.getVideoName(id, pandora.user.ui.videoResolution, part + 1),
+                                partialName = 'partial::' + name;
+                            renameFile(partialName, name, function(fileEntry) {
+                                if (fileEntry) {
+                                    that.local[name] = fileEntry.toURL();
+                                } else {
+                                    Ox.print('rename failed');
+                                    callback && callback({progress: -1, error: 'rename failed'});
+                                }
+                                if (++n == parts) {
+                                    callback && callback({
+                                        progress: 1
+                                    });
+                                }
+                            });
+                        });
                         delete that.downloads[id];
                         active = false;
                         if (queue.length) {
@@ -156,7 +174,10 @@ pandora.fs = (function() {
                 fileEntry.createWriter(function(fileWriter) {
                     append && fileWriter.seek(fileWriter.length);
                     fileWriter.onwriteend = function(e) {
-                        callback({progress: 1});
+                        callback({
+                            progress: 1,
+                            url: fileEntry.toURL()
+                        });
                     };
                     fileWriter.onerror = function(event) {
                         Ox.Log('FS', 'Write failed: ' + event.toString());
@@ -194,15 +215,49 @@ pandora.fs = (function() {
             url = '/' + pandora.getVideoURLName(id, resolution, part, track),
             blobSize = 5*1024*1024, total;
         Ox.Log('FS', 'start downloading', url);
-        that.fs.root.getFile(partialName, {create: false}, function(fileEntry) {
-            fileEntry.getMetadata(function(meta) {
-                Ox.Log('FS', 'resume from', meta.size);
-                partialDownload(meta.size);
+        getSize(url, function(size) {
+            Ox.Log('FS', 'HEAD', url, size);
+            total = size;
+            that.fs.root.getFile(partialName, {create: false}, function(fileEntry) {
+                fileEntry.getMetadata(function(meta) {
+                    if (meta.size >= total) {
+                        Ox.Log('FS', 'file exists, done', meta.size, total);
+                        callback({
+                            progress: 1,
+                            total: total,
+                            url: fileEntry.toURL()
+                        })
+                    } else {
+                        Ox.Log('FS', 'resume from', meta.size);
+                        partialDownload(meta.size);
+                    }
+                });
+            }, function() {
+                Ox.Log('FS', 'new download');
+                partialDownload(0);
             });
-        }, function() {
-            Ox.Log('FS', 'new download');
-            partialDownload(0);
         });
+        function getSize(url, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('HEAD', url, true);
+            xhr.addEventListener('load', function(event) {
+                callback(event.total);
+            });
+            xhr.addEventListener('error', function (event) {
+                setTimeout(function() {
+                    getSize(url, callback);
+                }, 1000);
+            });
+            xhr.addEventListener('abort', function (event) {
+                callback({progress: -1, event: event});
+            });
+            xhr.addEventListener('timeout', function (event) {
+                setTimeout(function() {
+                    getSize(url, callback);
+                }, 1000);
+            });
+            xhr.send();
+        }
         function partialDownload(offset) {
             var end = offset + blobSize - 1;
             if (total) {
@@ -240,16 +295,7 @@ pandora.fs = (function() {
                         if (offset + blob.size < total) {
                             partialDownload(offset + blob.size);
                         } else {
-                            renameFile(partialName, name, function(fileEntry) {
-                                if (fileEntry) {
-                                    that.local[name] = fileEntry.toURL();
-                                    response.url = that.local[name];
-                                    callback(response);
-                                } else {
-                                    Ox.print('rename failed');
-                                    callback({progress: -1, error: 'rename failed'});
-                                }
-                            });
+                            callback(response);
                         }
                     }, true);
                 });
