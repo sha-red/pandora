@@ -16,7 +16,7 @@ pandora.fs = (function() {
             that.fs = fs;
             that.fs.root.createReader().readEntries(function(results) {
                 results.forEach(function(entry) {
-                    if (entry.isFile) {
+                    if (entry.isFile && !Ox.startsWith(entry.name, 'partial::')) {
                         that.local[entry.name] = entry.toURL();
                     }
                 });
@@ -139,6 +139,10 @@ pandora.fs = (function() {
                             ++done == count && callback();
                         }, function() { // file not found
                             ++done == count && callback();
+                        });
+                        // remove partial file too
+                        that.fs.root.getFile('partial::' + name, {create: false}, function(fileEntry) {
+                            fileEntry.remove(function(e) {});
                         });
                     });
                 });
