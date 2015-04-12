@@ -18,7 +18,7 @@ pandora.fs = (function() {
                 results.forEach(function(entry) {
                     if (entry.isFile) {
                         if (Ox.startsWith(entry.name, 'partial::')) {
-                            fileEntry.remove(function() {});
+                            entry.remove(function() {});
                         } else {
                             var name = entry.name.split('::'),
                                 filename = Ox.last(name),
