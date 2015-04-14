@@ -45,7 +45,7 @@ def parseCondition(condition, user):
         v = decode_id(v)
     if isinstance(v, bool): #featured and public flag
         key = k
-    elif k in ('id', ):
+    elif k in ('id', 'created'):
         key = '%s%s' % (k, {
             '>': '__gt',
             '>=': '__gte',
