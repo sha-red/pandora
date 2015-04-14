@@ -82,6 +82,8 @@ def addEntity(request, data):
         entity.user = request.user
         entity.matches = 0
         entity.save()
+        data['name'] = name
+        add_changelog(request, data, entity.get_id())
         response = json_response(status=200, text='created')
         response['data'] = entity.json()
     return render_to_json_response(response)
