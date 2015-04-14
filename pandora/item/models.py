@@ -1010,24 +1010,39 @@ class Item(models.Model):
             current_values = [a['name']
                 for a in Entity.objects.filter(id__in=[ox.fromAZ(i) for i in current_values]).values('name')]
         current_values = [ox.decode_html(ox.strip_tags(v.replace('<br>', ' '))) for v in current_values]
-        saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
-        removed_values = filter(lambda i: i not in current_values, saved_values)
+        current_sortvalues = set([value.lower() for value in current_values])
+        saved_values = [i.value.lower() for i in Facet.objects.filter(item=self, key=key)]
+        removed_values = filter(lambda i: i not in current_sortvalues, saved_values)
+
         if removed_values:
-            Facet.objects.filter(item=self, key=key, value__in=removed_values).delete()
+            q = Q()
+            for v in removed_values:
+                q |=Q(value__iexact=v)
+            Facet.objects.filter(item=self, key=key).filter(q).delete()
+
         for value in current_values:
-            if value not in saved_values:
+            if value.lower() not in saved_values:
                 sortvalue = utils.sort_string(value).lower()[:900]
                 Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
+                saved_values.append(value.lower())
+
+    def get_layer_facets(self):
+        return [k['id']
+            for k in settings.CONFIG['itemKeys']
+                if k['type'] == 'layer' and (
+                    k.get('filter') or \
+                    utils.get_by_id(settings.CONFIG['layers'], k['id']).get('type') == 'string')
+        ]
 
     def update_layer_facets(self):
-        for k in settings.CONFIG['itemKeys']:
-            if k['type'] == 'layer' and (
-                k.get('filter') or \
-                utils.get_by_id(settings.CONFIG['layers'], k['id']).get('type') == 'string'):
-                self.update_layer_facet(k['id'])
+        for k in self.get_layer_facets():
+            self.update_layer_facet(k)
 
     def update_facets(self):
+        layer_facets = self.get_layer_facets()
         for key in self.facet_keys + ['title']:
+            if key in layer_facets:
+                continue
             current_values = self.get(key, [])
             if key == 'title':
                 if current_values:
@@ -1069,12 +1084,16 @@ class Item(models.Model):
 
             current_values = list(set(current_values))
             current_values = [ox.decode_html(ox.strip_tags(v)) for v in current_values]
-            saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
-            removed_values = filter(lambda i: i not in current_values, saved_values)
+            current_sortvalues = [value.lower() for value in current_values]
+            saved_values = [i.value.lower() for i in Facet.objects.filter(item=self, key=key)]
+            removed_values = filter(lambda i: i not in current_sortvalues, saved_values)
             if removed_values:
-                Facet.objects.filter(item=self, key=key, value__in=removed_values).delete()
+                q = Q()
+                for v in removed_values:
+                    q |=Q(value__iexact=v)
+                Facet.objects.filter(item=self, key=key).filter(q).delete()
             for value in current_values:
-                if value not in saved_values:
+                if value.lower() not in saved_values:
                     sortvalue = value
                     if key in self.person_keys + ['name']:
                         sortvalue = get_name_sort(value)
