@@ -3,7 +3,6 @@
 'use strict';
 
 pandora.ui.editor = function(data) {
-
     var ui = pandora.user.ui,
 
         that = Ox.VideoAnnotationPanel({
@@ -15,16 +14,6 @@ pandora.ui.editor = function(data) {
             annotationsTooltip: Ox._('annotations')
                 + ' <span class="OxBright">' + Ox.SYMBOLS.shift + 'A</span>',
             audioTrack: data.audioTrack,
-            autocomplete: function(key, value, callback) {
-                pandora.api.autocompleteEntities({
-                    key: key,
-                    operator: '=',
-                    range: [0, 20],
-                    value: value
-                }, function(result) {
-                    callback(result.data.items);
-                })
-            },
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
             censoredTooltip: Ox._(pandora.site.cantPlay.text),
@@ -53,7 +42,29 @@ pandora.ui.editor = function(data) {
             layers: data.annotations.map(function(layer) {
                 return Ox.extend({
                     editable: layer.canAddAnnotations[pandora.user.level]
-                }, layer);
+                }, layer, {
+                    autocomplete: layer.type == 'entity'
+                        ? function(key, value, callback) {
+                            pandora.api.autocompleteEntities({
+                                key: key,
+                                operator: '=',
+                                range: [0, 20],
+                                value: value
+                            }, function(result) {
+                                callback(result.data.items);
+                            })
+                        } : layer.autocomplete
+                        ? function(key, value, callback) {
+                            pandora.api.autocomplete({
+                                key: key,
+                                operator: '=',
+                                range: [0, 20],
+                                value: value
+                            }, function(result) {
+                                callback(result.data.items);
+                            });
+                        } : null
+                });
             }),
             loop: ui.videoLoop,
             muted: ui.videoMuted,

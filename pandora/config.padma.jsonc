@@ -603,6 +603,7 @@
             "title": "Keywords",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Keyword",
+            "autocomplete": true,
             "overlap": true,
             "type": "string"
         },
