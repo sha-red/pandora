@@ -984,6 +984,7 @@
             "videoScale": "fit",
             "videoSize": "small",
             "videoSubtitles": true,
+            "videoSubtitlesOffset": 0,
             "videoTimeline": "slitscan",
             "videoView": "player",
             "videoVolume": 1

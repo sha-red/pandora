@@ -911,6 +911,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "videoScale": "fit",
             "videoSize": "small",
             "videoSubtitles": true,
+            "videoSubtitlesOffset": 0,
             "videoTimeline": "antialias",
             "videoView": "player",
             "videoVolume": 1

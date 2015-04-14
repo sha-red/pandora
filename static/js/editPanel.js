@@ -147,6 +147,7 @@ pandora.ui.editPanel = function(isEmbed) {
                     })
                 ),
             subtitles: getSubtitles(edit.clips),
+            subtitlesOffset: ui.videoSubtitlesOffset,
             timeline: ui.videoTimeline,
             timelineTooltip: Ox._('timeline') + ' <span class="OxBright">' + Ox.SYMBOLS.shift + 'T</span>',
             video: getVideos(),

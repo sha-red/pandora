@@ -104,6 +104,7 @@ pandora.ui.embedPlayer = function() {
                 scaleToFill: ui.videoScale == 'fill',
                 showIconOnLoad: true,
                 subtitles: video.subtitles,
+                subtitlesOffset: ui.videoSubtitlesOffset,
                 timeline: options.playInToOut ? function(size, i) {
                     return pandora.getMediaURL('/' + options.item
                         + '/timelineantialias'

@@ -74,6 +74,7 @@ pandora.ui.editor = function(data) {
             subtitles: data.subtitles,
             subtitlesDefaultTrack: Ox.getLanguageNameByCode(pandora.site.language),
             subtitlesLayer: data.subtitlesLayer,
+            subtitlesOffset: ui.videoSubtitlesOffset,
             subtitlesTrack: Ox.getLanguageNameByCode(pandora.site.language),
             timeline: ui.videoTimeline,
             timelines: pandora.site.timelines,
