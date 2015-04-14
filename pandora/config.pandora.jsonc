@@ -567,6 +567,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "type": Can be "entity", "string" or "text" (strings cannot contain
             line breaks, text can contain HTML markup).
     Optional keys are:
+        "autocomplete": Available if the layer is used as a filter
         "canAddAnnotations": Permissions per user level
         "entity": ID of the referenced entity (if type is "entity")
         "hasEvents": If true, the calendar will be populated with matches from
