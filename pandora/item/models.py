@@ -1001,6 +1001,50 @@ class Item(models.Model):
 
         s.save()
 
+    def update_facet(self, key):
+        current_values = self.get(key, [])
+        if key == 'title':
+            if current_values:
+                current_values = [current_values]
+            else:
+                current_values = []
+            ot = self.get('originalTitle')
+            if ot:
+                current_values.append(ot)
+            at = self.get('alternativeTitles')
+            if at:
+                current_values += [a[0] for a in at]
+        elif key == 'character':
+            current_values = filter(lambda x: x.strip(),
+                                    [f['character'] for f in self.get('cast', [])])
+            current_values = [item for sublist in [x.split(' / ') for x in current_values]
+                              for item in sublist]
+        elif key == 'name':
+            current_values = []
+            #FIXME: is there a better way to build name collection?
+            for k in map(lambda x: x['id'],
+                           filter(lambda x: x.get('sortType') == 'person',
+                                  settings.CONFIG['itemKeys'])):
+                current_values += self.get(k, [])
+        if not isinstance(current_values, list):
+            if not current_values:
+                current_values = []
+            else:
+                current_values = [unicode(current_values)]
+        filter_map = utils.get_by_id(settings.CONFIG['itemKeys'], key).get('filterMap')
+        if filter_map:
+            filter_map = re.compile(filter_map)
+            _current_values = []
+            for value in current_values:
+                value = filter_map.findall(value)
+                if value:
+                    _current_values.append(value[0])
+            current_values = _current_values
+
+        current_values = list(set(current_values))
+        current_values = [ox.decode_html(ox.strip_tags(v)) for v in current_values]
+        self.update_facet_values(key, current_values)
+
     def update_layer_facet(self, key):
         from entity.models import Entity
         current_values = [a['value']
@@ -1010,6 +1054,9 @@ class Item(models.Model):
             current_values = [a['name']
                 for a in Entity.objects.filter(id__in=[ox.fromAZ(i) for i in current_values]).values('name')]
         current_values = [ox.decode_html(ox.strip_tags(v.replace('<br>', ' '))) for v in current_values]
+        self.update_facet_values(key, current_values)
+
+    def update_facet_values(self, key, current_values):
         current_sortvalues = set([value.lower() for value in current_values])
         saved_values = [i.value.lower() for i in Facet.objects.filter(item=self, key=key)]
         removed_values = filter(lambda i: i not in current_sortvalues, saved_values)
@@ -1022,84 +1069,19 @@ class Item(models.Model):
 
         for value in current_values:
             if value.lower() not in saved_values:
-                sortvalue = utils.sort_string(value).lower()[:900]
+                sortvalue = value
+                if key in self.person_keys + ['name']:
+                    sortvalue = get_name_sort(value)
+                sortvalue = utils.sort_string(sortvalue).lower()[:900]
                 Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
                 saved_values.append(value.lower())
 
-    def get_layer_facets(self):
-        return [k['id']
-            for k in settings.CONFIG['itemKeys']
-                if k['type'] == 'layer' and (
-                    k.get('filter') or \
-                    utils.get_by_id(settings.CONFIG['layers'], k['id']).get('type') == 'string')
-        ]
-
-    def update_layer_facets(self):
-        for k in self.get_layer_facets():
-            self.update_layer_facet(k)
-
     def update_facets(self):
-        layer_facets = self.get_layer_facets()
-        for key in self.facet_keys + ['title']:
-            if key in layer_facets:
-                continue
-            current_values = self.get(key, [])
-            if key == 'title':
-                if current_values:
-                    current_values = [current_values]
-                else:
-                    current_values = []
-                ot = self.get('originalTitle')
-                if ot:
-                    current_values.append(ot)
-                at = self.get('alternativeTitles')
-                if at:
-                    current_values += [a[0] for a in at]
-            elif key == 'character':
-                current_values = filter(lambda x: x.strip(),
-                                        [f['character'] for f in self.get('cast', [])])
-                current_values = [item for sublist in [x.split(' / ') for x in current_values]
-                                  for item in sublist]
-            elif key == 'name':
-                current_values = []
-                #FIXME: is there a better way to build name collection?
-                for k in map(lambda x: x['id'],
-                               filter(lambda x: x.get('sortType') == 'person',
-                                      settings.CONFIG['itemKeys'])):
-                    current_values += self.get(k, [])
-            if not isinstance(current_values, list):
-                if not current_values:
-                    current_values = []
-                else:
-                    current_values = [unicode(current_values)]
-            filter_map = utils.get_by_id(settings.CONFIG['itemKeys'], key).get('filterMap')
-            if filter_map:
-                filter_map = re.compile(filter_map)
-                _current_values = []
-                for value in current_values:
-                    value = filter_map.findall(value)
-                    if value:
-                        _current_values.append(value[0])
-                current_values = _current_values
-
-            current_values = list(set(current_values))
-            current_values = [ox.decode_html(ox.strip_tags(v)) for v in current_values]
-            current_sortvalues = [value.lower() for value in current_values]
-            saved_values = [i.value.lower() for i in Facet.objects.filter(item=self, key=key)]
-            removed_values = filter(lambda i: i not in current_sortvalues, saved_values)
-            if removed_values:
-                q = Q()
-                for v in removed_values:
-                    q |=Q(value__iexact=v)
-                Facet.objects.filter(item=self, key=key).filter(q).delete()
-            for value in current_values:
-                if value.lower() not in saved_values:
-                    sortvalue = value
-                    if key in self.person_keys + ['name']:
-                        sortvalue = get_name_sort(value)
-                    sortvalue = utils.sort_string(sortvalue).lower()[:900]
-                    Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
-        self.update_layer_facets()
+        for key in set(self.facet_keys + ['title']):
+            if key in self.layer_facet_keys:
+                self.update_layer_facet(key)
+            else:
+                self.update_facet(key)
 
     def path(self, name=''):
         h = self.public_id
@@ -1636,6 +1618,7 @@ def delete_item(sender, **kwargs):
 pre_delete.connect(delete_item, sender=Item)
 
 Item.facet_keys = []
+Item.layer_facet_keys = []
 Item.poster_keys = []
 for key in settings.CONFIG['itemKeys']:
     if 'autocomplete' in key and not 'autocompleteSortKey' in key or \
@@ -1646,6 +1629,11 @@ for key in settings.CONFIG['itemKeys']:
         Item.facet_keys.append(key['id'])
     if key['id'] in ('title', 'director', 'year') or key.get('poster'):
         Item.poster_keys.append(key['id'])
+    if key.get('type') == 'layer' and (
+            key.get('filter') or \
+            utils.get_by_id(settings.CONFIG['layers'], key['id']).get('type') == 'string'
+    ):
+        Item.layer_facet_keys.append(key['id'])
 
 Item.person_keys = []
 for key in settings.CONFIG['itemKeys']:
