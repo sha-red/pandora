@@ -381,3 +381,22 @@ def has_capability(user, capability):
         level = user.get_profile().get_level()
     return level in settings.CONFIG['capabilities'][capability] \
             and settings.CONFIG['capabilities'][capability][level]
+
+
+def merge_users(old, new):
+    old.annotations.all().update(user=new)
+    old.edits.all().update(user=new)
+    old.entities.all().update(user=new)
+    old.events.all().update(user=new)
+    old.files.all().update(user=new)
+    old.items.all().update(user=new)
+    old.lits.all().update(user=new)
+    old.places.all().update(user=new)
+    old.subscribed_edits.all().update(user=new)
+    old.subscribed_lists.all().update(user=new)
+    old.subscribed_texts.all().update(user=new)
+    old.texts.all().update(user=new)
+    old.volumes.all().update(user=new)
+    old.log_set.all().update(user=new)
+    old.changelog.all().update(user=new)
+    old.logentry_set.all().update(user=new)
