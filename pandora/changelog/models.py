@@ -39,7 +39,7 @@ class Log(models.Model):
 
     action = models.CharField(max_length=255, db_index=True)
     data = fields.DictField(default={})
-    created = models.DateTimeField()
+    created = models.DateTimeField(db_index=True)
     user = models.ForeignKey(User, null=True, related_name='changelog')
     changeid = models.CharField(max_length=255)
 
