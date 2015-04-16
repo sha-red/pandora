@@ -293,3 +293,9 @@ class Annotation(models.Model):
 def cleanup_related(sender, **kwargs):
     kwargs['instance'].cleanup_undefined_relations()
 pre_delete.connect(cleanup_related, sender=Annotation)
+
+def rename_layer(old, new):
+    import item.models
+    Annotation.objects.filter(layer=old).update(layer=new)
+    item.models.ItemFind.objects.filter(key=old).update(key=new)
+    item.models.Facet.objects.filter(key=old).update(key=new)
