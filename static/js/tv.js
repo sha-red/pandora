@@ -92,7 +92,7 @@ pandora.ui.tv = function() {
                     subtitles: getSubtitles(videoOptions),
                     subtitlesDefaultTrack: Ox.getLanguageNameByCode(pandora.site.language),
                     subtitlesLayer: videoOptions.subtitlesLayer,
-                    subtitlesOffset: ui.videoSubtitlesOffset,
+                    subtitlesOffset: pandora.user.ui.videoSubtitlesOffset,
                     subtitlesTrack: Ox.getLanguageNameByCode(pandora.site.language),
                     tooltips: true,
                     timeline: '/' + result.data.item + '/timeline16p.jpg',
