@@ -306,6 +306,9 @@ pandora.ui.editor = function(data) {
             select: function(data) {
                 pandora.UI.set('videoPoints.' + ui.item + '.annotation', data.id.split('/')[1] || '');
             },
+            showentityinfo: function(data) {
+                pandora.URL.push('/entities/' + data.id)
+            },
             subtitles: function(data) {
                 pandora.UI.set({videoSubtitles: data.subtitles});
             },

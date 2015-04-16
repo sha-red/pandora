@@ -244,7 +244,7 @@ class Annotation(models.Model):
             try:
                 entity = self.get_entity()
                 j['entity'] = entity.json(user=user)
-                j['value'] = entity.html_link()
+                j['value'] = entity.annotation_value()
             except:
                 j['entity'] = {}
         elif l['type'] == 'event':
