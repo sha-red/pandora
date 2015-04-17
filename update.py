@@ -55,7 +55,7 @@ repos = {
 }
 
 def reload_notice(base):
-    print '\nPlease restart pan.do/ra to finish the update:\n\t"sudo %s/ctl reload"\n' % base
+    print '\nPlease restart pan.do/ra to finish the update:\n\tsudo %s/ctl reload\n' % base
 
 if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ('database', 'db'):
