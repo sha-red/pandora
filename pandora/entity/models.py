@@ -181,13 +181,16 @@ class Entity(models.Model):
                 Find.objects.filter(entity=self, key=key).delete()
 
         with transaction.commit_on_success():
+            ids = ['name']
             entity = get_by_id(settings.CONFIG['entities'], self.type)
             for key in entity['keys']:
                 value = self.data.get(key['id'])
                 if isinstance(value, list):
                     value = u'\n'.join(value)
                 save(key['id'], value)
-
+                ids.append(key['id'])
+            save('name', u'\n'.join([self.name] + list(self.alternativeNames)))
+            self.find.exclude(key__in=ids).delete()
     
     def update_matches(self):
         import annotation.models
