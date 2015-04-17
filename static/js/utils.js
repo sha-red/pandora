@@ -2020,7 +2020,7 @@ pandora.logEvent = function(data, event, element) {
 };
 
 pandora.openLicenseDialog = function() {
-    if (!pandora.hasDialogOrScreen()) {
+    if (!Ox.Focus.focusedElementIsInput() && !pandora.hasDialogOrScreen()) {
         pandora.ui.licenseDialog().open().bindEvent({
             close: function() {
                 setTimeout(function() {
