@@ -1,32 +1,19 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
-
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        # Adding model 'Find'
-        db.create_table('entity_find', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('entity', self.gf('django.db.models.fields.related.ForeignKey')(related_name='find', to=orm['entity.Entity'])),
-            ('key', self.gf('django.db.models.fields.CharField')(max_length=200, db_index=True)),
-            ('value', self.gf('django.db.models.fields.TextField')(db_index=True, blank=True)),
-        ))
-        db.send_create_signal('entity', ['Find'])
-
-        # Adding unique constraint on 'Find', fields ['entity', 'key']
-        db.create_unique('entity_find', ['entity_id', 'key'])
+        # Update existing entites
+        import entity.models
+        for e in entity.models.Entity.objects.all():
+            e.update_find()
 
     def backwards(self, orm):
-        # Removing unique constraint on 'Find', fields ['entity', 'key']
-        db.delete_unique('entity_find', ['entity_id', 'key'])
-
-        # Deleting model 'Find'
-        db.delete_table('entity_find')
-
+        "Write your backwards methods here."
 
     models = {
         'auth.group': {
@@ -157,3 +144,4 @@ class Migration(SchemaMigration):
     }
 
     complete_apps = ['entity']
+    symmetrical = True
