@@ -29,7 +29,7 @@ pAAGSEQ4uz6bYSeM4Q==
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
 
-apt-get update
+apt-get update --qq
 
 if [ "$LXC" == "no" ]; then
 apt-get install -y \
