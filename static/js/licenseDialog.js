@@ -18,10 +18,10 @@ pandora.ui.licenseDialog = function() {
         content: Ox._(
             'This installation of <b>pan.do/ra</b> is unlicensed. '
             + 'Please contact your vendor for more information on '
-            + 'how to acquire a license, or renew an expired one.'
+            + 'how to acquire a license or renew an expired one.'
         ),
         keys: {enter: 'close', escape: 'close'},
         title: Ox._('License')
     });
-
+    return that;
 };

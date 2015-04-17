@@ -1955,7 +1955,7 @@ pandora.isEmbedURL = function(url) {
 };
 
 pandora.isLicensed = function() {
-    return pandora.site.license && pandora.site.license < +new Date();
+    return !pandora.site.license || pandora.site.license > +new Date();
 };
 
 pandora.isPrintURL = function(url) {
