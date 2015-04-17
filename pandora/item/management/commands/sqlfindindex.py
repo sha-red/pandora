@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         cursor = connection.cursor()
-        def create_table(index, table, key):
+        def create_index(index, table, key):
             sql = 'CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)' % (index, table, key)
             if options['debug']:
                 print sql
@@ -40,5 +40,5 @@ class Command(BaseCommand):
                 cursor = connection.cursor()
                 indexes = connection.introspection.get_indexes(cursor, table_name)
                 if name not in indexes:
-                    create_table("%s_%s_idx"%(table_name, name), table_name, name)
+                    create_index("%s_%s_idx"%(table_name, name), table_name, name)
             transaction.commit_unless_managed()

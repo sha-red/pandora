@@ -13,7 +13,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('entity', self.gf('django.db.models.fields.related.ForeignKey')(related_name='find', to=orm['entity.Entity'])),
             ('key', self.gf('django.db.models.fields.CharField')(max_length=200, db_index=True)),
-            ('value', self.gf('django.db.models.fields.TextField')(db_index=True, blank=True)),
+            ('value', self.gf('django.db.models.fields.TextField')(db_index=False, blank=True)),
         ))
         db.send_create_signal('entity', ['Find'])
 
@@ -128,7 +128,7 @@ class Migration(SchemaMigration):
             'entity': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'find'", 'to': "orm['entity.Entity']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'key': ('django.db.models.fields.CharField', [], {'max_length': '200', 'db_index': 'True'}),
-            'value': ('django.db.models.fields.TextField', [], {'db_index': 'True', 'blank': 'True'})
+            'value': ('django.db.models.fields.TextField', [], {'db_index': 'False', 'blank': 'True'})
         },
         'item.item': {
             'Meta': {'object_name': 'Item'},
