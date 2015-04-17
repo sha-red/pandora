@@ -39,7 +39,6 @@ class Command(BaseCommand):
             ):
                 cursor = connection.cursor()
                 indexes = connection.introspection.get_indexes(cursor, table_name)
-                name = 'value'
                 if name not in indexes:
                     create_table("%s_%s_idx"%(table_name, name), table_name, name)
             transaction.commit_unless_managed()
