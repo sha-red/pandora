@@ -1954,6 +1954,10 @@ pandora.isEmbedURL = function(url) {
     return /^#embed(\?.*?)?$/.test(hash);
 };
 
+pandora.isLicensed = function() {
+    return pandora.site.license && pandora.site.license < +new Date();
+};
+
 pandora.isPrintURL = function(url) {
     url = url || document.location.href;
     var hash = Ox.parseURL(url).hash;
@@ -2012,6 +2016,22 @@ pandora.logEvent = function(data, event, element) {
                 return handler.toString().split('\n').shift();
             })
         );
+    }
+};
+
+pandora.openLicenseDialog = function() {
+    if (!pandora.hasDialogOrScreen()) {
+        pandora.ui.licenseDialog().open().bindEvent({
+            close: function() {
+                setTimeout(function() {
+                    !pandora.isLicensed() && pandora.openLicenseDialog();
+                }, 900000); // 15 minutes
+            }
+        });
+    } else {
+        setTimeout(function() {
+            !pandora.isLicensed() && pandora.openLicenseDialog();
+        }, 60000); // 1 minute
     }
 };
 
