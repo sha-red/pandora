@@ -51,7 +51,7 @@ pandora.ui.entitiesDialog = function(options) {
                 $list.options({
                     query: {
                         conditions: data.value ? [
-                            {key: 'name', operator: '=', value: data.value}
+                            {key: '*', operator: '=', value: data.value}
                         ] : [],
                         operator: '&'
                     }

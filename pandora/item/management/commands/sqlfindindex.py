@@ -31,15 +31,15 @@ class Command(BaseCommand):
             cursor.execute(sql)
 
         if settings.DB_GIN_TRGM:
-            table_name = models.ItemFind._meta.db_table
-            indexes = connection.introspection.get_indexes(cursor, table_name)
-            name = 'value'
-            if name not in indexes:
-                create_table("%s_%s_idx"%(table_name, name), table_name, name)
-            table_name = models.Clip._meta.db_table
-            cursor = connection.cursor()
-            indexes = connection.introspection.get_indexes(cursor, table_name)
-            name = 'findvalue'
-            if name not in indexes:
-                create_table("%s_%s_idx"%(table_name, name), table_name, name)
+            import entity.models
+            for table_name, name in (
+                (models.ItemFind._meta.db_table, 'value'),   # Item Find
+                (models.Clip._meta.db_table, 'findvalue'),   # Clip Find
+                (entity.models.Find._meta.db_table, 'value'),# Entity Find
+            ):
+                cursor = connection.cursor()
+                indexes = connection.introspection.get_indexes(cursor, table_name)
+                name = 'value'
+                if name not in indexes:
+                    create_table("%s_%s_idx"%(table_name, name), table_name, name)
             transaction.commit_unless_managed()

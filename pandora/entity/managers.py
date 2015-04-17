@@ -11,10 +11,12 @@ def parseCondition(condition, user, item=None):
     k = condition.get('key', 'name')
     k = {
         'user': 'user__username',
+        'name': 'name_find'
     }.get(k, k)
 
     v = condition['value']
     op = condition.get('operator')
+    find_key = None
     if not op:
         op = '='
     if op.startswith('!'):
@@ -28,16 +30,27 @@ def parseCondition(condition, user, item=None):
     if isinstance(v, bool): #featured and public flag
         key = k
     else:
+        if k == '*':
+            k = 'find__value'
+        elif k not in ('name_find', 'id', 'user__username', 'type'):
+            find_key = k
+            k = 'find__value'
         key = "%s%s" % (k, {
             '==': '__iexact',
             '^': '__istartswith',
             '$': '__iendswith',
         }.get(op, '__icontains'))
     key = str(key)
-    if exclude:
-        q = ~Q(**{key: v})
+    if find_key:
+        if exclude:
+            q = Q(**{'find__key': find_key, key: v})
+        else:
+            q = Q(**{'find__key': find_key, key: v})
     else:
-        q = Q(**{key: v})
+        if exclude:
+            q = ~Q(**{key: v})
+        else:
+            q = Q(**{key: v})
     return q
 
 def parseConditions(conditions, operator, user, item=None):

@@ -5,6 +5,7 @@ import os
 import re
 from glob import glob
 from urllib import quote, unquote
+import unicodedata
 
 from django.db import models, transaction
 from django.db.models import Max
@@ -58,6 +59,7 @@ class Entity(models.Model):
         super(Entity, self).save(*args, **kwargs)
         self.update_matches()
         self.update_annotations()
+        self.update_find()
 
     def __unicode__(self):
         return self.get_id()
@@ -162,6 +164,30 @@ class Entity(models.Model):
     def annotation_value(self):
         #return u'<a href="/entities/%s">%s</a>' % (self.get_id(), ox.escape_html(self.name))
         return ox.escape_html(self.name)
+
+    def update_find(self):
+
+        def save(key, value):
+            if value not in ('', None):
+                f, created = Find.objects.get_or_create(entity=self, key=key)
+                if isinstance(value, bool):
+                    value = value and 'true' or 'false'
+                if isinstance(value, basestring):
+                    value = ox.decode_html(ox.strip_tags(value.strip()))
+                    value = unicodedata.normalize('NFKD', value).lower()
+                f.value = value
+                f.save()
+            else:
+                Find.objects.filter(entity=self, key=key).delete()
+
+        with transaction.commit_on_success():
+            entity = get_by_id(settings.CONFIG['entities'], self.type)
+            for key in entity['keys']:
+                value = self.data.get(key['id'])
+                if isinstance(value, list):
+                    value = u'\n'.join(value)
+                save(key['id'], value)
+
     
     def update_matches(self):
         import annotation.models
@@ -208,3 +234,15 @@ class DocumentProperties(models.Model):
     def save(self, *args, **kwargs):
 
         super(DocumentProperties, self).save(*args, **kwargs)
+
+class Find(models.Model):
+
+    class Meta:
+        unique_together = ("entity", "key")
+
+    entity = models.ForeignKey('Entity', related_name='find', db_index=True)
+    key = models.CharField(max_length=200, db_index=True)
+    value = models.TextField(blank=True, db_index=settings.DB_GIN_TRGM)
+
+    def __unicode__(self):
+        return u"%s=%s" % (self.key, self.value)
