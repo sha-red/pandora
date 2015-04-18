@@ -205,11 +205,7 @@ def update_static():
     oxjs_build = os.path.join(settings.STATIC_ROOT, 'oxjs/tools/build/build.py')
     if os.path.exists(oxjs_build):
         print 'update oxjs'
-        if os.path.exists(os.path.join(settings.STATIC_ROOT, 'oxjs/min/Geo/json/Geo.json')):
-            geo = '-nogeo'
-        else:
-            geo = ''
-        os.system('%s %s >/dev/null' % (oxjs_build, geo))
+        os.system('%s >/dev/null' % oxjs_build)
 
     data = ''
     js = []
@@ -234,8 +230,8 @@ def update_static():
         'png/icon.png',
     ]
     print 'write', pandora_js
+    data = ox.js.minify(data)
     with open(pandora_js, 'w') as f:
-        data = ox.js.minify(data)
         f.write(data)
 
     print 'write', pandora_json
