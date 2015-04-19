@@ -5,15 +5,18 @@ pandora.ui.uploadVideoDialog = function(data) {
 
     var cancelled = false,
         file,
-        hasFirefogg = !(typeof Firefogg == 'undefined') && (
-                $.browser.version < "35" || Firefogg().version >= 334),
-        itemView = pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level] ? 'media' : 'info',
+        hasFirefogg = !(Ox.isUndefined(Firefogg)) && (
+            $.browser.version < '35' || Firefogg().version >= 334
+        ),
+        itemView = pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level]
+            ? 'media' : 'info',
         selectFile,
         $actionButton,
         $closeButton,
         $content = Ox.Element().css({margin: '16px'}),
-        $info = $('<div>').css({padding: '4px'})
-            .html(Ox._('Please select the video file you want to upload.')),
+        $info = $('<div>')
+            .css({padding: '4px'})
+            .html(Ox._('Please select the video file that you want to upload.')),
         $progress,
         $status = $('<div>').css({padding: '4px', paddingTop: '8px'}),
         that = Ox.Dialog({
@@ -87,8 +90,8 @@ pandora.ui.uploadVideoDialog = function(data) {
                                 $info.html(formatVideoInfo(info));
                                 $status.html(
                                     info.direct
-                                    ? Ox._('Your video will be used directly.')
-                                    : Ox._('Your video will be transcoded.')
+                                    ? Ox._('Your video will be uploaded directly.')
+                                    : Ox._('Your video will be transcoded before uploading.')
                                 );
                             });
                             //$closeButton.options('title', Ox._('Cancel'));
@@ -116,7 +119,7 @@ pandora.ui.uploadVideoDialog = function(data) {
         $info.html(Ox._(
             'You can only upload a video to an existing {0}.'
             + ' Please check if an entry for the {0}'
-            + ' you want to upload exists and create otherwise.',
+            + ' you want to upload exists, and create one otherwise.',
             [pandora.site.itemName.singular.toLowerCase()]
         ));
         $actionButton.hide();

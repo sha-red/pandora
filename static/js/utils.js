@@ -135,7 +135,9 @@ pandora.addFolderItem = function(section) {
                 };
                 pandora.api.find({
                     query: {
-                        conditions: [{key: 'list', value: newList, operator: '=='}],
+                        conditions: [
+                            {key: 'list', value: newList, operator: '=='}
+                        ],
                         operator: '&'
                     },
                     keys: ['id', 'posterFrame'],
@@ -148,9 +150,15 @@ pandora.addFolderItem = function(section) {
                     posterFrames = posterFrames.length == 1
                         ? Ox.repeat([posterFrames[0]], 4)
                         : posterFrames.length == 2
-                        ? [posterFrames[0], posterFrames[1], posterFrames[1], posterFrames[0]]
+                        ? [
+                            posterFrames[0], posterFrames[1],
+                            posterFrames[1], posterFrames[0]
+                        ]
                         : posterFrames.length == 3
-                        ? [posterFrames[0], posterFrames[1], posterFrames[2], posterFrames[0]]
+                        ? [
+                            posterFrames[0], posterFrames[1],
+                            posterFrames[2], posterFrames[0]
+                        ]
                         : posterFrames;
                     setPosterFrames(newList, posterFrames);
                 });
@@ -189,7 +197,9 @@ pandora.addFolderItem = function(section) {
                     .editCell(newList, 'name', true);
                 pandora.UI.set(isItems ? {
                     find: {
-                        conditions: [{key: 'list', value: newList, operator: '=='}],
+                        conditions: [
+                            {key: 'list', value: newList, operator: '=='}
+                        ],
                         operator: '&'
                     }
                 } : {
@@ -226,9 +236,13 @@ pandora.addText = function(options) {
 }
 
 pandora.beforeUnloadWindow = function() {
-    if (pandora.firefogg)
-        return Ox._("Encoding is currently running\nDo you want to leave this page?");
-    //prevent error dialogs on unload
+    if (pandora.firefogg) {
+        return Ox._(
+            'Encoding is currently running. '
+            + 'Are you sure that you want to leave this page?'
+        );
+    }
+    // Prevent error dialogs on unload
     pandora.isUnloading = true;
 };
 
@@ -524,9 +538,7 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
 
     section = section || pandora.user.ui.section;
 
-    var $tooltip = Ox.Tooltip({
-            animate: false
-        }),
+    var $tooltip = Ox.Tooltip({animate: false}),
         drag = {},
         scrollInterval;
 
@@ -636,7 +648,6 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
             }
         },
         draganddropend: function(data) {
-            Ox.Log('', data, drag, '------------');
             canMove && Ox.$window.off({
                 keydown: keydown,
                 keyup: keyup
@@ -770,7 +781,9 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                         width: '16px',
                         height: '16px',
                         padding: '2px',
-                        border: '2px solid rgb(' + Ox.Theme.getThemeData().symbolDefaultColor.join(', ') + ')',
+                        border: '2px solid rgb('
+                            + Ox.Theme.getThemeData().symbolDefaultColor.join(', ')
+                            + ')',
                         borderRadius: '12px',
                         margin: '3px 2px 2px 2px'
                     })
@@ -811,6 +824,7 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
             $tooltip.options({title: getTitle()}).show();
         }
     }
+
     function keyup(e) {
         if (drag.action == 'move') {
             drag.action = 'copy';
@@ -822,12 +836,17 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
 
 pandora.enterFullscreen = function() {
     pandora.$ui.appPanel.size(0, 0);
-    pandora.user.ui.showSidebar && pandora.$ui.mainPanel.size(0, 0);
+    if (pandora.user.ui.showSidebar) {
+        pandora.$ui.mainPanel.size(0, 0);
+    }
     pandora.$ui.rightPanel.size(0, 0).size(2, 0);
-    !pandora.user.ui.showBrowser && pandora.$ui.contentPanel.css({
-        top: (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
-    });
-    pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 0);
+    if (pandora.user.ui.showBrowser) {
+        pandora.$ui.contentPanel.size(0, 0);
+    } else {
+        pandora.$ui.contentPanel.css({
+            top: (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+        });
+    }
     pandora.$ui.player.options({
         height: pandora.$document.height() - 2,
         width: pandora.$document.width() - 2
@@ -836,12 +855,17 @@ pandora.enterFullscreen = function() {
 
 pandora.exitFullscreen = function() {
     pandora.$ui.appPanel.size(0, 20);
-    pandora.user.ui.showSidebar && pandora.$ui.mainPanel.size(0, pandora.user.ui.sidebarSize);
+    if (pandora.user.ui.showSidebar) {
+        pandora.$ui.mainPanel.size(0, pandora.user.ui.sidebarSize);
+    }
     pandora.$ui.rightPanel.size(0, 24).size(2, 16);
-    !pandora.user.ui.showBrowser && pandora.$ui.contentPanel.css({
-        top: 24 + (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
-    });
-    pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
+    if (pandora.user.ui.showBrowser) {
+        pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
+    } else {
+        pandora.$ui.contentPanel.css({
+            top: 24 + (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+        });
+    }
 };
 
 pandora.getAllItemsTitle = function(section) {
@@ -910,10 +934,10 @@ pandora.getClipsQuery = function(callback) {
                 if (result.data.type == 'smart') {
                     addClipsConditions(result.data.query.conditions);
                 }
-                callback(clipsQuery)
+                callback(clipsQuery);
             });
         } else {
-                callback(clipsQuery)
+            callback(clipsQuery);
         }
     } else {
         return clipsQuery;
@@ -1032,7 +1056,8 @@ pandora.getFoldersHeight = function(section) {
     var height = 0;
     pandora.site.sectionFolders[section].forEach(function(folder, i) {
         height += 16 + pandora.user.ui.showFolder[section][folder.id] * (
-            !!(folder.showBrowser && folder.hasItems) * 40 + (folder.items || 1) * 16
+            !!(folder.showBrowser && folder.hasItems) * 40
+            + (folder.items || 1) * 16
         );
     });
     return height;
@@ -1043,8 +1068,8 @@ pandora.getFoldersWidth = function(section) {
     var width = pandora.user.ui.sidebarSize;
     if (
         pandora.$ui.appPanel
-        && pandora.getFoldersHeight(section)
-            > window.innerHeight - 20 - 24 - 16 - 1 - pandora.getInfoHeight(section)
+        && pandora.getFoldersHeight(section) > window.innerHeight
+            - 20 - 24 - 16 - 1 - pandora.getInfoHeight(section)
     ) {
         width -= Ox.UI.SCROLLBAR_SIZE;
     }
@@ -1811,7 +1836,6 @@ pandora.getVideoOptions = function(data) {
         canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
         options = {};
     options.subtitlesLayer = pandora.getSubtitlesLayer();
-    
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
             options.subtitlesLayer && data.layers[options.subtitlesLayer].length
@@ -1883,7 +1907,6 @@ pandora.getVideoOptions = function(data) {
             })
         });
     });
-    Ox.Log('Video', 'VideoOptions', options);
     return options;
 };
 
@@ -1944,7 +1967,7 @@ pandora.isClipView = function(view, item) {
 };
 
 pandora.isEmbeddableView = function(url) {
-    //fixme. actually return true for embeddable views
+    // FIXME: actually return true for embeddable views
     return false;
 };
 
@@ -2116,7 +2139,6 @@ pandora.renameList = function(oldId, newId, newName, folder) {
             }
         }, false);
         pandora.UI.set('lists.' + pandora.UI.encode(oldId), null, false);
-
     } else {
         pandora.replaceURL = true;
         pandora.UI.set(pandora.user.ui.section + '.' + pandora.UI.encode(newId),
@@ -2313,7 +2335,7 @@ pandora.setLocale = function(locale, callback) {
                 '/static/json/locale.' + pandora.site.site.id + '.' + locale + '.json',
             ];
         } else {
-            url = '/static/json/locale.' + locale + '.json'
+            url = '/static/json/locale.' + locale + '.json';
         }
     }
     Ox.setLocale(locale, url, callback);
@@ -2357,7 +2379,9 @@ pandora.updateItemContext = function() {
             if (result.data.positions[pandora.user.ui.item] === void 0) {
                 pandora.stayInItemView = true;
                 pandora.UI.set({find: pandora.site.user.ui.find});
-                pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
+                pandora.$ui.contentPanel.replaceElement(
+                    0, pandora.$ui.browser = pandora.ui.browser()
+                );
             } else {
                 pandora.$ui.browser.reloadList();
             }
@@ -2386,8 +2410,9 @@ pandora.updateStatus = function(item) {
                     if (result.data.rendered) {
                         Ox.Request.clearCache();
                         if (pandora.isVideoView()) {
-                            pandora.$ui.mainPanel.replaceElement(1,
-                                pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                            pandora.$ui.mainPanel.replaceElement(
+                                1, pandora.$ui.rightPanel = pandora.ui.rightPanel()
+                            );
                         } else if(pandora.$ui.item) {
                             pandora.updateItemContext();
                             pandora.$ui.item.reload();
@@ -2401,12 +2426,12 @@ pandora.updateStatus = function(item) {
             delete pandora.$ui.updateStatus[item];
         }
     }, 10000);
-
     function isActive() {
         return ui.item == item && [
             'info', 'player', 'editor', 'timeline'
         ].indexOf(ui.itemView) > -1 && !(
-            pandora.$ui.uploadVideoDialog && pandora.$ui.uploadVideoDialog.is('::visible')
+            pandora.$ui.uploadVideoDialog
+            && pandora.$ui.uploadVideoDialog.is('::visible')
         );
     }
 };

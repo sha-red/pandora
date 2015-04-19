@@ -202,7 +202,8 @@ appPanel
         } else {
             script.onload = callback;
         }
-        script.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'min') + '/Ox.js?' + getPandoraVersion();
+        script.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'min')
+            + '/Ox.js?' + getPandoraVersion();
         script.type = 'text/javascript';
         head.appendChild(script);
     }
@@ -244,13 +245,18 @@ appPanel
     function loadPandoraFiles(callback) {
         var prefix = '/static/';
         if (enableDebugMode) {
-            Ox.getJSON(prefix + 'json/pandora.json?' + Ox.random(1000), function(files) {
-                Ox.getFile(files.map(function(file) {
-                    return prefix + file + '?' + getPandoraVersion();
-                }), callback);
-            });
+            Ox.getJSON(
+                prefix + 'json/pandora.json?' + Ox.random(1000),
+                function(files) {
+                    Ox.getFile(files.map(function(file) {
+                        return prefix + file + '?' + getPandoraVersion();
+                    }), callback);
+                }
+            );
         } else {
-            Ox.getScript(prefix + 'js/pandora.min.js?' + getPandoraVersion(), callback);
+            Ox.getScript(
+                prefix + 'js/pandora.min.js?' + getPandoraVersion(), callback
+            );
         }
     }
 
@@ -296,7 +302,8 @@ appPanel
             pandora.user.ui.itemView = pandora.site.user.ui.itemView;
         }
         // patch theme ... this can be removed at a later point
-        pandora.user.ui.theme = legacyThemes[pandora.user.ui.theme] || pandora.user.ui.theme;
+        pandora.user.ui.theme = legacyThemes[pandora.user.ui.theme]
+            || pandora.user.ui.theme;
         // make sure theme is valid
         if (!Ox.contains(pandora.site.themes, pandora.user.ui.theme)) {
             pandora.user.ui.theme = pandora.site.user.ui.theme;
@@ -449,7 +456,8 @@ appPanel
                 ]
             ),
             images = browsers.map(function(browser) {
-                return Ox.PATH + 'UI/png/browser' + browser.name.replace(' ', '') + '128.png';
+                return Ox.PATH + 'UI/png/browser'
+                    + browser.name.replace(' ', '') + '128.png';
             }),
             $loadingScreen = $('#loadingScreen');
         Ox.getFile(images, function() {
