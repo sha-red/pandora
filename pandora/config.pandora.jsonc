@@ -126,6 +126,10 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         }
     ],
     /*
+    "flags", if set to true, will cause flag icons to appear in filters.
+    */
+    "flags": true,
+    /*
     "help" specifies the sections of the help dialog.
     */
     "help": [
@@ -620,7 +624,11 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         }
     ],
     /*
-    "itemViews" is an ordered list of available list views. Implemented views
+    "license" can be used to implement instance-specific license settings
+    */
+    "license": null,
+    /*
+    "listViews" is an ordered list of available list views. Implemented views
     are "list", "grid", "timelines", "clips", "clip", "map" and "calendar".
     */
     "listViews": [
@@ -684,6 +692,11 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         {"name": "Restricted", "color": [255, 192, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
+    /*
+    "sendReferrer", if set to false, will cause all outgoing links to originate
+    from one single URL
+    */
+    "sendReferrer": false,
     /*
     "site" contains various settings for this instance. In "email", "contact"
     if the address in the contact form (to), "system" is the address used by
