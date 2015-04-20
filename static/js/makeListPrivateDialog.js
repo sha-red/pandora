@@ -27,11 +27,17 @@ pandora.ui.makeListPrivateDialog = function(name, subscribers, callback) {
                     }
                 })
             ],
-            content: Ox._('Are you sure you want to make the {0} "{1}" private and lose its {2}?', [
-                folderItem.toLowerCase(),
-                name,
-                subscribers == 1 ? Ox._('subscriber') : Ox._('{0} subscribers', [subscribers])
-            ]),
+            content: Ox._(
+                'Are you sure you want to make the {0} "{1}" private'
+                + ' and lose its {2}?',
+                [
+                    folderItem.toLowerCase(),
+                    name,
+                    subscribers == 1
+                        ? Ox._('subscriber')
+                        : Ox._('{0} subscribers', [subscribers])
+                ]
+            ),
             keys: {enter: 'make', escape: 'keep'},
             title: Ox._('Make {0} Private', [folderItem])
         });

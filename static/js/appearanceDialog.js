@@ -18,7 +18,10 @@ pandora.ui.appearanceDialog = function() {
                 Ox.Select({
                         id: 'theme',
                         items: pandora.site.themes.map(function(theme) {
-                            return {id: theme, title: Ox.Theme.getThemeData(theme).themeName}
+                            return {
+                                id: theme,
+                                title: Ox.Theme.getThemeData(theme).themeName
+                            };
                         }),
                         label: Ox._('Theme'),
                         labelWidth: 120,
@@ -34,7 +37,10 @@ pandora.ui.appearanceDialog = function() {
                 Ox.Select({
                         id: 'locale',
                         items: pandora.site.languages.map(function(locale) {
-                            return {id: locale, title: Ox.LOCALE_NAMES[locale]}
+                            return {
+                                id: locale,
+                                title: Ox.LOCALE_NAMES[locale]
+                            };
                         }),
                         label: Ox._('Language'),
                         labelWidth: 120,

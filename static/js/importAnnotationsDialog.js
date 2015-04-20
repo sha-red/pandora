@@ -151,7 +151,9 @@ pandora.ui.importAnnotationsDialog = function(options) {
                     [annotations.length]
                 ));
                 annotations = annotations.map(function(annotation) {
-                    var value = Ox.sanitizeHTML(annotation.text ? annotation.text : annotation.value);
+                    var value = Ox.sanitizeHTML(
+                        annotation.text ? annotation.text : annotation.value
+                    );
                     if (format == 'srt') {
                         value = value.replace(/<br[ /]*?>\n/g, '\n')
                             .replace(/\n\n/g, '<br>\n')

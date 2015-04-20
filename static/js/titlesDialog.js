@@ -16,8 +16,16 @@ pandora.ui.titlesDialog = function() {
                 change: function(data) {
                     var query = {
                             conditions: [
-                                {key: 'title', value: data.value, operator: '='},
-                                {key: 'sorttitle', value: data.value, operator: '='}
+                                {
+                                    key: 'title',
+                                    operator: '=',
+                                    value: data.value
+                                },
+                                {
+                                    key: 'sorttitle',
+                                    operator: '=',
+                                    value: data.value
+                                }
                             ],
                             operator: '|'
                         };
@@ -92,7 +100,9 @@ pandora.ui.titlesDialog = function() {
                     pandora.UI.set({find: {
                         conditions: [{
                             key: 'title',
-                            value: $list.value($list.options('selected'), 'title'),
+                            value: $list.value(
+                                $list.options('selected'), 'title'
+                            ),
                             operator: '='
                         }],
                         operator: '&'

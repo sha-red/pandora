@@ -36,12 +36,16 @@ pandora.ui.deleteListDialog = function(list) {
                                 .bindEventOnce({
                                     load: function() {
                                         if (ui.section == 'items') {
-                                            pandora.UI.set('lists.' + listData.id, null);
+                                            pandora.UI.set(
+                                                'lists.' + listData.id, null
+                                            );
                                             pandora.UI.set({
                                                 find: pandora.site.user.ui.find
                                             });
                                         } else {
-                                            pandora.UI.set(folderItem.toLowerCase(), '');
+                                            pandora.UI.set(
+                                                folderItem.toLowerCase(), ''
+                                            );
                                         }
                                     }
                                 })
@@ -50,8 +54,10 @@ pandora.ui.deleteListDialog = function(list) {
                     }
                 })
             ],
-            content: Ox._('Are you sure you want to delete the {0} "{1}"?',
-                [Ox._(folderItem.toLowerCase()), listData.name]),
+            content: Ox._(
+                'Are you sure you want to delete the {0} "{1}"?',
+                [Ox._(folderItem.toLowerCase()), listData.name]
+            ),
             keys: {enter: 'delete', escape: 'keep'},
             title: Ox._('Delete {0}', [Ox._(folderItem)])
         });

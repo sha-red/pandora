@@ -8,7 +8,9 @@ pandora.ui.preferencesDialog = function() {
             {id: 'appearance', title: Ox._('Appearance')},
             {id: 'advanced', title: Ox._('Advanced')}
         ];
-    Ox.getObjectById(tabs, pandora.user.ui.part.preferences || 'account').selected = true;
+    Ox.getObjectById(
+        tabs, pandora.user.ui.part.preferences || 'account'
+    ).selected = true;
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var $content = Ox.Element()
@@ -91,7 +93,9 @@ pandora.ui.preferencesDialog = function() {
                                         id: 'newsletter',
                                         label: Ox._('Newsletter'),
                                         labelWidth: 120,
-                                        title: pandora.user.newsletter ? Ox._('Subscribed') : Ox._('Unsubscribed'),
+                                        title: pandora.user.newsletter
+                                            ? Ox._('Subscribed')
+                                            : Ox._('Unsubscribed'),
                                         value: pandora.user.newsletter,
                                         width: 320
                                     })
@@ -99,7 +103,9 @@ pandora.ui.preferencesDialog = function() {
                                         change: function(data) {
                                             pandora.user.newsletter = data.value;
                                             this.options({
-                                                title: pandora.user.newsletter ? Ox._('Subscribed') : Ox._('Unsubscribed')
+                                                title: pandora.user.newsletter
+                                                    ? Ox._('Subscribed')
+                                                    : Ox._('Unsubscribed')
                                             });
                                             pandora.api.editPreferences({
                                                 newsletter: pandora.user.newsletter 
@@ -118,7 +124,10 @@ pandora.ui.preferencesDialog = function() {
                                 Ox.Select({
                                         id: 'theme',
                                         items: pandora.site.themes.map(function(theme) {
-                                            return {id: theme, title: Ox.Theme.getThemeData(theme).themeName}
+                                            return {
+                                                id: theme,
+                                                title: Ox.Theme.getThemeData(theme).themeName
+                                            };
                                         }),
                                         label: Ox._('Theme'),
                                         labelWidth: 120,
@@ -134,7 +143,10 @@ pandora.ui.preferencesDialog = function() {
                                 Ox.Select({
                                         id: 'locale',
                                         items: pandora.site.languages.map(function(locale) {
-                                            return {id: locale, title: Ox.LOCALE_NAMES[locale]}
+                                            return {
+                                                id: locale,
+                                                title: Ox.LOCALE_NAMES[locale]
+                                            };
                                         }),
                                         label: Ox._('Language'),
                                         labelWidth: 120,
@@ -238,7 +250,9 @@ pandora.ui.preferencesDialog = function() {
             },
             'pandora_part.preferences': function(data) {
                 if (pandora.user.ui.page == 'preferences') {
-                    $tabPanel.select(data.value == '' ? 'account' : data.value);
+                    $tabPanel.select(
+                        data.value == '' ? 'account' : data.value
+                    );
                 }
             }
         });

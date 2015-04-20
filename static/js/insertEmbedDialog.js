@@ -56,9 +56,11 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
             range: [0, 1],
             sort: [{key: 'id', operator: '+'}],
         },
-        sites = [pandora.site.site].concat(pandora.site.sites).map(function(site) {
-            return {id: site.url, title: site.url, https: site.https};
-        });
+        sites = [pandora.site.site].concat(pandora.site.sites).map(
+            function(site) {
+                return {id: site.url, title: site.url, https: site.https};
+            }
+        );
 
     api.find(options, function(result) {
 
@@ -76,8 +78,16 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                                 return getForm(id);
                             },
                             tabs: [
-                                {id: 'basic', title: Ox._('Basic'), selected: !advanced},
-                                {id: 'advanced', title: Ox._('Advanced'), selected: advanced}
+                                {
+                                    id: 'basic',
+                                    title: Ox._('Basic'),
+                                    selected: !advanced
+                                },
+                                {
+                                    id: 'advanced',
+                                    title: Ox._('Advanced'),
+                                    selected: advanced
+                                }
                             ]
                         });
                     } else {
@@ -124,8 +134,15 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
 
             $input.protocol = Ox.Select({
                     items: [
-                        {id: 'http', title: 'http'},
-                        {id: 'https', title: 'https', disabled: !pandora.site.site.https}
+                        {
+                            id: 'http',
+                            title: 'http'
+                        },
+                        {
+                            id: 'https',
+                            title: 'https',
+                            disabled: !pandora.site.site.https
+                        }
                     ],
                     label: Ox._('Protocol'),
                     labelWidth: 128,
@@ -141,7 +158,9 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
 
             $input.site = Ox.SelectInput({
                     inputWidth: 128,
-                    items: sites.concat([{id: 'other', title: Ox._('Other...')}]),
+                    items: sites.concat(
+                        [{id: 'other', title: Ox._('Other...')}]
+                    ),
                     label: Ox._('Site'),
                     labelWidth: 128,
                     placeholder: 'example.com',
@@ -155,9 +174,11 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                         if (data.value) {
                             var site = Ox.getObjectById(sites, data.value);
                             $input.protocol[
-                                !site || site.https ? 'enableItem' : 'disableItem'
+                                !site || site.https
+                                ? 'enableItem' : 'disableItem'
                             ]('https').options({
-                                value: !site || !site.https ? 'http' : 'https'
+                                value: !site || !site.https
+                                ? 'http' : 'https'
                             });
                             updateAPI(data.value, formatURL);
                         }
@@ -225,8 +246,10 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                             $input.position.options({
                                 value: limitPoint(
                                     data.value,
-                                    hasInAndOut ? $input['in'].options('value') : 0,
-                                    hasInAndOut ? $input.out.options('value') : duration
+                                    hasInAndOut
+                                        ? $input['in'].options('value') : 0,
+                                    hasInAndOut
+                                        ? $input.out.options('value') : duration
                                 )
                             });
                         }
@@ -250,7 +273,9 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                                 value: limitPoint(data.value, 0, duration)
                             });
                             if ($input.out.options('value') === '') {
-                                $input.out.options({value: Ox.formatDuration(duration)});
+                                $input.out.options({
+                                    value: Ox.formatDuration(duration)
+                                });
                             } else if (
                                 Ox.parseDuration($input.out.options('value'))
                                 < Ox.parseDuration(data.value)
@@ -278,7 +303,9 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                                 value: limitPoint(data.value, 0, duration)
                             });
                             if ($input['in'].options('value') === '') {
-                                $input['in'].options({value: Ox.formatDuration(0)});
+                                $input['in'].options({
+                                    value: Ox.formatDuration(0)
+                                });
                             } else if (
                                 Ox.parseDuration($input['in'].options('value'))
                                 > Ox.parseDuration(data.value)
@@ -418,9 +445,11 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                 options = Ox.serialize({
                     title: data.title || void 0,
                     showTimeline: data.showTimeline || void 0,
-                    timeline: data.timeline && data.timeline != 'default' ? data.timeline : void 0,
+                    timeline: data.timeline && data.timeline != 'default'
+                        ? data.timeline : void 0,
                     showAnnotations: data.showAnnotations || void 0,
-                    showLayers: data.showAnnotations && data.showLayers ? data.showLayers : void 0,
+                    showLayers: data.showAnnotations && data.showLayers
+                        ? data.showLayers : void 0,
                     //matchRatio: true
                 }, true)
                 .replace(/_/g, '%09').replace(/\s/g, '_')
@@ -472,7 +501,10 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                             query[condition.key] = condition.value;
                         });
                     }
-                    (isSameItem ? Ox.noop : api.get)({id: id, keys: ['duration']}, function(result) {
+                    (isSameItem ? Ox.noop : api.get)({
+                        id: id,
+                        keys: ['duration']
+                    }, function(result) {
                         if (result && result.data) {
                             duration = result.data.duration;
                             item = id;
@@ -494,9 +526,10 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                             showTimeline: query.showTimeline || false,
                             timeline: query.timeline || 'default',
                             showAnnotations: query.showAnnotations || false,
-                            showLayers: query.showLayers || pandora.site.layers.map(function(layer) {
-                                return layer.id;
-                            })
+                            showLayers: query.showLayers
+                                || pandora.site.layers.map(function(layer) {
+                                    return layer.id;
+                                })
                         }, function(value, key) {
                             Ox.print('????', key, value);
                             $input[key].options({value: value});

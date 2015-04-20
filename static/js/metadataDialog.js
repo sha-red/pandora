@@ -166,7 +166,10 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function getMetadata() {
-        pandora.api.getMetadata({id: data.imdbId, keys: keys.concat(['originalTitle'])}, function(result) {
+        pandora.api.getMetadata({
+            id: data.imdbId,
+            keys: keys.concat(['originalTitle'])
+        }, function(result) {
             var $bar = Ox.Bar({size: 24}),
                 $data = Ox.Element()
                     .css({padding: '13px', overflowY: 'auto'}),
@@ -219,7 +222,10 @@ pandora.ui.metadataDialog = function(data) {
                             title: getTitle(key),
                             width: formWidth
                         })
-                        .css({display: 'inline-block', margin: '3px 3px 5px 3px'})
+                        .css({
+                            display: 'inline-block',
+                            margin: '3px 3px 5px 3px'
+                        })
                         .appendTo($data);
                     $input[key] = [data[key], imdb[key]].map(function(v, i) {
                         return Ox.InputGroup({
@@ -251,7 +257,10 @@ pandora.ui.metadataDialog = function(data) {
                                         })
                                 ],
                                 separators: [
-                                    {title: [Ox._('Current'), Ox._('Update')][i], width: 64}
+                                    {
+                                        title: [Ox._('Current'), Ox._('Update')][i],
+                                        width: 64
+                                    }
                                 ]
                             })
                             .css({display: 'inline-block', margin: '3px'})

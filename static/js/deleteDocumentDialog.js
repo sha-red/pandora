@@ -5,6 +5,7 @@
 pandora.ui.deleteDocumentDialog = function(files, callback) {
 
     var string = Ox._(files.length == 1 ? 'Document' : 'Documents'),
+
         that = pandora.ui.iconDialog({
             buttons: [
                 Ox.Button({

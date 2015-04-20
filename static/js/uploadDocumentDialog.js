@@ -70,7 +70,9 @@ pandora.ui.uploadDocumentDialog = function(files, callback) {
     if (!Ox.every(extensions, function(extension) {
         return Ox.contains(supportedExtensions, extension)
     })) {
-        return errorDialog(Ox._('Supported file types are GIF, JPG, PNG and PDF.'));
+        return errorDialog(
+            Ox._('Supported file types are GIF, JPG, PNG and PDF.')
+        );
     } else {
         var valid = true;
         Ox.parallelForEach(files, function(file, index, array, callback) {
@@ -81,18 +83,29 @@ pandora.ui.uploadDocumentDialog = function(files, callback) {
                 pandora.api.findDocuments({
                     keys: ['id', 'user', 'name', 'extension'],
                     query: {
-                        conditions: [{key: 'oshash', value: oshash, operator: '=='}],
+                        conditions: [{
+                            key: 'oshash',
+                            operator: '==',
+                            value: oshash
+                        }],
                         operator: '&'
                     },
                     range: [0, 1],
                     sort: [{key: 'name', operator: '+'}]
                 }, function(result) {
                     if (result.data.items.length) {
-                        var id = result.data.items[0].name + '.' + result.data.items[0].extension;
+                        var id = result.data.items[0].name + '.'
+                            + result.data.items[0].extension;
                         valid && errorDialog(
                             filename == id
-                            ? Ox._('The file "{0}" already exists.', [filename])
-                            : Ox._('The file "{0}" already exists as "{1}".', [filename, id])
+                            ? Ox._(
+                                'The file "{0}" already exists.',
+                                [filename]
+                            )
+                            : Ox._(
+                                'The file "{0}" already exists as "{1}".',
+                                [filename, id]
+                            )
                         ).open();
                         valid = false;
                     }
@@ -151,12 +164,14 @@ pandora.ui.uploadDocumentDialog = function(files, callback) {
                         }
                     } else {
                         $message.html(Ox._('Upload failed.'))
-                        $uploadDialog.options('buttons')[0].options({title: Ox._('Close')});
+                        $uploadDialog.options('buttons')[0].options({
+                            title: Ox._('Close')
+                        });
                     }
                 },
                 progress: function(data) {
                     var progress = data.progress || 0;
-                    progress = part/files.length + 1/files.length * progress;
+                    progress = part / files.length + 1 / files.length * progress;
                     $progress.options({progress: progress});
                 }
             });

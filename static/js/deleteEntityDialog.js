@@ -5,6 +5,7 @@
 pandora.ui.deleteEntityDialog = function(entities, callback) {
 
     var string = Ox._(entities.length == 1 ? 'Entity' : 'Entities'),
+
         that = pandora.ui.iconDialog({
             buttons: [
                 Ox.Button({

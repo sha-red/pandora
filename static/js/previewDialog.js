@@ -9,6 +9,7 @@ pandora.ui.previewDialog = function() {
             ? pandora.site.posters.ratio
             : ($list.value(item, 'posterRatio') || pandora.site.posters.ratio),
         size = getSize(posterRatio),
+
         that = Ox.Dialog({
                 closeButton: true,
                 content: Ox.Element(),
@@ -58,7 +59,9 @@ pandora.ui.previewDialog = function() {
     that.update = function() {
         pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);
         pandora.requests.preview = pandora.api.find({
-            keys: ['id', 'modified', 'posterRatio'].concat(pandora.site.itemTitleKeys),
+            keys: [
+                'id', 'modified', 'posterRatio'
+            ].concat(pandora.site.itemTitleKeys),
             query: {
                 conditions: [{
                     key: 'id',

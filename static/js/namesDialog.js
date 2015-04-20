@@ -18,8 +18,16 @@ pandora.ui.namesDialog = function() {
                 change: function(data) {
                     var query = {
                             conditions: [
-                                {key: 'name', value: data.value, operator: '='},
-                                {key: 'sortname', value: data.value, operator: '='}
+                                {
+                                    key: 'name',
+                                    operator: '=',
+                                    value: data.value
+                                },
+                                {
+                                    key: 'sortname',
+                                    operator: '=',
+                                    value: data.value
+                                }
                             ],
                             operator: '|'
                         };
@@ -103,7 +111,9 @@ pandora.ui.namesDialog = function() {
                     pandora.UI.set({find: {
                         conditions: [{
                             key: 'name',
-                            value: $list.value($list.options('selected'), 'name'),
+                            value: $list.value(
+                                $list.options('selected'), 'name'
+                            ),
                             operator: '='
                         }],
                         operator: '&'
@@ -188,4 +198,3 @@ pandora.ui.namesDialog = function() {
     return that;
 
 };
-

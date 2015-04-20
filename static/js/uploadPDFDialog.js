@@ -76,7 +76,9 @@ pandora.ui.uploadPDFDialog = function(options) {
             done: function(data) {
                 if (data.progress == 1) {
                     Ox.Request.clearCache();
-                    pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.textPanel = pandora.ui.textPanel());
+                    pandora.$ui.mainPanel.replaceElement(
+                        1, pandora.$ui.textPanel = pandora.ui.textPanel()
+                    );
                     that.close();
                 } else {
                     $content.html("failed: " + data.responseText);
