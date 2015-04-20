@@ -757,7 +757,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     "themes": ["oxlight", "oxmedium", "oxdark"],
     /*
     "timelines" is a list of timeline types. Implemented types are "antialias",
-    "slitscal", "keyframes" and "auto".
+    "slitscan", "keyframes" and "auto".
     */
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
