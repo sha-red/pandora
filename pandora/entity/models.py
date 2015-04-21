@@ -180,9 +180,11 @@ class Entity(models.Model):
             else:
                 Find.objects.filter(entity=self, key=key).delete()
 
+        entity = get_by_id(settings.CONFIG['entities'], self.type)
+        if not entity:
+            return
         with transaction.commit_on_success():
             ids = ['name']
-            entity = get_by_id(settings.CONFIG['entities'], self.type)
             for key in entity['keys']:
                 value = self.data.get(key['id'])
                 if isinstance(value, list):
