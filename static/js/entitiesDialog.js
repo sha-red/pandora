@@ -414,6 +414,7 @@ pandora.ui.entitiesDialog = function(options) {
                                 Ox.Request.clearCache('findEntities');
                                 Ox.Request.clearCache('getEntity');
                                 if (key.id == 'name') {
+                                    $input.value(result.data.name);
                                     $list.reloadList(true);
                                 }
                                 renderEntity();
