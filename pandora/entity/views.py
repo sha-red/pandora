@@ -75,7 +75,7 @@ def addEntity(request, data):
         type = data['type']
         name = 'Unnamed'
         num = 1
-        while models.Entity.objects.filter(name=name, type=type).count()>0:
+        while models.Entity.objects.filter(name_find__icontains=u'|%s|'%name).count() > 0:
             num += 1
             name = 'Unnamed [%d]' % num
         entity = models.Entity(name=name, type=type)

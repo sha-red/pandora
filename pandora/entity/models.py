@@ -115,7 +115,7 @@ class Entity(models.Model):
                     data['name'] = "Unnamed"
                 name = data['name']
                 num = 1
-                while Entity.objects.filter(name=name, type=self.type).exclude(id=self.id).count()>0:
+                while Entity.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=self.id).count() > 0:
                     num += 1
                     name = data['name'] + ' [%d]' % num
                 self.name = name
