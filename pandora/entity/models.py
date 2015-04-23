@@ -114,15 +114,28 @@ class Entity(models.Model):
                 if not data['name']:
                     data['name'] = "Unnamed"
                 name = data['name']
-                num = 1
+                n = 1
                 while Entity.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=self.id).count() > 0:
-                    num += 1
-                    name = data['name'] + ' [%d]' % num
+                    n += 1
+                    name = data['name'] + ' [%d]' % n
                 self.name = name
             elif key == 'type':
                 self.type = data[key]
             elif key == 'alternativeNames':
-                self.alternativeNames = tuple([ox.escape_html(v) for v in data[key]])
+                used_names = [self.name.lower()]
+                names = []
+                for v in data[key]:
+                    name = ox.decode_html(v)
+                    name = re.sub(' \[\d+\]$', '', name).strip()
+                    name_ = name
+                    n = 1
+                    while name in used_names or \
+                        Entity.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=self.id).count() > 0:
+                        n += 1
+                        name = name_ + ' [%d]' % n
+                    names.append(name)
+                    used_names.append(name.lower())
+                self.alternativeNames = tuple(ox.escape_html(n) for n in names)
             else:
                 #FIXME: more data validation
                 if isinstance(data[key], basestring):

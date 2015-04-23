@@ -416,6 +416,8 @@ pandora.ui.entitiesDialog = function(options) {
                                 if (key.id == 'name') {
                                     $input.value(result.data.name);
                                     $list.reloadList(true);
+                                } else if (key.id == 'alternativeNames') {
+                                    $input.value(result.data.alternativeNames);
                                 }
                                 renderEntity();
                             });
