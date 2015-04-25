@@ -1569,15 +1569,18 @@ class Item(models.Model):
                     for data in s.srt(offset):
                         subtitles_added = True
                         value = data['value'].replace('\n', '<br>\n').replace('<br><br>\n', '<br>\n')
-                        annotation = Annotation(
-                            item=self,
-                            layer=layer,
-                            start=float('%0.03f'%data['in']),
-                            end=float('%0.03f'%data['out']),
-                            value=value,
-                            user=user
-                        )
-                        annotation.save()
+                        if data['in'] < self.json['duration'] and data['out'] > self.json['duration']:
+                            data['out'] = self.json['duration']
+                        if data['in'] < self.json['duration']:
+                            annotation = Annotation(
+                                item=self,
+                                layer=layer,
+                                start=float('%0.03f'%data['in']),
+                                end=float('%0.03f'%data['out']),
+                                value=value,
+                                user=user
+                            )
+                            annotation.save()
                 #otherwise add empty 5 seconds annotation every minute
                 if not subtitles_added:
                     start = offset and int (offset / 60) * 60 + 60 or 0
