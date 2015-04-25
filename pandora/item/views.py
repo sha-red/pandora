@@ -861,7 +861,6 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
     return response
 
 def download(request, id, resolution=None, format='webm'):
-    print 'download', id, resolution, format
     item = get_object_or_404(models.Item, public_id=id)
     if not resolution or int(resolution) not in settings.CONFIG['video']['resolutions']:
         resolution = max(settings.CONFIG['video']['resolutions'])
