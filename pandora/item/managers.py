@@ -147,6 +147,8 @@ def parseCondition(condition, user, owner=None):
             value_key = 'id__in'
         else:
             value_key = value_key + get_operator(op)
+            if 'find__value' in value_key:
+                value_key = value_key.replace('_icontains', '_contains')
         k = str(k)
         value_key = str(value_key)
         if isinstance(v, unicode):
