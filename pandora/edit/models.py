@@ -229,7 +229,8 @@ class Edit(models.Model):
             clips_query = self.clip_query()
             if clips_query['conditions']:
                 clips = clip.models.Clip.objects.find({'query': clips_query}, user)
-                clips = clips.filter(item__in=self.get_items(user))
+                items = [i['id'] for i in self.get_items(user).values('id')]
+                clips = clips.filter(item__in=items)
             else:
                 clips = None
         return clips
@@ -272,9 +273,10 @@ class Edit(models.Model):
         frames = []
         if not self.poster_frames:
             items = self.get_items(self.user).filter(rendered=True)
-            if 0 < items.count() <= 1000:
+            items_count = items.count()
+            if 0 < items_count <= 1000:
                 poster_frames = []
-                for i in range(0, items.count(), max(1, int(items.count()/4))):
+                for i in range(0, items_count, max(1, int(items_count/4))):
                     poster_frames.append({
                         'item': items[int(i)].public_id,
                         'position': items[int(i)].poster_frame

@@ -118,20 +118,21 @@ class MetaClip:
         end = self.end
         item = self.item
         layers = {}
+        private = []
         for l in settings.CONFIG['layers']:
             name = l['id']
-            ll = layers.setdefault(name, [])
-            qs = Annotation.objects.filter(layer=name, item=item).order_by(
-                    'start', 'end', 'sortvalue')
-            if name == 'subtitles':
-                qs = qs.exclude(value='')
-            qs = qs.filter(start__lt=end, end__gt=start)
+            layers[name] = []
             if l.get('private'):
-                if user and user.is_anonymous():
-                    user = None
-                qs = qs.filter(user=user)
-            for a in qs.order_by('start'):
-                ll.append(a.json(user=user))
+                private.append(name)
+        qs = Annotation.objects.filter(item=item).exclude(value='')
+        qs = qs.order_by('start', 'end', 'sortvalue')
+        qs = qs.filter(start__lt=end, end__gt=start)
+        for a in qs.order_by('start'):
+            if a.layer in private:
+                if a.user == user:
+                    layers[a.layer].append(a.json(user=user))
+            else:
+                layers[a.layer].append(a.json(user=user))
         return layers
 
     @classmethod
