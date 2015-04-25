@@ -5,7 +5,6 @@ import os
 import re
 
 import ox
-from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from django.db import transaction
@@ -54,16 +53,10 @@ def addClips(request, data):
     edit = get_edit_or_404_json(data['edit'])
     clips = []
     if edit.editable(request.user):
-        index = data.get('index', edit.clips.count())
-        with transaction.commit_on_success():
-            for c in data['clips']:
-                clip = edit.add_clip(c, index)
-                index += 1
-                if not clip:
-                    response = json_response(status=500, text='invalid in/out')
-                    return render_to_json_response(response)
-                else:
-                    clips.append(clip.json(request.user))
+        clips = edit.add_clips(data['clips'], data.get('index'), request.user)
+        if not clips:
+            response = json_response(status=500, text='invalid in/out')
+            return render_to_json_response(response)
         add_changelog(request, data, edit.get_id())
         response['data']['clips'] = clips
     else:
@@ -273,14 +266,10 @@ def addEdit(request, data):
         edit.save()
 
     if 'clips' in data and edit.type == 'static':
-        index = 0
-        with transaction.commit_on_success():
-            for c in data['clips']:
-                clip = edit.add_clip(c, index)
-                index += 1
-                if not clip:
-                    response = json_response(status=500, text='invalid in/out')
-                    return render_to_json_response(response)
+        clips = edit.add_clips(data['clips'], 0, request.user)
+        if not clips:
+            response = json_response(status=500, text='invalid in/out')
+            return render_to_json_response(response)
 
     if edit.status == 'featured':
         pos, created = models.Position.objects.get_or_create(edit=edit,
@@ -293,7 +282,11 @@ def addEdit(request, data):
     pos.position = qs.aggregate(Max('position'))['position__max'] + 1
     pos.save()
     response = json_response(status=200, text='created')
-    response['data'] = edit.json(user=request.user)
+    response['data'] = edit.json(user=request.user, keys=[
+        'description', 'editable', 'rightslevel',
+        'id', 'name', 'posterFrames', 'status',
+        'subscribed', 'user', 'type'
+    ])
     add_changelog(request, data, edit.get_id())
     return render_to_json_response(response)
 actions.register(addEdit, cache=False)
@@ -321,7 +314,7 @@ def editEdit(request, data):
         response['data'] = edit.json(keys=[
             'description', 'editable', 'rightslevel',
             'id', 'name', 'posterFrames', 'status',
-            'subscribed', 'user'
+            'subscribed', 'user', 'type'
         ], user=request.user)
         add_changelog(request, data, edit.get_id())
     else:

@@ -68,32 +68,55 @@ class Edit(models.Model):
     def get_absolute_url(self):
         return ('/edits/%s' % quote(self.get_id())).replace('%3A', ':')
 
-    def add_clip(self, data, index):
-        ids = [i['id'] for i in self.clips.order_by('index').values('id')]
-        clip = Clip(edit=self)
+    def add_clip(self, data, index=None):
+        if index != None:
+            ids = [i['id'] for i in self.clips.order_by('index').values('id')]
+        c = Clip(edit=self)
         if 'annotation' in data and data['annotation']:
-            clip.annotation = Annotation.objects.get(public_id=data['annotation'])
-            clip.item = clip.annotation.item
+            c.annotation = Annotation.objects.get(public_id=data['annotation'])
+            c.item = c.annotation.item
         else:
-            clip.item = Item.objects.get(public_id=data['item'])
-            clip.start = data['in']
-            clip.end = data['out']
-        clip.index = index
+            c.item = Item.objects.get(public_id=data['item'])
+            c.start = data['in']
+            c.end = data['out']
+        if index != None:
+            c.index = index
         # dont add clip if in/out are invalid
-        if not clip.annotation:
-            duration = clip.item.sort.duration
-            if clip.start > clip.end \
-                or round(clip.start, 3) >= round(duration, 3) \
-                or round(clip.end, 3) > round(duration, 3):
+        if not c.annotation:
+            duration = c.item.sort.duration
+            if c.start > c.end \
+                or round(c.start, 3) >= round(duration, 3) \
+                or round(c.end, 3) > round(duration, 3):
                 return False
-        clip.save()
-        ids.insert(index, clip.id)
+        c.save()
+        if index != None:
+            ids.insert(index, c.id)
+            self.sort_clips(ids)
+        return c
+
+    def add_clips(self, clips, index=None, user=None):
+        if index is None:
+            index = self.clips.count()
+        ids = [i['id'] for i in self.clips.order_by('index').values('id')]
+        added = []
+        with transaction.commit_on_success():
+            for data in clips:
+                c = self.add_clip(data)
+                if c:
+                    ids.insert(index, c.id)
+                    index += 1
+                    added.append(c.json(user))
+                else:
+                    return False
+        self.sort_clips(ids)
+        return added
+
+    def sort_clips(self, ids):
         index = 0
         with transaction.commit_on_success():
             for i in ids:
                 Clip.objects.filter(id=i).update(index=index)
                 index += 1
-        return clip
 
     def accessible(self, user):
         return self.user == user or self.status in ('public', 'featured')
@@ -203,8 +226,12 @@ class Edit(models.Model):
         if self.type == 'static':
             clips = self.clips.all()
         else:
-            clips = clip.models.Clip.objects.find({'query': self.clip_query()}, user)
-            clips = clips.filter(item__in=self.get_items(user))
+            clips_query = self.clip_query()
+            if clips_query['conditions']:
+                clips = clip.models.Clip.objects.find({'query': clips_query}, user)
+                clips = clips.filter(item__in=self.get_items(user))
+            else:
+                clips = None
         return clips
 
     def get_clips_json(self, user=None):
@@ -212,15 +239,15 @@ class Edit(models.Model):
         if self.type == 'static':
             clips = [c.json(user) for c in qs.order_by('index')]
         else:
-            if qs.count() <= 1000:
+            if qs is None:
+                clips = []
+            else:
                 clips = [c.edit_json(user) for c in qs]
                 index = 0
                 for c in clips:
                     c['index'] = index
                     index += 1
-            else:
-                clips = []
-        return clips
+        return clips, qs
 
     def clip_query(self):
         def get_conditions(conditions):
@@ -245,7 +272,7 @@ class Edit(models.Model):
         frames = []
         if not self.poster_frames:
             items = self.get_items(self.user).filter(rendered=True)
-            if items.count():
+            if 0 < items.count() <= 1000:
                 poster_frames = []
                 for i in range(0, items.count(), max(1, int(items.count()/4))):
                     poster_frames.append({
@@ -320,21 +347,24 @@ class Edit(models.Model):
             'posterFrames': 'poster_frames'
         }
         if 'clips' in keys:
-            clips = self.get_clips_json(user)
-        clips_qs = self.get_clips(user)
+            clips, clips_qs = self.get_clips_json(user)
+        else:
+            clips_qs = self.get_clips(user)
 
         for key in keys:
             if key == 'id':
                 response[key] = self.get_id()
             elif key == 'items':
-                response[key] = clips_qs.count()
+                response[key] = 0 if clips_qs is None else clips_qs.count()
             elif key == 'query':
                 if not self.query.get('static', False):
                     response[key] = self.query
             elif key == 'clips':
                 response[key] = clips
             elif key == 'duration':
-                if self.type == 'static':
+                if clips_qs is None:
+                    response[key] = 0
+                elif self.type == 'static':
                     response[key] = sum([(c['annotation__end'] or c['end']) - (c['annotation__start'] or c['start'])
                         for c in clips_qs.values('start', 'end', 'annotation__start', 'annotation__end')])
                 else:

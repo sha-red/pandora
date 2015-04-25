@@ -133,7 +133,7 @@ pandora.addFolderItem = function(section) {
                     })),
                     operator: '|'
                 };
-                pandora.api.find({
+                (isItems ? pandora.api.find : Ox.noop)({
                     query: {
                         conditions: [
                             {key: 'list', value: newList, operator: '=='}
@@ -144,9 +144,10 @@ pandora.addFolderItem = function(section) {
                     sort: [{key: sortKey, operator: ''}],
                     range: [0, 4]
                 }, function(result) {
-                    var posterFrames = result.data.items.map(function(item) {
-                        return {item: item.id, position: item.posterFrame};
-                    });
+                    var posterFrames = result
+                        ? result.data.items.map(function(item) {
+                            return {item: item.id, position: item.posterFrame};
+                        }) : [];
                     posterFrames = posterFrames.length == 1
                         ? Ox.repeat([posterFrames[0]], 4)
                         : posterFrames.length == 2
