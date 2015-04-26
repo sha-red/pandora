@@ -5,7 +5,7 @@ pandora.ui.uploadVideoDialog = function(data) {
 
     var cancelled = false,
         file,
-        hasFirefogg = !(Ox.isUndefined(Firefogg)) && (
+        hasFirefogg = !(Ox.isUndefined(window.Firefogg)) && (
             $.browser.version < '35' || Firefogg().version >= 334
         ),
         itemView = pandora.site.capabilities.canSeeExtraItemViews[
@@ -40,71 +40,29 @@ pandora.ui.uploadVideoDialog = function(data) {
                         }
                     }
                 }),
-                $actionButton = hasFirefogg ? Ox.Button({
-                    id: 'action',
-                    title: Ox._('Select Video')
-                }).bindEvent({
-                    click: function() {
-                        if ($actionButton.options('title') == Ox._('Select Video')) {
-                            if (selectVideo()) {
-                                $actionButton.options('title', Ox._('Upload'));
+                $actionButton = hasFirefogg ?
+                    Ox.Button({
+                        id: 'action',
+                        title: Ox._('Select Video')
+                    }).bindEvent({
+                        click: function() {
+                            if ($actionButton.options('title') == Ox._('Select Video')) {
+                                if (selectVideo()) {
+                                    $actionButton.options('title', Ox._('Upload'));
+                                }
+                            } else if ($actionButton.options('title') == Ox._('Cancel')) {
+                                cancelled = true;
+                                pandora.firefogg && pandora.firefogg.cancel();
+                                pandora.$ui.upload && pandora.$ui.upload.abort();
+                                $actionButton.options('title', Ox._('Select Video'));
+                                $closeButton.show();
+                            } else {
+                                $closeButton.options('title', Ox._('Cancel'));
+                                $actionButton.hide().options('title', Ox._('Select Video'));
+                                encode();
                             }
-                        } else if ($actionButton.options('title') == Ox._('Cancel')) {
-                            cancelled = true;
-                            pandora.firefogg && pandora.firefogg.cancel();
-                            pandora.$ui.upload && pandora.$ui.upload.abort();
-                            $actionButton.options('title', Ox._('Select Video'));
-                            $closeButton.show();
-                        } else {
-                            $closeButton.options('title', Ox._('Cancel'));
-                            $actionButton.hide().options('title', Ox._('Select Video'));
-                            encode();
                         }
-                    }
-                }) : Ox.FileButton({
-                    id: 'action',
-                    title: Ox._('Select Video'),
-                    maxFiles: 1,
-                    width: 96
-                }).css({
-                    float: 'left'
-                }).bindEvent({
-                    click: function(data) {
-                        if (data.files.length) {
-                            cancelled = false;
-                            $actionButton.replaceWith($actionButton = Ox.Button({
-                                id: 'action',
-                                title: 'Upload',
-                                disabled: true
-                            }).css({
-                                float: 'left'
-                            }));
-                            getInfo(data.files[0], function(info) {
-                                console.log(info);
-                                $actionButton.options({
-                                    disabled: false
-                                }).bindEvent({
-                                    click: function() {
-                                        info.direct
-                                            ? directUpload(data.files[0], info)
-                                            : upload(data.files[0]);
-                                    }
-                                });
-                                $info.html(formatVideoInfo(info));
-                                $status.html(
-                                    info.direct
-                                    ? Ox._(
-                                        'Your video will be uploaded directly.'
-                                    )
-                                    : Ox._(
-                                        'Your video will be transcoded before uploading.'
-                                    )
-                                );
-                            });
-                            //$closeButton.options('title', Ox._('Cancel'));
-                        }
-                    }
-                })
+                    }) : getSelectVideoButton()
             ],
             content: $content,
             height: 128,
@@ -270,6 +228,53 @@ pandora.ui.uploadVideoDialog = function(data) {
                     return height <= resolution;
                 })[0] || Ox.max(pandora.site.video.resolutions);
         return resolution;
+    }
+
+    function getSelectVideoButton() {
+        return Ox.FileButton({
+            id: 'action',
+            title: Ox._('Select Video'),
+            maxFiles: 1,
+            width: 96
+        }).css({
+            float: 'left'
+        }).bindEvent({
+            click: function(data) {
+                if (data.files.length) {
+                    cancelled = false;
+                    $actionButton.replaceWith($actionButton = Ox.Button({
+                        id: 'action',
+                        title: 'Upload',
+                        disabled: true
+                    }).css({
+                        float: 'left'
+                    }));
+                    getInfo(data.files[0], function(info) {
+                        $actionButton.options({
+                            disabled: false
+                        }).bindEvent({
+                            click: function() {
+                                $actionButton.replaceWith($actionButton = getSelectVideoButton().hide());
+                                info.direct
+                                    ? directUpload(data.files[0], info)
+                                    : upload(data.files[0]);
+                            }
+                        });
+                        $info.html(formatVideoInfo(info));
+                        $status.html(
+                            info.direct
+                            ? Ox._(
+                                'Your video will be uploaded directly.'
+                            )
+                            : Ox._(
+                                'Your video will be transcoded before uploading.'
+                            )
+                        );
+                    });
+                    $closeButton.options('title', Ox._('Cancel'));
+                }
+            }
+        });
     }
 
     function uploadStream(item, info, file) {
