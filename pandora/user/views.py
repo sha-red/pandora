@@ -146,16 +146,17 @@ def signup(request, data):
     returns {
         errors: {
             username: 'Username already exists', // in case of error
-            password: 'E-mail address already exists' // in case of error
+            email: 'E-mail address already exists', // in case of error
+            password: 'Password can not be empty' // in case of error
         }
         user: object // user data, in case of success
     }
     see: signin, signout
     '''
-    if 'username' in data and 'password' in data:
+    if 'username' in data and 'password' in data and 'email' in data:
         data['username'] = data['username'].strip()
-        if 'email' in data:
-            data['email'] = ox.escape_html(data['email'])
+        data['email'] = ox.escape_html(data['email'])
+
         if User.objects.filter(username__iexact=data['username']).count() > 0:
             response = json_response({
                 'errors': {
