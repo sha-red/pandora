@@ -7,6 +7,8 @@ import json
 from django.db import models
 
 import monkey_patch
+import tasks
+
 
 class Page(models.Model):
     created = models.DateTimeField(auto_now_add=True)
