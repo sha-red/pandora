@@ -505,7 +505,7 @@ def add(request, data):
     see: edit, find, get, lookup, remove, upload
     '''
     if not request.user.get_profile().capability('canAddItems'):
-        response = json_response(status=403, text='permissino denied')
+        response = json_response(status=403, text='permission denied')
     else:
         data['title'] = data.get('title', 'Untitled')
         i = models.Item()
@@ -619,7 +619,7 @@ def setPosterFrame(request, data):
         response = json_response()
         add_changelog(request, data)
     else:
-        response = json_response(status=403, text='permissino denied')
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(setPosterFrame, cache=False)
 

@@ -157,7 +157,7 @@ def upload(request, data=None):
             item.tasks.load_subtitles.delay(f.item.public_id)
             response = json_response(text='file saved')
         else:
-            response = json_response(status=403, text='permissino denied')
+            response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(upload, cache=False)
 
@@ -505,7 +505,7 @@ def removeMedia(request, data):
                 i.save()
         add_changelog(request, data, data['ids'])
     else:
-        response = json_response(status=403, text='permissino denied')
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(removeMedia, cache=False)
 
