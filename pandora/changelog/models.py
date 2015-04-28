@@ -9,6 +9,7 @@ from django.db import models
 from ox.django import fields
 import ox
 
+import websocket
 import managers
 
 '''
@@ -34,6 +35,7 @@ def add_changelog(request, data, id=None):
     c.changeid = id or data.get('id')
     c.created = datetime.now()
     c.save()
+    websocket.trigger_event('change', {'action': c.action, 'id': c.changeid})
 
 class Log(models.Model):
 

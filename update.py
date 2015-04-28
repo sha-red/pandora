@@ -120,6 +120,8 @@ if __name__ == "__main__":
                 ]
                 with open('pandora/local_settings.py', 'w') as f:
                     f.write('\n'.join(local_settings))
+        if old < 4947:
+            run('./bin/pip', 'install', 'tornado==4.1')
     else:
 
         if len(sys.argv) == 1:

@@ -69,6 +69,9 @@ STATICFILES_FINDERS = (
 
 GEOIP_PATH = normpath(join(PROJECT_ROOT, '..', 'data', 'geo'))
 
+WEBSOCKET = False
+WEBSOCKET_PORT = 2622
+WEBSOCKET_ADDRESS = '127.0.0.1'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -129,6 +132,7 @@ INSTALLED_APPS = (
     'tv',
     'document',
     'entity',
+    'websocket'
 )
 
 # Log errors into db

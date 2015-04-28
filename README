@@ -121,6 +121,7 @@ b) apache2 (if you need it for other sites on the same server)
     apt-get install apache2-mpm-prefork libapache2-mod-xsendfile
     a2enmod xsendfile
     a2enmod proxy_http
+    a2enmod proxy_wstunnel
     cp /srv/pandora/etc/apache2/pandora.conf /etc/apache2/sites-available/pandora.conf
     a2ensite pandora
 

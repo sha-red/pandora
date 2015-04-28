@@ -1,4 +1,5 @@
 #!/bin/sh
+SERVICES="pandora pandora-tasks pandora-encoding pandora-cron pandora-websocketd"
 if [ -z "$1" ]; then
     echo "Usage: $0 (start|stop|restart|reload)"
     exit 1
@@ -17,7 +18,7 @@ if [ "$action" = "install" ]; then
             cp $BASE/etc/systemd/*.service /lib/systemd/system/
             cp $BASE/etc/tmpfiles.d/pandora.conf /usr/lib/tmpfiles.d/
             systemd-tmpfiles --create /usr/lib/tmpfiles.d/pandora.conf >/dev/null || true
-            for service in pandora pandora-tasks pandora-encoding pandora-cron; do
+            for service in $SERVICES; do
                 systemctl enable ${service}.service
             done
         fi
@@ -28,6 +29,6 @@ if [ "$action" = "install" ]; then
     fi
     exit 0
 fi
-for service in pandora pandora-tasks pandora-encoding pandora-cron; do
+for service in $SERVICES; do
     service $service $action
 done
