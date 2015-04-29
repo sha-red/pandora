@@ -130,6 +130,7 @@ if [ "$LXC" == "yes" ]; then
     else
         sed -i s/127.0.0.1/0.0.0.0/g /etc/init/pandora.conf
     fi
+    echo "WEBSOCKET_ADDRESS = \"0.0.0.0\"" >> /srv/pandora/pandora/local_settings.py
 fi
 /srv/pandora/ctl start
 
