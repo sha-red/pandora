@@ -27,7 +27,7 @@ pandora.ui.licenseDialog = function() {
             open: function() {
                 setTimeout(function() {
                     that.enableButton('close');
-                }, 15000);
+                }, 5000);
             }
         });
 

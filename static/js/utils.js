@@ -1743,7 +1743,9 @@ pandora.getSpan = function(state, val, callback) {
         } else {
             isName = val[0] == '@';
             isVideoView = pandora.isVideoView(state.view, state.item);
-            canBeAnnotation = state.item && (!state.view || isVideoView) && !isName;
+            canBeAnnotation = state.item
+                && (!state.view || isVideoView)
+                && !isName;
             canBeEvent = !state.view || state.view == 'calendar';
             canBePlace = !state.view || state.view == 'map';
             val = isName ? val.slice(1) : val;
@@ -1828,7 +1830,8 @@ pandora.getSpan = function(state, val, callback) {
                 query: {
                     conditions: [{
                         key: isName ? 'name' : 'id',
-                        value: type != 'annotation' ? val : state.item + '/' + val,
+                        value: type != 'annotation'
+                            ? val : state.item + '/' + val,
                         operator: '=='
                     }],
                     operator: '&'
@@ -1837,7 +1840,11 @@ pandora.getSpan = function(state, val, callback) {
                 range: [0, 1]
             }, state.item && type != 'annotation' ? {
                 itemQuery: {
-                    conditions: [{key: 'id', value: state.item, operator: '=='}],
+                    conditions: [{
+                        key: 'id',
+                        value: state.item,
+                        operator: '=='
+                    }],
                     operator: '&'
                 }
             } : {}), function(result) {
@@ -1941,12 +1948,14 @@ pandora.getVideoOptions = function(data) {
             options.subtitlesLayer && data.layers[options.subtitlesLayer].length
                 ? data.layers[options.subtitlesLayer].map(function(subtitle, i) {
                     return {
-                        'in': i == 0 ? 0 : data.layers[options.subtitlesLayer][i - 1].out,
+                        'in': i == 0 ? 0
+                            : data.layers[options.subtitlesLayer][i - 1].out,
                         out: subtitle['in']
                     };
-                }).concat(
-                    [{'in': Ox.last(data.layers[options.subtitlesLayer]).out, out: data.duration}]
-                ).filter(function(censored) {
+                }).concat([{
+                    'in': Ox.last(data.layers[options.subtitlesLayer]).out,
+                    out: data.duration
+                }]).filter(function(censored) {
                     // don't include gaps shorter than one second
                     return censored.out - censored['in'] >= 1;
                 })
@@ -1968,7 +1977,9 @@ pandora.getVideoOptions = function(data) {
                         index: i,
                         track: Ox.getLanguageNameByCode(track),
                         resolution: resolution,
-                        src: pandora.getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1, track)
+                        src: pandora.getVideoURL(
+                            data.item || pandora.user.ui.item, resolution, i + 1, track
+                        )
                     });
                 });
             });
@@ -1978,7 +1989,9 @@ pandora.getVideoOptions = function(data) {
                     duration: data.durations[i],
                     index: i,
                     resolution: resolution,
-                    src: pandora.getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1)
+                    src: pandora.getVideoURL(
+                        data.item || pandora.user.ui.item, resolution, i + 1
+                    )
                 });
             });
         }
@@ -2148,13 +2161,13 @@ pandora.openLicenseDialog = function() {
             close: function() {
                 setTimeout(function() {
                     !pandora.isLicensed() && pandora.openLicenseDialog();
-                }, 300000); // 5 minutes
+                }, 60000);
             }
         });
     } else {
         setTimeout(function() {
             !pandora.isLicensed() && pandora.openLicenseDialog();
-        }, 60000); // 1 minute
+        }, 60000);
     }
 };
 
@@ -2208,8 +2221,11 @@ pandora.reloadList = function() {
             init: function(data) {
                 // fixme: this will not work for lists in the favorites folder
                 // (but then it's also unlikely they'll have to be reloaded)
-                var folder = listData.status != 'featured' ? 'personal' : 'featured';
-                pandora.$ui.folderList[folder].value(listData.id, 'items', data.items);
+                var folder = listData.status != 'featured'
+                    ? 'personal' : 'featured';
+                pandora.$ui.folderList[folder].value(
+                    listData.id, 'items', data.items
+                );
             }
         })
         .bindEventOnce({
@@ -2231,7 +2247,11 @@ pandora.renameList = function(oldId, newId, newName, folder) {
         // fixme: ugly
         // ... does this always coincide with triggerEvents = false, as below?
         pandora.replaceURL = true;
-        pandora.UI.set('lists.' + pandora.UI.encode(newId), pandora.user.ui.lists[oldId], false);
+        pandora.UI.set(
+            'lists.' + pandora.UI.encode(newId),
+            pandora.user.ui.lists[oldId],
+            false
+        );
         pandora.UI.set({
             find: {
                 conditions: [{key: 'list', value: newId, operator: '=='}],
@@ -2241,10 +2261,17 @@ pandora.renameList = function(oldId, newId, newName, folder) {
         pandora.UI.set('lists.' + pandora.UI.encode(oldId), null, false);
     } else {
         pandora.replaceURL = true;
-        pandora.UI.set(pandora.user.ui.section + '.' + pandora.UI.encode(newId),
-                pandora.user.ui[pandora.user.ui.section][oldId], false);
+        pandora.UI.set(
+            pandora.user.ui.section + '.' + pandora.UI.encode(newId),
+            pandora.user.ui[pandora.user.ui.section][oldId],
+            false
+        );
         pandora.UI.set(pandora.user.ui.section.slice(0, -1), newId);
-        pandora.UI.set(pandora.user.ui.section + '.' + pandora.UI.encode(oldId), null, false);
+        pandora.UI.set(
+            pandora.user.ui.section + '.' + pandora.UI.encode(oldId),
+            null,
+            false
+        );
     }
 };
 
@@ -2257,9 +2284,14 @@ pandora.resizeFilters = function(width) {
         .size(0, pandora.user.ui.filterSizes[1])
         .size(2, pandora.user.ui.filterSizes[3]);
     pandora.$ui.filters && pandora.$ui.filters.forEach(function($list, i) {
-        $list.resizeColumn('name', pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE);
+        $list.resizeColumn(
+            'name',
+            pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE
+        );
         if (pandora.site.flags) {
-            $list.find('.flagname').css({width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE})
+            $list.find('.flagname').css({
+                width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE
+            });
         }
     });
 };
@@ -2277,9 +2309,14 @@ pandora.resizeFolders = function(section) {
     ) - 8);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getIndexById(pandora.site.sectionFolders[section], id);
-        pandora.$ui.folder[pos] && pandora.$ui.folder[pos].css({width: width + 'px'});
+        pandora.$ui.folder[pos] && pandora.$ui.folder[pos].css({
+            width: width + 'px'
+        });
         $list.css({width: width + 'px'});
-        if (pandora.site.sectionFolders[section][pos] && pandora.site.sectionFolders[section][pos].showBrowser) {
+        if (
+            pandora.site.sectionFolders[section][pos]
+            && pandora.site.sectionFolders[section][pos].showBrowser
+        ) {
             pandora.$ui.findListsInput[id] && pandora.$ui.findListsInput[id].options({
                 width: width - 24
             });
@@ -2288,7 +2325,10 @@ pandora.resizeFolders = function(section) {
         } else {
             $list.resizeColumn(id == 'favorite' ? 'id' : 'name', columnWidth);
         }
-        if (pandora.$ui.folder[pos] && !pandora.user.ui.showFolder[section][id]) {
+        if (
+            pandora.$ui.folder[pos]
+            && !pandora.user.ui.showFolder[section][id]
+        ) {
             pandora.$ui.folder[pos].updatePanel();
         }
     });
@@ -2305,14 +2345,18 @@ pandora.resizeWindow = function() {
         return;
     }
     // FIXME: a lot of this throws errors on load
-    pandora.$ui.leftPanel && pandora.$ui.leftPanel.size(2, pandora.getInfoHeight(true));
+    pandora.$ui.leftPanel && pandora.$ui.leftPanel.size(
+        2, pandora.getInfoHeight(true)
+    );
     pandora.resizeFolders();
     if (pandora.user.ui.section == 'items') {
         if (!pandora.user.ui.item) {
             pandora.resizeFilters(pandora.$ui.rightPanel.width());
             if (pandora.user.ui.listView == 'clips') {
                 var clipsItems = pandora.getClipsItems(),
-                    previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
+                    previousClipsItems = pandora.getClipsItems(
+                        pandora.$ui.list.options('width')
+                    );
                 pandora.$ui.list.options({
                     width: window.innerWidth
                         - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
@@ -2345,19 +2389,22 @@ pandora.resizeWindow = function() {
                 pandora.$ui.timeline && pandora.$ui.timeline.options({
                     // fixme: duplicated
                     height: pandora.$ui.contentPanel.size(1),
-                    width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+                    width: pandora.$ui.document.width()
+                        - pandora.$ui.mainPanel.size(0) - 1
                 });
             } else if (pandora.user.ui.itemView == 'player') {
                 pandora.$ui.player && pandora.$ui.player.options({
                     // fixme: duplicated
                     height: pandora.$ui.contentPanel.size(1),
-                    width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+                    width: pandora.$ui.document.width()
+                        - pandora.$ui.mainPanel.size(0) - 1
                 });
             } else if (pandora.user.ui.itemView == 'editor') {
                 pandora.$ui.editor && pandora.$ui.editor.options({
                     // fixme: duplicated
                     height: pandora.$ui.contentPanel.size(1),
-                    width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+                    width: pandora.$ui.document.width()
+                        - pandora.$ui.mainPanel.size(0) - 1
                 });
             } else if (pandora.user.ui.itemView == 'map') {
                 pandora.$ui.map.resizeMap();
@@ -2371,7 +2418,8 @@ pandora.resizeWindow = function() {
         } else {
             pandora.$ui.editPanel && pandora.$ui.editPanel.options({
                 height: pandora.$ui.appPanel.size(1),
-                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+                width: pandora.$ui.document.width()
+                    - pandora.$ui.mainPanel.size(0) - 1
             });
         }
     } else if (pandora.user.ui.section == 'texts') {
@@ -2385,7 +2433,11 @@ pandora.selectList = function() {
             pandora.api.findLists({
                 keys: ['status', 'user'],
                 query: {
-                    conditions: [{key: 'id', value: pandora.user.ui._list, operator: '=='}],
+                    conditions: [{
+                        key: 'id',
+                        operator: '==',
+                        value: pandora.user.ui._list
+                    }],
                     operator: ''
                 },
                 range: [0, 1]
@@ -2394,11 +2446,15 @@ pandora.selectList = function() {
                 if (result.data.items.length) {
                     list = result.data.items[0];
                     folder = list.status == 'featured' ? 'featured' : (
-                        list.user == pandora.user.username ? 'personal' : 'favorite'
+                        list.user == pandora.user.username
+                        ? 'personal' : 'favorite'
                     );
                     pandora.$ui.folderList[folder]
                         .options({selected: [pandora.user.ui._list]});
-                    if (!pandora.hasDialogOrScreen() && !Ox.Focus.focusedElementIsInput()) {
+                    if (
+                        !pandora.hasDialogOrScreen()
+                        && !Ox.Focus.focusedElementIsInput()
+                    ) {
                         pandora.$ui.folderList[folder].gainFocus();
                     }
                 }
@@ -2408,11 +2464,15 @@ pandora.selectList = function() {
         var id = pandora.user.ui[pandora.user.ui.section.slice(0,-1)],
             section = Ox.toTitleCase(pandora.user.ui.section.slice(0, -1));
         if (id) {
-            pandora.api['get' + section]({id: id, keys: ['id', 'status', 'user']}, function(result) {
+            pandora.api['get' + section]({
+                id: id,
+                keys: ['id', 'status', 'user']
+            }, function(result) {
                 var folder;
                 if (result.data.id) {
                     folder = result.data.status == 'featured' ? 'featured' : (
-                        result.data.user == pandora.user.username ? 'personal' : 'favorite'
+                        result.data.user == pandora.user.username
+                        ? 'personal' : 'favorite'
                     );
                     pandora.$ui.folderList[folder].options({selected: [id]});
                 }
@@ -2573,7 +2633,9 @@ pandora.wait = function(taskId, callback, timeout) {
         var indices = Ox.indicesOf(conditions, function(condition) {
             return (
                 condition.conditions
-                ? includeSubconditions && everyCondition(condition.conditions, key, operator)
+                ? includeSubconditions && everyCondition(
+                    condition.conditions, key, operator
+                )
                 : condition.key == key && condition.operator == operator
             );
         });

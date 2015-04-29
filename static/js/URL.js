@@ -16,7 +16,9 @@ pandora.URL = (function() {
         if (pandora.user.ui.page) {
 
             state.page = pandora.user.ui.page;
-            if (Ox.contains(Object.keys(pandora.site.user.ui.part), state.page)) {
+            if (
+                Ox.contains(Object.keys(pandora.site.user.ui.part), state.page)
+            ) {
                 state.part = pandora.user.ui.part[state.page];
                 if (
                     state.page == 'documents'
@@ -50,7 +52,9 @@ pandora.URL = (function() {
                         : '';
                 } else if (state.view == 'calendar') {
                     // ...
-                } else if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
+                } else if (
+                    ['timeline', 'player', 'editor'].indexOf(state.view) > -1
+                ) {
                     var videoPoints = pandora.user.ui.videoPoints[state.item] || {};
                     state.span = videoPoints.annotation || [].concat(
                         videoPoints.position
@@ -139,7 +143,9 @@ pandora.URL = (function() {
             if (state.page) {
 
                 set.page = state.page;
-                if (Ox.contains(Object.keys(pandora.site.user.ui.part), state.page) && state.part) {
+                if (Ox.contains(
+                    Object.keys(pandora.site.user.ui.part), state.page
+                ) && state.part) {
                     set['part.' + state.page] = state.part;
                 }
                 if (state.span) {
@@ -153,7 +159,8 @@ pandora.URL = (function() {
                 set.page = '';
 
                 if (state.type) {
-                    set.section = state.type == pandora.site.itemsSection ? 'items' : state.type
+                    set.section = state.type == pandora.site.itemsSection
+                        ? 'items' : state.type
                     set[set.section.slice(0, -1)] = state.item;
                 }
 
@@ -176,7 +183,9 @@ pandora.URL = (function() {
                                     position: state.span[0]
                                 };                       
                             } else {
-                                set['videoPoints.' + state.item + '.annotation'] = state.span;
+                                set[
+                                    'videoPoints.' + state.item + '.annotation'
+                                ] = state.span;
                             }
                         } else if (state.view == 'map') {
                             // fixme: this doesn't handle map coordinates
@@ -189,7 +198,10 @@ pandora.URL = (function() {
                             }
                         } else if (state.view == 'calendar') {
                             // fixme: this is still very much unclear
-                            if (state.span.length == 1 && /^\d/.test(state.span)) {
+                            if (
+                                state.span.length == 1
+                                && /^\d/.test(state.span)
+                            ) {
                                 set.calendarFind = state.span[0];
                             } else if (state.span.length == 2) {
                                 set.calendarFind = state.span[0];
@@ -474,7 +486,9 @@ pandora.URL = (function() {
             callback = arguments[0];
             url = null;
             if (document.location.pathname.slice(0, 4) == 'url=') {
-                document.location.href = Ox.decodeURI(document.location.pathname.slice(4));
+                document.location.href = Ox.decodeURI(
+                    document.location.pathname.slice(4)
+                );
             } else {
                 self.URL.parse(function(state) {
                     // setState -> UI.set -> URL.update
@@ -532,7 +546,9 @@ pandora.URL = (function() {
                 : ['item', 'itemView', 'itemSort'];
         } else {
             if (keys.some(function(key) {
-                return Ox.contains(['itemSort', 'itemView', 'listSort', 'listView'], key);
+                return Ox.contains(
+                    ['itemSort', 'itemView', 'listSort', 'listView'], key
+                );
             })) {
                 self.URL.options(getOptions());
             }

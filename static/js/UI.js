@@ -19,9 +19,15 @@ pandora.UI = (function() {
     that.reset = function() {
         pandora.api.resetUI({}, function() {
             pandora.user.ui = pandora.site.user.ui;
-            pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
-            pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
-            pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+            pandora.user.ui._list = pandora.getListState(
+                pandora.user.ui.find
+            );
+            pandora.user.ui._filterState = pandora.getFilterState(
+                pandora.user.ui.find
+            );
+            pandora.user.ui._findState = pandora.getFindState(
+                pandora.user.ui.find
+            );
             Ox.Theme(pandora.user.ui.theme);
             pandora.$ui.appPanel.reload();
         });
@@ -83,8 +89,10 @@ pandora.UI = (function() {
                     // if find has changed list
                     Ox.forEach(listSettings, function(listSetting, setting) {
                         // then for each setting that corresponds to a list setting
-                        if (!pandora.user.ui.lists[list]
-                            || Ox.isUndefined(pandora.user.ui.lists[list][listSetting])) {
+                        if (
+                            !pandora.user.ui.lists[list]
+                            || Ox.isUndefined(pandora.user.ui.lists[list][listSetting])
+                        ) {
                             // either add the default setting
                             add[setting] = pandora.site.user.ui[setting];
                         } else {
@@ -107,7 +115,9 @@ pandora.UI = (function() {
                     // when switching to a clip view, clear list selection
                     // (but don't trigger an additional event)
                     add.listSelection = [];
-                } else if (['text', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
+                } else if (['text', 'position'].indexOf(
+                    pandora.user.ui.listSort[0].key
+                ) > -1) {
                     // when switching to a non-clip view, with a sort key
                     // that only exists in clip view, reset sort to default
                     args.listSort = pandora.site.user.ui.listSort;
@@ -149,19 +159,26 @@ pandora.UI = (function() {
                 add['lists.' + that.encode(list) + '.selection'] = [args.item];
                 if (
                     !args.itemView
-                    && ['timeline', 'player', 'editor'].indexOf(pandora.user.ui.itemView) > -1
+                    && ['timeline', 'player', 'editor'].indexOf(
+                        pandora.user.ui.itemView
+                    ) > -1
                     && !pandora.user.ui.videoPoints[item]
                     && !args['videoPoints.' + item]
                 ) {
                     // if the item view doesn't change, remains a video view,
                     // video points don't exist yet, and won't be set,
                     // add default video points
-                    add['videoPoints.' + item] = {annotation: '', 'in': 0, out: 0, position: 0};
+                    add['videoPoints.' + item] = {
+                        annotation: '',
+                        'in': 0,
+                        out: 0,
+                        position: 0
+                    };
                 }
-                if (
-                    args['videoPoints.' + item]
-                    && (!pandora.user.ui.item || pandora.user.ui.itemView != 'editor')
-                ) {
+                if (args['videoPoints.' + item] && (
+                    !pandora.user.ui.item
+                    || pandora.user.ui.itemView != 'editor'
+                )) {
                     pandora._dontSelectResult = true;
                 }
             }
@@ -175,7 +192,12 @@ pandora.UI = (function() {
                 ) {
                     // if video points don't exist yet, and won't be set,
                     // add default video points
-                    add['videoPoints.' + item] = {annotation: '', 'in': 0, out: 0, position: 0};
+                    add['videoPoints.' + item] = {
+                        annotation: '',
+                        'in': 0,
+                        out: 0,
+                        position: 0
+                    };
                 }
             }
         }
@@ -188,10 +210,9 @@ pandora.UI = (function() {
             Ox.forEach(editSettings, function(value, key) {
                 var editsKey = 'edits.' + that.encode(args.edit) + '.' + key;
                 add[editsKey] = editsKey in args ? args[editsKey]
-                    : (
-                        pandora.user.ui.edits[args.edit]
-                        && !Ox.isUndefined(pandora.user.ui.edits[args.edit][key])
-                    ) ? pandora.user.ui.edits[args.edit][key]
+                    : (pandora.user.ui.edits[args.edit] && !Ox.isUndefined(
+                        pandora.user.ui.edits[args.edit][key]
+                    )) ? pandora.user.ui.edits[args.edit][key]
                     : value;
             });
         }
@@ -201,7 +222,9 @@ pandora.UI = (function() {
             editSort: 'sort',
             editView: 'view'
         }, function(editSetting, setting) {
-            var key = 'edits.' + that.encode(args.edit || pandora.user.ui.edit) + '.' + editSetting;
+            var key = 'edits.' + that.encode(
+                args.edit || pandora.user.ui.edit
+            ) + '.' + editSetting;
             if (setting in args) {
                 // add local edit setting
                 add[key] = args[setting];
@@ -220,10 +243,9 @@ pandora.UI = (function() {
                     textsSubKey = textsKey + '.' + key;
                 return textsKey in args && key in args[textsKey] ? args[textsKey][key]
                     : textsSubKey in args ? args[textSubKey]
-                    : (
-                        pandora.user.ui.texts[args.text]
-                        && !Ox.isUndefined(pandora.user.ui.texts[args.text][key])
-                    ) ? pandora.user.ui.texts[args.text][key]
+                    : (pandora.user.ui.texts[args.text] && !Ox.isUndefined(
+                        pandora.user.ui.texts[args.text][key]
+                    )) ? pandora.user.ui.texts[args.text][key]
                     : value;
             });
         }
