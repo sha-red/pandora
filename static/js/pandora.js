@@ -60,7 +60,9 @@ appPanel
 
     theme = legacyThemes[theme] || theme;
 
-    document.addEventListener && document.addEventListener('keydown', onKeydown);
+    document.addEventListener && document.addEventListener(
+        'keydown', onKeydown
+    );
 
     loadImages(function(images) {
         loadScreen(images);
@@ -128,17 +130,21 @@ appPanel
             images.loadingIcon.setAttribute('id', 'loadingIcon');
             images.loadingIcon.style.position = 'absolute';
             images.loadingIcon.style.left = 0;
-            images.loadingIcon.style.top = isEmbed || isPrint ? '32px' : '80px';
+            images.loadingIcon.style.top = isEmbed || isPrint
+                ? '32px' : '80px';
             images.loadingIcon.style.right = 0;
             images.loadingIcon.style.bottom = 0;
-            images.loadingIcon.style.width = isEmbed || isPrint ? '16px' : '32px';
-            images.loadingIcon.style.height = isEmbed || isPrint ? '16px' : '32px';
+            images.loadingIcon.style.width = isEmbed || isPrint
+                ? '16px' : '32px';
+            images.loadingIcon.style.height = isEmbed || isPrint
+                ? '16px' : '32px';
             images.loadingIcon.style.margin = 'auto';
             images.loadingIcon.style.MozUserSelect = 'none';
             images.loadingIcon.style.MSUserSelect = 'none';
             images.loadingIcon.style.OUserSelect = 'none';
             images.loadingIcon.style.WebkitUserSelect = 'none';
-            images.loadingIcon.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'min')
+            images.loadingIcon.src = '/static/oxjs/'
+                + (enableDebugMode ? 'dev' : 'min')
                 + '/UI/themes/' + theme + '/svg/symbolLoading.svg';
             callback(images);
         };
@@ -163,7 +169,6 @@ appPanel
                 gradient.style.background = theme == 'oxlight' ? prefix + 'linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
                     : theme == 'oxmedium' ? prefix + 'linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
                     : prefix + 'linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
-
             });
         }
         loadingScreen = document.createElement('div');
@@ -365,7 +370,7 @@ appPanel
         pandora.site.listSettings = {};
         Ox.forEach(pandora.site.user.ui, function(val, key) {
             if (/^list[A-Z]/.test(key)) {
-                pandora.site.listSettings[key] = key[4].toLowerCase() + key.slice(5);
+                pandora.site.listSettings[key] = key[4].toLowerCase()+ key.slice(5);
             }
         });
         pandora.site.editSettings = {
@@ -392,7 +397,9 @@ appPanel
         //pandora.setLocale(pandora.user.ui.locale || data.locale, function() {
         pandora.setLocale(pandora.user.ui.locale, function() {
             pandora.URL.init().parse(function() {
-                var isHome = Ox.contains(['/', '/home'], document.location.pathname);
+                var isHome = Ox.contains(
+                        ['/', '/home'], document.location.pathname
+                    );
                 if (data.browserSupported) {
                     stopAnimation();
                     $('#loadingScreen').remove();
@@ -417,7 +424,9 @@ appPanel
                 } else if (isPrint) {
                     pandora.$ui.printView = pandora.ui.printView().display();
                 } else if (isHome) {
-                    pandora.$ui.home = pandora.ui.home().showScreen(initPandoraApp);
+                    pandora.$ui.home = pandora.ui.home().showScreen(
+                        initPandoraApp
+                    );
                 } else {
                     initPandoraApp();
                 }
@@ -443,12 +452,16 @@ appPanel
         pandora.triggerEvent('loaded');
         !pandora.isLicensed() && pandora.openLicenseDialog();
         loadUserScript && pandora.loadUserScript();
-        document.removeEventListener && document.removeEventListener('keydown', onKeydown);
+        document.removeEventListener && document.removeEventListener(
+            'keydown', onKeydown
+        );
     }
 
     function loadBrowserMessage() {
         var browsers = [].concat(
-                isMSIE ? [{name: 'Chrome Frame', url: 'http://google.com/chromeframe/'}] : [],
+                isMSIE ? [{
+                    name: 'Chrome Frame', url: 'http://google.com/chromeframe/'
+                }] : [],
                 [
                     {name: 'Chrome', url: 'http://google.com/chrome/'},
                     {name: 'Firefox', url: 'http://mozilla.org/firefox/'},
@@ -504,9 +517,15 @@ appPanel
                     .append(
                         $('<img>')
                             .attr({
-                                src: Ox.PATH + 'UI/png/browser' + browser.name.replace(' ', '') + '128.png'
+                                src: Ox.PATH + 'UI/png/browser'
+                                    + browser.name.replace(' ', '') + '128.png'
                             })
-                            .css({width: '32px', height: '32px', border: 0, margin: '4px'})
+                            .css({
+                                width: '32px',
+                                height: '32px',
+                                border: 0,
+                                margin: '4px'
+                            })
                     )
                     .appendTo($images);
             });
