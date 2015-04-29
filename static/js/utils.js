@@ -65,7 +65,11 @@ pandora.addFolderItem = function(section) {
             data.query = listData.query;
         }
         pandora.api[isItems ? 'findLists' : 'findEdits']({
-            query: {conditions: [{key: 'id', value: list, operator: '=='}]},
+            query: {conditions: [{
+                key: 'id',
+                operator: '==',
+                value: list
+            }]},
             keys: ['description']
         }, function(result) {
             data.description = result.data.items[0].description;
@@ -73,7 +77,11 @@ pandora.addFolderItem = function(section) {
                 var query;
                 if (isItems) {
                     query = {
-                        conditions: [{key: 'list', value: list, operator: '=='}],
+                        conditions: [{
+                            key: 'list',
+                            operator: '==',
+                            value: list
+                        }],
                         operator: '&'
                     };
                     pandora.api.find({query: query}, function(result) {
@@ -94,7 +102,10 @@ pandora.addFolderItem = function(section) {
                         }
                     });
                 } else {
-                    pandora.api.getEdit({id: list, keys: ['clips']}, function(result) {
+                    pandora.api.getEdit({
+                        id: list,
+                        keys: ['clips']
+                    }, function(result) {
                         data.clips = result.data.clips.map(function(clip) {
                             return Ox.extend({
                                 item: clip.item
@@ -123,7 +134,10 @@ pandora.addFolderItem = function(section) {
             sortKey = Ox.getObjectById(pandora.site.itemKeys, 'votes')
                 ? 'votes' : 'timesaccessed';
         if (!isDuplicate) {
-            (isItems ? Ox.noop : pandora.api.getEdit)({id: newList, keys: ['clips']}, function(result) {
+            (isItems ? Ox.noop : pandora.api.getEdit)({
+                id: newList,
+                keys: ['clips']
+            }, function(result) {
                 query = isItems ? {
                     conditions: [{key: 'list', value: newList, operator: '=='}],
                     operator: '&'
@@ -249,7 +263,8 @@ pandora.beforeUnloadWindow = function() {
 
 pandora.changeFolderItemStatus = function(id, status, callback) {
     var ui = pandora.user.ui,
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = ui.section == 'items'
+            ? 'Lists' : Ox.toTitleCase(ui.section),
         folderItem = folderItems.slice(0, -1);
     if (status == 'private') {
         pandora.api['find' + folderItems]({
@@ -285,13 +300,16 @@ pandora.changeFolderItemStatus = function(id, status, callback) {
 };
 
 pandora.clickLink = function(e) {
-    var match = e.target.id.match(/^embed(\d+)$/)
+    var match = e.target.id.match(/^embed(\d+)$/);
     if (match) {
         pandora.$ui.textPanel.selectEmbed(parseInt(match[1]));
     } else if (
         e.target.hostname == document.location.hostname
         && !Ox.startsWith(e.target.pathname, '/static')
-        && (window.self == window.top  || pandora.isEmbeddableView(e.target.href))
+        && (
+            window.self == window.top
+            || pandora.isEmbeddableView(e.target.href)
+        )
     ) {
         if (pandora.$ui.home && e.target.pathname != '/home') {
             pandora.$ui.home.fadeOutScreen();
@@ -369,8 +387,11 @@ pandora.createLinks = function($element) {
                     : items.length,
                 type = getType(items),
                 text = Ox._(actions[action]) + ' ' + (
-                    length == 1 ? Ox._(type == 'item' ? pandora.site.itemName.singular : 'Clip')
-                    : length + ' ' + Ox._(type == 'item' ? pandora.site.itemName.plural : 'Clips')
+                    length == 1 ? Ox._(
+                        type == 'item' ? pandora.site.itemName.singular : 'Clip'
+                    ) : length + ' ' + Ox._(
+                        type == 'item' ? pandora.site.itemName.plural : 'Clips'
+                    )
                 );
             pandora.history.add({
                 action: action,
@@ -450,7 +471,10 @@ pandora.createLinks = function($element) {
                         return !Ox.contains(existingItems, item);
                     });
                 if (addedItems.length) {
-                    pandora.api.addListItems({items: addedItems, list: target}, function(result) {
+                    pandora.api.addListItems({
+                        items: addedItems,
+                        list: target
+                    }, function(result) {
                         callback(result, addedItems);
                     });                    
                 } else {
@@ -461,10 +485,14 @@ pandora.createLinks = function($element) {
             pandora.api.addClips({
                 clips: pandora.getClipData(items),
                 edit: target,
-                index: pandora.$ui.editPanel ? pandora.$ui.editPanel.getPasteIndex() : void 0
+                index: pandora.$ui.editPanel
+                    ? pandora.$ui.editPanel.getPasteIndex()
+                    : void 0
             }, function(result) {
                 // adding clips creates new ids, so mutate items in history
-                items.splice.apply(items, [0, items.length].concat(pandora.getClipItems(result.data.clips)));
+                items.splice.apply(items, [0, items.length].concat(
+                    pandora.getClipItems(result.data.clips)
+                ));
                 callback(result, items);
             });
         }
@@ -482,7 +510,11 @@ pandora.createLinks = function($element) {
                 listData = pandora.getListData(list);
                 pandora.api.find({
                     query: {
-                        conditions: [{key: 'list', value: list, operator: '=='}],
+                        conditions: [{
+                            key: 'list',
+                            operator: '==',
+                            value: list
+                        }],
                         operator: '&'
                     }
                 }, function(result) {
@@ -521,15 +553,22 @@ pandora.createLinks = function($element) {
     }
 
     function getType(items) {
-        return Ox.contains(items[0], '/') || Ox.contains(items[0][0], '/') ? 'clip' : 'item';
+        return Ox.contains(items[0], '/') || Ox.contains(items[0][0], '/')
+            ? 'clip' : 'item';
     }
 
     function removeItems(items, target, callback) {
         var type = getType(items);
         if (type == 'item') {
-            pandora.api.removeListItems({items: items, list: target}, callback);
+            pandora.api.removeListItems({
+                items: items,
+                list: target
+            }, callback);
         } else {
-            pandora.api.removeClips({ids: getClipIds(items), edit: target}, callback);
+            pandora.api.removeClips({
+                ids: getClipIds(items),
+                edit: target
+            }, callback);
         }
     }
 
@@ -572,7 +611,10 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                                     && data.type == 'static',
                                 selected: $item.is('.OxSelected')
                             }, data);
-                            if (!drag.targets[id].selected && drag.targets[id].editable) {
+                            if (
+                                !drag.targets[id].selected
+                                && drag.targets[id].editable
+                            ) {
                                 $item.addClass('OxDroppable');
                             }
                         }
@@ -590,7 +632,11 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
             $tooltip.options({
                 title: getTitle(event)
             }).show(event);
-            if (scrollInterval && !isAtListsTop(event) && !isAtListsBottom(event)) {
+            if (
+                scrollInterval
+                && !isAtListsTop(event)
+                && !isAtListsBottom(event)
+            ) {
                 clearInterval(scrollInterval);
                 scrollInterval = 0;
             }
@@ -608,12 +654,15 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                 $parent = $(event.target).parent();
                 $grandparent = $parent.parent();
                 $panel = $parent.is('.OxCollapsePanel') ? $parent
-                    : $grandparent.is('.OxCollapsePanel') ? $grandparent : null;
+                    : $grandparent.is('.OxCollapsePanel') ? $grandparent
+                    : null;
                 if ($panel) {
                     title = $panel.children('.OxBar').children('.OxTitle')
                         .html().split(' ')[0].toLowerCase();
                     if (!pandora.user.ui.showFolder.items[title]) {
-                        Ox.$elements[$panel.data('oxid')].options({collapsed: false});
+                        Ox.$elements[$panel.data('oxid')].options({
+                            collapsed: false
+                        });
                     }
                 }
                 if (!scrollInterval) {
@@ -664,11 +713,16 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                             Ox.Request.clearCache('find');
                             pandora.api.find({
                                 query: {
-                                    conditions: [{key: 'list', value: drag.target.id, operator: '=='}],
+                                    conditions: [{
+                                        key: 'list',
+                                        operator: '==',
+                                        value: drag.target.id
+                                    }],
                                     operator: '&'
                                 }
                             }, function(result) {
-                                var folder = drag.target.status != 'featured' ? 'personal' : 'featured';
+                                var folder = drag.target.status != 'featured'
+                                    ? 'personal' : 'featured';
                                 pandora.$ui.folderList[folder].value(
                                     drag.target.id, 'items', result.data.items
                                 );
@@ -697,10 +751,13 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                     $('.OxDroppable').removeClass('OxDroppable');
                     $('.OxDrop').removeClass('OxDrop');
                     $tooltip.hide();
-                    section != pandora.user.ui.section && setTimeout(function() {
-                        pandora.$ui.mainPanel.replaceElement(0,
-                            pandora.$ui.leftPanel = pandora.ui.leftPanel());
-                    }, 500);
+                    if (section != pandora.user.ui.section) {
+                        setTimeout(function() {
+                            pandora.$ui.mainPanel.replaceElement(0,
+                                pandora.$ui.leftPanel = pandora.ui.leftPanel()
+                            );
+                        }, 500);
+                    }
                 }, ms);
             }
         }
@@ -722,13 +779,20 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                 plural: Ox._('edits'),
                 singular: Ox._('edit')
             };
-        if (drag.action == 'move' && section == 'edits' && pandora.user.ui.section == 'items') {
+        if (
+            drag.action == 'move'
+            && section == 'edits'
+            && pandora.user.ui.section == 'items'
+        ) {
             image = 'symbolClose';
             text = Ox._(
                 'You can only remove {0}<br>from {1}.',
                 [itemName.plural, targetName.plural]
             );
-        } else if (drag.action == 'move' && drag.source.user != pandora.user.username) {
+        } else if (
+            drag.action == 'move'
+            && drag.source.user != pandora.user.username
+        ) {
             image = 'symbolClose';
             text = Ox._(
                 'You can only remove {0}<br>from your own {1}.',
@@ -961,7 +1025,10 @@ pandora.getClipVideos = function(clip, resolution) {
             if (clip.id) {
                 item.id = clip.id;
             }
-            if (currentTime <= start && currentTime + clip.durations[i] > start) {
+            if (
+                currentTime <= start
+                && currentTime + clip.durations[i] > start
+            ) {
                 item['in'] = start - currentTime;
             }
             if (currentTime + clip.durations[i] >= end) {
@@ -1003,10 +1070,16 @@ pandora.getClipVideos = function(clip, resolution) {
                     ? pandora.user.ui._list.split(':').slice(1).join(':')
                     : pandora.getAllItemsTitle('items')
                 );
-                parts.push(Ox._("{0} View", [Ox._(Ox.toTitleCase(pandora.user.ui.listView))]));
+                parts.push(Ox._('{0} View', [
+                    Ox._(Ox.toTitleCase(pandora.user.ui.listView))
+                ]));
             } else {
-                parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
-                parts.push(Ox._("{0} View", [Ox._(Ox.toTitleCase(pandora.user.ui.itemView))]));
+                parts.push(
+                    itemTitles[pandora.user.ui.item] || pandora.user.ui.item
+                );
+                parts.push(Ox._('{0} View', [
+                    Ox._(Ox.toTitleCase(pandora.user.ui.itemView))
+                ]));
             }
         } else if (pandora.user.ui.section == 'edits') {
             if (pandora.user.ui.edit) {
@@ -1224,7 +1297,10 @@ pandora.getItem = function(state, str, callback) {
             }
         });
     } else if (state.type == 'texts') {
-        pandora.api.getText({id: str, keys: ['id', 'names', 'pages', 'type']}, function(result) {
+        pandora.api.getText({
+            id: str,
+            keys: ['id', 'names', 'pages', 'type']
+        }, function(result) {
             if (result.status.code == 200) {
                 state.item = result.data.id;
                 callback();
@@ -1655,7 +1731,10 @@ pandora.getSpan = function(state, val, callback) {
         var isArray = Ox.isArray(val),
             isName, isVideoView, canBeAnnotation, canBeEvent, canBePlace;
         if (isArray) {
-            pandora.api.get({id: state.item, keys: ['duration']}, function(result) {
+            pandora.api.get({
+                id: state.item,
+                keys: ['duration']
+            }, function(result) {
                 state.span = val.map(function(number) {
                     return Math.min(number, result.data.duration);
                 });
@@ -1701,15 +1780,23 @@ pandora.getSpan = function(state, val, callback) {
         }
     } else if (state.type == 'edits') {
         if (isArray) {
-            pandora.api.getEdit({id: state.item, keys: ['duration']}, function(result) {
+            pandora.api.getEdit({
+                id: state.item,
+                keys: ['duration']
+            }, function(result) {
                 state.span = val.map(function(number) {
                     return Math.min(number, result.data.duration);
                 });
                 callback();
             });
         } else {
-            pandora.api.getEdit({id: state.item, keys: ['clips']}, function(result) {
-                if (result.data.clips && Ox.getObjectById(result.data.clips, val)) {
+            pandora.api.getEdit({
+                id: state.item, keys: ['clips']
+            }, function(result) {
+                if (
+                    result.data.clips
+                    && Ox.getObjectById(result.data.clips, val)
+                ) {
                     state.span = val;
                 }
                 callback();
@@ -1721,9 +1808,14 @@ pandora.getSpan = function(state, val, callback) {
                 if (result.data.type == 'html') {
                     state.span = Ox.limit(val[0], 0, 100);
                 } else {
-                    state.span = Math.floor(Ox.limit(val[0], 1, result.data.pages));
+                    state.span = Math.floor(
+                        Ox.limit(val[0], 1, result.data.pages)
+                    );
                 }
-            } else if (result.data.type == 'html' && Ox.contains(result.data.names, val)) {
+            } else if (
+                result.data.type == 'html'
+                && Ox.contains(result.data.names, val)
+            ) {
                 state.span = val;
             }
             callback();
@@ -1782,7 +1874,9 @@ pandora.getStatusText = function(data) {
         canSeeSize = pandora.site.capabilities.canSeeSize[pandora.user.level],
         itemName = ['clip', 'video'].indexOf(ui.listView) > -1
             ? (data.items == 1 ? Ox._('Clip') : Ox._('Clips'))
-            : Ox._(pandora.site.itemName[data.items == 1 ? 'singular' : 'plural']),
+            : Ox._(pandora.site.itemName[
+                data.items == 1 ? 'singular' : 'plural'
+            ]),
         parts = [];
     parts.push(Ox.formatNumber(data.items) + ' '+ itemName);
     if (data.runtime) {
@@ -1818,7 +1912,8 @@ pandora.getMediaURL = function(url) {
 };
 
 pandora.getVideoURLName = function(id, resolution, part, track) {
-    return id + '/' + resolution + 'p' + part + (track ? '.' + track : '') + '.' + pandora.user.videoFormat;
+    return id + '/' + resolution + 'p' + part + (track ? '.' + track : '')
+        + '.' + pandora.user.videoFormat;
 };
 
 pandora.getVideoURL = function(id, resolution, part, track) {
@@ -1833,8 +1928,12 @@ pandora.getVideoURL = function(id, resolution, part, track) {
 };
 
 pandora.getVideoOptions = function(data) {
-    var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
-        canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
+    var canPlayClips = data.editable
+            || pandora.site.capabilities.canPlayClips[pandora.user.level]
+            >= data.rightslevel,
+        canPlayVideo = data.editable
+            || pandora.site.capabilities.canPlayVideo[pandora.user.level]
+            >= data.rightslevel,
         options = {};
     options.subtitlesLayer = pandora.getSubtitlesLayer();
     options.censored = canPlayVideo ? []
@@ -2049,7 +2148,7 @@ pandora.openLicenseDialog = function() {
             close: function() {
                 setTimeout(function() {
                     !pandora.isLicensed() && pandora.openLicenseDialog();
-                }, 900000); // 15 minutes
+                }, 300000); // 5 minutes
             }
         });
     } else {
@@ -2527,7 +2626,7 @@ pandora.wait = function(taskId, callback, timeout) {
             }
             return state;
         });
-    }
+    };
 
     pandora.getFindState = function(find) {
         // The find element is populated if exactly one condition in an & query
@@ -2574,7 +2673,7 @@ pandora.wait = function(taskId, callback, timeout) {
             });
         }
         return state;
-    }
+    };
 
     pandora.getListState = function(find) {
         // A list is selected if exactly one condition in an & query has "list"
