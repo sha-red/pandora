@@ -296,7 +296,7 @@ def autocomplete(request, data):
         value: string, // search string
         operator: string, // '=', '==', '^', '$'
         query: object, // item query to limit results, see `find`
-        range: [int, int] // range of tesults to return
+        range: [int, int] // range of results to return
     }
     returns {
         items: [string, ...] // list of matching strings
