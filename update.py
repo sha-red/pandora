@@ -57,6 +57,20 @@ repos = {
 def reload_notice(base):
     print '\nPlease restart pan.do/ra to finish the update:\n\tsudo %s/ctl reload\n' % base
 
+def check_services(base):
+    services = "pandora pandora-tasks pandora-encoding pandora-cron pandora-websocketd".split()
+    for service in services:
+        cmd = ['service', 'status', service]
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p.wait()
+        if p.returncode != 0:
+            print 'Please install init script for "%s" service:' % service
+            if os.path.exists('/etc/init'):
+                print 'sudo cp %s/etc/init/%s.service /etc/init/' % (base, service)
+            if os.path.exists('/lib/systemd/system'):
+                print 'sudo cp %s/etc/systemd/%s.conf /lib/systemd/system/' % (base, service)
+            print ''
+
 if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ('database', 'db'):
         os.chdir(join(base, 'pandora'))
@@ -122,6 +136,7 @@ if __name__ == "__main__":
                     f.write('\n'.join(local_settings))
         if old < 4947:
             run('./bin/pip', 'install', 'tornado==4.1')
+            check_services(base)
     else:
 
         if len(sys.argv) == 1:
