@@ -99,7 +99,7 @@ def autocompleteEntities(request, data):
         range: [int, int] // range of results to return
     }
     returns {
-        items: [{id, name, ...}, ...] // list of matching entities
+        items: [name, ...] // list of matching entities' names
     }
     see: autocomplete
     '''
