@@ -1,4 +1,6 @@
 #!/bin/bash
+PANDORA=${PANDORA-pandora}
+echo Installing pandora with user: $PANDORA
 LXC=`grep -q lxc /proc/1/environ && echo 'yes' || echo 'no'`
 if [ -e /etc/os-release ]; then
     . /etc/os-release
@@ -72,8 +74,8 @@ apt-get install -y \
     postgresql \
     postgresql-contrib
 
-sudo -u postgres createuser -S -D -R pandora
-sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
+sudo -u postgres createuser -S -D -R $PANDORA
+sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O $PANDORA pandora
 echo "CREATE EXTENSION pg_trgm;" | sudo -u postgres psql pandora
 
 #rabbitmq
@@ -100,7 +102,7 @@ DATABASES = {
     'default': {
         'NAME': 'pandora',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': 'pandora',
+        'USER': '$PANDORA',
         'PASSWORD': '',
     }
 }
@@ -113,16 +115,22 @@ JSON_DEBUG = False
 DB_GIN_TRGM = True
 EOF
 
-MANAGE="sudo -H -u pandora /srv/pandora/pandora/manage.py"
+MANAGE="sudo -H -u $PANDORA /srv/pandora/pandora/manage.py"
 
 mkdir /srv/pandora/data
-chown -R pandora:pandora /srv/pandora
+chown -R $PANDORA:$PANDORA /srv/pandora
 
 cd /srv/pandora/pandora
 $MANAGE init_db
 echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
 
 /srv/pandora/ctl install
+if [ "$PANDORA" != "pandora" ]; then
+    sed -i \
+        -e "s/USER=pandora/USER=$PANDORA/g" \
+        -e "s/home\/pandora/home\/$PANDORA/g" \
+        /etc/init/pandora*.conf
+fi
 
 if [ "$LXC" == "yes" ]; then
     if [ "$SYSTEMD" == "yes" ]; then
@@ -195,7 +203,7 @@ fi
 
 apt-get clean
 
-cat > /home/pandora/.vimrc <<EOF
+cat > /home/$PANDORA/.vimrc <<EOF
 set nocompatible
 set encoding=utf-8
 set showcmd
