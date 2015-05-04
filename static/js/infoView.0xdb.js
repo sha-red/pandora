@@ -348,7 +348,7 @@ pandora.ui.infoView = function(data) {
             formatKey('Alternative Title' + (data.alternativeTitles.length == 1 ? '' : 's'))
             + data.alternativeTitles.map(function(value) {
                 return value[0] + (
-                    canSeeAllMetadata && Ox.isArray(value[1])
+                    canSeeAllMetadata && Ox.isArray(value[1]) && value[1].length
                     ? ' ' + formatLight('(' + value[1].join(', ') + ')')
                     : ''
                 );
