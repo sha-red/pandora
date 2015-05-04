@@ -1,6 +1,8 @@
 #!/bin/bash
 PANDORA=${PANDORA-pandora}
 echo Installing pandora with user: $PANDORA
+getent passwd $PANDORA > /dev/null 2>&1 || adduser --disabled-password --gecos "" $PANDORA
+
 LXC=`grep -q lxc /proc/1/environ && echo 'yes' || echo 'no'`
 if [ -e /etc/os-release ]; then
     . /etc/os-release
