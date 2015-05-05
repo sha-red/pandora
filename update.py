@@ -66,9 +66,10 @@ def check_services(base):
         if p.returncode != 0:
             print 'Please install init script for "%s" service:' % service
             if os.path.exists('/etc/init'):
-                print 'sudo cp %s/etc/init/%s.conf /etc/init/' % (base, service)
+                print '\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service)
             if os.path.exists('/lib/systemd/system'):
-                print 'sudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service)
+                print '\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service)
+            print '\tsudo service %s start' % service
             print ''
 
 if __name__ == "__main__":
