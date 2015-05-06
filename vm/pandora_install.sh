@@ -122,6 +122,7 @@ MANAGE="sudo -H -u $PANDORA /srv/pandora/pandora/manage.py"
 mkdir /srv/pandora/data
 chown -R $PANDORA:$PANDORA /srv/pandora
 
+echo "Initialize database..."
 cd /srv/pandora/pandora
 $MANAGE init_db
 echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
