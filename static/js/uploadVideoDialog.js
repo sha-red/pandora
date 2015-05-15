@@ -223,8 +223,8 @@ pandora.ui.uploadVideoDialog = function(data) {
         var height = info.video && info.video.length
                 ? info.video[0].height
                 : Ox.max(pandora.site.video.resolutions),
-            resolution = pandora.site.video.resolutions
-                .sort().filter(function(resolution) {
+            resolution = Ox.sort(pandora.site.video.resolutions)
+                .filter(function(resolution) {
                     return height <= resolution;
                 })[0] || Ox.max(pandora.site.video.resolutions);
         return resolution;
