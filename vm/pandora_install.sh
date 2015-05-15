@@ -42,6 +42,7 @@ apt-get install -y \
 fi
 
 apt-get install -y \
+    sudo \
     openssh-server \
     vim \
     wget \
@@ -50,8 +51,6 @@ apt-get install -y \
     rabbitmq-server \
     bzr \
     git \
-    subversion \
-    mercurial \
     python-setuptools \
     python-pip \
     python-virtualenv \
@@ -171,11 +170,15 @@ if [ "$LXC" == "yes" ]; then
 fi
 
 if [ "$LXC" == "no" ]; then
+    if [ "$SYSTEMD" == "yes" ]; then
+        echo Servers=pool.ntp.org >> /etc/systemd/timesyncd.conf
+    else
 cat > /etc/cron.d/ntp_fixtime <<EOF
 # /etc/cron.d/ntp_fixtime: vms can go out of sync, run ntpdate to sync time
 
 */10 * * * *   root /usr/sbin/ntpdate pool.ntp.org >/dev/null
 EOF
+    fi
 
 cat > /usr/local/bin/genissue <<EOF
 #!/bin/sh
