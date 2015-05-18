@@ -62,14 +62,22 @@ class Handler(WebSocketHandler):
         #logger.debug('got message %s', message)
 
     def post(self, event, data):
-        message = json.dumps([event, data])
+        try:
+            message = json.dumps([event, data])
+        except:
+            logger.debug('failed to serialize data %s %s', event, data)
+            return
         main = IOLoop.instance()
         main.add_callback(lambda: self.write_message(message))
 
 def trigger_event(event, data):
     logger.debug('trigger event %s %s to %s clients', event, data, len(sockets))
     main = IOLoop.instance()
-    message = json.dumps([event, data])
+    try:
+        message = json.dumps([event, data])
+    except:
+        logger.debug('faild to serialise data')
+        return
     for ws in sockets:
         try:
             main.add_callback(lambda: ws.write_message(message))
