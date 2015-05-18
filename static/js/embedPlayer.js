@@ -86,7 +86,7 @@ pandora.ui.embedPlayer = function() {
                 enableKeyboard: !isFrame,
                 enableMouse: !isFrame,
                 enablePosition: !isFrame,
-                enableSubtitles: true,
+                enableSubtitles: ui.videoSubtitles,
                 enableTimeline: !isFrame,
                 enableVolume: !isFrame,
                 height: options.height,
@@ -103,7 +103,7 @@ pandora.ui.embedPlayer = function() {
                 resolution: ui.videoResolution,
                 scaleToFill: ui.videoScale == 'fill',
                 showIconOnLoad: true,
-                subtitles: ui.videoSubtitles ? video.subtitles : [],
+                subtitles: video.subtitles,
                 subtitlesOffset: ui.videoSubtitlesOffset,
                 timeline: options.playInToOut ? function(size, i) {
                     return pandora.getMediaURL('/' + options.item
