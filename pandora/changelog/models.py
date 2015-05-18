@@ -38,7 +38,7 @@ def add_changelog(request, data, id=None):
     websocket.trigger_event('change', {
         'action': c.action,
         'id': c.changeid,
-        'user': c.user,
+        'user': c.user.username,
     })
 
 class Log(models.Model):
