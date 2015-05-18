@@ -40,11 +40,9 @@ server {
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
             proxy_redirect off;
+            proxy_buffering off;
             proxy_read_timeout 999999999;
-            if (!-f $request_filename) {
-                proxy_pass http://127.0.0.1:2622;
-                break;
-            }
+            proxy_pass http://127.0.0.1:2622/;
     }
 
     location / {
@@ -52,6 +50,7 @@ server {
             proxy_set_header X-Forwarded-Proto http;
             proxy_set_header Host $http_host;
             proxy_redirect off;
+            proxy_buffering off;
             proxy_read_timeout 90;    #should be in sync with gunicorn timeout
             proxy_connect_timeout 90; #should be in sync with gunicorn timeout
             if (!-f $request_filename) {
