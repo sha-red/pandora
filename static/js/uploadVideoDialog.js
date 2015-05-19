@@ -8,6 +8,7 @@ pandora.ui.uploadVideoDialog = function(data) {
         hasFirefogg = !(Ox.isUndefined(window.Firefogg)) && (
             $.browser.version < '35' || Firefogg().version >= 334
         ),
+        infoContent = Ox._('Please select the video file that you want to upload.'),
         itemView = pandora.site.capabilities.canSeeExtraItemViews[
             pandora.user.level
         ] ? 'media' : 'info',
@@ -17,7 +18,7 @@ pandora.ui.uploadVideoDialog = function(data) {
         $content = Ox.Element().css({margin: '16px'}),
         $info = $('<div>')
             .css({padding: '4px'})
-            .html(Ox._('Please select the video file that you want to upload.')),
+            .html(infoContent),
         $progress,
         $status = $('<div>').css({padding: '4px', paddingTop: '8px'}),
         that = Ox.Dialog({
@@ -31,38 +32,25 @@ pandora.ui.uploadVideoDialog = function(data) {
                     click: function() {
                         if ($closeButton.options('title') == Ox._('Cancel')) {
                             cancelled = true;
+                            $info.html(infoContent);
+                            $status.html('');
                             pandora.firefogg && pandora.firefogg.cancel();
                             pandora.$ui.upload && pandora.$ui.upload.abort();
                             $closeButton.options('title', Ox._('Close'));
+                            if ($actionButton.options('title') == Ox._('Upload')) {
+                                $closeButton.options('title', Ox._('Close'));
+                                $actionButton.replaceWith($actionButton = hasFirefogg
+                                    ? getFirefoggButton()
+                                    : getSelectVideoButton()
+                                );
+                            }
                             $actionButton.show();
                         } else {
                             that.triggerEvent('close');
                         }
                     }
                 }),
-                $actionButton = hasFirefogg ?
-                    Ox.Button({
-                        id: 'action',
-                        title: Ox._('Select Video')
-                    }).bindEvent({
-                        click: function() {
-                            if ($actionButton.options('title') == Ox._('Select Video')) {
-                                if (selectVideo()) {
-                                    $actionButton.options('title', Ox._('Upload'));
-                                }
-                            } else if ($actionButton.options('title') == Ox._('Cancel')) {
-                                cancelled = true;
-                                pandora.firefogg && pandora.firefogg.cancel();
-                                pandora.$ui.upload && pandora.$ui.upload.abort();
-                                $actionButton.options('title', Ox._('Select Video'));
-                                $closeButton.show();
-                            } else {
-                                $closeButton.options('title', Ox._('Cancel'));
-                                $actionButton.hide().options('title', Ox._('Select Video'));
-                                encode();
-                            }
-                        }
-                    }) : getSelectVideoButton()
+                $actionButton = hasFirefogg ? getFirefoggButton() : getSelectVideoButton()
             ],
             content: $content,
             height: 128,
@@ -211,7 +199,7 @@ pandora.ui.uploadVideoDialog = function(data) {
                 var format = pandora.site.video.formats[0],
                     resolution = getResolution(info);
                 info.direct = Ox.endsWith(info.name, format)
-                    && info.video.lengh > 0
+                    && info.video.length > 0
                     && info.video[0].height <= resolution;
                 callback(info);
             });
@@ -228,6 +216,32 @@ pandora.ui.uploadVideoDialog = function(data) {
                     return height <= resolution;
                 })[0] || Ox.max(pandora.site.video.resolutions);
         return resolution;
+    }
+
+    function getFirefoggButton() {
+        return Ox.Button({
+            id: 'action',
+            title: Ox._('Select Video')
+        }).bindEvent({
+            click: function() {
+                if ($actionButton.options('title') == Ox._('Select Video')) {
+                    if (selectVideo()) {
+                        $closeButton.options('title', Ox._('Cancel'));
+                        $actionButton.options('title', Ox._('Upload'));
+                    }
+                } else if ($actionButton.options('title') == Ox._('Cancel')) {
+                    cancelled = true;
+                    pandora.firefogg && pandora.firefogg.cancel();
+                    pandora.$ui.upload && pandora.$ui.upload.abort();
+                    $actionButton.options('title', Ox._('Select Video'));
+                    $closeButton.show();
+                } else {
+                    $closeButton.options('title', Ox._('Cancel'));
+                    $actionButton.hide().options('title', Ox._('Select Video'));
+                    encode();
+                }
+            }
+        })
     }
 
     function getSelectVideoButton() {
@@ -264,10 +278,10 @@ pandora.ui.uploadVideoDialog = function(data) {
                         $status.html(
                             info.direct
                             ? Ox._(
-                                'Your video will be uploaded directly.'
+                                'Your video will be used directly.'
                             )
                             : Ox._(
-                                'Your video will be transcoded before uploading.'
+                                'Your video will be transcoded on the server.'
                             )
                         );
                     });
