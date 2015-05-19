@@ -84,7 +84,7 @@ pandora.ui.browser = function() {
                     ) + '128.jpg?' + data.modified),
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director', 'random'].indexOf(sortKey) > -1) {
-                    info = data['year'];
+                    info = data['year'] || data['date'] || '';
                 } else {
                     // fixme: this is duplicated many times
                     format = pandora.getSortKeyData(sortKey).format;
