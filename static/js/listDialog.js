@@ -459,11 +459,17 @@ pandora.ui.listIconPanel = function(listData) {
         $list = Ox.IconList({
             borderRadius: 16,
             item: function(data, sort) {
-                var size = 128;
+                var infoKey = ['title', 'director'].indexOf(sort[0].key) > -1
+                        ? pandora.site.itemKeys.filter(function(key) {
+                            return ['year', 'date'].indexOf(key.id) > -1
+                        }).map(function(key) {
+                            return key.id;
+                        })[0] : sort[0],key,
+                    size = 128;
                 return {
                     height: size,
                     id: data.id,
-                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
+                    info: data[infoKey] || '',
                     title: pandora.getItemTitle(data),
                     url: pandora.getMediaURL('/' + data.id + '/icon' + size + '.jpg?' + data.modified),
                     width: size

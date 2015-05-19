@@ -190,7 +190,7 @@ pandora.ui.list = function() {
                     ) + size + '.jpg?' + data.modified),
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
-                    info = data['year'];
+                    info = data['year'] || data['date'] || '';
                 } else {
                     format = pandora.getSortKeyData(sortKey).format;
                     if (format) {
@@ -277,7 +277,7 @@ pandora.ui.list = function() {
                     ) + size + '.jpg?' + data.modified),
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
-                    info = data['year'];
+                    info = data['year'] || data['date'] || '';
                 } else {
                     format = pandora.getSortKeyData(sortKey).format;
                     if (format) {
