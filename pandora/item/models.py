@@ -14,7 +14,7 @@ from datetime import datetime
 from glob import glob
 from urllib import quote
 
-from django.db import models, transaction
+from django.db import models, transaction, connection
 from django.db.models import Q, Sum, Max
 from django.conf import settings
 from django.contrib.auth.models import User, Group
@@ -1538,6 +1538,7 @@ class Item(models.Model):
         with transaction.commit_on_success():
             layer = subtitles['id']
             Annotation.objects.filter(layer=layer, item=self).delete()
+            AnnotationSequence.reset(self)
             offset = 0
             language = ''
             subtitles = self.files.filter(selected=True, is_subtitle=True, available=True)
@@ -1613,6 +1614,9 @@ class Item(models.Model):
             'out': a.end,
             'value': format_value(a.value)
         } for a in annotations.order_by('start', 'end', 'sortvalue')])
+
+    def next_annotationid(self):
+        return AnnotationSequence.nextid(self)
 
 def delete_item(sender, **kwargs):
     i = kwargs['instance']
@@ -1756,3 +1760,29 @@ class Description(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.CharField(max_length=1000, db_index=True)
     description = models.TextField()
+
+
+class AnnotationSequence(models.Model):
+    item = models.ForeignKey('Item', related_name='_annotation_sequence', unique=True)
+    value = models.BigIntegerField(default=1)
+
+    @classmethod
+    def reset(cls, item):
+        s, created = cls.objects.get_or_create(item=item)
+        ids = [ox.fromAZ(a['public_id'].split('/')[1])
+            for a in item.annotations.exclude(public_id=None).values('public_id')]
+        s.value = max(ids) if ids else 0
+        s.save()
+
+    @classmethod
+    def nextid(cls, item):
+        with transaction.commit_on_success():
+            s, created = cls.objects.get_or_create(item=item)
+            if created:
+                nextid = s.value
+            else:
+                cursor = connection.cursor()
+                sql = "UPDATE %s SET value = value + 1 WHERE item_id = %s RETURNING value" % (cls._meta.db_table, item.id)
+                cursor.execute(sql)
+                nextid = cursor.fetchone()[0]
+        return "%s/%s" % (item.public_id, ox.toAZ(nextid))
