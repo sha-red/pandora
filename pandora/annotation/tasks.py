@@ -109,16 +109,17 @@ def update_item(id):
     from item.models import Item
     from clip.models import Clip
     a = models.Annotation.objects.get(pk=id)
-    #cleanup orphaned clips
-    Clip.objects.filter(item__id=a.item.id, annotations__id=None).delete()
-    #update facets if needed
-    with transaction.commit_on_success():
-        if filter(lambda f: f['id'] == a.layer and f.get('filter'), settings.CONFIG['itemKeys']):
-            a.item.update_layer_facet(a.layer)
-        Item.objects.filter(id=a.item.id).update(modified=a.modified)
-        a.item.modified = a.modified
-        a.item.update_find()
-        a.item.update_sort()
-        a.item.update_facets()
-        if a.item.update_languages():
-            a.item.save()
+    if a.modified >= a.item.annotations.order_by('-modified')[0].modified:
+        #cleanup orphaned clips
+        Clip.objects.filter(item__id=a.item.id, annotations__id=None).delete()
+        #update facets if needed
+        with transaction.commit_on_success():
+            if filter(lambda f: f['id'] == a.layer and f.get('filter'), settings.CONFIG['itemKeys']):
+                a.item.update_layer_facet(a.layer)
+            Item.objects.filter(id=a.item.id).update(modified=a.modified)
+            a.item.modified = a.modified
+            a.item.update_find()
+            a.item.update_sort()
+            a.item.update_facets()
+            if a.item.update_languages():
+                a.item.save()
