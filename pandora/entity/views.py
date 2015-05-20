@@ -19,6 +19,7 @@ from itemlist.models import List
 from changelog.models import add_changelog
 
 import models
+from managers import namePredicate
 
 def get_entity_or_404_json(id):
     try:
@@ -119,14 +120,8 @@ def autocompleteEntities(request, data):
 
     qs = models.Entity.objects.filter(type=data['key'])
     if data['value']:
-        if op == '=':
-            qs = qs.filter(name_find__icontains=data['value'])
-        elif op == '==':
-            qs = qs.filter(name_find__icontains=u'|%s|'%data['value'])
-        elif op == '^':
-            qs = qs.filter(name_find__icontains=u'|%s'%data['value'])
-        elif op == '$':
-            qs = qs.filter(name_find__icontains=u'%s|'%data['value'])
+        k, v = namePredicate(op, data['value'])
+        qs = qs.filter(**{k: v})
     qs = qs.order_by(order_by)
     if op != '$':
         value_lower = data['value'].lower()

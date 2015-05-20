@@ -5,6 +5,17 @@ from django.db.models import Q, Manager
 import ox
 from ox.django.query import QuerySet
 
+
+def namePredicate(op, value):
+    pat = {
+        '==': '|%s|',
+        '^': '|%s',
+        '$': '%s|',
+    }.get(op, '%s')
+
+    return ('name_find__icontains', pat % value)
+
+
 def parseCondition(condition, user, item=None):
     '''
     '''
@@ -29,10 +40,12 @@ def parseCondition(condition, user, item=None):
         return Q(**{k: v})
     if isinstance(v, bool): #featured and public flag
         key = k
+    elif k == 'name_find':
+        key, v = namePredicate(op, v)
     else:
         if k == '*':
             k = 'find__value'
-        elif k not in ('name_find', 'id', 'user__username', 'type'):
+        elif k not in ('id', 'user__username', 'type'):
             find_key = k
             k = 'find__value'
         key = "%s%s" % (k, {
