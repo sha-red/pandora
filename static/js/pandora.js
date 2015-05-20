@@ -21,13 +21,15 @@ appPanel
 
 (function() {
 
-    window.onerror = function(error, url, line) {
+    window.onerror = function(error, url, line, column, errorObj) {
         if (error == 'TypeError: Attempted to assign to readonly property.') {
             return;
         }
         try {
+            var stack = (errorObj && errorObj.stack) || "(no stack trace available)";
+
             !isMSIE && !/^resource:/.test(url) && pandora.api.logError({
-                text: error,
+                text: error + "\n\n" + stack,
                 url: document.location.pathname + ' at ' + url,
                 line: line
             });
