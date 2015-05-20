@@ -55,7 +55,7 @@ class Entity(models.Model):
             self.name_sort = get_name_sort(self.name)[:255].lower()
         else:
             self.name_sort = ox.sort_string(self.name or u'')[:255].lower() or None
-        self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
+        self.name_find = '||' + '||'.join((self.name,) + self.alternativeNames) + '||'
         super(Entity, self).save(*args, **kwargs)
         self.update_matches()
         self.update_annotations()
