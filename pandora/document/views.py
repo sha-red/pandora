@@ -39,7 +39,7 @@ def addDocument(request, data):
     }
     notes: either `item` or `entity` must be provided
     returns {}
-    see: editDocument, findDocument, getDocument, removeDocument, sortDocuments
+    see: editDocument, findDocuments, getDocument, removeDocument, sortDocuments
     '''
     response = json_response()
     if 'ids' in data:
@@ -102,7 +102,7 @@ def editDocument(request, data):
     notes: If `item` is present, this will not edit the global description of
     the document, but its specific description in the context of the given
     item.
-    see: addDocument, findDocument, getDocument, removeDocument, sortDocuments
+    see: addDocument, findDocuments, getDocument, removeDocument, sortDocuments
     '''
     response = json_response()
     item = 'item' in data and Item.objects.get(public_id=data['item']) or None
@@ -218,7 +218,7 @@ def getDocument(request, data):
         key: value, // document key and value
         ... // more key/value pairs
     }
-    see: addDocument, editDocument, findDocument, removeDocument, sortDocuments
+    see: addDocument, editDocument, findDocuments, removeDocument, sortDocuments
     '''
     response = json_response({})
     data['keys'] = data.get('keys', [])
@@ -240,7 +240,7 @@ def removeDocument(request, data):
     notes: If `item` is present, this removes the documents from that item.
     If `entity` is present, this removes the documents from that entity.
     Otherwise, it removes the documents from the database.
-    see: addDocument, editDocument, findDocument, getDocument, sortDocuments
+    see: addDocument, editDocument, findDocuments, getDocument, sortDocuments
     '''
     response = json_response()
 
@@ -287,7 +287,7 @@ def sortDocuments(request, data):
         ids: [string] // ordered list of document ids
     }
     returns {}
-    see: addDocument, editDocument, findDocument, removeDocument, sortDocuments
+    see: addDocument, editDocument, findDocuments, removeDocument, sortDocuments
     '''
     index = 0
     item = Item.objects.get(public_id=data['item'])
