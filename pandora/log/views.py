@@ -34,8 +34,9 @@ def logError(request, data):
     if 'text' in data:
         if len(url) > 1000:
             url = url[:997] + '...'
+        text = data['text'] + '\n\n' + request.META.get('HTTP_USER_AGENT', '')[:4096]
         l = models.Log(
-            text=data['text'],
+            text=text,
             line=int(data.get('line', 0)),
             url=url
         )
