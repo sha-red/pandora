@@ -141,35 +141,33 @@ pandora.ui.errorlogsDialog = function() {
                 open: function(data) {
                     var value = $list.value(Ox.last(data.ids)),
                         $dialog;
-                    if (/^Traceback/.test(value.text)) {
-                        $dialog = Ox.Dialog({
-                            buttons: [
-                                Ox.Button({
-                                    id: 'close',
-                                    title: Ox._('Close')
-                                })
-                                .bindEvent({
-                                    click: function() {
-                                        $dialog.close();
-                                    }
-                                })
-                            ],
-                            closeButton: true,
-                            content: $('<code>').append(
-                                $('<pre>')
-                                    .addClass('OxSelectable')
-                                    .css({margin: '16px'})
-                                    .text(value.text)
-                            ),
-                            height: height - 48,
-                            keys: {enter: 'close', escape: 'close'},
-                            maximizeButton: true,
-                            removeOnClose: true,
-                            title: formatURL(value.url, value.line),
-                            width: width - 48
-                        })
-                        .open();
-                    }
+                    $dialog = Ox.Dialog({
+                        buttons: [
+                            Ox.Button({
+                                id: 'close',
+                                title: Ox._('Close')
+                            })
+                            .bindEvent({
+                                click: function() {
+                                    $dialog.close();
+                                }
+                            })
+                        ],
+                        closeButton: true,
+                        content: $('<code>').append(
+                            $('<pre>')
+                                .addClass('OxSelectable')
+                                .css({margin: '16px'})
+                                .text(value.text)
+                        ),
+                        height: height - 48,
+                        keys: {enter: 'close', escape: 'close'},
+                        maximizeButton: true,
+                        removeOnClose: true,
+                        title: formatURL(value.url, value.line),
+                        width: width - 48
+                    })
+                    .open();
                 }
             }),
 
