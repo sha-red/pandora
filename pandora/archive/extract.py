@@ -144,8 +144,10 @@ def stream(video, target, profile, info, audio_track=0):
         audiobitrate = '22k'
         audiochannels = 1
 
-    
     if info['video'] and 'display_aspect_ratio' in info['video'][0]:
+        # dont make video bigger
+        height = min(height, info['video'][0]['height'])
+ 
         fps = AspectRatio(info['video'][0]['framerate'])
         fps = min(30, float(fps))
 
