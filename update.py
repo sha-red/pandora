@@ -191,8 +191,8 @@ if __name__ == "__main__":
         os.chdir(join(base, 'pandora'))
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
-            print 'Database has changed, please make a backup and run ./update.py db'
+            print 'Database has changed, please make a backup and run %s db' % sys.argv[0]
         elif not development:
-            print 'pan.do/ra is at the latest stable release,\nyou can run "./update.py dev" to update to the development version'
+            print 'pan.do/ra is at the latest stable release,\nyou can run "%s dev" to update to the development version' % sys.argv[0]
         elif current != new:
             reload_notice(base)
