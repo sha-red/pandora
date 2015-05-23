@@ -616,6 +616,9 @@ class Item(models.Model):
         if i['parts']:
             i['videoRatio'] = streams[0].aspect_ratio
             i['resolution'] = (streams[0].file.width, streams[0].file.height)
+            if i['resolution'] == (0, 0):
+                del i['resolution']
+                del i['videoRatio']
         else:
             i['duration'] = self.files.filter(
                 Q(selected=True)|Q(wanted=True)
@@ -916,16 +919,17 @@ class Item(models.Model):
             #s.duration = sum([v.duration for v in videos])
             s.duration = sum([v.duration for v in self.streams()])
             v = videos[0]
-            if v.is_audio:
+            if v.is_audio or not v.info.get('video'):
                 s.resolution = None
                 s.width = None
                 s.height = None
+                s.aspectratio = None
             else:
                 s.resolution = v.width * v.height
                 s.width = v.width
                 s.height = v.height
-            if not s.aspectratio and v.display_aspect_ratio:
-                s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
+                if not s.aspectratio and v.display_aspect_ratio:
+                    s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
             s.pixels = sum([v.pixels for v in videos])
             s.parts = videos.count()
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
@@ -944,6 +948,7 @@ class Item(models.Model):
             s.size = None
             s.volume = None
             s.parts = 0
+            s.aspectratio = None
 
         for key in ('hue', 'saturation', 'lightness'):
             if key in self.data:
