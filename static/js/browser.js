@@ -88,7 +88,9 @@ pandora.ui.browser = function() {
                 } else {
                     // fixme: this is duplicated many times
                     format = pandora.getSortKeyData(sortKey).format;
-                    if (format) {
+                    if (Ox.isUndefined(data[sortKey]) || Ox.isNull(data[sortKey])) {
+                        info = '';
+                    } else if (format) {
                         info = (
                             /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
                         )['format' + Ox.toTitleCase(format.type)].apply(

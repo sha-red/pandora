@@ -234,7 +234,7 @@ def find(request, data):
                 elif p == 'timesaccessed':
                     r[p] = m.sort.timesaccessed
                 else:
-                    r[p] = m.json.get(p, '')
+                    r[p] = m.json.get(p)
             if 'clip_qs' in query:
                 r['clips'] = get_clips(query['clip_qs'].filter(item=m))
             return r
@@ -243,7 +243,7 @@ def find(request, data):
             if m:
                 m = json.loads(m, object_hook=ox.django.fields.from_json)
                 for p in _p:
-                    r[p] = m.get(p, '')
+                    r[p] = m.get(p)
             if 'clip_qs' in query:
                 r['clips'] = get_clips(query['clip_qs'].filter(item__public_id=m['id']))
             return r
