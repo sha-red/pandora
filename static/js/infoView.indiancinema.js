@@ -49,16 +49,19 @@ pandora.ui.infoView = function(data) {
                 items: [
                     {
                         id: 'imdb',
-                        title: Ox._('Update IMDb ID...')
+                        title: Ox._('Update IMDb ID...'),
+                        disabled: !canEdit
                     },
                     {
                         id: 'metadata',
-                        title: Ox._('Update Metadata...')
+                        title: Ox._('Update Metadata...'),
+                        disabled: !canEdit
                     },
                     {},
                     {
                         id: 'upload',
-                        title: Ox._('Upload Video...')
+                        title: Ox._('Upload Video...'),
+                        disabled: !pandora.site.capabilities.canAddItems[pandora.user.level]
                     },
                     {},
                     {
