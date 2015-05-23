@@ -622,7 +622,7 @@ class Item(models.Model):
             ).aggregate(Sum('duration'))['duration__sum'] 
             videos = self.files.filter(selected=True, is_video=True)
             if i['duration'] and videos.count():
-                i['resolution'] = (videos[0].width, streams[0].height)
+                i['resolution'] = (videos[0].width, videos[0].height)
                 if i['resolution'][1] != 0:
                     i['videoRatio'] = i['resolution'][0] / i['resolution'][1]
             else:
