@@ -204,7 +204,7 @@ def addMedia(request, data):
         f.path = data.get('filename', 'Untitled')
         extension = f.path.split('.')
         if len(extension) > 1:
-            extension = extension[-1]
+            extension = extension[-1].lower()
         else:
             extension = 'webm'
         f.selected = True
