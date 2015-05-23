@@ -612,14 +612,23 @@ class Item(models.Model):
         i['audioTracks'] = self.audio_tracks()
         if not i['audioTracks']:
             del i['audioTracks']
-        if not streams:
-            i['duration'] = self.files.filter(
-                Q(selected=True)|Q(wanted=True)
-            ).aggregate(Sum('duration'))['duration__sum'] 
         i['parts'] = len(i['durations'])
         if i['parts']:
             i['videoRatio'] = streams[0].aspect_ratio
             i['resolution'] = (streams[0].file.width, streams[0].file.height)
+        else:
+            i['duration'] = self.files.filter(
+                Q(selected=True)|Q(wanted=True)
+            ).aggregate(Sum('duration'))['duration__sum'] 
+            videos = self.files.filter(selected=True, is_video=True)
+            if i['duration'] and videos.count():
+                i['resolution'] = (videos[0].width, streams[0].height)
+                if i['resolution'][1] != 0:
+                    i['videoRatio'] = i['resolution'][0] / i['resolution'][1]
+            else:
+                for k in ('resolution', 'videoRatio'):
+                    if k in i:
+                        del i[k]
 
         #only needed by admins
         if keys and 'posters' in keys:
@@ -1426,7 +1435,7 @@ class Item(models.Model):
                         })
                 offset += f.duration
         else:
-            if 'videoRatio' in self.json and self.sort.duration:
+            if 'videoRatio' in self.json and self.sort.duration and self.streams():
                 width, height = self.json['resolution']
                 if width and height:
                     pos = self.sort.duration / 2
