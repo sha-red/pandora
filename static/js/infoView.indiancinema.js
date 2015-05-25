@@ -619,7 +619,7 @@ pandora.ui.infoView = function(data) {
                     var year = item.year || Ox._('Unknown Year');
                     if (key == 'name' && result.data.items.length > 1) {
                         item.roles = nameKeys.filter(function(nameKey) {
-                            return Ox.contains(item[nameKey], value);
+                            return item[nameKey] && Ox.contains(item[nameKey], value);
                         });
                         if (roles.length == 1 && Ox.isEqual(item.roles, roles)) {
                             delete item.roles;
