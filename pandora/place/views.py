@@ -177,9 +177,7 @@ def removePlace(request, data):
     returns {}
     see: addPlace, editPlace, findPlaces
     '''
-    if isinstance(data, dict):
-        data = data['id']
-    place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data))
+    place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data['id']))
     if place.editable(request.user):
         add_changelog(request, data)
         place.delete()
