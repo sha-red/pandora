@@ -49,11 +49,11 @@ class File(models.Model):
     type = models.CharField(default="", max_length=255)
 
     #editable
-    extension = models.CharField(default="", max_length=255, null=True) 
+    extension = models.CharField(default="", max_length=255, null=True)
     language = models.CharField(default="", max_length=255, null=True)
     part = models.CharField(default="", max_length=255, null=True)
     part_title = models.CharField(default="", max_length=255, null=True)
-    version = models.CharField(default="", max_length=255, null=True) 
+    version = models.CharField(default="", max_length=255, null=True)
 
     size = models.BigIntegerField(default=0)
     duration = models.FloatField(null=True)
@@ -63,8 +63,8 @@ class File(models.Model):
     video_codec = models.CharField(max_length=255)
     pixel_format = models.CharField(max_length=255)
     display_aspect_ratio = models.CharField(max_length=255)
-    width = models.IntegerField(default = 0)
-    height = models.IntegerField(default = 0)
+    width = models.IntegerField(default=0)
+    height = models.IntegerField(default=0)
     framerate = models.CharField(max_length=255)
 
     audio_codec = models.CharField(max_length=255)
@@ -662,7 +662,7 @@ class Stream(models.Model):
 
     def name(self):
         return u"%sp.%s" % (self.resolution, self.format)
-        
+
     def __unicode__(self):
         return u"%s/%s" % (self.file, self.name())
 
