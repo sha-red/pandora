@@ -44,6 +44,11 @@ def addEntity(request, data):
     '''
     existing_names = []
     exists = False
+
+    if not utils.get_by_id(settings.CONFIG['entities'], data['type']):
+        response = json_response(status=500, text='unknown entity type')
+        return render_to_json_response(response)
+
     if 'name' in data:
         names = [data['name']] + data.get('alternativeNames', [])
         for name in names:
