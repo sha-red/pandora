@@ -46,7 +46,7 @@ pandora.ui.editor = function(data) {
                     autocomplete: layer.type == 'entity'
                         ? function(key, value, callback) {
                             pandora.api.autocompleteEntities({
-                                key: key,
+                                key: layer.entity,
                                 operator: '=',
                                 range: [0, 20],
                                 value: value
