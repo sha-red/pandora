@@ -31,7 +31,7 @@ def update(config_jsonc='config.jsonc', base='config.pandora.jsonc'):
     current_docs = get(config_jsonc)
     for key in docs:
         if key in current_docs:
-            match = '\n' + re.escape('    '+docs[key]) + '\W+"' + re.escape(key) + '":'
+            match = '\n' + re.escape('    ' + current_docs[key]) + '\W+"' + re.escape(key) + '":'
         else:
             match = '\n    "' + re.escape(key) + '":'
         data = re.sub(match, '\n    %s\n    "%s":' % (docs[key], key), data)
