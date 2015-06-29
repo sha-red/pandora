@@ -2020,6 +2020,7 @@ pandora.getVideoOptions = function(data) {
             })
         });
     });
+    data.videoRatio = data.videoRatio || pandora.site.video.previewRatio;
     return options;
 };
 
