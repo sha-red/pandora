@@ -87,6 +87,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'ox.django.middleware.ExceptionMiddleware',
     'ox.django.middleware.ChromeFrameMiddleware',
+    'user.middleware.UpdateSession',
 )
 
 ROOT_URLCONF = 'urls'
@@ -204,6 +205,9 @@ MEDIA_PREFIX=''
 #SESSION_COOKIE_DOMAIN = '.example.com'
 
 SESSION_COOKIE_AGE=60*24*60*60
+
+# Extend cookie age if session is older
+SESSION_UPDATE=24*60*60
 
 SCRIPT_ROOT = normpath(join(PROJECT_ROOT, '..', 'scripts'))
 #change script to customize
