@@ -172,7 +172,7 @@ def addAnnotation(request, data):
                 value = Entity.get_by_name(ox.decode_html(data['value']), layer['entity']).get_id()
             except Entity.DoesNotExist:
                 response = json_response({})
-                response['status']['text'] = 'unkown entity'
+                response['status']['text'] = 'unknown entity'
                 return render_to_json_response(response)
         else:
             value = data['value']
@@ -285,7 +285,7 @@ def editAnnotation(request, data):
                         value = Entity.get_by_name(ox.decode_html(data['value']), layer['entity']).get_id()
                     except Entity.DoesNotExist:
                         response = json_response({})
-                        response['status']['text'] = 'unkown entity'
+                        response['status']['text'] = 'unknown entity'
                         return render_to_json_response(response)
                 else:
                     value = data[key]
