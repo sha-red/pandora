@@ -278,6 +278,9 @@ def editAnnotation(request, data):
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
         layer = get_by_id(settings.CONFIG['layers'], a.layer)
+        if 'layer' in data and data['layer'] != a.layer:
+            response = json_response(status=400, text='cannot change annotation layer')
+            return render_to_json_response(response)
         for key in ('value', 'in', 'out'):
             if key in data:
                 if key == 'value' and layer['type'] == 'entity':
