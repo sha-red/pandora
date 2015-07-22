@@ -22,13 +22,15 @@ pandora.ui.errorlogsDialog = function() {
                 }
             }),
 
+        findFields = [
+            {id: 'all', title: Ox._('Find: All')},
+            {id: 'user', title: Ox._('Find: User')},
+            {id: 'url', title: Ox._('Find: URL')},
+            {id: 'text', title: Ox._('Find: Text')}
+        ],
+        findFieldKeys = findFields.slice(1).map(function(f) { return f.id; }),
         $findSelect = Ox.Select({
-                items: [
-                    {id: 'all', title: Ox._('Find: All')},
-                    {id: 'user', title: Ox._('Find: User')},
-                    {id: 'url', title: Ox._('Find: URL')},
-                    {id: 'text', title: Ox._('Find: Text')}
-                ],
+                items: findFields,
                 overlap: 'right',
                 type: 'image',
                 value: 'all'
@@ -232,12 +234,12 @@ pandora.ui.errorlogsDialog = function() {
     }
 
     function updateList(key, value) {
+        var keys = key == 'all' ? findFieldKeys : [key];
         var query = {
-                conditions: [].concat(
-                    key != 'url' ? [{key: 'user', value: value, operator: '='}] : [],
-                    key != 'user' ? [{key: 'url', value: value, operator: '='}] : []
-                ),
-                operator: key == 'all' ? '|' : '&'
+                conditions: keys.map(function(k) {
+                    return {key: k, value: value, operator: '='};
+                }),
+                operator: '|'
             };
         $list.options({
             items: function(data, callback) {
@@ -251,4 +253,3 @@ pandora.ui.errorlogsDialog = function() {
     return that;
 
 };
-
