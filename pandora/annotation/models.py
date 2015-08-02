@@ -213,20 +213,17 @@ class Annotation(models.Model):
         'duration', 'layer', 'item', 'videoRatio', 'languages', 
         'entity', 'event', 'place'
     )
+    _clip_keys = ('hue', 'lightness', 'saturation', 'volume')
     def json(self, layer=False, keys=None, user=None):
         j = {
             'user': self.user.username,
+            'id': self.public_id,
+            'in': self.start,
+            'out': self.end,
+            'value': self.value,
+            'created': self.created,
+            'modified': self.modified,
         }
-        for key in ('id', 'in', 'out', 'value', 'created', 'modified'):
-            j[key] = getattr(self, {
-                'hue': 'clip__hue',
-                'id': 'public_id',
-                'in': 'start',
-                'lightness': 'clip__lightness',
-                'out': 'end',
-                'saturation': 'clip__saturation',
-                'volume': 'clip__volume',
-            }.get(key, key))
         j['duration'] = abs(j['out'] - j['in'])
         if user:
             j['editable'] = self.editable(user)
@@ -268,12 +265,15 @@ class Annotation(models.Model):
                 if streams:
                     j['videoRatio'] = streams[0].aspect_ratio
             for key in keys:
-                if key not in self.annotation_keys and key not in j:
-                    value = self.item.get(key) or self.item.json.get(key)
-                    if not value and hasattr(self.item.sort, key):
-                        value = getattr(self.item.sort, key)
-                    if value != None:
-                        j[key] = value
+                if key not in j:
+                    if key in self._clip_keys:
+                        j[key] = getattr(self.clip, key)
+                    elif key not in self.annotation_keys:
+                        value = self.item.get(key) or self.item.json.get(key)
+                        if not value and hasattr(self.item.sort, key):
+                            value = getattr(self.item.sort, key)
+                        if value != None:
+                            j[key] = value
         subtitles = get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
         if subtitles:
             if 'id' in j and self.layer == subtitles['id'] and not self.value:
