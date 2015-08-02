@@ -522,7 +522,7 @@ class Clip(models.Model):
                 if user and user.is_anonymous():
                     user = None
                 qs = qs.filter(user=user)
-            for a in qs.order_by('start'):
+            for a in qs.order_by('start').select_related('user'):
                 ll.append(a.json(user=user))
         return layers
 
