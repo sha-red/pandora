@@ -55,7 +55,7 @@ def addClips(request, data):
     if edit.editable(request.user):
         clips = edit.add_clips(data['clips'], data.get('index'), request.user)
         if not clips:
-            response = json_response(status=500, text='invalid in/out')
+            response = json_response(status=500, text='invalid or missing item/in/out')
             return render_to_json_response(response)
         add_changelog(request, data, edit.get_id())
         response['data']['clips'] = clips
@@ -268,7 +268,7 @@ def addEdit(request, data):
     if 'clips' in data and edit.type == 'static':
         clips = edit.add_clips(data['clips'], 0, request.user)
         if not clips:
-            response = json_response(status=500, text='invalid in/out')
+            response = json_response(status=500, text='invalid or missing item/in/out')
             return render_to_json_response(response)
 
     if edit.status == 'featured':

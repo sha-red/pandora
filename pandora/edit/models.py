@@ -75,10 +75,12 @@ class Edit(models.Model):
         if 'annotation' in data and data['annotation']:
             c.annotation = Annotation.objects.get(public_id=data['annotation'])
             c.item = c.annotation.item
-        else:
+        elif 'item' in data and 'in' in data and 'out' in data:
             c.item = Item.objects.get(public_id=data['item'])
             c.start = data['in']
             c.end = data['out']
+        else:
+            return False
         if index != None:
             c.index = index
         # dont add clip if in/out are invalid
