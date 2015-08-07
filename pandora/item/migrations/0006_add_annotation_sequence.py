@@ -16,9 +16,10 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('item', ['AnnotationSequence'])
         import item.models
-        for i in item.models.Item.objects.all():
-            item.models.AnnotationSequence.reset(i)
-        for a in item.models.Annotation.objects.filter(public_id=None): a.save()
+        if item.models.Item.objects.all().count():
+            for i in item.models.Item.objects.all():
+                item.models.AnnotationSequence.reset(i)
+            for a in item.models.Annotation.objects.filter(public_id=None): a.save()
 
     def backwards(self, orm):
         # Deleting model 'AnnotationSequence'
