@@ -1906,6 +1906,20 @@ pandora.getStatusText = function(data) {
     return parts.join(', ');
 };
 
+pandora.getSubtitles = function(video) {
+    return video.subtitlesLayer ? video.annotations.filter(function(layer) {
+        return layer.id == video.subtitlesLayer;
+    })[0].items.map(function(subtitle) {
+        return {
+            id: subtitle.id,
+            'in': subtitle['in'],
+            out: subtitle.out,
+            text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n'),
+            tracks: subtitle.languages || [Ox.getLanguageNameByCode(pandora.site.language)]
+        };
+    }) : [];
+};
+
 pandora.getSubtitlesLayer = function() {
     return pandora.site.layers.filter(function(layer) {
         return layer.isSubtitles;

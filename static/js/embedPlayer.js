@@ -40,7 +40,7 @@ pandora.ui.embedPlayer = function() {
             sizes = getSizes();
 
         options.height = sizes.videoHeight;
-        video.subtitles = getSubtitles(video);
+        video.subtitles = pandora.getSubtitles(video);
 
         if (options.title) {
             $title = Ox.Element()
@@ -337,20 +337,6 @@ pandora.ui.embedPlayer = function() {
             $player.options({timeline: url});
         });
         return Ox.$('<canvas>').attr({width: width, height: height})[0].toDataURL();
-    }
-
-    function getSubtitles(options) {
-        return options.subtitlesLayer ? options.annotations.filter(function(layer) {
-            return layer.id == options.subtitlesLayer;
-        })[0].items.map(function(subtitle) {
-            return {
-                id: subtitle.id,
-                'in': subtitle['in'],
-                out: subtitle.out,
-                text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n'),
-                tracks: subtitle.languages || [Ox.getLanguageNameByCode(pandora.site.language)]
-            };
-        }) : [];
     }
 
     function selectAnnotation(data) {

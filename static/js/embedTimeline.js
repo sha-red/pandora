@@ -65,7 +65,7 @@ pandora.ui.embedTimeline = function() {
                 position: options.position,
                 resolution: Ox.min(pandora.site.video.resolutions),
                 smallTimelineURL: pandora.getMediaURL('/' + ui.item + '/timeline16p.jpg'),
-                subtitles: video.subtitles,
+                subtitles: pandora.getSubtitles(video),
                 timeline: ui.videoTimeline,
                 timelines: pandora.site.timelines,
                 video: video.video,
