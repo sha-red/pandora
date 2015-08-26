@@ -230,11 +230,20 @@ class Entity(models.Model):
 
     def update_annotations(self):
         import annotation.models
+        import annotation.tasks
+
         entity_layers = [l['id'] for l in settings.CONFIG['layers'] if l['type'] == 'entity']
         if entity_layers:
             with transaction.commit_on_success():
-                for a in annotation.models.Annotation.objects.filter(layer__in=entity_layers, value=self.get_id()):
+                items = {}
+                for a in annotation.models.Annotation.objects.filter(
+                    layer__in=entity_layers,
+                    value=self.get_id()
+                ):
                     a.save()
+                    items[a.item.id] = a.id
+                for id in items.values():
+                    annotation.tasks.update_item.delay(id, True)
 
 class DocumentProperties(models.Model):
 

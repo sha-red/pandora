@@ -105,11 +105,11 @@ def add_annotations(data):
     return True
 
 @task(ignore_results=True, queue='default')
-def update_item(id):
+def update_item(id, force=False):
     from item.models import Item
     from clip.models import Clip
     a = models.Annotation.objects.get(pk=id)
-    if a.modified >= a.item.annotations.order_by('-modified')[0].modified:
+    if force or a.modified >= a.item.annotations.order_by('-modified')[0].modified:
         #cleanup orphaned clips
         Clip.objects.filter(item__id=a.item.id, annotations__id=None).delete()
         #update facets if needed
