@@ -733,6 +733,8 @@
     Optional keys are:
         "autocomplete": Available if the layer is used as a filter
         "canAddAnnotations": Permissions per user level
+        "canPlayClips": If true, clips from this layer will play for users
+            with canPlayClips access
         "entity": ID of the referenced entity (if type is "entity")
         "hasEvents": If true, the calendar will be populated with matches from
             this layer
@@ -768,6 +770,7 @@
             "id": "subtitles",
             "title": "Subtitles",
             "canAddAnnotations": {"staff": true, "admin": true},
+            "canPlayClips": true,
             "hasEvents": true,
             "hasPlaces": true,
             "isSubtitles": true,

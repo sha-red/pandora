@@ -1948,6 +1948,54 @@ pandora.getVideoURL = function(id, resolution, part, track) {
         + pandora.getVideoURLName(id, resolution, part, track);
 };
 
+pandora.getCensoredClips = function(data) {
+    var annotations = [],
+        clips = [],
+        last;
+    pandora.site.layers.filter(function(layer) {
+        return layer.canPlayClips;
+    }).forEach(function(layer) {
+        data.layers[layer.id] && data.layers[layer.id].forEach(function(annotation, i) {
+            annotations.push(annotation)
+        });
+    });
+    if (annotations.length) {
+        Ox.sort(annotations, function(clip) {
+            return clip['in'];
+        }).forEach(function(clip) {
+            if (last && last['out'] >= clip['in']) {
+                last['out'] = Math.max(last['out'], clip['out']);
+            } else {
+                last = {
+                    'in': clip['in'],
+                    out: clip.out
+                };
+                clips.push(last);
+            }
+        });
+    }
+    return clips.length
+        ? clips.map(function(clip, i) {
+            return {
+                'in': i == 0 ? 0
+                    : clips[i - 1].out,
+                out: clip['in']
+            };
+        }).concat([{
+            'in': Ox.last(clips).out,
+            out: data.duration
+        }]).filter(function(censored) {
+            // don't include gaps shorter than one second
+            return censored.out - censored['in'] >= 1;
+        })
+        : Ox.range(0, data.duration - 5, 60).map(function(position) {
+            return {
+                'in': position + 5,
+                out: Math.min(position + 60, data.duration)
+            };
+        });
+};
+
 pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable
             || pandora.site.capabilities.canPlayClips[pandora.user.level]
@@ -1958,29 +2006,8 @@ pandora.getVideoOptions = function(data) {
         options = {};
     options.subtitlesLayer = pandora.getSubtitlesLayer();
     options.censored = canPlayVideo ? []
-        : canPlayClips ? (
-            options.subtitlesLayer && data.layers[options.subtitlesLayer].length
-                ? data.layers[options.subtitlesLayer].map(function(subtitle, i) {
-                    return {
-                        'in': i == 0 ? 0
-                            : data.layers[options.subtitlesLayer][i - 1].out,
-                        out: subtitle['in']
-                    };
-                }).concat([{
-                    'in': Ox.last(data.layers[options.subtitlesLayer]).out,
-                    out: data.duration
-                }]).filter(function(censored) {
-                    // don't include gaps shorter than one second
-                    return censored.out - censored['in'] >= 1;
-                })
-                : Ox.range(0, data.duration - 5, 60).map(function(position) {
-                    return {
-                        'in': position + 5,
-                        out: Math.min(position + 60, data.duration)
-                    };
-                })
-        )
-        : [{'in': 0, out: data.duration}];
+        : canPlayClips ? pandora.getCensoredClips(data)
+            : [{'in': 0, out: data.duration}];
     options.video = [];
     pandora.site.video.resolutions.forEach(function(resolution) {
         if (data.audioTracks) {
