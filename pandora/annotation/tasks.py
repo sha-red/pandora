@@ -123,3 +123,19 @@ def update_item(id, force=False):
             a.item.update_facets()
             if a.item.update_languages():
                 a.item.save()
+
+
+@task(ignore_results=True, queue='default')
+def update_annotations(layers, value):
+    items = {}
+
+    with transaction.commit_on_success():
+        for a in models.Annotation.objects.filter(
+            layer__in=layers,
+            value=value
+        ):
+            a.save()
+            items[a.item.id] = a.id
+
+    for id in items.values():
+        update_item.delay(id, True)

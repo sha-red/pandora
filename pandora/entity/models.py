@@ -234,16 +234,8 @@ class Entity(models.Model):
 
         entity_layers = [l['id'] for l in settings.CONFIG['layers'] if l['type'] == 'entity']
         if entity_layers:
-            with transaction.commit_on_success():
-                items = {}
-                for a in annotation.models.Annotation.objects.filter(
-                    layer__in=entity_layers,
-                    value=self.get_id()
-                ):
-                    a.save()
-                    items[a.item.id] = a.id
-                for id in items.values():
-                    annotation.tasks.update_item.delay(id, True)
+            annotation.tasks.update_annotations.delay(entity_layers, self.get_id())
+
 
 class DocumentProperties(models.Model):
 
