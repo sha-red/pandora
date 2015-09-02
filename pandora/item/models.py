@@ -999,7 +999,10 @@ class Item(models.Model):
                     set_value(s, name, value)
                 elif sort_type in ('length', 'integer', 'time', 'float'):
                     #can be length of strings or length of arrays, i.e. keywords
-                    value = self.get(source)
+                    if 'layer' in key.get('value', []):
+                        value = self.annotations.filter(layer=key['value']['layer']).count()
+                    else:
+                        value = self.get(source)
                     if isinstance(value, list):
                         value = len(value)
                     set_value(s, name, value)
