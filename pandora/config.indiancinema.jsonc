@@ -800,7 +800,6 @@
             "id": "subtitles",
             "title": "Subtitles",
             "canAddAnnotations": {"researcher": true, "staff": true, "admin": true},
-            "canPlayClips": true,
             "hasEvents": true,
             "hasPlaces": true,
             "isSubtitles": true,

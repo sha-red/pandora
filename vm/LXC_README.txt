@@ -6,7 +6,7 @@
 
 2) Create a new container, use different names if installing multiple instances:
 
-    sudo lxc-create -n pandora -t ubuntu -- -r precise
+    sudo lxc-create -n pandora -t ubuntu -- -r trusty
 
 3) Install pan.do/ra in container:
 
