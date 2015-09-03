@@ -15,8 +15,8 @@
 Now login as ubuntu/ubuntu and run the following commands:
 
     sudo su
-    apt-get update
-    apt-get -y install avahi-daemon curl
+    apt-get update -qq
+    apt-get -y install curl
     cd /root
     curl 'https://wiki.0x2620.org/browser/pandora/vm/pandora_install.sh?format=txt' > pandora_install.sh
     chmod +x pandora_install.sh
