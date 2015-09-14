@@ -159,7 +159,7 @@ class ClipManager(Manager):
                 '=': '__icontains',
                 '^': '__istartswith',
                 '$': '__iendswith',
-            }.get(condition.get('opterator', ''), '__icontains'))
+            }.get(condition.get('operator', ''), '__icontains'))
             v = condition['value']
             if isinstance(v, unicode):
                 v = unicodedata.normalize('NFKD', v).lower()
