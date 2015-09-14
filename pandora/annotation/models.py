@@ -208,13 +208,36 @@ class Annotation(models.Model):
         from entity.models import Entity
         return Entity.get(self.value)
 
+    def _get_entity_json(self, user=None, entity_cache=None):
+        """When serializing many annotations pointing to the same entity, it is expensive to
+        repeatedly look up and serialize the same entity.
+
+        TODO: if Entity were a (nullable) foreign key of Annotation, we could just:
+
+            prefetch_related('entity', 'entity__user', 'entity__documents')
+
+        before serializing the annotations, which would make self.entity.json(user=user) cheap and
+        all this unnecessary.
+        """
+        if entity_cache is not None and self.value in entity_cache:
+            return entity_cache[self.value]
+
+        entity = self.get_entity()
+        entity_json = entity.json(user=user)
+        value = entity.annotation_value()
+
+        if entity_cache is not None:
+            entity_cache[self.value] = (entity_json, value)
+
+        return (entity_json, value)
+
     annotation_keys = (
         'id', 'in', 'out', 'value', 'created', 'modified',
         'duration', 'layer', 'item', 'videoRatio', 'languages', 
         'entity', 'event', 'place'
     )
     _clip_keys = ('hue', 'lightness', 'saturation', 'volume')
-    def json(self, layer=False, keys=None, user=None):
+    def json(self, layer=False, keys=None, user=None, entity_cache=None):
         j = {
             'user': self.user.username,
             'id': self.public_id,
@@ -232,9 +255,8 @@ class Annotation(models.Model):
         l = self.get_layer()
         if l['type'] == 'entity':
             try:
-                entity = self.get_entity()
-                j['entity'] = entity.json(user=user)
-                j['value'] = entity.annotation_value()
+                (j['entity'], j['value']) = self._get_entity_json(
+                    user=user, entity_cache=entity_cache)
             except:
                 j['entity'] = {}
         elif l['type'] == 'event':

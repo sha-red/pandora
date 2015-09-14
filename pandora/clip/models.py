@@ -32,12 +32,14 @@ def get_layers(item, interval=None, user=None):
         start, end = interval
         qs = qs.filter(start__lt=end, end__gt=start)
 
+    entity_cache = {}
+
     for a in qs.order_by('start').select_related('user'):
-        if a.layer in private:
-            if a.user == user:
-                layers[a.layer].append(a.json(user=user))
-        else:
-            layers[a.layer].append(a.json(user=user))
+        if a.layer in private and a.user != user:
+            continue
+
+        layers[a.layer].append(a.json(user=user, entity_cache=entity_cache))
+
     return layers
 
 
@@ -107,7 +109,10 @@ class MetaClip:
                 annotations = self.annotations.all()
                 if qs:
                     annotations = annotations.filter(qs)
-                j['annotations'] = [a.json(keys=['value', 'id', 'layer']) for a in annotations]
+                entity_cache = {}
+                j['annotations'] = [
+                    a.json(keys=['value', 'id', 'layer'], entity_cache=entity_cache) for a in annotations
+                ]
             if 'layers' in keys:
                 j['layers'] = self.get_layers()
             if 'cuts' in keys:
