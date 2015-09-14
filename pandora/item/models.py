@@ -34,7 +34,7 @@ from data_api import external_data
 
 from annotation.models import Annotation
 from archive import extract
-from clip.models import Clip
+from clip.models import Clip, get_layers
 from person.models import get_name_sort
 from sequence.tasks import get_sequences
 from title.models import get_title_sort
@@ -547,21 +547,8 @@ class Item(models.Model):
             return s.json()
 
     def get_layers(self, user=None):
-        layers = {}
-        for l in settings.CONFIG['layers']:
-            name = l['id']
-            ll = layers.setdefault(name, [])
-            qs = Annotation.objects.filter(layer=name, item=self).order_by(
-                    'start', 'end', 'sortvalue')
-            qs = qs.exclude(value='')
-            if l.get('private'):
-                if user and user.is_anonymous():
-                    user = None
-                qs = qs.filter(user=user)
-            for a in qs.order_by('start'):
-                ll.append(a.json(user=user))
-        return layers
-    
+        return get_layers(item=self, user=user)
+
     def get_documents(self, user=None):
         qs = self.documents.all()
         documents = [d.json(item=self) for d in qs]

@@ -11,6 +11,36 @@ from archive import extract
 import managers
 
 
+def get_layers(item, interval=None, user=None):
+    from annotation.models import Annotation
+
+    if user and user.is_anonymous():
+        user = None
+
+    layers = {}
+    private = []
+    for l in settings.CONFIG['layers']:
+        name = l['id']
+        layers[name] = []
+        if l.get('private'):
+            private.append(name)
+
+    qs = Annotation.objects.filter(item=item).exclude(value='')
+    qs = qs.order_by('start', 'end', 'sortvalue')
+
+    if interval:
+        start, end = interval
+        qs = qs.filter(start__lt=end, end__gt=start)
+
+    for a in qs.order_by('start').select_related('user'):
+        if a.layer in private:
+            if a.user == user:
+                layers[a.layer].append(a.json(user=user))
+        else:
+            layers[a.layer].append(a.json(user=user))
+    return layers
+
+
 class MetaClip:
     def update_calculated_values(self):
         start = self.start
@@ -113,27 +143,7 @@ class MetaClip:
         return data
 
     def get_layers(self, user=None):
-        from annotation.models import Annotation
-        start = self.start
-        end = self.end
-        item = self.item
-        layers = {}
-        private = []
-        for l in settings.CONFIG['layers']:
-            name = l['id']
-            layers[name] = []
-            if l.get('private'):
-                private.append(name)
-        qs = Annotation.objects.filter(item=item).exclude(value='')
-        qs = qs.order_by('start', 'end', 'sortvalue')
-        qs = qs.filter(start__lt=end, end__gt=start)
-        for a in qs.order_by('start'):
-            if a.layer in private:
-                if a.user == user:
-                    layers[a.layer].append(a.json(user=user))
-            else:
-                layers[a.layer].append(a.json(user=user))
-        return layers
+        return get_layers(item=self.item, interval=(self.start, self.end), user=user)
 
     @classmethod
     def get_or_create(cls, item, start, end):

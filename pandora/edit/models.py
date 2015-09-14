@@ -511,22 +511,8 @@ class Clip(models.Model):
             start = self.start
             end = self.end
             item = self.item
-        layers = {}
-        for l in settings.CONFIG['layers']:
-            name = l['id']
-            ll = layers.setdefault(name, [])
-            qs = Annotation.objects.filter(layer=name, item=item).order_by(
-                    'start', 'end', 'sortvalue')
-            if name == 'subtitles':
-                qs = qs.exclude(value='')
-            qs = qs.filter(start__lt=end, end__gt=start)
-            if l.get('private'):
-                if user and user.is_anonymous():
-                    user = None
-                qs = qs.filter(user=user)
-            for a in qs.order_by('start').select_related('user'):
-                ll.append(a.json(user=user))
-        return layers
+
+        return clip.models.get_layers(item=item, interval=(start, end), user=user)
 
 class Position(models.Model):
 
