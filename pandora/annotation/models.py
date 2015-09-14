@@ -89,7 +89,7 @@ class Annotation(models.Model):
     item = models.ForeignKey('item.Item', related_name='annotations')
     clip = models.ForeignKey('clip.Clip', null=True, related_name='annotations')
 
-    public_id = models.CharField(max_length=128, unique=True, null=True)
+    public_id = models.CharField(max_length=128, unique=True)
     #seconds
     start = models.FloatField(default=-1, db_index=True)
     end = models.FloatField(default=-1, db_index=True)
@@ -114,9 +114,7 @@ class Annotation(models.Model):
         return cls.objects.get(public_id=id)
 
     def set_public_id(self):
-        if self.id:
-            self.public_id = self.item.next_annotationid()
-            Annotation.objects.filter(id=self.id).update(public_id=self.public_id)
+        self.public_id = self.item.next_annotationid()
 
     @classmethod
     def public_layers(self):
@@ -166,9 +164,10 @@ class Annotation(models.Model):
             if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
                 self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
 
-            super(Annotation, self).save(*args, **kwargs)
             if set_public_id:
                 self.set_public_id()
+
+            super(Annotation, self).save(*args, **kwargs)
 
             if self.clip:
                 Clip.objects.filter(**{

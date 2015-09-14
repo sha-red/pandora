@@ -446,9 +446,11 @@ class Item(models.Model):
             l.remove(self)
             if l.items.filter(id=other.id).count() == 0:
                 l.add(other)
-        self.annotations.all().update(item=other, public_id=None)
-        for a in other.annotations.filter(public_id=None).order_by('id'):
+
+        for a in self.annotations.all().order_by('id'):
+            a.item = other
             a.set_public_id()
+            Annotations.objects.filter(id=a.id).update(item=other, public_id=a.public_id)
 
         if hasattr(self, 'files'):
             for f in self.files.all():
