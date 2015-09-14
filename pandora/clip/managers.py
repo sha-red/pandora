@@ -44,7 +44,7 @@ def parseCondition(condition, user):
                                'operator': op}, user) \
              & parseCondition({'key': 'annotations__layer',
                                'value': k,
-                               'operator': '=='}, user)
+                               'operator': '==='}, user)
 
     if op.startswith('!'):
         op = op[1:]
@@ -82,6 +82,7 @@ def parseCondition(condition, user):
             '>=': '__gte',
             '<': '__lt',
             '<=': '__lte',
+            '===': '__exact',
             '==': '__iexact',
             '=': '__icontains',
             '^': '__istartswith',
@@ -89,7 +90,7 @@ def parseCondition(condition, user):
         }.get(op, '__icontains'))
 
     key = str(key)
-    if isinstance(v, unicode):
+    if isinstance(v, unicode) and op != '===':
         v = unicodedata.normalize('NFKD', v).lower()
     if exclude:
         q = ~Q(**{key: v})
