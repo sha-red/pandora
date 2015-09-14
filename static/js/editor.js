@@ -55,13 +55,25 @@ pandora.ui.editor = function(data) {
                             })
                         } : layer.autocomplete
                         ? function(key, value, callback) {
-                            pandora.api.autocomplete({
-                                key: key,
-                                operator: '=',
-                                range: [0, 20],
-                                value: value
-                            }, function(result) {
-                                callback(result.data.items);
+                            var keys = layer.autocompleteKeys && layer.autocompleteKeys.length
+                                ? layer.autocompleteKeys
+                                : [key];
+                            var n = keys.length;
+                            var itemss = [];
+
+                            keys.forEach(function(key) {
+                                pandora.api.autocomplete({
+                                    key: key,
+                                    operator: '=',
+                                    range: [0, 20],
+                                    value: value
+                                }, function(result) {
+                                    n--;
+                                    itemss.push(result.data.items);
+                                    if (n == 0) {
+                                        callback(Ox.unique(Ox.flatten(itemss)));
+                                    }
+                                });
                             });
                         } : null
                 });
