@@ -224,7 +224,9 @@ def stream(video, target, profile, info, audio_track=0):
     else:
         audio_settings = ['-an']
 
-    cmd = [settings.FFMPEG, '-y', '-i', video, '-threads', '4', '-map_metadata', '-1', '-sn'] \
+    cmd = [settings.FFMPEG, 
+          '-nostats', '-loglevel', 'error',
+          '-y', '-i', video, '-threads', '4', '-map_metadata', '-1', '-sn'] \
           + audio_settings \
           + video_settings
 
