@@ -246,4 +246,7 @@ hi SpellBad ctermbg=0
 nnoremap <F2> :set invpaste paste?<CR>
 set pastetoggle=<F2>
 set showmode
+
+set lcs=tab:→·,trail:·,nbsp:˽
+set list
 EOF
