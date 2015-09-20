@@ -2047,7 +2047,7 @@ pandora.getVideoOptions = function(data) {
         options.annotations[i] = Ox.extend({}, layer, {
             title: Ox._(layer.title),
             item: Ox._(layer.item),
-            items: data.layers[layer.id].map(function(annotation) {
+            items: data.layers[layer.id] ? data.layers[layer.id].map(function(annotation) {
                 annotation.duration = Math.abs(annotation.out - annotation['in']);
                 annotation.editable = annotation.editable
                     || annotation.user == pandora.user.username
@@ -2058,7 +2058,7 @@ pandora.getVideoOptions = function(data) {
                     return Ox.getLanguageNameByCode(language);
                 });
                 return annotation;
-            })
+            }) : []
         });
     });
     data.videoRatio = data.videoRatio || pandora.site.video.previewRatio;
