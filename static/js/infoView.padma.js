@@ -20,6 +20,7 @@ pandora.ui.infoView = function(data) {
         margin = 16,
         nameKeys = ['director', 'cinematographer', 'featuring'],
         listKeys = nameKeys.concat(['language', 'topic', 'license', 'groups']),
+        posterKeys = ['title', 'date'],
         statisticsWidth = 128,
 
         $bar = Ox.Bar({size: 16})
@@ -529,6 +530,11 @@ pandora.ui.infoView = function(data) {
                 }
                 pandora.updateItemContext();
                 pandora.$ui.browser.value(result.data.id, key, result.data[key]);
+                if (Ox.contains(posterKeys, key) && ui.icons == 'posters') {
+                    src = pandora.getMediaURL('/' + data.id + '/poster512.jpg?' + Ox.uid());
+                    $icon.attr({src: src});
+                    $reflectionIcon.attr({src: src});
+                }
                 pandora.$ui.itemTitle
                     .options({
                         title: '<b>' + result.data.title

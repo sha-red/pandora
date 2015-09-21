@@ -28,6 +28,7 @@ pandora.ui.infoView = function(data) {
         listKeys = nameKeys.concat([
             'country', 'language', 'color', 'sound', 'genre', 'keyword', 'links'
         ]),
+        posterKeys = ['title', 'director', 'year'],
         // these may contain commas, and are thus separated by semicolons
         specialListKeys = ['alternativeTitles', 'productionCompany'],
         descriptions = {
@@ -491,10 +492,7 @@ pandora.ui.infoView = function(data) {
                 }
                 pandora.updateItemContext();
                 pandora.$ui.browser.value(result.data.id, key, result.data[key]);
-                if (
-                    Ox.contains(['title', 'director', 'year'], key)
-                    && ui.icons == 'posters'
-                ) {
+                if (Ox.contains(posterKeys, key) && ui.icons == 'posters') {
                     src = pandora.getMediaURL('/' + data.id + '/poster512.jpg?' + Ox.uid());
                     $icon.attr({src: src});
                     $reflectionIcon.attr({src: src});
