@@ -375,14 +375,6 @@ pandora.ui.infoView = function(data) {
                                 : '')
                             + (result.data.year ? ' ' + result.data.year : '') + '</b>'
                     });
-                if (
-                    Ox.contains(['title', 'director', 'year'], key)
-                    && ui.icons == 'posters'
-                ) {
-                    src = '/' + data.id + '/poster512.jpg?' + Ox.uid()
-                    $icon.attr({src: src});
-                    $reflectionIcon.attr({src: src});
-                }
             });
         }
     }

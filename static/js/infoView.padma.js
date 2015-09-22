@@ -519,6 +519,7 @@ pandora.ui.infoView = function(data) {
                 edit[key] = value ? value : null;
             }
             pandora.api.edit(edit, function(result) {
+                var src;
                 data[key] = result.data[key];
                 descriptions[key] && descriptions[key].options({
                     value: result.data[key + 'description']
