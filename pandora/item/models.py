@@ -1540,73 +1540,74 @@ class Item(models.Model):
         existing = self.annotations.filter(layer=layer).exclude(value='')
         # only import on 0xdb for now or if forced manually
         # since this will remove all existing subtitles
-        if not (settings.USE_IMDB or existing.count() == 0) or not force:
-            self.add_empty_clips()
-            return False
-        with transaction.commit_on_success():
-            Annotation.objects.filter(layer=layer, item=self).delete()
-            AnnotationSequence.reset(self)
-            offset = 0
-            language = ''
-            subtitles = self.files.filter(selected=True, is_subtitle=True, available=True)
-            languages = [f.language for f in subtitles]
-            if languages:
-                if 'en' in languages:
-                    language = 'en'
-                elif '' in languages:
-                    language = ''
-                else:
-                    language = languages[0]
+        if force or not existing.count() or settings.USE_IMDB:
+            with transaction.commit_on_success():
+                Annotation.objects.filter(layer=layer, item=self).delete()
+                AnnotationSequence.reset(self)
+                offset = 0
+                language = ''
+                subtitles = self.files.filter(selected=True, is_subtitle=True, available=True)
+                languages = [f.language for f in subtitles]
+                if languages:
+                    if 'en' in languages:
+                        language = 'en'
+                    elif '' in languages:
+                        language = ''
+                    else:
+                        language = languages[0]
 
-            #loop over all videos
-            for f in self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
-                               .filter(selected=True).order_by('sort_path'):
-                subtitles_added = False
-                prefix = os.path.splitext(f.path)[0]
-                if f.instances.all().count() > 0:
-                    user = f.instances.all()[0].volume.user
-                else:
-                    #FIXME: allow annotations from no user instead?
-                    user = User.objects.all().order_by('id')[0]
-                #if there is a subtitle with the same prefix, import
-                q = subtitles.filter(path__startswith=prefix,
-                                     language=language)
-                if q.count() == 1:
-                    s = q[0]
-                    for data in s.srt(offset):
-                        subtitles_added = True
-                        value = data['value'].replace('\n', '<br>\n').replace('<br><br>\n', '<br>\n')
-                        if data['in'] < self.json['duration'] and data['out'] > self.json['duration']:
-                            data['out'] = self.json['duration']
-                        if data['in'] < self.json['duration']:
+                #loop over all videos
+                for f in self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
+                                   .filter(selected=True).order_by('sort_path'):
+                    subtitles_added = False
+                    prefix = os.path.splitext(f.path)[0]
+                    if f.instances.all().count() > 0:
+                        user = f.instances.all()[0].volume.user
+                    else:
+                        #FIXME: allow annotations from no user instead?
+                        user = User.objects.all().order_by('id')[0]
+                    #if there is a subtitle with the same prefix, import
+                    q = subtitles.filter(path__startswith=prefix,
+                                         language=language)
+                    if q.count() == 1:
+                        s = q[0]
+                        for data in s.srt(offset):
+                            subtitles_added = True
+                            value = data['value'].replace('\n', '<br>\n').replace('<br><br>\n', '<br>\n')
+                            if data['in'] < self.json['duration'] and data['out'] > self.json['duration']:
+                                data['out'] = self.json['duration']
+                            if data['in'] < self.json['duration']:
+                                annotation = Annotation(
+                                    item=self,
+                                    layer=layer,
+                                    start=float('%0.03f'%data['in']),
+                                    end=float('%0.03f'%data['out']),
+                                    value=value,
+                                    user=user
+                                )
+                                annotation.save()
+                    #otherwise add empty 5 seconds annotation every minute
+                    if not subtitles_added:
+                        start = offset and int (offset / 60) * 60 + 60 or 0
+                        for i in range(start,
+                                       int(offset + f.duration) - 5,
+                                       60):
                             annotation = Annotation(
                                 item=self,
                                 layer=layer,
-                                start=float('%0.03f'%data['in']),
-                                end=float('%0.03f'%data['out']),
-                                value=value,
+                                start=i,
+                                end=i + 5,
+                                value='',
                                 user=user
                             )
                             annotation.save()
-                #otherwise add empty 5 seconds annotation every minute
-                if not subtitles_added:
-                    start = offset and int (offset / 60) * 60 + 60 or 0
-                    for i in range(start,
-                                   int(offset + f.duration) - 5,
-                                   60):
-                        annotation = Annotation(
-                            item=self,
-                            layer=layer,
-                            start=i,
-                            end=i + 5,
-                            value='',
-                            user=user
-                        )
-                        annotation.save()
-                offset += f.duration
-            #remove left over clips without annotations
-            Clip.objects.filter(item=self, annotations__id=None).delete()
-        return True
+                    offset += f.duration
+                #remove left over clips without annotations
+                Clip.objects.filter(item=self, annotations__id=None).delete()
+            return True
+        else:
+            self.add_empty_clips()
+            return False
 
     def srt(self, layer, language=None):
         def format_value(value):
