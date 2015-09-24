@@ -1536,13 +1536,14 @@ class Item(models.Model):
         subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
         if not subtitles:
             return
+        layer = subtitles['id']
+        existing = self.annotations.filter(layer=layer).exclude(value='')
         # only import on 0xdb for now or if forced manually
         # since this will remove all existing subtitles
-        if not settings.USE_IMDB and not force:
+        if not (settings.USE_IMDB or existing.count() == 0) or not force:
             self.add_empty_clips()
             return False
         with transaction.commit_on_success():
-            layer = subtitles['id']
             Annotation.objects.filter(layer=layer, item=self).delete()
             AnnotationSequence.reset(self)
             offset = 0
