@@ -1078,7 +1078,9 @@ class Item(models.Model):
                 if key in self.person_keys + ['name']:
                     sortvalue = get_name_sort(value)
                 sortvalue = utils.sort_string(sortvalue).lower()[:900]
-                Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
+                f, created = Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
+                if created:
+                    Facet.objects.filter(key=key, value__iexact=value).exclude(value=value).update(value=value)
                 saved_values.append(value.lower())
 
     def update_facets(self):
