@@ -88,7 +88,7 @@ class MetaClip:
 
             self.findvalue = '\n'.join(filter(None, [a.findvalue for a in anns]))
             for l in [k['id'] for k in settings.CONFIG['layers']]:
-                setattr(self, l, len(anns_by_layer[l]) if l in anns_by_layer else 0)
+                setattr(self, l, l in anns_by_layer and len(anns_by_layer[l]))
         models.Model.save(self, *args, **kwargs)
 
     clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
@@ -199,7 +199,7 @@ attrs = {
     'end': models.FloatField(default=-1),
     'duration': models.FloatField(default=0, db_index=True),
 
-    
+
     #get from annotation
     'hue': models.FloatField(default=0, db_index=True),
     'saturation': models.FloatField(default=0, db_index=True),
