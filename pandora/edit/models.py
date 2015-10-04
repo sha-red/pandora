@@ -300,7 +300,10 @@ class Edit(models.Model):
             folder = os.path.dirname(icon)
             ox.makedirs(folder)
             for f in glob("%s/icon*.jpg" % folder):
-                os.unlink(f)
+                try:
+                    os.unlink(f)
+                except:
+                    pass
             cmd = [
                 settings.LIST_ICON,
                 '-f', ','.join(frames),
