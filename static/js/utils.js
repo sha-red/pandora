@@ -353,9 +353,10 @@ pandora.createLinks = function($element) {
 
 (function() {
 
-    pandora.doHistory = function(action, items, targets, callback) {
+    pandora.doHistory = function(action, items, targets, index, callback) {
         items = Ox.makeArray(items);
         targets = Ox.makeArray(targets);
+        callback = Ox.last(arguments);
         if (action == 'copy' || action == 'paste') {
             addItems(items, targets[0], addToHistory);
         } else if (action == 'cut' || action == 'delete') {
@@ -364,7 +365,7 @@ pandora.createLinks = function($element) {
             editItem(items[1], addToHistory);
         } else if (action == 'join' || action == 'split') {
             removeItems(items[0], targets[0], function() {
-                addItems(items[1], targets[0], addToHistory);
+                addItems(items[1], targets[0], index, addToHistory);
             });
         } else if (action == 'move') {
             removeItems(items, targets[0], function() {
@@ -456,8 +457,14 @@ pandora.createLinks = function($element) {
         }
     };
 
-    function addItems(items, target, callback) {
+    function addItems(items, target, index, callback) {
         var clips, type = getType(items);
+        if (Ox.isUndefined(callback)) {
+            callback = index;
+            index = pandora.$ui.editPanel
+                    ? pandora.$ui.editPanel.getPasteIndex()
+                    : void 0;
+        }
         if (type == 'item') {
             pandora.api.find({
                 query: {
@@ -485,9 +492,7 @@ pandora.createLinks = function($element) {
             pandora.api.addClips({
                 clips: pandora.getClipData(items),
                 edit: target,
-                index: pandora.$ui.editPanel
-                    ? pandora.$ui.editPanel.getPasteIndex()
-                    : void 0
+                index: index
             }, function(result) {
                 // adding clips creates new ids, so mutate items in history
                 items.splice.apply(items, [0, items.length].concat(

@@ -215,8 +215,9 @@ pandora.ui.editPanel = function(isEmbed) {
                 });
             },
             join: function(data) {
-                var clips = [serializeClips(data.ids), serializeClips(data.join)];
-                pandora.doHistory('join', clips, ui.edit, function(result) {
+                var clips = [serializeClips(data.ids), serializeClips(data.join)],
+                    index = pandora.$ui.editPanel.getPasteIndex() - 1;
+                pandora.doHistory('join', clips, ui.edit, index, function(result) {
                     edit.clips = edit.clips.filter(function(clip) {
                         return !Ox.contains(data.ids, clip.id);
                     }).concat(result.data.clips);
@@ -314,11 +315,25 @@ pandora.ui.editPanel = function(isEmbed) {
                 sortClips(updateClips);
             },
             split: function(data) {
-                var clips = [serializeClips(data.ids), serializeClips(data.split)];
-                pandora.doHistory('split', clips, ui.edit, function(result) {
+                var clips = [serializeClips(data.ids), serializeClips(data.split)],
+                    index = pandora.$ui.editPanel.getPasteIndex() - 1;
+                pandora.doHistory('split', clips, ui.edit, index, function(result) {
                     updateClips(edit.clips.filter(function(clip) {
                         return !Ox.contains(data.ids, clip.id);
+                    }).map(function(clip) {
+                        if (clip.index >= result.data.clips[0].index) {
+                            clip.index += result.data.clips.length
+                        }
+                        return clip;
                     }).concat(result.data.clips));
+                    //fixme: what resets the position here?
+                    var position = that.options('position');
+                    that.options({
+                        selected: result.data.clips.map(function(clip) { return clip.id}),
+                    });
+                    setTimeout(function() {
+                        that.options('position', position);
+                    }, 500);
                 });
             },
             subtitles: function(data) {
