@@ -70,19 +70,25 @@ class MetaClip:
             self.user = self.item.user and self.item.user.id
             self.sort = self.item.sort
         if self.id:
-            sortvalue = ''
-            if self.id:
-                for l in settings.CONFIG.get('clipLayers', []):
-                    sortvalue += ''.join(filter(lambda s: s,
-                         [a.sortvalue
-                          for a in self.annotations.filter(layer=l).order_by('sortvalue')]))
+            anns = self.annotations.order_by('layer', 'sortvalue')
+            anns_by_layer = {}
+            for ann in anns:
+                anns_by_layer.setdefault(ann.layer, []).append(ann)
+
+            sortvalue = ''.join((
+                a.sortvalue
+                for l in settings.CONFIG.get('clipLayers', [])
+                for a in anns_by_layer.get(l, [])
+                if a.sortvalue
+            ))
             if sortvalue:
                 self.sortvalue = sortvalue[:900]
             else:
                 self.sortvalue = None
-            self.findvalue = '\n'.join(filter(None, [a.findvalue for a in self.annotations.all()]))
+
+            self.findvalue = '\n'.join(filter(None, [a.findvalue for a in anns]))
             for l in [k['id'] for k in settings.CONFIG['layers']]:
-                setattr(self, l, self.annotations.filter(layer=l).count()>0)
+                setattr(self, l, len(anns_by_layer[l]) if l in anns_by_layer else 0)
         models.Model.save(self, *args, **kwargs)
 
     clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
