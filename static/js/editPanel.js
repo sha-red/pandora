@@ -261,7 +261,7 @@ pandora.ui.editPanel = function(isEmbed) {
                 });
             },
             paste: function() {
-                var clips = pandora.clipboard.paste();
+                var clips = pandora.clipboard.paste('clip');
                 clips.length && pandora.doHistory('paste', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
                     Ox.Request.clearCache('sortClips');
