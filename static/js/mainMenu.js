@@ -415,7 +415,7 @@ pandora.ui.mainMenu = function() {
                         type = 'clip', clips;
                     fromMenu = true;
                     function formatClip(clip) {
-                        return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
+                        return clip.annotation || (clip.item||ui.item) + '/' + clip['in'] + '-' + clip.out;
                     }
                     if (pandora.isVideoView() && !pandora.$ui.browser.hasFocus()) {
                         clips = [formatClip(ui.videoPoints[ui.item])];
