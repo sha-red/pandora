@@ -156,13 +156,22 @@ pandora.ui.editPanel = function(isEmbed) {
         })
         .bindEvent({
             copy: function(data) {
-                pandora.clipboard.copy(serializeClips(data.ids), 'clip');
+                var ids = Ox.sort(data.ids, function(id) {
+                    return Ox.getObjectById(edit.clips, id).index;
+                });
+                pandora.clipboard.copy(serializeClips(ids), 'clip');
             },
             copyadd: function(data) {
-                pandora.clipboard.add(serializeClips(data.ids), 'clip');
+                var ids = Ox.sort(data.ids, function(id) {
+                    return Ox.getObjectById(edit.clips, id).index;
+                });
+                pandora.clipboard.add(serializeClips(ids), 'clip');
             },
             cut: function(data) {
-                var clips = serializeClips(data.ids);
+                var ids = Ox.sort(data.ids, function(id) {
+                    return Ox.getObjectById(edit.clips, id).index;
+                });
+                var clips = serializeClips(ids);
                 pandora.clipboard.copy(clips, 'clip');
                 pandora.doHistory('cut', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
@@ -171,7 +180,10 @@ pandora.ui.editPanel = function(isEmbed) {
                 });
             },
             cutadd: function(data) {
-                var clips = serializeClips(data.ids);
+                var ids = Ox.sort(data.ids, function(id) {
+                    return Ox.getObjectById(edit.clips, id).index;
+                });
+                var clips = serializeClips(ids);
                 pandora.clipboard.add(clips, 'clip');
                 pandora.doHistory('cut', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
@@ -180,7 +192,10 @@ pandora.ui.editPanel = function(isEmbed) {
                 });
             },
             'delete': function(data) {
-                var clips = serializeClips(data.ids);
+                var ids = Ox.sort(data.ids, function(id) {
+                    return Ox.getObjectById(edit.clips, id).index;
+                });
+                var clips = serializeClips(ids);
                 pandora.doHistory('delete', clips, ui.edit, function(result) {
                     Ox.Request.clearCache('getEdit');
                     Ox.Request.clearCache('sortClips');
