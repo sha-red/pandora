@@ -26,6 +26,7 @@ def get_layers(item, interval=None, user=None):
             private.append(name)
 
     qs = Annotation.objects.filter(item=item).exclude(value='')
+    qs = qs.filter(layer__in=layers)
     qs = qs.order_by('start', 'end', 'sortvalue')
 
     if interval:
