@@ -106,8 +106,9 @@ class Edit(models.Model):
                 c = self.add_clip(data)
                 if c:
                     ids.insert(index, c.id)
-                    index += 1
                     added.append(c.json(user))
+                    added[-1]['index'] = index
+                    index += 1
                 else:
                     return False
         self.sort_clips(ids)
