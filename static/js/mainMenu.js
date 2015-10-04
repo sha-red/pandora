@@ -411,29 +411,34 @@ pandora.ui.mainMenu = function() {
                         });
                     }
                 } else if (data.id == 'copy' || data.id == 'copyadd') {
-                    var action = data.id == 'copy' ? 'copy' : 'add';
+                    var action = data.id == 'copy' ? 'copy' : 'add',
+                        type = 'clip', clips;
                     fromMenu = true;
-                    pandora.isVideoView() && !pandora.$ui.browser.hasFocus() ? pandora.clipboard[action]([{
-                            annotation: ui.videoPoints[ui.item].annotation,
-                            'in': pandora.user.ui.videoPoints[ui.item]['in'],
-                            item: ui.item,
-                            out: ui.videoPoints[ui.item].out
-                        }], 'clip')
-                        : pandora.isClipView() && !pandora.$ui.browser.hasFocus() ? pandora.clipboard[action](
-                            pandora.$ui.clipList.options('selected'), 'clip'
-                        )
-                        : ui.section == 'edits' ? pandora.clipboard[action](ui.editSelection, 'clip')
-                        : pandora.clipboard[action](ui.listSelection, 'item');
+                    function formatClip(clip) {
+                        return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
+                    }
+                    if (pandora.isVideoView() && !pandora.$ui.browser.hasFocus()) {
+                        clips = [formatClip(ui.videoPoints[ui.item])];
+                    } else if (pandora.isClipView() && !pandora.$ui.browser.hasFocus()) {
+                        clips = pandora.$ui.clipList.options('selected');
+                    } else if (ui.section == 'edits') {
+                        clips = pandora.$ui.editPanel.getSelectedClips();
+                    } else {
+                        clips = ui.listSelection;
+                        section = 'item';
+                    }
+                    pandora.clipboard[action](clips, type);
                 } else if (data.id == 'paste') {
-                    var items = pandora.clipboard.paste();
                     fromMenu = true;
                     if (ui.section == 'items') {
-                        pandora.doHistory('paste', items, ui._list, function() {
+                        var items = pandora.clipboard.paste('item');
+                        items.length && pandora.doHistory('paste', items, ui._list, function() {
                             pandora.UI.set({listSelection: items});
                             pandora.reloadList();
                         });
-                    } else {
-                        pandora.doHistory('paste', items, ui.edit, function(result) {
+                    } else if (ui.section == 'edits') {
+                        var clips = pandora.clipboard.paste('clip');
+                        clips.length && pandora.doHistory('paste', clips, ui.edit, function(result) {
                             pandora.$ui.editPanel.updatePanel(function() {
                                 pandora.UI.set({editSelection: result.data.clips.map(function(clip) {
                                     return clip.id;
@@ -444,10 +449,17 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'clearclipboard') {
                     pandora.clipboard.clear();
                 } else if (data.id == 'delete') {
-                    pandora.doHistory('delete', ui.listSelection, ui._list, function() {
-                        pandora.UI.set({listSelection: []});
-                        pandora.reloadList();
-                    });
+                    if (ui.section == 'items') {
+                        pandora.doHistory('delete', ui.listSelection, ui._list, function() {
+                            pandora.UI.set({listSelection: []});
+                            pandora.reloadList();
+                        });
+                    } else if (ui.section == 'edits') {
+                        var clips = pandora.$ui.editPanel.getSelectedClips();
+                        pandora.doHistory('delete', clips, ui.edit, function(result) {
+                            pandora.$ui.editPanel.updatePanel(function() {});
+                        });
+                    }
                 } else if (data.id == 'undo') {
                     fromMenu = true;
                     pandora.undoHistory();
