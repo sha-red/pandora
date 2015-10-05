@@ -414,11 +414,9 @@ pandora.ui.mainMenu = function() {
                     var action = data.id == 'copy' ? 'copy' : 'add',
                         type = 'clip', clips;
                     fromMenu = true;
-                    function formatClip(clip) {
-                        return clip.annotation || (clip.item||ui.item) + '/' + clip['in'] + '-' + clip.out;
-                    }
                     if (pandora.isVideoView() && !pandora.$ui.browser.hasFocus()) {
-                        clips = [formatClip(ui.videoPoints[ui.item])];
+                        var clip = ui.videoPoints[ui.item];
+                        clips = [clip.annotation || ui.item + '/' + clip['in'] + '-' + clip.out];
                     } else if (pandora.isClipView() && !pandora.$ui.browser.hasFocus()) {
                         clips = pandora.$ui.clipList.options('selected');
                     } else if (ui.section == 'edits') {
