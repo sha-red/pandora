@@ -412,11 +412,17 @@ pandora.ui.mainMenu = function() {
                     }
                 } else if (data.id == 'copy' || data.id == 'copyadd') {
                     var action = data.id == 'copy' ? 'copy' : 'add',
-                        type = 'clip', clips;
+                        type = 'clip', clip, clips;
                     fromMenu = true;
                     if (pandora.isVideoView() && !pandora.$ui.browser.hasFocus()) {
-                        var clip = ui.videoPoints[ui.item];
-                        clips = [clip.annotation || ui.item + '/' + clip['in'] + '-' + clip.out];
+                        clip = ui.item + '/';
+                        if (ui.videoPoints[ui.item].annotation) {
+                            clip += ui.videoPoints[ui.item].annotation;
+                        } else {
+                            clip += ui.videoPoints[ui.item]['in']
+                                 + '-' + ui.videoPoints[ui.item].out;
+                        }
+                        clips = [clip];
                     } else if (pandora.isClipView() && !pandora.$ui.browser.hasFocus()) {
                         clips = pandora.$ui.clipList.options('selected');
                     } else if (ui.section == 'edits') {
