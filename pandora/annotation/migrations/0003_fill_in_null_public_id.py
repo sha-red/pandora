@@ -8,21 +8,7 @@ import ox
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        AnnotationSequence = orm['item.AnnotationSequence']
-        for annotation in orm.Annotation.objects.filter(public_id=None).order_by('item'):
-            item = annotation.item
-            s, created = AnnotationSequence.objects.get_or_create(item=item)
-
-            if created:
-                nextid = s.value
-            else:
-                cursor = connection.cursor()
-                sql = "UPDATE %s SET value = value + 1 WHERE item_id = %s RETURNING value" % (AnnotationSequence._meta.db_table, item.id)
-                cursor.execute(sql)
-                nextid = cursor.fetchone()[0]
-
-            annotation.public_id = "%s/%s" % (item.public_id, ox.toAZ(nextid))
-            annotation.save()
+        pass
 
     def backwards(self, orm):
         pass
