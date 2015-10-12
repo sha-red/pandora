@@ -47,7 +47,7 @@ class Log(models.Model):
     data = fields.DictField(default={})
     created = models.DateTimeField(db_index=True)
     user = models.ForeignKey(User, null=True, related_name='changelog')
-    changeid = models.CharField(max_length=255)
+    changeid = models.TextField()
 
     objects = managers.LogManager()
 
