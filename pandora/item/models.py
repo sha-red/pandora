@@ -1080,6 +1080,7 @@ class Item(models.Model):
                 sortvalue = utils.sort_string(sortvalue).lower()[:900]
                 f, created = Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
                 if created:
+                    Facet.objects.filter(item=self, key=key, value__iexact=value).exclude(value=value).delete()
                     Facet.objects.filter(key=key, value__iexact=value).exclude(value=value).update(value=value)
                 saved_values.append(value.lower())
 
