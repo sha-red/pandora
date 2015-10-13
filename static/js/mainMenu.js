@@ -4,6 +4,7 @@
 
 pandora.ui.mainMenu = function() {
     var isGuest = pandora.user.level == 'guest',
+        itemViewKey = 1,
         ui = pandora.user.ui,
         findState = pandora.getFindState(ui.find),
         fromMenu = false,
@@ -113,6 +114,9 @@ pandora.ui.mainMenu = function() {
                                 return Ox.extend({
                                     checked: ui.itemView == view.id
                                 }, view, {
+                                    keyboard: itemViewKey <= 10
+                                        ? 'shift ' + (itemViewKey++%10)
+                                        : void 0,
                                     title: Ox._(view.title)
                                 });
                             }) },
@@ -858,6 +862,14 @@ pandora.ui.mainMenu = function() {
         },
         key_shift_t: function() {
             hasTimeline() && pandora.UI.set({showTimeline: !ui.showTimeline});
+        }
+    });
+
+    pandora.site.itemViews.forEach(function(view, i) {
+        if (i < 10) {
+            Ox.Event.bind('key_shift_' + (i + 1) % 10, function() {
+                pandora.UI.set({itemView: view.id});
+            });
         }
     });
 
