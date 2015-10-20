@@ -210,6 +210,12 @@ pandora.ui.infoView = function(data) {
         });
     });
 
+    listKeys.forEach(function(key) {
+        if (Ox.isString(data[key])) {
+            data[key] = [data[key]];
+        }
+    });
+
     if (!canEdit) {
         pandora.createLinks($info);
     }
