@@ -21,16 +21,19 @@ pandora.ui.infoView = function(data) {
         isCopyrighted = !data.year || parseInt(data.year) + 60 >= new Date().getFullYear(),
         listWidth = 0,
         margin = 16,
-        nameKeys = [
-            'director', 'producer', 'codirector', 'writer', 'cinematographer',
-            'editor', 'composer', 'lyricist', 'actor'
-        ],
-        listKeys = nameKeys.concat([
-            'country', 'language', 'color', 'sound', 'genre', 'keyword', 'links'
-        ]),
-        posterKeys = ['title', 'director', 'year'],
         // these may contain commas, and are thus separated by semicolons
         specialListKeys = ['alternativeTitles', 'productionCompany'],
+        nameKeys = pandora.site.itemKeys.filter(function(key) {
+            return key.sortType == 'person';
+        }).map(function(key) {
+            return key.id;
+        }),
+        listKeys = pandora.site.itemKeys.filter(function(key) {
+            return Ox.isArray(key.type) && !Ox.contains(specialListKeys, key.id);
+        }).map(function(key){
+            return key.id;
+        }),
+        posterKeys = ['title', 'director', 'year'],
         descriptions = {
             names: getNames(),
             studios: getStudios()

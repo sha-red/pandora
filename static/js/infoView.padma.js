@@ -18,8 +18,16 @@ pandora.ui.infoView = function(data) {
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         margin = 16,
-        nameKeys = ['director', 'cinematographer', 'featuring'],
-        listKeys = nameKeys.concat(['language', 'topic', 'license', 'groups']),
+        nameKeys = pandora.site.itemKeys.filter(function(key) {
+            return key.sortType == 'person';
+        }).map(function(key) {
+            return key.id;
+        }),
+        listKeys = pandora.site.itemKeys.filter(function(key) {
+            return Ox.isArray(key.type);
+        }).map(function(key){
+            return key.id;
+        }),
         posterKeys = ['title', 'date'],
         statisticsWidth = 128,
 
@@ -203,7 +211,7 @@ pandora.ui.infoView = function(data) {
     });
 
     if (!canEdit) {
-        pandora.createLinks($info);        
+        pandora.createLinks($info);
     }
 
     // Source & Project --------------------------------------------------------
