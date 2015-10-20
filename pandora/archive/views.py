@@ -187,6 +187,8 @@ def addMedia(request, data):
             response['status']['text'] = 'file exists'
         response['data']['item'] = f.item.public_id
         response['data']['itemUrl'] = request.build_absolute_uri('/%s' % f.item.public_id)
+        if not f.available:
+            add_changelog(request, data, f.item.public_id)
     else:
         if 'item' in data:
             i = Item.objects.get(public_id=data['item'])
@@ -215,6 +217,7 @@ def addMedia(request, data):
         f.save()
         response['data']['item'] = i.public_id
         response['data']['itemUrl'] = request.build_absolute_uri('/%s' % i.public_id)
+        add_changelog(request, data, i.public_id)
     return render_to_json_response(response)
 actions.register(addMedia, cache=False)
 
