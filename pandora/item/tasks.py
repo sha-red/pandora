@@ -100,7 +100,7 @@ def update_sitemap(base_url):
     urlset.attrib['xmlns'] = "http://www.sitemaps.org/schemas/sitemap/0.9"
     urlset.attrib['xmlns:xsi'] = "http://www.w3.org/2001/XMLSchema-instance"
     urlset.attrib['xsi:schemaLocation'] = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
-    urlset.attrib['xmlns:video']= "http://www.google.com/schemas/sitemap-video/1.0"
+    urlset.attrib['xmlns:video']= "http://www.google.com/schemas/sitemap-video/1.1"
 
     url = ET.SubElement(urlset, "url")
     loc = ET.SubElement(url, "loc")
@@ -162,6 +162,8 @@ def update_sitemap(base_url):
             if duration > 0:
                 el = ET.SubElement(video, "video:duration")
                 el.text = "%s" % int(duration)
+            el = ET.SubElement(video, "video:live")
+            el.text = "no"
 
     if Text.objects.filter(name='').exclude(text='').exists():
         t = Text.objects.filter(name='')[0]
