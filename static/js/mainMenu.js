@@ -110,7 +110,10 @@ pandora.ui.mainMenu = function() {
                                 Ox._('Open {0}', [Ox._(pandora.site.itemName.singular)]),
                                 Ox._('Open {0}', [Ox._(pandora.site.itemName.plural)])
                             ], items: [
-                            { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
+                            { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.filter(function(view) {
+                                return view.id != 'data' && view.id != 'media' ||
+                                    pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level];
+                            }).map(function(view) {
                                 return Ox.extend({
                                     checked: ui.itemView == view.id
                                 }, view, {
@@ -865,7 +868,10 @@ pandora.ui.mainMenu = function() {
         }
     });
 
-    pandora.site.itemViews.forEach(function(view, i) {
+    pandora.site.itemViews.filter(function(view) {
+        return view.id != 'data' && view.id != 'media' ||
+            pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level];
+    }).forEach(function(view, i) {
         if (i < 10) {
             Ox.Event.bind('key_shift_' + (i + 1) % 10, function() {
                 pandora.UI.set({itemView: view.id});
