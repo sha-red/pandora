@@ -5,6 +5,7 @@
 pandora.ui.mainMenu = function() {
     var isGuest = pandora.user.level == 'guest',
         itemViewKey = 1,
+        listViewKey = 1,
         ui = pandora.user.ui,
         findState = pandora.getFindState(ui.find),
         fromMenu = false,
@@ -67,6 +68,9 @@ pandora.ui.mainMenu = function() {
                                 return Ox.extend({
                                     checked: ui.listView == view.id
                                 }, view, {
+                                    keyboard: listViewKey <= 10
+                                        ? 'shift ' + (listViewKey++%10)
+                                        : void 0,
                                     title: Ox._(view.title)
                                 });
                             }) },
@@ -868,15 +872,22 @@ pandora.ui.mainMenu = function() {
         }
     });
 
-    pandora.site.itemViews.filter(function(view) {
-        return view.id != 'data' && view.id != 'media' ||
-            pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level];
-    }).forEach(function(view, i) {
-        if (i < 10) {
-            Ox.Event.bind('key_shift_' + (i + 1) % 10, function() {
-                pandora.UI.set({itemView: view.id});
-            });
-        }
+    Ox.range(10).forEach(function(i) {
+        Ox.Event.bind('key_shift_' + (i + 1) % 10, function() {
+            var view;
+            if (ui.item) {
+                view = pandora.site.itemViews[i];
+                if (view && (view.id != 'data' && view.id != 'media' ||
+                    pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level])) {
+                    pandora.UI.set({itemView: view.id});
+                }
+            } else {
+                view = pandora.site.listViews[i];
+                if (view) {
+                    pandora.UI.set({listView: view.id});
+                }
+            }
+        });
     });
 
     pandora.clipboard.bindEvent(function(data, event) {
