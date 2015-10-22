@@ -127,6 +127,7 @@ def update_sitemap(base_url):
         priority.text = '1.0'
 
     allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
+    can_play = settings.CONFIG['capabilities']['canPlayVideo']['guest']
     for i in models.Item.objects.filter(level__lte=allowed_level):
         url = ET.SubElement(urlset, "url")
         # URL of the page. This URL must begin with the protocol (such as http)
@@ -141,7 +142,7 @@ def update_sitemap(base_url):
         # priority of page on site values 0.1 - 1.0
         priority = ET.SubElement(url, "priority")
         priority.text = '1.0'
-        if i.rendered:
+        if i.rendered and i.level <= can_play:
             video = ET.SubElement(url, "video:video")
             #el = ET.SubElement(video, "video:content_loc")
             #el.text = absolute_url("%s/video" % i.public_id)
