@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
+import os
+from glob import glob
 
 import ox
 from ox.utils import json
@@ -317,11 +319,11 @@ def thumbnail(request, id, size=256, page=None):
 def upload(request):
     if 'id' in request.GET:
         file = models.Document.get(request.GET['id'])
+    elif 'id' in request.POST:
+        file = models.Document.get(request.POST['id'])
     else:
         file = None
-        extension = request.POST['filename'].split('.')
-        name = '.'.join(extension[:-1])
-        extension = extension[-1].lower()
+        name, extension = request.POST['filename'].rsplit('.', 1)
     response = json_response(status=400, text='this request requires POST')
     if 'chunk' in request.FILES:
         if file.editable(request.user):
@@ -348,8 +350,15 @@ def upload(request):
             file.save()
         else:
             #replace existing file
-            file.file.delete()
+            if file.file:
+                folder = os.path.dirname(file.file.path)
+                for f in glob('%s/*' % folder):
+                    if f != file.file.path:
+                        os.unlink(f)
+                file.file.delete()
             file.uploading = True
+            name, extension = request.POST['filename'].rsplit('.', 1)
+            file.extension = extension
             file.save()
         upload_url = request.build_absolute_uri('/api/upload/document?id=%s' % file.get_id())
         return render_to_json_response({

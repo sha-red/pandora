@@ -1,9 +1,9 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 
-pandora.ui.uploadDocumentDialog = function(files, callback) {
-
-    var extensions = files.map(function(file) {
+pandora.ui.uploadDocumentDialog = function(options, callback) {
+    var files = options.files,
+        extensions = files.map(function(file) {
             return file.name.split('.').pop().toLowerCase()
         }),
 
@@ -137,16 +137,20 @@ pandora.ui.uploadDocumentDialog = function(files, callback) {
     }
 
     function uploadFile(part) {
-        var file = files[part],
+        var data = {
+            },
+            file = files[part],
             extension = file.name.split('.').pop().toLowerCase(),
             filename = file.name.split('.').slice(0, -1).join('.') + '.'
                 + (extension == 'jpeg' ? 'jpg' : extension);
 
             $text.html(Ox._('Uploading {0}', [file.name]));
+            if (options.id) {
+                data.id = options.id;
+            }
+            data.filename = filename;
             upload = pandora.chunkupload({
-                data: {
-                    filename: filename
-                },
+                data: data,
                 file: file,
                 url: '/api/upload/document/',
             })

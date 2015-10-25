@@ -253,7 +253,7 @@ pandora.ui.documentsPanel = function(options) {
                 {id: 'add', title: ''},
                 {id: 'embed', title: Ox._('Embed Document...')},
                 {},
-                {id: 'replace', title: Ox._('Replace {0}...', [Ox._('Document')])},
+                {id: 'replace', title: Ox._('Replace {0}...', [Ox._('Document')]), file: {width: 192}},
                 {id: 'delete', title: '', keyboard: 'delete'}
             ],
             title: 'set',
@@ -276,7 +276,7 @@ pandora.ui.documentsPanel = function(options) {
                 } else if (data.id == 'remove') {
                     removeDocuments();
                 } else if (data.id == 'replace') {
-                    replaceDocument(data.files);
+                    replaceDocument(data);
                 } else if (data.id == 'upload') {
                     uploadDocuments(data);
                 }
@@ -509,8 +509,22 @@ pandora.ui.documentsPanel = function(options) {
         ).open();
     }
 
-    function replaceDocument(file) {
+    function replaceDocument(data) {
         var id = $list.options('selected')[0];
+        pandora.ui.uploadDocumentDialog({
+            files: data.files,
+            id: id
+        }, function(files) {
+            if (files) {
+                Ox.Request.clearCache();
+                $list.bindEventOnce({
+                    load: function() {
+                        $list.options({selected: files.ids});
+                    }
+                })
+                .reloadList();
+            }
+        }).open();
     }
 
     function removeDocuments() {
@@ -816,7 +830,7 @@ pandora.ui.documentsPanel = function(options) {
     function renderList() {
         var options = {
             items: pandora.api.findDocuments,
-            keys: ['description', 'dimensions', 'extension', 'id', 'name', 'ratio', 'size', 'user', 'entities'],
+            keys: ['description', 'dimensions', 'extension', 'id', 'name', 'ratio', 'size', 'user', 'entities', 'modified'],
             query: {
                 conditions: isItemView ? [{ key: 'item', value: ui.item, operator: '==' }] : [],
                 operator: '&'
@@ -845,7 +859,7 @@ pandora.ui.documentsPanel = function(options) {
                     id: data.id,
                     info: info,
                     title: data.name,
-                    url: pandora.getMediaURL('/documents/' + data.id + '/256p.jpg'),
+                    url: pandora.getMediaURL('/documents/' + data.id + '/256p.jpg?' + data.modified),
                     width: Math.round(data.ratio > 1 ? size : size * data.ratio)
                 };
             },
@@ -973,7 +987,6 @@ pandora.ui.documentsPanel = function(options) {
                         hasListSelection && ui.listSelection.length > 1
                         ? 'plural' : 'singular'])
                 ]))
-                .setItemTitle('replace', Ox._('Replace {0}...', [string]))
                 .setItemTitle('delete', Ox._('Delete {0}...',  [string]))
                 [selected.length && (hasItemView || hasListSelection) ? 'enableItem' : 'disableItem']('add')
                 [selected.length ? 'enableItem' : 'disableItem']('embed')
@@ -1035,7 +1048,9 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function uploadDocuments(data) {
-        pandora.ui.uploadDocumentDialog(data.files, function(files) {
+        pandora.ui.uploadDocumentDialog({
+            files: data.files
+        }, function(files) {
             if (files) {
                 Ox.Request.clearCache('findDocuments');
                 $list.bindEventOnce({
