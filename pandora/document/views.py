@@ -359,6 +359,8 @@ def upload(request):
             file.uploading = True
             name, extension = request.POST['filename'].rsplit('.', 1)
             file.extension = extension
+            file.width = -1
+            file.pages = -1
             file.save()
         upload_url = request.build_absolute_uri('/api/upload/document?id=%s' % file.get_id())
         return render_to_json_response({

@@ -520,6 +520,7 @@ pandora.ui.documentsPanel = function(options) {
                 $list.bindEventOnce({
                     load: function() {
                         $list.options({selected: files.ids});
+                        selectDocuments();
                     }
                 })
                 .reloadList();
@@ -915,8 +916,9 @@ pandora.ui.documentsPanel = function(options) {
 
     function renderPreview() {
         var selected = $list.options('selected')[0],
+            modified = $list.value(selected, 'modified'),
             size = getPreviewSize(),
-            src = '/documents/' + selected + '/256p.jpg',
+            src = '/documents/' + selected + '/256p.jpg?' + modified,
             $element = Ox.ImageElement({
                 height: size.height,
                 src: src,

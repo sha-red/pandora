@@ -19,7 +19,7 @@ pandora.openDocumentDialog = function(options) {
                 operator: '|'
             },
             range: [0, options.ids.length],
-            keys: ['description', 'dimensions', 'extension', 'id', 'name']
+            keys: ['description', 'dimensions', 'extension', 'id', 'name', 'modified']
         }, function(result) {
             var i = 0,
                 documents = Ox.sort(result.data.items, function(item) {
@@ -183,9 +183,9 @@ pandora.ui.documentDialog = function(options) {
                         : [],
                     height: dialogHeight,
                     imageHeight: item.dimensions[1],
-                    imagePreviewURL: pandora.getMediaURL('/documents/' + item.id + '/256p.jpg'),
+                    imagePreviewURL: pandora.getMediaURL('/documents/' + item.id + '/256p.jpg?' + item.modified),
                     imageURL: pandora.getMediaURL('/documents/' + item.id + '/'
-                        + item.name + '.' + item.extension),
+                        + item.name + '.' + item.extension + '?' + item.modified),
                     imageWidth: item.dimensions[0],
                     width: dialogWidth
                 })
