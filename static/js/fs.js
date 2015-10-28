@@ -391,7 +391,8 @@ pandora.fs = (function() {
                                     resolution = parseInt(fileEntry.name.split('::')[1].split('p')[0]),
                                     part = parseInt(fileEntry.name.split('::')[1].split('p')[1].split('.')[0]),
                                     key = item + '::' + resolution;
-                                if (!(that.downloads && that.downloads[item])) {
+                                if (!(that.downloads && that.downloads[item]
+                                      && that.downloads[item].resolution == resolution)) {
                                     files[key] = Ox.extend(files[key] || {}, {
                                         added: meta.modificationTime,
                                         id: item + '::' + resolution,
@@ -419,7 +420,8 @@ pandora.fs = (function() {
                                                     var item = prefix.name.split('::')[0],
                                                         resolution = parseInt(prefix.name.split('::')[1]),
                                                         key = item + '::' + resolution;
-                                                    if (!(that.downloads && that.downloads[item])) {
+                                                    if (!(that.downloads && that.downloads[item]
+                                                          && that.downloads[item].resolution == resolution)) {
                                                         files[key] = Ox.extend(files[key] || {}, {
                                                             added: Ox.min(meta.map(function(m) {
                                                                 return m.modificationTime;
