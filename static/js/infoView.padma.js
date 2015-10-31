@@ -593,7 +593,8 @@ pandora.ui.infoView = function(data) {
         var ret;
         if (key == 'date') {
             ret = value ? Ox.formatDate(value,
-                ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length]
+                ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length],
+                true
             ) : '';
         } else if (listKeys.indexOf(key) > -1) {
             ret = value.split(', ');
