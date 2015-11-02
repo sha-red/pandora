@@ -116,10 +116,11 @@ def join_tiles(source_paths, target_path):
         for info in sorted(file_info, key=lambda x: x['index']):
             mode = info['mode']
             source_files[mode].append(path + info['file'])
-            if mode == modes[0]:
-                width = Image.open(source_files[mode][-1]).size[0]
-                durations[i] += width / fps
-                frame_n += width
+    modes = [m for m in modes if source_files[m]]
+    for f in source_files[modes[0]]:
+        width = Image.open(f).size[0]
+        durations[i] += width / fps
+        frame_n += width
     large_tile_n = int(math.ceil(frame_n / large_tile_w)) 
     large_tile_last_w = frame_n % large_tile_w or 60
     small_tile_n = int(math.ceil(frame_n / fps / small_tile_w)) 
