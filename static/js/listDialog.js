@@ -536,6 +536,7 @@ pandora.ui.listIconPanel = function(listData) {
                 frameRatio: itemData.videoRatio,
                 height: 256,
                 id: itemData.id,
+                modified: itemData.modified,
                 position: position,
                 width: 256
             })

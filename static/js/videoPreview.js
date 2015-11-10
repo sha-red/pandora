@@ -14,13 +14,13 @@ pandora.ui.videoPreview = function(data) {
                         : Ox.max(pandora.site.video.resolutions);
                 return pandora.getMediaURL('/' + data.id + '/' + resolution + 'p' + (
                     Ox.isUndefined(position) ? '' : position
-                ) + '.jpg');
+                ) + '.jpg?' + data.modified);
             },
             frameRatio: data.frameRatio,
             height: data.height,
             position: data.position,
             scaleToFill: true,
-            timeline: pandora.getMediaURL('/' + data.id + '/timeline16p.jpg'),
+            timeline: pandora.getMediaURL('/' + data.id + '/timeline16p.jpg?' + data.modified),
             videoTooltip: data.videoTooltip,
             width: data.width
         });
