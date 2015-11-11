@@ -20,8 +20,7 @@ class Migration(SchemaMigration):
         if item.models.Item.objects.all().count():
             for i in item.models.Item.objects.all():
                 item.models.AnnotationSequence.reset(i)
-            for a in item.models.Annotation.objects.filter(public_id=None): a.save()
-            Annotation = orm['annotation.Annotation']
+            Annotation = item.models.Annotation
             AnnotationSequence = item.models.AnnotationSequence
             for annotation in Annotation.objects.filter(public_id=None).order_by('item'):
                 item = annotation.item
