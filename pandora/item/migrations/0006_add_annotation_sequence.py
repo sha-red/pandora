@@ -21,23 +21,23 @@ class Migration(SchemaMigration):
             for i in item.models.Item.objects.all():
                 item.models.AnnotationSequence.reset(i)
             for a in item.models.Annotation.objects.filter(public_id=None): a.save()
-        Annotation = orm['annotation.Annotation']
-        AnnotationSequence = item.models.AnnotationSequence
-        for annotation in Annotation.objects.filter(public_id=None).order_by('item'):
-            item = annotation.item
-            s, created = AnnotationSequence.objects.get_or_create(item=item)
+            Annotation = orm['annotation.Annotation']
+            AnnotationSequence = item.models.AnnotationSequence
+            for annotation in Annotation.objects.filter(public_id=None).order_by('item'):
+                item = annotation.item
+                s, created = AnnotationSequence.objects.get_or_create(item=item)
 
-            if created:
-                nextid = s.value
-            else:
-                cursor = connection.cursor()
-                sql = "UPDATE %s SET value = value + 1 WHERE item_id = %s RETURNING value" % (
-                    AnnotationSequence._meta.db_table, item.id)
-                cursor.execute(sql)
-                nextid = cursor.fetchone()[0]
+                if created:
+                    nextid = s.value
+                else:
+                    cursor = connection.cursor()
+                    sql = "UPDATE %s SET value = value + 1 WHERE item_id = %s RETURNING value" % (
+                        AnnotationSequence._meta.db_table, item.id)
+                    cursor.execute(sql)
+                    nextid = cursor.fetchone()[0]
 
-            annotation.public_id = "%s/%s" % (item.public_id, ox.toAZ(nextid))
-            annotation.save()
+                annotation.public_id = "%s/%s" % (item.public_id, ox.toAZ(nextid))
+                annotation.save()
 
     def backwards(self, orm):
         # Deleting model 'AnnotationSequence'
