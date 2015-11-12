@@ -60,7 +60,9 @@ def supported_formats():
         'mp4': 'libx264' in stdout and 'DEA.L. aac' in stdout,
     }
 
-def stream(video, target, profile, info, audio_track=0):
+
+
+def stream(video, target, profile, info, audio_track=0, flags={}):
     if not os.path.exists(target):
         ox.makedirs(os.path.dirname(target))
 
@@ -144,6 +146,7 @@ def stream(video, target, profile, info, audio_track=0):
         audiobitrate = '22k'
         audiochannels = 1
 
+
     if info['video'] and 'display_aspect_ratio' in info['video'][0]:
         # dont make video bigger
         height = min(height, info['video'][0]['height'])
@@ -155,17 +158,43 @@ def stream(video, target, profile, info, audio_track=0):
         width = int(dar * height)
         width += width % 2
 
-        bitrate = height*width*fps*bpp/1000
         aspect = dar.ratio
         #use 1:1 pixel aspect ratio if dar is close to that
         if abs(width/height - dar) < 0.02:
             aspect = '%s:%s' % (width, height)
 
-        video_settings = [
+        # parse extra falgs
+        if 'crop' in flags:
+            h = info['video'][0]['height'] - flags['crop']['top'] - flags['crop']['bottom']
+            w = info['video'][0]['width'] - flags['crop']['left'] - flags['crop']['right']
+            x = flags['crop']['left']
+            y = flags['crop']['top']
+            crop = ',crop=w=%s:h=%s:x=%s:y=%s' (w, h, x, y)
+            aspect = dar * (info['video'][0]['width'] / info['video'][0]['height']) * (w/h)
+            if abs(w/h - aspect) < 0.02:
+                aspect = '%s:%s' % (w, h)
+        else:
+            crop = ''
+        if 'trim' in flags:
+            trim = []
+            if 'in' in flags['trim']:
+                start = flags['trim']['in']
+                trim += ['-ss', str(start)]
+            if 'out' in flags['trim']:
+                t = info['duration'] - flags['trim'].get('in', 0) - flags['trim']['out']
+                trim += ['-t', str(t)]
+        else:
+            trim = []
+        if 'aspect' in flags:
+            aspect = flags['aspect']
+
+        bitrate = height*width*fps*bpp/1000
+
+        video_settings = trim + [
             '-vb', '%dk'%bitrate,
             '-aspect', aspect,
             #'-vf', 'yadif',
-            '-vf', 'hqdn3d,scale=%s:%s'%(width, height),
+            '-vf', 'hqdn3d%s,scale=%s:%s'%(crop, width, height),
             '-g', '%d' % int(fps*5),
         ]
         if format == 'webm':
