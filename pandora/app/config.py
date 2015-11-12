@@ -35,18 +35,28 @@ def get_version():
             return u'%s' % rev
     return u'unknown'
 
-def load_config():
+def load_config(init=False):
     with open(settings.SITE_CONFIG) as f:
         try:
             config = ox.jsonc.load(f)
-        except:
-            config = None
+        except ValueError as e:
+            if init:
+                print("Failed to parse %s:\n" % settings.SITE_CONFIG)
+                print (e)
+                sys.exit(1)
+            else:
+                config = None
 
     with open(settings.DEFAULT_CONFIG) as f:
         try:
             default = ox.jsonc.load(f)
-        except:
-            default = None
+        except ValueError as e:
+            if init:
+                print("Failed to default config %s:\n" % settings.DEFAULT_CONFIG)
+                print (e)
+                sys.exit(1)
+            else:
+                default = None
 
     if config:
         settings.SITENAME = config['site']['name']
@@ -306,7 +316,7 @@ def update_geoip(force=False):
 
 def init():
     if not settings.RELOADER_RUNNING:
-        load_config()
+        load_config(True)
         if settings.RELOAD_CONFIG:
             thread.start_new_thread(reloader_thread, ())
 
