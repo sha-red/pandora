@@ -112,7 +112,7 @@ if __name__ == "__main__":
             old = int(old)
         if new.isdigit():
             new = int(new)
-        print 'Post Update from %d to %d' % (old, new)
+        print 'Post Update from %s to %s' % (old, new)
         if old < 3111:
             run('bzr', 'resolved', 'pandora/monkey_patch', 'pandora/monkey_patch/migrations')
             if os.path.exists('pandora/monkey_patch'):
@@ -171,6 +171,7 @@ if __name__ == "__main__":
                 os.unlink('REPOSITORY_MOVED_TO_GIT')
             if os.path.exists('.bzr'):
                 shutil.rmtree('.bzr')
+            run('git', 'checkout', 'update.py')
     else:
         if len(sys.argv) == 1:
             release = get_release()
