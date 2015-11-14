@@ -106,8 +106,8 @@ if __name__ == "__main__":
         run('./manage.py', 'update_static')
     elif len(sys.argv) == 4 and sys.argv[1] == 'postupdate':
         os.chdir(base)
-        old = sys.argv[2]
-        new = sys.argv[3]
+        old = sys.argv[2].strip()
+        new = sys.argv[3].strip()
         if old.isdigit():
             old = int(old)
         if new.isdigit():
