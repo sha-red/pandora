@@ -10,6 +10,7 @@ if os.path.exists(activate_this):
     execfile(activate_this, dict(__file__=activate_this))
 
 import sys
+import shutil
 import subprocess
 import urllib2
 import json
@@ -29,28 +30,32 @@ def get_json(url):
     return json.loads(urllib2.urlopen(url).read())
 
 def get_release():
+    if os.path.exists('.release'):
+        url = open('.release').read().strip()
+    else:
+        url = 'https://pan.do/json/release-stable.json'
     try:
-        return get_json('https://pan.do/json/release.json')
+        return get_json(url)
     except:
-        print "failed to load https://pan.do/ra, check your internet connection"
+        print "Failed to load %s check your internet connection." % url
         sys.exit(1)
 
 repos = {
   "pandora": {
-    "url": "http://code.0x2620.org/pandora/", 
-    "path": ".", 
+    "url": "https://git.0x2620.org/pandora.git",
+    "path": ".",
   }, 
   "oxjs": {
-    "url": "http://code.0x2620.org/oxjs/", 
-    "path": "./static/oxjs", 
+    "url": "https://git.0x2620.org/oxjs.git",
+    "path": "./static/oxjs",
   }, 
   "oxtimelines": {
-    "url": "http://code.0x2620.org/oxtimelines/", 
-    "path": "./src/oxtimelines", 
+    "url": "https://git.0x2620.org/oxtimelines.git",
+    "path": "./src/oxtimelines",
   }, 
   "python-ox": {
-    "url": "http://code.0x2620.org/python-ox/", 
-    "path": "./src/python-ox", 
+    "url": "https://git.0x2620.org/python-ox.git",
+    "path": "./src/python-ox",
   }
 }
 
@@ -61,9 +66,7 @@ def check_services(base):
     services = "pandora pandora-tasks pandora-encoding pandora-cron pandora-websocketd".split()
     for service in services:
         cmd = ['service', service, 'status']
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p.wait()
-        if p.returncode != 0:
+        if subprocess.check_call(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) != 0:
             print 'Please install init script for "%s" service:' % service
             if os.path.exists('/etc/init'):
                 print '\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service)
@@ -71,6 +74,14 @@ def check_services(base):
                 print '\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service)
             print '\tsudo service %s start' % service
             print ''
+
+def run_git(path, *args):
+    cmd = ['git'] + list(args)
+    env = {'GIT_DIR': '%s/.git' % path}
+    return subprocess.check_output(cmd, env=env).strip()
+
+def get_version(path):
+    return run_git(path, 'rev-list', 'HEAD', '--count')
 
 if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ('database', 'db'):
@@ -95,8 +106,13 @@ if __name__ == "__main__":
         run('./manage.py', 'update_static')
     elif len(sys.argv) == 4 and sys.argv[1] == 'postupdate':
         os.chdir(base)
-        old = int(sys.argv[2])
-        new = int(sys.argv[3])
+        old = sys.argv[2]
+        new = sys.argv[3]
+        if old.isdigit():
+            old = int(old)
+        if new.isdigit():
+            new = int(new)
+        print 'Post Update from %d to %d' % (old, new)
         if old < 3111:
             run('bzr', 'resolved', 'pandora/monkey_patch', 'pandora/monkey_patch/migrations')
             if os.path.exists('pandora/monkey_patch'):
@@ -138,8 +154,24 @@ if __name__ == "__main__":
         if old < 4947:
             run('./bin/pip', 'install', 'tornado==4.1')
             check_services(base)
+        if old < 5074:
+            for component in ('oxtimelines', 'python-ox'):
+                if not os.path.exists('./src/%s/.git' % component):
+                    run('./bin/pip', 'install', '-e',
+                        'git+https://git.0x2620.org/%s.git#egg=%s' % (component, component),
+                        '--exists-action', 'w')
+            if not os.path.exists('./static/oxjs/.git'):
+                if os.path.exists('static/oxjs'):
+                    shutil.move('static/oxjs', 'static/oxjs_bzr')
+                run('git', 'clone', 'https://git.0x2620.org/oxjs.git', 'static/oxjs')
+                run('./pandora/manage.py', 'update_static')
+                if os.path.exists('static/oxjs_bzr'):
+                    shutil.rmtree('static/oxjs_bzr')
+            if os.path.exists('REPOSITORY_MOVED_TO_GIT'):
+                os.unlink('REPOSITORY_MOVED_TO_GIT')
+            if os.path.exists('.bzr'):
+                shutil.rmtree('.bzr')
     else:
-
         if len(sys.argv) == 1:
             release = get_release()
             repos = release['repositories']
@@ -156,26 +188,29 @@ if __name__ == "__main__":
             path = os.path.join(base, repos[repo]['path'])
             if exists(path):
                 os.chdir(path)
-                revno = get('bzr', 'revno')
+                revno = get_version(path)
                 if repo == 'pandora':
                     pandora_old_revno = revno
                 current += revno
                 url = repos[repo]['url']
                 if 'revision' in repos[repo]:
-                    if int(revno) < repos[repo]['revision']:
-                        run('bzr', 'pull', url, '-r', '%s' % repos[repo]['revision'])
+                    if revno != repos[repo]['revision']:
+                        run('git', 'fetch')
+                        run('git', 'checkout', repos[repo]['commit'])
                 else:
-                    run('bzr', 'pull', url)
-                revno = get('bzr', 'revno')
+                    print 'Checking', repo
+                    run('git', 'checkout', 'master', '-q')
+                    run('git', 'pull')
+                revno = get_version(path)
                 new += revno
                 if repo == 'pandora':
                     pandora_new_revno = revno
             else:
                 os.chdir(os.path.dirname(path))
-                cmd = ['bzr', 'branch', repos[repo]['url']]
-                if 'revision' in repos[repo]:
-                    cmd += ['-r', '%s' % repos[repo]['revision']]
+                cmd = ['git', 'clone', repos[repo]['url']]
                 run(*cmd)
+                if 'revision' in repos[repo]:
+                    run_git(path, 'checkout', repos[repo]['commit'])
                 setup = os.path.join(base, repos[repo]['path'], 'setup.py')
                 if repo in ('python-ox', 'oxtimelines') and os.path.exists(setup):
                     os.chdir(os.path.dirname(setup))
@@ -193,6 +228,6 @@ if __name__ == "__main__":
         if diff != '-- No differences':
             print 'Database has changed, please make a backup and run %s db' % sys.argv[0]
         elif not development:
-            print 'pan.do/ra is at the latest stable release,\nyou can run "%s dev" to update to the development version' % sys.argv[0]
+            print 'pan.do/ra is at the latest release,\nyou can run "%s dev" to update to the development version' % sys.argv[0]
         elif current != new:
             reload_notice(base)

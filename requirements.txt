@@ -1,7 +1,7 @@
 #-e git+https://github.com/django/django.git@stable/1.4.x#egg=django
 Django<1.5
--e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
--e bzr+http://code.0x2620.org/oxtimelines/#egg=oxtimelines
+-e git+https://git.0x2620.org/python-ox.git#egg=python-ox
+-e git+https://git.0x2620.org/oxtimelines.git#egg=oxtimelines
 simplejson
 chardet
 celery==3.0.24

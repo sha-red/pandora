@@ -49,7 +49,6 @@ apt-get install -y \
     pwgen \
     nginx \
     rabbitmq-server \
-    bzr \
     git \
     python-setuptools \
     python-pip \
@@ -86,8 +85,8 @@ rabbitmqctl add_vhost /pandora
 rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 
 #pandora
-bzr branch http://code.0x2620.org/pandora /srv/pandora
-bzr branch http://code.0x2620.org/oxjs /srv/pandora/static/oxjs
+git clone https://git.0x2620.org/pandora.git /srv/pandora
+git clone https://git.0x2620.org/oxjs.git /srv/pandora/static/oxjs
 virtualenv --system-site-packages /srv/pandora
 cd /srv/pandora
 ./bin/pip install -r /srv/pandora/requirements.txt

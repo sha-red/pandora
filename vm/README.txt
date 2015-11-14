@@ -32,9 +32,6 @@ Login via ssh or in terminal as pandora with password pandora
 
   ssh pandora@pandora.local
 
-Adjust your bzr configuration with bzr whoami:
- bzr whoami "Pando the Panda <pan.do@pan.do>"
-
 Pan.do/ra is installed in /srv/pandora and is served with nginx on http://pandora.local
 
 

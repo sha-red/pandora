@@ -24,7 +24,7 @@ To run pan.do/ra you need to install and setup:
     apt-get update
 
 2) install all required packages
-    apt-get install bzr git subversion mercurial \
+    apt-get install git subversion mercurial \
             python-setuptools python-pip python-virtualenv ipython \
             python-dev python-imaging python-numpy python-psycopg2 \
             python-geoip python-html5lib python-lxml \
@@ -54,15 +54,15 @@ You have to use the same password here and in BROKER_URL in local_settings.py
 
 === Install Pan.do/ra ===
 
-1) Get code from bazzar
+1) Get code from git
     cd /srv/
-    bzr branch http://code.0x2620.org/pandora pandora
+    git clone https://git.0x260.org/pandora.git pandora
     cd pandora
     virtualenv --system-site-packages .
     ./bin/pip install -r requirements.txt
 
     cd static
-    bzr branch http://code.0x2620.org/oxjs
+    git clone https://git.0x2620.org/oxjs.git
 
     cd /srv
     chown -R pandora.pandora pandora

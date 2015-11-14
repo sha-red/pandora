@@ -5,9 +5,11 @@ from __future__ import division, with_statement
 import os
 import sys
 import shutil
+import subprocess
 import time
 import thread
 import codecs
+from os.path import dirname, exists, join
 from glob import glob
 
 from django.conf import settings
@@ -26,14 +28,20 @@ RUN_RELOADER = True
 NOTIFIER = None
 
 def get_version():
-    info = os.path.join(os.path.dirname(__file__), '..', '..', '.bzr/branch/last-revision')
-    if os.path.exists(info):
+    info = join(dirname(dirname(dirname(__file__))), '.bzr', 'branch', 'last-revision')
+    git_dir = join(dirname(dirname(dirname(__file__))), '.git')
+    if exists(git_dir):
+        env = {'GIT_DIR': git_dir}
+        cmd = ['git', 'rev-list', 'HEAD', '--count']
+        return subprocess.check_output(cmd, env=env).strip()
+    elif exists(info):
         f = open(info)
         rev = int(f.read().split()[0])
         f.close()
         if rev:
             return u'%s' % rev
-    return u'unknown'
+    else:
+        return u'unknown'
 
 def load_config(init=False):
     with open(settings.SITE_CONFIG) as f:
