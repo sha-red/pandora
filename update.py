@@ -66,7 +66,9 @@ def check_services(base):
     services = "pandora pandora-tasks pandora-encoding pandora-cron pandora-websocketd".split()
     for service in services:
         cmd = ['service', service, 'status']
-        if subprocess.check_call(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) != 0:
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p.wait()
+        if p.returncode != 0:
             print 'Please install init script for "%s" service:' % service
             if os.path.exists('/etc/init'):
                 print '\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service)
