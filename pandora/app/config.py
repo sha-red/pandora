@@ -96,11 +96,11 @@ def load_config(init=False):
 
 
         #add missing defaults
-        for section in (
+        for section in sorted((
             'capabilities', 'cantPlay', 'entities', 'itemName', 'itemTitleKeys', 'media', 'posters',
             'site', 'tv', 'user.ui', 'user.ui.part', 'user.ui.showFolder',
             'menuExtras', 'languages'
-        ):
+        )):
             parts = map(lambda p: p.replace('\0', '\\.'), section.replace('\\.', '\0').split('.'))
             #print 'checking', section
             c = config
@@ -117,23 +117,26 @@ def load_config(init=False):
             if isinstance(d, list):
                 if not c and section not in ('entities', ):
                     c += d
-                    sys.stderr.write("adding default value for %s = %s\n" % (
-                        section, str(d)))
+                    sys.stderr.write("adding default value:\n\t\"%s\": %s,\n\n" % (
+                        section, json.dumps(d)))
             else:
-                for key in d:
+                added = []
+                for key in sorted(d):
                     if key not in c:
-                        sys.stderr.write("adding default value for %s.%s = %s\n" % (
-                            section, key, str(d[key])))
+                        added.append("\"%s\": %s," % (key, json.dumps(d[key])))
                         c[key] = d[key]
+                if added:
+                    sys.stderr.write("adding default %s:\n\t" % section)
+                    sys.stderr.write("\n\t".join(added) + '\n\n')
         for key in ('language', ):
             if not key in config:
-                sys.stderr.write("adding default value for %s = %s\n" % (key, default[key]))
+                sys.stderr.write("adding default value:\n\t\"%s\": %s,\n\n" % (key, json.dumps(default[key])))
                 config[key] = default[key]
 
         key = get_by_id(config['itemKeys'], 'title')
-        if not 'autocompleteSort' in key:
+        if not 'autocompleteSort' in key or True:
             key['autocompleteSort'] = get_by_id(default['itemKeys'], 'title')['autocompleteSort']
-            sys.stderr.write("adding default value for itemKeys.title.autocompleteSort = %r\n" % key['autocompleteSort'])
+            sys.stderr.write("adding default value to itemKeys.title.autocompleteSort:\n\t\"autocompleteSort\": %s\n\n" % json.dumps(key['autocompleteSort']))
 
         old_formats = getattr(settings, 'CONFIG', {}).get('video', {}).get('formats', [])
         formats = config.get('video', {}).get('formats')
