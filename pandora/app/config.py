@@ -134,7 +134,7 @@ def load_config(init=False):
                 config[key] = default[key]
 
         key = get_by_id(config['itemKeys'], 'title')
-        if not 'autocompleteSort' in key or True:
+        if not 'autocompleteSort' in key:
             key['autocompleteSort'] = get_by_id(default['itemKeys'], 'title')['autocompleteSort']
             sys.stderr.write("adding default value to itemKeys.title.autocompleteSort:\n\t\"autocompleteSort\": %s\n\n" % json.dumps(key['autocompleteSort']))
 
