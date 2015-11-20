@@ -220,8 +220,9 @@ def addAnnotations(request, data):
     '''
     for key in ('item', 'layer', 'annotations'):
         if key not in data:
-            return render_to_json_response(json_response(status=400,
-                                                         text='invalid data'))
+            return render_to_json_response(json_response(
+                status=400,
+                text='invalid data (missing "{}")'.format(key)))
 
     item = get_object_or_404_json(Item, public_id=data['item'])
     
