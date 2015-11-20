@@ -1617,7 +1617,7 @@ class Item(models.Model):
             value = value.replace('<br/>', '<br>').replace('<br>\n', '\n').replace('<br>', '\n')
             value = value.replace('\n\n', '<br>\n')
             return value
-        annotations = self.annotations.filter(layer=layer)
+        annotations = self.annotations.filter(layer=layer).exclude(value='')
         if language:
             annotations = annotations.filter(languages__contains=language)
         return ox.srt.encode([{
