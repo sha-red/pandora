@@ -448,7 +448,8 @@ pandora.ui.list = function() {
                 ) {
                     list = data.query.conditions[0].value;
                     folder = pandora.getListData(list).folder;
-                    if (pandora.$ui.folderList[folder]) {
+                    if (pandora.$ui.folderList[folder]
+                        && !Ox.isEmpty(pandora.$ui.folderList[folder].value(list))) {
                         pandora.$ui.folderList[folder].value(
                             list, 'items', data.items
                         );
