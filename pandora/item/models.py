@@ -942,7 +942,7 @@ class Item(models.Model):
         for key in ('hue', 'saturation', 'lightness'):
             if key in self.data:
                 setattr(s, key, self.data.get(key, None))
-        s.numberofannotations = self.annotations.count()
+        s.numberofannotations = self.annotations.exclude(value='').count()
         s.numberofcuts = len(self.data.get('cuts', []))
         s.numberofdocuments = self.documents.count()
         if s.duration:
