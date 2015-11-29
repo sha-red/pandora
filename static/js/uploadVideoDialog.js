@@ -162,10 +162,10 @@ pandora.ui.uploadVideoDialog = function(data) {
                         uploadStream(item, info, file);
                     });
                 },
-                function(progress) {
+                Ox.throttle(function(progress) {
                     progress = JSON.parse(progress).progress || 0;
                     $progress.options({progress: progress});
-                }
+                }, 1000)
             );
         });
     }
