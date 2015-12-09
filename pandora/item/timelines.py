@@ -83,7 +83,7 @@ def join_tiles(source_paths, target_path):
                     )
                     data['target_images']['small'].save(image_file)
                     #print image_file
-            if mode == 'antialias':
+            if mode == full_tile_mode:
                 # render full tile
                 resized = data['target_images']['large'].resize((
                     data['full_tile_widths'][0], large_tile_h
@@ -127,6 +127,7 @@ def join_tiles(source_paths, target_path):
     large_tile_last_w = frame_n % large_tile_w or 60
     small_tile_n = int(math.ceil(frame_n / fps / small_tile_w)) 
     small_tile_last_w = int(math.ceil(frame_n / fps)) % small_tile_w or small_tile_w
+    full_tile_mode = modes[0]
 
     # open full timeline
     if large_tile_n == 1:
@@ -168,10 +169,10 @@ def join_tiles(source_paths, target_path):
         save_and_open(data)
 
     # save full timelines
-    image_file = '%stimelineantialias%dp.jpg' % (target_path, large_tile_h)
+    image_file = '%stimeline%s%dp.jpg' % (target_path, full_tile_mode, large_tile_h)
     data['target_images']['full'].save(image_file)
     #print image_file
-    image_file = '%stimelineantialias%dp.jpg' % (target_path, small_tile_h)
+    image_file = '%stimeline%s%dp.jpg' % (target_path, full_tile_mode, small_tile_h)
     data['target_images']['full'].resize(
         (full_tile_w, small_tile_h), Image.ANTIALIAS
     ).save(image_file)

@@ -1401,6 +1401,9 @@ class Item(models.Model):
 
         frame = self.get_poster_frame_path()
         timeline = '%stimelineantialias64p.jpg' % self.timeline_prefix
+        audio_timeline = '%stimelineaudio64p.jpg' % self.timeline_prefix
+        if not os.path.exists(timeline) and os.path.exists(audio_timeline):
+            timeline = audio_timeline
 
         cmd = [settings.ITEM_POSTER,
                '-d', '-',
