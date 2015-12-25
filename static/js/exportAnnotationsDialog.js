@@ -120,14 +120,18 @@ pandora.ui.exportAnnotationsDialog = function(options) {
                     out: annotation.out,
                     text: text
                 };
-            });
-        $link.attr({
-            download: options.title + ' - '
-                + Ox.getObjectById(layers, layer).title + '.' + format,
-            href: 'data:text/plain;base64,' + btoa(Ox.encodeUTF8(
+            }),
+            blob = new Blob([Ox.encodeUTF8(
                 format == 'json'
                 ? JSON.stringify(items, null, '    ')
                 : Ox.formatSRT(items)
+            )], {type: 'text/plain'}),
+            url = window.URL.createObjectURL(blob);
+
+        $link.attr({
+            download: options.title + ' - '
+                + Ox.getObjectById(layers, layer).title + '.' + format,
+            href: url,
             ))
         });
     }
