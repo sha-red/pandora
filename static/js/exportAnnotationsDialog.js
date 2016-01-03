@@ -132,7 +132,6 @@ pandora.ui.exportAnnotationsDialog = function(options) {
             download: options.title + ' - '
                 + Ox.getObjectById(layers, layer).title + '.' + format,
             href: url,
-            ))
         });
     }
 
