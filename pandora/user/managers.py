@@ -102,11 +102,12 @@ class SessionDataManager(Manager):
 
         #join query with operator
         qs = self.get_query_set()
-        
+
         query = data.get('query', {})
         conditions = parseConditions(query.get('conditions', []),
                                      query.get('operator', '&'),
                                      user)
         if conditions:
             qs = qs.filter(conditions)
+        qs = qs.distinct()
         return qs
