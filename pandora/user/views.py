@@ -27,7 +27,6 @@ from changelog.models import add_changelog
 
 import models
 from decorators import capability_required_json
-import persona
 
 
 def get_user_or_404(data):
@@ -62,9 +61,7 @@ def signin(request, data):
     }
     see: signout, signup
     '''
-    if 'assertion' in data:
-        response = persona.signin(request)
-    elif 'username' in data and 'password' in data:
+    if 'username' in data and 'password' in data:
         data['username'] = data['username'].strip()
         if settings.AUTH_CHECK_USERNAME:
             qs = User.objects.filter(username__iexact=data['username'])

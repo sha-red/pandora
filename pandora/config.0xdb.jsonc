@@ -812,7 +812,6 @@
     */
     "menuExtras": [
         "user",
-        //"persona",
         //"locale",
         "reload"
     ],
