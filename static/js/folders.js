@@ -31,11 +31,12 @@ pandora.ui.folders = function(section) {
         var extras, $select;
         if (folder.id == 'personal') {
             if (pandora.user.level == 'guest') {
-                extras = [
-                    infoButton(Ox._('Personal ' + folderItems),
-                        Ox._('To create and share your own lists of {0}, please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLowerCase())]),
-                        Ox._('To create and share your own {0}, please sign up or sign in.', [section]))
-                ];
+                extras = [infoButton(
+                    Ox._('Personal ' + folderItems),
+                    section == 'items'
+                    ? Ox._('To create and share your own lists of {0}, please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLowerCase())]),
+                    : Ox._('To create and share your own {0}, please sign up or sign in.', [section])
+                )];
             } else {
                 if (section == 'items') {
                     extras = [
@@ -185,8 +186,10 @@ pandora.ui.folders = function(section) {
             }
         } else if (folder.id == 'favorite') {
             if (pandora.user.level == 'guest') {
-                extras = [infoButton(Ox._('Favorite ' + folderItems),
-                    Ox._('To browse and subscribe to {0} shared by other users, please sign up or sign in.', [Ox._(folderItems.toLowerCase())]))];
+                extras = [infoButton(
+                    Ox._('Favorite ' + folderItems),
+                    Ox._('To browse and subscribe to {0} shared by other users, please sign up or sign in.', [Ox._(folderItems.toLowerCase())])
+                )];
             } else {
                 extras = [pandora.$ui.manageListsButton['favorite'] = Ox.Button({
                     selectable: true,
@@ -234,9 +237,10 @@ pandora.ui.folders = function(section) {
             }
         } else if (folder.id == 'featured') {
             if (!canEditFeatured) {
-                extras = [infoButton(Ox._('Featured ' + folderItems),
-                    Ox._('Featured {0} are selected public {0}, picked by the {1} staff.',
-                        [Ox._(folderItems.toLowerCase()), pandora.site.site.name]))];
+                extras = [infoButton(
+                    Ox._('Featured ' + folderItems),
+                    Ox._('Featured {0} are selected public {0}, picked by the {1} staff.', [Ox._(folderItems.toLowerCase()), pandora.site.site.name])
+                )];
             } else {
                 extras = [pandora.$ui.manageListsButton['featured'] = Ox.Button({
                     selectable: true,
@@ -291,8 +295,10 @@ pandora.ui.folders = function(section) {
             }
         } else if (folder.id == 'volumes') {
             if (pandora.user.level == 'guest') {
-                extras = [infoButton(Ox._('Local Volumes'), Ox._('To import {0} from a local disk, please sign up or sign in.',
-                    [Ox._(pandora.site.itemName.plural.toLocaleLowerCase())]))];
+                extras = [infoButton(
+                    Ox._('Local Volumes'),
+                    Ox._('To import {0} from a local disk, please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLocaleLowerCase())])
+                )];
             } else {
                 extras = [Ox.MenuButton({
                     items: [
