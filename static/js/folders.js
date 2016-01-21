@@ -34,7 +34,7 @@ pandora.ui.folders = function(section) {
                 extras = [infoButton(
                     Ox._('Personal ' + folderItems),
                     section == 'items'
-                    ? Ox._('To create and share your own lists of {0}, please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLowerCase())]),
+                    ? Ox._('To create and share your own lists of {0}, please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLowerCase())])
                     : Ox._('To create and share your own {0}, please sign up or sign in.', [section])
                 )];
             } else {
