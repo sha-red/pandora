@@ -85,7 +85,7 @@ pandora.ui.clipList = function(videoRatio) {
                     // add possible layer conditions from query
                     if (ui._list) {
                         pandora.api.getList({id: ui._list}, function(result) {
-                            if (result.data.type == 'smart') {
+                            if (result.data.type == 'smart' && result.data.query.conditions) {
                                 addConditions(query, result.data.query.conditions);
                                 query.operator = result.data.query.operator;
                             }
