@@ -10,7 +10,7 @@ import unicodedata
 from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth.models import User
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_init
 from django.conf import settings
 
 import ox
@@ -232,9 +232,22 @@ class Entity(models.Model):
         import annotation.models
         import annotation.tasks
 
+        if self.name == self._original_name:
+            return
+
         entity_layers = [l['id'] for l in settings.CONFIG['layers'] if l['type'] == 'entity']
         if entity_layers:
             annotation.tasks.update_annotations.delay(entity_layers, self.get_id())
+
+
+def entity_post_init(sender, instance, **kwargs):
+    instance._original_name = instance.name
+
+
+post_init.connect(
+    entity_post_init,
+    sender=Entity,
+)
 
 
 class DocumentProperties(models.Model):
