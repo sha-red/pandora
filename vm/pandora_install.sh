@@ -85,8 +85,8 @@ rabbitmqctl add_vhost /pandora
 rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 
 #pandora
-git clone https://git.0x2620.org/pandora.git /srv/pandora
-git clone https://git.0x2620.org/oxjs.git /srv/pandora/static/oxjs
+git clone --depth 1 https://git.0x2620.org/pandora.git /srv/pandora
+git clone --depth 1 https://git.0x2620.org/oxjs.git /srv/pandora/static/oxjs
 virtualenv --system-site-packages /srv/pandora
 cd /srv/pandora
 ./bin/pip install -r /srv/pandora/requirements.txt

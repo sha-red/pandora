@@ -165,7 +165,7 @@ if __name__ == "__main__":
             if not os.path.exists('./static/oxjs/.git'):
                 if os.path.exists('static/oxjs'):
                     shutil.move('static/oxjs', 'static/oxjs_bzr')
-                run('git', 'clone', 'https://git.0x2620.org/oxjs.git', 'static/oxjs')
+                run('git', 'clone', '--depth', '1', 'https://git.0x2620.org/oxjs.git', 'static/oxjs')
                 run('./pandora/manage.py', 'update_static')
                 if os.path.exists('static/oxjs_bzr'):
                     shutil.rmtree('static/oxjs_bzr')
@@ -210,7 +210,7 @@ if __name__ == "__main__":
                     pandora_new_revno = revno
             else:
                 os.chdir(os.path.dirname(path))
-                cmd = ['git', 'clone', repos[repo]['url']]
+                cmd = ['git', 'clone', '--depth', '1', repos[repo]['url']]
                 run(*cmd)
                 if 'revision' in repos[repo]:
                     run_git(path, 'checkout', repos[repo]['commit'])
