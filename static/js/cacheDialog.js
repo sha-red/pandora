@@ -134,17 +134,41 @@ pandora.ui.cacheDialog = function() {
             .appendTo($item),
 
         $fileButton = Ox.FileButton({
-                title: 'Select Video...',
+                title: 'Select Videos...',
                 width: 128,
-                disabled: pandora.user.ui.section != 'items'
-                    || pandora.user.ui.item == ''
-                    || !!pandora.fs.getVideoURL(pandora.user.ui.item, pandora.user.ui.videoResolution, 1)
+                disabled: false,
             })
             .css({
                 margin: '8px'
             })
             .bindEvent({
-                click: selectVideo
+                click: function selectVideos(data) {
+                    $fileButton.options({disabled: true});
+                    var files = [];
+                    for (var i = 0; i < data.files.length; i++) {
+                        files.push(data.files[i]);
+                    }
+                    Ox.serialForEach(files, function(blob, index, array, next) {
+                        Ox.oshash(blob, function(oshash) {
+                            pandora.api.getMediaInfo({id: oshash}, function(result) {
+                                var index = parseInt(result.data.index || 1);
+                                if (result.data.item && result.data.resolution) {
+                                    pandora.fs.cacheBlob(blob, result.data.item, result.data.resolution, index, function(response) {
+                                        next();
+                                    });
+                                } else {
+                                    next();
+                                }
+                            });
+                        });
+                    }, function() {
+                        $fileButton.options({disabled: false});
+                        getCachedVideos(function(files) {
+                            cachedVideos = Ox.api(files);
+                            $list.reloadList(true);
+                        });
+                    });
+                }
             })
             .appendTo($item),
 
@@ -306,17 +330,6 @@ pandora.ui.cacheDialog = function() {
                     cachedVideos = Ox.api(files);
                     $list.reloadList(true);
                 });
-            });
-        });
-    }
-
-    function selectVideo(data) {
-        var blob = data.files[0],
-            name = pandora.fs.getVideoName(pandora.user.ui.item, pandora.user.ui.videoResolution, 1);
-        pandora.fs.storeBlob(blob, name, function() {
-            getCachedVideos(function(files) {
-                cachedVideos = Ox.api(files);
-                cachedVideos(data, callback);
             });
         });
     }

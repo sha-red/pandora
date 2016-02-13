@@ -666,15 +666,21 @@ def getMediaInfo(request, data):
         id: string // oshash of media file
     }
     returns {
-        item: string, // item id
-        file: string // oshash of source file
+        item: string,   // item id
+        file: string    // oshash of source file
+        resolution: int // stream resolution
+        index: int      // stream index
     }
     '''
     f = None
+    resolution = None
+    index = None
     qs = models.Stream.objects.filter(oshash=data['id'])
     if qs.count() > 0:
         s = qs[0]
         f = s.file
+        resolution = s.resolution
+        index = s.get_index()
     else:
         qs = models.File.objects.filter(oshash=data['id'])
         if qs.count() > 0:
@@ -685,6 +691,10 @@ def getMediaInfo(request, data):
             'file': f.oshash,
             'item': f.item.public_id
         }
+        if resolution:
+            response['data']['resolution'] = resolution
+        if index:
+            response['data']['index'] = index
     return render_to_json_response(response)
 actions.register(getMediaInfo)
 

@@ -711,6 +711,16 @@ class Stream(models.Model):
         _self.update_status(ok, error)
         return _self
 
+    def get_index(self):
+        index = 1
+        for s in self.file.item.streams():
+            if self.source and self.source == s:
+                return index
+            if s == self:
+                return index
+            index += 1
+        return None
+
     def update_status(self, ok, error):
         if ok:
             if not self.media:

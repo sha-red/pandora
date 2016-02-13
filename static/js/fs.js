@@ -170,6 +170,20 @@ pandora.fs = (function() {
 
     };
 
+    that.cacheBlob = function(blob, id, resolution, index, callback) {
+        var key = id[0] + '/' + id + '::' + resolution,
+            name = that.getVideoName(id, resolution, index);
+        createTree(key, function(folder) {
+            that.storeBlob(blob, name[0] + '/' + name, function(response) {
+                if (response.progress == -1) {
+                    callback(response);
+                } else {
+                    that.storeBlob(new Blob(['ok']), key + '/done', callback);
+                }
+            });
+        });
+    };
+
     that.getVideoName = function(id, resolution, part, track) {
         return pandora.getVideoURLName(id, resolution, part, track).replace(id + '\/', id + '::' + resolution + '/');
     };
