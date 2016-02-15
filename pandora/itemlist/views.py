@@ -80,7 +80,10 @@ def findLists(request, data):
         return x['key'] == 'status' and \
                x['value'] == 'featured' and \
                x['operator'] in ('=', '==')
-    is_featured = len(filter(is_featured_condition, data['query'].get('conditions', []))) > 0 
+    is_featured = any(
+        is_featured_condition(x)
+        for x in data.get('query', {}).get('conditions', [])
+    )
 
     if is_section_request:
         qs = query['qs']

@@ -116,8 +116,9 @@ class DocumentManager(Manager):
 
         #join query with operator
         qs = self.get_query_set()
-        conditions = parseConditions(data['query'].get('conditions', []),
-                                     data['query'].get('operator', '&'),
+        query = data.get('query', {})
+        conditions = parseConditions(query.get('conditions', []),
+                                     query.get('operator', '&'),
                                      user, item)
         if conditions:
             qs = qs.filter(conditions)

@@ -148,7 +148,7 @@ def _order_query(qs, sort, item=None):
     return qs
 
 def get_item(query):
-    for c in query.get('conditions'):
+    for c in query.get('conditions', []):
         if c.get('key') == 'item':
             return c.get('value')
     return None
@@ -161,7 +161,7 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Document.objects.find(data, user).exclude(name='')
-    query['item'] = get_item(data['query'])
+    query['item'] = get_item(data.get('query', {}))
     return query
 
 
