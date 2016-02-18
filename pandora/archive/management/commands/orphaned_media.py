@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
+
 from django.core.management.base import BaseCommand
 from django.conf import settings
 import os
@@ -18,4 +20,4 @@ class Command(BaseCommand):
         for f in glob(os.path.join(settings.MEDIA_ROOT, 'media', '*', '*', '*', '*')):
             oshash = f[-19:].replace('/', '')
             if models.File.objects.filter(oshash=oshash).count() == 0:
-                print f
+                print(f)

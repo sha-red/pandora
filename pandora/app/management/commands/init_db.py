@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
+
 from django.core.management.base import BaseCommand
 from django.conf import settings
 import os
@@ -11,7 +13,7 @@ def run(cmd):
     stdout, stderr = p.communicate()
 
     if p.returncode != 0:
-        print stderr
+        print(stderr)
         sys.exit(1)
 
 class Command(BaseCommand):
@@ -21,7 +23,7 @@ class Command(BaseCommand):
     args = ''
 
     def handle(self, **options):
-        print 'initializing database...'
+        print('initializing database...')
         manage_py = sys.argv[0]
         for cmd in [
             [manage_py, 'syncdb', '--noinput'],

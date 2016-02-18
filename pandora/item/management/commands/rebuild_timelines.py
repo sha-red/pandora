@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
 
 import os
 from glob import glob
@@ -25,6 +26,6 @@ class Command(BaseCommand):
             for i in models.Item.objects.all().order_by('id')[offset:offset+chunk]:
                 if not os.path.exists(os.path.join(i.timeline_prefix, 'cuts.json')) or \
                    not glob('%s/timelinekeyframes16p0.jpg'%i.timeline_prefix):
-                    print i.public_id
+                    print(i.public_id)
                     tasks.rebuild_timeline.delay(i.public_id)
             offset += chunk

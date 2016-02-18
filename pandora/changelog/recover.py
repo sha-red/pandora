@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import models
 import item.models
 import user.models
@@ -52,7 +54,7 @@ def recover_item(id):
     i.save()
     i.update_sort()
     i.update_find()
-    print 'created', i, i.id
+    print('created', i, i.id)
 
     for a in models.Changelog.objects.filter(value__contains='id": "%s/' % id).order_by('created'):
         qs = i.annotations.filter(public_id=a.value['id'])

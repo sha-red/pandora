@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
+
 from django.core.management.base import BaseCommand
 from django.db import connection
 
@@ -16,6 +18,6 @@ class Command(BaseCommand):
             table_name = south.models.MigrationHistory._meta.db_table
             cursor = connection.cursor()
             db_rows = connection.introspection.get_table_description(cursor, table_name)
-            print "yes"
+            print("yes")
         except:
-            print "no"
+            print("no")

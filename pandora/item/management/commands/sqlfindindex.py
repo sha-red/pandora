@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
+
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
@@ -27,7 +29,7 @@ class Command(BaseCommand):
         def create_index(index, table, key):
             sql = 'CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)' % (index, table, key)
             if options['debug']:
-                print sql
+                print(sql)
             cursor.execute(sql)
 
         if settings.DB_GIN_TRGM:

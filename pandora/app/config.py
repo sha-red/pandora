@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, with_statement, print_function
 
 import os
 import sys
@@ -50,7 +50,7 @@ def load_config(init=False):
         except ValueError as e:
             if init:
                 print("Failed to parse %s:\n" % settings.SITE_CONFIG)
-                print (e)
+                print(e)
                 sys.exit(1)
             else:
                 config = None
@@ -61,7 +61,7 @@ def load_config(init=False):
         except ValueError as e:
             if init:
                 print("Failed to default config %s:\n" % settings.DEFAULT_CONFIG)
-                print (e)
+                print(e)
                 sys.exit(1)
             else:
                 default = None
@@ -102,7 +102,7 @@ def load_config(init=False):
             'menuExtras', 'languages'
         )):
             parts = map(lambda p: p.replace('\0', '\\.'), section.replace('\\.', '\0').split('.'))
-            #print 'checking', section
+            #print('checking', section)
             c = config
             d = default
             while len(parts):
@@ -225,7 +225,7 @@ def reloader_thread():
 def update_static():
     oxjs_build = os.path.join(settings.STATIC_ROOT, 'oxjs/tools/build/build.py')
     if os.path.exists(oxjs_build):
-        print 'update oxjs'
+        print('update oxjs')
         os.system('%s >/dev/null' % oxjs_build)
 
     data = ''
@@ -250,12 +250,12 @@ def update_static():
     js += [
         'png/icon.png',
     ]
-    print 'write', pandora_js
+    print('write', pandora_js)
     data = ox.js.minify(data)
     with open(pandora_js, 'w') as f:
         f.write(data)
 
-    print 'write', pandora_json
+    print('write', pandora_json)
     with open(pandora_json, 'w') as f:
         json.dump(sorted(js), f, indent=2)
 
@@ -283,11 +283,11 @@ def update_static():
             locale = json.load(fd)
         site_locale = f.replace('locale.pandora', 'locale.' + settings.CONFIG['site']['id'])
         locale_file = f.replace('locale.pandora', 'locale')
-        print 'write', locale_file
-        print '    adding', f
+        print('write', locale_file)
+        print('    adding', f)
         if os.path.exists(site_locale):
             with open(site_locale) as fdl:
-                print '    adding', site_locale
+                print('    adding', site_locale)
                 locale.update(json.load(fdl))
         with codecs.open(locale_file, "w", "utf-8") as fd:
             json.dump(locale, fd, ensure_ascii=False)
@@ -311,7 +311,7 @@ def update_geoip(force=False):
     path = os.path.join(settings.GEOIP_PATH, 'GeoLiteCity.dat')
     if not os.path.exists(path) or force:
         url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
-        print 'download', url
+        print('download', url)
         ox.net.save_url(url, "%s.gz"%path)
         if os.path.exists(path):
             os.unlink(path)
@@ -319,7 +319,7 @@ def update_geoip(force=False):
     path = os.path.join(settings.GEOIP_PATH, 'GeoLiteCityv6.dat')
     if not os.path.exists(path) or force:
         url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz'
-        print 'download', url
+        print('download', url)
         ox.net.save_url(url, "%s.gz"%path)
         if os.path.exists(path):
             os.unlink(path)

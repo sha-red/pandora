@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-
-from __future__ import division, with_statement
+from __future__ import division, with_statement, print_function
 
 import math
 import os
@@ -57,7 +56,7 @@ def join_tiles(source_paths, target_path):
                     target_path, mode, large_tile_h, large_tile_i
                 )
                 data['target_images']['large'].save(image_file)
-                #print image_file
+                #print(image_file)
             if mode != 'keyframes':
                 # open small tile
                 small_tile_i = int(large_tile_i / 60)
@@ -82,7 +81,7 @@ def join_tiles(source_paths, target_path):
                         target_path, small_mode, small_tile_h, small_tile_i
                     )
                     data['target_images']['small'].save(image_file)
-                    #print image_file
+                    #print(image_file)
             if mode == full_tile_mode:
                 # render full tile
                 resized = data['target_images']['large'].resize((
@@ -171,12 +170,12 @@ def join_tiles(source_paths, target_path):
     # save full timelines
     image_file = '%stimeline%s%dp.jpg' % (target_path, full_tile_mode, large_tile_h)
     data['target_images']['full'].save(image_file)
-    #print image_file
+    #print(image_file)
     image_file = '%stimeline%s%dp.jpg' % (target_path, full_tile_mode, small_tile_h)
     data['target_images']['full'].resize(
         (full_tile_w, small_tile_h), Image.ANTIALIAS
     ).save(image_file)
-    #print image_file
+    #print(image_file)
 
     # join cuts
     cuts = []
@@ -187,7 +186,7 @@ def join_tiles(source_paths, target_path):
             with open(p, 'r') as f:
                 path_cuts = json.load(f)
         else:
-            print p, 'missing'
+            print(p, 'missing')
             path_cuts = []
         if i > 0:
             cuts.append(offset)
@@ -207,7 +206,7 @@ def split_tiles(path, paths, durations):
     tiles = {}
     for file_name in file_names:
         mode = re.split('\d+', file_name[8:])[0]
-        print file_name, mode
+        print(file_name, mode)
         split = re.split('[a-z]+', file_name[8 + len(mode):-4])
         height, index = map(lambda x: int(x) if len(x) else -1, split)
         if not mode in tiles:
@@ -216,7 +215,7 @@ def split_tiles(path, paths, durations):
             tiles[mode][height] = 0
         if index + 1 > tiles[mode][height]:
             tiles[mode][height] = index + 1
-    print tiles
+    print(tiles)
 
     # for each mode
     for mode in tiles:
@@ -264,5 +263,5 @@ def split_tiles(path, paths, durations):
                     paths[target_data[i]['item']], mode, height, target_data[i]['tile']
                 )
                 # target_image.save(file_name)
-                print file_name, target_image.size
+                print(file_name, target_image.size)
 

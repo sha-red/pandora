@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function
 import os.path
 import mimetypes
 import random
@@ -168,7 +168,7 @@ def find(request, data):
     see: add, edit, get, lookup, remove, upload
     '''
     if settings.JSON_DEBUG:
-        print json.dumps(data, indent=2)
+        print(json.dumps(data, indent=2))
     query = parse_query(data, request.user)
 
     response = json_response({})

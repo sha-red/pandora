@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
@@ -102,17 +103,17 @@ class Command(BaseCommand):
                     sql = 'BEGIN'
                     changes.append(sql)
         if changes:
-            print "Updating database schema..."
+            print("Updating database schema...")
             for sql in changes:
                 if options['debug']:
-                    print sql
+                    print(sql)
                 cursor.execute(sql)
             transaction.commit_unless_managed()
             if rebuild:
-                print "Updating sort values..."
+                print("Updating sort values...")
                 ids = [i['id'] for i in models.Item.objects.all().values('id')]
                 for id in ids:
                     i = models.Item.objects.get(pk=id)
                     if options['debug']:
-                        print i
+                        print(i)
                     i.update_sort()

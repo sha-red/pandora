@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from __future__ import print_function
 import os
 
 base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
@@ -37,7 +38,7 @@ def get_release():
     try:
         return get_json(url)
     except:
-        print "Failed to load %s check your internet connection." % url
+        print("Failed to load %s check your internet connection." % url)
         sys.exit(1)
 
 repos = {
@@ -60,7 +61,7 @@ repos = {
 }
 
 def reload_notice(base):
-    print '\nPlease restart pan.do/ra to finish the update:\n\tsudo %s/ctl reload\n' % base
+    print('\nPlease restart pan.do/ra to finish the update:\n\tsudo %s/ctl reload\n' % base)
 
 def check_services(base):
     services = "pandora pandora-tasks pandora-encoding pandora-cron pandora-websocketd".split()
@@ -69,13 +70,13 @@ def check_services(base):
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.wait()
         if p.returncode != 0:
-            print 'Please install init script for "%s" service:' % service
+            print('Please install init script for "%s" service:' % service)
             if os.path.exists('/etc/init'):
-                print '\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service)
+                print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
             if os.path.exists('/lib/systemd/system'):
-                print '\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service)
-            print '\tsudo service %s start' % service
-            print ''
+                print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
+            print('\tsudo service %s start' % service)
+            print('')
 
 def run_git(path, *args):
     cmd = ['git'] + list(args)
@@ -90,19 +91,19 @@ if __name__ == "__main__":
         os.chdir(join(base, 'pandora'))
         if get('./manage.py', 'south_installed').strip() == 'yes':
             run('./manage.py', 'syncdb')
-            print '\nRunning "./manage.py migrate"\n'
+            print('\nRunning "./manage.py migrate"\n')
             run('./manage.py', 'migrate')
             run('./manage.py', 'sqlfindindex')
             run('./manage.py', 'sync_itemsort')
             reload_notice(base)
         else:
-            print "You are upgrading from an older version of pan.do/ra."
-            print "Please use ./manage.py sqldiff -a to check for updates"
-            print "and apply required changes. You might have to set defaults too."
-            print "Once done run:"
-            print "\tcd %s" % os.path.abspath(os.curdir)
-            print "\t./manage.py migrate --all --fake"
-            print "Check http://wiki.0x2620.org/wiki/pandora/DatabaseUpdate for more information"
+            print("You are upgrading from an older version of pan.do/ra.")
+            print("Please use ./manage.py sqldiff -a to check for updates")
+            print("and apply required changes. You might have to set defaults too.")
+            print("Once done run:")
+            print("\tcd %s" % os.path.abspath(os.curdir))
+            print("\t./manage.py migrate --all --fake")
+            print("Check http://wiki.0x2620.org/wiki/pandora/DatabaseUpdate for more information")
     elif len(sys.argv) == 2 and sys.argv[1] == 'static':
         os.chdir(join(base, 'pandora'))
         run('./manage.py', 'update_static')
@@ -114,7 +115,7 @@ if __name__ == "__main__":
             old = int(old)
         if new.isdigit():
             new = int(new)
-        print 'Post Update from %s to %s' % (old, new)
+        print('Post Update from %s to %s' % (old, new))
         if old < 3111:
             run('bzr', 'resolved', 'pandora/monkey_patch', 'pandora/monkey_patch/migrations')
             if os.path.exists('pandora/monkey_patch'):
@@ -201,7 +202,7 @@ if __name__ == "__main__":
                         run('git', 'fetch')
                         run('git', 'checkout', repos[repo]['commit'])
                 else:
-                    print 'Checking', repo
+                    print('Checking', repo)
                     run('git', 'checkout', 'master', '-q')
                     run('git', 'pull')
                 revno = get_version(path)
@@ -229,8 +230,8 @@ if __name__ == "__main__":
         os.chdir(join(base, 'pandora'))
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
-            print 'Database has changed, please make a backup and run %s db' % sys.argv[0]
+            print('Database has changed, please make a backup and run %s db' % sys.argv[0])
         elif not development:
-            print 'pan.do/ra is at the latest release,\nyou can run "%s dev" to update to the development version' % sys.argv[0]
+            print('pan.do/ra is at the latest release,\nyou can run "%s dev" to update to the development version' % sys.argv[0])
         elif current != new:
             reload_notice(base)

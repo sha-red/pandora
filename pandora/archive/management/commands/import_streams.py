@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
+
 from django.core.management.base import BaseCommand
 from django.conf import settings
 import os
@@ -28,8 +30,8 @@ class Command(BaseCommand):
                     resolution = int(profile)
                     qs = models.Stream.objects.filter(file__oshash=oshash, format=format, resolution=resolution)
                     if qs.count() == 0:
-                        print 'add', f
-                        print oshash, resolution, format
+                        print('add', f)
+                        print(oshash, resolution, format)
                         qs = models.File.objects.filter(oshash=oshash)
                         if qs.count() == 1:
                             stream = models.Stream()
@@ -48,6 +50,6 @@ class Command(BaseCommand):
         for s in models.Stream.objects.exclude(format=format, resolution=resolution).filter(source=None):
             s.source = models.Stream.objects.get(file=s.file, resolution=resolution, format=format)
             s.save()
-        print "update streams"
+        print("update streams")
         for s in models.Stream.objects.filter(source=None):
             update_stream.delay(s.id)

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
+
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
@@ -26,7 +28,7 @@ class Command(BaseCommand):
             try:
                 i = models.Item.objects.get(pk=id)
                 if options['debug']:
-                    print i
+                    print(i)
                 i.update_facets()
                 i.update_sort()
                 i.update_find()

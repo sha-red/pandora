@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -25,7 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 4:
-            print self.usage('import_srt')
+            print(self.usage('import_srt'))
             return 
         username, public_id, layer_id, filename = args
         user = User.objects.get(username=username)
@@ -33,7 +34,7 @@ class Command(BaseCommand):
         layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
 
         annotations = ox.srt.load(filename)
-        print 'importing %d annotations into %s/%s' % (len(annotations), public_id, layer_id)
+        print('importing %d annotations into %s/%s' % (len(annotations), public_id, layer_id))
         for i in range(len(annotations)-1):
             if annotations[i]['out'] == annotations[i+1]['in']:
                 annotations[i]['out'] = annotations[i]['out'] - 0.001

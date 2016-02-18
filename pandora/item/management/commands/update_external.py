@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
+
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
@@ -27,9 +29,9 @@ class Command(BaseCommand):
         qs = models.Item.objects.exclude(public_id__startswith='0x')
         count = pos = qs.count()
         while (options['all'] and offset <= count) or offset < options['items']:
-            print offset, pos, count
+            print(offset, pos, count)
             for i in qs.order_by('modified')[:chunk]:
-                print pos, i.public_id, i.modified
+                print(pos, i.public_id, i.modified)
                 i.update_external()
                 pos -= 1
             offset += chunk

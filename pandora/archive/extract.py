@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, with_statement, print_function
 
 import os
 from os.path import exists
@@ -272,7 +272,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
     else:
         cmd += [enc_target]
 
-    #print cmd
+    #print(cmd)
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.STDOUT,
@@ -289,7 +289,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         return False, stdout
     if format == 'mp4':
         cmd = ['qt-faststart', "%s.mp4" % enc_target, enc_target]
-        #print cmd
+        #print(cmd)
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                                   stdout=open('/dev/null', 'w'),
                                   stderr=subprocess.STDOUT,
@@ -311,7 +311,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
 
 
 def run_command(cmd, timeout=10):
-    #print cmd
+    #print(cmd)
     p = subprocess.Popen(cmd, stdout=open('/dev/null', 'w'),
                               stderr=subprocess.STDOUT,
                               close_fds=True)
@@ -425,7 +425,7 @@ def timeline(video, prefix, modes=None, size=None):
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         close_fds=True)
-    #print cmd
+    #print(cmd)
     #p = subprocess.Popen(cmd)
     p.wait()
 
@@ -535,7 +535,7 @@ def timeline_strip(item, cuts, info, prefix):
                 widths = divide(duration, frames)
                 frame = frame
                 if _debug:
-                    print widths, duration, frames, cuts[c], cuts[c + 1]
+                    print(widths, duration, frames, cuts[c], cuts[c + 1])
                 for s in range(int(frames)):
                     frame_ratio = widths[s] / timeline_height
                     if video_ratio > frame_ratio:
@@ -547,7 +547,7 @@ def timeline_strip(item, cuts, info, prefix):
                         top = int((video_height - height) / 2)
                         box = (0, top, video_width, top + height)
                     if _debug:
-                        print frame, 'cut', c, 'frame', s, frame, 'width', widths[s], box
+                        print(frame, 'cut', c, 'frame', s, frame, 'width', widths[s], box)
                     #FIXME: why does this have to be frame+1?
                     frame_image = Image.open(item.frame((frame+1)/fps))
                     frame_image = frame_image.crop(box).resize((widths[s], timeline_height), Image.ANTIALIAS)
@@ -559,7 +559,7 @@ def timeline_strip(item, cuts, info, prefix):
         if x == timeline_width - 1:
             timeline_file = '%sStrip64p%04d.png' % (prefix, i)
             if _debug:
-                print 'writing', timeline_file
+                print('writing', timeline_file)
             timeline_image.save(timeline_file)
 
 

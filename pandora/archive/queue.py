@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function
 
 from datetime import datetime
 import time
@@ -52,7 +52,7 @@ def fill_queue():
         elif f.data:
             f.extract_stream()
         else:
-            print 'not sure what to do with' ,f
+            print('not sure what to do with' ,f)
             check.append(f)
         in_queue.append(f.oshash)
     for f in File.objects.filter(encoding=True).exclude(oshash__in=in_queue):
@@ -61,7 +61,7 @@ def fill_queue():
         elif f.data:
             f.extract_stream()
         else:
-            print 'not sure what to do with' ,f
+            print('not sure what to do with' ,f)
             check.append(f)
     return check
 
