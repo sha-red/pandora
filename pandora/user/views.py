@@ -3,10 +3,10 @@
 import random
 random.seed()
 import re
+import json
 
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext, loader
-from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
 from django.shortcuts import redirect

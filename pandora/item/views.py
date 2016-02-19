@@ -14,7 +14,7 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.core.files.temp import NamedTemporaryFile
-from django.core.servers.basehttp import FileWrapper
+from wsgiref.util import FileWrapper
 from django.conf import settings
 
 from ox.utils import json, ET

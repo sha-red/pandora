@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import os
 
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, include
 from ox.django.http import HttpFileResponse
 
 from django.conf import settings
@@ -28,7 +28,7 @@ urlpatterns = patterns('',
     (r'^api/upload/?$', 'archive.views.firefogg_upload'),
     (r'^url=(?P<url>.*)$', 'app.views.redirect_url'),
     (r'^file/(?P<oshash>.*)$', 'archive.views.lookup_file'),
-    (r'^api/?$', include(ox.django.api.urls)),
+    (r'^api/?', include(ox.django.api.urls)),
     (r'^resetUI$', 'user.views.reset_ui'),
     (r'^documents/(?P<id>[A-Z0-9]+)/(?P<size>\d*)p(?P<page>[\d,]*).jpg$', 'document.views.thumbnail'),
     (r'^documents/(?P<id>[A-Z0-9]+)/(?P<name>.*?\.[^\d]{3})$', 'document.views.file'),

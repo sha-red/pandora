@@ -7,7 +7,8 @@ from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
-from django.contrib.gis.utils import GeoIP
+from django.contrib.gis.geoip import GeoIP
+
 
 import ox
 from ox.django.fields import DictField
