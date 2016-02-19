@@ -16,7 +16,8 @@ class Channel(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     run = models.IntegerField(default=0)
-    list = models.ForeignKey('itemlist.List', related_name='channel', null=True, unique=True, blank=True)
+    list = models.OneToOneField('itemlist.List', related_name='channel', null=True, blank=True)
+    #list = models.ForeignKey('itemlist.List', related_name='channel', null=True, unique=True, blank=True)
 
     def __unicode__(self):
         return u"%s %s" % (self.list or 'All', self.run)

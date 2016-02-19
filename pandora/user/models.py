@@ -23,7 +23,7 @@ import tasks
 
 class SessionData(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
-    user = models.ForeignKey(User, unique=True, null=True, blank=True, related_name='data')
+    user = models.OneToOneField(User, null=True, blank=True, related_name='data')
     firstseen = models.DateTimeField(auto_now_add=True, db_index=True)
     lastseen = models.DateTimeField(default=datetime.now, db_index=True)
     username = models.CharField(max_length=255, null=True, db_index=True)
@@ -87,7 +87,7 @@ class SessionData(models.Model):
     def save(self, *args, **kwargs):
         if self.user:
             self.username = self.user.username
-            self.level = self.user.get_profile().level
+            self.level = self.user.profile.level
             self.firstseen = self.user.date_joined
             if self.user.groups.exists():
                 self.groupssort = ''.join([g.name for g in self.user.groups.all()])
@@ -160,7 +160,7 @@ class SessionData(models.Model):
             'windowsize': self.windowsize,
         }
         if self.user:
-            p = self.user.get_profile()
+            p = self.user.profile
             j['disabled'] = not self.user.is_active
             j['email'] = self.user.email
             j['groups'] = [g.name for g in self.user.groups.all()]
@@ -176,7 +176,7 @@ class SessionData(models.Model):
 
 class UserProfile(models.Model):
     reset_code = models.CharField(max_length=255, blank=True, null=True, unique=True)
-    user = models.ForeignKey(User, unique=True, related_name='profile')
+    user = models.OneToOneField(User, related_name='profile')
 
     level = models.IntegerField(default=1)
     files_updated = models.DateTimeField(default=datetime.now)
@@ -343,7 +343,7 @@ def init_user(user, request=None):
         result = settings.CONFIG['user'].copy()
         result['ui'] = get_ui(json.loads(request.session.get('ui', '{}')))
     else:
-        profile = user.get_profile()
+        profile = user.profile
         result = {}
         for key in ('username', ):
             result[key] = getattr(user, key)
@@ -357,7 +357,7 @@ def init_user(user, request=None):
     return result
 
 def user_json(user, keys=None):
-    p = user.get_profile()
+    p = user.profile
     j = {
         'disabled': not user.is_active,
         'email': user.email,
@@ -381,7 +381,7 @@ def has_capability(user, capability):
     if user.is_anonymous():
         level = 'guest'
     else:
-        level = user.get_profile().get_level()
+        level = user.profile.get_level()
     return level in settings.CONFIG['capabilities'][capability] \
             and settings.CONFIG['capabilities'][capability][level]
 

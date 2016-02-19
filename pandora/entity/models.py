@@ -102,7 +102,7 @@ class Entity(models.Model):
         if not user or user.is_anonymous():
             return False
         if user.is_staff or \
-           user.get_profile().capability('canEditEntities') == True or \
+           user.profile.capability('canEditEntities') == True or \
            (item and item.editable(user)):
             return True
         return False

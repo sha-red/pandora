@@ -98,7 +98,7 @@ def parseCondition(condition, user, owner=None):
     if (not exclude and op == '=' or op in ('$', '^')) and v == '':
         return Q()
     elif k == 'filename' and (user.is_anonymous() or \
-        not user.get_profile().capability('canSeeMedia')):
+        not user.profile.capability('canSeeMedia')):
         return Q(id=0)
     elif k == 'oshash':
         return Q(files__oshash=v)
@@ -117,7 +117,7 @@ def parseCondition(condition, user, owner=None):
             q = ~q
         return q
     elif k in ('canplayvideo', 'canplayclips'):
-        level = user.is_anonymous() and 'guest' or user.get_profile().get_level()
+        level = user.is_anonymous() and 'guest' or user.profile.get_level()
         allowed_level = settings.CONFIG['capabilities'][{
             'canplayvideo': 'canPlayVideo',
             'canplayclips': 'canPlayClips'
@@ -326,7 +326,7 @@ class ItemManager(Manager):
             rendered_q = Q(rendered=True)
         #users can see public items, there own items and items of there groups
         else:
-            level = user.get_profile().get_level()
+            level = user.profile.get_level()
             allowed_level = settings.CONFIG['capabilities']['canSeeItem'][level]
             q = Q(level__lte=allowed_level)|Q(user=user)
             rendered_q = Q(rendered=True)|Q(user=user)

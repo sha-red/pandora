@@ -170,7 +170,7 @@ def addAnnotation(request, data):
     
     layer_id = data['layer']
     layer = get_by_id(settings.CONFIG['layers'], layer_id)
-    if layer['canAddAnnotations'].get(request.user.get_profile().get_level()):
+    if layer['canAddAnnotations'].get(request.user.profile.get_level()):
         if layer['type'] == 'entity':
             try:
                 value = Entity.get_by_name(ox.decode_html(data['value']), layer['entity']).get_id()
@@ -229,7 +229,7 @@ def addAnnotations(request, data):
     layer_id = data['layer']
     layer = get_by_id(settings.CONFIG['layers'], layer_id)
     if item.editable(request.user) \
-        and layer['canAddAnnotations'].get(request.user.get_profile().get_level()):
+        and layer['canAddAnnotations'].get(request.user.profile.get_level()):
         response = json_response()
         data['user'] = request.user.username
         t = add_annotations.delay(data)

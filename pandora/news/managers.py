@@ -114,7 +114,7 @@ class NewsManager(Manager):
         if conditions:
             qs = qs.filter(conditions)
         if user:
-            if not user.get_profile().get_level() in ('staff', 'admin'):
+            if not user.profile.get_level() in ('staff', 'admin'):
                 qs = qs.filter(Q(public=True)|Q(user=user))
         else:
             qs = qs.filter(public=True)

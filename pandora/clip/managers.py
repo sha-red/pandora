@@ -219,7 +219,7 @@ class ClipManager(Manager):
             qs = qs.filter(sort__rightslevel__lte=allowed_level)
         #users can see public clips, there own clips and clips of there groups
         else:
-            allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.get_profile().get_level()]
+            allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.profile.get_level()]
             q = Q(sort__rightslevel__lte=allowed_level)|Q(user=user.id)
             if user.groups.count():
                 q |= Q(item__groups__in=user.groups.all())

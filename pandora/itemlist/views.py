@@ -394,7 +394,7 @@ def sortLists(request, data):
     }.get(section,section)
     #ids = list(set(data['ids']))
     ids = data['ids']
-    if section == 'featured' and not request.user.get_profile().capability('canEditFeaturedLists'):
+    if section == 'featured' and not request.user.profile.capability('canEditFeaturedLists'):
         response = json_response(status=403, text='not allowed')
     else:
         user = request.user

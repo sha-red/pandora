@@ -99,7 +99,7 @@ def getText(request, data):
                     'name': '',
                     'text': '',
                     'type': 'html',
-                    'editable': not request.user.is_anonymous() and request.user.get_profile().capability('canEditFeaturedTexts')
+                    'editable': not request.user.is_anonymous() and request.user.profile.capability('canEditFeaturedTexts')
             }
         else:
             text = qs[0]
@@ -140,7 +140,7 @@ def editText(request, data):
     else:
         qs = models.Text.objects.filter(name='')
         if qs.count() == 0:
-            if request.user.get_profile().capability('canEditFeaturedTexts'):
+            if request.user.profile.capability('canEditFeaturedTexts'):
                 text = models.Text(name='', user=request.user)
                 text.save()
             else:
@@ -331,7 +331,7 @@ def sortTexts(request, data):
     }.get(section,section)
     #ids = list(set(data['ids']))
     ids = data['ids']
-    if section == 'featured' and not request.user.get_profile().capability('canEditFeaturedTexts'):
+    if section == 'featured' and not request.user.profile.capability('canEditFeaturedTexts'):
         response = json_response(status=403, text='not allowed')
     else:
         user = request.user

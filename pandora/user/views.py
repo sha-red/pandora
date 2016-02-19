@@ -116,7 +116,7 @@ def signout(request, data):
     response = json_response(text='ok')
     if request.user.is_authenticated():
         uid = request.user.id
-        profile = request.user.get_profile()
+        profile = request.user.profile
         if profile.ui.get('page') == 'signout':
             profile.ui['page'] = ''
             profile.save()
@@ -201,7 +201,7 @@ def signup(request, data):
             user = authenticate(username=data['username'],
                                 password=data['password'])
             if ui:
-                profile = user.get_profile()
+                profile = user.profile
                 profile.ui = ui
                 profile.save()
 
@@ -245,7 +245,7 @@ def resetPassword(request, data):
                 user = qs[0].user
                 user.set_password(data['password'])
                 user.save()
-                user_profile = user.get_profile()
+                user_profile = user.profile
                 user_profile.reset_code = None
                 user_profile.save()
                 user = authenticate(username=user.username, password=data['password'])
@@ -301,7 +301,7 @@ def requestToken(request, data):
                                           ox.fromAZ('AAAAAAAAAAAAAAAAA')))
             if models.UserProfile.objects.filter(reset_code=code).count() == 0:
                 break
-        user_profile = user.get_profile()
+        user_profile = user.profile
         user_profile.reset_code = code 
         user_profile.save()
 
@@ -349,7 +349,7 @@ def editUser(request, data):
     response = json_response()
     user = get_object_or_404_json(User, pk=ox.fromAZ(data['id']))
 
-    profile = user.get_profile()
+    profile = user.profile
     if 'disabled' in data:
         user.is_active = not data['disabled']
     if 'email' in data:
@@ -567,7 +567,7 @@ def mail(request, data):
     see: contact
     '''
     response = json_response()
-    p = request.user.get_profile()
+    p = request.user.profile
     if p.capability('canSendMail'):
         email_from = '"%s" <%s>' % (settings.SITENAME, settings.CONFIG['site']['email']['system'])
         headers = {
@@ -707,14 +707,14 @@ def editPreferences(request, data):
             change = True
             request.user.email = ox.escape_html(data['email'])
     if 'newsletter' in data:
-        profile = request.user.get_profile()
+        profile = request.user.profile
         profile.newsletter = data['newsletter']
         profile.save()
     if 'password' in data:
         change = True
         request.user.set_password(data['password'])
     if 'script' in data:
-        profile = request.user.get_profile()
+        profile = request.user.profile
         profile.preferences['script'] = data['script']
         profile.save()
     if change:
@@ -727,7 +727,7 @@ actions.register(editPreferences, cache=False)
 
 def reset_ui(request):
     if request.user.is_authenticated():
-        profile = request.user.get_profile()
+        profile = request.user.profile
         profile.ui = {}
         profile.save()
     else:
@@ -744,7 +744,7 @@ def resetUI(request, data):
     '''
     response = json_response()
     if request.user.is_authenticated():
-        profile = request.user.get_profile()
+        profile = request.user.profile
         profile.ui = {}
         profile.save()
     else:
@@ -765,7 +765,7 @@ def setUI(request, data):
     see: resetUI
     '''
     if request.user.is_authenticated():
-        profile = request.user.get_profile()
+        profile = request.user.profile
         ui = profile.ui
     else:
         ui = json.loads(request.session.get('ui', '{}'))

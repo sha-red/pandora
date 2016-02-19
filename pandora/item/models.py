@@ -206,7 +206,7 @@ class Item(models.Model):
         if user.is_anonymous():
             level = 'guest'
         else:
-            level = user.get_profile().get_level()
+            level = user.profile.get_level()
         editable = self.editable(user)
         if editable:
             return True
@@ -220,7 +220,7 @@ class Item(models.Model):
     def editable(self, user):
         if user.is_anonymous():
             return False
-        if user.get_profile().capability('canEditMetadata') == True or \
+        if user.profile.capability('canEditMetadata') == True or \
            user.is_staff or \
            self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0:
@@ -346,7 +346,7 @@ class Item(models.Model):
         update_ids = False
         if not self.id:
             if self.user:
-                self.level = settings.CONFIG['rightsLevel'][self.user.get_profile().get_level()]
+                self.level = settings.CONFIG['rightsLevel'][self.user.profile.get_level()]
             else:
                 self.level = settings.CONFIG['rightsLevel']['member']
             if not self.public_id:
@@ -1139,7 +1139,7 @@ class Item(models.Model):
 
     def get_files(self, user):
         files = self.files.all().select_related()
-        if user.get_profile().get_level() != 'admin':
+        if user.profile.get_level() != 'admin':
             files = files.filter(instances__volume__user=user)
         return [f.json() for f in files]
 
@@ -1779,7 +1779,7 @@ class Description(models.Model):
 
 
 class AnnotationSequence(models.Model):
-    item = models.ForeignKey('Item', related_name='_annotation_sequence', unique=True)
+    item = models.OneToOneField('Item', related_name='_annotation_sequence')
     value = models.BigIntegerField(default=1)
 
     @classmethod

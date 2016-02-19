@@ -305,7 +305,7 @@ class File(models.Model):
         return srt
 
     def editable(self, user):
-        p = user.get_profile()
+        p = user.profile
         return p.get_level() in ('admin', 'staff') or \
             (not self.available and p.capability('canAddItems')) or \
             self.instances.filter(volume__user=user).count() > 0 or \

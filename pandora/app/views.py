@@ -133,7 +133,7 @@ def editPage(request, data):
     }
     see: getPage
     '''
-    if request.user.get_profile().capability('canEditSitePages'):
+    if request.user.profile.capability('canEditSitePages'):
         page, created = models.Page.objects.get_or_create(name=data['name'])
         page.text = ox.sanitize_html(data['text'])
         page.save()

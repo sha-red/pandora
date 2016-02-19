@@ -83,7 +83,7 @@ def update(request, data):
         t = tasks.update_files.delay(user.username, data['volume'], data['files'])
         response['data']['taskId'] = t.task_id
 
-        user_profile = user.get_profile()
+        user_profile = user.profile
         user_profile.files_updated = datetime.now()
         user_profile.save()
 
@@ -179,7 +179,7 @@ def addMedia(request, data):
     '''
     response = json_response({})
     oshash = data.pop('id')
-    if not request.user.get_profile().capability('canAddItems'):
+    if not request.user.profile.capability('canAddItems'):
         response = json_response(status=403, text='permission denied')
     elif models.File.objects.filter(oshash=oshash).count() > 0:
         f = models.File.objects.get(oshash=oshash)
@@ -496,7 +496,7 @@ def removeMedia(request, data):
     see: addMedia, editMedia, findMedia, moveMedia
     '''
     response = json_response()
-    if request.user.get_profile().get_level() == 'admin':
+    if request.user.profile.get_level() == 'admin':
         qs = models.File.objects.filter(oshash__in=data['ids'], instances__id=None)
         selected = set([f.item.id for f in qs if f.selected])
         items = list(set([f.item.id for f in qs]))

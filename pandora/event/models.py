@@ -74,7 +74,7 @@ class Event(models.Model):
         if user and not user.is_anonymous() \
             and (not self.user or \
                  self.user == user or \
-                 user.get_profile().capability('canEditEvents')):
+                 user.profile.capability('canEditEvents')):
                 return True
         return False
      

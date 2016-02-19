@@ -131,7 +131,7 @@ class Edit(models.Model):
             return False
         if self.user == user or \
            user.is_staff or \
-           user.get_profile().capability('canEditFeaturedEdits') == True:
+           user.profile.capability('canEditFeaturedEdits') == True:
             return True
         return False
 
@@ -151,7 +151,7 @@ class Edit(models.Model):
                         pos.section = 'personal'
                         pos.save()
                 elif value == 'featured':
-                    if user.get_profile().capability('canEditFeaturedEdits'):
+                    if user.profile.capability('canEditFeaturedEdits'):
                         pos, created = Position.objects.get_or_create(edit=self, user=user,
                                                                              section='featured')
                         if created:
@@ -527,7 +527,7 @@ class Position(models.Model):
 
     edit = models.ForeignKey(Edit, related_name='position')
     user = models.ForeignKey(User, related_name='edit_position')
-    section = models.CharField(max_length='255')
+    section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
     def __unicode__(self):

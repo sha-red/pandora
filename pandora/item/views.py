@@ -504,7 +504,7 @@ def add(request, data):
     notes: To allow for this, set config option `itemRequiresVideo` to false.
     see: edit, find, get, lookup, remove, upload
     '''
-    if not request.user.get_profile().capability('canAddItems'):
+    if not request.user.profile.capability('canAddItems'):
         response = json_response(status=403, text='permission denied')
     else:
         data['title'] = data.get('title', 'Untitled')
@@ -542,13 +542,13 @@ def edit(request, data):
     if item.editable(request.user):
         response = json_response(status=200, text='ok')
         if 'rightslevel' in data:
-            if request.user.get_profile().capability('canEditRightsLevel') == True:
+            if request.user.profile.capability('canEditRightsLevel') == True:
                 item.level = int(data['rightslevel'])
             else:
                 response = json_response(status=403, text='permission denied')
             del data['rightslevel']
         if 'user' in data:
-            if request.user.get_profile().get_level() in ('admin', 'staff') and \
+            if request.user.profile.get_level() in ('admin', 'staff') and \
                 models.User.objects.filter(username=data['user']).exists():
                 new_user = models.User.objects.get(username=data['user'])
                 if new_user != item.user:
@@ -556,7 +556,7 @@ def edit(request, data):
                     update_clips = True
             del data['user']
         if 'groups' in data:
-            if not request.user.get_profile().capability('canManageUsers'):
+            if not request.user.profile.capability('canManageUsers'):
                 # Users wihtout canManageUsers can only add/remove groups they are not in
                 groups = set([g.name for g in item.groups.all()])
                 user_groups = set([g.name for g in request.user.groups.all()])
@@ -588,7 +588,7 @@ def remove(request, data):
     response = json_response({})
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     user = request.user
-    if user.get_profile().capability('canRemoveItems') == True or \
+    if user.profile.capability('canRemoveItems') == True or \
            user.is_staff or \
            item.user == user or \
            item.groups.filter(id__in=user.groups.all()).count() > 0:
@@ -1016,7 +1016,7 @@ def atom_xml(request):
 
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     if not request.user.is_anonymous():
-        level = request.user.get_profile().level
+        level = request.user.profile.level
     for item in models.Item.objects.filter(level__lte=level, rendered=True).order_by('-created')[:7]:
         if add_updated:
             updated = ET.SubElement(feed, "updated")
@@ -1185,7 +1185,7 @@ def sitemap_xml(request):
 def item_json(request, id):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     if not request.user.is_anonymous():
-        level = request.user.get_profile().level
+        level = request.user.profile.level
     qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
         response = json_response(status=404, text='not found')
@@ -1198,7 +1198,7 @@ def item_json(request, id):
 def item_xml(request, id):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     if not request.user.is_anonymous():
-        level = request.user.get_profile().level
+        level = request.user.profile.level
     qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
         response = json_response(status=404, text='not found')
@@ -1237,7 +1237,7 @@ def item(request, id):
     template = 'index.html'
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     if not request.user.is_anonymous():
-        level = request.user.get_profile().level
+        level = request.user.profile.level
     qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
         context = RequestContext(request, {

@@ -103,7 +103,7 @@ class Document(models.Model):
             return False
         if self.user == user or \
            user.is_staff or \
-           user.get_profile().capability('canEditDocuments') == True or \
+           user.profile.capability('canEditDocuments') == True or \
            (item and item.editable(user)):
             return True
         return False

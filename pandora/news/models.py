@@ -19,7 +19,7 @@ class News(models.Model):
     text = models.TextField()
 
     def editable(self, user):
-        return user.is_authenticated() and user.get_profile().capability("canEditSitePages")
+        return user.is_authenticated() and user.profile.capability("canEditSitePages")
 
     def save(self, *args, **kwargs):
         super(News, self).save(*args, **kwargs)

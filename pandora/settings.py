@@ -108,9 +108,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'django.contrib.humanize',
 
-    'django_extensions',
-    'devserver',
-    'south',
+    #'django_extensions',
     'djcelery',
     'app',
     'log',
@@ -246,3 +244,6 @@ except NameError:
             Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
 
 INSTALLED_APPS = tuple(list(INSTALLED_APPS) + LOCAL_APPS)
+
+ALLOWED_HOSTS = ['*']
+

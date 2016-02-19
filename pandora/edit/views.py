@@ -491,7 +491,7 @@ def sortEdits(request, data):
     }.get(section,section)
     #ids = list(set(data['ids']))
     ids = data['ids']
-    if section == 'featured' and not request.user.get_profile().capability('canEditFeaturedEdits'):
+    if section == 'featured' and not request.user.profile.capability('canEditFeaturedEdits'):
         response = json_response(status=403, text='not allowed')
     else:
         user = request.user

@@ -173,7 +173,7 @@ check the README for further details.
             try:
                 if User.objects.filter(profile__level=admin).count() == 0:
                     for u in User.objects.filter(is_superuser=True):
-                        p = u.get_profile()
+                        p = u.profile
                         p.level = admin
                         p.save()
                 settings.ADMIN = tuple([(u.username, u.email)

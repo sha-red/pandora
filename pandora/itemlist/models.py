@@ -112,7 +112,7 @@ class List(models.Model):
             return False
         if self.user == user or \
            user.is_staff or \
-           user.get_profile().capability('canEditFeaturedLists') == True:
+           user.profile.capability('canEditFeaturedLists') == True:
             return True
         return False
 
@@ -143,7 +143,7 @@ class List(models.Model):
                         pos.section = 'personal'
                         pos.save()
                 elif value == 'featured':
-                    if user.get_profile().capability('canEditFeaturedLists'):
+                    if user.profile.capability('canEditFeaturedLists'):
                         pos, created = Position.objects.get_or_create(list=self, user=user,
                                                                              section='featured')
                         if created:
@@ -301,7 +301,7 @@ class Position(models.Model):
 
     list = models.ForeignKey(List, related_name='position')
     user = models.ForeignKey(User)
-    section = models.CharField(max_length='255')
+    section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
     def __unicode__(self):

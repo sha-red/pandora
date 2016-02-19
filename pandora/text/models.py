@@ -84,7 +84,7 @@ class Text(models.Model):
             return False
         if self.user == user or \
            user.is_staff or \
-           user.get_profile().capability('canEditFeaturedTexts') == True:
+           user.profile.capability('canEditFeaturedTexts') == True:
             return True
         return False
 
@@ -104,7 +104,7 @@ class Text(models.Model):
                         pos.section = 'personal'
                         pos.save()
                 elif value == 'featured':
-                    if user.get_profile().capability('canEditFeaturedTexts'):
+                    if user.profile.capability('canEditFeaturedTexts'):
                         pos, created = Position.objects.get_or_create(text=self, user=user,
                                                                              section='featured')
                         if created:
@@ -305,7 +305,7 @@ class Position(models.Model):
 
     text = models.ForeignKey(Text, related_name='position')
     user = models.ForeignKey(User, related_name='text_position')
-    section = models.CharField(max_length='255')
+    section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
     def __unicode__(self):

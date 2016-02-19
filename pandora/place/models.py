@@ -68,7 +68,7 @@ class Place(models.Model):
         if user and not user.is_anonymous() \
             and (not self.user or \
                  self.user == user or \
-                 user.get_profile().capability('canEditPlaces')):
+                 user.profile.capability('canEditPlaces')):
                 return True
         return False
 
