@@ -26,14 +26,11 @@ class Command(BaseCommand):
         print('initializing database...')
         manage_py = sys.argv[0]
         for cmd in [
-            [manage_py, 'syncdb', '--noinput'],
-            [manage_py, 'migrate', 'item'],
-            [manage_py, 'migrate', 'annotation'],
-            [manage_py, 'migrate'],
+            [manage_py, 'migrate', '--noinput'],
             [manage_py, 'sqlfindindex'],
             [manage_py, 'sync_itemsort'],
             [manage_py, 'update_static'],
-            [manage_py, 'compile_pyc'],
+            [manage_py, 'compile_pyc', '-p', os.path.dirname(manage_py)],
         ]:
             run(cmd)
         if not os.path.exists(os.path.join(settings.STATIC_ROOT, 'admin')):
