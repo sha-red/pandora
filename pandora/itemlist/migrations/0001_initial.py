@@ -16,7 +16,7 @@ class Migration(SchemaMigration):
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='lists', to=orm['auth.User'])),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('status', self.gf('django.db.models.fields.CharField')(default='private', max_length=20)),
-            ('query', self.gf('ox.django.fields.DictField')(default={'static': True})),
+            ('query', self.gf('ox.django.fields.DictField')(default='{"static": true}')),
             ('type', self.gf('django.db.models.fields.CharField')(default='static', max_length=255)),
             ('description', self.gf('django.db.models.fields.TextField')(default='')),
             ('icon', self.gf('django.db.models.fields.files.ImageField')(default=None, max_length=100, blank=True)),

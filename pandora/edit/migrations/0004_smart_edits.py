@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'Edit.query'
         db.add_column('edit_edit', 'query',
-                      self.gf('ox.django.fields.DictField')(default={'static': True}),
+                      self.gf('ox.django.fields.DictField')(default='{"static": true}'),
                       keep_default=False)
 
         # Adding field 'Edit.type'
