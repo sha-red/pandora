@@ -89,21 +89,11 @@ def get_version(path):
 if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ('database', 'db'):
         os.chdir(join(base, 'pandora'))
-        if get('./manage.py', 'south_installed').strip() == 'yes':
-            run('./manage.py', 'syncdb')
-            print('\nRunning "./manage.py migrate"\n')
-            run('./manage.py', 'migrate')
-            run('./manage.py', 'sqlfindindex')
-            run('./manage.py', 'sync_itemsort')
-            reload_notice(base)
-        else:
-            print("You are upgrading from an older version of pan.do/ra.")
-            print("Please use ./manage.py sqldiff -a to check for updates")
-            print("and apply required changes. You might have to set defaults too.")
-            print("Once done run:")
-            print("\tcd %s" % os.path.abspath(os.curdir))
-            print("\t./manage.py migrate --all --fake")
-            print("Check http://wiki.0x2620.org/wiki/pandora/DatabaseUpdate for more information")
+        print('\nRunning "./manage.py migrate"\n')
+        run('./manage.py', 'migrate', '--noinput')
+        run('./manage.py', 'sqlfindindex')
+        run('./manage.py', 'sync_itemsort')
+        reload_notice(base)
     elif len(sys.argv) == 2 and sys.argv[1] == 'static':
         os.chdir(join(base, 'pandora'))
         run('./manage.py', 'update_static')
