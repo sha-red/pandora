@@ -85,7 +85,7 @@ class List(models.Model):
             l = ListItem()
             l.list = self
             l.item = item
-            l.index = ListItem.objects.filter(item=self).aggregate(Max('index'))['index__max']
+            l.index = ListItem.objects.filter(list=self).aggregate(Max('index'))['index__max']
             if l.index == None:
                 l.index = 0
             else:
