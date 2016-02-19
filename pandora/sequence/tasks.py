@@ -36,5 +36,5 @@ def get_sequences(public_id):
                 cursor = connection.cursor()
                 sql = "INSERT INTO sequence_sequence (%s) VALUES %s" % (keys, ', '.join(values));
                 cursor.execute(sql)
-                transaction.commit_unless_managed()
+                transaction.commit()
         position += stream.duration
