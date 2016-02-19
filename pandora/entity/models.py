@@ -261,7 +261,7 @@ class DocumentProperties(models.Model):
     document = models.ForeignKey(Document)
     entity = models.ForeignKey(Entity, related_name='documentproperties')
     index = models.IntegerField(default=0)
-
+    data = fields.DictField(default={})
 
     def __unicode__(self):
         return u"%r-%r" % (self.document, self.entity)
