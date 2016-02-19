@@ -3,8 +3,7 @@
 import copy
 from datetime import datetime
 
-from django.shortcuts import render_to_response, redirect
-from django.template import RequestContext
+from django.shortcuts import render, redirect
 from django.conf import settings
 from django.http import HttpResponse
 
@@ -22,8 +21,7 @@ from changelog.models import add_changelog
 from ox.django.api import actions
 
 def intro(request):
-    context = RequestContext(request, {'settings': settings})
-    return render_to_response('intro.html', context)
+    return render(request, 'intro.html', {'settings': settings})
 
 def index(request):
     title = settings.SITENAME
@@ -38,19 +36,17 @@ def index(request):
             title += ' - ' + p['title']
             text, created = models.Page.objects.get_or_create(name=page)
             text = text.text
-    context = RequestContext(request, {
+    return render(request, 'index.html', {
         'base_url': request.build_absolute_uri('/'),
         'settings': settings,
         'text': text,
         'title': title,
     })
-    return render_to_response('index.html', context)
 
 def embed(request, id):
-    context = RequestContext(request, {
+    return render(request, 'embed.html', {
         'settings': settings
     })
-    return render_to_response('embed.html', context)
 
 def redirect_url(request, url):
     if request.META['QUERY_STRING']:

@@ -13,8 +13,7 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 from django import forms
 from django.db.models import Sum, Max
 from django.conf import settings
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 
 from item import utils
 from archive.chunk import process_chunk
@@ -381,13 +380,12 @@ def icon(request, id, size=16):
 def pdf_viewer(request, id):
     text = get_text_or_404_json(id)
     if text.type == 'pdf' and text.file and not text.uploading:
-        context = RequestContext(request, {
+        return render(request, 'pdf/viewer.html', {
             'editable': json.dumps(text.editable(request.user)),
             'embeds': json.dumps(text.embeds),
             'settings': settings,
             'url': text.get_absolute_pdf_url()
         })
-        return render_to_response('pdf/viewer.html', context)
     response = json_response(status=404, text='file not found')
     return render_to_json_response(response)
 
@@ -434,7 +432,7 @@ def text(request, id=''):
         if id != '' and not text.accessible(request.user):
             raise
         template = 'text.html'
-        context = RequestContext(request, {
+        context = {
             'base_url': request.build_absolute_uri('/'),
             'description': ox.strip_tags(text.description),
             'icon': request.build_absolute_uri('/text/%s/icon256.jpg' % text.get_id()),
@@ -442,12 +440,12 @@ def text(request, id=''):
             'text': text,
             'title': ox.strip_tags(text.name),
             'url': request.build_absolute_uri(text.get_absolute_url()),
-        })
+        }
     except:
         template = 'index.html'
-        context = RequestContext(request, {
+        context = {
             'base_url': request.build_absolute_uri('/'),
             'settings': settings,
             'title':  settings.SITENAME
-        })
-    return render_to_response(template, context)
+        }
+    return render(request, template, context)

@@ -10,9 +10,8 @@ import time
 
 import Image
 from django.db.models import Count, Sum
-from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseForbidden, Http404
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404, redirect, render
 from django.core.files.temp import NamedTemporaryFile
 from wsgiref.util import FileWrapper
 from django.conf import settings
@@ -1240,10 +1239,10 @@ def item(request, id):
         level = request.user.profile.level
     qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
-        context = RequestContext(request, {
+        ctx = {
             'base_url': request.build_absolute_uri('/'),
             'settings': settings
-        })
+        }
     else:
         item = qs[0]
         template = 'item.html'
@@ -1340,6 +1339,5 @@ def item(request, id):
             if value:
                 ctx['keywords'] = ox.strip_tags(value)
 
-        context = RequestContext(request, ctx)
-    return render_to_response(template, context)
+    return render(request, template, ctx)
 

@@ -6,7 +6,7 @@ import re
 import json
 
 from django.contrib.auth import authenticate, login, logout
-from django.template import RequestContext, loader
+from django.template import loader
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
 from django.shortcuts import redirect
@@ -306,13 +306,13 @@ def requestToken(request, data):
         user_profile.save()
 
         template = loader.get_template('password_reset_email.txt')
-        context = RequestContext(request, {
+        context = {
             'code': code,
             'sitename': settings.SITENAME,
             'footer': settings.CONFIG['site']['email']['footer'],
             'url': request.build_absolute_uri('/'),
-        })
-        message = template.render(context)
+        }
+        message = template.render(context, request)
         subject = '%s - Reset Password' % settings.SITENAME
         user.email_user(subject, message)
         response = json_response({
@@ -593,14 +593,14 @@ def mail(request, data):
         if 'receipt' in data \
             and data['receipt']:
             template = loader.get_template('mailout_receipt.txt')
-            context = RequestContext(request, {
+            context = {
                 'footer': settings.CONFIG['site']['email']['footer'],
                 'to': ', '.join(['"%s" <%s>' % (u.username, u.email) for u in users]),
                 'subject': subject,
                 'message': data['message'],
                 'url': request.build_absolute_uri('/'),
-            })
-            message = template.render(context)
+            }
+            message = template.render(context, request)
             subject = u'Fwd: %s' % subject
             email_to = '"%s" <%s>' % (request.user.username, request.user.email)
             receipt = EmailMessage(subject,
@@ -637,7 +637,7 @@ def contact(request, data):
         email_to = [settings.CONFIG['site']['email']['contact'], ]
         subject = data.get('subject', '').strip()
         template = loader.get_template('contact_email.txt')
-        context = RequestContext(request, {
+        context = {
             'name': name,
             'email': email,
             'subject': subject,
@@ -645,9 +645,9 @@ def contact(request, data):
             'sitename': settings.SITENAME,
             'footer': settings.CONFIG['site']['email']['footer'],
             'url': request.build_absolute_uri('/'),
-        })
+        }
         subject = ox.decode_html(subject)
-        message = ox.decode_html(template.render(context))
+        message = ox.decode_html(template.render(context, request))
         response = json_response(text='message sent')
         try:
             send_mail(u'%s Contact - %s' % (settings.SITENAME, subject), message, email_from, email_to)
@@ -657,7 +657,7 @@ def contact(request, data):
             and 'receipt' in data \
             and data['receipt']:
             template = loader.get_template('contact_receipt.txt')
-            context = RequestContext(request, {
+            context = {
                 'name': name,
                 'from': email,
                 'sitename': settings.SITENAME,
@@ -666,8 +666,8 @@ def contact(request, data):
                 'subject': subject,
                 'message': data['message'].strip(),
                 'url': request.build_absolute_uri('/'),
-            })
-            message = template.render(context)
+            }
+            message = template.render(context, request)
             try:
                 send_mail('Fwd: %s' % subject, message, email_from, [email])
             except:

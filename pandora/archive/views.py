@@ -5,8 +5,7 @@ import os.path
 from datetime import datetime
 
 from django import forms
-from django.shortcuts import get_object_or_404, redirect, render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, redirect, render
 from django.conf import settings
 from django.db.models import Count, Q
 
@@ -224,12 +223,11 @@ actions.register(addMedia, cache=False)
 @login_required_json
 def firefogg_upload(request):
     if not 'profile' in request.GET or not 'id' in request.GET:
-        context = RequestContext(request, {
+        return render(request, 'api.html', {
             'api': [],
             'settings': settings,
             'sitename': settings.SITENAME
         })
-        return render_to_response('api.html', context)
     profile = request.GET['profile']
     oshash = request.GET['id']
     config = settings.CONFIG['video']
