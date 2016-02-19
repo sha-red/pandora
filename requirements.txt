@@ -1,17 +1,12 @@
-#-e git+https://github.com/django/django.git@stable/1.4.x#egg=django
-Django<1.5
+Django==1.9.2
 -e git+https://git.0x2620.org/python-ox.git#egg=python-ox
 -e git+https://git.0x2620.org/oxtimelines.git#egg=oxtimelines
 simplejson
 chardet
-celery==3.0.24
-django-celery==3.0.23
-#django_extensions
-#use fork fixing some postgresql issues
--e contrib/django_extensions
-django_devserver
-gunicorn>=0.14.3,<0.19
+celery==3.1.20
+django-celery==3.1.17
+django-extensions==1.6.1
+gunicorn==19.4.5
 html5lib
-South
-requests>=2.0.0
+requests==2.2.1
 tornado==4.1
