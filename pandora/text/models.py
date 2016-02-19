@@ -21,6 +21,9 @@ from archive.chunk import save_chunk
 import managers
 
 
+def get_path(i, x): return i.path(x)
+def get_icon_path(i, x): return get_path(i, 'icon.jpg')
+
 class Text(models.Model):
 
     class Meta:
@@ -35,8 +38,7 @@ class Text(models.Model):
     type = models.CharField(max_length=255, default='html')
     description = models.TextField(default='')
     rightslevel = models.IntegerField(db_index=True, default=0)
-    icon = models.ImageField(default=None, blank=True,
-                             upload_to=lambda i, x: i.path("icon.jpg"))
+    icon = models.ImageField(default=None, blank=True, upload_to=get_icon_path)
 
     text = models.TextField(default="")
     embeds = TupleField(default=[], editable=True)
@@ -46,7 +48,7 @@ class Text(models.Model):
 
     objects = managers.TextManager()
     uploading = models.BooleanField(default = False)
-    file = models.FileField(default=None, blank=True,null=True, upload_to=lambda f, x: f.path(x))
+    file = models.FileField(default=None, blank=True,null=True, upload_to=get_path)
 
     def save(self, *args, **kwargs):
         self.rightslevel = min(self.rightslevel, len(settings.CONFIG['textRightsLevels']) - 1)

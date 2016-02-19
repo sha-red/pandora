@@ -17,6 +17,11 @@ from ox.django.fields import DictField, TupleField
 from archive import extract
 import managers
 
+def get_path(f, x): return f.path(x)
+def get_icon_path(f, x): return get_path(f, 'icon.jpg')
+def get_listview(): return settings.CONFIG['user']['ui']['listView']
+def get_listsort(): return tuple(settings.CONFIG['user']['ui']['listSort'])
+
 class List(models.Model):
 
     class Meta:
@@ -32,11 +37,10 @@ class List(models.Model):
     type = models.CharField(max_length=255, default='static')
     description = models.TextField(default='')
 
-    icon = models.ImageField(default=None, blank=True,
-                             upload_to=lambda i, x: i.path("icon.jpg"))
+    icon = models.ImageField(default=None, blank=True, upload_to=get_icon_path)
 
-    view = models.TextField(default=lambda: settings.CONFIG['user']['ui']['listView'])
-    sort = TupleField(default=lambda: tuple(settings.CONFIG['user']['ui']['listSort']), editable=False)
+    view = models.TextField(default=get_listview)
+    sort = TupleField(default=get_listsort, editable=False)
 
     poster_frames = TupleField(default=[], editable=False)
 

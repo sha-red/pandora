@@ -144,6 +144,11 @@ def get_item(info, user=None, async=False):
                 tasks.update_poster.delay(item.public_id)
     return item
 
+def get_path(f, x): return f.path(x)
+def get_icon_path(f, x): return get_path(f, 'icon.jpg')
+def get_poster_path(f, x): return get_path(f, 'poster.jpg')
+def get_torrent_path(f, x): return get_path(f, 'torrent.torrent')
+
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -161,18 +166,15 @@ class Item(models.Model):
     external_data = fields.DictField(default={}, editable=False)
     data = fields.DictField(default={}, editable=False)
     json = fields.DictField(default={}, editable=False)
-    poster = models.ImageField(default=None, blank=True,
-                               upload_to=lambda i, x: i.path("poster.jpg"))
+    poster = models.ImageField(default=None, blank=True, upload_to=get_poster_path)
     poster_source = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
     poster_frame = models.FloatField(default=-1)
 
-    icon = models.ImageField(default=None, blank=True,
-                             upload_to=lambda i, x: i.path("icon.jpg"))
+    icon = models.ImageField(default=None, blank=True, upload_to=get_icon_path)
 
-    torrent = models.FileField(default=None, blank=True, max_length=1000,
-                               upload_to=lambda i, x: i.path('torrent.torrent'))
+    torrent = models.FileField(default=None, blank=True, max_length=1000, upload_to=get_torrent_path)
     stream_info = fields.DictField(default={}, editable=False)
 
     #stream related fields

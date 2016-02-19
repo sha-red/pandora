@@ -23,6 +23,9 @@ from person.models import get_name_sort
 from chunk import save_chunk
 import extract
 
+def get_path(f, x): return f.path(x)
+def get_data_path(f, x): return get_path(f, 'data.bin')
+
 class File(models.Model):
     AV_INFO = (
         'duration', 'video', 'audio', 'oshash', 'size',
@@ -89,7 +92,7 @@ class File(models.Model):
 
     #upload and data handling
     data = models.FileField(null=True, blank=True,
-                            upload_to=lambda f, x: f.get_path('data.bin'))
+                            upload_to=get_data_path)
 
     def __unicode__(self):
         return self.path
@@ -565,6 +568,9 @@ class Volume(models.Model):
             'items': self.files.count()
         }
 
+def inttime():
+    return int(time.time())
+
 class Instance(models.Model):
 
     class Meta:
@@ -573,9 +579,9 @@ class Instance(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    atime = models.IntegerField(default=lambda: int(time.time()), editable=False)
-    ctime = models.IntegerField(default=lambda: int(time.time()), editable=False)
-    mtime = models.IntegerField(default=lambda: int(time.time()), editable=False)
+    atime = models.IntegerField(default=inttime, editable=False)
+    ctime = models.IntegerField(default=inttime, editable=False)
+    mtime = models.IntegerField(default=inttime, editable=False)
 
     path = models.CharField(max_length=2048)
     ignore = models.BooleanField(default=False)
@@ -641,7 +647,7 @@ class Stream(models.Model):
     resolution = models.IntegerField(default=96)
     format = models.CharField(max_length=255, default='webm')
 
-    media = models.FileField(default=None, blank=True, upload_to=lambda f, x: f.path(x))
+    media = models.FileField(default=None, blank=True, upload_to=get_path)
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
     oshash = models.CharField(max_length=16, null=True, db_index=True)

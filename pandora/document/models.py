@@ -21,6 +21,7 @@ from archive.chunk import save_chunk
 import managers
 import utils
 
+def get_path(f, x): return f.path(x)
 
 class Document(models.Model):
 
@@ -42,7 +43,7 @@ class Document(models.Model):
     description = models.TextField(default="")
     oshash = models.CharField(max_length=16, unique=True, null=True)
 
-    file = models.FileField(default=None, blank=True,null=True, upload_to=lambda f, x: f.path(x))
+    file = models.FileField(default=None, blank=True,null=True, upload_to=get_path)
 
     objects = managers.DocumentManager()
     uploading = models.BooleanField(default = False)

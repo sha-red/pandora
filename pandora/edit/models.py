@@ -26,6 +26,9 @@ from archive import extract
 
 import managers
 
+def get_path(f, x): return f.path(x)
+def get_icon_path(f, x): return get_path(f, 'icon.jpg')
+
 class Edit(models.Model):
 
     class Meta:
@@ -46,8 +49,7 @@ class Edit(models.Model):
     query = DictField(default={"static": True})
     type = models.CharField(max_length=255, default='static')
 
-    icon = models.ImageField(default=None, blank=True, null=True,
-                             upload_to=lambda i, x: i.path("icon.jpg"))
+    icon = models.ImageField(default=None, blank=True, null=True, upload_to=get_icon_path)
 
     poster_frames = TupleField(default=[], editable=False)
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_edits')
