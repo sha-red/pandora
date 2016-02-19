@@ -34,10 +34,17 @@ def update_random_clip_sort():
     if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):
         with transaction.atomic():
             cursor = connection.cursor()
-            cursor.execute('DROP TABLE clip_random;')
-            cursor.execute('CREATE TABLE "clip_random" AS SELECT id AS clip_id, row_number() OVER (ORDER BY random()) AS random FROM "clip_clip"')
-            cursor.execute('ALTER TABLE "clip_random" ADD UNIQUE ("clip_id")')
-            cursor.execute('CREATE INDEX "clip_random_random" ON "clip_random" ("random")')
+            for row in (
+                'DROP TABLE clip_cliprandom',
+                'CREATE TABLE "clip_cliprandom" AS SELECT id AS clip_id, row_number() OVER (ORDER BY random()) AS id FROM "clip_clip"',
+                'ALTER TABLE "clip_cliprandom" ADD UNIQUE ("clip_id")',
+                'ALTER TABLE "clip_cliprandom" ADD UNIQUE ("id")',
+                'ALTER TABLE "clip_cliprandom" ALTER COLUMN "id" SET NOT NULL',
+                'ALTER TABLE "clip_cliprandom" ALTER COLUMN "clip_id" SET NOT NULL',
+
+            ):
+                cursor.execute(row)
+
 
 @task(ignore_results=True, queue='default')
 def update_clips(public_id):

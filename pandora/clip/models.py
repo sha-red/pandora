@@ -59,7 +59,7 @@ class MetaClip(object):
         else:
             self.hue = self.saturation = self.lightness = 0
             self.volume = 0
-  
+
     def save(self, *args, **kwargs):
         if self.duration != self.end - self.start:
             self.update_calculated_values()
@@ -215,7 +215,6 @@ for name in [k['id'] for k in settings.CONFIG['layers']]:
 
 Clip = type('Clip', (MetaClip,models.Model), attrs)
 
-class Random(models.Model):
-    clip = models.ForeignKey(Clip, primary_key=True)
-    random = models.BigIntegerField(db_index=True, null=True)
-
+class ClipRandom(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    clip = models.OneToOneField(Clip)
