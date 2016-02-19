@@ -258,7 +258,7 @@ class DocumentProperties(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    document = models.ForeignKey(Document)
+    document = models.ForeignKey(Document, related_name='documentproperties')
     entity = models.ForeignKey(Entity, related_name='documentproperties')
     index = models.IntegerField(default=0)
     data = fields.DictField(default={})

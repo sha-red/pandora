@@ -165,8 +165,12 @@ class Document(models.Model):
             elif key == 'user':
                 response[key] = self.user.username
             elif key == 'entities':
-                response[key] = [e.json(['id', 'type', 'name'])
-                    for e in self.entities.all().order_by('documentproperties__index')]
+                dps = self.documentproperties.select_related('entity').order_by('index')
+                response[key] = entity_jsons = []
+                for dp in dps:
+                    entity_json = dp.entity.json(['id', 'type', 'name'])
+                    entity_json['data'] = dp.data
+                    entity_jsons.append(entity_json)
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key,key)) or ''
         if item:
