@@ -116,7 +116,7 @@ class List(models.Model):
         for key in data:
             if key == 'query' and not data['query']:
                 setattr(self, key, {"static":True})
-            elif key == 'query':
+            elif key == 'query' and isinstance(data[key], dict):
                 setattr(self, key, data[key])
             elif key == 'type':
                 if data[key] == 'static':

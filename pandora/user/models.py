@@ -116,7 +116,9 @@ class SessionData(models.Model):
         if data.ip.startswith('::ffff:'):
             data.ip = data.ip[len('::ffff:'):]
         data.useragent = request.META.get('HTTP_USER_AGENT', '')[:4096]
-        data.info = json.loads(request.POST.get('data', '{}'))
+        info = json.loads(request.POST.get('data', '{}'))
+        if info and isinstance(info, dict):
+            data.info = info
         screen = data.info.get('screen', {})
         if screen and 'height' in screen and 'width' in screen:
             data.screensize = u'%s\xd7%s' % (screen['width'], screen['height'])

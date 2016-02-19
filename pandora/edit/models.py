@@ -191,7 +191,7 @@ class Edit(models.Model):
                 self.rightslevel = int(data['rightslevel'])
             if key == 'query' and not data['query']:
                 setattr(self, key, {"static":True})
-            elif key == 'query':
+            elif key == 'query' and isinstance(data[key], dict):
                 setattr(self, key, data[key])
 
         if 'position' in data:

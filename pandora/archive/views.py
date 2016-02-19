@@ -210,7 +210,7 @@ def addMedia(request, data):
         else:
             extension = 'webm'
         f.selected = True
-        if 'info' in data and data['info']:
+        if 'info' in data and data['info'] and isinstance(data['info'], dict):
             f.info = data['info']
         f.info['extension'] = extension
         f.parse_info()
