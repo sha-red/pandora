@@ -38,7 +38,7 @@ class Command(BaseCommand):
         for i in range(len(annotations)-1):
             if annotations[i]['out'] == annotations[i+1]['in']:
                 annotations[i]['out'] = annotations[i]['out'] - 0.001
-        with transaction.commit_on_success():
+        with transaction.atomic():
             for a in annotations:
                 if a['value']:
                     annotation = models.Annotation(

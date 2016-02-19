@@ -96,7 +96,7 @@ class Place(models.Model):
     def get_super_matches(self):
         return get_super_matches(self, Place)
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def update_matches(self, annotations=None):
         matches = self.get_matches(annotations)
         if not annotations:

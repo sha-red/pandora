@@ -32,7 +32,7 @@ def update_random_sort():
 
 def update_random_clip_sort():
     if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):
-        with transaction.commit_on_success():
+        with transaction.atomic():
             cursor = connection.cursor()
             cursor.execute('DROP TABLE clip_random;')
             cursor.execute('CREATE TABLE "clip_random" AS SELECT id AS clip_id, row_number() OVER (ORDER BY random()) AS random FROM "clip_clip"')

@@ -160,7 +160,7 @@ class Annotation(models.Model):
             self.sortvalue = None
             self.languages = None
 
-        with transaction.commit_on_success():
+        with transaction.atomic():
             if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
                 self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
 
@@ -184,7 +184,7 @@ class Annotation(models.Model):
                 update_matches(self.id, 'event')
 
     def delete(self, *args, **kwargs):
-        with transaction.commit_on_success():
+        with transaction.atomic():
             super(Annotation, self).delete(*args, **kwargs)
             if self.clip and self.clip.annotations.count() == 0:
                 self.clip.delete()

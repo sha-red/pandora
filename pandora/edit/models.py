@@ -101,7 +101,7 @@ class Edit(models.Model):
             index = self.clips.count()
         ids = [i['id'] for i in self.clips.order_by('index').values('id')]
         added = []
-        with transaction.commit_on_success():
+        with transaction.atomic():
             for data in clips:
                 c = self.add_clip(data)
                 if c:
@@ -116,7 +116,7 @@ class Edit(models.Model):
 
     def sort_clips(self, ids):
         index = 0
-        with transaction.commit_on_success():
+        with transaction.atomic():
             for i in ids:
                 Clip.objects.filter(id=i).update(index=index)
                 index += 1

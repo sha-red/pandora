@@ -17,7 +17,7 @@ class Command(BaseCommand):
     def handle(self, id, height, position, **options):
         position = float(position)
         height = int(height)
-        with transaction.commit_on_success():
+        with transaction.atomic():
             i = models.Item.objects.get(public_id=id)
             path = i.frame(position, height)
         if path:

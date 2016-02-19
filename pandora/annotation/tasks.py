@@ -113,7 +113,7 @@ def update_item(id, force=False):
         #cleanup orphaned clips
         Clip.objects.filter(item__id=a.item.id, annotations__id=None).delete()
         #update facets if needed
-        with transaction.commit_on_success():
+        with transaction.atomic():
             if filter(lambda f: f['id'] == a.layer and f.get('filter'), settings.CONFIG['itemKeys']):
                 a.item.update_layer_facet(a.layer)
             Item.objects.filter(id=a.item.id).update(modified=a.modified)
@@ -129,7 +129,7 @@ def update_item(id, force=False):
 def update_annotations(layers, value):
     items = {}
 
-    with transaction.commit_on_success():
+    with transaction.atomic():
         for a in models.Annotation.objects.filter(
             layer__in=layers,
             value=value

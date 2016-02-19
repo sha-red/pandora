@@ -769,7 +769,7 @@ class Item(models.Model):
             return titles
 
 
-        with transaction.commit_on_success():
+        with transaction.atomic():
             for key in settings.CONFIG['itemKeys']:
                 i = key['id']
                 if i == 'title':
@@ -1547,7 +1547,7 @@ class Item(models.Model):
         # only import on 0xdb for now or if forced manually
         # since this will remove all existing subtitles
         if force or not existing.count() or settings.USE_IMDB:
-            with transaction.commit_on_success():
+            with transaction.atomic():
                 Annotation.objects.filter(layer=layer, item=self).delete()
                 AnnotationSequence.reset(self)
                 offset = 0
@@ -1790,7 +1790,7 @@ class AnnotationSequence(models.Model):
 
     @classmethod
     def nextid(cls, item):
-        with transaction.commit_on_success():
+        with transaction.atomic():
             s, created = cls.objects.get_or_create(item=item)
             if created:
                 nextid = s.value

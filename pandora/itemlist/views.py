@@ -149,7 +149,7 @@ def addListItems(request, data):
     list = get_list_or_404_json(data['list'])
     if 'items' in data:
         if list.editable(request.user):
-            with transaction.commit_on_success():
+            with transaction.atomic():
                 for item in Item.objects.filter(public_id__in=data['items']):
                     list.add(item)
             response = json_response(status=200, text='items added')
@@ -208,7 +208,7 @@ def orderListItems(request, data):
     response = json_response()
     if list.editable(request.user) and list.type == 'static':
         index = 0
-        with transaction.commit_on_success():
+        with transaction.atomic():
             for i in data['ids']:
                 models.ListItem.objects.filter(list=list, item__public_id=i).update(index=index)
                 index += 1

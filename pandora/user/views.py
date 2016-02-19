@@ -122,7 +122,7 @@ def signout(request, data):
             profile.save()
         response = json_response(text='logged out')
         logout(request)
-        with transaction.commit_on_success():
+        with transaction.atomic():
             for s in Session.objects.all():
                 if s.get_decoded().get('_auth_user_id') == uid:
                     s.delete()

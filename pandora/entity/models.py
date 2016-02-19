@@ -196,7 +196,7 @@ class Entity(models.Model):
         entity = get_by_id(settings.CONFIG['entities'], self.type)
         if not entity:
             return
-        with transaction.commit_on_success():
+        with transaction.atomic():
             ids = ['name']
             for key in entity['keys']:
                 value = self.data.get(key['id'])

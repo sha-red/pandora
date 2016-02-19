@@ -148,7 +148,7 @@ def orderClips(request, data):
     if edit.editable(request.user):
         if edit.type == 'static':
             index = 0
-            with transaction.commit_on_success():
+            with transaction.atomic():
                 for i in ids:
                     models.Clip.objects.filter(edit=edit, id=i).update(index=index)
                     index += 1
