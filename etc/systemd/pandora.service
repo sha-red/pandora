@@ -10,8 +10,9 @@ PIDFile=/run/pandora/pandora.pid
 WorkingDirectory=/srv/pandora/pandora
 StandardOutput=syslog
 StandardError=syslog
-ExecStartPre=/srv/pandora/pandora/manage.py compile_pyc
-ExecStart=/srv/pandora/bin/gunicorn_django \
+ExecStartPre=/srv/pandora/pandora/manage.py compile_pyc -p /srv/pandora/pandora
+ExecStart=/srv/pandora/bin/gunicorn \
+    wsgi:application \
     -p /run/pandora/pandora.pid \
     --bind 127.0.0.1:2620 \
     --timeout 90 \
