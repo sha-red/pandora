@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import print_function
-from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
@@ -16,10 +15,6 @@ import clip.models
 class Command(BaseCommand):
     help = 'update find values, run after adding new keys'
     args = ''
-    option_list = BaseCommand.option_list + (
-        make_option('--debug', action='store_true', dest='debug',
-            default=False, help='print sql commans'),
-    )
 
     def handle(self, **options):
         ids = [i['id'] for i in models.Item.objects.all().values('id')]

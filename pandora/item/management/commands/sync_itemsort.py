@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import print_function
-from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
@@ -19,10 +18,10 @@ class Command(BaseCommand):
     """
     help = 'alter table to match itemKeys in site.json.'
     args = ''
-    option_list = BaseCommand.option_list + (
-        make_option('--debug', action='store_true', dest='debug',
-            default=False, help='print sql commans'),
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('--debug', action='store_true', dest='debug',
+            default=False, help='print sql commans')
 
     def handle(self, **options):
         table_name = models.ItemSort._meta.db_table
@@ -69,7 +68,7 @@ class Command(BaseCommand):
                                                                     f.null and "DROP" or "SET")
                     changes.append(sql)
                     rebuild = True
-       
+
         #also update clip index
         table_name = clip.models.Clip._meta.db_table
         db_rows = connection.introspection.get_table_description(cursor, table_name)
@@ -108,7 +107,7 @@ class Command(BaseCommand):
                 if options['debug']:
                     print(sql)
                 cursor.execute(sql)
-            transaction.commit_unless_managed()
+            transaction.commit()
             if rebuild:
                 print("Updating sort values...")
                 ids = [i['id'] for i in models.Item.objects.all().values('id')]

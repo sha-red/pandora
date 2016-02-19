@@ -3,7 +3,6 @@
 from __future__ import absolute_import
 
 import os
-from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -18,14 +17,13 @@ class Command(BaseCommand):
     """
     help = 'run websocket daemon'
     args = ''
-    option_list = BaseCommand.option_list + (
-        make_option('--debug',
+    def add_arguments(self, parser):
+        parser.add_argument('--debug',
             action='store_true',
             dest='debug',
             default=False,
             help='enable debug'),
-        make_option("--pidfile", dest="pidfile",metavar="PIDFILE"),
-    )
+        parser.add_argument("--pidfile", dest="pidfile",metavar="PIDFILE"),
 
     def handle(self, **options):
         socket = daemon.Daemon(settings.WEBSOCKET_PORT, settings.WEBSOCKET_ADDRESS)

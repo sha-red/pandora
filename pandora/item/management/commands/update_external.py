@@ -2,7 +2,6 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import print_function
 
-from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
@@ -16,12 +15,12 @@ class Command(BaseCommand):
     """
     help = 'listen to rabbitmq and execute encoding tasks.'
     args = ''
-    option_list = BaseCommand.option_list + (
-        make_option('--all', action='store_true', dest='all',
+
+    def add_arguments(self, parser):
+        parser.add_argument('--all', action='store_true', dest='all',
             default=False, help='update all items, otherwise oldes N'),
-        make_option('-n', '--items', action='store', dest='items', type=int,
+        parser.add_argument('-n', '--items', action='store', dest='items', type=int,
             default=30, help='number of items ot update'),
-    )
 
     def handle(self, **options):
         offset = 0
