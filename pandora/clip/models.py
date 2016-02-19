@@ -44,7 +44,7 @@ def get_layers(item, interval=None, user=None):
     return layers
 
 
-class MetaClip:
+class MetaClip(object):
     def update_calculated_values(self):
         start = self.start
         end = self.end
