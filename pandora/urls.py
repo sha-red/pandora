@@ -2,10 +2,11 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import os
 
-from django.conf.urls import patterns, include
+from django.conf.urls import url, include
 from ox.django.http import HttpFileResponse
 
 from django.conf import settings
+import django.views
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -15,59 +16,76 @@ import app.monkey_patch
 
 import ox.django.api.urls
 
+import app.views
+import archive.views
+import document.views
+import text.views
+import user.views
+import edit.views
+import itemlist.views
+import item.views
+import item.urls
+import urlalias.views
+
 def serve_static_file(path, location, content_type):
     return HttpFileResponse(location, content_type=content_type)
 
-urlpatterns = patterns('',
+urlpatterns = [
     # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-    (r'^admin/', include(admin.site.urls)),
-    (r'^api/upload/text/?$', 'text.views.upload'),
-    (r'^api/upload/document/?$', 'document.views.upload'),
-    (r'^api/upload/direct/?$', 'archive.views.direct_upload'),
-    (r'^api/upload/?$', 'archive.views.firefogg_upload'),
-    (r'^url=(?P<url>.*)$', 'app.views.redirect_url'),
-    (r'^file/(?P<oshash>.*)$', 'archive.views.lookup_file'),
-    (r'^api/?', include(ox.django.api.urls)),
-    (r'^resetUI$', 'user.views.reset_ui'),
-    (r'^documents/(?P<id>[A-Z0-9]+)/(?P<size>\d*)p(?P<page>[\d,]*).jpg$', 'document.views.thumbnail'),
-    (r'^documents/(?P<id>[A-Z0-9]+)/(?P<name>.*?\.[^\d]{3})$', 'document.views.file'),
-    (r'^edit/(?P<id>.*?)/icon(?P<size>\d*).jpg$', 'edit.views.icon'),
-    (r'^list/(?P<id>.*?)/icon(?P<size>\d*).jpg$', 'itemlist.views.icon'),
-    (r'^text/(?P<id>.*?)/icon(?P<size>\d*).jpg$', 'text.views.icon'),
-    (r'^texts/(?P<id>.*?)/text.pdf$', 'text.views.pdf'),
-    (r'^texts/(?P<id>.*?)/text.pdf.html$', 'text.views.pdf_viewer'),
-    (r'^texts/$', 'text.views.text'),
-    (r'^texts/(?P<id>.*?)/\d+$', 'text.views.text'),
-    (r'^texts/(?P<id>.*?)$', 'text.views.text'),
-    (r'^robots.txt$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'robots.txt'), 'content_type': 'text/plain'}),
-    (r'^favicon.ico$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'png/icon.16.png'), 'content_type': 'image/x-icon'}),
-    (r'^opensearch.xml$', 'app.views.opensearch_xml'),
-    (r'^oembed$', 'item.views.oembed'),
-    (r'^atom.xml$', 'item.views.atom_xml'),
-    (r'^robots.txt$', 'app.views.robots_txt'),
-    (r'^sitemap.xml$', 'item.views.sitemap_xml'),
-    (r'', include('item.urls')),
-)
+    # urlurl(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/upload/text/?$', text.views.upload),
+    url(r'^api/upload/document/?$', document.views.upload),
+    url(r'^api/upload/direct/?$', archive.views.direct_upload),
+    url(r'^api/upload/?$', archive.views.firefogg_upload),
+    url(r'^url=(?P<url>.*)$', app.views.redirect_url),
+    url(r'^file/(?P<oshash>.*)$', archive.views.lookup_file),
+    url(r'^api/?', include(ox.django.api.urls)),
+    url(r'^resetUI$', user.views.reset_ui),
+    url(r'^documents/(?P<id>[A-Z0-9]+)/(?P<size>\d*)p(?P<page>[\d,]*).jpg$', document.views.thumbnail),
+    url(r'^documents/(?P<id>[A-Z0-9]+)/(?P<name>.*?\.[^\d]{3})$', document.views.file),
+    url(r'^edit/(?P<id>.*?)/icon(?P<size>\d*).jpg$', edit.views.icon),
+    url(r'^list/(?P<id>.*?)/icon(?P<size>\d*).jpg$', itemlist.views.icon),
+    url(r'^text/(?P<id>.*?)/icon(?P<size>\d*).jpg$', text.views.icon),
+    url(r'^texts/(?P<id>.*?)/text.pdf$', text.views.pdf),
+    url(r'^texts/(?P<id>.*?)/text.pdf.html$', text.views.pdf_viewer),
+    url(r'^texts/$', text.views.text),
+    url(r'^texts/(?P<id>.*?)/\d+$', text.views.text),
+    url(r'^texts/(?P<id>.*?)$', text.views.text),
+    url(r'^robots.txt$', serve_static_file, {
+        'location': os.path.join(settings.STATIC_ROOT, 'robots.txt'),
+        'content_type': 'text/plain'
+    }),
+    url(r'^favicon.ico$', serve_static_file, {
+        'location': os.path.join(settings.STATIC_ROOT, 'png/icon.16.png'),
+        'content_type': 'image/x-icon'
+    }),
+    url(r'^opensearch.xml$', app.views.opensearch_xml),
+    url(r'^oembed$', item.views.oembed),
+    url(r'^atom.xml$', item.views.atom_xml),
+    url(r'^robots.txt$', app.views.robots_txt),
+    url(r'^sitemap.xml$', item.views.sitemap_xml),
+    url(r'', include(item.urls)),
+]
 #if settings.DEBUG:
 #sould this not be enabled by default? nginx should handle those
-urlpatterns += patterns('',
-    (r'^data/(?P<path>.*)$', 'django.views.static.serve',
+urlpatterns += [
+    url(r'^data/(?P<path>.*)$', django.views.static.serve,
         {'document_root': settings.MEDIA_ROOT}),
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
+    url(r'^static/(?P<path>.*)$', django.views.static.serve,
         {'document_root': settings.STATIC_ROOT}),
-)
+]
 
-urlpatterns += patterns('',
-    (r'^(V[a-z0-9]+)$', 'urlalias.views.padma_video'),
-    (r'^(V[a-z0-9]+/.*)$', 'urlalias.views.padma_video'),
-    (r'^find$', 'urlalias.views.padma_find'),
-)
-urlpatterns += patterns('',
-    (r'^(?P<id>[A-Z0-9]+)/embed', 'app.views.embed'),
-    (r'^(?P<id>[A-Z0-9]+).*', 'item.views.item'),
-    (r'^[a-z0-9].+$', 'app.views.index'),
-    (r'^$', 'app.views.index'),
-    (r'^.*$', 'app.views.index'),
-)
+urlpatterns += [
+    url(r'^(V[a-z0-9]+)$', urlalias.views.padma_video),
+    url(r'^(V[a-z0-9]+/.*)$', urlalias.views.padma_video),
+    url(r'^find$', urlalias.views.padma_find),
+]
+urlpatterns += [
+    url(r'^(?P<id>[A-Z0-9]+)/embed', app.views.embed),
+    url(r'^(?P<id>[A-Z0-9]+).*', item.views.item),
+    url(r'^[a-z0-9].+$', app.views.index),
+    url(r'^$', app.views.index),
+    url(r'^.*$', app.views.index),
+]
 

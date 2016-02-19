@@ -10,7 +10,6 @@ from os.path import join, normpath, dirname
 PROJECT_ROOT = normpath(dirname(__file__))
 
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 JSON_DEBUG = False
 
 #this gets set to all users in highest userLevel (app/config.py)
@@ -73,12 +72,23 @@ WEBSOCKET = False
 WEBSOCKET_PORT = 2622
 WEBSOCKET_ADDRESS = '127.0.0.1'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'django.template.loaders.eggs.Loader',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            join(PROJECT_ROOT, 'templates'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -92,9 +102,6 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'urls'
 
-TEMPLATE_DIRS = (
-    join(PROJECT_ROOT, 'templates'),
-)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
