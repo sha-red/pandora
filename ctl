@@ -6,6 +6,29 @@ if [ -z "$1" ]; then
 else
     action="$1"
 fi
+if [ "$action" = "init" ]; then
+    cd "`dirname "$0"`"
+    BASE=`pwd`
+    virtualenv --system-site-packages .
+    if [ ! -d static/oxjs ]; then
+        git clone --depth 1 https://git.0x2620.org/oxjs.git static/oxjs
+    fi
+    mkdir -p src
+    if [ ! -d src/oxtimelines ]; then
+        git clone --depth 1 https://git.0x2620.org/oxtimelines.git src/oxtimelines
+    fi
+    for package in oxtimelines python-ox; do
+        cd ${BASE}
+        if [ ! -d src/${package} ]; then
+            git clone --depth 1 https://git.0x2620.org/${package}.git src/${package}
+        fi
+        cd ${BASE}/src/${package}
+        ${BASE}/bin/python setup.py develop
+    done
+    cd ${BASE}
+    ./bin/pip install -r requirements.txt
+    exit 0
+fi
 if [ `whoami` != 'root' ]; then
     echo you have to be root or run $0 with sudo
     exit 1

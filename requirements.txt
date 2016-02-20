@@ -1,6 +1,4 @@
 Django==1.9.2
--e git+https://git.0x2620.org/python-ox.git#egg=python-ox
--e git+https://git.0x2620.org/oxtimelines.git#egg=oxtimelines
 simplejson
 chardet
 celery==3.1.20

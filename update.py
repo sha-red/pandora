@@ -211,10 +211,11 @@ if __name__ == "__main__":
                     pandora_new_revno = revno
             else:
                 os.chdir(os.path.dirname(path))
-                cmd = ['git', 'clone', '--depth', '1', repos[repo]['url']]
-                run(*cmd)
                 if 'revision' in repos[repo]:
+                    run('git', 'clone', repos[repo]['url'])
                     run_git(path, 'checkout', repos[repo]['commit'])
+                else:
+                    run('git', 'clone', '--depth', '1', repos[repo]['url'])
                 setup = os.path.join(base, repos[repo]['path'], 'setup.py')
                 if repo in ('python-ox', 'oxtimelines') and os.path.exists(setup):
                     os.chdir(os.path.dirname(setup))
