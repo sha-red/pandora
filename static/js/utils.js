@@ -2647,7 +2647,7 @@ pandora.wait = function(taskId, callback, timeout) {
     var task = {};
     timeout = timeout || 5000;
     task.timeout = setTimeout(function() {
-        pandora.api.taskStatus({taskId: taskId}, function(result) {
+        pandora.api.getTaskStatus({taskId: taskId}, function(result) {
             var t;
             if (result.data.status == 'PENDING') {
                 t = pandora.wait(taskId, callback);

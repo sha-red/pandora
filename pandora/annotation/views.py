@@ -159,7 +159,7 @@ def addAnnotation(request, data):
         ... // more annotation properties
     }
     see: addAnnotations, editAnnotation, findAnnotations, getAnnotation,
-    taskStatus, removeAnnotation
+    getTaskStatus, removeAnnotation
     '''
     for key in ('item', 'layer', 'in', 'out', 'value'):
         if key not in data:
@@ -213,10 +213,10 @@ def addAnnotations(request, data):
         ]
     }
     returns {
-        taskId: string // task id, use `taskStatus` to poll
+        taskId: string // task id, use `getTaskStatus` to poll
     }
     see: addAnnotation, editAnnotation, findAnnotations, getAnnotation,
-    taskStatus, removeAnnotation
+    getTaskStatus, removeAnnotation
     '''
     for key in ('item', 'layer', 'annotations'):
         if key not in data:

@@ -339,7 +339,7 @@ def direct_upload(request):
 
 
 @login_required_json
-def taskStatus(request, data):
+def getTaskStatus(request, data):
     '''
     Gets the status for a given task
     takes {
@@ -373,7 +373,8 @@ def taskStatus(request, data):
             'traceback': traceback
         })
     return render_to_json_response(response)
-actions.register(taskStatus, cache=False)
+actions.register(getTaskStatus, cache=False)
+actions.register(getTaskStatus, action='taskStatus', cache=False)
 
 
 @login_required_json
