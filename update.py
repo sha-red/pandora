@@ -203,7 +203,7 @@ if __name__ == "__main__":
                         run('git', 'checkout', repos[repo]['commit'])
                 else:
                     print('Checking', repo)
-                    run('git', 'checkout', 'master', '-q')
+                    #run('git', 'checkout', 'master', '-q')
                     run('git', 'pull')
                 revno = get_version(path)
                 new += revno
