@@ -167,7 +167,7 @@ if __name__ == "__main__":
             run('git', 'checkout', 'update.py')
         if old <= 5389:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
-            run('./pandora/manage.py', 'migrate', '--fake-initial')
+            run('./pandora/manage.py', 'migrate', '--fake-initial', '--noinput')
             service = 'pandora'
             print('Please install new init script for "%s" service:' % service)
             if os.path.exists('/etc/init'):
@@ -222,12 +222,13 @@ if __name__ == "__main__":
                     run(os.path.join(base, 'bin', 'python'), 'setup.py', 'develop')
                 new += '+'
         os.chdir(join(base, 'pandora'))
-        if current != new:
-            run('./manage.py', 'update_static')
-            run('./manage.py', 'compile_pyc')
         if pandora_old_revno != pandora_new_revno:
             os.chdir(base)
             run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
+        os.chdir(join(base, 'pandora'))
+        if current != new:
+            run('./manage.py', 'update_static')
+            run('./manage.py', 'compile_pyc')
         os.chdir(join(base, 'pandora'))
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
