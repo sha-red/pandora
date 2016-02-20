@@ -1943,11 +1943,13 @@ pandora.getVideoURLName = function(id, resolution, part, track) {
 };
 
 pandora.getVideoURL = function(id, resolution, part, track) {
-    var prefix = pandora.site.site.videoprefix
+    var uid = Ox.uid(),
+        prefix = pandora.site.site.videoprefix
             .replace('{id}', id)
             .replace('{part}', part)
             .replace('{resolution}', resolution)
-            .replace('{uid}', Ox.uid()),
+            .replace('{uid}', uid),
+            .replace('{uid42}', uid % 42),
         local = pandora.fs && pandora.fs.getVideoURL(id, resolution, part, track);
     return local || prefix + '/'
         + pandora.getVideoURLName(id, resolution, part, track);

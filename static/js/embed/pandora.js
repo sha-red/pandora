@@ -251,11 +251,13 @@ Ox.load('UI', {
     }
 
     function getVideoURL(id, resolution, part) {
-        var prefix = pandora.site.site.videoprefix
+        var uid = Ox.uid(),
+            prefix = pandora.site.site.videoprefix
             .replace('{id}', id)
             .replace('{part}', part)
             .replace('{resolution}', resolution)
-            .replace('{uid}', Ox.uid());
+            .replace('{uid}', uid)
+            .replace('{uid42}', uid % 42);
         return prefix + '/' + id + '/' + resolution + 'p' + part + '.' + pandora.user.videoFormat;
     }
 
