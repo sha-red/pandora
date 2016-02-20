@@ -6,6 +6,8 @@
 
 import os
 from os.path import join, normpath, dirname
+import djcelery
+djcelery.setup_loader()
 
 PROJECT_ROOT = normpath(dirname(__file__))
 
@@ -178,7 +180,11 @@ DATABASES = {
 }
 
 #rabbitmq connection settings
-CELERY_RESULT_BACKEND = "database"
+CELERY_RESULT_BACKEND = 'database'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+
 BROKER_URL = 'amqp://pandora:box@localhost:5672//pandora'
 
 SEND_CELERY_ERROR_EMAILS = False
