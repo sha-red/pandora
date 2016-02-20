@@ -165,6 +165,16 @@ if __name__ == "__main__":
             if os.path.exists('.bzr'):
                 shutil.rmtree('.bzr')
             run('git', 'checkout', 'update.py')
+        if old <= 5389:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
+            run('./pandora/manage.py', 'migrate', '--fake-initial')
+            service = 'pandora'
+            print('Please install new init script for "%s" service:' % service)
+            if os.path.exists('/etc/init'):
+                print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
+            if os.path.exists('/lib/systemd/system'):
+                print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
+            print('\tsudo service %s restart' % service)
     else:
         if len(sys.argv) == 1:
             release = get_release()
