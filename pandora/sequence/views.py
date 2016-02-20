@@ -3,9 +3,9 @@
 from __future__ import division
 
 from ox.utils import json
-from ox.django.shortcuts import render_to_json_response, json_response
+from oxdjango.shortcuts import render_to_json_response, json_response
 
-from ox.django.api import actions
+from oxdjango.api import actions
 
 from item.models import Item
 from item import utils

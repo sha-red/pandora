@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import ox.django.fields
+import oxdjango.fields
 
 
 class Migration(migrations.Migration):
@@ -36,8 +36,8 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('type', models.CharField(max_length=255)),
                 ('name', models.CharField(max_length=255)),
-                ('alternativeNames', ox.django.fields.TupleField(default=[])),
-                ('data', ox.django.fields.DictField(default={}, editable=False)),
+                ('alternativeNames', oxdjango.fields.TupleField(default=[])),
+                ('data', oxdjango.fields.DictField(default={}, editable=False)),
                 ('matches', models.IntegerField(default=0)),
                 ('name_sort', models.CharField(max_length=255, null=True)),
                 ('name_find', models.TextField(default=b'')),

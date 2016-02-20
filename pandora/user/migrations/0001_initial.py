@@ -6,7 +6,7 @@ import datetime
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import ox.django.fields
+import oxdjango.fields
 
 
 class Migration(migrations.Migration):
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('useragent', models.CharField(max_length=4096, null=True)),
                 ('windowsize', models.CharField(max_length=255, null=True)),
                 ('screensize', models.CharField(max_length=255, null=True)),
-                ('info', ox.django.fields.DictField(default={})),
+                ('info', oxdjango.fields.DictField(default={})),
                 ('location', models.CharField(max_length=255, null=True)),
                 ('location_sort', models.CharField(max_length=255, null=True)),
                 ('system', models.CharField(max_length=255, null=True)),
@@ -49,8 +49,8 @@ class Migration(migrations.Migration):
                 ('level', models.IntegerField(default=1)),
                 ('files_updated', models.DateTimeField(default=datetime.datetime.now)),
                 ('newsletter', models.BooleanField(default=True)),
-                ('ui', ox.django.fields.DictField(default={})),
-                ('preferences', ox.django.fields.DictField(default={})),
+                ('ui', oxdjango.fields.DictField(default={})),
+                ('preferences', oxdjango.fields.DictField(default={})),
                 ('notes', models.TextField(default=b'')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL, unique=True)),
             ],

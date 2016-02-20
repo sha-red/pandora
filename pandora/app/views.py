@@ -7,8 +7,8 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from django.http import HttpResponse
 
-from ox.django.shortcuts import json_response, render_to_json_response
-from ox.django.decorators import login_required_json
+from oxdjango.shortcuts import json_response, render_to_json_response
+from oxdjango.decorators import login_required_json
 
 import ox
 from ox.utils import json, ET
@@ -18,7 +18,7 @@ import models
 from user.models import init_user
 from changelog.models import add_changelog
 
-from ox.django.api import actions
+from oxdjango.api import actions
 
 def intro(request):
     return render(request, 'intro.html', {'settings': settings})

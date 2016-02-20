@@ -22,7 +22,7 @@ from django.db.models.signals import pre_delete
 from django.utils import datetime_safe
 
 import ox
-from ox.django import fields
+from oxdjango import fields
 import ox.web.imdb
 import ox.image
 

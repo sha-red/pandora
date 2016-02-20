@@ -14,7 +14,7 @@ from django.db.models.signals import pre_delete, post_init
 from django.conf import settings
 
 import ox
-from ox.django import fields
+from oxdjango import fields
 
 from person.models import get_name_sort
 from item.utils import get_by_id

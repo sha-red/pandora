@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import item.models
-import ox.django.fields
+import oxdjango.fields
 
 
 class Migration(migrations.Migration):
@@ -62,9 +62,9 @@ class Migration(migrations.Migration):
                 ('level', models.IntegerField(db_index=True)),
                 ('public_id', models.CharField(blank=True, max_length=128, unique=True)),
                 ('oxdbId', models.CharField(blank=True, max_length=42, null=True, unique=True)),
-                ('external_data', ox.django.fields.DictField(default={}, editable=False)),
-                ('data', ox.django.fields.DictField(default={}, editable=False)),
-                ('json', ox.django.fields.DictField(default={}, editable=False)),
+                ('external_data', oxdjango.fields.DictField(default={}, editable=False)),
+                ('data', oxdjango.fields.DictField(default={}, editable=False)),
+                ('json', oxdjango.fields.DictField(default={}, editable=False)),
                 ('poster', models.ImageField(blank=True, default=None, upload_to=item.models.get_poster_path)),
                 ('poster_source', models.TextField(blank=True)),
                 ('poster_height', models.IntegerField(default=0)),
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
                 ('poster_frame', models.FloatField(default=-1)),
                 ('icon', models.ImageField(blank=True, default=None, upload_to=item.models.get_icon_path)),
                 ('torrent', models.FileField(blank=True, default=None, max_length=1000, upload_to=item.models.get_torrent_path)),
-                ('stream_info', ox.django.fields.DictField(default={}, editable=False)),
+                ('stream_info', oxdjango.fields.DictField(default={}, editable=False)),
                 ('stream_aspect', models.FloatField(default=1.3333333333333333)),
             ],
         ),

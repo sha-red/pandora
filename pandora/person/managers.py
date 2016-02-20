@@ -3,7 +3,7 @@
 import unicodedata
 
 from django.db.models import Q, Manager
-from ox.django.query import QuerySet
+from oxdjango.query import QuerySet
 
 from item.utils import decode_id
 

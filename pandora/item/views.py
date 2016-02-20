@@ -18,9 +18,9 @@ from django.conf import settings
 
 from ox.utils import json, ET
 
-from ox.django.decorators import login_required_json
-from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
-from ox.django.http import HttpFileResponse
+from oxdjango.decorators import login_required_json
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from oxdjango.http import HttpFileResponse
 import ox
 
 import models
@@ -33,7 +33,7 @@ from clip.models import Clip
 from user.models import has_capability
 from changelog.models import add_changelog
 
-from ox.django.api import actions
+from oxdjango.api import actions
 
 
 def _order_query(qs, sort, prefix='sort__'):
@@ -241,7 +241,7 @@ def find(request, data):
             r = {}
             if m:
                 if not isinstance(m, dict):
-                    m = json.loads(m, object_hook=ox.django.fields.from_json)
+                    m = json.loads(m, object_hook=oxdjango.fields.from_json)
                 for p in _p:
                     r[p] = m.get(p)
             if 'clip_qs' in query:

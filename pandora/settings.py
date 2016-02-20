@@ -97,8 +97,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'ox.django.middleware.ExceptionMiddleware',
-    'ox.django.middleware.ChromeFrameMiddleware',
+    'oxdjango.middleware.ExceptionMiddleware',
+    'oxdjango.middleware.ChromeFrameMiddleware',
     'user.middleware.UpdateSession',
 )
 

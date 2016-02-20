@@ -5,7 +5,7 @@ from __future__ import division, with_statement
 from django.db import models, transaction
 from django.contrib.auth.models import User
 import ox
-from ox.django import fields
+from oxdjango import fields
 
 import managers
 from annotation.models import Annotation, get_matches, get_super_matches

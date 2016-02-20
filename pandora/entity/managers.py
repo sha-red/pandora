@@ -3,7 +3,7 @@
 from django.db.models import Q, Manager
 
 import ox
-from ox.django.query import QuerySet
+from oxdjango.query import QuerySet
 
 
 def namePredicate(op, value):

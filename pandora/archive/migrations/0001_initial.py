@@ -6,7 +6,7 @@ import archive.models
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import ox.django.fields
+import oxdjango.fields
 
 
 class Migration(migrations.Migration):
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('version', models.CharField(default=b'', max_length=255, null=True)),
                 ('size', models.BigIntegerField(default=0)),
                 ('duration', models.FloatField(null=True)),
-                ('info', ox.django.fields.DictField(default={})),
+                ('info', oxdjango.fields.DictField(default={})),
                 ('video_codec', models.CharField(max_length=255)),
                 ('pixel_format', models.CharField(max_length=255)),
                 ('display_aspect_ratio', models.CharField(max_length=255)),
@@ -96,11 +96,11 @@ class Migration(migrations.Migration):
                 ('media', models.FileField(blank=True, default=None, upload_to=archive.models.get_path)),
                 ('available', models.BooleanField(default=False)),
                 ('oshash', models.CharField(db_index=True, max_length=16, null=True)),
-                ('info', ox.django.fields.DictField(default={})),
+                ('info', oxdjango.fields.DictField(default={})),
                 ('duration', models.FloatField(default=0)),
                 ('aspect_ratio', models.FloatField(default=0)),
-                ('cuts', ox.django.fields.TupleField(default=[])),
-                ('color', ox.django.fields.TupleField(default=[])),
+                ('cuts', oxdjango.fields.TupleField(default=[])),
+                ('color', oxdjango.fields.TupleField(default=[])),
                 ('volume', models.FloatField(default=0)),
                 ('error', models.TextField(blank=True, default=b'')),
                 ('file', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='streams', to='archive.File')),

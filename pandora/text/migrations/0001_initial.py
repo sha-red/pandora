@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import ox.django.fields
+import oxdjango.fields
 import text.models
 
 
@@ -39,8 +39,8 @@ class Migration(migrations.Migration):
                 ('rightslevel', models.IntegerField(db_index=True, default=0)),
                 ('icon', models.ImageField(blank=True, default=None, upload_to=text.models.get_icon_path)),
                 ('text', models.TextField(default=b'')),
-                ('embeds', ox.django.fields.TupleField(default=[])),
-                ('poster_frames', ox.django.fields.TupleField(default=[], editable=False)),
+                ('embeds', oxdjango.fields.TupleField(default=[])),
+                ('poster_frames', oxdjango.fields.TupleField(default=[], editable=False)),
                 ('uploading', models.BooleanField(default=False)),
                 ('file', models.FileField(blank=True, default=None, null=True, upload_to=text.models.get_path)),
                 ('subscribed_users', models.ManyToManyField(related_name='subscribed_texts', to=settings.AUTH_USER_MODEL)),

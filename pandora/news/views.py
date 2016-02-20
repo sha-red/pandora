@@ -4,11 +4,11 @@ from __future__ import division
 
 import ox
 from ox.utils import json
-from ox.django.decorators import login_required_json
-from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from oxdjango.decorators import login_required_json
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
 
-from ox.django.api import actions
+from oxdjango.api import actions
 from changelog.models import add_changelog
 
 import models

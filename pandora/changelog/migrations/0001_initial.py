@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import ox.django.fields
+import oxdjango.fields
 
 
 class Migration(migrations.Migration):
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('type', models.CharField(db_index=True, max_length=255)),
-                ('value', ox.django.fields.DictField(default={})),
+                ('value', oxdjango.fields.DictField(default={})),
             ],
         ),
         migrations.CreateModel(
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('action', models.CharField(db_index=True, max_length=255)),
-                ('data', ox.django.fields.DictField(default={})),
+                ('data', oxdjango.fields.DictField(default={})),
                 ('created', models.DateTimeField(db_index=True)),
                 ('changeid', models.TextField()),
                 ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='changelog', to=settings.AUTH_USER_MODEL)),

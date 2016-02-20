@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group
 import models
 import utils
 
-from ox.django.query import QuerySet
+from oxdjango.query import QuerySet
 
 def get_operator(op, type='str'):
     return {

@@ -6,11 +6,11 @@ from django.conf import settings
 
 import ox
 from ox.utils import json
-from ox.django.decorators import login_required_json
-from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response, HttpErrorJson
+from oxdjango.decorators import login_required_json
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response, HttpErrorJson
 
 
-from ox.django.api import actions
+from oxdjango.api import actions
 
 from item import utils
 from item.models import Item

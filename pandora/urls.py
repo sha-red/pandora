@@ -3,7 +3,7 @@
 import os
 
 from django.conf.urls import url, include
-from ox.django.http import HttpFileResponse
+from oxdjango.http import HttpFileResponse
 
 from django.conf import settings
 import django.views
@@ -14,7 +14,7 @@ admin.autodiscover()
 
 import app.monkey_patch
 
-import ox.django.api.urls
+import oxdjango.api.urls
 
 import app.views
 import archive.views
@@ -40,7 +40,7 @@ urlpatterns = [
     url(r'^api/upload/?$', archive.views.firefogg_upload),
     url(r'^url=(?P<url>.*)$', app.views.redirect_url),
     url(r'^file/(?P<oshash>.*)$', archive.views.lookup_file),
-    url(r'^api/?', include(ox.django.api.urls)),
+    url(r'^api/?', include(oxdjango.api.urls)),
     url(r'^resetUI$', user.views.reset_ui),
     url(r'^documents/(?P<id>[A-Z0-9]+)/(?P<size>\d*)p(?P<page>[\d,]*).jpg$', document.views.thumbnail),
     url(r'^documents/(?P<id>[A-Z0-9]+)/(?P<name>.*?\.[^\d]{3})$', document.views.file),

@@ -11,7 +11,7 @@ from django.contrib.gis.geoip import GeoIP
 
 
 import ox
-from ox.django.fields import DictField
+from oxdjango.fields import DictField
 from ox.utils import json
 
 from itemlist.models import List, Position

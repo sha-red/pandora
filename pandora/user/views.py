@@ -15,12 +15,12 @@ from django.db.models import Max
 from django.contrib.auth.models import User, Group
 from django.contrib.sessions.models import Session
 
-from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
-from ox.django.decorators import login_required_json
+from oxdjango.shortcuts import render_to_json_response, json_response, get_object_or_404_json
+from oxdjango.decorators import login_required_json
 import ox
 
 
-from ox.django.api import actions
+from oxdjango.api import actions
 from item.models import Access, Item
 from item import utils 
 from changelog.models import add_changelog

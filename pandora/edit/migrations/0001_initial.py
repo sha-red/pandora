@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import edit.models
-import ox.django.fields
+import oxdjango.fields
 
 
 class Migration(migrations.Migration):
@@ -47,10 +47,10 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(default=b'private', max_length=20)),
                 ('description', models.TextField(default=b'')),
                 ('rightslevel', models.IntegerField(db_index=True, default=0)),
-                ('query', ox.django.fields.DictField(default={b'static': True})),
+                ('query', oxdjango.fields.DictField(default={b'static': True})),
                 ('type', models.CharField(default=b'static', max_length=255)),
                 ('icon', models.ImageField(blank=True, default=None, null=True, upload_to=edit.models.get_icon_path)),
-                ('poster_frames', ox.django.fields.TupleField(default=[], editable=False)),
+                ('poster_frames', oxdjango.fields.TupleField(default=[], editable=False)),
                 ('subscribed_users', models.ManyToManyField(related_name='subscribed_edits', to=settings.AUTH_USER_MODEL)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='edits', to=settings.AUTH_USER_MODEL)),
             ],

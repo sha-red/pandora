@@ -4,22 +4,21 @@ from __future__ import division
 import os.path
 from datetime import datetime
 
-from django import forms
 from django.shortcuts import get_object_or_404, redirect, render
 from django.conf import settings
 from django.db.models import Count, Q
 
+from celery.utils import get_full_cls_name
+from celery.backends import default_backend
 import ox
-from ox.utils import json
-from ox.django.decorators import login_required_json
-from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
-from ox.django.views import task_status
+from oxdjango.decorators import login_required_json
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
 from item import utils
 from item.models import get_item, Item
 from item.views import parse_query
 import item.tasks
-from ox.django.api import actions
+from oxdjango.api import actions
 from changelog.models import add_changelog
 
 import models
@@ -358,7 +357,21 @@ def taskStatus(request, data):
         task_id = data['taskId']
     else:
         task_id = data['task_id']
-    response = task_status(request, task_id)
+    response = json_response(status=200, text='ok')
+    status = default_backend.get_status(task_id)
+    res = default_backend.get_result(task_id)
+    response['data'] = {
+        'id': task_id,
+        'status': status,
+        'result': res
+    }
+    if status in default_backend.EXCEPTION_STATES:
+        traceback = default_backend.get_traceback(task_id)
+        response['data'].update({
+            'result': str(res.args[0]),
+            'exc': get_full_cls_name(res.__class__),
+            'traceback': traceback
+        })
     return render_to_json_response(response)
 actions.register(taskStatus, cache=False)
 

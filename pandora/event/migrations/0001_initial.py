@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import ox.django.fields
+import oxdjango.fields
 
 
 class Migration(migrations.Migration):
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('name_sort', models.CharField(db_index=True, max_length=255, null=True)),
                 ('name_find', models.TextField(default=b'')),
                 ('wikipediaId', models.CharField(blank=True, max_length=1000)),
-                ('alternativeNames', ox.django.fields.TupleField(default=[])),
+                ('alternativeNames', oxdjango.fields.TupleField(default=[])),
                 ('start', models.CharField(default=b'', max_length=255)),
                 ('startTime', models.BigIntegerField(default=None, null=True)),
                 ('end', models.CharField(default=b'', max_length=255)),

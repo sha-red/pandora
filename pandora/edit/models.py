@@ -11,7 +11,7 @@ from urllib import quote
 import tempfile
 
 import ox
-from ox.django.fields import DictField, TupleField
+from oxdjango.fields import DictField, TupleField
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Max

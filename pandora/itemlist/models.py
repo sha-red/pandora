@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 import ox
 
-from ox.django.fields import DictField, TupleField
+from oxdjango.fields import DictField, TupleField
 
 from archive import extract
 import managers

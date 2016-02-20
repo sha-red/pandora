@@ -4,10 +4,10 @@ from __future__ import division
 
 import ox
 from ox.utils import json
-from ox.django.api import actions
-from ox.django.decorators import login_required_json
-from ox.django.http import HttpFileResponse
-from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response, HttpErrorJson
+from oxdjango.api import actions
+from oxdjango.decorators import login_required_json
+from oxdjango.http import HttpFileResponse
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response, HttpErrorJson
 
 from django import forms
 from django.conf import settings

@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import itemlist.models
-import ox.django.fields
+import oxdjango.fields
 
 
 class Migration(migrations.Migration):
@@ -27,13 +27,13 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('name', models.CharField(max_length=255)),
                 ('status', models.CharField(default=b'private', max_length=20)),
-                ('query', ox.django.fields.DictField(default={b'static': True})),
+                ('query', oxdjango.fields.DictField(default={b'static': True})),
                 ('type', models.CharField(default=b'static', max_length=255)),
                 ('description', models.TextField(default=b'')),
                 ('icon', models.ImageField(blank=True, default=None, upload_to=itemlist.models.get_icon_path)),
                 ('view', models.TextField(default=itemlist.models.get_listview)),
-                ('sort', ox.django.fields.TupleField(default=itemlist.models.get_listsort, editable=False)),
-                ('poster_frames', ox.django.fields.TupleField(default=[], editable=False)),
+                ('sort', oxdjango.fields.TupleField(default=itemlist.models.get_listsort, editable=False)),
+                ('poster_frames', oxdjango.fields.TupleField(default=[], editable=False)),
                 ('numberofitems', models.IntegerField(default=0)),
             ],
         ),

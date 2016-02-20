@@ -6,7 +6,7 @@ import unicodedata
 
 from django.db import models
 
-from ox.django import fields
+from oxdjango import fields
 import ox
 
 from item import utils

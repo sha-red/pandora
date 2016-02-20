@@ -4,7 +4,7 @@ try:
     from django.contrib.auth.decorators import wraps
 except:
     from django.utils.functional import wraps
-from ox.django.shortcuts import render_to_json_response, json_response
+from oxdjango.shortcuts import render_to_json_response, json_response
 
 def capability_required_json(capability):
     def capability_required(function=None):

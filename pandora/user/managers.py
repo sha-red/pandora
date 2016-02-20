@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
-from ox.django.query import QuerySet
+from oxdjango.query import QuerySet
 from django.conf import settings
 
 def parseCondition(condition, user):

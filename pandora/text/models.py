@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models.signals import pre_delete
 import ox
-from ox.django.fields import TupleField
+from oxdjango.fields import TupleField
 
 from archive import extract
 from archive.chunk import save_chunk

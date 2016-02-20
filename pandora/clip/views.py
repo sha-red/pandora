@@ -4,9 +4,9 @@ from __future__ import division
 
 from django.conf import settings
 from ox.utils import json
-from ox.django.shortcuts import render_to_json_response, json_response
+from oxdjango.shortcuts import render_to_json_response, json_response
 
-from ox.django.api import actions
+from oxdjango.api import actions
 
 from annotation.models import Annotation
 from item.models import Item
