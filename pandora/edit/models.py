@@ -192,7 +192,7 @@ class Edit(models.Model):
             elif key == 'rightslevel':
                 self.rightslevel = int(data['rightslevel'])
             if key == 'query' and not data['query']:
-                setattr(self, key, {"static":True})
+                setattr(self, key, {"static": True})
             elif key == 'query' and isinstance(data[key], dict):
                 setattr(self, key, data[key])
 
@@ -205,7 +205,7 @@ class Edit(models.Model):
             pos.save()
         if 'type' in data:
             if data['type'] == 'static':
-                self.query = {"static":True}
+                self.query = {"static": True}
                 self.type = 'static'
             else:
                 self.type = 'smart'
