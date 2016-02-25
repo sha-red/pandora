@@ -188,10 +188,14 @@ appPanel
         loadingScreen.appendChild(images.loadingIcon);
 
         // FF3.6 document.body can be undefined here
+        var onloadCalled = false;
         window.onload = function() {
-            document.body.style.margin = 0;
-            document.body.appendChild(loadingScreen);
-            startAnimation();
+            if (!onloadCalled) {
+                onloadCalled = true;
+                document.body.style.margin = 0;
+                document.body.appendChild(loadingScreen);
+                startAnimation();
+            }
         };
         // IE8 does not call onload if already loaded before set
         document.body && window.onload();
@@ -556,6 +560,10 @@ appPanel
     }
 
     function startAnimation() {
+        if (animationInterval !== undefined) {
+            return;
+        }
+
         var css, deg = 0, loadingIcon = document.getElementById('loadingIcon'),
             previousTime = +new Date();
         animationInterval = setInterval(function() {
@@ -573,7 +581,10 @@ appPanel
     }
 
     function stopAnimation() {
-        clearInterval(animationInterval);
+        if (animationInterval !== undefined) {
+            clearInterval(animationInterval);
+            animationInterval = undefined;
+        }
     }
 
 }());
