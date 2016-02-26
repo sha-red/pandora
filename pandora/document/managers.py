@@ -24,11 +24,14 @@ def parseCondition(condition, user, item=None):
     op = condition.get('operator')
     if not op:
         op = '='
+
     if op.startswith('!'):
-        op = op[1:]
-        exclude = True
+        return ~buildCondition(k, op[1:], v)
     else:
-        exclude = False
+        return buildCondition(k, op, v)
+
+
+def buildCondition(k, op, v):
     if k == 'id':
         v = ox.fromAZ(v)
         return Q(**{k: v})
@@ -41,11 +44,8 @@ def parseCondition(condition, user, item=None):
             '$': '__iendswith',
         }.get(op, '__icontains'))
     key = str(key)
-    if exclude:
-        q = ~Q(**{key: v})
-    else:
-        q = Q(**{key: v})
-    return q
+    return Q(**{key: v})
+
 
 def parseConditions(conditions, operator, user, item=None):
     '''
