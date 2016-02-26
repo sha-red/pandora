@@ -168,11 +168,13 @@ pandora.ui.documentsPanel = function(options) {
         $findSelect = Ox.Select({
             items: isItemView ? [
                 {id: 'all', title: Ox._('Find: All')},
-                {id: 'name', title: Ox._('Find: Name')}
+                {id: 'name', title: Ox._('Find: Name')},
+                {id: 'entity', title: Ox._('Find: Entity')}
             ] : [
                 {id: 'all', title: Ox._('Find: All')},
                 {id: 'name', title: Ox._('Find: Name')},
-                {id: 'user', title: Ox._('Find: User')}
+                {id: 'user', title: Ox._('Find: User')},
+                {id: 'entity', title: Ox._('Find: Entity')}
             ],
             overlap: 'right',
             type: 'image'
@@ -1009,27 +1011,19 @@ pandora.ui.documentsPanel = function(options) {
         );
     }
 
+    var allKeys = ['user', 'name', 'entity', 'extension', 'description'];
+
     function updateList() {
         var key = $findSelect.value(),
             value = $findInput.value(),
             itemCondition = isItemView
                 ? {key: 'item', operator: '==', value: ui.item}
                 : null,
+            findKeys = key == 'all' ? allKeys : [key],
             findQuery = {
-                conditions: [].concat(
-                    key != 'user'
-                        ? [{key: 'name', operator: '=', value: value}]
-                        : [],
-                    key == 'all'
-                        ? [
-                            {key: 'extension', operator: '=', value: value},
-                            {key: 'description', operator: '=', value: value}
-                        ]
-                        : [],
-                    key != 'name'
-                        ? [{key: 'user', operator: '=', value: value}]
-                        : []
-                ),
+                conditions: findKeys.map(function(k) {
+                    return {key: k, operator: '=', value: value};
+                }),
                 operator: '|'
             },
             query = isItemView

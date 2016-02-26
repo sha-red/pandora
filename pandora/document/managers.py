@@ -5,6 +5,9 @@ from django.db.models import Q, Manager
 import ox
 from oxdjango.query import QuerySet
 
+import entity.managers
+
+
 def parseCondition(condition, user, item=None):
     '''
     '''
@@ -37,6 +40,9 @@ def buildCondition(k, op, v):
         return Q(**{k: v})
     if isinstance(v, bool): #featured and public flag
         key = k
+    elif k == 'entity':
+        entity_key, v = entity.managers.namePredicate(op, v)
+        key = 'entities__' + entity_key
     else:
         key = "%s%s" % (k, {
             '==': '__iexact',
@@ -124,4 +130,3 @@ class DocumentManager(Manager):
             qs = qs.filter(conditions)
 
         return qs
-
