@@ -302,7 +302,7 @@ def delete_document(sender, **kwargs):
         for f in glob('%s/*' % folder):
             if f != t.file.path:
                 os.unlink(f)
-        t.file.delete()
+        t.file.delete(save=False)
 pre_delete.connect(delete_document, sender=Document)
 
 class ItemProperties(models.Model):
