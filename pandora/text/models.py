@@ -295,7 +295,7 @@ class Text(models.Model):
 def delete_file(sender, **kwargs):
     t = kwargs['instance']
     if t.file:
-        t.file.delete()
+        t.file.delete(save=False)
 pre_delete.connect(delete_file, sender=Text)
 
 class Position(models.Model):

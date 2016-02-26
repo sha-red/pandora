@@ -536,7 +536,7 @@ class File(models.Model):
 
     def delete_files(self):
         if self.data:
-            self.data.delete()
+            self.data.delete(save=False)
         self.streams.all().delete()
         prefix = os.path.join(settings.MEDIA_ROOT, self.get_path(''))
         if os.path.exists(prefix):
@@ -634,7 +634,7 @@ class Frame(models.Model):
 def delete_frame(sender, **kwargs):
     f = kwargs['instance']
     if f.frame:
-        f.frame.delete()
+        f.frame.delete(save=False)
 pre_delete.connect(delete_frame, sender=Frame)
 
 
@@ -780,5 +780,5 @@ class Stream(models.Model):
 def delete_stream(sender, **kwargs):
     f = kwargs['instance']
     if f.media:
-        f.media.delete()
+        f.media.delete(save=False)
 pre_delete.connect(delete_stream, sender=Stream)
