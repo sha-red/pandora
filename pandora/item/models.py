@@ -436,10 +436,6 @@ class Item(models.Model):
         if os.path.exists(path):
             shutil.rmtree(path)
 
-    def delete(self, *args, **kwargs):
-        self.delete_files()
-        super(Item, self).delete(*args, **kwargs)
-
     def merge_with(self, other, save=True):
         '''
             move all related tables to other and delete self

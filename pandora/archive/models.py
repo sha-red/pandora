@@ -525,10 +525,6 @@ class File(models.Model):
                             status[name] = u'queued'
         return status
 
-    def delete(self, *args, **kwargs):
-        self.delete_files()
-        super(File, self).delete(*args, **kwargs)
-
     def delete_frames(self):
         frames = os.path.join(settings.MEDIA_ROOT, self.get_path('frames'))
         if os.path.exists(frames):
