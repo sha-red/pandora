@@ -206,7 +206,7 @@ class Entity(models.Model):
                 ids.append(key['id'])
             save('name', u'\n'.join([self.name] + list(self.alternativeNames)))
             self.find.exclude(key__in=ids).delete()
-    
+
     def update_matches(self):
         import annotation.models
         import item.models
@@ -262,6 +262,9 @@ class DocumentProperties(models.Model):
     entity = models.ForeignKey(Entity, related_name='documentproperties')
     index = models.IntegerField(default=0)
 
+
+    def __unicode__(self):
+        return u"%r-%r" % (self.document, self.entity)
 
     def save(self, *args, **kwargs):
 
