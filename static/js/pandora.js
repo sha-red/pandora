@@ -20,6 +20,10 @@ appPanel
 */
 
 (function() {
+    // By default, Chrome and IE limit the .stack property to 10 frames
+    if (typeof Error.stackTraceLimit === 'number') {
+        Error.stackTraceLimit = Math.max(50, Error.stackTraceLimit);
+    }
 
     window.onerror = function(error, url, line, column, errorObj) {
         if (error == 'TypeError: Attempted to assign to readonly property.') {
