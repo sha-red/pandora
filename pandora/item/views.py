@@ -311,10 +311,10 @@ def autocomplete(request, data):
     order_by = key.get('autocompleteSort', False)
     if order_by:
         for o in order_by:
-            if o['operator'] != '-': o['operator'] = '' 
-        order_by = ','.join(['%(operator)ssort__%(key)s' % o for o in order_by])
+            if o['operator'] != '-': o['operator'] = ''
+        order_by = ['%(operator)ssort__%(key)s' % o for o in order_by]
     else:
-        order_by = '-items'
+        order_by = ['-items']
     sort_type = key.get('sortType', key.get('type', 'string'))
     if sort_type == 'title':
         qs = parse_query({'query': data.get('query', {})}, request.user)['qs']
@@ -327,7 +327,7 @@ def autocomplete(request, data):
                 qs = qs.filter(find__key=data['key'], find__value__istartswith=data['value'])
             elif op == '$':
                 qs = qs.filter(find__key=data['key'], find__value__iendswith=data['value'])
-        qs = qs.order_by(order_by, nulls_last=True)
+        qs = qs.order_by(*order_by, nulls_last=True)
         qs = qs[data['range'][0]:data['range'][1]]
         response = json_response({})
         response['data']['items'] = list(set([i.get(data['key']) for i in qs]))
@@ -346,7 +346,7 @@ def autocomplete(request, data):
             item_query = parse_query({'query': data.get('query', {})}, request.user)['qs']
             qs = qs.filter(item__in=item_query)
         qs = qs.values('value').annotate(items=Count('id'))
-        qs = qs.order_by(order_by)
+        qs = qs.order_by(*order_by)
         qs = qs[data['range'][0]:data['range'][1]]
         response = json_response({})
         response['data']['items'] = [i['value'] for i in qs]

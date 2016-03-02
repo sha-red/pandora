@@ -118,16 +118,16 @@ def autocompleteEntities(request, data):
     if order_by:
         for o in order_by:
             if o['operator'] != '-':
-                o['operator'] = '' 
-        order_by = ','.join(['%(operator)s%(key)s' % o for o in order_by])
+                o['operator'] = ''
+        order_by = ['%(operator)s%(key)s' % o for o in order_by]
     else:
-        order_by = 'name_sort'
+        order_by = ['name_sort']
 
     qs = models.Entity.objects.filter(type=data['key'])
     if data['value']:
         k, v = namePredicate(op, data['value'])
         qs = qs.filter(**{k: v})
-    qs = qs.order_by(order_by)
+    qs = qs.order_by(*order_by)
     if op != '$':
         value_lower = data['value'].lower()
         matches = []
