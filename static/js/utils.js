@@ -1948,7 +1948,7 @@ pandora.getVideoURL = function(id, resolution, part, track) {
             .replace('{id}', id)
             .replace('{part}', part)
             .replace('{resolution}', resolution)
-            .replace('{uid}', uid),
+            .replace('{uid}', uid)
             .replace('{uid42}', uid % 42),
         local = pandora.fs && pandora.fs.getVideoURL(id, resolution, part, track);
     return local || prefix + '/'
