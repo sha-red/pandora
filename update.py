@@ -166,16 +166,24 @@ if __name__ == "__main__":
                 shutil.rmtree('.bzr')
             run('git', 'checkout', 'update.py')
         if old <= 5389:
-            run('./bin/pip', 'install', '-r', 'requirements.txt')
-            run('./pandora/manage.py', 'migrate', '--fake-initial', '--noinput')
-            if os.path.exists('contrib'):
-                shutil.rmtree('contrib')
             for path in (
                 'lib/python2.7/site-packages/Django.egg-link',
-                'lib/python2.7/site-packages/django-extensions.egg-link'
+                'lib/python2.7/site-packages/django-extensions.egg-link',
+                'lib/python2.7/site-packages/django-devserver.egg-link'
             ):
                 if os.path.exists(path):
                     os.unlink(path)
+            for path in (
+                'src/django',
+                'src/django-devserver',
+                'src/django-extensions',
+            ):
+                if os.path.exists(path):
+                    shutil.rmtree(path)
+            if os.path.exists('contrib'):
+                shutil.rmtree('contrib')
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
+            run('./pandora/manage.py', 'migrate', '--fake-initial', '--noinput')
             service = 'pandora'
             print('Please install new init script for "%s" service:' % service)
             if os.path.exists('/etc/init'):
