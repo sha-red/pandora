@@ -244,7 +244,7 @@ if __name__ == "__main__":
         os.chdir(join(base, 'pandora'))
         if current != new:
             run('./manage.py', 'update_static')
-            run('./manage.py', 'compile_pyc')
+            run('./manage.py', 'compile_pyc', '-p', '.')
         os.chdir(join(base, 'pandora'))
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
