@@ -9,7 +9,7 @@ from os.path import join, normpath, dirname
 import djcelery
 djcelery.setup_loader()
 
-PROJECT_ROOT = normpath(dirname(__file__))
+BASE_DIR = PROJECT_ROOT = normpath(dirname(__file__))
 
 DEBUG = False
 JSON_DEBUG = False
