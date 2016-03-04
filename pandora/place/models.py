@@ -23,7 +23,7 @@ class Place(models.Model):
     user = models.ForeignKey(User, null=True, related_name='places')
 
     name = models.CharField(max_length=1024)
-    alternativeNames = fields.TupleField(default=[])
+    alternativeNames = fields.TupleField(default=())
     name_sort = models.CharField(max_length=200, db_index=True)
     name_find = models.TextField(default='', editable=False)
 

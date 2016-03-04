@@ -35,7 +35,7 @@ class Entity(models.Model):
 
     type = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
-    alternativeNames = fields.TupleField(default=[])
+    alternativeNames = fields.TupleField(default=())
 
     data = fields.DictField(default={}, editable=False)
     matches = models.IntegerField(default=0)

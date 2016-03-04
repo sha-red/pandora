@@ -36,14 +36,14 @@ class Event(models.Model):
     name_find = models.TextField(default='', editable=True)
     wikipediaId = models.CharField(max_length=1000, blank=True)
 
-    alternativeNames = fields.TupleField(default=[])
+    alternativeNames = fields.TupleField(default=())
 
     objects = managers.EventManager()
 
     #start yyyy-mm-dd|mm-dd|dow 00:00|00:00
     start = models.CharField(default='', max_length=255)
     startTime = models.BigIntegerField(default=None, null=True)
-    
+
     #end   yyyy-mm-dd|mm-dd|dow 00:00|00:01
     end = models.CharField(default='', max_length=255)
     endTime = models.BigIntegerField(default=None, null=True)
@@ -77,7 +77,7 @@ class Event(models.Model):
                  user.profile.capability('canEditEvents')):
                 return True
         return False
-     
+
     def get_matches(self, qs=None):
         return get_matches(self, Event, 'event', qs)
 
@@ -130,7 +130,7 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         if not self.name_sort:
             self.set_name_sort()
-        self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
+        self.name_find = '||' + '||'.join((self.name,) + self.alternativeNames) + '||'
         self.defined = len(filter(None, [getattr(self, key)
                              for key in ('start', 'end')])) > 0
         if self.endTime and self.startTime:
