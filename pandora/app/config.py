@@ -308,17 +308,9 @@ def update_static():
                 os.symlink(default_script, script)
 
 def update_geoip(force=False):
-    path = os.path.join(settings.GEOIP_PATH, 'GeoLiteCity.dat')
+    path = os.path.join(settings.GEOIP_PATH, 'GeoLite2-City.mmdb')
     if not os.path.exists(path) or force:
-        url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
-        print('download', url)
-        ox.net.save_url(url, "%s.gz"%path)
-        if os.path.exists(path):
-            os.unlink(path)
-        os.system('gunzip "%s.gz"' % path)
-    path = os.path.join(settings.GEOIP_PATH, 'GeoLiteCityv6.dat')
-    if not os.path.exists(path) or force:
-        url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz'
+        url = 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz'
         print('download', url)
         ox.net.save_url(url, "%s.gz"%path)
         if os.path.exists(path):

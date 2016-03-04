@@ -7,7 +7,8 @@ from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
-from django.contrib.gis.geoip import GeoIP
+from django.contrib.gis.geoip2 import GeoIP2
+
 
 
 import ox
@@ -66,7 +67,7 @@ class SessionData(models.Model):
         self.parse_useragent()
         if self.ip:
             try:
-                g = GeoIP()
+                g = GeoIP2()
                 location = g.city(self.ip)
                 if location:
                     country = ox.get_country_name(location['country_code'])

@@ -191,6 +191,12 @@ if __name__ == "__main__":
             if os.path.exists('/lib/systemd/system'):
                 print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
             print('\tsudo service %s restart' % service)
+        if old <= 5432:
+            import pandora.settings
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
+            path = os.path.join(pandora.settings.GEOIP_PATH, 'GeoLite2-City.mmdb')
+            if not os.path.exists(path):
+                run('./pandora/manage.py', 'update_geoip')
     else:
         if len(sys.argv) == 1:
             release = get_release()
