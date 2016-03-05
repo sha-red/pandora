@@ -9,6 +9,9 @@ pandora.ui.documentsPanel = function(options) {
         hasListSelection = ui.section == 'items' && !ui.item && ui.listSelection.length,
         isItemView = options.isItemView,
         listLoaded = false,
+        allFindKeys = ['user', 'name', 'entity', 'extension', 'description'].filter(function(key) {
+            return key != 'entity' || pandora.site.entities.length;
+        }),
 
         columns = [
             {
@@ -166,16 +169,19 @@ pandora.ui.documentsPanel = function(options) {
         .appendTo($listBar),
 
         $findSelect = Ox.Select({
-            items: isItemView ? [
-                {id: 'all', title: Ox._('Find: All')},
-                {id: 'name', title: Ox._('Find: Name')},
-                {id: 'entity', title: Ox._('Find: Entity')}
-            ] : [
+            items: [
                 {id: 'all', title: Ox._('Find: All')},
                 {id: 'name', title: Ox._('Find: Name')},
                 {id: 'user', title: Ox._('Find: User')},
                 {id: 'entity', title: Ox._('Find: Entity')}
-            ],
+            ].filter(function(item) {
+                if (item.id == 'user') {
+                    return !isItemView;
+                } else if (item.id == 'entity') {
+                    return pandora.site.entities.length;
+                }
+                return true;
+            }),
             overlap: 'right',
             type: 'image'
         })
@@ -1011,15 +1017,13 @@ pandora.ui.documentsPanel = function(options) {
         );
     }
 
-    var allKeys = ['user', 'name', 'entity', 'extension', 'description'];
-
     function updateList() {
         var key = $findSelect.value(),
             value = $findInput.value(),
             itemCondition = isItemView
                 ? {key: 'item', operator: '==', value: ui.item}
                 : null,
-            findKeys = key == 'all' ? allKeys : [key],
+            findKeys = key == 'all' ? allFindKeys : [key],
             findQuery = {
                 conditions: findKeys.map(function(k) {
                     return {key: k, operator: '=', value: value};
