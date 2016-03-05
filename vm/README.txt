@@ -2,10 +2,10 @@ Create virtual disk of pan.do/ra
 
 == Preparations ==
 
-Pan.do/ra VM scripts use python-vm-builder,
-its available in ubuntu 12.04 and later
+Pan.do/ra VM scripts use vmdebootstrap 0.9 or later
+You also need qemu to run the vm and virtualbox to convert the image
 
-  apt-get install python-vm-builder
+  apt-get install vmdebootstrap virtualbox qemu
 
 
 == Building ==
@@ -14,7 +14,12 @@ You can configure some of the arguments in build.sh once done run:
 
  ./build.sh
 
-this will create a vdi image in pandora/
+this will create a vdi image in pandora-r{REVISON}.vdi
+
+If you have a local apt-cacher instance export MIRROR:
+
+export MIRROR="--mirror http://<LOCAL IP>:3142/archive.ubuntu.com/ubuntu/ --configure-apt"
+./build.sh
 
 
 == VirtualBox Usage ==
