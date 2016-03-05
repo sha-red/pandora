@@ -368,7 +368,7 @@ def getTaskStatus(request, data):
     if status in default_backend.EXCEPTION_STATES:
         traceback = default_backend.get_traceback(task_id)
         response['data'].update({
-            'result': str(res.args[0]),
+            'result': str(res),
             'exc': get_full_cls_name(res.__class__),
             'traceback': traceback
         })

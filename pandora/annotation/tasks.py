@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import json
 import ox
 
 from django.conf import settings
@@ -28,12 +27,12 @@ def update_matches(id, type):
         a_matches.add(Model.get_or_create(a.value))
         for p in a_matches.all():
             p.update_matches()
-    
+
     if a.findvalue:
         names = {}
         for n in Model.objects.all().values('id', 'name', 'alternativeNames'):
             names[n['id']] = [ox.decode_html(x)
-                for x in [n['name']] + json.loads(n['alternativeNames'])]
+                for x in (n['name'],) + n['alternativeNames']]
         value = a.findvalue.lower()
 
         current = [p.id for p in a_matches.all()]
