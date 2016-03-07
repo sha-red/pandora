@@ -75,8 +75,11 @@ def get_positions(ids, pos):
     return positions
 
 def get_by_key(objects, key, value):
-    obj = filter(lambda o: o.get(key) == value, objects)
-    return obj and obj[0] or None
+    for o in objects:
+        if o.get(key) == value:
+            return o
+
+    return None
 
 def get_by_id(objects, id):
     return get_by_key(objects, 'id', id)
