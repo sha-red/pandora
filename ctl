@@ -27,6 +27,9 @@ if [ "$action" = "init" ]; then
     done
     cd ${BASE}
     ./bin/pip install -r requirements.txt
+    if [ ! -e pandora/gunicorn_config.py ]; then
+        cp pandora/gunicorn_config.py.in pandora/gunicorn_config.py
+    fi
     exit 0
 fi
 if [ `whoami` != 'root' ]; then
@@ -41,6 +44,7 @@ if [ "$action" = "install" ]; then
             cp $BASE/etc/systemd/*.service /lib/systemd/system/
             cp $BASE/etc/tmpfiles.d/pandora.conf /usr/lib/tmpfiles.d/
             systemd-tmpfiles --create /usr/lib/tmpfiles.d/pandora.conf >/dev/null || true
+            systemctl daemon-reload
             for service in $SERVICES; do
                 systemctl enable ${service}.service
             done

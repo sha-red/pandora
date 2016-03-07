@@ -1,0 +1,5 @@
+bind="127.0.0.1:2620"
+log_level="info"
+max_requests=1000
+timeout=90
+workers=5

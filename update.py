@@ -197,6 +197,23 @@ if __name__ == "__main__":
             path = os.path.join(pandora.settings.GEOIP_PATH, 'GeoLite2-City.mmdb')
             if not os.path.exists(path):
                 run('./pandora/manage.py', 'update_geoip')
+        if old <= 5443:
+            gunicorn_config = 'pandora/gunicorn_config.py'
+            if not os.path.exists(gunicorn_config):
+                shutil.copy('%s.in'%gunicorn_config, gunicorn_config)
+                if os.path.exists('/etc/init/pandora.conf'):
+                    with open('/etc/init/pandora.conf') as fd:
+                        data = fd.read()
+                        if '0.0.0.0:2620' in data:
+                            run('sed', '-i', 's/127.0.0.1:2620/0.0.0.0:2620/g', gunicorn_config)
+                if old > 5389:
+                    service = 'pandora'
+                    print('Please install new init script for "%s" service:' % service)
+                    if os.path.exists('/etc/init'):
+                        print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
+                    if os.path.exists('/lib/systemd/system'):
+                        print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
+                    print('\tsudo service %s restart' % service)
     else:
         if len(sys.argv) == 1:
             release = get_release()
