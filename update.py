@@ -73,9 +73,9 @@ def check_services(base):
             print('Please install init script for "%s" service:' % service)
             if os.path.exists('/etc/init') and not os.path.exists('/bin/systemctl'):
                 print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
-            if os.path.exists('/lib/systemd/system'):
+            if os.path.exists('/bin/systemctl'):
                 print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
-                print('sudo systemctl daemon-reload')
+                print('\tsudo systemctl daemon-reload')
             print('\tsudo service %s start' % service)
             print('')
 
@@ -189,9 +189,9 @@ if __name__ == "__main__":
             print('Please install new init script for "%s" service:' % service)
             if os.path.exists('/etc/init/%s.conf'%service):
                 print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
-            if os.path.exists('/lib/systemd/system'):
+            if os.path.exists('/bin/systemctl'):
                 print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
-                print('sudo systemctl daemon-reload')
+                print('\tsudo systemctl daemon-reload')
             print('\tsudo service %s restart' % service)
         if old <= 5432:
             import pandora.settings
@@ -213,9 +213,9 @@ if __name__ == "__main__":
                     print('Please install new init script for "%s" service:' % service)
                     if os.path.exists('/etc/init/%s.conf'%service):
                         print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
-                    if os.path.exists('/lib/systemd/system'):
+                    if os.path.exists('/bin/systemctl'):
                         print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
-                        print('sudo systemctl daemon-reload')
+                        print('\tsudo systemctl daemon-reload')
                     print('\tsudo service %s restart' % service)
     else:
         if len(sys.argv) == 1:
