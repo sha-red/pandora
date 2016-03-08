@@ -75,6 +75,7 @@ def check_services(base):
                 print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
             if os.path.exists('/lib/systemd/system'):
                 print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
+                print('sudo systemctl daemon-reload')
             print('\tsudo service %s start' % service)
             print('')
 
@@ -190,6 +191,7 @@ if __name__ == "__main__":
                 print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
             if os.path.exists('/lib/systemd/system'):
                 print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
+                print('sudo systemctl daemon-reload')
             print('\tsudo service %s restart' % service)
         if old <= 5432:
             import pandora.settings
@@ -213,6 +215,7 @@ if __name__ == "__main__":
                         print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
                     if os.path.exists('/lib/systemd/system'):
                         print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
+                        print('sudo systemctl daemon-reload')
                     print('\tsudo service %s restart' % service)
     else:
         if len(sys.argv) == 1:
