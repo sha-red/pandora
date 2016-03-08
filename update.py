@@ -71,7 +71,7 @@ def check_services(base):
         p.wait()
         if p.returncode != 0:
             print('Please install init script for "%s" service:' % service)
-            if os.path.exists('/etc/init'):
+            if os.path.exists('/etc/init') and not os.path.exists('/bin/systemctl'):
                 print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
             if os.path.exists('/lib/systemd/system'):
                 print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
@@ -186,7 +186,7 @@ if __name__ == "__main__":
             run('./pandora/manage.py', 'migrate', '--fake-initial', '--noinput')
             service = 'pandora'
             print('Please install new init script for "%s" service:' % service)
-            if os.path.exists('/etc/init'):
+            if os.path.exists('/etc/init/%s.conf'%service):
                 print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
             if os.path.exists('/lib/systemd/system'):
                 print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
@@ -209,7 +209,7 @@ if __name__ == "__main__":
                 if old > 5389:
                     service = 'pandora'
                     print('Please install new init script for "%s" service:' % service)
-                    if os.path.exists('/etc/init'):
+                    if os.path.exists('/etc/init/%s.conf'%service):
                         print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
                     if os.path.exists('/lib/systemd/system'):
                         print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
