@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import os
 from glob import glob
 
 from celery.task import task
 
 from django.conf import settings
-import ox
+from django.db.models import Q
 
 from item.models import Item
 import models
@@ -107,7 +106,8 @@ def process_stream(fileId):
         file.encoding = False
         file.save()
     file.item.update_selected(update_timeline=False)
-    if not file.item.rendered:
+    if not file.item.rendered \
+        and not file.item.files.exclude(id=fileId).filter(Q(queued=True)|Q(encoding=True)).count():
         file.item.update_timeline()
     if file.item.rendered:
         file.item.save()
