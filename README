@@ -56,7 +56,7 @@ You have to use the same password here and in BROKER_URL in local_settings.py
 
 1) Get code from git
     cd /srv/
-    git clone https://git.0x260.org/pandora.git pandora
+    git clone https://git.0x2620.org/pandora.git pandora
     cd pandora
     ./ctl init
 
