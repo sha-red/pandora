@@ -1613,7 +1613,7 @@ class Item(models.Model):
             self.add_empty_clips()
             return False
 
-    def srt(self, layer, language=None):
+    def srt(self, layer, language=None, encoder=ox.srt):
         def format_value(value):
             value = value.replace('<br/>', '<br>').replace('<br>\n', '\n').replace('<br>', '\n')
             value = value.replace('\n\n', '<br>\n')
@@ -1621,7 +1621,8 @@ class Item(models.Model):
         annotations = self.annotations.filter(layer=layer).exclude(value='')
         if language:
             annotations = annotations.filter(languages__contains=language)
-        return ox.srt.encode([{
+
+        return encoder.encode([{
             'in': a.start,
             'out': a.end,
             'value': format_value(a.value)

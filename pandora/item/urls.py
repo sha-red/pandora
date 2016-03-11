@@ -31,10 +31,7 @@ urlpatterns = [
     url(r'^(?P<id>[A-Z0-9].*)/xml$', views.item_xml),
 
     #srt export
-    url(r'^(?P<id>[A-Z0-9].*)/(?P<layer>.+)\.(?P<language>.{2})\.srt$', views.srt),
-
-    #srt export
-    url(r'^(?P<id>[A-Z0-9].*)/(?P<layer>.+)\.srt$', views.srt),
+    url(r'^(?P<id>[A-Z0-9].*)/(?P<layer>.+)\.(?:(?P<language>.{2})\.)?(?P<ext>srt|vtt)$', views.srt),
 
     #icon
     url(r'^(?P<id>[A-Z0-9].*)/icon(?P<size>\d*)\.jpg$', views.icon),

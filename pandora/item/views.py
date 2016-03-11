@@ -968,19 +968,27 @@ def video(request, id, resolution, format, index=None, track=None):
     response['Cache-Control'] = 'public'
     return response
 
-def srt(request, id, layer, language=None, index=None):
+
+_subtitle_formats = {
+    'srt': ('text/x-srt', ox.srt),
+    'vtt': ('text/vtt', ox.vtt),
+}
+
+
+def srt(request, id, layer, language=None, index=None, ext='srt'):
     item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         response = HttpResponseForbidden()
     else:
+        content_type, encoder = _subtitle_formats[ext]
         response = HttpResponse()
         if language:
-            filename = u"%s.%s.srt" % (item.get('title'), language)
+            filename = u"%s.%s.%s" % (item.get('title'), language, ext)
         else:
-            filename = u"%s.srt" % item.get('title')
+            filename = u"%s.%s" % (item.get('title'), ext)
         response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
-        response['Content-Type'] = 'text/x-srt'
-        response.write(item.srt(layer, language))
+        response['Content-Type'] = content_type
+        response.write(item.srt(layer, language, encoder=encoder))
     return response
 
 def random_annotation(request):
