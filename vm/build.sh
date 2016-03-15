@@ -10,6 +10,10 @@ if [ "$MIRROR" = "" ]; then
     MIRROR="--mirror http://archive.ubuntu.com/ubuntu/"
 fi
 
+if [ -e "$BASE/settings.sh" ]; then
+    . "$BASE/settings.sh"
+fi
+
 if [ $(id -u) -ne 0 ]; then
     echo "you need to run $0 as root"
     exit 1
@@ -18,12 +22,18 @@ fi
 # make sure ubuntu-archive-keyring is installed
 test -e /usr/share/keyrings/ubuntu-archive-keyring.gpg || apt-get install ubuntu-archive-keyring
 
+vmdebootstrap=`vmdebootstrap --version`
+if [[ $vmdebootstrap == "1.4" ]]; then
+    EXTRA=--no-systemd-networkd
+fi
+
 vmdebootstrap \
     --image ${TARGET}.img \
     --size ${SIZE} \
     --sparse \
     --distribution=${RELEASE} \
     $MIRROR \
+    $EXTRA \
     --enable-dhcp \
     --no-serial-console \
     --no-kernel \
