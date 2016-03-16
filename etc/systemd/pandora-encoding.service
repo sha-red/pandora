@@ -15,7 +15,7 @@ ExecStart=/srv/pandora/bin/python /srv/pandora/pandora/manage.py \
     -Q encoding -n pandora-encoding \
     --pidfile /run/pandora/encoding.pid \
     -l INFO
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -TERM $MAINPID
 
 [Install]
 WantedBy=multi-user.target
