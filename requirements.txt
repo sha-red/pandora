@@ -1,7 +1,7 @@
 Django==1.9.4
 simplejson
 chardet
-celery==3.1.20
+celery==3.1.23
 django-celery==3.1.17
 django-extensions==1.6.1
 gunicorn==19.4.5

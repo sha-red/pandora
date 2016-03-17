@@ -79,6 +79,15 @@ def check_services(base):
             print('\tsudo service %s start' % service)
             print('')
 
+def update_service(service):
+    print('Please install new init script for "%s" service:' % service)
+    if os.path.exists('/etc/init/%s.conf'%service):
+        print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
+    if os.path.exists('/bin/systemctl'):
+        print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
+        print('\tsudo systemctl daemon-reload')
+    print('\tsudo service %s restart' % service)
+
 def run_git(path, *args):
     cmd = ['git'] + list(args)
     env = {'GIT_DIR': '%s/.git' % path}
@@ -185,14 +194,7 @@ if __name__ == "__main__":
                 shutil.rmtree('contrib')
             run('./bin/pip', 'install', '-r', 'requirements.txt')
             run('./pandora/manage.py', 'migrate', '--fake-initial', '--noinput')
-            service = 'pandora'
-            print('Please install new init script for "%s" service:' % service)
-            if os.path.exists('/etc/init/%s.conf'%service):
-                print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
-            if os.path.exists('/bin/systemctl'):
-                print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
-                print('\tsudo systemctl daemon-reload')
-            print('\tsudo service %s restart' % service)
+            update_service('pandora')
         if old <= 5432:
             import pandora.settings
             run('./bin/pip', 'install', '-r', 'requirements.txt')
@@ -209,14 +211,11 @@ if __name__ == "__main__":
                         if '0.0.0.0:2620' in data:
                             run('sed', '-i', 's/127.0.0.1:2620/0.0.0.0:2620/g', gunicorn_config)
                 if old > 5389:
-                    service = 'pandora'
-                    print('Please install new init script for "%s" service:' % service)
-                    if os.path.exists('/etc/init/%s.conf'%service):
-                        print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
-                    if os.path.exists('/bin/systemctl'):
-                        print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
-                        print('\tsudo systemctl daemon-reload')
-                    print('\tsudo service %s restart' % service)
+                    update_service('pandora')
+        if old < 5452:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
+            update_service('pandora-encoding')
+            update_service('pandora-tasks')
     else:
         if len(sys.argv) == 1:
             release = get_release()
