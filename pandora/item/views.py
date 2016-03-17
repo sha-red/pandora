@@ -84,6 +84,8 @@ def parse_query(data, user):
     for key in ('sort', 'keys', 'group', 'range', 'position', 'positions'):
         if key in data:
             query[key] = data[key]
+    if [r for r in query['range'] if not isinstance(r, int)]:
+        query['range'] = [0, 0]
     query['qs'] = models.Item.objects.find(data, user)
     if 'clips' in data:
         conditions = {'query': data['clips']['query']}

@@ -25,3 +25,4 @@ static/django_extensions
 *.pyc
 *~
 *.swp
+pandora/gunicorn_config.py
