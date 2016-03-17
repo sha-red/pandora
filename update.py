@@ -212,7 +212,7 @@ if __name__ == "__main__":
                             run('sed', '-i', 's/127.0.0.1:2620/0.0.0.0:2620/g', gunicorn_config)
                 if old > 5389:
                     update_service('pandora')
-        if old < 5452:
+        if old <= 5452:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
             update_service('pandora-encoding')
             update_service('pandora-tasks')
