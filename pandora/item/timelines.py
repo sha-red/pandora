@@ -10,7 +10,7 @@ import Image
 from ox.utils import json
 
 
-def join_tiles(source_paths, target_path):
+def join_tiles(source_paths, durations, target_path):
     '''
     This is an implementation of a join_tiles function for new-style timelines.
     Timelines of files will be read from source_paths, the timeline of the item will
@@ -104,24 +104,31 @@ def join_tiles(source_paths, target_path):
     modes = ['antialias', 'slitscan', 'keyframes', 'keyframeswide', 'audio']
     source_files = {}
     for mode in modes:
-        source_files[mode] = []
+        source_files[mode] = {}
 
     # read files
-    durations = [0] * len(source_paths)
     frame_n = 0
+    offset = 0
     for i, path in enumerate(source_paths):
         file_info = map(get_file_info, os.listdir(path))
         file_info = filter(lambda x: x != None, file_info)
+        files = {}
+        for mode in modes:
+            files[mode] = []
         for info in sorted(file_info, key=lambda x: x['index']):
             mode = info['mode']
-            source_files[mode].append(path + info['file'])
+            files[mode].append(path + info['file'])
+        if i:
+            offset = int(sum(durations[:i]) * 25)
+        for mode in files:
+            source_files[mode][offset] = files[mode]
     modes = [m for m in modes if source_files[m]]
-    for i, path in enumerate(source_paths):
-        for f in source_files[modes[0]]:
-            if f.startswith(path):
-                width = Image.open(f).size[0]
-                durations[i] += width / fps
-                frame_n += width
+    offsets = sorted(source_files[modes[0]])
+    last_offset = max(offsets)
+    frame_n = last_offset
+    for f in source_files[modes[0]][last_offset]:
+        width = Image.open(f).size[0]
+        frame_n += width
     large_tile_n = int(math.ceil(frame_n / large_tile_w)) 
     large_tile_last_w = frame_n % large_tile_w or 60
     small_tile_n = int(math.ceil(frame_n / fps / small_tile_w)) 
@@ -149,19 +156,21 @@ def join_tiles(source_paths, target_path):
     data['target_images'] = {'large': None, 'small': None, 'full': full_tile_image}
     for mode in modes:
         target_w = 0
-        for source_file in source_files[mode]:
-            source_image = Image.open(source_file)
-            source_w = source_image.size[0]
-            target_x = target_w % large_tile_w
-            if target_x == 0:
-                save_and_open(data)
-            data['target_images']['large'].paste(source_image, (target_x, 0))
-            target_w += source_w
-            if target_x + source_w > large_tile_w:
-                # target tile overflows into next source tile
-                save_and_open(data)
-                target_x -= large_tile_w
+        for offset in sorted(source_files[mode]):
+            target_w = offset
+            for source_file in source_files[mode][offset]:
+                source_image = Image.open(source_file)
+                source_w = source_image.size[0]
+                target_x = target_w % large_tile_w
+                if target_x == 0:
+                    save_and_open(data)
                 data['target_images']['large'].paste(source_image, (target_x, 0))
+                target_w += source_w
+                if target_x + source_w > large_tile_w:
+                    # target tile overflows into next source tile
+                    save_and_open(data)
+                    target_x -= large_tile_w
+                    data['target_images']['large'].paste(source_image, (target_x, 0))
         # save_and_open saves previous tile and opens tile at target_w
         # increase target_w to be in next tile
         target_w += large_tile_w

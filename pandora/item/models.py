@@ -1364,8 +1364,12 @@ class Item(models.Model):
     def make_timeline(self):
         streams = self.streams()
         if streams.count() > 1:
-            timelines = [s.timeline_prefix for s in self.streams()]
-            join_tiles(timelines, self.timeline_prefix)
+            timelines = []
+            durations = []
+            for s in self.streams():
+                timelines.append(s.timeline_prefix)
+                durations.append(s.duration)
+            join_tiles(timelines, durations, self.timeline_prefix)
         else:
             #remove joined timeline if it was created at some point
             for f in glob(os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline*.jpg')):
