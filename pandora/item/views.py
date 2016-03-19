@@ -1140,6 +1140,8 @@ def oembed(request):
 
     url = request.GET['url']
     parts = urlparse(url).path.split('/')
+    if not len(parts) < 2:
+        raise Http404
     public_id = parts[1]
     item = get_object_or_404_json(models.Item, public_id=public_id)
     embed_url = request.build_absolute_uri('/%s' % public_id)
