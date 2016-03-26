@@ -32,6 +32,7 @@ pAAGSEQ4uz6bYSeM4Q==
 =SM2a
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
+echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99languages
 
 apt-get update -qq
 
