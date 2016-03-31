@@ -113,10 +113,10 @@ def join_tiles(source_paths, durations, target_path):
         file_info = map(get_file_info, os.listdir(path))
         file_info = filter(lambda x: x != None, file_info)
         files = {}
-        for mode in modes:
-            files[mode] = []
         for info in sorted(file_info, key=lambda x: x['index']):
             mode = info['mode']
+            if not mode in files:
+                files[mode] = []
             files[mode].append(path + info['file'])
         if i:
             offset = int(sum(durations[:i]) * 25)
