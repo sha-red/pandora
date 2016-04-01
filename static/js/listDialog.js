@@ -481,7 +481,9 @@ pandora.ui.listIconPanel = function(listData) {
                     query: {
                         conditions: ui.section == 'items'
                             ? [{key: 'list', value: listData.id, operator: '=='}]
-                            : listData.query ? listData.query.conditions : [],
+                            : listData.query
+                                ? listData.query.conditions
+                                : [{key: 'duration', value: '00:00:00', operator: '>'}],
                         operator: '&'
                     }
                 }), callback);

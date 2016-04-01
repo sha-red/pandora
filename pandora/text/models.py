@@ -162,7 +162,10 @@ class Text(models.Model):
         if 'type' in data:
             self.type = data['type'] == 'pdf' and 'pdf' or 'html'
         if 'posterFrames' in data:
-            self.poster_frames = tuple(data['posterFrames'])
+            poster_frames = [p for p in data['posterFrames'] if 'item' in p]
+            while len(poster_frames) < 4:
+                poster_frames += [poster_frames[-1]]
+            self.poster_frames = tuple(poster_frames)
         if 'embeds' in data:
             self.embeds = tuple(data['embeds'])
         self.save()
