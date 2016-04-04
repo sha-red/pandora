@@ -7,6 +7,12 @@ from oxdjango.query import QuerySet
 
 from item.utils import decode_id
 
+case_sensitive_keys = (
+    'public_id',
+    'layer',
+    'item__public_id',
+)
+
 
 def parseCondition(condition, user):
     '''
@@ -53,14 +59,24 @@ def parseCondition(condition, user):
         v = decode_id(v)
     if isinstance(v, bool): #featured and public flag
         key = k
-    elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches',
-               'id', 'places__id', 'events__id'):
+    elif k in ('places__id', 'events__id'):
         key = "%s%s" % (k, {
             '>': '__gt',
             '>=': '__gte',
             '<': '__lt',
             '<=': '__lte',
         }.get(op, ''))
+    elif k in case_sensitive_keys:
+        key = "%s%s" % (k, {
+            '>': '__gt',
+            '>=': '__gte',
+            '<': '__lt',
+            '<=': '__lte',
+            '==': '__exact',
+            '=': '__contains',
+            '^': '__startswith',
+            '$': '__endswith',
+        }.get(op, '__contains'))
     else:
         key = "%s%s" % (k, {
             '>': '__gt',
@@ -75,7 +91,9 @@ def parseCondition(condition, user):
 
     key = str(key)
     if isinstance(v, unicode):
-        v = unicodedata.normalize('NFKD', v).lower()
+        v = unicodedata.normalize('NFKD', v)
+        if v not in case_sensitive_keys:
+            v = v.lower()
     if exclude:
         q = ~Q(**{key: v})
     else:
@@ -152,7 +170,7 @@ class AnnotationManager(Manager):
 
         #join query with operator
         qs = self.get_query_set()
-        
+
         conditions = parseConditions(data.get('query', {}).get('conditions', []),
                                      data.get('query', {}).get('operator', '&'),
                                      user)
