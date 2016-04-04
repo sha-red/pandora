@@ -42,15 +42,16 @@ function getVideoOverlay(page) {
                 video = links.filter(function(embed) {
                     return embed.id == id;
                 })[0],
-                $interface, $playButton, $editButton;
+                $interface, $playButton, $editButton,
+                pixelRatio = window.devicePixelRatio || 1;
             if (editable || video) {
                 $interface = Ox.$('<div>')
                     .addClass('interface')
                     .css({
-                        left: image.left + 'px',
-                        top: image.top + 'px',
-                        width: image.width + 'px',
-                        height: image.height + 'px'
+                        left: (image.left / pixelRatio) + 'px',
+                        top: (image.top / pixelRatio) + 'px',
+                        width: (image.width / pixelRatio) + 'px',
+                        height: (image.height / pixelRatio) + 'px'
                     });
                 $playButton = Ox.$('<img>')
                     .addClass('button playButton')
