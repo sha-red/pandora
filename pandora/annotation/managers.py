@@ -20,7 +20,7 @@ def parseCondition(condition, user):
             operator: "!="
     }
     '''
-    k = condition.get('key', 'name')
+    k = condition.get('key')
     k = {
         'user': 'user__username',
         'place': 'places__id',
@@ -32,7 +32,7 @@ def parseCondition(condition, user):
         'value': 'findvalue',
     }.get(k, k)
     if not k:
-        k = 'name'
+        k = 'findvalue'
     v = condition['value']
     op = condition.get('operator')
     if not op:
