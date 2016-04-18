@@ -97,7 +97,9 @@ def findClips(request, data):
         qs = qs[query['range'][0]:query['range'][1]]
 
         ids = []
-        layer_ids = [k['id'] for k in settings.CONFIG['layers']]
+        layers = settings.CONFIG['layers']
+        subtitles = utils.get_by_key(layers, 'isSubtitles', True)
+        layer_ids = [k['id'] for k in layers]
         keys = filter(lambda k: k not in layer_ids + ['annotations'], data['keys'])
         if filter(lambda k: k not in models.Clip.clip_keys, keys):
             qs = qs.select_related('sort')
@@ -114,7 +116,6 @@ def findClips(request, data):
 
         def add_annotations(key, qs, add_layer=False):
             values = ['public_id', 'value', 'clip__start', 'clip__end']
-            subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
             if subtitles or add_layer:
                 values.append('layer')
             if query['filter']:
@@ -140,7 +141,7 @@ def findClips(request, data):
                 aqs = Annotation.objects.filter(layer__in=settings.CONFIG['clipLayers'],
                                                 clip__in=ids)
                 add_annotations('annotations', aqs , True)
-            layer_ids = [k['id'] for k in settings.CONFIG['layers']]
+
             for layer in filter(lambda l: l in keys, layer_ids):
                 aqs = Annotation.objects.filter(layer=layer, clip__in=ids)
                 add_annotations(layer, aqs)
