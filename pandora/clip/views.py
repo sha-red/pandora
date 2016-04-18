@@ -95,6 +95,7 @@ def findClips(request, data):
     if 'keys' in data:
         qs = order_query(qs, query['sort'])
         qs = qs[query['range'][0]:query['range'][1]]
+        qs = qs.select_related('item')
 
         ids = []
         layers = settings.CONFIG['layers']
@@ -102,7 +103,7 @@ def findClips(request, data):
         layer_ids = [k['id'] for k in layers]
         keys = filter(lambda k: k not in layer_ids + ['annotations'], data['keys'])
         if filter(lambda k: k not in models.Clip.clip_keys, keys):
-            qs = qs.select_related('sort')
+            qs = qs.select_related('item__sort')
 
         def add(p):
             ids.append(p.id)
