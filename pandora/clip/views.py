@@ -97,7 +97,6 @@ def findClips(request, data):
         qs = qs[query['range'][0]:query['range'][1]]
         qs = qs.select_related('item')
 
-        ids = []
         layers = settings.CONFIG['layers']
         subtitles = utils.get_by_key(layers, 'isSubtitles', True)
         layer_ids = [k['id'] for k in layers]
@@ -105,18 +104,17 @@ def findClips(request, data):
         if filter(lambda k: k not in models.Clip.clip_keys, keys):
             qs = qs.select_related('item__sort')
 
-        def add(p):
-            ids.append(p.id)
-            return p.json(keys=keys)
+        clips = {}
+        response['data']['items'] = clip_jsons = []
+        for p in qs:
+            j = p.json(keys=keys)
+            clips[p.id] = j
+            clip_jsons.append(j)
 
-        response['data']['items'] = [add(p) for p in qs]
         keys = data['keys']
 
-        def clip_public_id(c):
-            return u'%s/%0.03f-%0.03f' % (c['public_id'].split('/')[0], c['clip__start'], c['clip__end'])
-
         def add_annotations(key, qs, add_layer=False):
-            values = ['public_id', 'value', 'clip__start', 'clip__end']
+            values = ['public_id', 'value', 'clip_id']
             if subtitles or add_layer:
                 values.append('layer')
             if query['filter']:
@@ -125,26 +123,25 @@ def findClips(request, data):
                 if not key in i:
                     i[key] = []
             for a in qs.values(*values):
-                public_id = clip_public_id(a)
-                for i in response['data']['items']:
-                    if i['id'] == public_id:
-                        l = {
-                            'id': a['public_id'],
-                            'value': a['value'],
-                        }
-                        if subtitles and a['layer'] == subtitles['id'] and not a['value']:
-                            del l['id']
-                        if add_layer:
-                            l['layer'] = a['layer']
-                        i[key].append(l)
+                i = clips[a['clip_id']]
+                l = {
+                    'id': a['public_id'],
+                    'value': a['value'],
+                }
+                if subtitles and a['layer'] == subtitles['id'] and not a['value']:
+                    del l['id']
+                if add_layer:
+                    l['layer'] = a['layer']
+                i[key].append(l)
+
         if response['data']['items']:
             if 'annotations' in keys:
                 aqs = Annotation.objects.filter(layer__in=settings.CONFIG['clipLayers'],
-                                                clip__in=ids)
+                                                clip__in=clips)
                 add_annotations('annotations', aqs , True)
 
             for layer in filter(lambda l: l in keys, layer_ids):
-                aqs = Annotation.objects.filter(layer=layer, clip__in=ids)
+                aqs = Annotation.objects.filter(layer=layer, clip__in=clips)
                 add_annotations(layer, aqs)
     elif 'position' in query:
         qs = order_query(qs, query['sort'])
