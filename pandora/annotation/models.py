@@ -295,6 +295,9 @@ class Annotation(models.Model):
                         if value != None:
                             j[key] = value
 
+        # Items without any real subtitles are given a dummy 5-second subtitle
+        # every minute to ensure that they have at least *some* clips. Treat
+        # them specially. See Item.add_empty_clips
         if l.get('isSubtitles') and 'id' in j and not self.value:
             del j['id']
 
