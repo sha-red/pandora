@@ -3,12 +3,13 @@
 from __future__ import division
 
 from django.conf import settings
-from ox.utils import json
+import ox
 from oxdjango.shortcuts import render_to_json_response, json_response
 
 from oxdjango.api import actions
 
 from annotation.models import Annotation
+from entity.models import Entity
 from item.models import Item
 from item import utils
 from changelog.models import add_changelog
@@ -98,6 +99,7 @@ def findClips(request, data):
         qs = qs.select_related('item')
 
         layers = settings.CONFIG['layers']
+        entity_layer_ids = [k['id'] for k in layers if k['type'] == 'entity']
         subtitles = utils.get_by_key(layers, 'isSubtitles', True)
         layer_ids = [k['id'] for k in layers]
         keys = filter(lambda k: k not in layer_ids + ['annotations'], data['keys'])
@@ -114,14 +116,14 @@ def findClips(request, data):
         keys = data['keys']
 
         def add_annotations(key, qs, add_layer=False):
-            values = ['public_id', 'value', 'clip_id']
-            if subtitles or add_layer:
-                values.append('layer')
+            values = ['public_id', 'layer', 'value', 'clip_id']
             if query['filter']:
                 qs = qs.filter(query['filter'])
             for i in response['data']['items']:
                 if not key in i:
                     i[key] = []
+            entity_annotations = {}
+
             for a in qs.values(*values):
                 i = clips[a['clip_id']]
                 l = {
@@ -133,6 +135,15 @@ def findClips(request, data):
                 if add_layer:
                     l['layer'] = a['layer']
                 i[key].append(l)
+
+                if a['layer'] in entity_layer_ids:
+                    entity_annotations.setdefault(l['value'], []).append(l)
+
+            if entity_annotations:
+                ids = map(ox.fromAZ, entity_annotations)
+                for e in Entity.objects.filter(id__in=ids).only('name'):
+                    for l in entity_annotations[e.get_id()]:
+                        l['value'] = e.annotation_value()
 
         if response['data']['items']:
             if 'annotations' in keys:
