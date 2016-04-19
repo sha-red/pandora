@@ -98,7 +98,7 @@ class Annotation(models.Model):
     value = models.TextField()
     findvalue = models.TextField(null=True)
     sortvalue = models.CharField(max_length=1000, null=True, blank=True, db_index=True)
-    
+
     languages = models.CharField(max_length=255, null=True, blank=True)
 
     def editable(self, user):
@@ -138,8 +138,7 @@ class Annotation(models.Model):
 
             findvalue = self.value
             try:
-                l = self.get_layer()
-                if l['type'] == 'entity':
+                if layer['type'] == 'entity':
                     findvalue = self.get_entity().name
             except:
                 pass
@@ -232,7 +231,7 @@ class Annotation(models.Model):
 
     annotation_keys = (
         'id', 'in', 'out', 'value', 'created', 'modified',
-        'duration', 'layer', 'item', 'videoRatio', 'languages', 
+        'duration', 'layer', 'item', 'videoRatio', 'languages',
         'entity', 'event', 'place'
     )
     _clip_keys = ('hue', 'lightness', 'saturation', 'volume')
@@ -295,10 +294,10 @@ class Annotation(models.Model):
                             value = getattr(self.item.sort, key)
                         if value != None:
                             j[key] = value
-        subtitles = get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
-        if subtitles:
-            if 'id' in j and self.layer == subtitles['id'] and not self.value:
-                del j['id']
+
+        if l.get('isSubtitles') and 'id' in j and not self.value:
+            del j['id']
+
         return j
 
     def __unicode__(self):
