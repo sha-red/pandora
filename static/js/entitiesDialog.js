@@ -1,5 +1,82 @@
 'use strict';
 
+(function() {
+
+// cribbed from documentsPanel.js, TODO: refactor
+var entitiesInput = function(width, defaultType, max) {
+    var labelWidth = 80;
+
+    if (!defaultType) {
+        defaultType = pandora.site.entities[0].id;
+    }
+
+    return Ox.ArrayInput({
+            input: {
+                get: function(width) {
+                    var $input = Ox.FormElementGroup({
+                        elements: [
+                            Ox.Select({
+                                items: pandora.site.entities.map(function(entity) {
+                                    return {
+                                        id: entity.id,
+                                        title: entity.title
+                                    };
+                                }),
+                                overlap: 'right',
+                                width: labelWidth
+                            })
+                            .bindEvent({
+                                change: function() {
+                                    var v = $input.value();
+                                    $input.value({type: v.type, name: ''});
+                                    $input.options('elements')[1].focusInput();
+                                }
+                            }),
+                            Ox.Input({
+                                autocomplete: function(value, callback) {
+                                    pandora.api.autocompleteEntities({
+                                        key: $input.value().type,
+                                        operator: '=',
+                                        range: [0, 10],
+                                        value: value
+                                    }, function(result) {
+                                        callback(result.data.items);
+                                    });
+                                },
+                                autocompleteReplace: true,
+                                autocompleteSelect: true,
+                                autocompleteSelectSubmit: true,
+                                width: width - labelWidth
+                            })
+                        ],
+                        width: width,
+                        split: function(value) {
+                            return [value.type || defaultType, value.name || ''];
+                        },
+                        join: function(value) {
+                            return {type: value[0], name: value[1]};
+                        }
+                    });
+                    return $input;
+                },
+                getEmpty: function(value) {
+                    var type = (value && value[0]) || defaultType;
+                    return {type: type, name: ''};
+                },
+                isEmpty: function(value) {
+                    return !value.name;
+                },
+                setWidth: function($input, width) {
+                    $input.options('elements')[1].options({
+                        width: width - labelWidth
+                    });
+                }
+            },
+            width: width,
+            max: max || 0,
+        });
+}
+
 pandora.ui.entitiesDialog = function(options) {
 
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
@@ -372,6 +449,7 @@ pandora.ui.entitiesDialog = function(options) {
             $form.empty()
             keys.forEach(function(key, index) {
                 var defaultValue = void 0,
+                    value = result.data[key.id],
                     $label = Ox.Label({
                             title: Ox._(key.title),
                             width: width
@@ -397,29 +475,42 @@ pandora.ui.entitiesDialog = function(options) {
                         height: width,
                         type: 'textarea'
                     });
+                } else if (key.type[0] === 'entity') {
+                    $input = entitiesInput(width, type, key.max || 0);
+                    defaultValue = [];
+
+                    $input.bindEvent({
+                        submit: function(data) {
+                            $input.triggerEvent('change', data);
+                        }
+                    })
                 }
+
+                var change = function(data, eventName) {
+                    console.log(eventName, data);
+                    pandora.api.editEntity(Ox.extend({
+                        id: id
+                    }, key.id, data.value), function(result) {
+                        Ox.Request.clearCache('findEntities');
+                        Ox.Request.clearCache('getEntity');
+                        if (key.id == 'name') {
+                            $input.value(result.data.name);
+                            $list.reloadList(true);
+                        } else if (key.id == 'alternativeNames') {
+                            $input.value(result.data.alternativeNames);
+                        }
+                        renderEntity();
+                    });
+                };
+
                 $input.options({
                         disabled: key.id == 'id',
-                        value: result.data[key.id] || defaultValue,
+                        value: value || defaultValue,
                         width: width
                     })
                     .css({margin: '4px'})
                     .bindEvent({
-                        change: function(data) {
-                            pandora.api.editEntity(Ox.extend({
-                                id: id
-                            }, key.id, data.value), function(result) {
-                                Ox.Request.clearCache('findEntities');
-                                Ox.Request.clearCache('getEntity');
-                                if (key.id == 'name') {
-                                    $input.value(result.data.name);
-                                    $list.reloadList(true);
-                                } else if (key.id == 'alternativeNames') {
-                                    $input.value(result.data.alternativeNames);
-                                }
-                                renderEntity();
-                            });
-                        }
+                        change: change,
                     })
                     .appendTo($form);
                 $labels.push($label);
@@ -467,3 +558,4 @@ pandora.ui.entitiesDialog = function(options) {
     return that;
 
 };
+}());
