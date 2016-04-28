@@ -168,8 +168,8 @@ class Entity(models.Model):
             elif key == 'sortName':
                 response[key] = self.name_sort
             elif key == 'documents':
-                response[key] = [ox.toAZ(d['id'])
-                    for d in self.documents.all().values('id').order_by('documentproperties__index')]
+                response[key] = [ox.toAZ(id_)
+                    for id_, in self.documentproperties.order_by('index').values_list('document_id')]
             elif key in self.data:
                 response[key] = self.data[key]
         return response
