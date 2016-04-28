@@ -6,17 +6,17 @@ getent passwd $PANDORA > /dev/null 2>&1 || adduser --disabled-password --gecos "
 LXC=`grep -q lxc /proc/1/environ && echo 'yes' || echo 'no'`
 if [ -e /etc/os-release ]; then
     . /etc/os-release
-else
-    ID=unknown
 fi
-UBUNTU_VERSION="$VERSION_ID"
 if [ -d "/run/systemd/system/" ]; then
     SYSTEMD="yes"
 else
     SYSTEMD="no"
 fi
+if [ -z "$UBUNTU_CODENAME" ]; then
+    UBUNTU_CODENAME=trusty
+fi
 export DEBIAN_FRONTEND=noninteractive
-echo "deb http://ppa.launchpad.net/j/pandora/ubuntu trusty main" > /etc/apt/sources.list.d/j-pandora.list
+echo "deb http://ppa.launchpad.net/j/pandora/ubuntu ${UBUNTU_CODENAME} main" > /etc/apt/sources.list.d/j-pandora.list
 apt-key add - <<EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1
