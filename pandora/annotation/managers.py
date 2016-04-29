@@ -92,7 +92,7 @@ def parseCondition(condition, user):
     key = str(key)
     if isinstance(v, unicode):
         v = unicodedata.normalize('NFKD', v)
-        if v not in case_sensitive_keys:
+        if k not in case_sensitive_keys:
             v = v.lower()
     if exclude:
         q = ~Q(**{key: v})
