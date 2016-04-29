@@ -23,8 +23,7 @@ from person.models import get_name_sort
 from chunk import save_chunk
 import extract
 
-def get_path(f, x): return f.path(x)
-def get_data_path(f, x): return get_path(f, 'data.bin')
+def data_path(f, x): return f.get_path('data.bin')
 
 class File(models.Model):
     AV_INFO = (
@@ -92,7 +91,7 @@ class File(models.Model):
 
     #upload and data handling
     data = models.FileField(null=True, blank=True,
-                            upload_to=get_data_path)
+                            upload_to=data_path)
 
     def __unicode__(self):
         return self.path
@@ -634,6 +633,8 @@ def delete_frame(sender, **kwargs):
 pre_delete.connect(delete_frame, sender=Frame)
 
 
+def stream_path(f, x): return f.path(x)
+
 class Stream(models.Model):
 
     class Meta:
@@ -643,7 +644,7 @@ class Stream(models.Model):
     resolution = models.IntegerField(default=96)
     format = models.CharField(max_length=255, default='webm')
 
-    media = models.FileField(default=None, blank=True, upload_to=get_path)
+    media = models.FileField(default=None, blank=True, upload_to=stream_path)
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
     oshash = models.CharField(max_length=16, null=True, db_index=True)
