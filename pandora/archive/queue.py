@@ -3,9 +3,11 @@
 from __future__ import division, print_function
 
 from datetime import datetime
-import time
+from time import time
 
 import celery.task.control
+import kombu.five
+
 
 from .models import File
 
@@ -18,9 +20,10 @@ def parse_job(job):
         'file': f.oshash
     }
     if job['time_start']:
+        start_time = datetime.fromtimestamp(time() - (kombu.five.monotonic() - job['time_start']))
         r.update({
-        'started': datetime.fromtimestamp(job['time_start']),
-        'running': time.time() - job['time_start'],
+        'started': start_time,
+        'running': (datetime.now() - start_time).total_seconds()
         })
     if f.encoding:
         r['status'] = f.encoding_status()
@@ -33,10 +36,10 @@ def status():
     }
     encoding_jobs = ('archive.tasks.extract_stream', 'archive.tasks.process_stream')
     c = celery.task.control.inspect()
-    for job in c.active(safe=True)['pandora-encoding']:
+    for job in c.active(safe=True).get('celery@pandora-encoding', []):
         if job['name'] in encoding_jobs:
             status['active'].append(parse_job(job))
-    for job in c.reserved(safe=True)['pandora-encoding']:
+    for job in c.reserved(safe=True).get('celery@pandora-encoding', []):
         if job['name'] in encoding_jobs:
             status['queued'].append(parse_job(job))
     return status
