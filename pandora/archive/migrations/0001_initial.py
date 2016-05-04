@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
                 ('is_audio', models.BooleanField(default=False)),
                 ('is_video', models.BooleanField(default=False)),
                 ('is_subtitle', models.BooleanField(default=False)),
-                ('data', models.FileField(blank=True, null=True, upload_to=archive.models.get_data_path)),
+                ('data', models.FileField(blank=True, null=True, upload_to=archive.models.data_path)),
             ],
         ),
         migrations.CreateModel(
@@ -93,7 +93,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('resolution', models.IntegerField(default=96)),
                 ('format', models.CharField(default=b'webm', max_length=255)),
-                ('media', models.FileField(blank=True, default=None, upload_to=archive.models.get_path)),
+                ('media', models.FileField(blank=True, default=None, upload_to=archive.models.stream_path)),
                 ('available', models.BooleanField(default=False)),
                 ('oshash', models.CharField(db_index=True, max_length=16, null=True)),
                 ('info', oxdjango.fields.DictField(default={})),
