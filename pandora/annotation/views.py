@@ -3,6 +3,8 @@
 from __future__ import division
 
 from django.conf import settings
+from django.db.models import Count, Sum, F, Value
+from django.db.models.functions import Coalesce
 
 import ox
 from ox.utils import json
@@ -85,12 +87,21 @@ def findAnnotations(request, data):
         range: [int, int], // items to return, per current sort order, see `find`
         sort: [] // list of sort object, see `find`
     }
-    returns {
+    returns { // if `keys` is present
         annotations: [{
             id: string, // annotation id
             ... // more annotation properties
         }]
+    } or { // if `keys` is missing
+        items: int, // total number of matching annotations
+        duration: float // total duration of matching annotations, in seconds
+    } or { // if `positions` is present
+        positions: { // returns positions of given annotations
+            id: position, // position of the annotation, per current sort order
+            ... // more id/position pairs
+        }
     }
+
     see: addAnnotation, addAnnotations, editAnnotation, find, getAnnotation,
     removeAnnotation
     '''
@@ -120,7 +131,10 @@ def findAnnotations(request, data):
         ids = [i.public_id for i in qs]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
-        response['data']['items'] = qs.count()
+        response['data'] = qs.aggregate(
+            items=Count('*'),
+            duration=Coalesce(Sum(F('end') - F('start')), Value(0)),
+        )
     return render_to_json_response(response)
 actions.register(findAnnotations)
 
