@@ -22,26 +22,23 @@ def parse_job(job):
     if job['time_start']:
         start_time = datetime.fromtimestamp(time() - (kombu.five.monotonic() - job['time_start']))
         r.update({
-        'started': start_time,
-        'running': (datetime.now() - start_time).total_seconds()
+            'started': start_time,
+            'running': (datetime.now() - start_time).total_seconds()
         })
     if f.encoding:
         r['status'] = f.encoding_status()
     return r
 
 def status():
-    status = {
-        'active': [],
-        'queued': [],
-    }
+    status = []
     encoding_jobs = ('archive.tasks.extract_stream', 'archive.tasks.process_stream')
     c = celery.task.control.inspect()
     for job in c.active(safe=True).get('celery@pandora-encoding', []):
         if job['name'] in encoding_jobs:
-            status['active'].append(parse_job(job))
+            status.append(parse_job(job))
     for job in c.reserved(safe=True).get('celery@pandora-encoding', []):
         if job['name'] in encoding_jobs:
-            status['queued'].append(parse_job(job))
+            status.append(parse_job(job))
     return status
 
 

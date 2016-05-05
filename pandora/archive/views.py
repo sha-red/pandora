@@ -21,9 +21,10 @@ import item.tasks
 from oxdjango.api import actions
 from changelog.models import add_changelog
 
-import models
-import tasks
-from chunk import process_chunk
+from . import models
+from . import queue
+from . import tasks
+from .chunk import process_chunk
 
 
 @login_required_json
@@ -710,3 +711,9 @@ def getMediaInfo(request, data):
     return render_to_json_response(response)
 actions.register(getMediaInfo)
 
+
+def getEncodingStatus(request, data):
+    response = json_response()
+    response['data']['status'] = queue.status()
+    return render_to_json_response(response)
+actions.register(getEncodingStatus, cache=False)
