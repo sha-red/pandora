@@ -822,7 +822,7 @@ pandora.ui.infoView = function(data) {
                                         .html(Ox._('Loading {0}...', [filmography]));
                                     getFilmography(
                                         key == 'studios' ? 'productionCompany' : 'name',
-                                        value.name,
+                                        Ox.decodeHTMLEntities(value.name),
                                         value.keys,
                                         function($element) {
                                             $link.addClass('OxLink')
