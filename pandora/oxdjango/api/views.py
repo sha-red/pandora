@@ -8,7 +8,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
 
-from ..shortcuts import render_to_json_response, json_response
+from ..shortcuts import render_to_json_response, json_response, HttpErrorJson
 
 from actions import actions
 
@@ -31,7 +31,9 @@ def api(request):
             'settings': settings,
             'sitename': settings.SITENAME
         })
-        return render_to_response('api.html', context)
+        response = render_to_response('api.html', context)
+        response['Access-Control-Allow-Origin'] = '*'
+        return response
     if request.META.get('CONTENT_TYPE') == 'application/json':
         r = json.loads(request.body)
         action = r['action']
@@ -45,7 +47,10 @@ def api(request):
     else:
         f = actions.get(action)
     if f:
-        response = f(request, data)
+        try:
+            response = f(request, data)
+        except HttpErrorJson as e:
+            response = render_to_json_response(e.response)
     else:
         response = render_to_json_response(json_response(status=400,
                                 text='Unknown action %s' % action))
