@@ -248,8 +248,9 @@ except NameError:
         SECRET_KEY = open(SECRET_FILE).read().strip()
     except IOError:
         try:
-            from random import choice
-            SECRET_KEY = ''.join([choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
+            from django.utils.crypto import get_random_string
+            chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+            SECRET_KEY = get_random_string(50, chars)
             secret = file(SECRET_FILE, 'w')
             secret.write(SECRET_KEY)
             secret.close()
