@@ -164,7 +164,7 @@ LOGGING = {
 
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 AUTH_CHECK_USERNAME = True
-FFMPEG='ffmpeg'
+FFMPEG = 'ffmpeg'
 
 #=========================================================================
 #Pan.do/ra related settings settings
@@ -200,7 +200,7 @@ DEFAULT_CONFIG = join(PROJECT_ROOT, 'config.pandora.jsonc')
 RELOAD_CONFIG = False
 
 #used if CONFIG['canDownloadVideo'] is set
-TRACKER_URL="udp://tracker.openbittorrent.com:80"
+TRACKER_URL = "udp://tracker.openbittorrent.com:80"
 
 DATA_SERVICE = ''
 POSTER_PRECEDENCE = ()
@@ -209,22 +209,22 @@ USE_IMDB = False
 
 #If you set VIDEO_PREFIX make sure cookies work accros subsomains
 #by setting SESSION_COOKIE_DOMAIN to ".domain.tld"
-VIDEO_PREFIX=''
+VIDEO_PREFIX = ''
 #VIDEO_PREFIX = '//video{uid}.example.com'
-MEDIA_PREFIX=''
+MEDIA_PREFIX = ''
 #VIDEO_PREFIX = '//media.example.com'
 #SESSION_COOKIE_DOMAIN = '.example.com'
 
-SESSION_COOKIE_AGE=60*24*60*60
+SESSION_COOKIE_AGE = 60*24*60*60
 
 # Extend cookie age if session is older
-SESSION_UPDATE=24*60*60
+SESSION_UPDATE = 24*60*60
 
 SCRIPT_ROOT = normpath(join(PROJECT_ROOT, '..', 'scripts'))
 #change script to customize
 ITEM_POSTER = join(SCRIPT_ROOT, 'poster.py')
-ITEM_ICON   = join(SCRIPT_ROOT, 'item_icon.py')
-LIST_ICON   = join(SCRIPT_ROOT, 'list_icon.py')
+ITEM_ICON = join(SCRIPT_ROOT, 'item_icon.py')
+LIST_ICON = join(SCRIPT_ROOT, 'list_icon.py')
 
 DB_GIN_TRGM = False
 
