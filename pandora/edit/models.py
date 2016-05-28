@@ -71,7 +71,7 @@ class Edit(models.Model):
         return ('/edits/%s' % quote(self.get_id())).replace('%3A', ':')
 
     def add_clip(self, data, index=None):
-        if index != None:
+        if index is not None:
             ids = [i['id'] for i in self.clips.order_by('index').values('id')]
         c = Clip(edit=self)
         if 'annotation' in data and data['annotation']:
@@ -83,17 +83,17 @@ class Edit(models.Model):
             c.end = data['out']
         else:
             return False
-        if index != None:
+        if index is not None:
             c.index = index
         # dont add clip if in/out are invalid
         if not c.annotation:
             duration = c.item.sort.duration
             if c.start > c.end \
-                or round(c.start, 3) >= round(duration, 3) \
-                or round(c.end, 3) > round(duration, 3):
+                    or round(c.start, 3) >= round(duration, 3) \
+                    or round(c.end, 3) > round(duration, 3):
                 return False
         c.save()
-        if index != None:
+        if index is not None:
             ids.insert(index, c.id)
             self.sort_clips(ids)
         return c
@@ -131,7 +131,7 @@ class Edit(models.Model):
             return False
         if self.user == user or \
            user.is_staff or \
-           user.profile.capability('canEditFeaturedEdits') == True:
+           user.profile.capability('canEditFeaturedEdits'):
             return True
         return False
 
@@ -153,7 +153,7 @@ class Edit(models.Model):
                 elif value == 'featured':
                     if user.profile.capability('canEditFeaturedEdits'):
                         pos, created = Position.objects.get_or_create(edit=self, user=user,
-                                                                             section='featured')
+                                                                      section='featured')
                         if created:
                             qs = Position.objects.filter(user=user, section='featured')
                             pos.position = qs.aggregate(Max('position'))['position__max'] + 1
@@ -164,14 +164,14 @@ class Edit(models.Model):
                 elif self.status == 'featured' and value == 'public':
                     Position.objects.filter(edit=self).delete()
                     pos, created = Position.objects.get_or_create(edit=self,
-                                                  user=self.user,section='personal')
+                                                                  user=self.user, section='personal')
                     qs = Position.objects.filter(user=self.user,
-                                                        section='personal')
+                                                 section='personal')
                     pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                     pos.save()
                     for u in self.subscribed_users.all():
                         pos, created = Position.objects.get_or_create(edit=self, user=u,
-                                                                             section='public')
+                                                                      section='public')
                         qs = Position.objects.filter(user=u, section='public')
                         pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                         pos.save()
@@ -183,7 +183,7 @@ class Edit(models.Model):
                     data['name'] = "Untitled"
                 name = data['name']
                 num = 1
-                while Edit.objects.filter(name=name, user=self.user).exclude(id=self.id).count()>0:
+                while Edit.objects.filter(name=name, user=self.user).exclude(id=self.id).count() > 0:
                     num += 1
                     name = data['name'] + ' [%d]' % num
                 self.name = name
@@ -210,7 +210,7 @@ class Edit(models.Model):
             else:
                 self.type = 'smart'
                 if self.query.get('static', False):
-                     self.query = {'conditions': [], 'operator': '&'}
+                    self.query = {'conditions': [], 'operator': '&'}
         if 'posterFrames' in data:
             self.poster_frames = tuple(data['posterFrames'])
         self.save()
@@ -265,8 +265,8 @@ class Edit(models.Model):
                         'conditions': get_conditions(condition['conditions'])
                     })
                 elif condition['key'] == 'annotations' or \
-                    get_by_id(settings.CONFIG['layers'], condition['key']):
-                        clip_conditions.append(condition)
+                        get_by_id(settings.CONFIG['layers'], condition['key']):
+                    clip_conditions.append(condition)
             return clip_conditions
 
         return {
@@ -335,7 +335,7 @@ class Edit(models.Model):
 
     def json(self, keys=None, user=None):
         if not keys:
-             keys=[
+            keys = [
                 'clips',
                 'description',
                 'duration',
@@ -376,7 +376,7 @@ class Edit(models.Model):
                     response[key] = 0
                 elif self.type == 'static':
                     response[key] = sum([(c['annotation__end'] or c['end']) - (c['annotation__start'] or c['start'])
-                        for c in clips_qs.values('start', 'end', 'annotation__start', 'annotation__end')])
+                                         for c in clips_qs.values('start', 'end', 'annotation__start', 'annotation__end')])
                 else:
                     response[key] = sum([c['end'] - c['start'] for c in clips_qs.values('start', 'end')])
             elif key == 'editable':
@@ -389,7 +389,7 @@ class Edit(models.Model):
                 if user and not user.is_anonymous():
                     response[key] = self.subscribed_users.filter(id=user.id).exists()
             elif hasattr(self, _map.get(key, key)):
-                response[key] = getattr(self, _map.get(key,key))
+                response[key] = getattr(self, _map.get(key, key))
         return response
 
     def render(self):
@@ -403,7 +403,7 @@ class Edit(models.Model):
             cmd = ['avconv', '-i', path,
                    '-ss', data['in'], '-t', data['out'],
                    '-vcodec', 'copy', '-acodec', 'copy',
-                    clips[-1]]
+                   clips[-1]]
             #p = subprocess.Popen(cmd, close_fds=True)
             #p.wait()
         cmd = ['mkvmerge', clips[0]] \
@@ -426,8 +426,8 @@ class Clip(models.Model):
     duration = models.FloatField(default=0)
     
     hue = models.FloatField(default=0)
-    saturation= models.FloatField(default=0)
-    lightness= models.FloatField(default=0)
+    saturation = models.FloatField(default=0)
+    lightness = models.FloatField(default=0)
     volume = models.FloatField(default=0)
     sortvalue = models.CharField(max_length=1000, null=True, db_index=True)
 
@@ -447,9 +447,9 @@ class Clip(models.Model):
         sortvalue = ''
         if self.id:
             for l in settings.CONFIG.get('clipLayers', []):
-                sortvalue += ''.join(filter(lambda s: s,
-                     [a.sortvalue
-                      for a in self.get_annotations().filter(layer=l)]))
+                sortvalue += ''.join([a.sortvalue
+                                      for a in self.get_annotations().filter(layer=l)
+                                      if a.sortvalue])
         if sortvalue:
             self.sortvalue = sortvalue[:900]
         else:
@@ -462,7 +462,7 @@ class Clip(models.Model):
         self.duration = end - start
         if int(end*25) - int(start*25) > 0:
             self.hue, self.saturation, self.lightness = extract.average_color(
-                           self.item.timeline_prefix, self.start, self.end)
+                self.item.timeline_prefix, self.start, self.end)
             self.volume = extract.average_volume(self.item.timeline_prefix, self.start, self.end)
         else:
             self.hue = self.saturation = self.lightness = 0
