@@ -46,7 +46,7 @@ if [ "$action" = "install" ]; then
                   /lib/systemd/system/pandora-encoding.service \
                   /lib/systemd/system/pandora-tasks.service \
                   /lib/systemd/system/pandora-websocketd.service
-            cp $BASE/etc/systemd/*.service /etc/systemd/system/
+            cp $BASE/etc/systemd/system/*.service /etc/systemd/system/
             cp $BASE/etc/tmpfiles.d/pandora.conf /etc/tmpfiles.d/
             systemd-tmpfiles --create /etc/tmpfiles.d/pandora.conf >/dev/null || true
             systemctl daemon-reload

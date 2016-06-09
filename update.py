@@ -74,7 +74,7 @@ def check_services(base):
             if os.path.exists('/etc/init') and not os.path.exists('/bin/systemctl'):
                 print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
             if os.path.exists('/bin/systemctl'):
-                print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
+                print('\tsudo cp %s/etc/systemd/system/%s.service /etc/systemd/system/' % (base, service))
                 print('\tsudo systemctl daemon-reload')
             print('\tsudo service %s start' % service)
             print('')
@@ -84,7 +84,7 @@ def update_service(service):
     if os.path.exists('/etc/init/%s.conf'%service):
         print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
     if os.path.exists('/bin/systemctl'):
-        print('\tsudo cp %s/etc/systemd/%s.service /lib/systemd/system/' % (base, service))
+        print('\tsudo cp %s/etc/systemd/system/%s.service /etc/systemd/system/' % (base, service))
         print('\tsudo systemctl daemon-reload')
     print('\tsudo service %s restart' % service)
 
