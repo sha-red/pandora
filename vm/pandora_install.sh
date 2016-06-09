@@ -133,11 +133,7 @@ if [ "$PANDORA" != "pandora" ]; then
 fi
 
 if [ "$LXC" == "yes" ]; then
-    if [ "$SYSTEMD" == "yes" ]; then
-        sed -i s/127.0.0.1/0.0.0.0/g /lib/systemd/system/pandora.service
-    else
-        sed -i s/127.0.0.1/0.0.0.0/g /etc/init/pandora.conf
-    fi
+    sed -i s/127.0.0.1/0.0.0.0/g /srv/pandora/pandora/gunicorn_config.py
     echo "WEBSOCKET_ADDRESS = \"0.0.0.0\"" >> /srv/pandora/pandora/local_settings.py
 fi
 /srv/pandora/ctl start
