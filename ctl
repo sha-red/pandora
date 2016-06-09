@@ -40,10 +40,15 @@ if [ "$action" = "install" ]; then
     cd "`dirname "$0"`"
     BASE=`pwd`
     if [ -x /bin/systemctl ]; then
-        if [ -d /lib/systemd/system/ ]; then
-            cp $BASE/etc/systemd/*.service /lib/systemd/system/
-            cp $BASE/etc/tmpfiles.d/pandora.conf /usr/lib/tmpfiles.d/
-            systemd-tmpfiles --create /usr/lib/tmpfiles.d/pandora.conf >/dev/null || true
+        if [ -d /etc/systemd/system/ ]; then
+            rm -f /lib/systemd/system/pandora.service \
+                  /lib/systemd/system/pandora-cron.service \
+                  /lib/systemd/system/pandora-encoding.service \
+                  /lib/systemd/system/pandora-tasks.service \
+                  /lib/systemd/system/pandora-websocketd.service
+            cp $BASE/etc/systemd/*.service /etc/systemd/system/
+            cp $BASE/etc/tmpfiles.d/pandora.conf /etc/tmpfiles.d/
+            systemd-tmpfiles --create /etc/tmpfiles.d/pandora.conf >/dev/null || true
             systemctl daemon-reload
             for service in $SERVICES; do
                 systemctl enable ${service}.service
