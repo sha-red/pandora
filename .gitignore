@@ -2,6 +2,7 @@ secret.txt
 local_settings.py
 lib
 include
+share
 src
 bin
 static/json/pandora.json
