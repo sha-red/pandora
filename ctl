@@ -41,11 +41,13 @@ if [ "$action" = "install" ]; then
     BASE=`pwd`
     if [ -x /bin/systemctl ]; then
         if [ -d /etc/systemd/system/ ]; then
-            rm -f /lib/systemd/system/pandora.service \
-                  /lib/systemd/system/pandora-cron.service \
-                  /lib/systemd/system/pandora-encoding.service \
-                  /lib/systemd/system/pandora-tasks.service \
-                  /lib/systemd/system/pandora-websocketd.service
+            for service in $SERVICES; do
+                if [ -e /lib/systemd/system/${service}.service ]; then
+                    rm -f /lib/systemd/system/${service}.service \
+                          /etc/systemd/system/multi-user.target.wants/${service}.service
+                fi
+            done
+
             cp $BASE/etc/systemd/system/*.service /etc/systemd/system/
             cp $BASE/etc/tmpfiles.d/pandora.conf /etc/tmpfiles.d/
             systemd-tmpfiles --create /etc/tmpfiles.d/pandora.conf >/dev/null || true
