@@ -142,10 +142,17 @@ def get_item(info, user=None, async=False):
                 tasks.update_poster.delay(item.public_id)
     return item
 
-def get_path(f, x): return f.path(x)
-def get_icon_path(f, x): return get_path(f, 'icon.jpg')
-def get_poster_path(f, x): return get_path(f, 'poster.jpg')
-def get_torrent_path(f, x): return get_path(f, 'torrent.torrent')
+def get_path(f, x):
+    return f.path(x)
+
+def get_icon_path(f, x):
+    return get_path(f, 'icon.jpg')
+
+def get_poster_path(f, x):
+    return get_path(f, 'poster.jpg')
+
+def get_torrent_path(f, x):
+    return get_path(f, 'torrent.torrent')
 
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -154,9 +161,9 @@ class Item(models.Model):
     user = models.ForeignKey(User, null=True, related_name='items')
     groups = models.ManyToManyField(Group, blank=True, related_name='items')
 
-    #while metadata is updated, files are set to rendered=False
+    # while metadata is updated, files are set to rendered=False
     rendered = models.BooleanField(default=False, db_index=True)
-    #should be set based on user
+    # should be set based on user
     level = models.IntegerField(db_index=True)
 
     public_id = models.CharField(max_length=128, unique=True, blank=True)
@@ -175,7 +182,7 @@ class Item(models.Model):
     torrent = models.FileField(default=None, blank=True, max_length=1000, upload_to=get_torrent_path)
     stream_info = fields.DictField(default={}, editable=False)
 
-    #stream related fields
+    # stream related fields
     stream_aspect = models.FloatField(default=4/3)
 
     objects = managers.ItemManager()
@@ -227,9 +234,9 @@ class Item(models.Model):
 
     def edit(self, data):
         data = data.copy()
-        #FIXME: how to map the keys to the right place to write them to?
+        # FIXME: how to map the keys to the right place to write them to?
         if 'id' in data:
-            #FIXME: check if id is valid and exists and move/merge items accordingly
+            # FIXME: check if id is valid and exists and move/merge items accordingly
             del data['id']
         if 'groups' in data:
             groups = data.pop('groups')
@@ -354,7 +361,7 @@ class Item(models.Model):
             if not settings.USE_IMDB:
                 self.public_id = ox.toAZ(self.id)
 
-        #this does not work if another item without imdbid has the same metadata
+        # this does not work if another item without imdbid has the same metadata
         oxdbId = self.oxdb_id()
         if not settings.USE_IMDB:
             self.oxdbId = None
@@ -379,10 +386,10 @@ class Item(models.Model):
                 if len(self.public_id) != 7:
                     update_ids = True
 
-        #id changed, what about existing item with new id?
+        # id changed, what about existing item with new id?
         if settings.USE_IMDB and len(self.public_id) != 7 and self.oxdbId != self.public_id:
             self.public_id = self.oxdbId
-            #FIXME: move files to new id here
+            # FIXME: move files to new id here
         if settings.USE_IMDB and len(self.public_id) == 7:
             for key in ('title', 'year', 'director', 'season', 'episode',
                         'seriesTitle', 'episodeTitle'):
@@ -415,7 +422,8 @@ class Item(models.Model):
         self.update_sort()
         self.update_facets()
         if update_ids:
-            for c in self.clips.all(): c.save()
+            for c in self.clips.all():
+                c.save()
             for a in self.annotations.all():
                 public_id = a.public_id.split('/')[1]
                 public_id = "%s/%s" % (self.public_id, public_id)
@@ -455,7 +463,7 @@ class Item(models.Model):
         self.delete()
         if save:
             other.save()
-            #FIXME: update poster, stills and streams after this
+            # FIXME: update poster, stills and streams after this
 
     def merge_streams(self, output, resolution=None, format="webm"):
         streams = [s.get(resolution, format).media.path for s in self.streams()]
@@ -569,7 +577,7 @@ class Item(models.Model):
             if not keys or key in keys:
                 if key not in i:
                     value = self.get(key)
-                    #also get values from sort table, i.e. numberof values
+                    # also get values from sort table, i.e. numberof values
                     if not value:
                         try:
                             if self.sort and hasattr(self.sort, key):
@@ -582,7 +590,7 @@ class Item(models.Model):
         if 'cast' in i and isinstance(i['cast'][0], basestring):
             i['cast'] = [i['cast']]
         if 'cast' in i and isinstance(i['cast'][0], list):
-            i['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, i['cast'])
+            i['cast'] = [{'actor': x[0], 'character': x[1]} for x in i['cast']]
 
         if 'connections' in i:
             i['connections'] = self.expand_connections()
@@ -617,7 +625,7 @@ class Item(models.Model):
                     if k in i:
                         del i[k]
 
-        #only needed by admins
+        # only needed by admins
         if keys and 'posters' in keys:
             i['posters'] = self.get_posters()
 
@@ -798,10 +806,9 @@ class Item(models.Model):
                         values = list(set(values))
                 elif key == 'name':
                     values = []
-                    for k in map(lambda x: x['id'],
-                                   filter(lambda x: x.get('sortType') == 'person',
-                                          settings.CONFIG['itemKeys'])):
-                        values += self.get(k, [])
+                    for k in settings.CONFIG['itemKeys']:
+                        if k.get('sortType') == 'person':
+                            values += self.get(k['id'], [])
                     values = list(set(values))
                 else:
                     values = self.get(key, '')
@@ -812,8 +819,8 @@ class Item(models.Model):
 
             isSeries = self.get('series',
                                 self.get('episodeTitle',
-                                self.get('episode',
-                                self.get('seriesTitle')))) is not None
+                                         self.get('episode',
+                                                  self.get('seriesTitle')))) is not None
             save('series', isSeries)
 
     def update_sort(self):
@@ -882,7 +889,7 @@ class Item(models.Model):
             'volume',
         )
 
-        #sort keys based on database, these will always be available
+        # sort keys based on database, these will always be available
         s.public_id = self.public_id.replace('0x', 'xx')
         s.oxdbId = self.oxdbId
         if not settings.USE_IMDB and s.public_id.isupper() and s.public_id.isalpha():
@@ -898,7 +905,7 @@ class Item(models.Model):
         s.numberoffiles = self.files.all().count()
         videos = self.files.filter(selected=True).filter(Q(is_video=True) | Q(is_audio=True))
         if videos.count() > 0:
-            #s.duration = sum([v.duration for v in videos])
+            # s.duration = sum([v.duration for v in videos])
             s.duration = sum([v.duration for v in self.streams()])
             v = videos[0]
             if v.is_audio or not v.info.get('video'):
@@ -914,7 +921,7 @@ class Item(models.Model):
                     s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
             s.pixels = sum([v.pixels for v in videos])
             s.parts = videos.count()
-            s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
+            s.size = sum([v.size for v in videos])  # FIXME: only size of movies?
             if s.duration:
                 s.bitrate = s.size * 8 / s.duration
             else:
@@ -980,7 +987,7 @@ class Item(models.Model):
                     value = value / (s.duration / 60) if value and s.duration else None
                     set_value(s, name, value)
                 elif sort_type in ('length', 'integer', 'time', 'float'):
-                    #can be length of strings or length of arrays, i.e. keywords
+                    # can be length of strings or length of arrays, i.e. keywords
                     if 'layer' in key.get('value', []):
                         value = self.annotations.filter(layer=key['value']['layer']).count()
                     else:
@@ -1019,11 +1026,9 @@ class Item(models.Model):
                               for item in sublist]
         elif key == 'name':
             current_values = []
-            #FIXME: is there a better way to build name collection?
-            for k in map(lambda x: x['id'],
-                           filter(lambda x: x.get('sortType') == 'person',
-                                  settings.CONFIG['itemKeys'])):
-                current_values += self.get(k, [])
+            for k in settings.CONFIG['itemKeys']:
+                if k.get('sortType') == 'person':
+                    current_values += self.get(k['id'], [])
         if not isinstance(current_values, list):
             if not current_values:
                 current_values = []
@@ -1049,8 +1054,10 @@ class Item(models.Model):
                           for a in self.annotations.filter(layer=key).distinct().values('value')]
         layer = utils.get_by_id(settings.CONFIG['layers'], key)
         if layer.get('type') == 'entity':
-            current_values = [a['name']
-                for a in Entity.objects.filter(id__in=[ox.fromAZ(i) for i in current_values]).values('name')]
+            current_values = [
+                a['name']
+                for a in Entity.objects.filter(id__in=[ox.fromAZ(i) for i in current_values]).values('name')
+            ]
         current_values = [ox.decode_html(ox.strip_tags(v.replace('<br>', ' '))) for v in current_values]
         self.update_facet_values(key, current_values)
 
@@ -1138,8 +1145,8 @@ class Item(models.Model):
         return User.objects.filter(
             volumes__files__file__item=self
         ).order_by('date_joined').distinct()
-        #FIXME: profile not showing up here
-        #).order_by('-profile__level', 'date_joined').distinct()
+        # FIXME: profile not showing up here
+        # ).order_by('-profile__level', 'date_joined').distinct()
 
     def sets(self):
         sets = []
@@ -1224,8 +1231,8 @@ class Item(models.Model):
             media_path = v.media.path
             extension = media_path.split('.')[-1]
             url = "%s/torrent/%s.%s" % (self.get_absolute_url(),
-                                         quote(filename.encode('utf-8')),
-                                         extension)
+                                        quote(filename.encode('utf-8')),
+                                        extension)
             video = "%s.%s" % (base, extension)
             if isinstance(media_path, unicode):
                 media_path = media_path.encode('utf-8')
@@ -1264,10 +1271,10 @@ class Item(models.Model):
         if duration:
             meta['playtime'] = ox.format_duration(duration*1000)[:-4]
 
-        #slightly bigger torrent file but better for streaming
-        piece_size_pow2 = 15 #1 mbps -> 32KB pieces
+        # slightly bigger torrent file but better for streaming
+        piece_size_pow2 = 15  # 1 mbps -> 32KB pieces
         if size / duration >= 1000000:
-            piece_size_pow2 = 16 #2 mbps -> 64KB pieces
+            piece_size_pow2 = 16  # 2 mbps -> 64KB pieces
         meta['piece_size_pow2'] = piece_size_pow2
 
         ox.torrent.create_torrent(video, settings.TRACKER_URL, meta)
@@ -1313,12 +1320,12 @@ class Item(models.Model):
             n = streams.count()
             for s in streams:
                 self.data['volume'] += s.volume * s.duration
-                color = map(lambda a, b: (a+b)/n, color, ox.image.getRGB(s.color or [0.0] * 3))
+                color = [(a+b)/n for a, b in zip(color, ox.image.getRGB([1.0] * 3))]
                 offset += s.duration
             self.data['hue'], self.data['saturation'], self.data['lightness'] = ox.image.getHSL(color)
             if offset:
                 self.data['volume'] /= offset
-        #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
+        # extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
         self.json = self.get_json()
         self.update_sort()
         self.select_frame()
@@ -1344,7 +1351,8 @@ class Item(models.Model):
         if self.json.get('posterRatio') != self.poster_width / self.poster_height:
             self.json = self.get_json()
             Item.objects.filter(id=self.id).update(json=self.json,
-                poster_width=self.poster_width, poster_height=self.poster_height)
+                                                   poster_width=self.poster_width,
+                                                   poster_height=self.poster_height)
 
     def prefered_poster_url(self):
         if settings.DATA_SERVICE:
@@ -1368,7 +1376,7 @@ class Item(models.Model):
                 durations.append(s.duration)
             join_tiles(timelines, durations, self.timeline_prefix)
         else:
-            #remove joined timeline if it was created at some point
+            # remove joined timeline if it was created at some point
             for f in glob(os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline*.jpg')):
                 os.unlink(f)
 
@@ -1438,7 +1446,8 @@ class Item(models.Model):
                 width, height = self.json['resolution']
                 if width and height:
                     pos = self.sort.duration / 2
-                    for p in map(int, [pos/2, pos, pos+pos/2]):
+                    for p in [pos/2, pos, pos+pos/2]:
+                        p = int(p)
                         path = self.frame(p, height)
                         if path:
                             frames.append({
@@ -1489,7 +1498,7 @@ class Item(models.Model):
             cmd += ['-f', frame]
         p = subprocess.Popen(cmd, close_fds=True)
         p.wait()
-        #remove cached versions
+        # remove cached versions
         icon = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
         for f in glob(icon.replace('.jpg', '*.jpg')):
             if f != icon:
@@ -1503,10 +1512,10 @@ class Item(models.Model):
         subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
         if not subtitles:
             return
-        #otherwise add empty 5 seconds annotation every minute
+        # otherwise add empty 5 seconds annotation every minute
         duration = sum([s.duration for s in self.streams()])
         layer = subtitles['id']
-        #FIXME: allow annotations from no user instead?
+        # FIXME: allow annotations from no user instead?
         user = User.objects.all().order_by('id')[0]
 
         clips = [(i, i+5) for i in range(0, int(duration) - 5, 60)]
@@ -1556,7 +1565,7 @@ class Item(models.Model):
                     else:
                         language = languages[0]
 
-                #loop over all videos
+                # loop over all videos
                 for f in self.files.filter(Q(is_audio=True) | Q(is_video=True)) \
                                    .filter(selected=True).order_by('sort_path'):
                     subtitles_added = False
@@ -1564,9 +1573,9 @@ class Item(models.Model):
                     if f.instances.all().count() > 0:
                         user = f.instances.all()[0].volume.user
                     else:
-                        #FIXME: allow annotations from no user instead?
+                        # FIXME: allow annotations from no user instead?
                         user = User.objects.all().order_by('id')[0]
-                    #if there is a subtitle with the same prefix, import
+                    # if there is a subtitle with the same prefix, import
                     q = subtitles.filter(path__startswith=prefix,
                                          language=language)
                     if q.count() == 1:
@@ -1586,7 +1595,7 @@ class Item(models.Model):
                                     user=user
                                 )
                                 annotation.save()
-                    #otherwise add empty 5 seconds annotation every minute
+                    # otherwise add empty 5 seconds annotation every minute
                     if not subtitles_added:
                         start = offset and int(offset / 60) * 60 + 60 or 0
                         for i in range(start,
@@ -1602,7 +1611,7 @@ class Item(models.Model):
                             )
                             annotation.save()
                     offset += f.duration
-                #remove left over clips without annotations
+                # remove left over clips without annotations
                 Clip.objects.filter(item=self, annotations__id=None).delete()
             return True
         else:

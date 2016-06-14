@@ -80,7 +80,7 @@ def _order_by_group(query):
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'title', 'operator':'+'}]
+    query['sort'] = [{'key': 'title', 'operator': '+'}]
     for key in ('sort', 'keys', 'group', 'range', 'position', 'positions'):
         if key in data:
             query[key] = data[key]
@@ -96,7 +96,7 @@ def parse_query(data, user):
         if not query['clip_keys']:
             query['clip_keys'] = ['id', 'in', 'out', 'annotations']
 
-    #group by only allows sorting by name or number of itmes
+    # group by only allows sorting by name or number of itmes
     return query
 
 def find(request, data):
@@ -228,7 +228,7 @@ def find(request, data):
         def only_p_sums(m):
             r = {}
             for p in _p:
-                if p  == 'accessed':
+                if p == 'accessed':
                     r[p] = m.sort.accessed or ''
                 elif p == 'modified':
                     r[p] = m.sort.modified
@@ -239,6 +239,7 @@ def find(request, data):
             if 'clip_qs' in query:
                 r['clips'] = get_clips(query['clip_qs'].filter(item=m))
             return r
+
         def only_p(m):
             r = {}
             if m:
@@ -250,7 +251,7 @@ def find(request, data):
                 r['clips'] = get_clips(query['clip_qs'].filter(item__public_id=m['id']))
             return r
         qs = qs[query['range'][0]:query['range'][1]]
-        #response['data']['items'] = [m.get_json(_p) for m in qs]
+        # response['data']['items'] = [m.get_json(_p) for m in qs]
         if filter(lambda p: p in (
             'accessed', 'modified', 'timesaccessed', 'viewed'
         ), _p):
@@ -259,7 +260,7 @@ def find(request, data):
         else:
             response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
 
-    else: # otherwise stats
+    else:  # otherwise stats
         items = query['qs']
         files = File.objects.filter(item__in=items).filter(selected=True).filter(size__gt=0)
         r = files.aggregate(
@@ -267,9 +268,10 @@ def find(request, data):
             Sum('pixels'),
             Sum('size')
         )
-        totals = [i['id']
+        totals = [
+            i['id']
             for i in settings.CONFIG['totals']
-            if not 'capability' in i or has_capability(request.user, i['capability'])
+            if 'capability' not in i or has_capability(request.user, i['capability'])
         ]
         if 'duration' in totals:
             response['data']['duration'] = r['duration__sum']
@@ -284,8 +286,8 @@ def find(request, data):
         if 'size' in totals:
             response['data']['size'] = r['size__sum']
         for key in ('runtime', 'duration', 'pixels', 'size'):
-            if key in totals and response['data'][key] == None:
-                response['data'][key] = 0 
+            if key in totals and response['data'][key] is None:
+                response['data'][key] = 0
     return render_to_json_response(response)
 actions.register(find)
 
@@ -305,7 +307,7 @@ def autocomplete(request, data):
     }
     see: autocompleteEntities
     '''
-    if not 'range' in data:
+    if 'range' not in data:
         data['range'] = [0, 10]
     op = data.get('operator', '=')
 
@@ -313,7 +315,8 @@ def autocomplete(request, data):
     order_by = key.get('autocompleteSort', False)
     if order_by:
         for o in order_by:
-            if o['operator'] != '-': o['operator'] = ''
+            if o['operator'] != '-':
+                o['operator'] = ''
         order_by = ['%(operator)ssort__%(key)s' % o for o in order_by]
     else:
         order_by = ['-items']
@@ -375,8 +378,8 @@ def findId(request, data):
             ]
 
     if not response['data']['items'] \
-        and settings.USE_IMDB \
-        and settings.DATA_SERVICE:
+            and settings.USE_IMDB \
+            and settings.DATA_SERVICE:
         r = models.external_data('getId', data)
         if r['status']['code'] == 200:
             response['data']['items'] = [r['data']]
@@ -479,14 +482,14 @@ def get(request, data):
             info['groups'] = [g.name for g in item.groups.all()]
         for k in settings.CONFIG['itemKeys']:
             if 'capability' in k \
-                and not (item.editable(request.user) or has_capability(request.user, k['capability'])) \
-                and k['id'] in info \
-                and k['id'] not in ('parts', 'durations', 'duration'):
-                    del info[k['id']]
+                    and not (item.editable(request.user) or has_capability(request.user, k['capability'])) \
+                    and k['id'] in info \
+                    and k['id'] not in ('parts', 'durations', 'duration'):
+                del info[k['id']]
         info['editable'] = item.editable(request.user)
         response['data'] = info
     else:
-        #response = json_response(status=403, text='permission denied')
+        # response = json_response(status=403, text='permission denied')
         response = json_response(status=404, text='not found')
     return render_to_json_response(response)
 actions.register(get)
@@ -544,14 +547,14 @@ def edit(request, data):
     if item.editable(request.user):
         response = json_response(status=200, text='ok')
         if 'rightslevel' in data:
-            if request.user.profile.capability('canEditRightsLevel') == True:
+            if request.user.profile.capability('canEditRightsLevel'):
                 item.level = int(data['rightslevel'])
             else:
                 response = json_response(status=403, text='permission denied')
             del data['rightslevel']
         if 'user' in data:
             if request.user.profile.get_level() in ('admin', 'staff') and \
-                models.User.objects.filter(username=data['user']).exists():
+                    models.User.objects.filter(username=data['user']).exists():
                 new_user = models.User.objects.get(username=data['user'])
                 if new_user != item.user:
                     item.user = new_user
@@ -590,12 +593,12 @@ def remove(request, data):
     response = json_response({})
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     user = request.user
-    if user.profile.capability('canRemoveItems') == True or \
-           user.is_staff or \
-           item.user == user or \
-           item.groups.filter(id__in=user.groups.all()).count() > 0:
+    if user.profile.capability('canRemoveItems') or \
+            user.is_staff or \
+            item.user == user or \
+            item.groups.filter(id__in=user.groups.all()).count() > 0:
         add_changelog(request, data)
-        #FIXME: is this cascading enough or do we end up with orphan files etc.
+        # FIXME: is this cascading enough or do we end up with orphan files etc.
         item.delete()
         response = json_response(status=200, text='removed')
     else:
@@ -715,7 +718,7 @@ def lookup(request, data):
         r = {'id': i.public_id}
         for key in ('title', 'director', 'year'):
             value = i.get(key)
-            if value != None:
+            if value is not None:
                 r[key] = value
         response = json_response(r)
     else:
@@ -749,7 +752,7 @@ def frame(request, id, size, position=None):
 
     if not frame:
         frame = os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
-        #raise Http404
+        # raise Http404
     response = HttpFileResponse(frame, content_type='image/jpeg')
     if request.method == 'OPTIONS':
         response.allow_access()
@@ -770,7 +773,7 @@ def poster_frame(request, id, position):
 def image_to_response(image, size=None):
     if size:
         size = int(size)
-        path = image.path.replace('.jpg', '.%d.jpg'%size)
+        path = image.path.replace('.jpg', '.%d.jpg' % size)
         if not os.path.exists(path):
             image_size = max(image.width, image.height)
             if size > image_size:
@@ -792,7 +795,7 @@ def siteposter(request, id, size=None):
         image = Image.open(poster)
         image_size = max(image.size)
         if size < image_size:
-            path = poster.replace('.jpg', '.%d.jpg'%size)
+            path = poster.replace('.jpg', '.%d.jpg' % size)
             extract.resize_image(poster, path, size=size)
             poster = path
     return HttpFileResponse(poster, content_type='image/jpeg')
@@ -847,6 +850,7 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
     modes.pop(modes.index(mode))
 
     prefix = os.path.join(item.timeline_prefix, 'timeline')
+
     def timeline():
         timeline = '%s%s%sp' % (prefix, mode, size) 
         if position > -1:
@@ -881,7 +885,7 @@ def download(request, id, resolution=None, format='webm'):
     r = item.merge_streams(video.name, resolution, format)
     if not r:
         return HttpResponseForbidden()
-    elif r == True:
+    elif r is True:
         response = HttpResponse(FileWrapper(video), content_type=content_type)
         response['Content-Length'] = os.path.getsize(video.name)
     else:
@@ -931,8 +935,8 @@ def video(request, id, resolution, format, index=None, track=None):
         raise Http404
     path = stream.media.path
 
-    #server side cutting
-    #FIXME: this needs to join segments if needed
+    # server side cutting
+    # FIXME: this needs to join segments if needed
     t = request.GET.get('t')
     if t:
         def parse_timestamp(s):
@@ -942,7 +946,7 @@ def video(request, id, resolution, format, index=None, track=None):
         t = map(parse_timestamp, t.split(','))
         ext = '.%s' % format
         content_type = mimetypes.guess_type(path)[0]
-        if len(t) == 2 and t[1] > t[0] and stream.info['duration']>=t[1]:
+        if len(t) == 2 and t[1] > t[0] and stream.info['duration'] >= t[1]:
             response = HttpResponse(extract.chop(path, t[0], t[1]), content_type=content_type)
             filename = u"Clip of %s - %s-%s - %s %s%s" % (
                 item.get('title'),
@@ -1000,7 +1004,7 @@ def random_annotation(request):
     n = item.annotations.all().count()
     pos = random.randint(0, n)
     clip = item.annotations.all()[pos]
-    return redirect('/%s'% clip.public_id)
+    return redirect('/%s' % clip.public_id)
 
 def atom_xml(request):
     add_updated = True
@@ -1058,8 +1062,8 @@ def atom_xml(request):
             name.text = item.user.username
 
         for topic in item.get('topics', []):
-          el = ET.SubElement(entry, "category")
-          el.attrib['term'] = topic
+            el = ET.SubElement(entry, "category")
+            el.attrib['term'] = topic
 
         '''
         el = ET.SubElement(entry, "rights")
@@ -1098,7 +1102,7 @@ def atom_xml(request):
                     value = stream.info['audio'][0].get({
                         'audio_codec': 'codec'
                     }.get(key, key))
-                if value and value !=  -1:
+                if value and value != -1:
                     el = ET.SubElement(format, key)
                     el.text = unicode(value)
         el = ET.SubElement(format, 'pixel_aspect_ratio')
@@ -1111,14 +1115,14 @@ def atom_xml(request):
                 el.attrib['type'] = 'application/x-bittorrent'
                 el.attrib['href'] = '%s/torrent/' % page_link
                 el.attrib['length'] = '%s' % ox.get_torrent_size(item.torrent.path)
-            #FIXME: loop over streams
-            #for s in item.streams().filter(resolution=max(settings.CONFIG['video']['resolutions'])):
+            # FIXME: loop over streams
+            # for s in item.streams().filter(resolution=max(settings.CONFIG['video']['resolutions'])):
             for s in item.streams().filter(source=None):
                 el = ET.SubElement(entry, "link")
                 el.attrib['rel'] = 'enclosure'
                 el.attrib['type'] = 'video/%s' % s.format
                 el.attrib['href'] = '%s/%sp.%s' % (page_link, s.resolution, s.format)
-                el.attrib['length'] = '%s'%s.media.size
+                el.attrib['length'] = '%s' % s.media.size
 
         el = ET.SubElement(entry, "media:thumbnail")
         thumbheight = 96
@@ -1147,7 +1151,7 @@ def oembed(request):
     embed_url = request.build_absolute_uri('/%s' % public_id)
     if url.startswith(embed_url):
         embed_url = url
-    if not '#embed' in embed_url:
+    if '#embed' not in embed_url:
         embed_url = '%s#embed' % embed_url
 
     oembed = {}
@@ -1156,8 +1160,8 @@ def oembed(request):
     oembed['provider_name'] = settings.SITENAME
     oembed['provider_url'] = request.build_absolute_uri('/')
     oembed['title'] = item.get('title')
-    #oembed['author_name'] = item.get('director')
-    #oembed['author_url'] = ??
+    # oembed['author_name'] = item.get('director')
+    # oembed['author_url'] = ??
     height = max(settings.CONFIG['video']['resolutions'])
     height = min(height, maxheight)
     width = int(round(height * item.stream_aspect))
@@ -1220,7 +1224,8 @@ def item_xml(request, id):
         j = item.get_json()
         j['layers'] = item.get_layers(request.user)
         if 'resolution' in j:
-            j['resolution'] = {'width': j['resolution'][0], 'height':j['resolution'][1]}
+            j['resolution'] = {'width': j['resolution'][0], 'height': j['resolution'][1]}
+
         def xmltree(root, key, data):
             if isinstance(data, list) or \
                 isinstance(data, tuple):
@@ -1296,12 +1301,12 @@ def item(request, id):
                     value = value = u', '.join([unicode(v) for v in value])
                 elif key and key.get('type') == 'float':
                     value = '%0.3f' % value
-                elif key  and key.get('type') == 'time':
+                elif key and key.get('type') == 'time':
                     value = ox.format_duration(value * 1000)
                 data.append({'key': k, 'title': title, 'value': value})
         clips = []
         clip = {'in': 0, 'annotations': []}
-        #logged in users should have javascript. not adding annotations makes load faster
+        # logged in users should have javascript. not adding annotations makes load faster
         if not settings.USE_IMDB and request.user.is_anonymous():
             for a in item.annotations.exclude(
                 layer='subtitles'
