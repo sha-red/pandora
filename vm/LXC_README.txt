@@ -6,7 +6,7 @@
 
 2) Create a new container, use different names if installing multiple instances:
 
-    sudo lxc-create -n pandora -t ubuntu -- -r trusty
+    sudo lxc-create -n pandora -t ubuntu -- -r xenial
 
 3) Install pan.do/ra in container:
 
@@ -17,13 +17,14 @@
     sudo lxc-attach -n pandora --clear-env
     apt-get update -qq
     apt-get -y install curl
-    cd /root
-    curl -L https://pan.do/ra-install > pandora_install.sh
-    chmod +x pandora_install.sh
     sed -i s/ubuntu/pandora/g /etc/passwd /etc/shadow /etc/group
     mv /home/ubuntu /home/pandora
     echo "pandora:pandora" | chpasswd
+    echo PasswordAuthentication no >> /etc/ssh/sshd_config
     locale-gen en_US.UTF-8
-    dpkg-reconfigure locales
+
+    cd /root
+    curl -L https://pan.do/ra-install > pandora_install.sh
+    chmod +x pandora_install.sh
     ./pandora_install.sh | tee pandora_install.log
 
