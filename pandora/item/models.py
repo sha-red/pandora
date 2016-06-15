@@ -98,7 +98,7 @@ def get_item(info, user=None, async=False):
                     item.external_data = item_data
                 item.user = user
                 item.oxdbId = item.public_id
-                item.save()
+                item.save(sync=not async)
                 if async:
                     tasks.update_external.delay(item.public_id)
                 else:
@@ -124,8 +124,8 @@ def get_item(info, user=None, async=False):
                     item = existing_item
                 except Item.DoesNotExist:
                     item.oxdbId = item.oxdb_id()
-                    p = item.save()
-                    if not p:
+                    p = item.save(sync=not async)
+                    if not p and async:
                         tasks.update_poster.delay(item.public_id)
     else:
         qs = Item.objects.filter(find__key='title', find__value__iexact=info['title'])
@@ -137,8 +137,8 @@ def get_item(info, user=None, async=False):
             item = Item()
             item.data = item_data
             item.user = user
-            p = item.save()
-            if not p:
+            p = item.save(sync=not async)
+            if not p and async:
                 tasks.update_poster.delay(item.public_id)
     return item
 
@@ -347,6 +347,9 @@ class Item(models.Model):
         return '/%s' % self.public_id
 
     def save(self, *args, **kwargs):
+        sync = kwargs.get('sync', False)
+        if 'sync' in kwargs:
+            del kwargs['sync']
         update_poster = False
         update_ids = False
         if not self.id:
@@ -430,9 +433,14 @@ class Item(models.Model):
                 if public_id != a.public_id:
                     a.public_id = public_id
                     a.save()
-        tasks.update_file_paths.delay(self.public_id)
-        if update_poster:
-            return tasks.update_poster.delay(self.public_id)
+        if sync:
+            tasks.update_file_paths(self.public_id)
+            if update_poster:
+                tasks.update_poster(self.public_id)
+        else:
+            tasks.update_file_paths.delay(self.public_id)
+            if update_poster:
+                return tasks.update_poster.delay(self.public_id)
         return None
 
     def delete_files(self):
