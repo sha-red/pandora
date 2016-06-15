@@ -4,7 +4,6 @@ import os
 from datetime import timedelta, datetime
 import gzip
 import random
-random
 
 from django.conf import settings
 from django.db import connection, transaction
@@ -14,6 +13,7 @@ from celery.task import task, periodic_task
 
 import models
 from text.models import Text
+
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')
 def cronjob(**kwargs):
@@ -107,7 +107,7 @@ def update_sitemap(base_url):
     urlset.attrib['xmlns'] = "http://www.sitemaps.org/schemas/sitemap/0.9"
     urlset.attrib['xmlns:xsi'] = "http://www.w3.org/2001/XMLSchema-instance"
     urlset.attrib['xsi:schemaLocation'] = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
-    urlset.attrib['xmlns:video']= "http://www.google.com/schemas/sitemap-video/1.1"
+    urlset.attrib['xmlns:video'] = "http://www.google.com/schemas/sitemap-video/1.1"
 
     url = ET.SubElement(urlset, "url")
     loc = ET.SubElement(url, "loc")
