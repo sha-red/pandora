@@ -81,13 +81,17 @@ def get_sequences(path, position=0):
 
 class DataTimeline():
     fps = 25
+
     def __init__(self, path):
         file_names = filter(lambda x: 'timelinedata8p' in x, os.listdir(path))
         file_names = sorted(file_names, key=lambda x: int(x[14:-4]))
         file_names = map(lambda x: path + x, file_names)
         self.file_names = file_names
-        self.timeline_image = Image.open(file_names[0])
-        self.timeline_width = self.timeline_image.size[0]
+        if file_names:
+            self.timeline_image = Image.open(file_names[0])
+            self.timeline_width = self.timeline_image.size[0]
+        else:
+            self.timeline_width = 0
         self.current_tile = 0
 
     def get_frame(self, pos):
@@ -101,6 +105,8 @@ class DataTimeline():
 
 def get_cut_sequences(stream):
     timeline = DataTimeline(stream.timeline_prefix)
+    if not time.timeline_width:
+        return {}
     cuts = list(stream.cuts) + [stream.duration]
     modes = ['color', 'shape']
     sequences = {}
