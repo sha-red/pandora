@@ -434,7 +434,7 @@ class Item(models.Model):
                     a.public_id = public_id
                     a.save()
         if sync:
-            tasks.update_file_paths(self.public_id)
+            self.update_file_paths()
             if update_poster:
                 tasks.update_poster(self.public_id)
         else:
@@ -1098,6 +1098,11 @@ class Item(models.Model):
                 self.update_layer_facet(key)
             else:
                 self.update_facet(key)
+
+    def update_file_paths(self):
+        for f in item.files.all():
+            if f.normalize_path() != f.path:
+                f.save()
 
     def path(self, name=''):
         h = self.public_id

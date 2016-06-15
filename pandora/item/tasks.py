@@ -67,9 +67,7 @@ def update_poster(public_id):
 @task(ignore_results=True, queue='default')
 def update_file_paths(public_id):
     item = models.Item.objects.get(public_id=public_id)
-    for f in item.files.all():
-        if f.normalize_path() != f.path:
-            f.save()
+    item.update_file_paths()
 
 @task(ignore_results=True, queue='default')
 def update_external(public_id):

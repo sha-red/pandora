@@ -15,8 +15,8 @@ def update_itemsort(id):
 
 @task(ignore_results=True, queue='default')
 def update_file_paths(id):
-    from item.models import Item
-    from item.tasks import update_file_paths
+    from item.models import Item, ItemFind
     p = models.Person.objects.get(pk=id)
-    for i in Item.objects.filter(find__value__icontains=p.name).distinct():
-        update_file_paths(i.public_id)
+    items = ItemFind.objects.filter(key='name', value__icontains=p.name).values('item_id')
+    for i in Item.objects.filter(id__in=items):
+        i.update_file_paths()
