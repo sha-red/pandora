@@ -7,8 +7,11 @@ import models
 
 @task(ignore_results=True, queue='default')
 def update_itemsort(id):
-    p = models.Person.objects.get(pk=id)
-    p.update_itemsort()
+    try:
+        p = models.Person.objects.get(pk=id)
+        p.update_itemsort()
+    except models.Person.DoesNotExist:
+        pass
 
 @task(ignore_results=True, queue='default')
 def update_file_paths(id):
