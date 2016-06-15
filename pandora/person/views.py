@@ -37,6 +37,7 @@ def editName(request, data):
         person.sortname = data['sortname']
         person.edited = True
     person.save()
+    tasks.update_itemsort.delay(person.id)
     tasks.update_file_paths.delay(person.id)
     add_changelog(request, data)
     response['data'] = person.json()

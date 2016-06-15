@@ -53,7 +53,6 @@ class Person(models.Model):
         self.sortsortname = utils.sort_string(self.sortname)
         self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)
-        tasks.update_itemsort.delay(self.id)
 
     def update_itemsort(self):
         item.models.Facet.objects.filter(
