@@ -20,7 +20,7 @@ def update_statistics():
 
     stats = Statistics()
     ids = [i['session_key']
-        for i in models.SessionData.objects.filter(level__gte=0).values('session_key')]
+           for i in models.SessionData.objects.filter(level__gte=0).values('session_key')]
 
     for chunk in chunker(ids, 100, None):
         chunk = filter(None, chunk)

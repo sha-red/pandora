@@ -257,7 +257,7 @@ class File(models.Model):
             self.duration = None
         else:
             duration = sum([s.info.get('duration', 0)
-                for s in self.streams.filter(source=None)])
+                            for s in self.streams.filter(source=None)])
             if duration:
                 self.duration = duration
 
