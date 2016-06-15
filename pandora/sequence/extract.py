@@ -105,7 +105,7 @@ class DataTimeline():
 
 def get_cut_sequences(stream):
     timeline = DataTimeline(stream.timeline_prefix)
-    if not time.timeline_width:
+    if not timeline.timeline_width:
         return {}
     cuts = list(stream.cuts) + [stream.duration]
     modes = ['color', 'shape']
