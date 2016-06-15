@@ -1100,7 +1100,7 @@ class Item(models.Model):
                 self.update_facet(key)
 
     def update_file_paths(self):
-        for f in item.files.all():
+        for f in self.files.all():
             if f.normalize_path() != f.path:
                 f.save()
 
