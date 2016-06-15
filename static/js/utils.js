@@ -2645,14 +2645,14 @@ pandora.updateStatus = function(item) {
     }
 };
 
-pandora.wait = function(taskId, callback, timeout) {
+pandora.wait = function(id, callback, timeout) {
     var task = {};
     timeout = timeout || 5000;
     task.timeout = setTimeout(function() {
-        pandora.api.getTaskStatus({taskId: taskId}, function(result) {
+        pandora.api.getTaskStatus({id: id}, function(result) {
             var t;
             if (result.data.status == 'PENDING') {
-                t = pandora.wait(taskId, callback);
+                t = pandora.wait(id, callback);
                 task.timeout = t.timeout;
             } else {
                 callback(result);

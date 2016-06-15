@@ -344,17 +344,19 @@ def getTaskStatus(request, data):
     '''
     Gets the status for a given task
     takes {
-        taskId: string // taskId
+        id: string // taskId
     }
     returns {
-        taskId: string, // taskId
+        id: string,     // taskId
         status: string, // status, 'PENDING' or 'OK'
-        result: object // result data
+        result: object  // result data
     }
     notes: To be deprecated, will be wrapped in regular API call.
     '''
     #FIXME: should check if user has permissions to get status
-    if 'taskId' in data:
+    if 'id' in data:
+        task_id = data['id']
+    elif 'taskId' in data:
         task_id = data['taskId']
     else:
         task_id = data['task_id']
