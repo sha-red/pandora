@@ -52,7 +52,7 @@ def fill_queue():
         elif f.data:
             f.extract_stream()
         else:
-            print('not sure what to do with' ,f)
+            print('not sure what to do with', f)
             check.append(f)
         in_queue.append(f.oshash)
     for f in File.objects.filter(encoding=True).exclude(oshash__in=in_queue):
@@ -61,7 +61,7 @@ def fill_queue():
         elif f.data:
             f.extract_stream()
         else:
-            print('not sure what to do with' ,f)
+            print('not sure what to do with', f)
             check.append(f)
     return check
 
@@ -72,13 +72,13 @@ def get_celery_worker_status():
         insp = celery.task.control.inspect()
         d = insp.stats()
         if not d:
-            d = { ERROR_KEY: 'No running Celery workers were found.' }
+            d = {ERROR_KEY: 'No running Celery workers were found.'}
     except IOError as e:
         from errno import errorcode
         msg = "Error connecting to the backend: " + str(e)
         if len(e.args) > 0 and errorcode.get(e.args[0]) == 'ECONNREFUSED':
             msg += ' Check that the RabbitMQ server is running.'
-        d = { ERROR_KEY: msg }
+        d = {ERROR_KEY: msg}
     except ImportError as e:
-        d = { ERROR_KEY: str(e)}
+        d = {ERROR_KEY: str(e)}
     return d
