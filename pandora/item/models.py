@@ -64,7 +64,7 @@ def get_id(info):
             return imdbId
     return None
 
-def get_item(info, user=None, async=False):
+def get_item(info, user=None):
     '''
         info dict with:
             imdbId, title, director, year,
@@ -98,11 +98,8 @@ def get_item(info, user=None, async=False):
                     item.external_data = item_data
                 item.user = user
                 item.oxdbId = item.public_id
-                item.save(sync=not async)
-                if async:
-                    tasks.update_external.delay(item.public_id)
-                else:
-                    item.update_external()
+                item.save(sync=True)
+                item.update_external()
         else:
             public_id = get_id(info)
             if public_id:
@@ -124,9 +121,8 @@ def get_item(info, user=None, async=False):
                     item = existing_item
                 except Item.DoesNotExist:
                     item.oxdbId = item.oxdb_id()
-                    p = item.save(sync=not async)
-                    if not p and async:
-                        tasks.update_poster.delay(item.public_id)
+                    item.save(sync=True)
+                    tasks.update_poster.delay(item.public_id)
     else:
         qs = Item.objects.filter(find__key='title', find__value__iexact=info['title'])
         if 'year' in info:
@@ -137,9 +133,8 @@ def get_item(info, user=None, async=False):
             item = Item()
             item.data = item_data
             item.user = user
-            p = item.save(sync=not async)
-            if not p and async:
-                tasks.update_poster.delay(item.public_id)
+            item.save(sync=True)
+            tasks.update_poster.delay(item.public_id)
     return item
 
 def get_path(f, x):
@@ -361,6 +356,7 @@ class Item(models.Model):
                 self.public_id = str(uuid.uuid1())
             self.add_default_data()
             super(Item, self).save(*args, **kwargs)
+            update_poster = True
             if not settings.USE_IMDB:
                 self.public_id = ox.toAZ(self.id)
 
@@ -462,7 +458,7 @@ class Item(models.Model):
         for a in self.annotations.all().order_by('id'):
             a.item = other
             a.set_public_id()
-            Annotations.objects.filter(id=a.id).update(item=other, public_id=a.public_id)
+            Annotation.objects.filter(id=a.id).update(item=other, public_id=a.public_id)
 
         if hasattr(self, 'files'):
             for f in self.files.all():
@@ -1186,7 +1182,7 @@ class Item(models.Model):
             qs = qs.exclude(id__in=wanted)
         qs.update(wanted=False)
 
-    def update_selected(self, update_timeline=True):
+    def update_selected(self):
         sets = self.sets()
         for s in sets:
             if s.filter(Q(is_video=True) | Q(is_audio=True)).filter(available=False).count() == 0:
@@ -1202,8 +1198,6 @@ class Item(models.Model):
                 if update:
                     self.rendered = False
                     self.save()
-                    if update_timeline:
-                        tasks.update_timeline.delay(self.public_id)
                 break
         if not sets:
             self.rendered = False

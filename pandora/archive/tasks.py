@@ -68,7 +68,7 @@ def update_files(user, volume, files):
     volume, created = models.Volume.objects.get_or_create(user=user, name=volume)
     all_files = [f['oshash'] for f in files]
 
-    #remove deleted files
+    # remove deleted files
     removed = models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files)
     ids = [i['public_id'] for i in Item.objects.filter(
            files__instances__in=removed.filter(file__selected=True)).distinct().values('public_id')]
@@ -105,9 +105,9 @@ def process_stream(fileId):
         file = models.File.objects.get(id=fileId)
         file.encoding = False
         file.save()
-    file.item.update_selected(update_timeline=False)
+    file.item.update_selected()
     if not file.item.rendered \
-        and not file.item.files.exclude(id=fileId).filter(Q(queued=True)|Q(encoding=True)).count():
+            and not file.item.files.exclude(id=fileId).filter(Q(queued=True) | Q(encoding=True)).count():
         file.item.update_timeline()
     if file.item.rendered:
         file.item.save()
