@@ -98,8 +98,8 @@ def get_item(info, user=None):
                     item.external_data = item_data
                 item.user = user
                 item.oxdbId = item.public_id
-                item.save(sync=True)
-                item.update_external()
+                if not item.update_external():
+                    item.save(sync=True)
         else:
             public_id = get_id(info)
             if public_id:
@@ -299,11 +299,9 @@ class Item(models.Model):
             response = external_data('getData', {'id': self.public_id})
             if response['status']['code'] == 200:
                 self.external_data = response['data']
-                p = self.save()
-                if p:
-                    p.wait()
-                else:
-                    self.make_poster(True)
+                self.save(sync=True)
+                return True
+        return False
 
     def add_default_data(self):
         for k in settings.CONFIG['itemKeys']:
