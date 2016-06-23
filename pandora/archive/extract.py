@@ -57,7 +57,10 @@ def supported_formats():
     return {
         'ogg': 'libtheora' in stdout and 'libvorbis' in stdout,
         'webm': 'libvpx' in stdout and 'libvorbis' in stdout,
+        'vp8': 'libvpx' in stdout and 'libvorbis' in stdout,
+        'vp9': 'libvpx-vp9' in stdout and 'libopus' in stdout,
         'mp4': 'libx264' in stdout and 'DEA.L. aac' in stdout,
+        'h264': 'libx264' in stdout and 'DEA.L. aac' in stdout,
     }
 
 
@@ -78,6 +81,8 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
     '''
     profile, format = profile.split('.')
     bpp = 0.17
+    video_codec = 'libvpx'
+    audio_codec = 'libvorbis'
 
     if 'error' in info:
         return False, "Unsupported Format"
@@ -140,10 +145,24 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
     else:
         height = 96
 
+        if settings.FFMPEG_SUPPORTS_VP9:
+            audio_codec = 'libopus'
+            video_codec = 'libvpx-vp9'
+
         audiorate = 22050
         audioquality = -1
         audiobitrate = '22k'
         audiochannels = 1
+
+    if format == 'webm' and audio_codec == 'libopus':
+        audiorate = 48000
+        if not audiobitrate:
+            audiobitrate = '%sk' % {
+                -1: 32,  0: 48,  1: 64,  2: 96,  3: 112,  4: 128,
+                 5: 144, 6: 160, 7: 192, 8: 256, 9: 320, 10: 512,
+            }[audioquality]
+    if format == 'webm' and video_codec == 'libvpx-vp9':
+        bpp = 0.15
 
     if info['video'] and 'display_aspect_ratio' in info['video'][0]:
         # dont make video bigger
@@ -197,11 +216,17 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         ]
         if format == 'webm':
             video_settings += [
+                '-c:v', video_codec,
                 '-deadline', 'good',
-                '-cpu-used', '0',
-                '-lag-in-frames', '16',
+                '-cpu-used', '1' if video_codec == 'libvpx-vp9' else '0',
+                '-lag-in-frames', '25',
                 '-auto-alt-ref', '1',
             ]
+            if video_codec == 'libvpx-vp9':
+                video_settings += [
+                    '-tile-columns', '6',
+                    '-frame-parallel', '1',
+                ]
         if format == 'mp4':
             video_settings += [
                 '-c:v', 'libx264',
@@ -232,7 +257,9 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         else:
             video_settings += ['-map', '0:%s,0:%s' % (info['audio'][audio_track]['id'], n)]
             mono_mix = False
-        audio_settings = ['-ar', str(audiorate), '-aq', str(audioquality)]
+        audio_settings = ['-ar', str(audiorate)]
+        if audio_codec != 'libopus':
+            audio_settings += ['-aq', str(audioquality)]
         if mono_mix:
             ac = 2
         else:
@@ -246,55 +273,63 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             audio_settings += ['-ab', audiobitrate]
         if format == 'mp4':
             audio_settings += ['-c:a', 'aac', '-strict', '-2']
+        elif audio_codec == 'libopus':
+            audio_settings += ['-c:a', 'libopus', '-frame_duration', '60']
         else:
-            audio_settings += ['-c:a', 'libvorbis']
+            audio_settings += ['-c:a', audio_codec]
     else:
         audio_settings = ['-an']
 
-    cmd = [settings.FFMPEG, 
-           '-nostats', '-loglevel', 'error',
-           '-y', '-i', video, '-threads', '4', '-map_metadata', '-1', '-sn'] \
-            + audio_settings \
-            + video_settings
+    cmds = []
+
+    base = [settings.FFMPEG,
+            '-nostats', '-loglevel', 'error',
+            '-y', '-i', video, '-threads', '4', '-map_metadata', '-1', '-sn']
 
     if format == 'webm':
         enc_target = target + '.tmp.webm'
+    elif format == 'mp4':
+        enc_target = target + '.tmp.mp4'
     else:
         enc_target = target
 
     if format == 'webm':
-        cmd += ['-f', 'webm', enc_target]
+        post = ['-f', 'webm', enc_target]
     elif format == 'mp4':
-        # mp4 needs postprocessing(qt-faststart), write to temp file
-        cmd += ["%s.mp4" % enc_target]
+        post = ['-movflags', '+faststart', '-f', 'mp4', enc_target]
     else:
-        cmd += [enc_target]
+        post = [target]
+    if video_settings != ['-vn']:
+        pass1_post = post[:]
+        pass1_post[-1] = '/dev/null'
+        if format == 'webm':
+            pass1_post = ['-speed', '4'] + pass1_post
+            post = ['-speed', '1'] + post
+        cmds.append(base + ['-an', '-pass', '1', '-passlogfile', '%s.log' % target]
+                         + video_settings + pass1_post)
+        cmds.append(base + ['-pass', '2', '-passlogfile', '%s.log' % target]
+                         + audio_settings + video_settings + post)
+    else:
+        cmds.append(base + audio_settings + video_settings + post)
 
-    # print(cmd)
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.STDOUT,
-                         close_fds=True)
-    stdout, stderr = p.communicate()
-
-    if p.returncode != 0:
-        t = "%s.mp4" % enc_target if format == 'mp4' else enc_target
-        if os.path.exists(t):
-            os.unlink(t)
-        if os.path.exists(target):
-            os.unlink(target)
-        stdout = stdout.replace('\r\n', '\n').replace('\r', '\n')
-        return False, stdout
-    if format == 'mp4':
-        cmd = ['qt-faststart', "%s.mp4" % enc_target, enc_target]
-        # print(cmd)
+    # print(cmds)
+    n = 0
+    for cmd in cmds:
+        n += 1
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-                             stdout=open('/dev/null', 'w'),
+                             stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,
                              close_fds=True)
-        p.communicate()
-        os.unlink("%s.mp4" % enc_target)
-    elif format == 'webm' and audio_only:
+        stdout, stderr = p.communicate()
+
+        if p.returncode != 0:
+            if os.path.exists(enc_target):
+                os.unlink(enc_target)
+            if os.path.exists(target):
+                os.unlink(target)
+            stdout = stdout.replace('\r\n', '\n').replace('\r', '\n')
+            return False, stdout
+    if format == 'webm' and audio_only:
         cmd = ['mkvmerge', '-w', '-o', target, '--cues', '-1:all', enc_target]
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,
@@ -305,6 +340,8 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         enc_target = target
     if p.returncode == 0 and enc_target != target:
         shutil.move(enc_target, target)
+    for f in glob('%s.log*' % target):
+        os.unlink(f)
     return True, None
 
 
@@ -358,7 +395,8 @@ def ffmpeg_frame_cmd(video, frame, position, height=128):
 
 def ffmpeg_version():
     p = subprocess.Popen([settings.FFMPEG],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     version = stderr.split(' ')[2].split('-')[0]
     try:
@@ -414,16 +452,17 @@ def timeline(video, prefix, modes=None, size=None):
         size = [64, 16]
     if isinstance(video, basestring):
         video = [video]
-    cmd = [
-        os.path.join(settings.PROJECT_ROOT, '../bin/oxtimelines'),
-        '-s', ','.join(map(str, reversed(sorted(size)))),
-        '-m', ','.join(modes),
-        '-o', prefix,
-        '-c', os.path.join(prefix, 'cuts.json'),
-    ] + video
-    # print(cmd)
+    cmd = ['../bin/oxtimelines',
+           '-s', ','.join(map(str, reversed(sorted(size)))),
+           '-m', ','.join(modes),
+           '-o', prefix,
+           '-c', os.path.join(prefix, 'cuts.json'),
+           ] + video
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                          close_fds=True)
+    # print(cmd)
+    # p = subprocess.Popen(cmd)
     p.wait()
 
 
@@ -437,8 +476,8 @@ def average_color(prefix, start=0, end=0, mode='antialias'):
         start = int(start * 25)
         end = int(end * 25)
     mode = 'timeline' + mode
-    timelines = ox.sorted_strings(filter(lambda t: t!= '%s%s%sp.jpg'%(prefix, mode, height),
-                              glob("%s%s%sp*.jpg"%(prefix, mode, height))))
+    timelines = ox.sorted_strings(filter(lambda t: t != '%s%s%sp.jpg' % (prefix, mode, height),
+                                  glob("%s%s%sp*.jpg" % (prefix, mode, height))))
     for image in timelines:
         start_offset = 0
         if start and frames + 1500 <= start:
@@ -526,7 +565,7 @@ def timeline_strip(item, cuts, info, prefix):
             timeline_image = Image.new('RGB', (timeline_width, timeline_height))
         if frame in cuts:
             c = cuts.index(frame)
-            if c +1 < len(cuts):
+            if c + 1 < len(cuts):
                 duration = cuts[c + 1] - cuts[c]
                 frames = math.ceil(duration / (video_width * timeline_height / video_height))
                 widths = divide(duration, frames)
@@ -545,7 +584,7 @@ def timeline_strip(item, cuts, info, prefix):
                         box = (0, top, video_width, top + height)
                     if _debug:
                         print(frame, 'cut', c, 'frame', s, frame, 'width', widths[s], box)
-                    #FIXME: why does this have to be frame+1?
+                    # FIXME: why does this have to be frame+1?
                     frame_image = Image.open(item.frame((frame+1)/fps))
                     frame_image = frame_image.crop(box).resize((widths[s], timeline_height), Image.ANTIALIAS)
                     for x_ in range(widths[s]):
@@ -569,17 +608,17 @@ def chop(video, start, end):
         settings.FFMPEG,
         '-y',
         '-i', video,
-        '-ss', '%.3f'%start,
-        '-t', '%.3f'%t,
+        '-ss', '%.3f' % start,
+        '-t', '%.3f' % t,
         '-c:v', 'copy',
         '-c:a', 'copy',
         '-f', ext[1:],
         choped_video
     ]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-                              stdout=open('/dev/null', 'w'),
-                              stderr=open('/dev/null', 'w'),
-                              close_fds=True)
+                         stdout=open('/dev/null', 'w'),
+                         stderr=open('/dev/null', 'w'),
+                         close_fds=True)
     p.wait()
     f = open(choped_video, 'r')
     os.unlink(choped_video)
