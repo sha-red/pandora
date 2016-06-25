@@ -15,11 +15,11 @@ from distutils.spawn import find_executable
 from glob import glob
 
 import numpy as np
-import Image
 import ox
 import ox.image
 from ox.utils import json
 from django.conf import settings
+from PIL import Image
 
 img_extension = 'jpg'
 

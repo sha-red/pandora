@@ -54,9 +54,8 @@ apt-get install -y \
     python-setuptools \
     python-pip \
     python-virtualenv \
-    python-imaging \
     python-dev \
-    python-imaging \
+    python-pil \
     python-numpy \
     python-psycopg2 \
     python-pyinotify \

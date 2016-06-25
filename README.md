@@ -29,7 +29,7 @@
 
     apt-get install git subversion mercurial \
             python-setuptools python-pip python-virtualenv ipython \
-            python-dev python-imaging python-numpy python-psycopg2 \
+            python-dev python-pil python-numpy python-psycopg2 \
             python-geoip python-html5lib python-lxml \
             postgresql postgresql-contrib rabbitmq-server \
             poppler-utils mkvtoolnix gpac imagemagick \

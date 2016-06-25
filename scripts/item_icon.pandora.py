@@ -10,7 +10,7 @@ root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file_
 activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
 execfile(activate_this, dict(__file__=activate_this))
 
-import Image
+from PIL import Image
 from optparse import OptionParser
 import sys
 

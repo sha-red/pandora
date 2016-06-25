@@ -8,7 +8,7 @@ from urlparse import urlparse
 from urllib import quote
 import time
 
-import Image
+from PIL import Image
 from django.db.models import Count, Sum
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import get_object_or_404, redirect, render

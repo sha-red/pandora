@@ -11,7 +11,7 @@ from django.db.models import Max
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete
 
-import Image
+from PIL import Image
 import ox
 
 from item.models import Item

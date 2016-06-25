@@ -11,8 +11,8 @@ activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
 execfile(activate_this, dict(__file__=activate_this))
 
 import hashlib
-import Image
-import ImageDraw
+from PIL import Image
+from PIL import ImageDraw
 import json
 from optparse import OptionParser
 import ox
