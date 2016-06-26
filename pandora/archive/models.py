@@ -128,7 +128,7 @@ class File(models.Model):
                 self.height = 0
             if 'audio' in self.info and self.info['audio'] and self.duration > 0:
                 audio = self.info['audio'][0]
-                self.audio_codec = audio['codec']
+                self.audio_codec = audio.get('codec', '')
                 self.samplerate = audio.get('samplerate', 0)
                 self.channels = audio.get('channels', 0)
 
