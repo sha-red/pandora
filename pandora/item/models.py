@@ -1310,7 +1310,7 @@ class Item(models.Model):
         qs = qs.order_by('file__part', 'file__sort_path')
         return qs
 
-    def update_timeline(self, force=False, async=True):
+    def update_timeline(self, async=True):
         streams = self.streams()
         self.make_timeline()
         if streams.count() == 1:
@@ -1334,7 +1334,7 @@ class Item(models.Model):
         self.json = self.get_json()
         self.update_sort()
         self.select_frame()
-        self.make_poster(True)
+        self.make_poster()
         self.make_icon()
         self.make_torrent()
         self.rendered = streams.count() > 0
@@ -1385,9 +1385,9 @@ class Item(models.Model):
             for f in glob(os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline*.jpg')):
                 os.unlink(f)
 
-    def make_poster(self, force=False):
+    def make_poster(self):
         ox.makedirs(os.path.join(settings.MEDIA_ROOT, self.path()))
-        if not self.poster or force:
+        if not self.poster:
             poster = self.make_siteposter()
             url = self.prefered_poster_url()
             if url:

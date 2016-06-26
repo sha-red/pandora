@@ -520,7 +520,7 @@ def add(request, data):
         if p:
             p.wait()
         else:
-            i.make_poster(True)
+            i.make_poster()
         response = json_response(status=200, text='created')
         response['data'] = i.get_json()
         add_changelog(request, data, i.public_id)
