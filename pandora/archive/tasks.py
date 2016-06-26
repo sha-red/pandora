@@ -136,10 +136,7 @@ def extract_stream(fileId):
                 stream.extract_derivatives()
                 # get current version from db
                 file = models.File.objects.get(id=fileId)
-                if not file.item.rendered:
-                    file.item.update_timeline()
-                if file.item.rendered:
-                    file.item.save()
+                file.item.update_timeline()
                 file.extract_tracks()
     models.File.objects.filter(id=fileId).update(encoding=False)
 
