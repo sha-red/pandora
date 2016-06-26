@@ -21,10 +21,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--debug', action='store_true', dest='debug',
-            default=False, help='print sql commans')
+                            default=False, help='print sql commans')
 
     def handle(self, **options):
         cursor = connection.cursor()
+
         def create_index(index, table, key):
             sql = 'CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)' % (index, table, key)
             if options['debug']:
@@ -33,13 +34,28 @@ class Command(BaseCommand):
 
         if settings.DB_GIN_TRGM:
             import entity.models
-            for table_name, name in (
-                (models.ItemFind._meta.db_table, 'value'),   # Item Find
-                (models.Clip._meta.db_table, 'findvalue'),   # Clip Find
-                (entity.models.Find._meta.db_table, 'value'),# Entity Find
+            for table, column in (
+                (models.ItemFind._meta.db_table, 'value'),    # Item Find
+                (models.Clip._meta.db_table, 'findvalue'),    # Clip Find
+                (entity.models.Find._meta.db_table, 'value'), # Entity Find
             ):
                 cursor = connection.cursor()
-                indexes = connection.introspection.get_indexes(cursor, table_name)
-                if name not in indexes:
-                    create_index("%s_%s_idx"%(table_name, name), table_name, name)
+                indexes = connection.introspection.get_indexes(cursor, table)
+                drop = []
+                if column in indexes:
+                    sql = "SELECT indexname, indexdef FROM pg_catalog.pg_indexes " + \
+                          "WHERE indexname LIKE '%{table}%' AND indexname LIKE '%{column}%'".format(table=table, column=column)
+                    cursor.execute(sql)
+                    for r in cursor:
+                        if 'USING gin' not in r[1]:
+                            drop.append(r[0])
+                if drop:
+                    for idx in drop:
+                        sql = 'DROP INDEX ' + idx
+                        if options['debug']:
+                            print(sql)
+                        cursor.execute(sql)
+                    indexes = connection.introspection.get_indexes(cursor, table)
+                if column not in indexes:
+                    create_index("%s_%s_idx" % (table, column), table, column)
             transaction.commit()
