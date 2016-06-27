@@ -242,7 +242,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         audio_only = True
 
     # ignore some unsupported audio codecs
-    if info['audio'] and info['audio'].get('codec') in ('qdmc', ):
+    if info['audio'] and info['audio'][0].get('codec') in ('qdmc', ):
         audio_settings = ['-an']
     elif info['audio']:
         if video_settings == ['-vn'] or not info['video']:
