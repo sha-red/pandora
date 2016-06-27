@@ -108,10 +108,12 @@ class File(models.Model):
                 self.width = video['width']
                 self.height = video['height']
                 self.framerate = video['framerate']
-                if 'display_aspect_ratio' in video:
+                if 'display_aspect_ratio' in video and video['display_aspect_ratio'].split(':')[-1] != '0':
                     self.display_aspect_ratio = video['display_aspect_ratio']
-                else:
+                elif self.width and self.height:
                     self.display_aspect_ratio = "%s:%s" % (self.width, self.height)
+                else:
+                    self.display_aspect_ratio = "4:3"
                 self.is_video = True
                 self.is_audio = False
                 if self.path.endswith('.jpg') or \
