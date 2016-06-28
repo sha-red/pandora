@@ -35,14 +35,18 @@ def parseCondition(condition, user, item=None):
 
 
 def buildCondition(k, op, v):
+    import entity.models
     if k == 'id':
         v = ox.fromAZ(v)
         return Q(**{k: v})
     if isinstance(v, bool): #featured and public flag
         key = k
     elif k == 'entity':
-        entity_key, v = entity.managers.namePredicate(op, v)
-        key = 'entities__' + entity_key
+        entity_key, entity_v = entity.managers.namePredicate(op, v)
+        key = 'id__in'
+        v = entity.models.DocumentProperties.objects.filter(**{
+            'entity__' + entity_key: entity_v
+        }).values_list('document_id', flat=True)
     else:
         key = "%s%s" % (k, {
             '==': '__iexact',
