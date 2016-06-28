@@ -165,6 +165,33 @@ def parse_query(data, user):
     return query
 
 
+def get_positions(qs, query_positions):
+    '''
+    qs: a QuerySet
+    query_positions: a list of AZ ids
+
+    TODO: merge this with item.utils.get_positions. The win is to fetch
+    only the integer IDs and convert the (smaller) set of query_positions to
+    ints, rather than fetch all keys for everything in qs (expected to be many
+    orders of magnitude larger), ignore most of it, and convert those ids to
+    strings.
+
+    Returns:
+        {
+            i: index of i in qs
+            for i in query_positions
+        }
+    '''
+    ids = list(qs.values_list('id', flat=True))
+    ret = {}
+    for i in query_positions:
+        try:
+            ret[i] = ids.index(ox.fromAZ(i))
+        except:
+            pass
+    return ret
+
+
 def findDocuments(request, data):
     '''
     Finds documents for a given query
@@ -198,8 +225,7 @@ def findDocuments(request, data):
         #FIXME: actually implement position requests
         response['data']['position'] = 0
     elif 'positions' in data:
-        ids = [i.get_id() for i in qs]
-        response['data']['positions'] = utils.get_positions(ids, query['positions'])
+        response['data']['positions'] = get_positions(qs, query['positions'])
     else:
         r = qs.aggregate(
             Sum('size')
