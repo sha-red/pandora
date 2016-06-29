@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 
+import json
 import os.path
 import shutil
 import tempfile
@@ -371,7 +372,8 @@ class File(models.Model):
         if self.failed:
             state = 'failed'
             error = '\n\n'.join(['Failed to encode %s:\n%s' % (s.name(), s.error)
-                for s in self.streams.exclude(error='') if s.error])
+                                 for s in self.streams.exclude(error='') if s.error]) + \
+                    '\n\nSource Info:\n' + json.dumps(self.info, indent=2)
         elif self.encoding:
             state = 'encoding'
         elif self.queued:
