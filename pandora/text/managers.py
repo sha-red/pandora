@@ -2,19 +2,24 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
 
+from oxdjango.managers import get_operator
 from oxdjango.query import QuerySet
+
+
+keymap = {
+    'user': 'user__username',
+    'position': 'position__position',
+    'posterFrames': 'poster_frames',
+}
+default_key = 'name'
 
 def parseCondition(condition, user):
     '''
     '''
-    k = condition.get('key', 'name')
-    k = {
-        'user': 'user__username',
-        'position': 'position__position',
-        'posterFrames': 'poster_frames',
-    }.get(k, k)
+    k = condition.get('key', default_key)
+    k = keymap.get(k, k)
     if not k:
-        k = 'name'
+        k = default_key
     v = condition['value']
     op = condition.get('operator')
     if not op:
@@ -35,14 +40,10 @@ def parseCondition(condition, user):
     if k == 'subscribed':
         key = 'subscribed_users__username'
         v = user.username
-    elif isinstance(v, bool): #featured and public flag
+    elif isinstance(v, bool):
         key = k
     else:
-        key = "%s%s" % (k, {
-            '==': '__iexact',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        }.get(op, '__icontains'))
+        key = k + get_operator(op, 'istr')
     key = str(key)
     if exclude:
         q = ~Q(**{key: v})

@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
-from oxdjango.query import QuerySet
 
+from oxdjango.query import QuerySet
+from oxdjango.managers import get_operator
 from item.utils import decode_id
 
+
+keymap = {
+    'user': 'user__username',
+}
+default_key = 'name'
 
 def parseCondition(condition, user):
     '''
@@ -19,12 +25,10 @@ def parseCondition(condition, user):
     }
     ...
     '''
-    k = condition.get('key', 'name')
-    k = {
-        'user': 'user__username',
-    }.get(k, k)
+    k = condition.get('key', default_key)
+    k = keymap.get(k, k)
     if not k:
-        k = 'name'
+        k = default_key
     v = condition['value']
     op = condition.get('operator')
     if not op:
@@ -43,22 +47,12 @@ def parseCondition(condition, user):
             return q
     if k == 'id':
         v = decode_id(v)
-    if isinstance(v, bool): #featured and public flag
+    if isinstance(v, bool):
         key = k
     elif k in ('id', ):
-        key = '%s%s' % (k, {
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-        }.get(op,''))
+        key = k + get_operator(op, 'int')
     else:
-        key = '%s%s' % (k, {
-            '==': '__iexact',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        }.get(op,'__icontains'))
-
+        key = k + get_operator(op, 'istr')
     key = str(key)
     if exclude:
         q = ~Q(**{key: v})

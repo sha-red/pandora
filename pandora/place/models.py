@@ -56,7 +56,7 @@ class Place(models.Model):
 
     @classmethod
     def get_or_create(model, name):
-        qs = model.objects.filter(name_find__icontains=u'|%s|'%name)
+        qs = model.objects.filter(name_find__contains=u'|%s|' % name.lower())
         if qs.count() == 0:
             instance = model(name=name)
             instance.save()
@@ -148,7 +148,7 @@ class Place(models.Model):
             self.name_sort = self.name #', '.join(self.name)
         if self.geoname:
             self.geoname_sort = ', '.join(reversed(self.geoname.split(', ')))
-        self.name_find = '|%s|'%'|'.join([self.name]+list(self.alternativeNames))
+        self.name_find = '|%s|' % '|'.join([self.name]+list(self.alternativeNames)).lower()
 
         self.defined = len(filter(None, [getattr(self, key)
                              for key in ('south', 'west', 'north', 'east')])) > 0

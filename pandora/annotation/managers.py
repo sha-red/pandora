@@ -6,12 +6,25 @@ from django.db.models import Q, Manager
 from oxdjango.query import QuerySet
 
 from item.utils import decode_id
+from oxdjango.managers import get_operator
 
+keymap = {
+    'user': 'user__username',
+    'place': 'places__id',
+    'event': 'events__id',
+    'in': 'start',
+    'out': 'end',
+    'id': 'public_id',
+    'item': 'item__public_id',
+    'value': 'findvalue',
+}
+case_insensitive_keys = ('user__username', )
 case_sensitive_keys = (
     'public_id',
     'layer',
     'item__public_id',
 )
+default_key = 'findvalue'
 
 
 def parseCondition(condition, user):
@@ -27,18 +40,9 @@ def parseCondition(condition, user):
     }
     '''
     k = condition.get('key')
-    k = {
-        'user': 'user__username',
-        'place': 'places__id',
-        'event': 'events__id',
-        'in': 'start',
-        'out': 'end',
-        'id': 'public_id',
-        'item': 'item__public_id',
-        'value': 'findvalue',
-    }.get(k, k)
+    k = keymap.get(k, k)
     if not k:
-        k = 'findvalue'
+        k = default_key
     v = condition['value']
     op = condition.get('operator')
     if not op:
@@ -57,38 +61,12 @@ def parseCondition(condition, user):
             return q
     if k in ('places__id', 'events__id'):
         v = decode_id(v)
-    if isinstance(v, bool): #featured and public flag
+    if isinstance(v, bool):
         key = k
     elif k in ('places__id', 'events__id'):
-        key = "%s%s" % (k, {
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-        }.get(op, ''))
-    elif k in case_sensitive_keys:
-        key = "%s%s" % (k, {
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-            '==': '__exact',
-            '=': '__contains',
-            '^': '__startswith',
-            '$': '__endswith',
-        }.get(op, '__contains'))
+        key = k + get_operator(op, 'int')
     else:
-        key = "%s%s" % (k, {
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-            '==': '__iexact',
-            '=': '__icontains',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        }.get(op, '__icontains'))
-
+        key = k + get_operator(op, 'istr' if k in case_insensitive_keys else 'str')
     key = str(key)
     if isinstance(v, unicode):
         v = unicodedata.normalize('NFKD', v)

@@ -3,16 +3,19 @@
 import unicodedata
 
 from django.db.models import Q, Manager
-from oxdjango.query import QuerySet
 
+from oxdjango.query import QuerySet
+from oxdjango.managers import get_operator
 from item.utils import decode_id
 
+keymap = {
+    'user': 'user__username',
+}
+default_key = 'name'
 
 def parseCondition(condition, user):
-    k = condition.get('key', 'name')
-    k = {
-        'user': 'user__username',
-    }.get(k, k)
+    k = condition.get('key', default_key)
+    k = keymap.get(k, k)
     v = condition['value']
     op = condition.get('operator')
     if not op:
@@ -25,12 +28,7 @@ def parseCondition(condition, user):
     if k == 'id':
         v = decode_id(v)
 
-    key = '%s%s' % (k, {
-        '==': '__iexact',
-        '^': '__istartswith',
-        '$': '__iendswith',
-    }.get(op,'__icontains'))
-
+    key = k + get_operator(op, 'istr')
     key = str(key)
     if isinstance(v, unicode):
         v = unicodedata.normalize('NFKD', v).lower()

@@ -2,10 +2,14 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import unicodedata
 from django.db.models import Q, Manager
-from oxdjango.query import QuerySet
 
 from item.utils import decode_id
+from oxdjango.managers import get_operator
+from oxdjango.query import QuerySet
 
+keymap = {
+}
+default_key = 'title'
 
 def parseCondition(condition, user):
     '''
@@ -20,12 +24,10 @@ def parseCondition(condition, user):
     }
     ...
     '''
-    k = condition.get('key', 'title')
-    k = {
-        'user': 'user__usertitle',
-    }.get(k, k)
+    k = condition.get('key', default_key)
+    k = keymap.get(k, k)
     if not k:
-        k = 'title'
+        k = default_key
     v = condition['value']
     op = condition.get('operator')
     if not op:
@@ -45,23 +47,13 @@ def parseCondition(condition, user):
     if k == 'id':
         v = decode_id(v)
     elif isinstance(v, unicode):
-        v = unicodedata.normalize('NFKD', v)
-    if isinstance(v, bool): #featured and public flag
+        v = unicodedata.normalize('NFKD', v).lower()
+    if isinstance(v, bool):
         key = k
-    elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches', 'id'):
-        key = '%s%s' % (k, {
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-        }.get(op,''))
+    elif k in ('id', ):
+        key = k + get_operator(op, 'int')
     else:
-        key = '%s%s' % (k, {
-            '==': '__iexact',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        }.get(op,'__icontains'))
-
+        key = k + get_operator(op, 'istr')
     key = str(key)
     if exclude:
         q = ~Q(**{key: v})

@@ -13,29 +13,7 @@ import models
 import utils
 
 from oxdjango.query import QuerySet
-
-def get_operator(op, type='str'):
-    return {
-        'str': {
-            '==': '__iexact',
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        },
-        'int':  {
-            '==': '__exact',
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-        }
-    }[type].get(op, {
-        'str': '__icontains',
-        'int': ''
-    }[type])
+from oxdjango.managers import get_operator
 
 def parseCondition(condition, user, owner=None):
     '''
@@ -97,8 +75,7 @@ def parseCondition(condition, user, owner=None):
 
     if (not exclude and op == '=' or op in ('$', '^')) and v == '':
         return Q()
-    elif k == 'filename' and (user.is_anonymous() or \
-        not user.profile.capability('canSeeMedia')):
+    elif k == 'filename' and (user.is_anonymous() or not user.profile.capability('canSeeMedia')):
         return Q(id=0)
     elif k == 'oshash':
         return Q(files__oshash=v)
@@ -140,19 +117,17 @@ def parseCondition(condition, user, owner=None):
             value_key = 'find__value'
         else:
             value_key = k
+        if isinstance(v, unicode):
+            v = unicodedata.normalize('NFKD', v).lower()
         if k in facet_keys:
             in_find = False
-            facet_value = 'facets__value' + get_operator(op)
-            v = models.Item.objects.filter(**{'facets__key':k, facet_value:v})
+            facet_value = 'facets__value' + get_operator(op, 'istr')
+            v = models.Item.objects.filter(**{'facets__key': k, facet_value: v})
             value_key = 'id__in'
         else:
             value_key = value_key + get_operator(op)
-            if 'find__value' in value_key:
-                value_key = value_key.replace('_icontains', '_contains')
         k = str(k)
         value_key = str(value_key)
-        if isinstance(v, unicode):
-            v = unicodedata.normalize('NFKD', v).lower()
         if k == '*':
             q = Q(**{value_key: v})
         elif in_find:

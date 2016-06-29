@@ -62,7 +62,7 @@ class Event(models.Model):
 
     @classmethod
     def get_or_create(model, name):
-        qs = model.objects.filter(name_find__icontains=u'|%s|'%name)
+        qs = model.objects.filter(name_find__contains=u'|%s|' % name.lower())
         if qs.count() == 0:
             instance = model(name=name)
             instance.save()
@@ -131,6 +131,7 @@ class Event(models.Model):
         if not self.name_sort:
             self.set_name_sort()
         self.name_find = '||' + '||'.join((self.name,) + self.alternativeNames) + '||'
+        self.name_find = self.name_find.lower()
         self.defined = len(filter(None, [getattr(self, key)
                              for key in ('start', 'end')])) > 0
         if self.endTime and self.startTime:

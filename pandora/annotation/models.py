@@ -22,9 +22,11 @@ from tasks import update_matches
 
 def get_super_matches(obj, model):
     super_matches = []
-    q = Q(name_find__contains=" " + obj.name)|Q(name_find__contains="|%s"%obj.name)
+    name_lower = obj.name.lower()
+    q = Q(name_find__contains=" " + name_lower) | Q(name_find__contains="|%s" % name_lower)
     for name in obj.alternativeNames:
-        q = q|Q(name_find__contains=" " + name)|Q(name_find__contains="|%s"%name)
+        name_lower = name.lower()
+        q = q | Q(name_find__contains=" " + name_lower) | Q(name_find__contains="|%s" % name_lower)
     for p in model.objects.filter(q).exclude(id=obj.id):
         for othername in [p.name] + list(p.alternativeNames):
             for name in [obj.name] + list(obj.alternativeNames):
@@ -48,11 +50,11 @@ def get_matches(obj, model, layer_type, qs=None):
     if contains:
         name = ox.decode_html(obj.name)
         name = unicodedata.normalize('NFKD', name).lower()
-        q = Q(findvalue__icontains=" " + name)|Q(findvalue__istartswith=name)
+        q = Q(findvalue__contains=" " + name) | Q(findvalue__startswith=name)
         for name in obj.alternativeNames:
             name = ox.decode_html(name)
             name = unicodedata.normalize('NFKD', name).lower()
-            q = q|Q(findvalue__icontains=" " + name)|Q(findvalue__istartswith=name)
+            q = q | Q(findvalue__contains=" " + name) | Q(findvalue__startswith=name)
         contains_matches = q&Q(layer__in=contains)
         if f:
             f = contains_matches | f

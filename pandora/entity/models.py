@@ -56,6 +56,7 @@ class Entity(models.Model):
         else:
             self.name_sort = ox.sort_string(self.name or u'')[:255].lower() or None
         self.name_find = '||' + '||'.join((self.name,) + self.alternativeNames) + '||'
+        self.name_find = self.name_find.lower()
         super(Entity, self).save(*args, **kwargs)
         self.update_matches()
         self.update_annotations()
@@ -70,11 +71,11 @@ class Entity(models.Model):
 
     @classmethod
     def get_by_name(cls, name, type):
-        return cls.objects.get(name_find__icontains=u'|%s|'%name, type=type)
+        return cls.objects.get(name_find__contains=u'|%s|' % name.lower(), type=type)
 
     @classmethod
     def get_or_create(model, name):
-        qs = model.objects.filter(name_find__icontains=u'|%s|'%name)
+        qs = model.objects.filter(name_find__contains=u'|%s|' % name.lower())
         if qs.count() == 0:
             instance = model(name=name)
             instance.save()
@@ -115,7 +116,7 @@ class Entity(models.Model):
                     data['name'] = "Unnamed"
                 name = data['name']
                 n = 1
-                while Entity.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=self.id).count() > 0:
+                while Entity.objects.filter(name_find__contains=u'|%s|' % name.lower()).exclude(id=self.id).count() > 0:
                     n += 1
                     name = data['name'] + ' [%d]' % n
                 self.name = name
@@ -130,7 +131,7 @@ class Entity(models.Model):
                     name_ = name
                     n = 1
                     while name in used_names or \
-                        Entity.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=self.id).count() > 0:
+                        Entity.objects.filter(name_find__contains=u'|%s|' % name.lower()).exclude(id=self.id).count() > 0:
                         n += 1
                         name = name_ + ' [%d]' % n
                     names.append(name)

@@ -8,7 +8,20 @@ from django.conf import settings
 from oxdjango.query import QuerySet
 
 from item.utils import decode_id, get_by_id
+from oxdjango.managers import get_operator
 
+
+keymap = {
+    'event': 'annotations__events__id',
+    'in': 'start',
+    'out': 'end',
+    'place': 'annotations__places__id',
+    'text': 'findvalue',
+    'annotations': 'findvalue',
+    'user': 'annotations__user__username',
+}
+case_insensitive_keys = ('annotations__user__username', )
+default_key = 'name'
 
 def parseCondition(condition, user):
     '''
@@ -22,18 +35,10 @@ def parseCondition(condition, user):
             operator: "!="
     }
     '''
-    k = condition.get('key', 'name')
-    k = {
-        'event': 'annotations__events__id',
-        'in': 'start',
-        'out': 'end',
-        'place': 'annotations__places__id',
-        'text': 'findvalue',
-        'annotations': 'findvalue',
-        'user': 'annotations__user__username',
-    }.get(k, k)
+    k = condition.get('key', default_key)
+    k = keymap.get(k, k)
     if not k:
-        k = 'name'
+        k = default_key
     v = condition['value']
     op = condition.get('operator')
     if not op:
@@ -60,35 +65,18 @@ def parseCondition(condition, user):
 
     if k == 'id':
         public_id, points = v.split('/')
-        points = [float('%0.03f'%float(p)) for p in points.split('-')]
+        points = [float('%0.03f' % float(p)) for p in points.split('-')]
         q = Q(item__public_id=public_id, start=points[0], end=points[1])
         return exclude and ~q or q
-
     elif k.endswith('__id'):
         v = decode_id(v)
-    if isinstance(v, bool): #featured and public flag
-        key = k
-    elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches',
-               'id') or k.endswith('__id'):
-        key = "%s%s" % (k, {
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-        }.get(op, ''))
-    else:
-        key = "%s%s" % (k, {
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-            '===': '__exact',
-            '==': '__iexact',
-            '=': '__icontains',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        }.get(op, '__icontains'))
 
+    if isinstance(v, bool):
+        key = k
+    elif k in ('id', ) or k.endswith('__id'):
+        key = k + get_operator(op, 'int')
+    else:
+        key = k + get_operator(op, 'istr' if k in case_insensitive_keys else 'str')
     key = str(key)
     if isinstance(v, unicode) and op != '===':
         v = unicodedata.normalize('NFKD', v).lower()
@@ -137,8 +125,6 @@ def parseConditions(conditions, operator, user):
         return q
     return None
 
-
-
 class ClipManager(Manager):
 
     def get_query_set(self):
@@ -150,17 +136,9 @@ class ClipManager(Manager):
         conditions = data.get('query', {}).get('conditions', [])
         conditions = filter(lambda c: c['key'] in keys, conditions)
         operator = data.get('query', {}).get('operator', '&')
+
         def parse(condition):
-            key = "%s%s" % ('findvalue', {
-                '>': '__gt',
-                '>=': '__gte',
-                '<': '__lt',
-                '<=': '__lte',
-                '==': '__iexact',
-                '=': '__icontains',
-                '^': '__istartswith',
-                '$': '__iendswith',
-            }.get(condition.get('operator', ''), '__icontains'))
+            key = 'findvalue' + get_operator(condition.get('operator', ''))
             v = condition['value']
             if isinstance(v, unicode):
                 v = unicodedata.normalize('NFKD', v).lower()
@@ -168,6 +146,7 @@ class ClipManager(Manager):
             if condition['key'] in layer_ids:
                 q = q & Q(layer=condition['key'])
             return q
+
         conditions = map(parse, conditions)
         if conditions:
             q = conditions[0]

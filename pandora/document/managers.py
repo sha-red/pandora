@@ -6,18 +6,22 @@ import ox
 from oxdjango.query import QuerySet
 
 import entity.managers
+from oxdjango.managers import get_operator
 
+
+keymap = {
+    'user': 'user__username',
+    'item': 'items__public_id',
+}
+default_key = 'name'
 
 def parseCondition(condition, user, item=None):
     '''
     '''
-    k = condition.get('key', 'name')
-    k = {
-        'user': 'user__username',
-        'item': 'items__public_id',
-    }.get(k, k)
+    k = condition.get('key', default_key)
+    k = keymap.get(k, k)
     if not k:
-        k = 'name'
+        k = default_key
     if item and k == 'description':
         item_conditions = condition.copy()
         item_conditions['key'] = 'items__itemproperties__description'
@@ -38,17 +42,13 @@ def buildCondition(k, op, v):
     if k == 'id':
         v = ox.fromAZ(v)
         return Q(**{k: v})
-    if isinstance(v, bool): #featured and public flag
+    if isinstance(v, bool):
         key = k
     elif k == 'entity':
         entity_key, v = entity.managers.namePredicate(op, v)
         key = 'entities__' + entity_key
     else:
-        key = "%s%s" % (k, {
-            '==': '__iexact',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        }.get(op, '__icontains'))
+        key = k + get_operator(op, 'istr')
     key = str(key)
     return Q(**{key: v})
 

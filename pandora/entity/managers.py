@@ -3,7 +3,16 @@
 from django.db.models import Q, Manager
 
 import ox
+
 from oxdjango.query import QuerySet
+from oxdjango.managers import get_operator
+
+keymap = {
+    'user': 'user__username',
+    'name': 'name_find'
+}
+case_insensitive_keys = ('user__username',)
+default_key = 'name'
 
 
 def namePredicate(op, value):
@@ -13,17 +22,14 @@ def namePredicate(op, value):
         '$': '%s|',
     }.get(op, '%s')
 
-    return ('name_find__icontains', pat % value)
+    return ('name_find__contains', pat % value.lower())
 
 
 def parseCondition(condition, user, item=None):
     '''
     '''
-    k = condition.get('key', 'name')
-    k = {
-        'user': 'user__username',
-        'name': 'name_find'
-    }.get(k, k)
+    k = condition.get('key', default_key)
+    k = keymap.get(k, k)
 
     v = condition['value']
     op = condition.get('operator')
@@ -42,7 +48,7 @@ def buildCondition(k, op, v):
     if k == 'id':
         v = ox.fromAZ(v)
         return Q(**{k: v})
-    if isinstance(v, bool): #featured and public flag
+    if isinstance(v, bool):
         key = k
     elif k == 'name_find':
         key, v = namePredicate(op, v)
@@ -52,11 +58,7 @@ def buildCondition(k, op, v):
         elif k not in ('id', 'user__username', 'type'):
             find_key = k
             k = 'find__value'
-        key = "%s%s" % (k, {
-            '==': '__iexact',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        }.get(op, '__icontains'))
+        key = k + get_operator(op, 'istr' if k in case_insensitive_keys else 'str')
     key = str(key)
     if find_key:
         return Q(**{'find__key': find_key, key: v})
