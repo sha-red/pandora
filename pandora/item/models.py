@@ -749,6 +749,7 @@ class Item(models.Model):
         return changed
 
     def update_find(self):
+        layer_keys = []
 
         def save(key, value):
             if value not in ('', None):
@@ -791,6 +792,7 @@ class Item(models.Model):
                     qs = qs.filter(layer=i)
                     qs = qs.order_by('start')
                     save(i, u'\n'.join(filter(None, [l.findvalue for l in qs])))
+                    layer_keys.append(i)
                 elif i != '*' and i not in self.facet_keys:
                     value = self.get(i)
                     if isinstance(value, list):
@@ -798,6 +800,8 @@ class Item(models.Model):
                     save(i, value)
 
             for key in self.facet_keys:
+                if key in layer_keys:
+                    continue
                 if key == 'title':
                     values = get_titles()
                 elif key == 'character':
