@@ -72,7 +72,7 @@ def get_matches(obj, model, layer_type, qs=None):
                 name = name.lower()
                 name = ox.decode_html(name)
                 name = unicodedata.normalize('NFKD', name).lower()
-                if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\'"\)\]\-\/\s]|$))'%re.escape(name)).findall(value)):
+                if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\'"\)\]\-\/\s]|$))' % re.escape(name)).findall(value)):
                     matches.append(a.id)
                     break
     if not matches:
@@ -96,7 +96,7 @@ class Annotation(models.Model):
 
     layer = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
-    findvalue = models.TextField(null=True)
+    findvalue = models.TextField(null=True, db_index=settings.DB_GIN_TRGM)
     sortvalue = models.CharField(max_length=1000, null=True, blank=True, db_index=True)
 
     languages = models.CharField(max_length=255, null=True, blank=True)

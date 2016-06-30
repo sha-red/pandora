@@ -37,6 +37,7 @@ class Command(BaseCommand):
             for table, column in (
                 (models.ItemFind._meta.db_table, 'value'),    # Item Find
                 (models.Clip._meta.db_table, 'findvalue'),    # Clip Find
+                (models.Annotation._meta.db_table, 'findvalue'),    # Annotation Find
                 (entity.models.Find._meta.db_table, 'value'), # Entity Find
             ):
                 cursor = connection.cursor()
