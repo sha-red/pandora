@@ -39,12 +39,12 @@ def parseCondition(condition, user):
     if not op:
         op = ''
     if get_by_id(settings.CONFIG['layers'], k):
-        return parseCondition({'key': 'annotations__findvalue',
-                               'value': v,
-                               'operator': op}, user) \
-             & parseCondition({'key': 'annotations__layer',
+        return parseCondition({'key': 'annotations__layer',
                                'value': k,
-                               'operator': '==='}, user)
+                               'operator': '==='}, user) & \
+            parseCondition({'key': 'annotations__findvalue',
+                            'value': v,
+                            'operator': op}, user)
 
     if op.startswith('!'):
         op = op[1:]
