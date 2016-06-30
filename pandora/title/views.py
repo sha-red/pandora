@@ -133,7 +133,7 @@ def findTitles(request, data):
             response['data']['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
     elif 'positions' in data:
         ids = list(qs.values_list('id', flat=True))
-        response['data']['positions'] = utils.get_positions(ids, query['positions'], decode_id=True)
+        response['data']['positions'] = utils.get_positions(ids, data['positions'], decode_id=True)
     else:
         response['data']['items'] = qs.count()
     return render_to_json_response(response)
