@@ -204,7 +204,7 @@ def find(request, data):
             response['data']['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
     elif 'positions' in query:
         qs = _order_query(query['qs'], query['sort'])
-        ids = [j['public_id'] for j in qs.values('public_id')]
+        ids = list(qs.values_list('public_id', flat=True))
         response['data']['positions'] = utils.get_positions(ids, query['positions'])
     elif 'keys' in query:
         response['data']['items'] = []

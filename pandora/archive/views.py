@@ -640,7 +640,7 @@ def findMedia(request, data):
         qs = _order_query(qs, query['sort'])
 
         response['data']['positions'] = {}
-        ids = [j['oshash'] for j in qs.values('oshash')]
+        ids = list(qs.values_list('oshash', flat=True))
         response['data']['positions'] = utils.get_positions(ids, query['positions'])
 
     elif 'keys' in query:

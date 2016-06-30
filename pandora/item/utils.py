@@ -61,7 +61,7 @@ def sort_title(title):
     title = re.sub(u'[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
     return title.strip()
 
-def get_positions(ids, pos):
+def get_positions(ids, pos, decode_id=False):
     '''
     >>> get_positions([1,2,3,4], [2,4])
     {2: 1, 4: 3}
@@ -69,7 +69,10 @@ def get_positions(ids, pos):
     positions = {}
     for i in pos:
         try:
-            positions[i] = ids.index(i)
+            if decode_id:
+                positions[i] = ids.index(ox.fromAZ(i))
+            else:
+                positions[i] = ids.index(i)
         except:
             pass
     return positions

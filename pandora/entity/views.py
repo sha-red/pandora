@@ -234,8 +234,8 @@ def findEntities(request, data):
         #FIXME: actually implement position requests
         response['data']['position'] = 0
     elif 'positions' in data:
-        ids = [i.get_id() for i in qs]
-        response['data']['positions'] = utils.get_positions(ids, query['positions'])
+        ids = list(qs.values_list('id', flat=True))
+        response['data']['positions'] = utils.get_positions(ids, query['positions'], decode_id=True)
     else:
         response['data']['items'] = qs.count()
     return render_to_json_response(response)

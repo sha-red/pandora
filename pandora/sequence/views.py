@@ -85,7 +85,7 @@ def findSequences(request, data):
             response['data']['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
     elif 'positions' in data:
         qs = order_query(qs, query['sort'])
-        ids = [i['public_id'] for i in qs.values('public_id')]
+        ids = list(qs.values_list('public_id', flat=True))
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()
