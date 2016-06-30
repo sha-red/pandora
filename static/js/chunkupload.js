@@ -89,7 +89,7 @@ pandora.chunkupload = function(options) {
             }
         }, false);
         request.addEventListener('error', function (evt) {
-            that.status = 'uplaod failed';
+            that.status = 'upload failed';
             that.progress = -1;
             that.responseText = evt.target.responseText;
             done();
@@ -100,7 +100,7 @@ pandora.chunkupload = function(options) {
             done();
         }, false);
         var formData = new FormData();
-        
+
         Object.keys(options.data).forEach(function(key) {
             formData.append(key, options.data[key]);
         });
@@ -176,7 +176,7 @@ pandora.chunkupload = function(options) {
                 // failed to upload, try again in 5 second
                 retries++;
                 if (maxRetry > 0 && retries > maxRetry) {
-                    that.status = 'uplaod failed';
+                    that.status = 'upload failed';
                     that.progress = -1;
                     done();
                 } else {
@@ -195,7 +195,7 @@ pandora.chunkupload = function(options) {
             // failed to upload, try again in 3 second
             retries++;
             if (maxRetry > 0 && retries > maxRetry) {
-                that.status = 'uplaod failed';
+                that.status = 'upload failed';
                 that.progress = -1;
                 done();
             } else {
