@@ -94,7 +94,7 @@ def update(request, data):
         files = all_files.filter(file__available=False)
         if volume:
             files = files.filter(volume=volume)
-        response['data']['info'] = [f.file.oshash for f in all_files.filter(Q(file__info='{}')|Q(file__size=0))]
+        response['data']['info'] = [f.file.oshash for f in all_files.filter(Q(file__info='{}') | Q(file__size=0))]
         response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True,
                                                                         file__available=False,
                                                                         file__wanted=True)]
@@ -135,13 +135,13 @@ def upload(request, data=None):
             f.frames.all().delete()
             for frame in request.FILES.getlist('frame'):
                 name = frame.name
-                #float required?
+                # float required?
                 position = float(os.path.splitext(name)[0])
                 fr, created = models.Frame.objects.get_or_create(file=f, position=position)
                 if fr.frame:
                     fr.frame.delete()
                 fr.frame.save(name, frame)
-                os.chmod(fr.frame.path, 0644)
+                os.chmod(fr.frame.path, 0o644)
                 fr.save()
             f.item.select_frame()
             f.item.save()
@@ -152,7 +152,7 @@ def upload(request, data=None):
                 f.data.delete()
             f.data.save('data.raw', request.FILES['file'])
             f.save()
-            os.chmod(f.data.path, 0644)
+            os.chmod(f.data.path, 0o644)
             item.tasks.load_subtitles.delay(f.item.public_id)
             response = json_response(text='file saved')
         else:
@@ -235,20 +235,20 @@ def firefogg_upload(request):
     resolution, format = profile.split('p.')
     resolution = int(resolution)
     if resolution not in config['resolutions'] \
-        or format not in config['formats']:
+            or format not in config['formats']:
         response = json_response(status=500, text='invalid profile')
         return render_to_json_response(response)
 
-    #handle video upload
+    # handle video upload
     if request.method == 'POST':
-        #post next chunk
+        # post next chunk
         if 'chunk' in request.FILES and oshash:
             f = get_object_or_404(models.File, oshash=oshash)
             if f.editable(request.user):
                 def save_chunk(chunk, offset, done):
                     return f.save_chunk_stream(chunk, offset, resolution, format, done)
                 response = process_chunk(request, save_chunk)
-                response['resultUrl'] = request.build_absolute_uri('/%s'%f.item.public_id)
+                response['resultUrl'] = request.build_absolute_uri('/%s' % f.item.public_id)
                 if response.get('done'):
                     f.uploading = False
                     if response['result'] == 1:
@@ -258,16 +258,16 @@ def firefogg_upload(request):
                         f.queued = False
                         f.wanted = True
                     f.save()
-                    #FIXME: this fails badly if rabbitmq goes down
+                    # FIXME: this fails badly if rabbitmq goes down
                     try:
                         t = f.process_stream()
                         response['resultUrl'] = t.task_id
                     except:
                         pass
                 return render_to_json_response(response)
-        #init upload
+        # init upload
         elif oshash:
-            #404 if oshash is not know, files must be registered via update api first
+            # 404 if oshash is not know, files must be registered via update api first
             f = get_object_or_404(models.File, oshash=oshash)
             if f.editable(request.user):
                 f.streams.all().delete()
@@ -309,18 +309,18 @@ def direct_upload(request):
                     file.queued = False
                     file.wanted = True
                 file.save()
-                #try/execpt so it does not fail if rabitmq is down
+                # try/execpt so it does not fail if rabitmq is down
                 try:
                     t = file.extract_stream()
                     response['resultUrl'] = t.task_id
                 except:
                     pass
             return render_to_json_response(response)
-    #init upload
+    # init upload
     else:
         file, created = models.File.objects.get_or_create(oshash=oshash)
         if file.editable(request.user):
-            #remove previous uploads
+            # remove previous uploads
             if not created:
                 file.streams.all().delete()
                 file.delete_frames()
@@ -353,7 +353,7 @@ def getTaskStatus(request, data):
     }
     notes: To be deprecated, will be wrapped in regular API call.
     '''
-    #FIXME: should check if user has permissions to get status
+    # FIXME: should check if user has permissions to get status
     if 'id' in data:
         task_id = data['id']
     elif 'taskId' in data:
@@ -477,7 +477,7 @@ def editMedia(request, data):
         models.Instance.objects.filter(file__oshash__in=dont_ignore).update(ignore=False)
     if ignore or dont_ignore:
         files = models.File.objects.filter(oshash__in=ignore+dont_ignore)
-        #FIXME: is this to slow to run sync?
+        # FIXME: is this to slow to run sync?
         for i in Item.objects.filter(files__in=files).distinct():
             i.update_selected()
             i.update_wanted()
@@ -624,7 +624,7 @@ def findMedia(request, data):
         qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
 
         if 'positions' in query:
-            #FIXME: this does not scale for larger results
+            # FIXME: this does not scale for larger results
             response['data']['positions'] = {}
             ids = [j['value'] for j in qs]
             response['data']['positions'] = utils.get_positions(ids, query['positions'])
@@ -635,7 +635,7 @@ def findMedia(request, data):
         else:
             response['data']['items'] = qs.count()
     elif 'positions' in query:
-        #FIXME: this does not scale for larger results
+        # FIXME: this does not scale for larger results
         qs = models.File.objects.filter(item__in=query['qs'])
         qs = _order_query(qs, query['sort'])
 
@@ -651,7 +651,7 @@ def findMedia(request, data):
         keys = query['keys']
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [f.json(keys) for f in qs]
-    else: # otherwise stats
+    else:  # otherwise stats
         items = query['qs']
         files = models.File.objects.filter(item__in=query['qs'])
         response['data']['items'] = files.count()
@@ -659,7 +659,7 @@ def findMedia(request, data):
 
 actions.register(findMedia)
 
-def parsePath(request, data): #parse path and return info
+def parsePath(request, data): # parse path and return info
     '''
     Parses a path
     takes {

@@ -23,7 +23,7 @@ def save_chunk(obj, file, chunk, offset, name, done_cb=None):
     else:
         path = file.path
         size = file.size
-        if offset == None:
+        if offset is None:
             offset = size
         elif offset > size:
             return False, size

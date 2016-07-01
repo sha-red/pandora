@@ -24,7 +24,8 @@ from person.models import get_name_sort
 from chunk import save_chunk
 import extract
 
-def data_path(f, x): return f.get_path('data.bin')
+def data_path(f, x):
+    return f.get_path('data.bin')
 
 class File(models.Model):
     AV_INFO = (
@@ -46,12 +47,12 @@ class File(models.Model):
     oshash = models.CharField(max_length=16, unique=True)
     item = models.ForeignKey("item.Item", related_name='files', null=True)
 
-    path = models.CharField(max_length=2048, default="") # canoncial path/file
-    sort_path = models.CharField(max_length=2048, default="") # sort name
+    path = models.CharField(max_length=2048, default="")  # canoncial path/file
+    sort_path = models.CharField(max_length=2048, default="")  # sort name
 
     type = models.CharField(default="", max_length=255)
 
-    #editable
+    # editable
     extension = models.CharField(default="", max_length=255, null=True)
     language = models.CharField(default="", max_length=255, null=True)
     part = models.CharField(default="", max_length=255, null=True)
@@ -77,20 +78,20 @@ class File(models.Model):
     bits_per_pixel = models.FloatField(default=-1)
     pixels = models.BigIntegerField(default=0)
 
-    #This is true if derivative is available or subtitles where uploaded
-    available = models.BooleanField(default = False)
-    selected = models.BooleanField(default = False)
-    uploading = models.BooleanField(default = False)
-    queued = models.BooleanField(default = False)
-    encoding = models.BooleanField(default = False)
-    wanted = models.BooleanField(default = False)
-    failed = models.BooleanField(default = False)
+    # This is true if derivative is available or subtitles where uploaded
+    available = models.BooleanField(default=False)
+    selected = models.BooleanField(default=False)
+    uploading = models.BooleanField(default=False)
+    queued = models.BooleanField(default=False)
+    encoding = models.BooleanField(default=False)
+    wanted = models.BooleanField(default=False)
+    failed = models.BooleanField(default=False)
 
     is_audio = models.BooleanField(default=False)
     is_video = models.BooleanField(default=False)
     is_subtitle = models.BooleanField(default=False)
 
-    #upload and data handling
+    # upload and data handling
     data = models.FileField(null=True, blank=True,
                             upload_to=data_path)
 
@@ -161,11 +162,11 @@ class File(models.Model):
                 data['isEpisode'] = True
             data['directorSort'] = [get_name_sort(n) for n in self.item.get('director', [])]
         data['isEpisode'] = 'isEpisode' in data \
-                or data.get('season') != None \
-                or data.get('episode') != None \
-                or data.get('episodes') not in ([], None) \
-                or (data.get('seriesTitle') != None and data.get('episodeTitle') != None)
-        if data['isEpisode'] and data['seriesYear'] == None:
+            or data.get('season') is not None \
+            or data.get('episode') is not None \
+            or data.get('episodes') not in ([], None) \
+            or (data.get('seriesTitle') is not None and data.get('episodeTitle') is not None)
+        if data['isEpisode'] and data['seriesYear'] is None:
             data['seriesYear'] = data['year']
         data['type'] = 'unknown'
         if 'extension' in data and data['extension']:
@@ -178,7 +179,7 @@ class File(models.Model):
         return data
 
     def normalize_path(self):
-        #FIXME: always use format_path
+        # FIXME: always use format_path
         if settings.CONFIG['site']['folderdepth'] == 4:
             return self.normalize_item_path()
         else:
@@ -193,6 +194,7 @@ class File(models.Model):
 
         files = []
         volume = self.instances.all()[0].volume
+
         def add_file(f):
             instance = f.instances.all()[0]
             files.append(f.get_path_info())
@@ -214,11 +216,11 @@ class File(models.Model):
 
     def update_info(self, info, user):
         if not self.info:
-            #populate name sort with director if unknown
+            # populate name sort with director if unknown
             if info.get('director') and info.get('directorSort'):
                 for name, sortname in zip(info['director'], info['directorSort']):
                     get_name_sort(name, sortname)
-            #add all files in one folder to same item
+            # add all files in one folder to same item
             if self.instances.all().count():
                 if info.get('isEpisode'):
                     prefix = os.path.splitext(self.instances.all()[0].path)[0]
@@ -268,7 +270,7 @@ class File(models.Model):
             self.available = self.data and True or False
         else:
             self.available = not self.uploading and \
-                self.streams.filter(source=None, available=True).count() > 0
+                self.streams.filter(source=None, available=True).count()
         super(File, self).save(*args, **kwargs)
         if update_path:
             self.path = self.normalize_path()
@@ -279,7 +281,7 @@ class File(models.Model):
         return os.path.join('media', h[:2], h[2:4], h[4:6], h[6:], name)
 
     def contents(self):
-        if self.data != None:
+        if self.data is not None:
             self.data.seek(0)
             return self.data.read()
         return None
@@ -293,7 +295,7 @@ class File(models.Model):
                 if key not in subtitles:
                     subtitles.append(key)
                     srt.append(s)
-        #subtitles should not overlap
+        # subtitles should not overlap
         for i in range(1, len(srt)):
             if srt[i-1]['out'] > srt[i]['in']:
                 srt[i-1]['out'] = srt[i]['in']
@@ -335,8 +337,7 @@ class File(models.Model):
 
     def save_chunk_stream(self, chunk, offset, resolution, format, done):
         if not self.available:
-            stream, created = Stream.objects.get_or_create(
-                        file=self, resolution=resolution, format=format)
+            stream, created = Stream.objects.get_or_create(file=self, resolution=resolution, format=format)
             name = stream.path(stream.name())
 
             def done_cb():
@@ -436,7 +437,7 @@ class File(models.Model):
                     extract.frame_direct(filename, fr.frame.path, pos)
                 if os.path.exists(fr.frame.path):
                     fr.save()
-                    os.chmod(fr.frame.path, 0644)
+                    os.chmod(fr.frame.path, 0o644)
             self.item.select_frame()
 
     def extract_stream(self):
@@ -558,7 +559,7 @@ class Volume(models.Model):
     name = models.CharField(max_length=1024)
 
     def __unicode__(self):
-        return u"%s's %s"% (self.user, self.name)
+        return u"%s's %s" % (self.user, self.name)
 
     def json(self):
         return {
@@ -589,7 +590,7 @@ class Instance(models.Model):
     volume = models.ForeignKey(Volume, related_name='files')
 
     def __unicode__(self):
-        return u"%s's %s <%s>"% (self.volume.user, self.path, self.file.oshash)
+        return u"%s's %s <%s>" % (self.volume.user, self.path, self.file.oshash)
 
     @property
     def public_id(self):
@@ -618,8 +619,8 @@ class Frame(models.Model):
     file = models.ForeignKey(File, related_name="frames")
     position = models.FloatField()
     frame = models.ImageField(default=None, null=True, upload_to=frame_path)
-    width = models.IntegerField(default = 0)
-    height = models.IntegerField(default = 0)
+    width = models.IntegerField(default=0)
+    height = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if self.frame:
@@ -636,8 +637,8 @@ def delete_frame(sender, **kwargs):
         f.frame.delete(save=False)
 pre_delete.connect(delete_frame, sender=Frame)
 
-
-def stream_path(f, x): return f.path(x)
+def stream_path(f, x):
+    return f.path(x)
 
 class Stream(models.Model):
 
@@ -696,7 +697,8 @@ class Stream(models.Model):
             if resolution <= self.resolution:
                 for f in config['formats']:
                     derivative, created = Stream.objects.get_or_create(file=self.file,
-                                                      resolution=resolution, format=f)
+                                                                       resolution=resolution,
+                                                                       format=f)
                     if created:
                         derivative.source = self
                         derivative.save()

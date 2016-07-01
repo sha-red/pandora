@@ -494,9 +494,9 @@ def average_color(prefix, start=0, end=0, mode='antialias'):
             end_offset = timeline.size[0] - (frames - end)
             box = (0, 0, end_offset, height)
             timeline = timeline.crop(box)
-        
+
         p = np.asarray(timeline.convert('RGB'), dtype=np.float32)
-        p = np.sum(p, axis=0) / height               #average color per frame
+        p = np.sum(p, axis=0) / height  # average color per frame
         pixels.append(p)
         if end and frames >= end:
             break
