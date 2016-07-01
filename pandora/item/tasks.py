@@ -54,7 +54,7 @@ def update_clips(public_id):
 @task(ignore_results=True, queue='default')
 def update_poster(public_id):
     item = models.Item.objects.get(public_id=public_id)
-    item.make_poster(True)
+    item.make_poster()
     item.make_icon()
     if item.poster and os.path.exists(item.poster.path):
         models.Item.objects.filter(pk=item.id).update(
