@@ -256,7 +256,7 @@ class File(models.Model):
             self.sort_path = utils.sort_string(self.path)
             self.is_audio = self.type == 'audio'
             self.is_video = self.type == 'video'
-            self.is_subtitle = self.path.endswith('.srt')
+            self.is_subtitle = self.path.split('.')[-1] in ('srt', 'vtt')
 
         if self.type not in ('audio', 'video'):
             self.duration = None
@@ -289,7 +289,11 @@ class File(models.Model):
     def srt(self, offset=0):
         srt = []
         subtitles = []
-        for s in ox.srt.load(self.data.path):
+        if self.data.path.endswith('.vtt'):
+            load = ox.vtt.load
+        else:
+            load = ox.srt.load
+        for s in load(self.data.path):
             if s['in'] <= s['out'] and s['value'].strip():
                 key = '%s --> %s\n%s' % (s['in'], s['out'], s['value'])
                 if key not in subtitles:
