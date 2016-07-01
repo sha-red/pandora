@@ -258,7 +258,6 @@ def firefogg_upload(request):
                         f.queued = False
                         f.wanted = True
                     f.save()
-                    # FIXME: this fails badly if rabbitmq goes down
                     try:
                         t = f.process_stream()
                         response['resultUrl'] = t.task_id
@@ -477,7 +476,6 @@ def editMedia(request, data):
         models.Instance.objects.filter(file__oshash__in=dont_ignore).update(ignore=False)
     if ignore or dont_ignore:
         files = models.File.objects.filter(oshash__in=ignore+dont_ignore)
-        # FIXME: is this to slow to run sync?
         for i in Item.objects.filter(files__in=files).distinct():
             i.update_selected()
             i.update_wanted()
@@ -624,7 +622,6 @@ def findMedia(request, data):
         qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
 
         if 'positions' in query:
-            # FIXME: this does not scale for larger results
             response['data']['positions'] = {}
             ids = [j['value'] for j in qs]
             response['data']['positions'] = utils.get_positions(ids, query['positions'])
@@ -635,7 +632,6 @@ def findMedia(request, data):
         else:
             response['data']['items'] = qs.count()
     elif 'positions' in query:
-        # FIXME: this does not scale for larger results
         qs = models.File.objects.filter(item__in=query['qs'])
         qs = _order_query(qs, query['sort'])
 

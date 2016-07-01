@@ -598,7 +598,6 @@ def remove(request, data):
             item.user == user or \
             item.groups.filter(id__in=user.groups.all()).count() > 0:
         add_changelog(request, data)
-        # FIXME: is this cascading enough or do we end up with orphan files etc.
         item.delete()
         response = json_response(status=200, text='removed')
     else:
