@@ -59,7 +59,7 @@ Ox.PDFViewer = function(options, self) {
             .attr({
                 frameborder: 0,
                 height: self.options.height + 'px',
-                src: self.options.pdfjsURL + '?file=' + self.options.url + '#page=' + self.options.page,
+                src: self.options.pdfjsURL + '?file=' + encodeURIComponent(self.options.url) + '#page=' + self.options.page,
                 width: self.options.width + 'px'
             })
             .onMessage(function(data, event) {
