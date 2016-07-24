@@ -15,6 +15,7 @@ import utils
 from oxdjango.query import QuerySet
 from oxdjango.managers import get_operator
 
+
 def parseCondition(condition, user, owner=None):
     '''
     condition: {
@@ -117,8 +118,9 @@ def parseCondition(condition, user, owner=None):
             value_key = 'find__value'
         else:
             value_key = k
-        if isinstance(v, unicode):
-            v = unicodedata.normalize('NFKD', v).lower()
+        if not k.startswith('public_id'):
+            if isinstance(v, unicode):
+                v = unicodedata.normalize('NFKD', v).lower()
         if k in facet_keys:
             in_find = False
             facet_value = 'facets__value' + get_operator(op, 'istr')
