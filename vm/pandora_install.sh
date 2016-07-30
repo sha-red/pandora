@@ -69,6 +69,7 @@ apt-get install -y \
     gpac \
     imagemagick \
     poppler-utils \
+    youtube-dl \
     ipython \
     postfix \
     postgresql \

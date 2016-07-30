@@ -24,6 +24,7 @@ from changelog.models import add_changelog
 from . import models
 from . import queue
 from . import tasks
+from . import external
 from .chunk import process_chunk
 
 
@@ -718,3 +719,48 @@ def getEncodingStatus(request, data):
     response['data']['status'] = queue.status()
     return render_to_json_response(response)
 actions.register(getEncodingStatus, cache=False)
+
+@login_required_json
+def getMediaUrlInfo(request, data):
+    '''
+    Get info (title, duration,...) about given media url,
+    if url is a playlist, result has info about each item.
+
+    takes {
+        url: string // url
+    }
+    returns {
+        items: [{title, url,...}] // info for each url found
+
+    }
+    '''
+    if not request.user.profile.capability('canAddItems'):
+        response = json_response(status=403, text='permission denied')
+    else:
+        response = json_response()
+        response['data']['items'] = external.get_info(data['url'])
+    return render_to_json_response(response)
+actions.register(getMediaUrlInfo, cache=False)
+
+@login_required_json
+def addMediaUrl(request, data):
+    '''
+    Import video from url and add to item
+
+    takes {
+        url: string, // url
+        item: string // item
+    }
+    returns {
+        taskId: string, // taskId
+    }
+    '''
+    if not request.user.profile.capability('canAddItems'):
+        response = json_response(status=403, text='permission denied')
+    else:
+        response = json_response()
+        t = tasks.download_media.delay(data['item'], data['url'])
+        response['data']['taskId'] = t.task_id
+        add_changelog(request, data, data['item'])
+    return render_to_json_response(response)
+actions.register(addMediaUrl, cache=False)

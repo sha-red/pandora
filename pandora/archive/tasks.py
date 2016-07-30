@@ -10,6 +10,7 @@ from django.db.models import Q
 from item.models import Item
 import models
 import extract
+import external
 
 _INSTANCE_KEYS = ('mtime', 'path')
 
@@ -169,3 +170,7 @@ def update_stream(id):
     for c in s.file.item.clips.all():
         c.update_calculated_values()
         c.save()
+
+@task(queue="encoding")
+def download_media(item_id, url):
+    return external.download(item_id, url)
