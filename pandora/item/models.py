@@ -1066,6 +1066,7 @@ class Item(models.Model):
                 for a in Entity.objects.filter(id__in=[ox.fromAZ(i) for i in current_values]).values('name')
             ]
         current_values = [ox.decode_html(ox.strip_tags(v.replace('<br>', ' '))) for v in current_values]
+        current_values = [unicodedata.normalize('NFKD', v) for v in current_values]
         self.update_facet_values(key, current_values)
 
     def update_facet_values(self, key, current_values):
