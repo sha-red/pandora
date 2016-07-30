@@ -1053,6 +1053,7 @@ class Item(models.Model):
 
         current_values = list(set(current_values))
         current_values = [ox.decode_html(ox.strip_tags(v)) for v in current_values]
+        current_values = [unicodedata.normalize('NFKD', v) for v in current_values]
         self.update_facet_values(key, current_values)
 
     def update_layer_facet(self, key):
