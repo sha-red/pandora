@@ -1390,8 +1390,23 @@ class Item(models.Model):
             for f in glob(os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline*.jpg')):
                 os.unlink(f)
 
+    def clear_poster_cache(self, poster):
+        for f in glob(poster.replace('.jpg', '*.jpg')):
+            if f != poster:
+                try:
+                    os.unlink(f)
+                except OSError:
+                    pass
+
     def make_poster(self):
         ox.makedirs(os.path.join(settings.MEDIA_ROOT, self.path()))
+        poster = self.path('poster.jpg')
+        poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
+
+        if self.poster and self.poster.path != poster:
+            self.clear_poster_cache(self.poster.path)
+            self.poster.delete()
+
         if not self.poster:
             poster = self.make_siteposter()
             url = self.prefered_poster_url()
@@ -1403,14 +1418,7 @@ class Item(models.Model):
                     data = f.read()
                     if data:
                         self.save_poster(data)
-        poster = self.path('poster.jpg')
-        poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
-        for f in glob(poster.replace('.jpg', '*.jpg')):
-            if f != poster:
-                try:
-                    os.unlink(f)
-                except OSError:
-                    pass
+            self.clear_poster_cache(poster)
 
     def make_siteposter(self):
         poster = self.path('siteposter.jpg')
