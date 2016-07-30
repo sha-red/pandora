@@ -1403,14 +1403,14 @@ class Item(models.Model):
                     data = f.read()
                     if data:
                         self.save_poster(data)
-            poster = self.path('poster.jpg')
-            poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
-            for f in glob(poster.replace('.jpg', '*.jpg')):
-                if f != poster:
-                    try:
-                        os.unlink(f)
-                    except OSError:
-                        pass
+        poster = self.path('poster.jpg')
+        poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
+        for f in glob(poster.replace('.jpg', '*.jpg')):
+            if f != poster:
+                try:
+                    os.unlink(f)
+                except OSError:
+                    pass
 
     def make_siteposter(self):
         poster = self.path('siteposter.jpg')
