@@ -94,14 +94,14 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         audioquality = 6
         audiobitrate = None
         audiochannels = None
-    if profile == '720p':
+    elif profile == '720p':
         height = 720
 
         audiorate = 48000
         audioquality = 5
         audiobitrate = None
         audiochannels = None
-    if profile == '480p':
+    elif profile == '480p':
         height = 480
 
         audiorate = 44100
