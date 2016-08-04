@@ -266,12 +266,12 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         if mono_mix:
             ac = 2
         else:
-            ac = info['audio'][audio_track].get('channels', audiochannels)
-        if ac:
+            ac = info['audio'][0].get('channels')
+            if not ac:
+                ac = audiochannels
+        if audiochannels:
             ac = min(ac, audiochannels)
-        else:
-            ac = audiochannels
-        audio_settings += ['-ac', str(ac)]
+            audio_settings += ['-ac', str(ac)]
         if audiobitrate:
             audio_settings += ['-ab', audiobitrate]
         if format == 'mp4':
