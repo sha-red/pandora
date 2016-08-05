@@ -8,6 +8,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from item.models import Item
+from item.tasks import update_poster
 import models
 import extract
 import external
@@ -138,6 +139,7 @@ def extract_stream(fileId):
                 # get current version from db
                 file = models.File.objects.get(id=fileId)
                 file.item.update_timeline()
+                update_poster(file.item.public_id)
                 file.extract_tracks()
     models.File.objects.filter(id=fileId).update(encoding=False)
 
