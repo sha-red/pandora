@@ -90,6 +90,7 @@ pandora.ui.importMediaDialog = function(options) {
             result.data.items.forEach(function(info) {
                 pandora.api.add({title: info.title}, function(result) {
                     var edit = {
+                        date: info.date,
                         director: info.uploader ? [info.uploader] : [],
                         id: result.data.id,
                         notes: info.url,
