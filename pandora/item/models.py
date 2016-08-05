@@ -1392,6 +1392,11 @@ class Item(models.Model):
             for f in glob(os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline*.jpg')):
                 os.unlink(f)
 
+    def remove_poster(self):
+        if self.poster:
+            self.clear_poster_cache(self.poster.path)
+            self.poster.delete()
+
     def clear_poster_cache(self, poster):
         for f in glob(poster.replace('.jpg', '*.jpg')):
             if f != poster:
@@ -1442,9 +1447,7 @@ class Item(models.Model):
         ox.makedirs(os.path.join(settings.MEDIA_ROOT, self.path()))
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE, close_fds=True)
         p.communicate(json.dumps(data, default=fields.to_json))
-        for f in glob(poster.replace('.jpg', '*.jpg')):
-            if f != poster:
-                os.unlink(f)
+        self.clear_poster_cache(poster)
         return poster
 
     def poster_frames(self):
