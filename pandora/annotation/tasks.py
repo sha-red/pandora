@@ -92,7 +92,7 @@ def add_annotations(data):
             start=float(a['in']), end=float(a['out']),
             value=value)
         annotation.save()
-    #update facets if needed
+    # update facets if needed
     if layer_id in item.facet_keys:
         item.update_layer_facet(layer_id)
     if annotation:

@@ -79,9 +79,11 @@ def get_item(info, user=None):
         item_data['year'] = info.get('year', '') or ''
 
     # add additional item metadata parsed from path
-    for key in [i for i in info if i in set([k['id'] for k in settings.CONFIG['itemKeys']])
-                                   and i not in ('language', ) and i not in item_data]:
-        item_data[key] = info[key]
+    ignore_keys = set(list(Item.base_keys) + ['language'] + list(item_data))
+    possible_keys = set([k['id'] for k in settings.CONFIG['itemKeys'] if k['id'] not in ignore_keys])
+    for key in info:
+        if key in possible_keys:
+            item_data[key] = info[key]
 
     for key in ('episodeTitle', 'episodeDirector', 'episodeYear',
                 'season', 'episode', 'seriesTitle'):
@@ -830,6 +832,37 @@ class Item(models.Model):
                                                   self.get('seriesTitle')))) is not None
             save('series', isSeries)
 
+    base_keys = (
+        'aspectratio',
+        'bitrate',
+        'clips',
+        'created',
+        'cutsperminute',
+        'duration',
+        'hue',
+        'id',
+        'oxdbId',
+        'lightness',
+        'modified',
+        'numberofannotations',
+        'numberofcuts',
+        'numberofdocuments',
+        'numberoffiles',
+        'parts',
+        'pixels',
+        'random',
+        'timesaccessed',
+        'accessed',
+        'resolution',
+        'width',
+        'height',
+        'rendered',
+        'rightslevel',
+        'saturation',
+        'size',
+        'volume',
+    )
+
     def update_sort(self):
         try:
             s = self.sort
@@ -865,36 +898,6 @@ class Item(models.Model):
             value = len(value.split(' ')) if value else 0
             return value
 
-        base_keys = (
-            'aspectratio',
-            'bitrate',
-            'clips',
-            'created',
-            'cutsperminute',
-            'duration',
-            'hue',
-            'id',
-            'oxdbId',
-            'lightness',
-            'modified',
-            'numberofannotations',
-            'numberofcuts',
-            'numberofdocuments',
-            'numberoffiles',
-            'parts',
-            'pixels',
-            'random',
-            'timesaccessed',
-            'accessed',
-            'resolution',
-            'width',
-            'height',
-            'rendered',
-            'rightslevel',
-            'saturation',
-            'size',
-            'volume',
-        )
 
         # sort keys based on database, these will always be available
         s.public_id = self.public_id.replace('0x', 'xx')
@@ -971,7 +974,7 @@ class Item(models.Model):
                 sort_type = key['value'].get('type', sort_type)
             if isinstance(sort_type, list):
                 sort_type = sort_type[0]
-            if name not in base_keys:
+            if name not in self.base_keys:
                 if sort_type == 'title':
                     value = get_title_sort(self.get(source, u'Untitled'))
                     value = utils.sort_title(value)[:955]
