@@ -90,21 +90,28 @@ pandora.ui.importMediaDialog = function(options) {
                     'title', 'uploader', 'url'
                 ];
                 var values = Ox.map(pandora.site.importMetadata, function(value, key) {
-                    var type = Ox.getObjectById(pandora.site.itemKeys, key).type;
-                    infoKeys.forEach(function(infoKey) {
-                        var infoValue = info[infoKey];
-                        if (key == 'year' && infoKey == 'date') {
-                            infoValue = infoValue.substr(0, 4);
+                    var isArray = Ox.isArray(
+                        Ox.getObjectById(pandora.site.itemKeys, key).type
+                    );
+                    if (isArray && value == '{tags}') {
+                        value = info.tags;
+                    } else {
+                        infoKeys.forEach(function(infoKey) {
+                            var infoValue = info[infoKey];
+                            if (key == 'year' && infoKey == 'date') {
+                                infoValue = infoValue.substr(0, 4);
+                            }
+                            if (infoKey == 'tags') {
+                                infoValue = infoValue.join(', ');
+                            }
+                            value = value.replace(
+                                new RegExp('\{' + infoKey + '\}', 'g'), infoValue
+                            );
+                        });
+                        // For example: director -> uploader
+                        if (isArray) {
+                            value = [value];
                         }
-                        if (infoKey == 'tags' && !Ox.isArray(type)) {
-                            infoValue = infoValue.join(', ');
-                        }
-                        value = value.replace(
-                            new RegExp('\{' + infoKey + '\}', 'g'), infoValue
-                        );
-                    });
-                    if (Ox.isArray(type)) {
-                        value = [value];
                     }
                     return value;
                 });
