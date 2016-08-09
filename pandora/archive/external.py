@@ -55,6 +55,8 @@ def get_info(url):
                     for k in info_keys
                     if k in i and i[k]
                 })
+                if not 'tags' in info[-1]:
+                    info[-1]['tags'] = []
                 if 'upload_date' in i:
                     info[-1]['date'] = '-'.join([i['upload_date'][:4], i['upload_date'][4:6], i['upload_date'][6:]])
     return info

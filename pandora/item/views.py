@@ -225,15 +225,18 @@ def find(request, data):
                 clips = qs
             return [c.json(query['clip_keys'], query['clip_filter']) for c in clips]
 
+        sort_keys = {
+            'accessed', 'modified', 'timesaccessed',
+            'numberofannotations', 'numberoffiles', 'numberofdocuments'
+        }
+
         def only_p_sums(m):
             r = {}
             for p in _p:
                 if p == 'accessed':
                     r[p] = m.sort.accessed or ''
-                elif p == 'modified':
-                    r[p] = m.sort.modified
-                elif p == 'timesaccessed':
-                    r[p] = m.sort.timesaccessed
+                elif p in sort_keys:
+                    r[p] = getattr(m.sort, p)
                 else:
                     r[p] = m.json.get(p)
             if 'clip_qs' in query:
@@ -252,9 +255,7 @@ def find(request, data):
             return r
         qs = qs[query['range'][0]:query['range'][1]]
         # response['data']['items'] = [m.get_json(_p) for m in qs]
-        if filter(lambda p: p in (
-            'accessed', 'modified', 'timesaccessed', 'viewed'
-        ), _p):
+        if any(p for p in _p if p in sort_keys):
             qs = qs.select_related()
             response['data']['items'] = [only_p_sums(m) for m in qs]
         else:
