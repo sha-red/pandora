@@ -122,7 +122,7 @@ pandora.ui.importMediaDialog = function(options) {
     }
 
     function importMedia() {
-        var url = $url.value();
+        var url = $input.value();
         $info.empty();
         $info.append(loadingIcon());
         that.disableButton('import');
