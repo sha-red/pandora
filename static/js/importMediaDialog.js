@@ -96,7 +96,7 @@ pandora.ui.importMediaDialog = function(options) {
                         if (key == 'year' && infoKey == 'date') {
                             infoValue = infoValue.substr(0, 4);
                         }
-                        if (infoKey == 'tags' && Ox.isArray(type)) {
+                        if (infoKey == 'tags' && !Ox.isArray(type)) {
                             infoValue = infoValue.join(', ');
                         }
                         value = value.replace(
