@@ -135,6 +135,12 @@
         {"id": "texts", "title": "Texts"},
         {"id": "embeds", "title": "Embeds"}
     ],
+    "importMetadata": {
+        "date": "{date}",
+        "topic": "{tags}",
+        "summary": "{description}",
+        "title": "{title}"
+    },
     /*
     "itemKeys" defines the metadata associated with each item. Required keys
     are "*", "id" and "title". Annotation layers can be referenced too, which
