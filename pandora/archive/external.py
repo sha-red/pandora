@@ -19,20 +19,23 @@ import models
 info_keys = [
     'title',
     'description',
+    'webpage_url',
+    'display_id',
+    'uploader',
+    'tags',
+
     'duration',
     'width',
     'height',
-    'webpage_url',
-    'thumbnail',
     'ext',
-    'uploader',
+    'thumbnail',
     'subtitles',
-    'tags'
 ]
 
 info_key_map = {
     'webpage_url': 'url',
     'ext': 'extension',
+    'display_id': 'id',
 }
 
 def get_info(url):
