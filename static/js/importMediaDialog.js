@@ -103,7 +103,7 @@ pandora.ui.importMediaDialog = function(options) {
                             infoValue = infoValue.join(', ');
                         }
                         value = value.replace(
-                            new RegExp('\{' + infoKey '\}', 'g'), infoValue
+                            new RegExp('\{' + infoKey + '\}', 'g'), infoValue
                         );
                     });
                     if (Ox.isArray(type)) {
@@ -114,7 +114,7 @@ pandora.ui.importMediaDialog = function(options) {
                 pandora.api.add({title: values.title || info.title}, function(result) {
                     var edit = Ox.extend(
                         Ox.filter(values, function(value, key) {
-                            return key != 'title'
+                            return key != 'title';
                         }),
                         {'id': result.data.id}
                     );
