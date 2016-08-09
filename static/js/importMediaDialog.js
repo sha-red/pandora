@@ -2,35 +2,55 @@
 
 pandora.ui.importMediaDialog = function(options) {
 
-    var help = Ox._('Enter a URL from an external site (like YouTube or Vimeo).'),
+    var help = Ox._('You can import videos from external sites, like YouTube or Vimeo.'),
 
         $content = Ox.Element().css({margin: '16px'}),
 
-        $input = Ox.Input({
-            label: Ox._('URL'),
-            labelWidth: 128,
-            width: 384
-        })
-        .bindEvent({
-            change: submitURL
-        }),
-
         $button = Ox.Button({
+            overlap: 'left',
             title: Ox._('Preview'),
             width: 128
         })
+        .css({
+            marginLeft: '-20px',
+            paddingLeft: '20px',
+            position: 'absolute',
+            right: '16px',
+            top: '16px'
+        })
         .bindEvent({
             click: submitURL
-        }),
+        })
+        .appendTo($content),
 
-        $form = Ox.FormElementGroup({
-            elements: [$input, $button]
+        $input = Ox.Input({
+            label: Ox._('URL'),
+            labelWidth: 64,
+            width: 384
+        })
+        .css({
+            left: '16px',
+            position: 'absolute',
+            top: '16px'
+        })
+        .bindEvent({
+            change: submitURL
         })
         .appendTo($content),
 
         $info = Ox.Element()
+            .css({
+                left: '16px',
+                position: 'absolute',
+                top: '48px'
+            })
             .html(help)
             .appendTo($content),
+
+        $loading = Ox.LoadingScreen({
+            width: 512,
+            height: 224
+        }),
 
         that = Ox.Dialog({
             buttons: [
@@ -51,7 +71,6 @@ pandora.ui.importMediaDialog = function(options) {
                     click: importMedia
                 })
             ],
-            closeButton: true,
             content: $content,
             fixedSize: true,
             height: 288,
@@ -59,7 +78,7 @@ pandora.ui.importMediaDialog = function(options) {
                 escape: 'close'
             },
             removeOnClose: true,
-            title: Ox._('Import Media'),
+            title: Ox._('Import Video'),
             width: 544
         });
 
@@ -123,53 +142,50 @@ pandora.ui.importMediaDialog = function(options) {
 
     function importMedia() {
         var url = $input.value();
-        $info.empty();
-        $info.append(loadingIcon());
-        that.disableButton('import');
+        $input.options({disabled: true});
+        $button.options({disabled: true});
+        $info.empty().append($loading.start());
         that.disableButton('close');
+        that.disableButton('import');
         addMedia(url, function(item) {
             if (item) {
                 that.close();
                 Ox.Request.clearCache();
                 pandora.URL.push('/' + item + '/media');
             } else {
-                $info.empty().html('Import failed.');
+                $input.options({disabled: false});
+                $button.options({disabled: false});
+                $info.empty().html(Ox._('Import failed. Please try again'));
                 that.enableButton('close');
             }
         });
     }
 
-    function loadingIcon() {
-        return Ox.LoadingIcon().css({
-            margin: 'auto',
-            marginTop: '64px',
-            width: '100%'
-        }).start();
-    }
-
     function submitURL() {
         var value = $input.value();
         if (value) {
-            $info.empty();
-            $info.append(loadingIcon());
+            $input.options({disabled: true});
+            $button.options({disabled: true});
+            $info.empty().append($loading.start());
+            that.disableButton('close');
             getInfo(value, function(items) {
+                $input.options({disabled: false});
+                $button.options({disabled: false});
+                $loading.stop();
                 $info.empty();
                 if (items.length) {
                     // FIXME: support playlists / multiple items
                     var info = items[0];
                     $info.append($('<img>').css({
                         position: 'absolute',
-                        left: '16px',
-                        top: '48px',
                         width: '248px'
                     }).attr('src', info.thumbnail));
                     $info.append($('<div>').addClass('OxText').css({
                         height: '192px',
                         overflow: 'hidden',
                         position: 'absolute',
-                        right: '16px',
+                        left: '264px',
                         textOverflow: 'ellipsis',
-                        top: '48px',
                         width: '248px'
                     }).html(
                         '<span style="font-weight: bold">' + info.title
@@ -180,6 +196,7 @@ pandora.ui.importMediaDialog = function(options) {
                     $info.html(help);
                 }
             });
+            that.enableButton('close');
         }
     }
 
