@@ -95,14 +95,14 @@ def load_config(init=False):
             config['keys'][key['id']] = key
 
 
-        #add missing defaults
+        # add missing defaults
         for section in sorted((
             'capabilities', 'cantPlay', 'entities', 'itemName', 'itemTitleKeys', 'media', 'posters',
             'site', 'tv', 'user.ui', 'user.ui.part', 'user.ui.showFolder',
             'menuExtras', 'languages'
         )):
             parts = map(lambda p: p.replace('\0', '\\.'), section.replace('\\.', '\0').split('.'))
-            #print('checking', section)
+            # print('checking', section)
             c = config
             d = default
             while len(parts):
@@ -128,8 +128,8 @@ def load_config(init=False):
                 if added:
                     sys.stderr.write("adding default %s:\n\t" % section)
                     sys.stderr.write("\n\t".join(added) + '\n\n')
-        for key in ('language', ):
-            if not key in config:
+        for key in ('language', 'importMetadata'):
+            if key not in config:
                 sys.stderr.write("adding default value:\n\t\"%s\": %s,\n\n" % (key, json.dumps(default[key])))
                 config[key] = default[key]
 
