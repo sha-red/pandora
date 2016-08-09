@@ -387,6 +387,8 @@ pandora.ui.mainMenu = function() {
                     pandora.addItem();
                 } else if (data.id == 'upload') {
                     pandora.$ui.uploadVideoDialog = pandora.ui.uploadVideoDialog().open();
+                } else if (data.id == 'import') {
+                    pandora.$ui.importMediaDialog = pandora.ui.importMediaDialog().open();
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
                 } else if (data.id == 'print') {
@@ -1042,6 +1044,7 @@ pandora.ui.mainMenu = function() {
         return { id: 'itemMenu', title: Ox._('Item'), items: [
             { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
             { id: 'upload', title: Ox._('Upload Video...'), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
+            { id: 'import', title: Ox._('Import Video...'), disabled: !pandora.site.capabilities.canImportItems[pandora.user.level] },
             {},
             { id: 'selectall', title: Ox._('Select All {0}', [listItemsName]), disabled: !canSelect, keyboard: 'control a' },
             { id: 'selectnone', title: Ox._('Select None'), disabled: !canSelect, keyboard: 'shift control a' },

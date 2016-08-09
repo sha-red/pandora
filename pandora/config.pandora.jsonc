@@ -55,6 +55,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "canEditUsers": {"admin": true},
         "canExportAnnotations": {"member": true, "staff": true, "admin": true},
         "canImportAnnotations": {"member": true, "staff": true, "admin": true},
+        "canImportItems": {"member": true, "staff": true, "admin": true},
         "canManageDocuments": {"member": true, "staff": true, "admin": true},
         "canManageEntities": {"member": true, "staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "staff": true, "admin": true},
@@ -161,7 +162,6 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     with "{date}".
     */
     "importMetadata": {
-        "keywords": "{tags}",
         "summary": "{description}",
         "title": "{title}"
     },
