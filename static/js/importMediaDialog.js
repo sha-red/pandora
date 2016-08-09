@@ -93,7 +93,7 @@ pandora.ui.importMediaDialog = function(options) {
                     "title", "uploader", "url"
                 ];
                 var values = Ox.map(pandora.site.importMetadata, function(value, key) {
-                    var type = pandora.site.itemKeys[key].type;
+                    var type = Ox.getObjectById(pandora.site.itemKeys, key).type;
                     infoKeys.forEach(function(infoKey) {
                         infoValue = info[infoKey];
                         if (key == 'year') {
