@@ -13,7 +13,7 @@ pandora.ui.importMediaDialog = function(options) {
         })
         .bindEvent({
             change: submitURL
-        })
+        }),
 
         $button = Ox.Button({
             title: Ox._('Preview'),
