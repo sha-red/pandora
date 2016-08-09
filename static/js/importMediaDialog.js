@@ -95,7 +95,7 @@ pandora.ui.importMediaDialog = function(options) {
                 var values = Ox.map(pandora.site.importMetadata, function(value, key) {
                     var type = Ox.getObjectById(pandora.site.itemKeys, key).type;
                     infoKeys.forEach(function(infoKey) {
-                        infoValue = info[infoKey];
+                        var infoValue = info[infoKey];
                         if (key == 'year' && infoKey == 'date') {
                             infoValue = infoValue.substr(0, 4);
                         }
