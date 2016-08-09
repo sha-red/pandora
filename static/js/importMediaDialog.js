@@ -161,7 +161,7 @@ pandora.ui.importMediaDialog = function(options) {
                         position: 'absolute',
                         left: '16px',
                         top: '48px',
-                        width: '128px'
+                        width: '248px'
                     }).attr('src', info.thumbnail));
                     $info.append($('<div>').addClass('OxText').css({
                         height: '192px',
@@ -170,7 +170,7 @@ pandora.ui.importMediaDialog = function(options) {
                         right: '16px',
                         textOverflow: 'ellipsis',
                         top: '48px',
-                        width: '240px'
+                        width: '248px'
                     }).html(
                         '<span style="font-weight: bold">' + info.title
                         + '</span><br/><br/>' + info.description
