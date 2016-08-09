@@ -88,15 +88,36 @@ pandora.ui.importMediaDialog = function(options) {
     function addMedia(url, callback) {
         pandora.api.getMediaUrlInfo({url: url}, function(result) {
             result.data.items.forEach(function(info) {
-                pandora.api.add({title: info.title}, function(result) {
-                    var edit = {
-                        date: info.date,
-                        director: info.uploader ? [info.uploader] : [],
-                        id: result.data.id,
-                        notes: info.url,
-                        summary: info.description,
-                        topic: info.tags
-                    };
+                var infoKeys = [
+                    "date", "description", "id", "tags",
+                    "title", "uploader", "url"
+                ];
+                var values = Ox.map(pandora.site.importMetadata, function(value, key) {
+                    var type = pandora.site.itemKeys[key].type;
+                    infoKeys.forEach(function(infoKey) {
+                        infoValue = info[infoKey];
+                        if (key == 'year') {
+                            infoValue = infoValue.substr(0, 4);
+                        }
+                        if (infoKey == 'tags' && Ox.isArray(type)) {
+                            infoValue = infoValue.join(', ');
+                        }
+                        value = value.replace(
+                            new RegExp('\{' + infoKey '\}', 'g'), infoValue
+                        );
+                    });
+                    if (Ox.isArray(type)) {
+                        value = [value];
+                    }
+                    return value;
+                });
+                pandora.api.add({title: values.title || info.title}, function(result) {
+                    var edit = Ox.extend(
+                        Ox.filter(values, function(value, key) {
+                            return key != 'title'
+                        }),
+                        {'id': result.data.id}
+                    );
                     pandora.api.edit(edit, function(result) {
                         pandora.api.addMediaUrl({
                             url: info.url,
@@ -104,7 +125,6 @@ pandora.ui.importMediaDialog = function(options) {
                         }, function(result) {
                             if (result.data.taskId) {
                                 pandora.wait(result.data.taskId, function(result) {
-                                    Ox.print('status?', result);
                                     callback(edit.id);
                                 });
                             } else {
