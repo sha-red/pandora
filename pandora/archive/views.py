@@ -740,7 +740,7 @@ def getMediaUrlInfo(request, data):
         response = json_response()
         response['data']['items'] = external.get_info(data['url'])
     return render_to_json_response(response)
-actions.register(getMediaUrlInfo, cache=False)
+actions.register(getMediaUrlInfo, cache=True)
 
 @login_required_json
 def addMediaUrl(request, data):
