@@ -1,58 +1,42 @@
 'use strict';
 
 pandora.ui.importMediaDialog = function(options) {
-    var 
+
+    var help = Ox._('Enter a URL from an external site (like YouTube or Vimeo).'),
+
         $content = Ox.Element().css({margin: '16px'}),
-        $url = Ox.Input({
-            label: Ox._('Url'),
-            labelWidth: 32,
+
+        $input = Ox.Input({
+            label: Ox._('URL'),
+            labelWidth: 128,
             width: 384
         })
-        .css({
-            marginTop: '16px'
+        .bindEvent({
+            change: submitURL
+        })
+
+        $button = Ox.Button({
+            title: Ox._('Preview'),
+            width: 128
         })
         .bindEvent({
-            change: function(data) {
-                $info.empty();
-                that.disableButton('import');
-                if (data.value) {
-                    $info.append(loadingIcon());
-                    getInfo(data.value, function(items) {
-                        $info.empty();
-                        if (items.length) {
-                            // FIXME: support playlists / multiple items
-                            var info = items[0];
-                            that.enableButton('import');
-                            $info.append($('<img>').css({
-                                'max-width': '128px',
-                                margin: '4px',
-                                float: 'left'
-                            }).attr('src', info.thumbnail));
-                            $info.append($('<div>').css({
-                                'font-weight': 'bold'
-                            }).html(info.title));
-                            if (info.duration) {
-                                $info.append($('<div>').html(Ox.formatDuration(info.duration)));
-                            }
-                            $info.append($('<div>').html(info.description));
-                        } else {
-                            $info.empty();
-                            that.disableButton('import');
-                        }
-                    });
-                }
-            }
+            click: submitURL
+        }),
+
+        $form = Ox.FormElementGroup({
+            elements: [$input, $button]
         })
         .appendTo($content),
+
         $info = Ox.Element()
-            .css({margin: '8px'})
-            .html('Enter a url from another site (like YouTube) to create a new item.')
+            .html(help)
             .appendTo($content),
+
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
-                    id: 'cancel',
-                    title: Ox._('Cancel')
+                    id: 'close',
+                    title: Ox._('Close')
                 })
                 .bindEvent({
                     click: function() {
@@ -62,7 +46,7 @@ pandora.ui.importMediaDialog = function(options) {
                 Ox.Button({
                     disabled: true,
                     id: 'import',
-                    title: Ox._('Import')
+                    title: Ox._('Import Video')
                 }).bindEvent({
                     click: importMedia
                 })
@@ -70,27 +54,21 @@ pandora.ui.importMediaDialog = function(options) {
             closeButton: true,
             content: $content,
             fixedSize: true,
-            height: 176,
+            height: 288,
             keys: {
-                escape: 'cancel'
+                escape: 'close'
             },
             removeOnClose: true,
             title: Ox._('Import Media'),
-            width: 416
+            width: 544
         });
-    window.$info = $info;
-    function getInfo(url, callback) {
-        pandora.api.getMediaUrlInfo({url: url}, function(result) {
-            callback(result.data.items);
-        });
-    }
 
     function addMedia(url, callback) {
         pandora.api.getMediaUrlInfo({url: url}, function(result) {
             result.data.items.forEach(function(info) {
                 var infoKeys = [
-                    "date", "description", "id", "tags",
-                    "title", "uploader", "url"
+                    'date', 'description', 'id', 'tags',
+                    'title', 'uploader', 'url'
                 ];
                 var values = Ox.map(pandora.site.importMetadata, function(value, key) {
                     var type = Ox.getObjectById(pandora.site.itemKeys, key).type;
@@ -137,20 +115,26 @@ pandora.ui.importMediaDialog = function(options) {
         });
     };
 
+    function getInfo(url, callback) {
+        pandora.api.getMediaUrlInfo({url: url}, function(result) {
+            callback(result.data.items);
+        });
+    }
+
     function importMedia() {
         var url = $url.value();
         $info.empty();
         $info.append(loadingIcon());
         that.disableButton('import');
-        that.disableButton('cancel');
+        that.disableButton('close');
         addMedia(url, function(item) {
             if (item) {
                 that.close();
                 Ox.Request.clearCache();
-                pandora.URL.push('/'+item+'/media');
+                pandora.URL.push('/' + item + '/media');
             } else {
-                $info.empty().html('Import failed');
-                that.enableButton('cancel');
+                $info.empty().html('Import failed.');
+                that.enableButton('close');
             }
         });
     }
@@ -163,5 +147,42 @@ pandora.ui.importMediaDialog = function(options) {
         }).start();
     }
 
+    function submitURL() {
+        var value = $input.value();
+        if (value) {
+            $info.empty();
+            $info.append(loadingIcon());
+            getInfo(value, function(items) {
+                $info.empty();
+                if (items.length) {
+                    // FIXME: support playlists / multiple items
+                    var info = items[0];
+                    $info.append($('<img>').css({
+                        position: 'absolute',
+                        left: '16px',
+                        top: '48px',
+                        width: '128px'
+                    }).attr('src', info.thumbnail));
+                    $info.append($('<div>').addClass('OxText').css({
+                        height: '192px',
+                        overflow: 'hidden',
+                        position: 'absolute',
+                        right: '16px',
+                        textOverflow: 'ellipsis',
+                        top: '48px',
+                        width: '240px'
+                    }).html(
+                        '<span style="font-weight: bold">' + info.title
+                        + '</span><br/><br/>' + info.description
+                    ));
+                    that.enableButton('import');
+                } else {
+                    $info.html(help);
+                }
+            });
+        }
+    }
+
     return that;
+
 };
