@@ -51,6 +51,7 @@
         "canEditUsers": {"admin": true},
         "canExportAnnotations": {"member": true, "staff": true, "admin": true},
         "canImportAnnotations": {"member": true, "staff": true, "admin": true},
+        "canImportItems": {"member": true, "staff": true, "admin": true},
         "canManageDocuments": {"member": true, "staff": true, "admin": true},
         "canManageEntities": {"member": true, "staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "staff": true, "admin": true},
@@ -135,6 +136,14 @@
         {"id": "texts", "title": "Texts"},
         {"id": "embeds", "title": "Embeds"}
     ],
+    /*
+    "importMetadata" defines what fields (as defined in "itemKeys") will get
+    populated with imported metadata. There is metadata for "title",
+    "description", "uploader", "date", "tags", "id", "url", and the value must
+    be a format string (like "{title} ({id})"). The type of the itemKeys must
+    be "string", ["string"], "text", "date" or "year". The last two only work
+    with "{date}".
+    */
     "importMetadata": {
         "date": "{date}",
         "topic": "{tags}",

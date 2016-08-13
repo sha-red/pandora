@@ -89,8 +89,8 @@ def add_subtitles(item, media, tmp):
 def download(item_id, url):
     item = Item.objects.get(public_id=item_id)
     info = get_info(url)
-    if len(info) != 1:
-        return '%s contains %d videos' % (url, len(info))
+    if not len(info):
+        return '%s contains no videos' % url
     media = info[0]
     cdir = os.path.abspath(os.curdir)
     tmp = tempfile.mkdtemp().decode('utf-8')
@@ -100,28 +100,34 @@ def download(item_id, url):
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
-    fname = list(os.listdir(tmp))
-    if fname:
-        fname = os.path.join(tmp, fname[0])
-        oshash = ox.oshash(fname)
-        f, created = models.File.objects.get_or_create(oshash=oshash)
-        if created:
-            f.data.name = f.get_path('data.' + fname.split('.')[-1])
-            ox.makedirs(os.path.dirname(f.data.path))
-            shutil.move(fname, f.data.path)
-            f.item = item
-            f.info = ox.avinfo(f.data.path)
-            f.info['extension'] = media['extension']
-            f.path = '%(title)s.%(extension)s' % media
-            f.parse_info()
-            f.selected = True
-            f.save()
-            f.item.save()
-            f.extract_stream()
-            status = True
-        else:
-            status = 'file exists'
-        add_subtitles(f.item, media, tmp)
+    parts = list(os.listdir(tmp))
+    if parts:
+        part = 1
+        for name in parts:
+            name = os.path.join(tmp, name)
+            oshash = ox.oshash(name)
+            f, created = models.File.objects.get_or_create(oshash=oshash)
+            if created:
+                f.data.name = f.get_path('data.' + name.split('.')[-1])
+                ox.makedirs(os.path.dirname(f.data.path))
+                shutil.move(name, f.data.path)
+                f.item = item
+                f.info = ox.avinfo(f.data.path)
+                f.info['extension'] = media['extension']
+                f.path = '%(title)s.%(extension)s' % media
+                f.parse_info()
+                f.selected = True
+                if len(parts) > 1:
+                    f.part = part
+                    part += 1
+                f.save()
+                f.item.save()
+                f.extract_stream()
+                status = True
+            else:
+                status = 'file exists'
+        if len(parts) == 1:
+            add_subtitles(f.item, media, tmp)
     else:
         status = 'download failed'
     os.chdir(cdir)

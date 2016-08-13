@@ -51,6 +51,7 @@
         "canEditUsers": {"admin": true},
         "canExportAnnotations": {"friend": true, "staff": true, "admin": true},
         "canImportAnnotations": {"staff": true, "admin": true},
+        "canImportItems": {},
         "canManageDocuments": {"staff": true, "admin": true},
         "canManageEntities": {"staff": true, "admin": true},
         "canManagePlacesAndEvents": {"staff": true, "admin": true},
@@ -131,6 +132,18 @@
         {"id": "texts", "title": "Texts"},
         {"id": "embeds", "title": "Embeds"}
     ],
+    /*
+    "importMetadata" defines what fields (as defined in "itemKeys") will get
+    populated with imported metadata. There is metadata for "title",
+    "description", "uploader", "date", "tags", "id", "url", and the value must
+    be a format string (like "{title} ({id})"). The type of the itemKeys must
+    be "string", ["string"], "text", "date" or "year". The last two only work
+    with "{date}".
+    */
+    "importMetadata": {
+        "summary": "{description}",
+        "title": "{title}"
+    },
     /*
     "itemKeys" defines the metadata associated with each item. Required keys
     are "*", "id" and "title". Annotation layers can be referenced too, which

@@ -84,57 +84,57 @@ pandora.ui.importMediaDialog = function(options) {
 
     function addMedia(url, callback) {
         pandora.api.getMediaUrlInfo({url: url}, function(result) {
-            result.data.items.forEach(function(info) {
-                var infoKeys = [
-                    'date', 'description', 'id', 'tags',
-                    'title', 'uploader', 'url'
-                ];
-                var values = Ox.map(pandora.site.importMetadata, function(value, key) {
-                    var isArray = Ox.isArray(
-                        Ox.getObjectById(pandora.site.itemKeys, key).type
-                    );
-                    if (isArray && value == '{tags}') {
-                        value = info.tags;
-                    } else {
-                        infoKeys.forEach(function(infoKey) {
-                            var infoValue = info[infoKey];
-                            if (key == 'year' && infoKey == 'date') {
-                                infoValue = infoValue.substr(0, 4);
-                            }
-                            if (infoKey == 'tags') {
-                                infoValue = infoValue.join(', ');
-                            }
-                            value = value.replace(
-                                new RegExp('\{' + infoKey + '\}', 'g'), infoValue
-                            );
-                        });
-                        // For example: director -> uploader
-                        if (isArray) {
-                            value = [value];
+            // FIXME: support playlists / multiple items
+            var info = result.data.items[0];
+            var infoKeys = [
+                'date', 'description', 'id', 'tags',
+                'title', 'uploader', 'url'
+            ];
+            var values = Ox.map(pandora.site.importMetadata, function(value, key) {
+                var isArray = Ox.isArray(
+                    Ox.getObjectById(pandora.site.itemKeys, key).type
+                );
+                if (isArray && value == '{tags}') {
+                    value = info.tags;
+                } else {
+                    infoKeys.forEach(function(infoKey) {
+                        var infoValue = info[infoKey] || '';
+                        if (key == 'year' && infoKey == 'date') {
+                            infoValue = infoValue.substr(0, 4);
                         }
+                        if (infoKey == 'tags') {
+                            infoValue = infoValue.join(', ');
+                        }
+                        value = value.replace(
+                            new RegExp('\{' + infoKey + '\}', 'g'), infoValue
+                        );
+                    });
+                    // For example: director -> uploader
+                    if (isArray) {
+                        value = [value];
                     }
-                    return value;
-                });
-                pandora.api.add({title: values.title || info.title}, function(result) {
-                    var edit = Ox.extend(
-                        Ox.filter(values, function(value, key) {
-                            return key != 'title';
-                        }),
-                        {'id': result.data.id}
-                    );
-                    pandora.api.edit(edit, function(result) {
-                        pandora.api.addMediaUrl({
-                            url: info.url,
-                            item: edit.id
-                        }, function(result) {
-                            if (result.data.taskId) {
-                                pandora.wait(result.data.taskId, function(result) {
-                                    callback(edit.id);
-                                });
-                            } else {
+                }
+                return value;
+            });
+            pandora.api.add({title: values.title || info.title}, function(result) {
+                var edit = Ox.extend(
+                    Ox.filter(values, function(value, key) {
+                        return key != 'title';
+                    }),
+                    {'id': result.data.id}
+                );
+                pandora.api.edit(edit, function(result) {
+                    pandora.api.addMediaUrl({
+                        url: info.url,
+                        item: edit.id
+                    }, function(result) {
+                        if (result.data.taskId) {
+                            pandora.wait(result.data.taskId, function(result) {
                                 callback(edit.id);
-                            }
-                        });
+                            });
+                        } else {
+                            callback(edit.id);
+                        }
                     });
                 });
             });
@@ -183,7 +183,7 @@ pandora.ui.importMediaDialog = function(options) {
                 if (items.length) {
                     // FIXME: support playlists / multiple items
                     var info = items[0];
-                    $info.append($('<img>').css({
+                    info.thumbnail && $info.append($('<img>').css({
                         position: 'absolute',
                         width: '248px'
                     }).attr('src', info.thumbnail));
@@ -196,7 +196,7 @@ pandora.ui.importMediaDialog = function(options) {
                         width: '248px'
                     }).html(
                         '<span style="font-weight: bold">' + info.title
-                        + '</span><br/><br/>' + info.description
+                        + '</span><br/><br/>' + (info.description || '')
                     ));
                     that.enableButton('import');
                 } else {
