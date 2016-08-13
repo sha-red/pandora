@@ -38,7 +38,10 @@ def update_or_create_instance(volume, f):
         updated = False
         for key in _INSTANCE_KEYS:
             if f[key] != getattr(instance, key):
-                setattr(instance, key, f[key])
+                value = f[key]
+                if key == 'path' and models.Instance.objects.filter(path=f[key], volume=volume).count():
+                    value = f['oshash']
+                setattr(instance, key, value)
                 updated = True
         if updated:
             instance.ignore = False
@@ -75,11 +78,25 @@ def update_files(user, volume, files):
     ids = [i['public_id'] for i in Item.objects.filter(
            files__instances__in=removed.filter(file__selected=True)).distinct().values('public_id')]
     removed.delete()
+    fix_path = []
+    update_timeline = set()
     for f in files:
-        update_or_create_instance(volume, f)
+        instance = update_or_create_instance(volume, f)
+        if instance.path == f['oshash'] and f['path'] != f['oshash']:
+            fix_path.append([instance, f['path']])
+    for instance, path in fix_path:
+        instance.path = path
+        instance.save()
+        instance.file.save()
+        if instance.file.item:
+            instance.file.item.update_wanted()
+            update_timeline.add(instance.file.item.public_id)
     for i in ids:
         i = Item.objects.get(public_id=i)
         i.update_selected()
+    for i in update_timeline:
+        i = Item.objects.get(public_id=i)
+        i.update_timeline()
 
 @task(ignore_results=True, queue='default')
 def update_info(user, info):
