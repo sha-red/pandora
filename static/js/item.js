@@ -16,7 +16,7 @@ pandora.ui.item = function() {
             'audioTracks',
             'cuts', 'duration', 'durations', 'editable', 'layers',
             'modified', 'parts', 'posterFrame', 'rendered', 'rightslevel',
-            'size', 'videoRatio',
+            'streams', 'size', 'videoRatio',
         ].concat(pandora.site.itemTitleKeys) : []
     }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
 

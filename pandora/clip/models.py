@@ -126,10 +126,13 @@ class MetaClip(object):
                 j['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
             for key in keys:
                 if key not in self.clip_keys and key not in j:
-                    value = self.item.get(key) or self.item.json.get(key)
+                    if key == 'streams':
+                        value = [s.file.oshash for s in self.item.streams()]
+                    else:
+                        value = self.item.get(key) or self.item.json.get(key)
                     if not value and hasattr(self.item.sort, key):
                         value = getattr(self.item.sort, key)
-                    if value != None:
+                    if value is not None:
                         j[key] = value
         return j
 
@@ -152,6 +155,7 @@ class MetaClip(object):
         data['duration'] = data['out'] - data['in']
         data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
         data['layers'] = self.get_layers(user)
+        data['streams'] = [s.file.oshash for s in self.item.streams()]
         return data
 
     def get_layers(self, user=None):

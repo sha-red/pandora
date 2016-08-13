@@ -52,7 +52,7 @@ pandora.ui.videoView = function(isEmbed) {
         pandora.api.findClips({
             query: query,
             itemsQuery: itemsQuery,
-            keys: ['id', 'in', 'out', 'durations', 'parts'],
+            keys: ['id', 'in', 'out', 'durations', 'parts', 'streams'],
             range: range,
             sort: pandora.user.ui.listSort
         }, function(result) {

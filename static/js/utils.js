@@ -1021,7 +1021,7 @@ pandora.getClipVideos = function(clip, resolution) {
     resolution = resolution || pandora.user.ui.videoResolution;
     return Ox.flatten(Ox.range(clip.parts).map(function(i) {
         var item = {
-            src: pandora.getVideoURL(clip.item, resolution, i + 1),
+            src: pandora.getVideoURL(clip.item, resolution, i + 1, null, clip.streams[i]),
             resolution: resolution
         };
         if (currentTime + clip.durations[i] <= start || currentTime > end) {
@@ -1937,12 +1937,12 @@ pandora.getMediaURL = function(url) {
     return pandora.site.site.mediaprefix + url;
 };
 
-pandora.getVideoURLName = function(id, resolution, part, track) {
+pandora.getVideoURLName = function(id, resolution, part, track, streamId) {
     return id + '/' + resolution + 'p' + part + (track ? '.' + track : '')
-        + '.' + pandora.user.videoFormat;
+        + '.' + pandora.user.videoFormat + (streamId ? '?' + streamId : '');
 };
 
-pandora.getVideoURL = function(id, resolution, part, track) {
+pandora.getVideoURL = function(id, resolution, part, track, streamId) {
     var uid = Ox.uid(),
         prefix = pandora.site.site.videoprefix
             .replace('{id}', id)
@@ -1952,7 +1952,7 @@ pandora.getVideoURL = function(id, resolution, part, track) {
             .replace('{uid42}', uid % 42),
         local = pandora.fs && pandora.fs.getVideoURL(id, resolution, part, track);
     return local || prefix + '/'
-        + pandora.getVideoURLName(id, resolution, part, track);
+        + pandora.getVideoURLName(id, resolution, part, track, streamId);
 };
 
 pandora.getCensoredClips = function(data) {
@@ -2026,7 +2026,7 @@ pandora.getVideoOptions = function(data) {
                         track: Ox.getLanguageNameByCode(track),
                         resolution: resolution,
                         src: pandora.getVideoURL(
-                            data.item || pandora.user.ui.item, resolution, i + 1, track
+                            data.item || pandora.user.ui.item, resolution, i + 1, track, data.streams[i]
                         )
                     });
                 });
@@ -2038,7 +2038,7 @@ pandora.getVideoOptions = function(data) {
                     index: i,
                     resolution: resolution,
                     src: pandora.getVideoURL(
-                        data.item || pandora.user.ui.item, resolution, i + 1
+                        data.item || pandora.user.ui.item, resolution, i + 1, null, data.streams[i]
                     )
                 });
             });

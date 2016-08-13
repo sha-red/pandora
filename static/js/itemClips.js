@@ -95,7 +95,7 @@ pandora.ui.itemClips = function(options) {
             $img = $item.find('.OxIcon > img');
             points = [$item.data('in'), $item.data('out')];
             if ($img.length) {
-                pandora.api.get({id: self.options.id, keys: ['durations', 'rightslevel']}, function(result) {
+                pandora.api.get({id: self.options.id, keys: ['durations', 'rightslevel', 'streams']}, function(result) {
                     var partsAndPoints = pandora.getVideoPartsAndPoints(
                             result.data.durations, points
                         ),
@@ -113,7 +113,8 @@ pandora.ui.itemClips = function(options) {
                             ),
                             rewind: true,
                             video: partsAndPoints.parts.map(function(i) {
-                                return pandora.getVideoURL(self.options.id, Ox.min(pandora.site.video.resolutions), i + 1);
+                                return pandora.getVideoURL(self.options.id, Ox.min(pandora.site.video.resolutions), i + 1,
+                                                           null, result.data.streams[i]);
                             }),
                             width: self.width
                         })

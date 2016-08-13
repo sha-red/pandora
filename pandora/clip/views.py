@@ -149,7 +149,7 @@ def findClips(request, data):
             if 'annotations' in keys:
                 aqs = Annotation.objects.filter(layer__in=settings.CONFIG['clipLayers'],
                                                 clip__in=clips)
-                add_annotations('annotations', aqs , True)
+                add_annotations('annotations', aqs, True)
 
             for layer in filter(lambda l: l in keys, layer_ids):
                 aqs = Annotation.objects.filter(layer=layer, clip__in=clips)
