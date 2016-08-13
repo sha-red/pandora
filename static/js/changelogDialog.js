@@ -75,7 +75,7 @@ pandora.ui.changelogDialog = function() {
                     },
                     {
                         format: function(value) {
-                            return Ox.formatDate(value, "%Y-%m-%d %H:%M:%S");
+                            return Ox.formatDate(value, '%Y-%m-%d %H:%M:%S');
                         },
                         id: 'created',
                         operator: '-',
