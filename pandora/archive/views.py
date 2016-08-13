@@ -450,8 +450,9 @@ def editMedia(request, data):
     see: addMedia, findMedia, moveMedia, removeMedia
     '''
     ignore = []
-    save_items = []
     dont_ignore = []
+    save_items = set()
+    update_timeline = set()
     response = json_response(status=200, text='updated')
     response['data']['files'] = []
     for info in data['files']:
@@ -467,7 +468,9 @@ def editMedia(request, data):
                 if key in info:
                     f.info[key] = info[key]
                     if key == 'language' and (f.is_video or f.is_audio):
-                        save_items.append(f.item.id)
+                        save_items.add(f.item.id)
+                    if key == 'part' and (f.is_video or f.is_audio):
+                        update_timeline.add(f.item.id)
                     update = True
             if update:
                 f.save()
@@ -496,9 +499,12 @@ def editMedia(request, data):
                 qs.update(selected=True)
         for id in list(set(ids)):
             item.tasks.update_timeline.delay(id)
-    if save_items:
-        for i in Item.objects.filter(id__in=list(set(save_items))):
-            i.save()
+    if save_items | update_timeline:
+        for i in Item.objects.filter(id__in=list(save_items | update_timeline)):
+            if i.id in save_items:
+                i.save()
+            if i.id in update_timeline:
+                item.tasks.update_timeline.delay(i.public_id)
     add_changelog(request, data, [f['id'] for f in response['data']['files']])
     return render_to_json_response(response)
 actions.register(editMedia, cache=False)
