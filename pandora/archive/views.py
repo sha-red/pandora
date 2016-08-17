@@ -20,6 +20,7 @@ from item.views import parse_query
 import item.tasks
 from oxdjango.api import actions
 from changelog.models import add_changelog
+from taskqueue.models import Task
 
 from . import models
 from . import queue
@@ -280,6 +281,7 @@ def firefogg_upload(request):
                 f.save()
                 if f.item.rendered and f.selected:
                     Item.objects.filter(id=f.item.id).update(rendered=False)
+                Task.start(f.item, request.user)
                 response = {
                     'uploadUrl': '/api/upload/?id=%s&profile=%s' % (f.oshash, profile),
                     'url': request.build_absolute_uri('/%s' % f.item.public_id),
@@ -331,6 +333,7 @@ def direct_upload(request):
                     Item.objects.filter(id=file.item.id).update(rendered=False)
             file.uploading = True
             file.save()
+            Task.start(file.item, request.user)
             upload_url = request.build_absolute_uri('/api/upload/direct/?id=%s' % file.oshash)
             return render_to_json_response({
                 'uploadUrl': upload_url,
@@ -423,6 +426,7 @@ def moveMedia(request, data):
         else:
             c.rendered = False
             c.save()
+            Task.start(c, request.user)
             item.tasks.update_timeline.delay(public_id)
     response = json_response(text='updated')
     response['data']['item'] = i.public_id
@@ -470,6 +474,10 @@ def editMedia(request, data):
                     if key == 'language' and (f.is_video or f.is_audio):
                         save_items.add(f.item.id)
                     if key == 'part' and (f.is_video or f.is_audio):
+                        if f.item.rendered:
+                            f.item.rendered = False
+                            f.item.save()
+                        Task.start(f.item, request.user)
                         update_timeline.add(f.item.id)
                     update = True
             if update:

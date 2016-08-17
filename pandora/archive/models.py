@@ -20,6 +20,7 @@ import ox.iso
 from item import utils
 import item.models
 from person.models import get_name_sort
+from taskqueue.models import Task
 
 from chunk import save_chunk
 import extract
@@ -231,6 +232,7 @@ class File(models.Model):
                     self.item = qs[0]
             if not self.item:
                 self.item = item.models.get_item(info, user)
+                Task.start(self.item, user)
         for key in self.AV_INFO + self.PATH_INFO:
             if key in info:
                 self.info[key] = info[key]

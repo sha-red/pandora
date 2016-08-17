@@ -64,6 +64,7 @@
         "canReadText": {"guest": 0, "member": 0, "researcher": 1, "staff": 1, "admin": 1},
         "canRemoveItems": {"staff": true, "admin": true},
         "canSeeAccessed": {"researcher": true, "staff": true, "admin": true},
+        "canSeeAllTasks": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"researcher": true, "staff": true, "admin": true},
         "canSeeExtraItemViews": {"researcher": true, "staff": true, "admin": true},
         "canSeeMedia": {"researcher": true, "staff": true, "admin": true},

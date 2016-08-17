@@ -9,6 +9,8 @@ from django.db.models import Q
 
 from item.models import Item
 from item.tasks import update_poster
+from taskqueue.models import Task
+
 import models
 import extract
 import external
@@ -96,6 +98,7 @@ def update_files(user, volume, files):
         i.update_selected()
     for i in update_timeline:
         i = Item.objects.get(public_id=i)
+        Tasks.start(i, user)
         i.update_timeline()
 
 @task(ignore_results=True, queue='default')
@@ -130,6 +133,7 @@ def process_stream(fileId):
         file.item.update_timeline()
     if file.item.rendered:
         file.item.save()
+    Task.finish(file.item)
     models.File.objects.filter(id=fileId).update(encoding=False)
     return True
 
@@ -158,6 +162,7 @@ def extract_stream(fileId):
                 file.item.update_timeline()
                 update_poster(file.item.public_id)
                 file.extract_tracks()
+    Task.finish(file.item)
     models.File.objects.filter(id=fileId).update(encoding=False)
 
 @task(queue="encoding")

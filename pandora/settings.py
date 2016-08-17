@@ -140,7 +140,8 @@ INSTALLED_APPS = (
     'tv',
     'document',
     'entity',
-    'websocket'
+    'websocket',
+    'taskqueue',
 )
 
 # Log errors into db

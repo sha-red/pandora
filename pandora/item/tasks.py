@@ -13,6 +13,7 @@ from celery.task import task, periodic_task
 
 import models
 from text.models import Text
+from taskqueue.models import Task
 
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')
@@ -79,6 +80,7 @@ def update_external(public_id):
 def update_timeline(public_id):
     item = models.Item.objects.get(public_id=public_id)
     item.update_timeline(async=False)
+    Task.finish(item)
 
 @task(queue="encoding")
 def rebuild_timeline(public_id):
@@ -117,7 +119,7 @@ def update_sitemap(base_url):
     # This date should be in W3C Datetime format, can be %Y-%m-%d
     lastmod = ET.SubElement(url, "lastmod")
     lastmod.text = datetime.now().strftime("%Y-%m-%d")
-     # priority of page on site values 0.1 - 1.0
+    # priority of page on site values 0.1 - 1.0
     priority = ET.SubElement(url, "priority")
     priority.text = '1.0'
 
@@ -150,8 +152,8 @@ def update_sitemap(base_url):
         priority.text = '1.0'
         if i.rendered and i.level <= can_play:
             video = ET.SubElement(url, "video:video")
-            #el = ET.SubElement(video, "video:content_loc")
-            #el.text = absolute_url("%s/video" % i.public_id)
+            # el = ET.SubElement(video, "video:content_loc")
+            # el.text = absolute_url("%s/video" % i.public_id)
             el = ET.SubElement(video, "video:player_loc")
             el.attrib['allow_embed'] = 'no'
             el.text = absolute_url("%s/player" % i.public_id)
@@ -188,7 +190,7 @@ def update_sitemap(base_url):
         priority = ET.SubElement(url, "priority")
         priority.text = '1.0'
 
-    for t in Text.objects.filter(Q(status='featured')|Q(status='public')):
+    for t in Text.objects.filter(Q(status='featured') | Q(status='public')):
         url = ET.SubElement(urlset, "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")

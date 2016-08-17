@@ -66,6 +66,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "canReadText": {"guest": 0, "member": 0, "staff": 1, "admin": 1},
         "canRemoveItems": {"admin": true},
         "canSeeAccessed": {"staff": true, "admin": true},
+        "canSeeAllTasks": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"staff": true, "admin": true},
         "canSeeExtraItemViews": {"staff": true, "admin": true},
         "canSeeMedia": {"staff": true, "admin": true},

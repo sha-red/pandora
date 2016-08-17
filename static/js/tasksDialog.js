@@ -158,7 +158,7 @@ pandora.ui.tasksDialog = function() {
         pandora.api.getTasks($checkbox.value() ? {} : {
             user: pandora.user.username
         }, function(result) {
-            $list.options({items: result.data})
+            $list.options({items: result.data.items})
             updateButton()
         });
         timeout = setTimeout(getItems, 15000);
