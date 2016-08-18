@@ -5,21 +5,24 @@ from datetime import timedelta, datetime
 import gzip
 import random
 
+from celery.task import task, periodic_task
 from django.conf import settings
 from django.db import connection, transaction
 from django.db.models import Q
 from ox.utils import ET
-from celery.task import task, periodic_task
 
-import models
+from app.utils import limit_rate
 from text.models import Text
 from taskqueue.models import Task
+
+import models
 
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')
 def cronjob(**kwargs):
-    update_random_sort()
-    update_random_clip_sort()
+    if limit_rate('item.tasks.cronjob', 8 * 60 * 60):
+        update_random_sort()
+        update_random_clip_sort()
 
 def update_random_sort():
     if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):

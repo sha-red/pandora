@@ -4,10 +4,13 @@ from datetime import timedelta
 
 from celery.task import periodic_task
 
+from app.utils import limit_rate
+
 import models
 
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')
 def update_program(**kwargs):
-    for c in models.Channel.objects.all():
-        c.update_program()
+    if limit_rate('tv.tasks.update_program', 8 * 60 * 60):
+        for c in models.Channel.objects.all():
+            c.update_program()

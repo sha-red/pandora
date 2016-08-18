@@ -42,6 +42,3 @@ class Settings(models.Model):
         else:
             value = default
         return value
-
-
-
