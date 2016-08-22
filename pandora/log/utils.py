@@ -25,7 +25,7 @@ class ErrorHandler(logging.Handler):
         text = ''
         url = ''
         try:
-            if sys.version_info < (2,5):
+            if sys.version_info < (2, 5):
                 # A nasty workaround required because Python 2.4's logging
                 # module doesn't support passing in extra context.
                 # For this handler, the only extra data we need is the
@@ -53,11 +53,14 @@ class ErrorHandler(logging.Handler):
 
         text = "%s\n\n%s" % (stack_trace, request_repr)
         if text:
-            l = models.Log(
-                text=text,
-                line=line,
-                url=url
-            )
-            if user:
-                l.user = user
-            l.save()
+            try:
+                l = models.Log(
+                    text=text,
+                    line=line,
+                    url=url
+                )
+                if user:
+                    l.user = user
+                l.save()
+            except:
+                pass
