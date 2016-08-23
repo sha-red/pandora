@@ -166,7 +166,7 @@ def _order_clips(edit, sort):
     if len(sort) == 1:
         for s in settings.CONFIG['user']['ui']['editSort']:
             if (edit.type == 'smart' and s['key'] == 'index') \
-                or s['key'] == sort[0]['key']:
+                    or s['key'] == sort[0]['key']:
                 continue
             sort.append(s)
     for e in sort:
@@ -174,7 +174,7 @@ def _order_clips(edit, sort):
         if operator != '-':
             operator = ''
         key = e['key']
-        #fixme, random should be clip random
+        # fixme, random should be clip random
         if key not in ('index', 'in', 'out', 'position', 'hue', 'saturation', 'lightness', 'volume', 'duration', 'text'):
             key = "item__sort__%s" % key
         key = {
@@ -187,7 +187,10 @@ def _order_clips(edit, sort):
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
-        qs = qs.order_by(*order_by, nulls_last=True)
+        if edit.type == 'static':
+            qs = qs.order_by(*order_by)
+        else:
+            qs = qs.order_by(*order_by, nulls_last=True)
     qs = qs.distinct()
     return qs
 
