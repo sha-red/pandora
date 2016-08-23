@@ -393,7 +393,7 @@ class Edit(models.Model):
         return response
 
     def render(self):
-        #creating a new file from clips
+        # creating a new file from clips
         tmp = tempfile.mkdtemp()
         clips = []
         for clip in self.clips.all().order_by('index'):
@@ -493,6 +493,7 @@ class Clip(models.Model):
         data['duration'] = data['out'] - data['in']
         data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
         data['layers'] = self.get_layers(user)
+        data['streams'] = [s.file.oshash for s in self.item.streams()]
         return data
 
     def get_annotations(self):
