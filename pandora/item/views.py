@@ -230,11 +230,25 @@ def find(request, data):
             'numberofannotations', 'numberoffiles', 'numberofdocuments'
         }
 
+        groups = {g.name for g in request.user.groups.all()}
+
+        def is_editable(item):
+            if request.user.is_anonymous():
+                return False
+            if request.user.profile.capability('canEditMetadata') or \
+                    request.user.is_staff or \
+                    item.get('user') == request.user.username or \
+                    item.get('groups', []) & groups:
+                return True
+            return False
+
         def only_p_sums(m):
             r = {}
             for p in _p:
                 if p == 'accessed':
                     r[p] = m.sort.accessed or ''
+                elif p == 'editable':
+                    r[p] = is_editable(m.json)
                 elif p in sort_keys:
                     r[p] = getattr(m.sort, p)
                 else:
@@ -249,7 +263,10 @@ def find(request, data):
                 if not isinstance(m, dict):
                     m = json.loads(m, object_hook=oxdjango.fields.from_json)
                 for p in _p:
-                    r[p] = m.get(p)
+                    if p == 'editable':
+                        r[p] = is_editable(m)
+                    else:
+                        r[p] = m.get(p)
             if 'clip_qs' in query:
                 r['clips'] = get_clips(query['clip_qs'].filter(item__public_id=m['id']))
             return r

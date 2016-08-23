@@ -573,6 +573,7 @@ class Item(models.Model):
         }
         if self.user:
             i['user'] = self.user.username
+        i['groups'] = [g.name for g in self.groups.all()]
         i.update(self.external_data)
         i.update(self.data)
         if settings.USE_IMDB:
