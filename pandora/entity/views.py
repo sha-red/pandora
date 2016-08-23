@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
+from six import string_types
 import ox
 from ox.utils import json
 from oxdjango.api import actions
@@ -18,8 +19,8 @@ from item.models import Item
 from itemlist.models import List
 from changelog.models import add_changelog
 
-import models
-from managers import namePredicate
+from . import models
+from .managers import namePredicate
 
 def get_entity_or_404_json(id):
     try:
@@ -64,7 +65,7 @@ def addEntity(request, data):
             for key in ('type', 'alternativeNames'):
                 if key in data and data[key]:
                     value = data[key]
-                    if isinstance(value, basestring):
+                    if isinstance(value, string_types):
                         value = ox.escape_html(value)
                     if key == 'alternativeNames':
                         value = tuple([ox.escape_html(v) for v in value])

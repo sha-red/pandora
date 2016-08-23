@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 from datetime import timedelta
 
 from celery.task import periodic_task
 
 from app.utils import limit_rate
 
-import models
+from . import models
 
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')

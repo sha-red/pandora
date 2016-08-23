@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 from django.db import models
 import ox
 
-import managers
+from . import managers
 
 
 class News(models.Model):
@@ -35,7 +35,7 @@ class News(models.Model):
             'text': self.text,
         }
         if keys:
-            for key in j.keys():
+            for key in list(j):
                 if key not in keys:
                     del j[key]
         return j

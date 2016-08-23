@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+
 import os.path
 from datetime import datetime
 
@@ -8,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.conf import settings
 from django.db.models import Count, Q
 
+from six import string_types
 from celery.utils import get_full_cls_name
 from celery.backends import default_backend
 import ox
@@ -404,7 +406,7 @@ def moveMedia(request, data):
         data['public_id'] = data.pop('item').strip()
         if len(data['public_id']) != 7:
             del data['public_id']
-            if 'director' in data and isinstance(data['director'], basestring):
+            if 'director' in data and isinstance(data['director'], string_types):
                 if data['director'] == '':
                     data['director'] = []
                 else:
@@ -556,7 +558,7 @@ def getPath(request, data):
     '''
     response = json_response()
     ids = data['id']
-    if isinstance(ids, basestring):
+    if isinstance(ids, string_types):
         ids = [ids]
     for f in models.File.objects.filter(oshash__in=ids).values('path', 'oshash').order_by('sort_path'):
         response['data'][f['oshash']] = f['path']

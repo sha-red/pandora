@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 import random
 random.seed()
 import re
@@ -25,8 +27,8 @@ from item.models import Access, Item
 from item import utils 
 from changelog.models import add_changelog
 
-import models
-from decorators import capability_required_json
+from . import models
+from .decorators import capability_required_json
 
 
 def get_user_or_404(data):
@@ -770,10 +772,10 @@ def setUI(request, data):
     else:
         ui = json.loads(request.session.get('ui', '{}'))
     for key in data:
-        keys = map(lambda p: p.replace('\0', '\\.'), key.replace('\\.', '\0').split('.'))
+        keys = [p.replace('\0', '\\.') for p in key.replace('\\.', '\0').split('.')]
         value = data[key]
         p = ui
-        while len(keys)>1:
+        while len(keys) > 1:
             key = keys.pop(0)
             if isinstance(p, list):
                 p = p[getPositionById(p, key)]

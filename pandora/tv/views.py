@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
-import models
 from ox.utils import json
 from oxdjango.shortcuts import render_to_json_response, json_response
 
 from itemlist.views import get_list_or_404_json
 from oxdjango.api import actions
+
+from . import models
 
 def tv(request, data):
     '''

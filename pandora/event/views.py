@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 from django.db.models import Count
 from django.conf import settings
 
+from six import string_types
 import ox
 from ox.utils import json
 from oxdjango.decorators import login_required_json
@@ -14,7 +15,7 @@ from oxdjango.api import actions
 from item import utils
 from changelog.models import add_changelog
 
-import models
+from . import models
 
 @login_required_json
 def addEvent(request, data):
@@ -47,7 +48,7 @@ def addEvent(request, data):
                     'type', 'alternativeNames'):
             if key in data and data[key]:
                 value = data[key]
-                if isinstance(value, basestring):
+                if isinstance(value, string_types):
                     value = ox.escape_html(value)
                 if key == 'alternativeNames':
                     value = tuple([ox.escape_html(v) for v in value])
@@ -101,7 +102,7 @@ def editEvent(request, data):
                         'type', 'alternativeNames'):
                 if key in data:
                     value = data[key]
-                    if isinstance(value, basestring):
+                    if isinstance(value, string_types):
                         value = ox.escape_html(value)
                     if key == 'alternativeNames':
                         value = tuple([ox.escape_html(v) for v in value])

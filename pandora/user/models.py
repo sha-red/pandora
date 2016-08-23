@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 import copy
 from datetime import datetime
 
@@ -9,8 +11,6 @@ from django.db.models import Max
 from django.conf import settings
 from django.contrib.gis.geoip2 import GeoIP2
 
-
-
 import ox
 from oxdjango.fields import DictField
 from ox.utils import json
@@ -19,8 +19,9 @@ from itemlist.models import List, Position
 import text
 import edit
 
-import managers
-import tasks
+from . import managers
+from . import tasks
+
 
 class SessionData(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
@@ -170,7 +171,7 @@ class SessionData(models.Model):
             j['notes'] = p.notes
             j['numberoflists'] = self.numberoflists
         if keys:
-            for key in j.keys():
+            for key in list(j):
                 if key not in keys:
                     del j[key]
         return j
@@ -323,7 +324,7 @@ def get_ui(user_ui, user=None):
         ids += add(user.lists.exclude(status="featured"), 'personal')
         ids += add(user.subscribed_lists.filter(status='public'), 'public')
     ids += add(List.objects.filter(status='featured'), 'featured')
-    for i in ui['lists'].keys():
+    for i in list(ui['lists']):
         if i not in ids:
             del ui['lists'][i]
     tids = ['']
@@ -373,7 +374,7 @@ def user_json(user, keys=None):
         'username': user.username,
     }
     if keys:
-        for key in j.keys():
+        for key in list(j):
             if key not in keys:
                 del j[key]
     return j

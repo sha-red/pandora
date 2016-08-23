@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, absolute_import
 
 import json
 
@@ -10,7 +10,7 @@ from django.conf import settings
 
 from ..shortcuts import render_to_json_response, json_response, HttpErrorJson
 
-from actions import actions
+from .actions import actions
 
 def api(request):
     if request.META['REQUEST_METHOD'] == "OPTIONS":
@@ -21,7 +21,7 @@ def api(request):
     if request.META['REQUEST_METHOD'] != "POST" or (
         not 'action' in request.POST and request.META.get('CONTENT_TYPE') != 'application/json'
     ):
-        methods = actions.keys()
+        methods = list(actions)
         api = []
         for f in sorted(methods):
             api.append({'name': f,

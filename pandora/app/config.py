@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement, print_function
+from __future__ import division, print_function, absolute_import
 
 import os
 import sys
 import shutil
 import subprocess
 import time
-import thread
 import codecs
 from os.path import dirname, exists, join
 from glob import glob
 
+from six.moves import _thread as thread
 from django.conf import settings
 from django.contrib.auth.models import User
 
@@ -33,7 +33,7 @@ def get_version():
     if exists(git_dir):
         env = {'GIT_DIR': git_dir}
         cmd = ['git', 'rev-list', 'HEAD', '--count']
-        return subprocess.check_output(cmd, env=env).strip()
+        return subprocess.check_output(cmd, env=env).strip().decode('utf-8')
     elif exists(info):
         f = open(info)
         rev = int(f.read().split()[0])
@@ -101,7 +101,7 @@ def load_config(init=False):
             'site', 'tv', 'user.ui', 'user.ui.part', 'user.ui.showFolder',
             'menuExtras', 'languages'
         )):
-            parts = map(lambda p: p.replace('\0', '\\.'), section.replace('\\.', '\0').split('.'))
+            parts = [p.replace('\0', '\\.') for p in section.replace('\\.', '\0').split('.')]
             # print('checking', section)
             c = config
             d = default

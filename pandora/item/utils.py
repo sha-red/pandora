@@ -53,8 +53,8 @@ def plural_key(term):
 def sort_title(title):
 
     title = title.replace(u'Æ', 'Ae')
-    if isinstance(title, str):
-        title = unicode(title)
+    if isinstance(title, bytes):
+        title = title.decode('utf-8')
     title = sort_string(title)
 
     #title

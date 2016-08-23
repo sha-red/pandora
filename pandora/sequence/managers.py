@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 from django.db.models import Q, Manager
 
 
 from item.utils import decode_id
 from oxdjango.managers import get_operator
 from oxdjango.query import QuerySet
-
-import models
 
 keymap = {
     'in': 'start',
@@ -29,6 +29,7 @@ def parseCondition(condition, user):
             operator: "!="
     }
     '''
+    from . import models
     k = condition.get('key', default_key)
     k = keymap.get(k, k)
     if not k:

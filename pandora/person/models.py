@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 import unicodedata
 
@@ -12,8 +12,7 @@ import ox
 from item import utils
 import item.models
 
-import managers
-import tasks
+from . import managers
 
 def get_name_sort(name, sortname=None):
     name = unicodedata.normalize('NFKD', name).strip()
@@ -95,7 +94,7 @@ class Person(models.Model):
             'numberofnames': self.numberofnames,
         }
         if keys:
-            for key in j.keys():
+            for key in list(j):
                 if key not in keys:
                     del j[key]
         return j

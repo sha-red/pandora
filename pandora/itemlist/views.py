@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+
 import os
 import re
 
@@ -13,7 +14,7 @@ from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, 
 from oxdjango.http import HttpFileResponse
 
 
-import models
+from . import models
 from oxdjango.api import actions
 from item import utils
 from item.models import Item

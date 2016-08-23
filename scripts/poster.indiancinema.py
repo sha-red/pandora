@@ -8,7 +8,10 @@ root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file_
 
 # using virtualenv's activate_this.py to reorder sys.path
 activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
-execfile(activate_this, dict(__file__=activate_this))
+if os.path.exists(activate_this):
+    with open(activate_this) as f:
+        code = compile(f.read(), activate_this, 'exec')
+        exec(code, dict(__file__=activate_this))
 
 from PIL import Image
 from PIL import ImageDraw

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 from django.contrib.auth.models import User, Group
 from django.core.validators import MaxLengthValidator
 
-#load config from json
-import config
+# load config from json
+from . import config
 config.init()
 
 NEW_LENGTH = {

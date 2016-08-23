@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 from datetime import datetime
 
@@ -10,7 +10,8 @@ from oxdjango import fields
 import ox
 
 import websocket
-import managers
+
+from . import managers
 
 '''
 FIXME: remove this table more migrate to new ChangeLog
@@ -21,7 +22,7 @@ class Changelog(models.Model):
     value = fields.DictField(default={})
 
     def __unicode__(self):
-        return u'%s %s' %(self.type, self.created)
+        return u'%s %s' % (self.type, self.created)
 
     def json(self):
         return self.value
@@ -67,7 +68,7 @@ class Log(models.Model):
             'user': self.user.username,
         }
         if keys:
-            for k in r.keys():
+            for k in list(r):
                 if k not in keys:
                     del r[k]
         return r

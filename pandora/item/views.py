@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, print_function
+from __future__ import division, print_function, absolute_import
+
 import os.path
 import mimetypes
 import random
-from urlparse import urlparse
-from urllib import quote
 import time
 
+from six import PY2
+from six.moves.urllib.parse import quote, urlparse
 from PIL import Image
 from django.db.models import Count, Sum
 from django.http import HttpResponse, HttpResponseForbidden, Http404
@@ -23,9 +24,9 @@ from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, 
 from oxdjango.http import HttpFileResponse
 import ox
 
-import models
-import utils
-import tasks
+from . import models
+from . import utils
+from . import tasks
 
 from archive.models import File, Stream
 from archive import extract
@@ -35,6 +36,8 @@ from changelog.models import add_changelog
 
 from oxdjango.api import actions
 
+if not PY2:
+    unicode = str
 
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
@@ -869,6 +872,7 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
     modes.pop(modes.index(mode))
 
     prefix = os.path.join(item.timeline_prefix, 'timeline')
+    position = int(position)
 
     def timeline():
         timeline = '%s%s%sp' % (prefix, mode, size) 

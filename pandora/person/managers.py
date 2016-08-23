@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import unicodedata
 
+from six import string_types
 from django.db.models import Q, Manager
 
 from item.utils import decode_id
@@ -56,7 +57,7 @@ def parseCondition(condition, user):
     else:
         key = k + get_operator(op, 'istr')
     key = str(key)
-    if isinstance(v, unicode):
+    if isinstance(v, string_types):
         v = unicodedata.normalize('NFKD', v).lower()
     if exclude:
         q = ~Q(**{key: v})

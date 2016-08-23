@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 import logging
 import sys
@@ -19,7 +19,7 @@ class ErrorHandler(logging.Handler):
         import traceback
         from django.views.debug import ExceptionReporter
         from django.conf import settings
-        import models
+        from . import models
         user = None
         line = 0
         text = ''

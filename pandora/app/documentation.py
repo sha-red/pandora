@@ -18,7 +18,7 @@ def get(config_jsonc='config.pandora.jsonc'):
         if key not in docs:
             print(config_jsonc, 'missing', key)
     '''
-    for key in docs.keys():
+    for key in list(docs):
         if key not in config:
             print('parse error, invalid config key:', key)
             del docs[key]

@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 import ox
 
 from django.conf import settings
 from django.db import transaction
 from celery.task import task
 
-import models
+from .models import Annotation
 
 
 @task(ignore_results=True, queue='default')
@@ -16,7 +18,7 @@ def update_matches(id, type):
     elif type == 'event':
         from event.models import Event as Model
 
-    a = models.Annotation.objects.get(pk=id)
+    a = Annotation.objects.get(pk=id)
     a_matches = getattr(a, type == 'place' and 'places' or 'events')
 
     #remove undefined matches that only have this annotation
@@ -52,16 +54,16 @@ def update_matches(id, type):
             if not filter(lambda n: n in name_matches,
                           [n.lower() for n in p.get_super_matches()]):
                 new.append(i)
-        removed = filter(lambda p: p not in new, current)
-        added = filter(lambda p: p not in current, new)
+        removed = list(filter(lambda p: p not in new, current))
+        added = list(filter(lambda p: p not in current, new))
         update = removed + added
         if update:
             for e in Model.objects.filter(id__in=update):
-                e.update_matches(models.Annotation.objects.filter(pk=a.id))
+                e.update_matches(Annotation.objects.filter(pk=a.id))
     else:
         #annotation has no value, remove all exisint matches
         for e in a_matches.all():
-            e.update_matches(models.Annotation.objects.filter(pk=a.id))
+            e.update_matches(Annotation.objects.filter(pk=a.id))
 
 @task(ignore_results=False, queue='default')
 def add_annotations(data):
@@ -85,7 +87,7 @@ def add_annotations(data):
                 continue
         else:
             value = a['value']
-        annotation = models.Annotation(
+        annotation = Annotation(
             item=item,
             layer=layer_id,
             user=user,
@@ -107,7 +109,7 @@ def add_annotations(data):
 def update_item(id, force=False):
     from item.models import Item
     from clip.models import Clip
-    a = models.Annotation.objects.get(pk=id)
+    a = Annotation.objects.get(pk=id)
     if force or a.modified >= a.item.annotations.order_by('-modified')[0].modified:
         #cleanup orphaned clips
         Clip.objects.filter(item__id=a.item.id, annotations__id=None).delete()
@@ -129,7 +131,7 @@ def update_annotations(layers, value):
     items = {}
 
     with transaction.atomic():
-        for a in models.Annotation.objects.filter(
+        for a in Annotation.objects.filter(
             layer__in=layers,
             value=value
         ):

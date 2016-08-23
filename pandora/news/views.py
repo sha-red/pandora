@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 import ox
 from ox.utils import json
@@ -11,7 +11,7 @@ from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, 
 from oxdjango.api import actions
 from changelog.models import add_changelog
 
-import models
+from . import models
 
 def getNews(request, data):
     '''

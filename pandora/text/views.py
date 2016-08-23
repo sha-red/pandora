@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+
 import os
 import re
 
@@ -17,7 +18,7 @@ from django.shortcuts import render
 
 from item import utils
 from archive.chunk import process_chunk
-import models
+from . import models
 from changelog.models import add_changelog
 
 def get_text_or_404_json(id):

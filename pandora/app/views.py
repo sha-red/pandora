@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 import copy
 from datetime import datetime
 
+from six import string_types
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.http import HttpResponse
@@ -13,7 +16,7 @@ from oxdjango.decorators import login_required_json
 import ox
 from ox.utils import json, ET
 
-import models
+from . import models
 
 from user.models import init_user
 from changelog.models import add_changelog
@@ -102,7 +105,7 @@ def getPage(request, data):
     }
     see: editPage
     '''
-    if isinstance(data, basestring):
+    if isinstance(data, string_types):
         name = data
     else:
         name = data['name']

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
+
 import os
 import re
 import subprocess
 from glob import glob
-from urllib import quote
 
+from six.moves.urllib.parse import quote
 from django.db import models
 from django.db.models import Max
 from django.contrib.auth.models import User
@@ -18,7 +19,7 @@ from oxdjango.fields import TupleField
 from archive import extract
 from archive.chunk import save_chunk
 
-import managers
+from . import managers
 
 
 def get_path(i, x): return i.path(x)
@@ -217,7 +218,7 @@ class Text(models.Model):
         else:
             response['names'] = re.compile('<[^<>]*?data-name="(.+?)"').findall(self.text)
 
-        for key in response.keys():
+        for key in list(response):
             if key not in keys + default_keys:
                 del response[key]
         return response

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 import os
 from datetime import timedelta, datetime
 import gzip
@@ -15,8 +17,6 @@ from app.utils import limit_rate
 from text.models import Text
 from taskqueue.models import Task
 
-import models
-
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')
 def cronjob(**kwargs):
@@ -25,6 +25,7 @@ def cronjob(**kwargs):
         update_random_clip_sort()
 
 def update_random_sort():
+    from . import models
     if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):
         random.seed()
         ids = [f['item'] for f in models.ItemSort.objects.values('item')]
@@ -52,11 +53,13 @@ def update_random_clip_sort():
 
 @task(ignore_results=True, queue='default')
 def update_clips(public_id):
+    from . import models
     item = models.Item.objects.get(public_id=public_id)
     item.clips.all().update(user=item.user.id)
 
 @task(ignore_results=True, queue='default')
 def update_poster(public_id):
+    from . import models
     item = models.Item.objects.get(public_id=public_id)
     item.remove_poster()
     item.make_poster()
@@ -71,22 +74,26 @@ def update_poster(public_id):
 
 @task(ignore_results=True, queue='default')
 def update_file_paths(public_id):
+    from . import models
     item = models.Item.objects.get(public_id=public_id)
     item.update_file_paths()
 
 @task(ignore_results=True, queue='default')
 def update_external(public_id):
+    from . import models
     item = models.Item.objects.get(public_id=public_id)
     item.update_external()
 
 @task(queue="encoding")
 def update_timeline(public_id):
+    from . import models
     item = models.Item.objects.get(public_id=public_id)
     item.update_timeline(async=False)
     Task.finish(item)
 
 @task(queue="encoding")
 def rebuild_timeline(public_id):
+    from . import models
     i = models.Item.objects.get(public_id=public_id)
     for s in i.streams():
         s.make_timeline()
@@ -94,6 +101,7 @@ def rebuild_timeline(public_id):
 
 @task(queue="encoding")
 def load_subtitles(public_id):
+    from . import models
     item = models.Item.objects.get(public_id=public_id)
     if item.load_subtitles():
         item.update_find()
@@ -102,6 +110,7 @@ def load_subtitles(public_id):
 
 @task(ignore_results=True, queue='default')
 def update_sitemap(base_url):
+    from . import models
     sitemap = os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'sitemap.xml.gz'))
 
     def absolute_url(url):

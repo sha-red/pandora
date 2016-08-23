@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
+
 import os
 import re
 from glob import glob
-from urllib import quote, unquote
 import unicodedata
 
+from six import string_types
+from six.moves.urllib.parse import quote, unquote
 from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth.models import User
@@ -20,7 +22,7 @@ from person.models import get_name_sort
 from item.utils import get_by_id
 from document.models import Document
 
-import managers
+from . import managers
 
 
 class Entity(models.Model):
@@ -139,14 +141,14 @@ class Entity(models.Model):
                 self.alternativeNames = tuple(ox.escape_html(n) for n in names)
             else:
                 #FIXME: more data validation
-                if isinstance(data[key], basestring):
+                if isinstance(data[key], string_types):
                     self.data[key] = ox.sanitize_html(data[key])
                 else:
                     self.data[key] = data[key]
 
     def json(self, keys=None, user=None):
         if not keys:
-            keys=[
+            keys = [
                 'alternativeNames',
                 'editable',
                 'id',
@@ -155,7 +157,7 @@ class Entity(models.Model):
                 'type',
                 'user',
                 'documents',
-            ] + self.data.keys()
+            ] + list(self.data)
         response = {}
         for key in keys:
             if key == 'id':
@@ -186,7 +188,7 @@ class Entity(models.Model):
                 f, created = Find.objects.get_or_create(entity=self, key=key)
                 if isinstance(value, bool):
                     value = value and 'true' or 'false'
-                if isinstance(value, basestring):
+                if isinstance(value, string_types):
                     value = ox.decode_html(ox.strip_tags(value.strip()))
                     value = unicodedata.normalize('NFKD', value).lower()
                 f.value = value

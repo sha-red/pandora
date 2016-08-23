@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 from django.conf import settings
 from django.db.models import Count, Sum, F, Value
@@ -20,8 +20,8 @@ from item.utils import get_by_id
 from entity.models import Entity
 from changelog.models import add_changelog
 
-import models
-from tasks import update_item, add_annotations
+from . import models
+from .tasks import update_item, add_annotations
 
 def get_annotation_or_404_json(id):
     try:

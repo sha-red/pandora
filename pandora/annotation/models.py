@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
+
 import re
 import unicodedata
 
@@ -15,10 +16,9 @@ import ox
 from clip.models import Clip
 
 from item.utils import sort_string, get_by_key
-import managers
-import utils
-from tasks import update_matches
 
+from . import managers
+from . import utils
 
 def get_super_matches(obj, model):
     super_matches = []
@@ -133,6 +133,8 @@ class Annotation(models.Model):
         return {}
 
     def save(self, *args, **kwargs):
+        from .tasks import update_matches
+
         set_public_id = not self.id or not self.public_id
         layer = self.get_layer()
         if self.value:

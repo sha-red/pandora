@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 import unicodedata
+
+from six import string_types
 from django.db.models import Q, Manager
 
 from item.utils import decode_id
@@ -46,7 +48,7 @@ def parseCondition(condition, user):
             return q
     if k == 'id':
         v = decode_id(v)
-    elif isinstance(v, unicode):
+    elif isinstance(v, string_types):
         v = unicodedata.normalize('NFKD', v).lower()
     if isinstance(v, bool):
         key = k

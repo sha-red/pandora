@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
+
 import os
 import re
 from glob import glob
-from urllib import quote, unquote
 
+from six import string_types
+from six.moves.urllib.parse import quote
 from django.db import models
 from django.db.models import Max
 from django.contrib.auth.models import User
@@ -18,8 +20,8 @@ from item.models import Item
 from archive.extract import resize_image
 from archive.chunk import save_chunk
 
-import managers
-import utils
+from . import managers
+from . import utils
 
 def get_path(f, x): return f.path(x)
 
@@ -174,7 +176,7 @@ class Document(models.Model):
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key,key)) or ''
         if item:
-            if isinstance(item, basestring):
+            if isinstance(item, string_types):
                 item = Item.objects.get(public_id=item)
             d = self.descriptions.filter(item=item)
             if d.exists():
@@ -228,7 +230,7 @@ class Document(models.Model):
         elif self.extension in ('jpg', 'png', 'gif'):
             if os.path.exists(src):
                 if size and page:
-                    crop = map(int, page.split(','))
+                    crop = list(map(int, page.split(',')))
                     if len(crop) == 4:
                         path = os.path.join(folder, '%s.jpg' % ','.join(map(str, crop)))
                         if not os.path.exists(path):

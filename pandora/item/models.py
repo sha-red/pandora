@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 import json
 import os
@@ -12,8 +12,9 @@ import unicodedata
 import uuid
 from datetime import datetime
 from glob import glob
-from urllib import quote
 
+from six import PY2, string_types
+from six.moves.urllib.parse import quote
 from django.db import models, transaction, connection
 from django.db.models import Q, Sum, Max
 from django.conf import settings
@@ -26,11 +27,11 @@ from oxdjango import fields
 import ox.web.imdb
 import ox.image
 
-import managers
-import utils
-import tasks
+from . import managers
+from . import utils
+from . import tasks
 from .timelines import join_tiles
-from data_api import external_data
+from .data_api import external_data
 
 from annotation.models import Annotation
 from archive import extract
@@ -39,6 +40,10 @@ from person.models import get_name_sort
 from sequence.tasks import get_sequences
 from title.models import get_title_sort
 import archive.models
+
+
+if not PY2:
+    unicode = str
 
 def get_id(info):
     q = Item.objects.all()
@@ -270,7 +275,7 @@ class Item(models.Model):
                 if key in self.data:
                     del self.data[key]
             else:
-                k = filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys'])
+                k = list(filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys']))
                 ktype = k and k[0].get('type') or ''
                 if ktype == 'text':
                     self.data[key] = ox.sanitize_html(data[key])
@@ -280,11 +285,11 @@ class Item(models.Model):
                     self.data[key] = [ox.escape_html(t) for t in data[key]]
                 elif key in ('episodeTitle', 'seriesTitle', 'episodeDirector', 'seriesYear'):
                     self.data[key] = ox.escape_html(data[key])
-                elif isinstance(data[key], basestring):
+                elif isinstance(data[key], string_types):
                     self.data[key] = ox.escape_html(data[key])
                 elif isinstance(data[key], list):
                     def cleanup(i):
-                        if isinstance(i, basestring):
+                        if isinstance(i, string_types):
                             i = ox.escape_html(i)
                         return i
                     self.data[key] = [cleanup(i) for i in data[key]]
@@ -314,9 +319,9 @@ class Item(models.Model):
     def expand_connections(self):
         c = self.get('connections')
         if c:
-            for t in c.keys():
+            for t in list(c):
                 if c[t]:
-                    if isinstance(c[t][0], basestring):
+                    if isinstance(c[t][0], string_types):
                         c[t] = [{'id': i, 'title': None} for i in c[t]]
                     ids = [i['id'] for i in c[t]]
                     known = {}
@@ -442,7 +447,7 @@ class Item(models.Model):
 
     def delete_files(self):
         path = os.path.join(settings.MEDIA_ROOT, self.path())
-        if isinstance(path, unicode):
+        if not isinstance(path, bytes):
             path = path.encode('utf-8')
         if os.path.exists(path):
             shutil.rmtree(path)
@@ -498,7 +503,7 @@ class Item(models.Model):
         if settings.DATA_SERVICE:
             url = self.prefered_poster_url()
             external_posters = self.external_data.get('posters', {})
-            services = external_posters.keys()
+            services = list(external_posters)
             for service in settings.POSTER_PRECEDENCE:
                 if service in services:
                     index.append(service)
@@ -593,7 +598,7 @@ class Item(models.Model):
                     if value:
                         i[key] = value
 
-        if 'cast' in i and isinstance(i['cast'][0], basestring):
+        if 'cast' in i and isinstance(i['cast'][0], string_types):
             i['cast'] = [i['cast']]
         if 'cast' in i and isinstance(i['cast'][0], list):
             i['cast'] = [{'actor': x[0], 'character': x[1]} for x in i['cast']]
@@ -639,7 +644,7 @@ class Item(models.Model):
         if keys and 'frames' in keys:
             i['frames'] = frames
 
-        selected_frame = filter(lambda f: f['selected'], frames)
+        selected_frame = [f for f in frames if f['selected']]
         if selected_frame:
             i['posterFrame'] = selected_frame[0]['position']
         elif self.poster_frame != -1.0:
@@ -650,7 +655,7 @@ class Item(models.Model):
         if keys:
             dkeys = filter(lambda k: k in keys, dkeys)
         for key in dkeys:
-            k = filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys'])
+            k = list(filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys']))
             if isinstance((k and k[0].get('type') or ''), list):
                 i['%sdescription' % key] = {}
                 if key == 'name':
@@ -760,7 +765,7 @@ class Item(models.Model):
                 f, created = ItemFind.objects.get_or_create(item=self, key=key)
                 if isinstance(value, bool):
                     value = value and 'true' or 'false'
-                if isinstance(value, basestring):
+                if isinstance(value, string_types):
                     value = ox.decode_html(ox.strip_tags(value.strip()))
                     value = unicodedata.normalize('NFKD', value).lower()
                 f.value = value
@@ -879,7 +884,7 @@ class Item(models.Model):
             return sort_value
 
         def set_value(s, name, value):
-            if isinstance(value, basestring):
+            if isinstance(value, string_types):
                 value = ox.decode_html(value.lower())
                 if not value:
                     value = None
@@ -1011,7 +1016,7 @@ class Item(models.Model):
                     set_value(s, name, value)
                 elif sort_type == 'date':
                     value = self.get(source)
-                    if isinstance(value, basestring):
+                    if isinstance(value, string_types):
                         value = datetime_safe.datetime.strptime(value, '%Y-%m-%d')
                     set_value(s, name, value)
 
@@ -1045,6 +1050,7 @@ class Item(models.Model):
                 current_values = []
             else:
                 current_values = [unicode(current_values)]
+
         filter_map = utils.get_by_id(settings.CONFIG['itemKeys'], key).get('filterMap')
         if filter_map:
             filter_map = re.compile(filter_map)
@@ -1231,7 +1237,7 @@ class Item(models.Model):
             return
         base = self.path('torrent')
         base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
-        if isinstance(base, unicode):
+        if not isinstance(base, bytes):
             base = base.encode('utf-8')
         if os.path.exists(base):
             shutil.rmtree(base)
@@ -1250,9 +1256,9 @@ class Item(models.Model):
                                         quote(filename.encode('utf-8')),
                                         extension)
             video = "%s.%s" % (base, extension)
-            if isinstance(media_path, unicode):
+            if not isinstance(media_path, bytes):
                 media_path = media_path.encode('utf-8')
-            if isinstance(video, unicode):
+            if not isinstance(video, bytes):
                 video = video.encode('utf-8')
             media_path = os.path.relpath(media_path, os.path.dirname(video))
             os.symlink(media_path, video)
@@ -1267,9 +1273,9 @@ class Item(models.Model):
                 extension = media_path.split('.')[-1]
                 video = "%s/%s.Part %d.%s" % (base, filename, part, extension)
                 part += 1
-                if isinstance(media_path, unicode):
+                if not isinstance(media_path, bytes):
                     media_path = media_path.encode('utf-8')
-                if isinstance(video, unicode):
+                if not isinstance(video, bytes):
                     video = video.encode('utf-8')
                 media_path = os.path.relpath(media_path, os.path.dirname(video))
                 os.symlink(media_path, video)
@@ -1360,7 +1366,7 @@ class Item(models.Model):
     def save_poster(self, data):
         self.poster.name = self.path('poster.jpg')
         poster = self.poster.path
-        with open(poster, 'w') as f:
+        with open(poster, 'wb') as f:
             f.write(data)
         self.poster_height = self.poster.height
         self.poster_width = self.poster.width
@@ -1425,7 +1431,7 @@ class Item(models.Model):
                 data = ox.net.read_url(url)
                 self.save_poster(data)
             elif os.path.exists(poster):
-                with open(poster) as f:
+                with open(poster, 'rb') as f:
                     data = f.read()
                     if data:
                         self.save_poster(data)
@@ -1450,7 +1456,7 @@ class Item(models.Model):
         data['oxdbId'] = self.oxdbId or self.oxdb_id() or self.public_id
         ox.makedirs(os.path.join(settings.MEDIA_ROOT, self.path()))
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(json.dumps(data, default=fields.to_json))
+        p.communicate(json.dumps(data, default=fields.to_json).encode('utf-8'))
         self.clear_poster_cache(poster)
         return poster
 

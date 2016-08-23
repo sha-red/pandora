@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, print_function
+from __future__ import division, print_function, absolute_import
 
 import json
 import subprocess
@@ -14,7 +14,7 @@ from django.conf import settings
 from item.models import Item
 from item.tasks import load_subtitles
 
-import models
+from . import models
 
 info_keys = [
     'title',

@@ -1,12 +1,15 @@
-# Create your views here.
-from urllib import quote
+# -*- coding: utf-8 -*-
+# vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 import re
 
+from six.moves.urllib.parse import quote
 from django.shortcuts import get_object_or_404, redirect
 
 import app.views
 
-import models
+from . import models
 
 def padma_find(request):
     url = '/'

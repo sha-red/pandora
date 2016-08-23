@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement, print_function
+from __future__ import division, print_function, absolute_import
 
 import os
 from os.path import exists
@@ -14,6 +14,7 @@ import shutil
 from distutils.spawn import find_executable
 from glob import glob
 
+from six import string_types
 import numpy as np
 import ox
 import ox.image
@@ -54,6 +55,7 @@ def supported_formats():
     p = subprocess.Popen([settings.FFMPEG, '-codecs'],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
+    stdout = stdout.decode('utf-8')
     return {
         'ogg': 'libtheora' in stdout and 'libvorbis' in stdout,
         'webm': 'libvpx' in stdout and 'libvorbis' in stdout,
@@ -453,7 +455,7 @@ def timeline(video, prefix, modes=None, size=None):
         modes = ['antialias', 'slitscan', 'keyframes', 'audio', 'data']
     if size is None:
         size = [64, 16]
-    if isinstance(video, basestring):
+    if isinstance(video, string_types):
         video = [video]
     cmd = ['../bin/oxtimelines',
            '-s', ','.join(map(str, reversed(sorted(size)))),
@@ -621,7 +623,7 @@ def chop(video, start, end):
                          stderr=open('/dev/null', 'w'),
                          close_fds=True)
     p.wait()
-    f = open(choped_video, 'r')
+    f = open(choped_video, 'rb')
     os.unlink(choped_video)
     os.rmdir(tmp)
     return f

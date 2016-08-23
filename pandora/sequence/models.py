@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 from django.db import models
 
-import managers
 from item.models import ItemSort
+
+from . import managers
 
 
 def parse_hash(value):
@@ -22,7 +23,7 @@ class Sequence(models.Model):
         'shape': 0,
         'color': 1
     }
-    mode = models.IntegerField(choices=sorted(zip(MODE.values(), MODE.keys()), key=lambda k: k[0]), default=0)
+    mode = models.IntegerField(choices=sorted(zip(MODE.values(), list(MODE)), key=lambda k: k[0]), default=0)
     sort = models.ForeignKey(ItemSort, null=True, related_name='sequences')
 
     hash = models.BigIntegerField(db_index=True, default=-9223372036854775808)

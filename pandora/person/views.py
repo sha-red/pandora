@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 import ox
 from ox.utils import json
@@ -11,8 +11,8 @@ from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, 
 from oxdjango.api import actions
 from item import utils
 
-import models
-import tasks
+from . import models
+from . import tasks
 from user.decorators import capability_required_json
 from changelog.models import add_changelog
 

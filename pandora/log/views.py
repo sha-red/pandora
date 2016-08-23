@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 import ox
 from ox.utils import json
@@ -12,7 +12,7 @@ from oxdjango.api import actions
 
 from item import utils
 
-import models
+from . import models
 
 
 def logError(request, data):

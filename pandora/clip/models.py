@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 from django.db import models
 from django.conf import settings
@@ -8,7 +8,8 @@ from django.conf import settings
 import ox
 
 from archive import extract
-import managers
+
+from . import managers
 
 
 def get_layers(item, interval=None, user=None):
@@ -107,7 +108,7 @@ class MetaClip(object):
         if not j['videoRatio']:
             j['videoRatio'] = 4/3
         if keys:
-            for key in j.keys():
+            for key in list(j):
                 if key not in keys:
                     del j[key]
             #needed here to make item find with clips work

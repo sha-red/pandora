@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 from glob import glob
 
 from celery.task import task
@@ -11,9 +13,9 @@ from item.models import Item
 from item.tasks import update_poster
 from taskqueue.models import Task
 
-import models
-import extract
-import external
+from . import models
+from . import extract
+from . import external
 
 _INSTANCE_KEYS = ('mtime', 'path')
 
@@ -104,7 +106,7 @@ def update_files(user, volume, files):
 @task(ignore_results=True, queue='default')
 def update_info(user, info):
     user = models.User.objects.get(username=user)
-    files = models.File.objects.filter(oshash__in=info.keys())
+    files = models.File.objects.filter(oshash__in=list(info))
     for f in files:
         f.update_info(info[f.oshash], user)
         f.save()

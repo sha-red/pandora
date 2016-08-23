@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 from django.db import models, transaction
 from django.contrib.auth.models import User
@@ -13,7 +13,7 @@ from item import utils
 from person.models import get_name_sort
 from title.models import get_title_sort
 
-import managers
+from . import managers
 
 
 class Event(models.Model):

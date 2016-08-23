@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 import json
 import os.path
@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import time
 
+from six import string_types, PY2
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -22,8 +23,11 @@ import item.models
 from person.models import get_name_sort
 from taskqueue.models import Task
 
-from chunk import save_chunk
-import extract
+from .chunk import save_chunk
+from . import extract
+
+if not PY2:
+    unicode = str
 
 def data_path(f, x):
     return f.get_path('data.bin')
@@ -155,7 +159,7 @@ class File(models.Model):
         if self.item:
             for key in self.ITEM_INFO:
                 data[key] = self.item.get(key)
-                if isinstance(data[key], basestring):
+                if isinstance(data[key], string_types):
                     data[key] = ox.decode_html(data[key])
                 elif isinstance(data[key], list):
                     data[key] = [ox.decode_html(e) for e in data[key]]
@@ -351,7 +355,7 @@ class File(models.Model):
                     stream.available = True 
                     stream.info = {} 
                     stream.save()
-                    if self.info.keys() == ['extension']:
+                    if list(self.info) == ['extension']:
                         self.info.update(stream.info)
                         self.parse_info()
                         self.save()
@@ -416,7 +420,7 @@ class File(models.Model):
         data['users'] = list(set([i['user'] for i in data['instances']]))
         data['item'] = self.item.public_id
         if keys:
-            for k in data.keys():
+            for k in list(data):
                 if k not in keys:
                     del data[k]
         return data
@@ -450,14 +454,14 @@ class File(models.Model):
         '''
             extract stream from direct upload
         '''
-        import tasks
+        from . import tasks
         return tasks.extract_stream.delay(self.id)
 
     def process_stream(self):
         '''
             extract derivatives from webm upload
         '''
-        import tasks
+        from . import tasks
         return tasks.process_stream.delay(self.id)
 
     def extract_tracks(self):

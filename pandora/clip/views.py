@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 from django.conf import settings
 import ox
@@ -14,7 +14,7 @@ from item.models import Item
 from item import utils
 from changelog.models import add_changelog
 
-import models
+from . import models
 
 
 def parse_query(data, user):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, absolute_import
+
 import inspect
 import sys
 
@@ -8,7 +9,7 @@ from django.conf import settings
 
 from ..shortcuts import render_to_json_response, json_response
 
-def autodiscover():
+def autodiscover(self=None):
     # Register api actions from all installed apps
     from importlib import import_module
     from django.utils.module_loading import module_has_submodule
@@ -50,6 +51,9 @@ def trim(docstring):
 class ApiActions(dict):
     properties = {}
     versions = {}
+
+    autodiscover = autodiscover
+
     def __init__(self):
 
         def api(request, data):
@@ -74,10 +78,10 @@ class ApiActions(dict):
             code = data.get('code', False)
             version = getattr(request, 'version', None)
             if version:
-                _actions = self.versions.get(version, {}).keys()
-                _actions = list(set(_actions + self.keys()))
+                _actions = list(self.versions.get(version, {}))
+                _actions = list(set(_actions + list(self)))
             else:
-                _actions = self.keys()
+                _actions = list(self)
             _actions.sort()
             actions = {}
             for a in _actions:
@@ -111,7 +115,10 @@ class ApiActions(dict):
 
     def register(self, method, action=None, cache=True, version=None):
         if not action:
-            action = method.func_name
+            if hasattr(method, 'func_name'):
+                action = method.func_name
+            else:
+                action = method.__name__
         if version:
             if not version in self.versions:
                 self.versions[version] = {}

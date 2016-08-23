@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
+from six import string_types
 from django.db import connection, transaction
 from celery.task import task
 
-import models
 import item.models
-import extract
+from . import extract
 
 @task(ignore_results=True, queue='encoding')
 def get_sequences(public_id):
+    from . import models
     i = item.models.Item.objects.get(public_id=public_id)
     models.Sequence.objects.filter(sort=i.sort).delete()
     position = 0
@@ -29,7 +32,7 @@ def get_sequences(public_id):
                     sequence['duration'] = sequence['end'] - sequence['start']
                     if not keys:
                         keys = ', '.join(['"%s"'%k for k in sequence.keys()])
-                    v = ', '.join([isinstance(v, basestring) and "'%s'"%v or str(v)
+                    v = ', '.join([isinstance(v, string_types) and "'%s'"%v or str(v)
                                    for v in sequence.values()])
                     values.append('(%s)'%v)
             if values:

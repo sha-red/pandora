@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 from datetime import datetime
 import unicodedata
 
+from six import string_types
 from django.db.models import Q, Manager
 from django.conf import settings
 
 from archive.models import Volume
 from itemlist.models import List
 from django.contrib.auth.models import Group
-import models
-import utils
+from . import utils
 
 from oxdjango.query import QuerySet
 from oxdjango.managers import get_operator
@@ -29,6 +31,7 @@ def parseCondition(condition, user, owner=None):
     }
     ...
     '''
+    from . import models
     k = condition.get('key', '*')
     k = {'id': 'public_id'}.get(k, k)
     if not k:
@@ -119,7 +122,7 @@ def parseCondition(condition, user, owner=None):
         else:
             value_key = k
         if not k.startswith('public_id'):
-            if isinstance(v, unicode):
+            if isinstance(v, string_types):
                 v = unicodedata.normalize('NFKD', v).lower()
         if k in facet_keys:
             in_find = False
@@ -237,6 +240,7 @@ class ItemManager(Manager):
         return QuerySet(self.model)
 
     def filter_list(self, qs, l, user):
+        from . import models
         if l != "*":
             l = l.split(":")
             only_public = True

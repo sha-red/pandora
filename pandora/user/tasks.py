@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, print_function, absolute_import
+
 import json
 from datetime import timedelta
-from itertools import izip_longest
 
+from six.moves import zip_longest
 from celery.task import task, periodic_task
 
-import models
 from app.models import Settings
-from statistics import Statistics
+from .statistics import Statistics
 
 @periodic_task(run_every=timedelta(hours=1), queue='encoding')
 def cronjob(**kwargs):
     update_statistics()
 
 def update_statistics():
+    from . import models
     def chunker(iterable, chunksize, filler):
-        return izip_longest(*[iter(iterable)]*chunksize, fillvalue=filler)
+        return zip_longest(*[iter(iterable)]*chunksize, fillvalue=filler)
 
     stats = Statistics()
     ids = [i['session_key']
@@ -30,12 +32,14 @@ def update_statistics():
 
 @task(ignore_results=True, queue='default')
 def parse_data(key):
+    from . import models
     session_data = models.SessionData.objects.get(session_key=key)
     session_data.parse_data()
     session_data.save()
 
 @task(ignore_results=True, queue='default')
 def update_numberoflists(username):
+    from . import models
     user = models.User.objects.get(username=username)
     models.SessionData.objects.filter(
         user=user

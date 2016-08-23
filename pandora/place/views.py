@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 from django.db.models import Max, Min, Count
 from django.conf import settings
 
+from six import string_types
 import ox
 from ox.utils import json
 
@@ -15,7 +16,7 @@ from oxdjango.api import actions
 from item import utils
 from changelog.models import add_changelog
 
-import models
+from . import models
 
 @login_required_json
 def addPlace(request, data):
@@ -116,7 +117,7 @@ def editPlace(request, data):
     '''
     place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data['id']))
     names = data.get('name', [])
-    if isinstance(names, basestring):
+    if isinstance(names, string_types):
         names = [names]
     names = [ox.escape_html(n) for n in names]
     alternative_names = [ox.escape_html(n) for n in data.get('alternativeNames', [])]
@@ -145,7 +146,7 @@ def editPlace(request, data):
             for key in data:
                 if key != 'id':
                     value = data[key]
-                    if isinstance(value, basestring):
+                    if isinstance(value, string_types):
                         value = ox.escape_html(value)
                     if isinstance(value, list):
                         value = tuple(value)

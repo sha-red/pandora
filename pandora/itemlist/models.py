@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
+
 import os
 import re
 import subprocess
@@ -15,7 +16,9 @@ import ox
 from oxdjango.fields import DictField, TupleField
 
 from archive import extract
-import managers
+
+from . import managers
+
 
 def get_path(f, x): return f.path(x)
 def get_icon_path(f, x): return get_path(f, 'icon.jpg')

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+
 import os
 from glob import glob
 
+from six import string_types
 import ox
 from ox.utils import json
 from oxdjango.api import actions
@@ -20,7 +22,7 @@ from entity.models import Entity
 from archive.chunk import process_chunk
 from changelog.models import add_changelog
 
-import models
+from . import models
 
 def get_document_or_404_json(id):
     try:
@@ -49,7 +51,7 @@ def addDocument(request, data):
     else:
         ids = [data['id']]
     if 'item' in data:
-        if isinstance(data['item'], basestring):
+        if isinstance(data['item'], string_types):
             item = Item.objects.get(public_id=data['item'])
             if item.editable(request.user):
                 for id in ids:
@@ -66,7 +68,7 @@ def addDocument(request, data):
                         document.add(item)
             add_changelog(request, data, data['item'])
     elif 'entity' in data:
-        if isinstance(data['entity'], basestring):
+        if isinstance(data['entity'], string_types):
             entity = Entity.get(data['entity'])
             if entity.editable(request.user):
                 for id in ids:

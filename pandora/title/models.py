@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division, with_statement
+from __future__ import division, print_function, absolute_import
 
 import unicodedata
 
@@ -10,11 +10,11 @@ import ox
 
 from item import utils
 
-import managers
+from . import managers
 
 def get_title_sort(title):
-    if isinstance(title, str):
-        title = unicode(title)
+    if isinstance(title, bytes):
+        title = title.decde('utf-8')
     title = unicodedata.normalize('NFKD', title).strip()
     if title:
         title, created = Title.objects.get_or_create(title=title)
@@ -70,7 +70,7 @@ class Title(models.Model):
             'sorttitle': self.sorttitle,
         }
         if keys:
-            for key in j.keys():
+            for key in list(j):
                 if key not in keys:
                     del j[key]
         return j

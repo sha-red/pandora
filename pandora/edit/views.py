@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+
 import os
 import re
 
@@ -16,7 +17,7 @@ from django.conf import settings
 from item import utils
 from changelog.models import add_changelog
 
-import models
+from . import models
 
 def get_edit_or_404_json(id):
     id = id.split(':')
@@ -400,7 +401,7 @@ def findEdits(request, data):
                x['value'] == 'featured' and \
                x['operator'] in ('=', '==')
 
-    is_featured = len(filter(is_featured_condition, data.get('query', {}).get('conditions', []))) > 0
+    is_featured = any(filter(is_featured_condition, data.get('query', {}).get('conditions', [])))
 
     if is_section_request:
         qs = query['qs']
