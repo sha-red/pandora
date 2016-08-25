@@ -122,12 +122,12 @@ class Task(models.Model):
         return False
 
     def cancel(self):
-        self.state = 'cancelled'
+        self.status = 'cancelled'
         self.save()
         # FIXME: actually cancel task
 
     def json(self):
-        if self.state != 'cancelled':
+        if self.status != 'cancelled':
             self.update()
         return {
             'started': self.started,
