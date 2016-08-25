@@ -321,14 +321,19 @@ def direct_upload(request):
                     t = file.extract_stream()
                     response['resultUrl'] = t.task_id
                 except:
+                    print('ERROR: rabbitmq is down')
                     pass
             return render_to_json_response(response)
     # init upload
     else:
         file, created = models.File.objects.get_or_create(oshash=oshash)
         if file.editable(request.user):
-            # remove previous uploads
-            if not created:
+            if created:
+                if not file.item:
+                    file.item = get_item({
+                        'title': oshash
+                    }, user=request.user)
+            else:  # remove previous uploads
                 file.streams.all().delete()
                 file.delete_frames()
                 if file.item.rendered and file.selected:
