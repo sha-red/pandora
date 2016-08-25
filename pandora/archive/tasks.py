@@ -135,8 +135,8 @@ def process_stream(fileId):
         file.item.update_timeline()
     if file.item.rendered:
         file.item.save()
-    Task.finish(file.item)
     models.File.objects.filter(id=fileId).update(encoding=False)
+    Task.finish(file.item)
     return True
 
 @task(queue="encoding")
@@ -164,8 +164,8 @@ def extract_stream(fileId):
                 file.item.update_timeline()
                 update_poster(file.item.public_id)
                 file.extract_tracks()
-    Task.finish(file.item)
     models.File.objects.filter(id=fileId).update(encoding=False)
+    Task.finish(file.item)
 
 @task(queue="encoding")
 def extract_derivatives(fileId, rebuild=False):
