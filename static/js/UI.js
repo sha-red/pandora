@@ -89,7 +89,9 @@ pandora.UI = (function() {
                     // if find has changed list
                     Ox.forEach(listSettings, function(listSetting, setting) {
                         // then for each setting that corresponds to a list setting
-                        if (
+                        if (!Ox.isUndefined(args[setting])) {
+                            add[setting] = args[setting];
+                        } else if (
                             !pandora.user.ui.lists[list]
                             || Ox.isUndefined(pandora.user.ui.lists[list][listSetting])
                         ) {
@@ -97,7 +99,7 @@ pandora.UI = (function() {
                             add[setting] = pandora.site.user.ui[setting];
                         } else {
                             // or the existing list setting
-                            add[setting] = pandora.user.ui.lists[list][listSetting]
+                            add[setting] = pandora.user.ui.lists[list][listSetting];
                         }
                     });
                 }
