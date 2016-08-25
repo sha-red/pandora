@@ -251,18 +251,20 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             n = 0
         else:
             n = 1
+        audio_settings = []
         # mix 2 mono channels into stereo(common for fcp dv mov files)
+        audio_map = []
         if audio_track == 0 and len(info['audio']) == 2 \
                 and len(filter(None, [a['channels'] == 1 or None for a in info['audio']])) == 2:
-            video_settings += [
+            audio_settings += [
                 '-filter_complex',
                 '[0:%s][0:%s] amerge' % (info['audio'][0]['id'], info['audio'][1]['id'])
             ]
             mono_mix = True
         else:
-            video_settings += ['-map', '0:%s,0:%s' % (info['audio'][audio_track]['id'], n)]
+            audio_settings += ['-map', '0:%s,0:%s' % (info['audio'][audio_track]['id'], n)]
             mono_mix = False
-        audio_settings = ['-ar', str(audiorate)]
+        audio_settings += ['-ar', str(audiorate)]
         if audio_codec != 'libopus':
             audio_settings += ['-aq', str(audioquality)]
         if mono_mix:
