@@ -75,9 +75,9 @@ pandora.chunkupload = function(options) {
             }
             chunkURL = response.uploadUrl;
             if (chunkURL) {
-                if (document.location.protocol == 'https:') {
-                    chunkURL = chunkURL.replace(/http:\/\//, 'https://');
-                }
+                // only take local part of url
+                var url = Ox.parseURL(chunkURL);
+                chunkURL = url.pathname + url.search;
                 that.status = 'uploading';
                 that.progress = 0.0;
                 // start upload
@@ -136,7 +136,7 @@ pandora.chunkupload = function(options) {
             done();
         }
 
-        progress(parseFloat(chunkOffset)/bytesAvailable);
+        progress(Math.min(parseFloat(chunkOffset)/bytesAvailable), 1);
 
         request = new XMLHttpRequest();
         request.addEventListener('load', function (evt) {
