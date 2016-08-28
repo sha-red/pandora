@@ -133,6 +133,7 @@ def process_stream(fileId):
     if not file.item.rendered \
             and not file.item.files.exclude(id=fileId).filter(Q(queued=True) | Q(encoding=True)).count():
         file.item.update_timeline()
+        update_poster(file.item.public_id)
     if file.item.rendered:
         file.item.save()
     models.File.objects.filter(id=fileId).update(encoding=False)
