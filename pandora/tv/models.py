@@ -92,6 +92,7 @@ class Program(models.Model):
         for key in ('title', 'director', 'year', 'durations', 'parts', 'rightslevel'):
             r[key] = item_json.get(key, '')
         r['layers'] = self.item.get_layers(user)
+        r['streams'] = [s.file.oshash for s in self.item.streams()]
         if current:
             #requires python2.7
             #r['position'] = (current - self.start).total_seconds()
