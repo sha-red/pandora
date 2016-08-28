@@ -227,6 +227,10 @@ pandora.ui.infoView = function(data) {
 
     renderGroup(['director', 'year', 'country']);
 
+    // Featuring ----------------------------------------------
+
+    renderGroup(['featuring']);
+
     // Summary -----------------------------------------------------------------
 
     if (canEdit || data.summary) {
