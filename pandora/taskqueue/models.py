@@ -107,7 +107,7 @@ class Task(models.Model):
         if active:
             for queue in active:
                 for job in active[queue]:
-                    if job.get('name') in ('item.tasks.update_timeline', ):
+                    if job.get('name') in ('item.tasks.update_timeline', 'archive.tasks.download_media'):
                         args = job.get('args', [])
                         if args and args[0] == self.item.public_id:
                             if job.get('time_start'):
