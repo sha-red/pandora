@@ -365,6 +365,11 @@ class Item(models.Model):
             update_poster = True
             if not settings.USE_IMDB:
                 self.public_id = ox.toAZ(self.id)
+                # avoid looking like an ad
+                if self.id == ox.fromAZ('AD') - 1:
+                    cursor = connection.cursor()
+                    sql = "SELECT nextval('%s_id_seq')" % self._meta.db_table
+                    cursor.execute(sql)
 
         # this does not work if another item without imdbid has the same metadata
         oxdbId = self.oxdb_id()
