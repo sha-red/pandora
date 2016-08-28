@@ -21,7 +21,7 @@ def getTasks(request, data):
         [{
             started: 0,
             finished: 0,
-            status: 'queued|uploading|processing|finished|failed|cancelled',
+            status: 'pending|uploading|queued|processing|finished|failed|cancelled',
             title: '',
             item: 'itemID',
             id: 'taskID'

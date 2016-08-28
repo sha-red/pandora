@@ -780,6 +780,8 @@ def addMediaUrl(request, data):
         response = json_response(status=403, text='permission denied')
     else:
         response = json_response()
+        i = Item.objects.get(public_id=data['item'])
+        Tasks.start(i, request.user)
         t = tasks.download_media.delay(data['item'], data['url'])
         response['data']['taskId'] = t.task_id
         add_changelog(request, data, data['item'])

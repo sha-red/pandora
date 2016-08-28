@@ -91,6 +91,8 @@ class Task(models.Model):
             status = 'failed'
         elif self.item.rendered:
             status = 'finished'
+        elif not self.item.files.count():
+            status = 'queued'
         else:
             status = 'unknown'
         if status != self.status:
