@@ -117,6 +117,7 @@ def download(item_id, url):
                 f.path = '%(title)s.%(extension)s' % media
                 f.parse_info()
                 f.selected = True
+                f.queued = True
                 if len(parts) > 1:
                     f.part = part
                     part += 1
