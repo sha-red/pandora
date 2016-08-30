@@ -422,6 +422,8 @@ class File(models.Model):
             data[key] = self.info.get(key)
         data['users'] = list(set([i['user'] for i in data['instances']]))
         data['item'] = self.item.public_id
+        if 'url' in keys and 'url' in self.info:
+            data['url'] = self.info['url']
         if keys:
             for k in list(data):
                 if k not in keys:
