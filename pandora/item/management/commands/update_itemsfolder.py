@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import print_function
 
 import os
 
@@ -13,8 +14,8 @@ from ... import models
 def link(src, target):
     if not os.path.exists(target):
         ox.makedirs(os.path.dirname(target))
-        print src
-        print '\t', target
+        print(src)
+        print('\t', target)
         os.symlink(src, target)
 
 class Command(BaseCommand):
@@ -28,7 +29,7 @@ class Command(BaseCommand):
         for i in models.Item.objects.all():
             for f in i.files.all():
                 path = f.normalize_item_path()
-                print path
+                print(path)
                 if settings.CONFIG['site']['folderdepth'] == 4:
                     path = os.path.join(path[0], path)
                 if f.data:
