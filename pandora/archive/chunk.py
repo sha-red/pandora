@@ -17,7 +17,7 @@ def save_chunk(obj, file, chunk, offset, name, done_cb=None):
     if not file:
         file.name = name
         ox.makedirs(os.path.dirname(file.path))
-        with open(file.path, 'w') as f:
+        with open(file.path, 'wb') as f:
             f.write(chunk.read())
         obj.save()
     else:
@@ -27,7 +27,7 @@ def save_chunk(obj, file, chunk, offset, name, done_cb=None):
             offset = size
         elif offset > size:
             return False, size
-        with open(path, 'r+') as f:
+        with open(path, 'rb+') as f:
             f.seek(offset)
             f.write(chunk.read())
     return done_cb() if done_cb else True, file.size

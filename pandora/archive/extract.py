@@ -31,7 +31,7 @@ class AspectRatio(fractions.Fraction):
 
     def __new__(cls, numerator, denominator=None):
         if not denominator:
-            ratio = map(int, numerator.split(':'))
+            ratio = list(map(int, numerator.split(':')))
             if len(ratio) == 1:
                 ratio.append(1)
             numerator = ratio[0]
@@ -560,7 +560,7 @@ def timeline_strip(item, cuts, info, prefix):
     if cuts[0] != 0:
         cuts.insert(0, 0)
 
-    cuts = map(lambda x: int(round(x * fps)), cuts)
+    cuts = list(map(lambda x: int(round(x * fps)), cuts))
 
     for frame in range(frames):
         i = int(frame / timeline_width)

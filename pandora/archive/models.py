@@ -215,7 +215,7 @@ class File(models.Model):
             add_file(f)
         versions = ox.movie.parse_item_files(files)
         for version in versions:
-            p = filter(lambda f: f['oshash'] == self.oshash, version['files'])
+            p = list(filter(lambda f: f['oshash'] == self.oshash, version['files']))
             if p:
                 return p[0]['normalizedPath']
 
@@ -774,7 +774,7 @@ class Stream(models.Model):
         self.duration = self.info.get('duration', 0)
         if 'video' in self.info and self.info['video']:
             if 'display_aspect_ratio' in self.info['video'][0]:
-                dar = map(int, self.info['video'][0]['display_aspect_ratio'].split(':'))
+                dar = list(map(int, self.info['video'][0]['display_aspect_ratio'].split(':')))
                 self.aspect_ratio = dar[0] / dar[1]
             else:
                 self.aspect_ratio = self.info['video'][0]['width'] / self.info['video'][0]['height']
