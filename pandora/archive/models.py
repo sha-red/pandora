@@ -25,6 +25,7 @@ from taskqueue.models import Task
 
 from .chunk import save_chunk
 from . import extract
+from . import managers
 
 if not PY2:
     unicode = str
@@ -99,6 +100,8 @@ class File(models.Model):
     # upload and data handling
     data = models.FileField(null=True, blank=True,
                             upload_to=data_path)
+
+    objects = managers.FileManager()
 
     def __unicode__(self):
         return self.path

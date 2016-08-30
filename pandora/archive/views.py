@@ -605,6 +605,17 @@ def _order_query(qs, sort, prefix=''):
         qs = qs.order_by(*order_by)
     return qs
 
+def parse_query(data, user):
+    query = {}
+    query['range'] = [0, 100]
+    query['sort'] = [{'key': 'path', 'operator': '+'}]
+    for key in ('sort', 'keys', 'group', 'range', 'position', 'positions'):
+        if key in data:
+            query[key] = data[key]
+    if [r for r in query['range'] if not isinstance(r, int)]:
+        query['range'] = [0, 0]
+    query['qs'] = models.File.objects.find(data, user)
+    return query
 
 def findMedia(request, data):
     '''
@@ -625,40 +636,9 @@ def findMedia(request, data):
 
     response = json_response({})
     if 'group' in query:
-        if 'sort' in query:
-            if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
-                if query['group'] == "year":
-                    order_by = query['sort'][0]['operator'] == '-' and 'items' or '-items'
-                else:
-                    order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
-                if query['group'] != "keyword":
-                    order_by = (order_by, 'sortvalue')
-                else:
-                    order_by = (order_by,)
-            else:
-                order_by = query['sort'][0]['operator'] == '-' and '-sortvalue' or 'sortvalue'
-                order_by = (order_by, 'items')
-        else:
-            order_by = ('-sortvalue', 'items')
-        response['data']['items'] = []
-        items = 'items'
-        item_qs = query['qs']
-        qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
-        qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
-
-        if 'positions' in query:
-            response['data']['positions'] = {}
-            ids = [j['value'] for j in qs]
-            response['data']['positions'] = utils.get_positions(ids, query['positions'])
-
-        elif 'range' in data:
-            qs = qs[query['range'][0]:query['range'][1]]
-            response['data']['items'] = [{'path': i['value'], 'items': i[items]} for i in qs]
-        else:
-            response['data']['items'] = qs.count()
+        print('findMedia does not support group query')
     elif 'positions' in query:
-        qs = models.File.objects.filter(item__in=query['qs'])
-        qs = _order_query(qs, query['sort'])
+        qs = _order_query(query['qs'], query['sort'])
 
         response['data']['positions'] = {}
         ids = list(qs.values_list('oshash', flat=True))
@@ -666,21 +646,19 @@ def findMedia(request, data):
 
     elif 'keys' in query:
         response['data']['items'] = []
-        qs = models.File.objects.filter(item__in=query['qs'])
-        qs = _order_query(qs, query['sort'])
+        qs = _order_query(query['qs'], query['sort'])
         qs = qs.select_related()
         keys = query['keys']
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [f.json(keys) for f in qs]
     else:  # otherwise stats
-        items = query['qs']
-        files = models.File.objects.filter(item__in=query['qs'])
+        files = query['qs']
         response['data']['items'] = files.count()
     return render_to_json_response(response)
 
 actions.register(findMedia)
 
-def parsePath(request, data): # parse path and return info
+def parsePath(request, data):  # parse path and return info
     '''
     Parses a path
     takes {

@@ -48,10 +48,12 @@ def from_json(json_object):
 class DictField(models.TextField):
     _type = dict
 
-    def loads(self, value):
+    @classmethod
+    def loads(cls, value):
         return json.loads(value, object_hook=from_json)
 
-    def dumps(self, obj):
+    @classmethod
+    def dumps(cls, obj):
         return json.dumps(obj, default=to_json, ensure_ascii=False)
 
     def from_db_value(self, value, expression, connection, context):
@@ -85,8 +87,9 @@ class DictField(models.TextField):
 class TupleField(DictField):
     _type = (tuple, list)
 
+    @classmethod
     def loads(self, value):
-        value = DictField.loads(self, value)
+        value = DictField.loads(value)
         if isinstance(value, list):
             value = tuple(value)
         return value
