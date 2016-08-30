@@ -114,6 +114,7 @@ def download(item_id, url):
                 f.item = item
                 f.info = ox.avinfo(f.data.path)
                 f.info['extension'] = media['extension']
+                f.info['url'] = url
                 f.path = '%(title)s.%(extension)s' % media
                 f.parse_info()
                 f.selected = True
