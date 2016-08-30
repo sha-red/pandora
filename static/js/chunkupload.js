@@ -37,6 +37,10 @@ pandora.chunkupload = function(options) {
         request,
         that = Ox.Element();
 
+    if (Ox.typeOf(file) != 'file') {
+        Ox.print('Invalid arguments, options.file must be file', options);
+        return;
+    }
     options.data = options.data || {};
 
     initUpload();
@@ -134,9 +138,10 @@ pandora.chunkupload = function(options) {
         } else {
             that.status = Ox._('Sorry, your browser is currently not supported.');
             done();
+            return;
         }
 
-        progress(Math.min(parseFloat(chunkOffset)/bytesAvailable), 1);
+        progress(Math.min(parseFloat(chunkOffset) / bytesAvailable, 1));
 
         request = new XMLHttpRequest();
         request.addEventListener('load', function (evt) {
@@ -211,7 +216,7 @@ pandora.chunkupload = function(options) {
         }, false);
         request.upload.addEventListener('progress', function (evt) {
             if (evt.lengthComputable) {
-                progress(parseFloat(chunkOffset + evt.loaded) / bytesAvailable);
+                progress(Math.min(parseFloat(chunkOffset + evt.loaded) / bytesAvailable, 1));
             }
         }, false);
         request.addEventListener('abort', function (evt) {
