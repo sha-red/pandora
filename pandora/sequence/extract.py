@@ -30,7 +30,7 @@ def get_hash(image, mode):
             zone_values[ZONE_INDEX[pixel_index]].append(pixel_value)
         for zone_index, pixel_values in enumerate(zone_values):
             # get the mean for each color channel
-            mean = map(lambda x: int(round(sum(x) / 8)), zip(*pixel_values))
+            mean = list(map(lambda x: int(round(sum(x) / 8)), zip(*pixel_values)))
             # store the mean color of each zone as an 8-bit value:
             # RRRGGGBB
             color_index = sum((
@@ -62,7 +62,7 @@ def get_sequences(path, position=0):
     fps = 25
     file_names = filter(lambda x: 'timelinedata8p' in x, os.listdir(path))
     file_names = sorted(file_names, key=lambda x: int(x[14:-4]))
-    file_names = map(lambda x: path + x, file_names)
+    file_names = list(map(lambda x: path + x, file_names))
     for file_name in file_names:
         timeline_image = Image.open(file_name)
         timeline_width = timeline_image.size[0]
@@ -86,7 +86,7 @@ class DataTimeline():
     def __init__(self, path):
         file_names = filter(lambda x: 'timelinedata8p' in x, os.listdir(path))
         file_names = sorted(file_names, key=lambda x: int(x[14:-4]))
-        file_names = map(lambda x: path + x, file_names)
+        file_names = list(map(lambda x: path + x, file_names))
         self.file_names = file_names
         if file_names:
             self.timeline_image = Image.open(file_names[0])
