@@ -66,7 +66,8 @@ class Task(models.Model):
         task, created = cls.objects.get_or_create(item=item)
         if task.update(save=False) or created:
             task.user = user
-            task.started = datetime.now()
+            if not task.started:
+                task.started = datetime.now()
             task.ended = None
             task.save()
 
@@ -83,10 +84,10 @@ class Task(models.Model):
             status = 'pending'
         elif self.item.files.filter(uploading=True).count():
             status = 'uploading'
-        elif self.item.files.filter(queued=True).count():
-            status = 'queued'
         elif self.item.files.filter(encoding=True).count():
             status = 'processing'
+        elif self.item.files.filter(queued=True).count():
+            status = 'queued'
         elif self.item.files.filter(failed=True).count():
             status = 'failed'
         elif self.item.rendered:
