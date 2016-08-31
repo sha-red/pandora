@@ -141,6 +141,9 @@ class SessionData(models.Model):
 
     def json(self, keys=None, user=None):
         ua = ox.parse_useragent(self.useragent or '')
+        if ua['robot']['name'] and self.level != -1:
+            self.level = -1
+            self.save()
         j = {
             'browser': ua['browser']['string'],
             'disabled': False,

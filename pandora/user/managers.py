@@ -37,7 +37,6 @@ def parseCondition(condition, user):
     else:
         key = k + get_operator(op, 'istr')
     key = str(key)
-
     q = Q(**{key: v})
     if exclude:
         q = ~q
@@ -53,7 +52,7 @@ def parseConditions(conditions, operator, user):
     for condition in conditions:
         if 'conditions' in condition:
             q = parseConditions(condition['conditions'],
-                             condition.get('operator', '&'), user)
+                                condition.get('operator', '&'), user)
             if q:
                 conn.append(q)
             pass
