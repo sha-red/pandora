@@ -1632,7 +1632,7 @@ class Item(models.Model):
                                     value=value,
                                     user=user
                                 )
-                                annotation.save()
+                                annotation.save(async=True)
                     # otherwise add empty 5 seconds annotation every minute
                     if not subtitles_added:
                         start = offset and int(offset / 60) * 60 + 60 or 0
@@ -1647,7 +1647,7 @@ class Item(models.Model):
                                 value='',
                                 user=user
                             )
-                            annotation.save()
+                            annotation.save(async=True)
                     offset += f.duration
                 # remove left over clips without annotations
                 Clip.objects.filter(item=self, annotations__id=None).delete()

@@ -107,13 +107,13 @@ class Place(models.Model):
             numberofmatches = -1
         for a in annotations.exclude(id__in=matches):
             self.annotations.remove(a)
-            #annotations of type place always need a place
+            # annotations of type place always need a place
             if a.get_layer().get('type') == 'place' and a.places.count() == 0:
                 a.places.add(Place.get_or_create(a.value))
                 for p in a.places.exclude(id=self.id):
                     p.update_matches()
         for a in matches.exclude(id__in=self.annotations.all()):
-            #need to check again since editEvent might have been called again
+            # need to check again since editEvent might have been called again
             if self.annotations.filter(id=a.id).count() == 0:
                 self.annotations.add(a)
         ids = list(set([a['item_id'] for a in self.annotations.all().values('item_id')]))
