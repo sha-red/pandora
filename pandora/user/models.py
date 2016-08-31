@@ -47,7 +47,7 @@ class SessionData(models.Model):
 
     objects = managers.SessionDataManager()
 
-    groupssort = models.CharField(default=None,blank=True,null=True, max_length=255)
+    groupssort = models.CharField(default=None, blank=True, null=True, max_length=255)
 
     def __unicode__(self):
         return u"%s" % self.session_key
@@ -237,6 +237,7 @@ def get_ui(user_ui, user=None):
     ui = {}
     config = copy.deepcopy(settings.CONFIG)
     ui.update(config['user']['ui'])
+
     def update_ui(ui, new):
         '''
             only update set keys in dicts
@@ -388,8 +389,7 @@ def has_capability(user, capability):
     else:
         level = user.profile.get_level()
     return level in settings.CONFIG['capabilities'][capability] \
-            and settings.CONFIG['capabilities'][capability][level]
-
+        and settings.CONFIG['capabilities'][capability][level]
 
 def merge_users(old, new):
     old.annotations.all().update(user=new)
