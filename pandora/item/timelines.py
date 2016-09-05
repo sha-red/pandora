@@ -68,7 +68,9 @@ def join_tiles(source_paths, durations, target_path):
                         w = small_tile_last_w
                     data['target_images']['small'] = Image.new(image_mode, (w, small_tile_h))
                 # paste large tile into small tile
-                w = 60 if large_tile_i < large_tile_n - 1 else small_tile_last_w % 60
+                w = small_tile_last_w % 60
+                if not w or large_tile_i < large_tile_n - 1:
+                    w = 60
                 data['target_images']['large'] = data['target_images']['large'].resize(
                     (w, small_tile_h), Image.ANTIALIAS
                 )
