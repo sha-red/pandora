@@ -9,6 +9,16 @@ import re
 from PIL import Image
 from ox.utils import json
 
+__all__ = ['join_tiles', 'split_tiles']
+
+def divide(num, by):
+    # divide(100, 3) -> [33, 33, 34]
+    arr = []
+    div = int(num / by)
+    mod = num % by
+    for i in range(int(by)):
+        arr.append(div + (i > by - 1 - mod))
+    return arr
 
 def join_tiles(source_paths, durations, target_path):
     '''
@@ -16,15 +26,6 @@ def join_tiles(source_paths, durations, target_path):
     Timelines of files will be read from source_paths, the timeline of the item will
     be written to target_path.
     '''
-
-    def divide(num, by):
-        # divide(100, 3) -> [33, 33, 34]
-        arr = []
-        div = int(num / by)
-        mod = num % by
-        for i in range(int(by)):
-            arr.append(div + (i > by - 1 - mod))
-        return arr
 
     def get_file_info(file_name):
         for mode in modes:
@@ -84,11 +85,12 @@ def join_tiles(source_paths, durations, target_path):
                     #print(image_file)
             if mode == full_tile_mode:
                 # render full tile
-                resized = data['target_images']['large'].resize((
-                    data['full_tile_widths'][0], large_tile_h
-                ), Image.ANTIALIAS)
-                data['target_images']['full'].paste(resized, (data['full_tile_offset'], 0))
-                data['full_tile_offset'] += data['full_tile_widths'][0]
+                if data['full_tile_widths'][0]:
+                    resized = data['target_images']['large'].resize((
+                        data['full_tile_widths'][0], large_tile_h
+                    ), Image.ANTIALIAS)
+                    data['target_images']['full'].paste(resized, (data['full_tile_offset'], 0))
+                    data['full_tile_offset'] += data['full_tile_widths'][0]
                 data['full_tile_widths'] = data['full_tile_widths'][1:]
             large_tile_i += 1
         # open next large tile
