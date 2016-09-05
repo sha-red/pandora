@@ -133,8 +133,7 @@ class Annotation(models.Model):
         return {}
 
     def save(self, *args, **kwargs):
-        from .tasks import update_matches
-        async = kwargs.pop('async', False)
+        delay_matches = kwargs.pop('delay_matches', False)
 
         set_public_id = not self.id or not self.public_id
         layer = self.get_layer()
@@ -181,11 +180,8 @@ class Annotation(models.Model):
                 # update clip.findvalue
                 self.clip.save()
 
-            # editAnnotations needs to be in snyc
-            # load_subtitles can not be in sync
-            if async:
-                update_matches.delay(self.id)
-            else:
+            # update matches in bulk if called from load_subtitles
+            if not delay_matches:
                 self.update_matches()
 
     def update_matches(self):

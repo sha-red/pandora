@@ -1588,69 +1588,70 @@ class Item(models.Model):
         # only import on 0xdb for now or if forced manually
         # since this will remove all existing subtitles
         if force or not existing.count() or settings.USE_IMDB:
-            with transaction.atomic():
-                Annotation.objects.filter(layer=layer, item=self).delete()
-                AnnotationSequence.reset(self)
-                offset = 0
-                language = ''
-                subtitles = self.files.filter(selected=True, is_subtitle=True, available=True)
-                languages = [f.language for f in subtitles]
-                if languages:
-                    if 'en' in languages:
-                        language = 'en'
-                    elif '' in languages:
-                        language = ''
-                    else:
-                        language = languages[0]
+            new = []
+            current = [(v.start, v.end, v.value) for v in Annotation.objects.filter(layer=layer, item=self)]
+            current.sort()
+            offset = 0
+            language = ''
+            subtitles = self.files.filter(selected=True, is_subtitle=True, available=True)
+            languages = [f.language for f in subtitles]
+            if languages:
+                if 'en' in languages:
+                    language = 'en'
+                elif '' in languages:
+                    language = ''
+                else:
+                    language = languages[0]
 
-                # loop over all videos
-                for f in self.files.filter(Q(is_audio=True) | Q(is_video=True)) \
-                                   .filter(selected=True).order_by('sort_path'):
-                    subtitles_added = False
-                    prefix = os.path.splitext(f.path)[0]
-                    if f.instances.all().count() > 0:
-                        user = f.instances.all()[0].volume.user
-                    else:
-                        # FIXME: allow annotations from no user instead?
-                        user = User.objects.all().order_by('id')[0]
-                    # if there is a subtitle with the same prefix, import
-                    q = subtitles.filter(path__startswith=prefix,
-                                         language=language)
-                    if q.count() == 1:
-                        s = q[0]
-                        for data in s.srt(offset):
-                            subtitles_added = True
-                            value = data['value'].replace('\n', '<br>\n').replace('<br><br>\n', '<br>\n')
-                            if data['in'] < self.json['duration'] and data['out'] > self.json['duration']:
-                                data['out'] = self.json['duration']
-                            if data['in'] < self.json['duration']:
-                                annotation = Annotation(
-                                    item=self,
-                                    layer=layer,
-                                    start=float('%0.03f' % data['in']),
-                                    end=float('%0.03f' % data['out']),
-                                    value=value,
-                                    user=user
-                                )
-                                annotation.save(async=True)
-                    # otherwise add empty 5 seconds annotation every minute
-                    if not subtitles_added:
-                        start = offset and int(offset / 60) * 60 + 60 or 0
-                        for i in range(start,
-                                       int(offset + f.duration) - 5,
-                                       60):
-                            annotation = Annotation(
-                                item=self,
-                                layer=layer,
-                                start=i,
-                                end=i + 5,
-                                value='',
-                                user=user
-                            )
-                            annotation.save(async=True)
-                    offset += f.duration
-                # remove left over clips without annotations
-                Clip.objects.filter(item=self, annotations__id=None).delete()
+            # loop over all videos
+            for f in self.files.filter(Q(is_audio=True) | Q(is_video=True)) \
+                               .filter(selected=True).order_by('sort_path'):
+                subtitles_added = False
+                prefix = os.path.splitext(f.path)[0]
+                if f.instances.all().count() > 0:
+                    user = f.instances.all()[0].volume.user
+                else:
+                    # FIXME: allow annotations from no user instead?
+                    user = User.objects.all().order_by('id')[0]
+                # if there is a subtitle with the same prefix, import
+                q = subtitles.filter(path__startswith=prefix,
+                                     language=language)
+                if q.count() == 1:
+                    s = q[0]
+                    for data in s.srt(offset):
+                        subtitles_added = True
+                        value = data['value'].replace('\n', '<br>\n').replace('<br><br>\n', '<br>\n')
+                        if data['in'] < self.json['duration'] and data['out'] > self.json['duration']:
+                            data['out'] = self.json['duration']
+                        if data['in'] < self.json['duration']:
+                            new.append((float('%0.03f' % data['in']), float('%0.03f' % data['out']), value))
+                # otherwise add empty 5 seconds annotation every minute
+                if not subtitles_added:
+                    start = offset and int(offset / 60) * 60 + 60 or 0
+                    for i in range(start,
+                                   int(offset + f.duration) - 5,
+                                   60):
+                        new.append((i, i+5, ''))
+                offset += f.duration
+            if current != new:
+                with transaction.atomic():
+                    # FIXME: only reset if most subtitles are new
+                    Annotation.objects.filter(layer=layer, item=self).delete()
+                    AnnotationSequence.reset(self)
+                    for start, end, value in new:
+                        annotation = Annotation(
+                            item=self,
+                            layer=layer,
+                            start=start,
+                            end=end,
+                            value=value,
+                            user=user
+                        )
+                        annotation.save(delay_matches=True)
+                    # remove left over clips without annotations
+                    Clip.objects.filter(item=self, annotations__id=None).delete()
+                for a in self.annotations.filter(layer=layer):
+                    a.update_matches()
             return True
         else:
             self.add_empty_clips()
