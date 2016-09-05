@@ -82,8 +82,8 @@ urlpatterns += [
     url(r'^find$', urlalias.views.padma_find),
 ]
 urlpatterns += [
-    url(r'^(?P<id>[A-Z0-9]+)/embed', app.views.embed),
-    url(r'^(?P<id>[A-Z0-9]+).*', item.views.item),
+    url(r'^(?P<id>[A-Z0-9x]+)/embed', app.views.embed),
+    url(r'^(?P<id>[A-Z0-9x]+).*', item.views.item),
     url(r'^[a-z0-9].+$', app.views.index),
     url(r'^$', app.views.index),
     url(r'^.*$', app.views.index),
