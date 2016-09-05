@@ -40,8 +40,8 @@ def get_matches(obj, model, layer_type, qs=None):
     if exact:
         q = Q(value__iexact=obj.name)
         for name in obj.alternativeNames:
-            q = q|Q(value__iexact=name)
-        f = q&Q(layer__in=exact)
+            q = q | Q(value__iexact=name)
+        f = q & Q(layer__in=exact)
     else:
         f = None
 
@@ -55,7 +55,7 @@ def get_matches(obj, model, layer_type, qs=None):
             name = ox.decode_html(name)
             name = unicodedata.normalize('NFKD', name).lower()
             q = q | Q(findvalue__contains=" " + name) | Q(findvalue__startswith=name)
-        contains_matches = q&Q(layer__in=contains)
+        contains_matches = q & Q(layer__in=contains)
         if f:
             f = contains_matches | f
         else:
@@ -183,11 +183,73 @@ class Annotation(models.Model):
 
             # editAnnotations needs to be in snyc
             # load_subtitles can not be in sync
-            fn = update_matches.delay if async else update_matches
-            if layer.get('type') == 'place' or layer.get('hasPlaces'):
-                fn(self.id, 'place')
-            if layer.get('type') == 'event' or layer.get('hasEvents'):
-                fn(self.id, 'event')
+            if async:
+                update_matches.delay(self.id)
+            else:
+                self.update_matches()
+
+    def update_matches(self):
+        from place.models import Place
+        from event.models import Event
+        types = []
+        layer = self.get_layer()
+        if layer.get('type') == 'place' or layer.get('hasPlaces'):
+            types.append('place')
+        if layer.get('type') == 'event' or layer.get('hasEvents'):
+            types.append('event')
+        for type in types:
+            if type == 'place':
+                Model = Place
+            elif type == 'event':
+                Model = Event
+
+            a_matches = getattr(self, type == 'place' and 'places' or 'events')
+
+            # remove undefined matches that only have this annotation
+            for p in a_matches.filter(defined=False).exclude(name=self.value):
+                if p.annotations.exclude(id=id).count() == 0:
+                    p.delete()
+            if layer.get('type') == type and a_matches.count() == 0:
+                a_matches.add(Model.get_or_create(self.value))
+                for p in a_matches.all():
+                    p.update_matches()
+
+            if self.findvalue:
+                names = {}
+                for n in Model.objects.all().values('id', 'name', 'alternativeNames'):
+                    names[n['id']] = [ox.decode_html(x) for x in (n['name'],) + n['alternativeNames']]
+                value = self.findvalue.lower()
+                current = {p.id for p in a_matches.all()}
+                matches = []
+                name_matches = set()
+                new = set()
+
+                for i in names:
+                    for name in names[i]:
+                        if name.lower() in value:
+                            matches.append(i)
+                            name_matches.add(name.lower())
+                            break
+                for p in Model.objects.filter(id__in=matches):
+                    # only add places/events that did not get added as a super match
+                    # i.e. only add The Paris Region and not Paris
+                    super_match = False
+                    for n in p.get_super_matches():
+                        if n.lower() in name_matches:
+                            super_match = True
+                            break
+                    if not super_match:
+                        new.add(p.id)
+
+                # added or removed items are only in current or only in new
+                update = list(current ^ new)
+                if update:
+                    for e in Model.objects.filter(id__in=update):
+                        e.update_matches(Annotation.objects.filter(id=self.id))
+            else:
+                # annotation has no value, remove all exisint matches
+                for e in a_matches.all():
+                    e.update_matches(Annotation.objects.filter(pk=self.id))
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
@@ -238,6 +300,7 @@ class Annotation(models.Model):
         'entity', 'event', 'place'
     )
     _clip_keys = ('hue', 'lightness', 'saturation', 'volume')
+
     def json(self, layer=False, keys=None, user=None, entity_cache=None):
         j = {
             'user': self.user.username,
@@ -307,7 +370,7 @@ class Annotation(models.Model):
         return j
 
     def __unicode__(self):
-        return u"%s %s-%s" %(self.public_id, self.start, self.end)
+        return u"%s %s-%s" % (self.public_id, self.start, self.end)
 
 def cleanup_related(sender, **kwargs):
     kwargs['instance'].cleanup_undefined_relations()

@@ -13,59 +13,12 @@ from .models import Annotation
 
 @task(ignore_results=True, queue='default')
 def update_matches(id, type):
-    if type == 'place':
-        from place.models import Place as Model
-    elif type == 'event':
-        from event.models import Event as Model
-
     try:
         a = Annotation.objects.get(pk=id)
     except Annotation.DoesNotExist:
-        return
-    a_matches = getattr(a, type == 'place' and 'places' or 'events')
-
-    # remove undefined matches that only have this annotation
-    for p in a_matches.filter(defined=False).exclude(name=a.value):
-        if p.annotations.exclude(id=id).count() == 0:
-            p.delete()
-    if a.get_layer().get('type') == type and a_matches.count() == 0:
-        a_matches.add(Model.get_or_create(a.value))
-        for p in a_matches.all():
-            p.update_matches()
-
-    if a.findvalue:
-        names = {}
-        for n in Model.objects.all().values('id', 'name', 'alternativeNames'):
-            names[n['id']] = [ox.decode_html(x) for x in (n['name'],) + n['alternativeNames']]
-        value = a.findvalue.lower()
-
-        current = [p.id for p in a_matches.all()]
-        matches = []
-        name_matches = []
-        for i in names:
-            for name in names[i]:
-                if name.lower() in value:
-                    matches.append(i)
-                    name_matches.append(name.lower())
-                    break
-        new = []
-        for i in matches: 
-            p = Model.objects.get(pk=i)
-            # only add places/events that did not get added as a super match
-            # i.e. only add The Paris Region and not Paris
-            if not filter(lambda n: n in name_matches,
-                          [n.lower() for n in p.get_super_matches()]):
-                new.append(i)
-        removed = set(filter(lambda p: p not in new, current))
-        added = set(filter(lambda p: p not in current, new))
-        update = list(removed | added)
-        if update:
-            for e in Model.objects.filter(id__in=update):
-                e.update_matches(Annotation.objects.filter(pk=a.id))
-    else:
-        # annotation has no value, remove all exisint matches
-        for e in a_matches.all():
-            e.update_matches(Annotation.objects.filter(pk=a.id))
+        a = None
+    if a:
+        a.update_matches()
 
 @task(ignore_results=False, queue='default')
 def add_annotations(data):
