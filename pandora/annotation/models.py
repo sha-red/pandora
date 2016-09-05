@@ -134,6 +134,7 @@ class Annotation(models.Model):
 
     def save(self, *args, **kwargs):
         from .tasks import update_matches
+        async = kwargs.pop('async', False)
 
         set_public_id = not self.id or not self.public_id
         layer = self.get_layer()
@@ -177,14 +178,16 @@ class Annotation(models.Model):
                     'id': self.clip.id,
                     self.layer: False
                 }).update(**{self.layer: True})
-                #update clip.findvalue
+                # update clip.findvalue
                 self.clip.save()
 
-            #editAnnotations needs to be in snyc
+            # editAnnotations needs to be in snyc
+            # load_subtitles can not be in sync
+            fn = update_matches.delay if async else update_matches
             if layer.get('type') == 'place' or layer.get('hasPlaces'):
-                update_matches(self.id, 'place')
+                fn(self.id, 'place')
             if layer.get('type') == 'event' or layer.get('hasEvents'):
-                update_matches(self.id, 'event')
+                fn(self.id, 'event')
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
