@@ -11,15 +11,6 @@ from celery.task import task
 from .models import Annotation
 
 
-@task(ignore_results=True, queue='default')
-def update_matches(id, type):
-    try:
-        a = Annotation.objects.get(pk=id)
-    except Annotation.DoesNotExist:
-        a = None
-    if a:
-        a.update_matches()
-
 @task(ignore_results=False, queue='default')
 def add_annotations(data):
     from item.models import Item
