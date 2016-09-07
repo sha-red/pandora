@@ -693,7 +693,9 @@ def updateExternalData(request, data):
     takes {
         id: string // item id
     }
-    returns {}
+    returns {
+        taskId: string, // taskId
+    }
     notes: This can be used to populate metadata from a remote source, like
     IMDb.
     see: getIds, getMetadata
@@ -701,7 +703,8 @@ def updateExternalData(request, data):
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     response = json_response()
     if item.editable(request.user):
-        item.update_external()
+        t = tasks.update_external.delay(item.public_id)
+        response['taskId'] = t.task_id
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)

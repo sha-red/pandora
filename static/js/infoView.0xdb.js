@@ -1123,14 +1123,16 @@ pandora.ui.infoView = function(data) {
         pandora.api.updateExternalData({
             id: ui.item
         }, function(result) {
-            pandora.updateItemContext();
-            Ox.Request.clearCache();
-            if (ui.item == item && ui.itemView == 'info') {
-                pandora.$ui.contentPanel.replaceElement(
-                    1, pandora.$ui.item = pandora.ui.item()
-                );
-            }
-            $options.enableItem('update');
+            (result.data.taskId ? pandora.wait : Ox.noop)(result.data.taskId, function(result) {
+                pandora.updateItemContext();
+                Ox.Request.clearCache();
+                if (ui.item == item && ui.itemView == 'info') {
+                    pandora.$ui.contentPanel.replaceElement(
+                        1, pandora.$ui.item = pandora.ui.item()
+                    );
+                }
+                $options.enableItem('update');
+            });
         });
     }
 
