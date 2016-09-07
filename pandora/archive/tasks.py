@@ -4,8 +4,8 @@ from __future__ import division, print_function, absolute_import
 
 from glob import glob
 
+from six import string_types
 from celery.task import task
-
 from django.conf import settings
 from django.db.models import Q
 
@@ -201,3 +201,47 @@ def update_stream(id):
 @task(queue="encoding")
 def download_media(item_id, url):
     return external.download(item_id, url)
+
+@task(queue='default')
+def move_media(data, user):
+    user = models.User.objects.get(username=user)
+    from changelog.models import add_changelog
+    from item.models import get_item, Item
+    import item.tasks
+    if Item.objects.filter(public_id=data['item']).count() == 1:
+        i = Item.objects.get(public_id=data['item'])
+    else:
+        data['public_id'] = data.pop('item').strip()
+        if len(data['public_id']) != 7:
+            del data['public_id']
+            if 'director' in data and isinstance(data['director'], string_types):
+                if data['director'] == '':
+                    data['director'] = []
+                else:
+                    data['director'] = data['director'].split(', ')
+            i = get_item(data, user=user)
+        else:
+            i = get_item({'imdbId': data['public_id']}, user=user)
+    changed = [i.public_id]
+    for f in models.File.objects.filter(oshash__in=data['ids']):
+        if f.item.id != i.public_id and f.editable(user):
+            if f.item.public_id not in changed:
+                changed.append(f.item.public_id)
+            f.item = i
+            f.save()
+    for public_id in changed:
+        c = Item.objects.get(public_id=public_id)
+        if c.files.count() == 0 and settings.CONFIG['itemRequiresVideo']:
+            c.delete()
+        else:
+            c.rendered = False
+            c.save()
+            Task.start(c, user)
+            item.tasks.update_timeline.delay(public_id)
+    add_changelog({
+        'user': user,
+        'action': 'moveMedia'
+    }, data, i.public_id)
+    return {
+        'item': i.public_id
+    }

@@ -28,8 +28,12 @@ class Changelog(models.Model):
         return self.value
 
 def add_changelog(request, data, id=None):
-    user = request.user
-    action = request.POST['action']
+    if isinstance(request, dict):
+        user = request['user']
+        action = request['action']
+    else:
+        user = request.user
+        action = request.POST['action']
     c = Log(user=user, action=action, data=data)
     if id and isinstance(id, list):
         id = ', '.join(id)

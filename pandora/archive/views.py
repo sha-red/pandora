@@ -378,9 +378,12 @@ def getTaskStatus(request, data):
     res = default_backend.get_result(task_id)
     response['data'] = {
         'id': task_id,
-        'status': status,
-        'result': res
+        'status': status
     }
+    if isinstance(res, dict):
+        response['data'].update(res)
+    else:
+        response['data']['result'] = res
     if status in default_backend.EXCEPTION_STATES:
         traceback = default_backend.get_traceback(task_id)
         response['data'].update({
@@ -405,39 +408,9 @@ def moveMedia(request, data):
     notes: This will *not* (yet) shift the corresponding annotations.
     see: addMedia, editMedia, findMedia, removeMedia
     '''
-    if Item.objects.filter(public_id=data['item']).count() == 1:
-        i = Item.objects.get(public_id=data['item'])
-    else:
-        data['public_id'] = data.pop('item').strip()
-        if len(data['public_id']) != 7:
-            del data['public_id']
-            if 'director' in data and isinstance(data['director'], string_types):
-                if data['director'] == '':
-                    data['director'] = []
-                else:
-                    data['director'] = data['director'].split(', ')
-            i = get_item(data, user=request.user)
-        else:
-            i = get_item({'imdbId': data['public_id']}, user=request.user)
-    changed = [i.public_id]
-    for f in models.File.objects.filter(oshash__in=data['ids']):
-        if f.item.id != i.public_id and f.editable(request.user):
-            if f.item.public_id not in changed:
-                changed.append(f.item.public_id)
-            f.item = i 
-            f.save()
-    for public_id in changed:
-        c = Item.objects.get(public_id=public_id)
-        if c.files.count() == 0 and settings.CONFIG['itemRequiresVideo']:
-            c.delete()
-        else:
-            c.rendered = False
-            c.save()
-            Task.start(c, request.user)
-            item.tasks.update_timeline.delay(public_id)
-    response = json_response(text='updated')
-    response['data']['item'] = i.public_id
-    add_changelog(request, data, i.public_id)
+    response = json_response()
+    t = tasks.move_media.delay(data, request.user.username)
+    response['data']['taskId'] = t.task_id
     return render_to_json_response(response)
 actions.register(moveMedia, cache=False)
 

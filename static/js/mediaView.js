@@ -550,19 +550,21 @@ pandora.ui.mediaView = function(options) {
             {disabled: true, title: Ox._('Moving Files...')}
         );
         pandora.api.moveMedia(data, function(result) {
-            if (isActive()) {
-                Ox.Request.clearCache(); // fixme: remove
-                if (self.$switch.value()) {
-                    pandora.UI.set({item: result.data.item});
-                    pandora.updateItemContext();
-                } else {
-                    self.$filesList.reloadList();
-                    self.$instancesList.reloadList();
-                    self.$moveButton.options(
-                        {disabled: false, title: Ox._('Move Files')}
-                    );
+            pandora.wait(result.data.taskId, function(result) {
+                if (isActive()) {
+                    Ox.Request.clearCache(); // fixme: remove
+                    if (self.$switch.value()) {
+                        pandora.UI.set({item: result.data.item});
+                        pandora.updateItemContext();
+                    } else {
+                        self.$filesList.reloadList();
+                        self.$instancesList.reloadList();
+                        self.$moveButton.options(
+                            {disabled: false, title: Ox._('Move Files')}
+                        );
+                    }
                 }
-            }
+            });
         });
     }
 
