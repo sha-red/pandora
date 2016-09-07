@@ -1,5 +1,6 @@
 [Unit]
 Description=pandora encoding daemon
+After=postgresql.service rabbitmq-server.service
 
 [Service]
 Type=simple

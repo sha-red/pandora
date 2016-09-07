@@ -1,5 +1,6 @@
 [Unit]
 Description=pandora cron daemon
+After=postgresql.service rabbitmq-server.service
 
 [Service]
 Type=simple
