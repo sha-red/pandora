@@ -12,7 +12,10 @@ WorkingDirectory=/srv/pandora/pandora
 StandardOutput=syslog
 StandardError=syslog
 ExecStartPre=/srv/pandora/pandora/manage.py compile_pyc -p /srv/pandora/pandora
-ExecStart=/srv/pandora/bin/gunicorn wsgi:application -c gunicorn_config.py -p /run/pandora/pandora.pid
+ExecStart=/srv/pandora/bin/gunicorn \
+    wsgi:application \
+    -c gunicorn_config.py \
+    -p /run/pandora/pandora.pid
 ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
