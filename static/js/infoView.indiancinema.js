@@ -503,6 +503,8 @@ pandora.ui.infoView = function(data) {
                     Ox.Request.clearCache(); // fixme: too much
                     pandora.UI.set({item: result.data.id});
                     pandora.$ui.browser.value(data.id, 'id', result.data.id);
+                } else {
+                    Ox.Request.clearCache('autocomplete');
                 }
                 pandora.updateItemContext();
                 pandora.$ui.browser.value(result.data.id, key, result.data[key]);
