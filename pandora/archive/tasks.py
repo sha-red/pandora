@@ -160,11 +160,13 @@ def extract_stream(fileId):
             if stream.available:
                 stream.make_timeline()
                 stream.extract_derivatives()
+                file.extract_tracks()
                 # get current version from db
                 file = models.File.objects.get(id=fileId)
-                file.item.update_timeline()
-                update_poster(file.item.public_id)
-                file.extract_tracks()
+                if not file.item.rendered \
+                        and not file.item.files.exclude(id=fileId).filter(Q(queued=True) | Q(encoding=True)).count():
+                    file.item.update_timeline()
+                    update_poster(file.item.public_id)
     models.File.objects.filter(id=fileId).update(encoding=False)
     Task.finish(file.item)
 
