@@ -75,16 +75,17 @@ def join_tiles(source_paths, durations, target_path):
                 data['target_images']['large'] = data['target_images']['large'].resize(
                     (w, small_tile_h), Image.ANTIALIAS
                 )
-                data['target_images']['small'].paste(
-                    data['target_images']['large'], (small_tile_x, 0)
-                )
-                # save small tile
-                if small_tile_x == small_tile_w - 60 or large_tile_i == large_tile_n - 1:
-                    image_file = '%stimeline%s%dp%d.jpg' % (
-                        target_path, small_mode, small_tile_h, small_tile_i
+                if data['target_images']['small']:
+                    data['target_images']['small'].paste(
+                        data['target_images']['large'], (small_tile_x, 0)
                     )
-                    data['target_images']['small'].save(image_file)
-                    #print(image_file)
+                    # save small tile
+                    if small_tile_x == small_tile_w - 60 or large_tile_i == large_tile_n - 1:
+                        image_file = '%stimeline%s%dp%d.jpg' % (
+                            target_path, small_mode, small_tile_h, small_tile_i
+                        )
+                        data['target_images']['small'].save(image_file)
+                        #print(image_file)
             if mode == full_tile_mode:
                 # render full tile
                 if data['full_tile_widths'][0]:
