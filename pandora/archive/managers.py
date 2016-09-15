@@ -9,6 +9,7 @@ from oxdjango.fields import DictField
 
 keymap = {
     'id': 'item__public_id',
+    'filename': 'path',
 }
 default_key = 'oshash'
 
