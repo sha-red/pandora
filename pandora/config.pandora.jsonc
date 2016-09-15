@@ -672,6 +672,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     The plug-in architecture is not yet finalized, documentation forthcoming.
     */
     "menuExtras": [
+        "upload",
         "user",
         // "locale",
         "reload"

@@ -61,7 +61,9 @@ pandora.ui.infoView = function(data) {
             .bindEvent({
                 click: function(data_) {
                     if (data_.id == 'delete') {
-                        pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
+                        pandora.$ui.deleteItemsDialog = pandora.ui.deleteItemsDialog({
+                            items: [data]
+                        }).open();
                     }
                 }
             })

@@ -13,7 +13,9 @@ pandora.ui.mainMenu = function() {
         lists = {},
         that = Ox.MainMenu({
             extras: pandora.site.menuExtras.map(function(menuExtra) {
-                if (menuExtra == 'user') {
+                if (menuExtra == 'upload') {
+                    return pandora.$ui.uploadButton = pandora.ui.uploadButton();
+                } else if (menuExtra == 'user') {
                     return pandora.$ui.userButton = pandora.ui.userButton();
                 } else if (menuExtra == 'locale') {
                     return pandora.$ui.localeButton = pandora.ui.localeButton();
@@ -42,6 +44,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'username', title: Ox._('User: {0}', [isGuest ? 'not signed in' : Ox.encodeHTMLEntities(pandora.user.username)]), disabled: true },
                         {},
                         { id: 'preferences', title: Ox._('Preferences...'), disabled: isGuest, keyboard: 'control ,' },
+                        { id: 'tasks', title: Ox._('Tasks...'), disabled: isGuest },
                         { id: 'archives', title: Ox._('Archives...'), disabled: /*isGuest*/ true },
                         {},
                         { id: 'signup', title: Ox._('Sign Up...'), disabled: !isGuest },
@@ -367,6 +370,8 @@ pandora.ui.mainMenu = function() {
                     })
                 ), data.id)) {
                     pandora.UI.set({page: data.id});
+                } else if (data.id == 'tasks') {
+                    pandora.ui.tasksDialog().open();
                 } else if (Ox.contains([
                     'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'
                 ], data.id)) {
@@ -384,11 +389,9 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'editlist') {
                     pandora.ui.listDialog().open();
                 } else if (data.id == 'add') {
-                    pandora.addItem();
-                } else if (data.id == 'upload') {
-                    pandora.$ui.uploadVideoDialog = pandora.ui.uploadVideoDialog().open();
-                } else if (data.id == 'import') {
-                    pandora.$ui.importMediaDialog = pandora.ui.importMediaDialog().open();
+                    pandora.$ui.addItemDialog = pandora.ui.addItemDialog().open();
+                } else if (data.id == 'edit') {
+                    pandora.ui.editItemDialog().open();
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
                 } else if (data.id == 'print') {
@@ -465,10 +468,27 @@ pandora.ui.mainMenu = function() {
                     pandora.clipboard.clear();
                 } else if (data.id == 'delete') {
                     if (ui.section == 'items') {
-                        pandora.doHistory('delete', ui.listSelection, ui._list, function() {
-                            pandora.UI.set({listSelection: []});
-                            pandora.reloadList();
-                        });
+                        if (ui._list) {
+                            pandora.doHistory('delete', ui.listSelection, ui._list, function() {
+                                pandora.UI.set({listSelection: []});
+                                pandora.reloadList();
+                            });
+                        } else {
+                            pandora.api.find({
+                                query: {
+                                    conditions: ui.listSelection.map(function(id) {
+                                        return {key: 'id', value: id, operator: '=='}
+                                    }),
+                                    operator: '|'
+                                },
+                                keys: ['id', 'title'],
+                                range: [0, ui.listSelection.length]
+                            }, function(result) {
+                                pandora.$ui.deleteItemsDialog = pandora.ui.deleteItemsDialog({
+                                    items: result.data.items
+                                }).open();
+                            });
+                        }
                     } else if (ui.section == 'edits') {
                         var clips = pandora.$ui.editPanel.getSelectedClips();
                         pandora.doHistory('delete', clips, ui.edit, function(result) {
@@ -987,6 +1007,7 @@ pandora.ui.mainMenu = function() {
 
     function getItemMenu() {
         var listData = pandora.getListData(),
+            deleteVerb = ui._list ? Ox._('Remove') : Ox._('Delete'),
             isEditable = listData.editable && listData.type == 'static',
             isClipView = pandora.isClipView()
                 && pandora.$ui.clipList
@@ -999,7 +1020,9 @@ pandora.ui.mainMenu = function() {
             isEditView = ui.section == 'edits' && ui.edit
                 && ui.editView != 'annotations', // FIXME: focus
             listName = isVideoView || isClipView ? ''
-                : ui.section == 'items' ? Ox._('from List')
+                : ui.section == 'items' ? (
+                    ui._list ? Ox._('from List') : Ox._('from Archive')
+                )
                 : Ox._('from Edit'),
             listItemsName = Ox._(
                 ui.section == 'edits' || isVideoView || isClipView ? 'Clips'
@@ -1026,6 +1049,24 @@ pandora.ui.mainMenu = function() {
                     : clipboardType == 'clip' ? (clipboardItems == 1 ? 'Clip' : 'Clips')
                     : ''
                 ),
+            canEdit = pandora.site.capabilities.canEditMedia[pandora.user.level] || (
+                ui.section == 'items' && (
+                    ui.item || (
+                        Ox.contains(['list', 'grid', 'clips', 'timelines'], ui.listView)
+                        && ui.listSelection.length == 1
+                    )
+                ) && pandora.$ui.list.value(ui.listSelection[0], 'editable')
+            ),
+            canDelete = pandora.site.capabilities.canRemoveItems[pandora.user.level] || (
+                ui.section == 'items' && (
+                    ui.item || (
+                        Ox.contains(['list', 'grid', 'clips', 'timelines'], ui.listView)
+                        && ui.listSelection.length
+                    )
+                ) && ui.listSelection.every(function(item) {
+                    return pandora.$ui.list.value(item, 'editable');
+                })
+            ),
             canSelect = isListView || isClipView || isEditView,
             canCopy = isListView ? ui.listSelection.length
                 : isClipView ? pandora.$ui.clipList.options('selected').length
@@ -1042,9 +1083,8 @@ pandora.ui.mainMenu = function() {
             undoText = pandora.history.undoText(),
             redoText = pandora.history.redoText();
         return { id: 'itemMenu', title: Ox._('Item'), items: [
-            { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
-            { id: 'upload', title: Ox._('Upload Video...'), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
-            { id: 'import', title: Ox._('Import Video...'), disabled: !pandora.site.capabilities.canImportItems[pandora.user.level] },
+            { id: 'add', title: Ox._('Add {0}...', [Ox._(pandora.site.itemName.singular)]), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
+            { id: 'edit', title: Ox._('Edit {0}...', [Ox._(pandora.site.itemName.singular)]), disabled: true /*fixme: !canEdit */ },
             {},
             { id: 'selectall', title: Ox._('Select All {0}', [listItemsName]), disabled: !canSelect, keyboard: 'control a' },
             { id: 'selectnone', title: Ox._('Select None'), disabled: !canSelect, keyboard: 'shift control a' },
@@ -1057,7 +1097,7 @@ pandora.ui.mainMenu = function() {
             { id: 'paste', title: clipboardItems == 0 ? Ox._('Paste') : Ox._('Paste {0}', [clipboardItemName]), disabled: !canPaste, keyboard: 'control v' },
             { id: 'clearclipboard', title: Ox._('Clear Clipboard'), disabled: !clipboardItems},
             {},
-            { id: 'delete', title: Ox._('Delete {0} {1}', [selectionItemName, listName]), disabled: !canCut, keyboard: 'delete' },
+            { id: 'delete', title: Ox._('{0} {1} {2}', [deleteVerb, selectionItemName, listName]), disabled: !canDelete, keyboard: 'delete' },
             {},
             { id: 'undo', title: undoText ? Ox._('Undo {0}', [undoText]) : Ox._('Undo'), disabled: !undoText, keyboard: 'control z' },
             { id: 'redo', title: redoText ? Ox._('Redo {0}', [redoText]) : Ox._('Redo'), disabled: !redoText, keyboard: 'shift control z' },

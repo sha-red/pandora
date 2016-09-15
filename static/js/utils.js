@@ -2,13 +2,15 @@
 
 'use strict';
 
-pandora.addItem = function() {
-    pandora.api.add(function(result) {
+pandora.addItem = function(title, callback) {
+    // unused
+    pandora.api.add({title: title || 'Untitled'}, function(result) {
         Ox.Request.clearCache('find');
         pandora.UI.set({
             item: result.data.id,
             itemView: 'info'
         });
+        callback && callback();
     });
 };
 
@@ -254,6 +256,12 @@ pandora.beforeUnloadWindow = function() {
     if (pandora.firefogg) {
         return Ox._(
             'Encoding is currently running. '
+            + 'Are you sure that you want to leave this page?'
+        );
+    }
+    if (pandora.uploadQueue.uploading) {
+        return Ox._(
+            'You still have active uploads. '
             + 'Are you sure that you want to leave this page?'
         );
     }
@@ -2272,9 +2280,11 @@ pandora.reloadList = function() {
                 // (but then it's also unlikely they'll have to be reloaded)
                 var folder = listData.status != 'featured'
                     ? 'personal' : 'featured';
-                pandora.$ui.folderList[folder].value(
-                    listData.id, 'items', data.items
-                );
+                if (!Ox.isEmpty(listData)) {
+                    pandora.$ui.folderList[folder].value(
+                        listData.id, 'items', data.items
+                    );
+                }
             }
         })
         .bindEventOnce({
@@ -2639,11 +2649,88 @@ pandora.updateStatus = function(item) {
         return ui.item == item && [
             'info', 'player', 'editor', 'timeline'
         ].indexOf(ui.itemView) > -1 && !(
+            // fixme: still wrong
             pandora.$ui.uploadVideoDialog
             && pandora.$ui.uploadVideoDialog.is('::visible')
         );
     }
 };
+
+pandora.uploadQueue = (function() {
+    var that = {
+        uploading: false
+    };
+    var queue = [];
+    var index = -1;
+    var uploader;
+
+    function upload() {
+        if (index == queue.length - 1) {
+            that.uploading = false;
+            pandora.$ui.uploadButton && pandora.$ui.uploadButton.update();
+            return;
+        }
+        index++;
+        if (queue[index].data.status == 'canceled') {
+            upload();
+            return;
+        }
+        that.uploading = true;
+        queue[index].data.status = 'uploading';
+        pandora.$ui.uploadButton && pandora.$ui.uploadButton.update();
+        pandora.api.addMedia({
+            filename: queue[index].file.name,
+            id: queue[index].oshash,
+            item: queue[index].item.id
+        }, function(result) {
+            uploader = pandora.chunkupload({
+                data: {id: queue[index].oshash},
+                file: queue[index].file,
+                url: '/api/upload/direct/'
+            }).bindEvent({
+                done: function(data) {
+                    queue[index].data.ended = +new Date();
+                    queue[index].data.status = data.progress == 1 ? 'queued' : 'failed';
+                    queue[index].data.progress = data.progress;
+                    upload();
+                },
+                progress: function(data) {
+                    queue[index].data.progress = data.progress;
+                }
+            });
+            that.uploading = queue[index].item.id;
+        });
+    }
+    that.add = function(items) {
+        items = Ox.isArray(items) ? items : [items];
+        queue = queue.concat(items.map(function(item) {
+            return Ox.extend(item, {
+                data: {
+                    progress: 0,
+                    started: +new Date(),
+                    status: 'pending'
+                }
+            });
+        }));
+        !that.uploading && upload();
+    };
+    that.get = function() {
+        return queue;
+    };
+    that.remove = function(id) {
+        queue.forEach(function(item, index) {
+            if (item.item.id == id) {
+                queue[index].data.status = 'canceled';
+            }
+        });
+        if (that.uploading == id) {
+            uploader.abort();
+            upload();
+        }
+    };
+
+    return that;
+}());
 
 pandora.wait = function(id, callback, timeout) {
     var task = {};

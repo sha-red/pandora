@@ -91,9 +91,14 @@ pandora.ui.infoView = function(data) {
                     } else if (data_.id == 'metadata') {
                         pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
                     } else if (data_.id == 'upload') {
-                        pandora.$ui.uploadVideoDialog = pandora.ui.uploadVideoDialog(data).open();
+                        pandora.$ui.addItemDialog = pandora.ui.addItemDialog({
+                            item: pandora.user.ui.item,
+                            selected: 'upload'
+                        }).open();
                     } else if (data_.id == 'delete') {
-                        pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
+                        pandora.$ui.deleteItemsDialog = pandora.ui.deleteItemsDialog({
+                            items: [data]
+                        }).open();
                     }
                 }
             })

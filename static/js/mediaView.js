@@ -518,7 +518,9 @@ pandora.ui.mediaView = function(options) {
             id: pandora.user.ui.item,
             keys: ['id', 'title']
         },function(result) {
-            pandora.ui.deleteItemDialog(result.data).open();
+            pandora.$ui.deleteItemsDialog = pandora.ui.deleteItemsDialog({
+                items: [result.data]
+            }).open();
         });
     }
 

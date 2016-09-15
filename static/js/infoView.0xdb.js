@@ -64,7 +64,9 @@ pandora.ui.infoView = function(data) {
                     if (data_.id == 'update') {
                         updateMetadata();
                     } else if (data_.id == 'delete') {
-                        pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
+                        pandora.$ui.deleteItemsDialog = pandora.ui.deleteItemsDialog({
+                            items: [data]
+                        }).open();
                     }
                 }
             })

@@ -67,7 +67,11 @@ pandora.ui.allItems = function(section) {
             .css({opacity: canAddItems ? 1 : 0.25})
             .hide()
             .bindEvent({
-                click: pandora.addItem
+                click: function() {
+                    pandora.$ui.addItemDialog = pandora.ui.addItemDialog({
+                        selected: 'add'
+                    }).open();
+                }
             })
             .appendTo(that);
         $buttons[1] = Ox.Button({
@@ -80,7 +84,9 @@ pandora.ui.allItems = function(section) {
             .hide()
             .bindEvent({
                 click: function() {
-                    pandora.$ui.uploadVideoDialog = pandora.ui.uploadVideoDialog().open();
+                    pandora.$ui.addItemDialog = pandora.ui.addItemDialog({
+                        selected: 'upload'
+                    }).open();
                 }
             })
             .appendTo(that);

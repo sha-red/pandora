@@ -85,7 +85,7 @@ pandora.ui.list = function() {
                 //Ox.Log('', 'data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find(Ox.extend(data, {
                     query: ui.find,
-                    keys: data.keys ? ['modified'].concat(data.keys) : void 0
+                    keys: data.keys ? ['editable', 'modified'].concat(data.keys) : void 0
                 }), callback);
                 return Ox.clone(data, true);
             },
@@ -165,7 +165,7 @@ pandora.ui.list = function() {
                 }), callback);
                 return Ox.clone(data, true);
             },
-            keys: ['id', 'modified', 'posterRatio'].concat(pandora.site.itemTitleKeys),
+            keys: ['id', 'editable', 'modified', 'posterRatio'].concat(pandora.site.itemTitleKeys),
             selected: ui.listSelection,
             size: 128,
             sort: ui.listSort,
@@ -241,7 +241,7 @@ pandora.ui.list = function() {
                 });
                 return Ox.clone(data, true);
             },
-            keys: ['clips', 'duration', 'id', 'modified', 'posterRatio', 'videoRatio'].concat(pandora.site.itemTitleKeys),
+            keys: ['clips', 'duration', 'editable', 'id', 'modified', 'posterRatio', 'videoRatio'].concat(pandora.site.itemTitleKeys),
             selected: ui.listSelection,
             size: 192,
             sort: ui.listSort,
@@ -358,7 +358,7 @@ pandora.ui.list = function() {
                 }} : {})), callback);
                 return Ox.clone(data, true);
             },
-            keys: ['clips', 'duration', 'id', 'modified', 'posterRatio', 'rendered'].concat(pandora.site.itemTitleKeys),
+            keys: ['clips', 'duration', 'editable', 'id', 'modified', 'posterRatio', 'rendered'].concat(pandora.site.itemTitleKeys),
             selected: ui.listSelection,
             size: 192,
             sort: ui.listSort,

@@ -852,6 +852,7 @@
     The plug-in architecture is not yet finalized, documentation forthcoming.
     */
     "menuExtras": [
+        "upload",
         "user",
         //"locale",
         "reload"
