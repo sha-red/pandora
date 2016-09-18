@@ -14,7 +14,7 @@ from . import managers
 
 def get_title_sort(title):
     if isinstance(title, bytes):
-        title = title.decde('utf-8')
+        title = title.decode('utf-8')
     title = unicodedata.normalize('NFKD', title).strip()
     if title:
         title, created = Title.objects.get_or_create(title=title)
