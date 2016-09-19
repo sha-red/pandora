@@ -25,11 +25,13 @@ def get_tasks(username):
     Task.objects.filter(status__in=Task.DONE, ended__lt=yesterday).delete()
 
     # add task for that might be missing
+    '''
     for i in Item.objects.filter(rendered=False).exclude(files__id=None):
         task, created = Task.objects.get_or_create(item=i)
         if created:
             task.started = i.modified
             task.update()
+    '''
 
     qs = Task.objects.all()
     if username:
