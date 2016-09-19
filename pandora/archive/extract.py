@@ -66,7 +66,7 @@ def supported_formats():
     }
 
 
-def stream(video, target, profile, info, audio_track=0, flags={}):
+def stream(video, target, profile, info, audio_track=None, flags={}):
     if not os.path.exists(target):
         ox.makedirs(os.path.dirname(target))
 
@@ -253,8 +253,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             n = 1
         audio_settings = []
         # mix 2 mono channels into stereo(common for fcp dv mov files)
-        audio_map = []
-        if audio_track == 0 and len(info['audio']) == 2 \
+        if audio_track is None and len(info['audio']) == 2 \
                 and len(filter(None, [a['channels'] == 1 or None for a in info['audio']])) == 2:
             audio_settings += [
                 '-filter_complex',
@@ -262,8 +261,9 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             ]
             mono_mix = True
         else:
-            audio_settings += ['-map', '0:%s,0:%s' % (info['audio'][audio_track]['id'], n)]
             mono_mix = False
+            if audio_track is not None:
+                audio_settings += ['-map', '0:%s,0:%s' % (info['audio'][audio_track]['id'], n)]
         audio_settings += ['-ar', str(audiorate)]
         if audio_codec != 'libopus':
             audio_settings += ['-aq', str(audioquality)]
