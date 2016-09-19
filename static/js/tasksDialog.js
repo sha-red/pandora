@@ -99,7 +99,6 @@ pandora.ui.tasksDialog = function(options) {
                     title: Ox._('Progress'),
                     visible: false
                 }
-                
             ],
             columnsVisible: true,
             items: listItems,
@@ -336,11 +335,11 @@ pandora.ui.tasksDialog = function(options) {
             if (Ox.getIndexById(listItems, item.id) == -1) {
                 hasNewItems = true;
             } else if (!hasNewItems) {
-                $list.value(item.id, 'progress', item.progress);
-                $list.value(item.id, 'status', item.status);
-                if (item.ended) {
-                    $list.value(item.id, 'ended', item.ended);
-                }
+                ['progress', 'status'].concat(
+                    item.ended ? ['ended'] : []
+                ).forEach(function(key) {
+                    $list.value(item.id, key, item[key]);
+                });
             }
         });
         hasNewItems && updateList();
