@@ -57,6 +57,7 @@ pandora.chunkupload = function(options) {
           response: response,
           responseText: that.responseText
         });
+        options.file = null;
         options = null;
         file = null;
         request = null
@@ -69,7 +70,7 @@ pandora.chunkupload = function(options) {
         request = new XMLHttpRequest();
         request.addEventListener('load', function (evt) {
             var response = {};
-            that.responseText = evt.target.responseText;
+            that.responseText = '' + evt.target.responseText;
             try {
                 response = JSON.parse(evt.target.responseText);
             } catch(e) {
@@ -99,7 +100,7 @@ pandora.chunkupload = function(options) {
         request.addEventListener('error', function (evt) {
             that.status = 'upload failed';
             that.progress = -1;
-            that.responseText = evt.target.responseText;
+            that.responseText = '' + evt.target.responseText;
             done();
         }, false);
         request.addEventListener('abort', function (evt) {
@@ -149,7 +150,7 @@ pandora.chunkupload = function(options) {
         request = new XMLHttpRequest();
         request.addEventListener('load', function (evt) {
             var response;
-            that.responseText = evt.target.responseText;
+            that.responseText = '' + evt.target.responseText;
             try {
                 response = JSON.parse(evt.target.responseText);
             } catch(e) {

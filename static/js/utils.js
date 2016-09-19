@@ -2692,6 +2692,7 @@ pandora.uploadQueue = (function() {
                     queue[index].data.ended = +new Date();
                     queue[index].data.status = data.progress == 1 ? 'queued' : 'failed';
                     queue[index].data.progress = data.progress;
+                    queue[index].file = null;
                     upload();
                 },
                 progress: function(data) {
