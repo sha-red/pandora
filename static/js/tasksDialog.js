@@ -218,12 +218,14 @@ pandora.ui.tasksDialog = function(options) {
             closeButton: true,
             content: $panel,
             height: 384,
+            removeOnClose: true,
             title: Ox._('Tasks'),
             width: 896
         })
         .bindEvent({
             close: function() {
                 clientTimeout && clearTimeout(clientTimeout);
+                serverTimeout && clearTimeout(serverTimeout);
             },
             open: function() {
                 getClientItems();
