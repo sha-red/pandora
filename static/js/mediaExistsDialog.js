@@ -57,6 +57,7 @@ pandora.ui.mediaExistsDialog = function(options) {
                     items = options.items.filter(function(item) {
                         return existing.indexOf(item.oshash) == -1;
                     });
+                that.close();
                 pandora.ui.addFilesDialog({
                     action: options.action,
                     items: items
