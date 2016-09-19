@@ -115,6 +115,7 @@ pandora.ui.addItemDialog = function(options) {
     }
 
     function getFileInfo(file, callback) {
+        var done = false;
         Ox.oshash(file, function(oshash) {
             var $video = $('<video>'),
                 url = URL.createObjectURL(file),
@@ -128,18 +129,26 @@ pandora.ui.addItemDialog = function(options) {
                     video: []
                 };
             $video.one('error', function(event) {
-                callback(info);
+                if (!done) {
+                    done = true;
+                    URL.revokeObjectURL(url);
+                    callback(info);
+                }
             });
             $video.one('loadedmetadata', function(event) {
-                info.duration = $video[0].duration;
-                if ($video[0].videoHeight > 0) {
-                    info.width = $video[0].videoWidth;
-                    info.height = $video[0].videoHeight;
+                if (!done) {
+                    done = true;
+                    info.duration = $video[0].duration;
+                    if ($video[0].videoHeight > 0) {
+                        info.width = $video[0].videoWidth;
+                        info.height = $video[0].videoHeight;
+                    }
+                    if (info.duration) {
+                        info.bitrate = info.size * 8 / info.duration / 1000;
+                    }
+                    URL.revokeObjectURL(url);
+                    callback(info);
                 }
-                if (info.duration) {
-                    info.bitrate = info.size * 8 / info.duration / 1000;
-                }
-                callback(info);
             });
             $video[0].src = url;
         });
