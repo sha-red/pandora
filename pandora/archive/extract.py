@@ -319,7 +319,8 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
     else:
         cmds.append(base + audio_settings + video_settings + post)
 
-    # print(cmds)
+    # print('\n'.join([' '.join(cmd) for cmd in cmds]))
+
     n = 0
     for cmd in cmds:
         n += 1
