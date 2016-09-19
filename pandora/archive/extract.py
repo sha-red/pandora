@@ -66,7 +66,7 @@ def supported_formats():
     }
 
 
-def stream(video, target, profile, info, audio_track=None, flags={}):
+def stream(video, target, profile, info, audio_track=0, flags={}):
     if not os.path.exists(target):
         ox.makedirs(os.path.dirname(target))
 
@@ -253,7 +253,7 @@ def stream(video, target, profile, info, audio_track=None, flags={}):
             n = 1
         audio_settings = []
         # mix 2 mono channels into stereo(common for fcp dv mov files)
-        if audio_track is None and len(info['audio']) == 2 \
+        if audio_track == 0 and len(info['audio']) == 2 \
                 and len(filter(None, [a['channels'] == 1 or None for a in info['audio']])) == 2:
             audio_settings += [
                 '-filter_complex',
@@ -262,8 +262,7 @@ def stream(video, target, profile, info, audio_track=None, flags={}):
             mono_mix = True
         else:
             mono_mix = False
-            if audio_track is not None:
-                audio_settings += ['-map', '0:%s,0:%s' % (info['audio'][audio_track]['id'], n)]
+            audio_settings += ['-map', '0:%s,0:%s' % (info['audio'][audio_track]['id'], n)]
         audio_settings += ['-ar', str(audiorate)]
         if audio_codec != 'libopus':
             audio_settings += ['-aq', str(audioquality)]
@@ -319,7 +318,8 @@ def stream(video, target, profile, info, audio_track=None, flags={}):
     else:
         cmds.append(base + audio_settings + video_settings + post)
 
-    # print('\n'.join([' '.join(cmd) for cmd in cmds]))
+    if settings.FFMPEG_DEBUG:
+        print('\n'.join([' '.join(cmd) for cmd in cmds]))
 
     n = 0
     for cmd in cmds:
