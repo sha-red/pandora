@@ -30,6 +30,7 @@ pandora.chunkupload = function(options) {
         chunkSize = options.size || 1024 * 1024,
         chunkURL,
         file = options.file,
+        bytesAvailable = file.size,
         maxRetry = -1,
         nextChunkId,
         paused = false,
@@ -56,6 +57,9 @@ pandora.chunkupload = function(options) {
           response: response,
           responseText: that.responseText
         });
+        options = null;
+        file = null;
+        request = null
     }
 
     function initUpload() {
@@ -121,8 +125,7 @@ pandora.chunkupload = function(options) {
     }
 
     function uploadChunk(chunkId) {
-        var bytesAvailable = file.size,
-            chunk,
+        var chunk,
             chunkOffset = chunkId * chunkSize;
 
         if (aborted) {
