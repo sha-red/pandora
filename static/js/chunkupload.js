@@ -60,7 +60,9 @@ pandora.chunkupload = function(options) {
         options.file = null;
         options = null;
         file = null;
-        request = null
+        request = null;
+        // cleanup events
+        that.remove();
     }
 
     function initUpload() {
@@ -108,8 +110,8 @@ pandora.chunkupload = function(options) {
             that.progress = -1;
             done();
         }, false);
-        var formData = new FormData();
 
+        var formData = new FormData();
         Object.keys(options.data).forEach(function(key) {
             formData.append(key, options.data[key]);
         });
