@@ -137,7 +137,8 @@ pandora.ui.addFilesDialog = function(options) {
                 }
                 (isNewItem ? pandora.api.edit : Ox.noop)(Ox.extend(
                     Ox.filter(item, function(value, key) {
-                        return key != 'title';
+                        return key != 'title' &&
+                            Object.keys(pandora.site.importMetadata).indexOf(key) > -1;
                     }),
                     {'id': id}
                 ), function(result) {

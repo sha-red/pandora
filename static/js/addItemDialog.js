@@ -106,7 +106,7 @@ pandora.ui.addItemDialog = function(options) {
                     pandora.api.getMediaUrlInfo({
                         url: input
                     }, function(result) {
-                        onInfo(result.data.items);
+                        onInfo(result.data.items.map(getVideoInfo));
                     });
                 }
             }
@@ -175,6 +175,8 @@ pandora.ui.addItemDialog = function(options) {
             }
             return value;
         });
+        values.url= info.url;
+        return Ox.extend(info, values);
     }
 
     function onInfo(items) {
