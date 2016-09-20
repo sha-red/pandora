@@ -7,7 +7,7 @@ import re
 from glob import glob
 
 from six import string_types
-from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import quote, unquote
 from django.db import models
 from django.db.models import Max
 from django.contrib.auth.models import User
