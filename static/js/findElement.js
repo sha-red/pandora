@@ -34,8 +34,9 @@ pandora.ui.findElement = function() {
                             id: 'select',
                             items: [].concat(
                                 pandora.site.findKeys.filter(function(key, i) {
-                                    return !key.capability
-                                        || pandora.site.capabilities[key.capability][pandora.user.level];
+                                    return (!key.capability
+                                        || pandora.site.capabilities[key.capability][pandora.user.level])
+                                        && !key.advanced;
                                 }).map(function(key) {
                                     return {
                                         id: key.id,
