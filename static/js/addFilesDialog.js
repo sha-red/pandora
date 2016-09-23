@@ -66,7 +66,7 @@ pandora.ui.addFilesDialog = function(options) {
                 title: Ox._('Size'),
                 align: 'right',
                 visible: true,
-                width: 128
+                width: 110
             },
             {
                 id: 'width',
@@ -82,7 +82,7 @@ pandora.ui.addFilesDialog = function(options) {
         items: options.items.map(function(value, index) {
             return Ox.extend(value, {index: index})
         }),
-        scrollbarsVisible: true,
+        scrollbarVisible: true,
         sort: [{key: 'index', operator: '+'}],
         sortable: true
     }).css({

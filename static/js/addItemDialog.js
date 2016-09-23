@@ -131,6 +131,7 @@ pandora.ui.addItemDialog = function(options) {
             $video.one('error', function(event) {
                 if (!done) {
                     done = true;
+                    $video[0].src = ''
                     URL.revokeObjectURL(url);
                     callback(info);
                 }
@@ -146,6 +147,7 @@ pandora.ui.addItemDialog = function(options) {
                     if (info.duration) {
                         info.bitrate = info.size * 8 / info.duration / 1000;
                     }
+                    $video[0].src = ''
                     URL.revokeObjectURL(url);
                     callback(info);
                 }
