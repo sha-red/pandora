@@ -173,6 +173,8 @@ class Document(models.Model):
                     entity_json = dp.entity.json(['id', 'type', 'name'])
                     entity_json['data'] = dp.data
                     entity_jsons.append(entity_json)
+            elif key == 'items':
+                response[key] = [i['public_id'] for i in self.items.all().values('public_id')]
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key,key)) or ''
         if item:
