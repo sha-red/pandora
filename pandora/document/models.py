@@ -202,6 +202,7 @@ class Document(models.Model):
                     self.get_ratio()
                     self.oshash = ox.oshash(self.file.path)
                     self.save()
+                    self.delete_cache()
                 return True, self.file.size
 
             return save_chunk(self, self.file, chunk, offset, name, done_cb)
@@ -301,13 +302,17 @@ class Document(models.Model):
             Document.objects.filter(id=self.id).update(matches=matches)
             self.matches = matches
 
+    def delete_cache(self):
+        if self.file:
+            folder = os.path.dirname(self.file.path)
+            for f in glob('%s/*' % folder):
+                if f != self.file.path:
+                    os.unlink(f)
+
 def delete_document(sender, **kwargs):
     t = kwargs['instance']
     if t.file:
-        folder = os.path.dirname(t.file.path)
-        for f in glob('%s/*' % folder):
-            if f != t.file.path:
-                os.unlink(f)
+        t.delete_cache()
         t.file.delete(save=False)
 pre_delete.connect(delete_document, sender=Document)
 

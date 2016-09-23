@@ -353,10 +353,7 @@ def upload(request):
         else:
             #replace existing file
             if file.file:
-                folder = os.path.dirname(file.file.path)
-                for f in glob('%s/*' % folder):
-                    if f != file.file.path:
-                        os.unlink(f)
+                file.delete_cache()
                 file.file.delete()
             file.uploading = True
             name, extension = request.POST['filename'].rsplit('.', 1)
