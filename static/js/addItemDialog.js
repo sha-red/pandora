@@ -150,6 +150,7 @@ pandora.ui.addItemDialog = function(options) {
                     callback(info);
                 }
             });
+            $video[0].muted = true;
             $video[0].src = url;
         });
     }
