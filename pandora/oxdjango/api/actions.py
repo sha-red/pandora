@@ -5,6 +5,7 @@ from __future__ import division, absolute_import
 import inspect
 import sys
 
+from six import PY2
 from django.conf import settings
 
 from ..shortcuts import render_to_json_response, json_response
@@ -17,7 +18,7 @@ def autodiscover(self=None):
         if app != 'api':
             mod = import_module(app)
             try:
-                import_module('%s.views'%app)
+                import_module('%s.views' % app)
             except:
                 if module_has_submodule(mod, 'views'):
                     raise
@@ -109,8 +110,12 @@ class ApiActions(dict):
         if name != 'api' and hasattr(f, 'func_closure') and f.func_closure:
             fc = filter(lambda c: hasattr(c.cell_contents, '__call__'), f.func_closure)
             f = fc[len(fc)-1].cell_contents
-        info = f.func_code.co_filename[len(settings.PROJECT_ROOT)+1:]
-        info = u'%s:%s' % (info, f.func_code.co_firstlineno)
+        if PY2:
+            info = f.func_code.co_filename[len(settings.PROJECT_ROOT)+1:]
+            info = u'%s:%s' % (info, f.func_code.co_firstlineno)
+        else:
+            info = f.__code__.co_filename[len(settings.PROJECT_ROOT)+1:]
+            info = u'%s:%s' % (info, f.__code__.co_firstlineno)
         return info, trim(inspect.getsource(f))
 
     def register(self, method, action=None, cache=True, version=None):
