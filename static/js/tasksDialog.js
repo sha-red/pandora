@@ -102,6 +102,7 @@ pandora.ui.tasksDialog = function(options) {
             ],
             columnsVisible: true,
             items: listItems,
+            scrollbarVisible: true,
             sort: [{key: 'ended', operator: '-'}],
             unique: 'id'
         }).bindEvent({
