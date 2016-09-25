@@ -66,7 +66,7 @@ pandora.ui.addFilesDialog = function(options) {
                 title: Ox._('Size'),
                 align: 'right',
                 visible: true,
-                width: 110
+                width: 128 - Ox.SCROLLBAR_SIZE
             },
             {
                 id: 'width',

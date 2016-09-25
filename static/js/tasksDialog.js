@@ -92,7 +92,7 @@ pandora.ui.tasksDialog = function(options) {
                     },
                     title: Ox._('Status'),
                     visible: true,
-                    width: 156
+                    width: 176 - Ox.SCROLLBAR_SIZE
                 },
                 {
                     id: 'progress',
