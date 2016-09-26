@@ -159,6 +159,10 @@ def init(request, data):
 
     if 'HTTP_ACCEPT_LANGUAGE' in request.META:
         response['data']['locale'] = request.META['HTTP_ACCEPT_LANGUAGE'].split(';')[0].split('-')[0]
+
+    if request.META.get('HTTP_X_PREFIX') == 'NO':
+        config['site']['videoprefix'] = ''
+        config['site']['mediaprefix'] = ''
     response['data']['site'] = config
     response['data']['user'] = init_user(request.user, request)
     request.session['last_init'] = str(datetime.now())
