@@ -382,8 +382,10 @@
             "title": "Cast",
             "type": ["string"],
             "autocomplete": true,
+            "columnWidth": 180,
             "filter": true,
             "find": true,
+            "sort": true,
             "sortType": "person"
         },
         {
