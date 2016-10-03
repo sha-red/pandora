@@ -2011,6 +2011,24 @@ pandora.getCensoredClips = function(data) {
         });
 };
 
+pandora.VIDEO_OPTIONS_KEYS = [
+    'audioTracks',
+    'cuts',
+    'duration',
+    'durations',
+    'editable',
+    'layers',
+    'modified',
+    'parts',
+    'posterFrame',
+    'rendered',
+    'rightslevel',
+    'size',
+    'streams',
+    'title',
+    'videoRatio'
+];
+
 pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable
             || pandora.site.capabilities.canPlayClips[pandora.user.level]

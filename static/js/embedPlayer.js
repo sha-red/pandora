@@ -26,16 +26,12 @@ pandora.ui.embedPlayer = function() {
         $innerPanel, $outerPanel,
         $title, $player, $controls, $timeline, $annotations;
 
-    pandora.api.get({id: ui.item, keys: [
-        'duration', 'durations', 'layers', 'parts', 'posterFrame',
-        'rightslevel', 'size', 'title', 'videoRatio'
-    ]}, function(result) {
+    pandora.api.get({id: ui.item, keys: pandora.VIDEO_OPTIONS_KEYS}, function(result) {
         if (removed) {
             return;
         }
         video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
 
-        Ox.print('OPTIONS::::::::', options)
         var isFrame = options['in'] && options['in'] == options.out,
             sizes = getSizes();
 
@@ -363,8 +359,8 @@ pandora.ui.embedPlayer = function() {
 
     that.resizePanel = function() {
         var sizes = getSizes();
-        $player.options({width: window.innerWidth, height: sizes.videoHeight});
-        $outerPanel.size(0, sizes.innerHeight);
+        $player && $player.options({width: window.innerWidth, height: sizes.videoHeight});
+        $outerPanel && $outerPanel.size(0, sizes.innerHeight);
         options.showTimeline && $timeline.options({width: window.innerWidth - 16});
         options.showAnnotations && $annotations.options({width: window.innerWidth});
         return that;

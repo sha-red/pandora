@@ -19,10 +19,7 @@ pandora.ui.embedTimeline = function() {
         video,
         $title, $panel, $player, $annotations;
 
-    pandora.api.get({id: ui.item, keys: [
-        'duration', 'durations', 'layers', 'parts', 'posterFrame',
-        'rightslevel', 'size', 'title', 'videoRatio'
-    ]}, function(result) {
+    pandora.api.get({id: ui.item, keys: pandora.VIDEO_OPTIONS_KEYS}, function(result) {
         if (removed) {
             return;
         }
