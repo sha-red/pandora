@@ -36,11 +36,13 @@
     */
     "capabilities": {
         "canAddItems": {"researcher": true, "staff": true, "admin": true},
+        "canAddDocuments": {"researcher": true, "staff": true, "admin": true},
         "canDownloadVideo": {"guest": -1, "member": -1, "researcher": 3, "staff": 3, "admin": 3},
         "canEditAnnotations": {"staff": true, "admin": true},
-        "canEditEntities": {"staff": true, "admin": true},
         "canEditDocuments": {"researcher": true, "staff": true, "admin": true},
+        "canEditEntities": {"staff": true, "admin": true},
         "canEditEvents": {"researcher": true, "staff": true, "admin": true},
+        "canEditFeaturedCollections": {"staff": true, "admin": true},
         "canEditFeaturedEdits": {"staff": true, "admin": true},
         "canEditFeaturedLists": {"staff": true, "admin": true},
         "canEditFeaturedTexts": {"staff": true, "admin": true},
@@ -63,11 +65,13 @@
         "canPlayVideo": {"guest": 1, "member": 1, "researcher": 3, "staff": 3, "admin": 3},
         "canReadText": {"guest": 0, "member": 0, "researcher": 1, "staff": 1, "admin": 1},
         "canRemoveItems": {"staff": true, "admin": true},
+        "canRemoveDocuments": {"staff": true, "admin": true},
         "canSeeAccessed": {"researcher": true, "staff": true, "admin": true},
         "canSeeAllTasks": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"researcher": true, "staff": true, "admin": true},
         "canSeeExtraItemViews": {"researcher": true, "staff": true, "admin": true},
         "canSeeMedia": {"researcher": true, "staff": true, "admin": true},
+        "canSeeDocument": {"guest": 3, "member": 3, "researcher": 3, "staff": 3, "admin": 3},
         "canSeeItem": {"guest": 3, "member": 3, "researcher": 3, "staff": 3, "admin": 3},
         "canSeeSize": {"researcher": true, "staff": true, "admin": true},
         "canSeeSoftwareVersion": {"researcher": true, "staff": true, "admin": true},
@@ -93,6 +97,257 @@
     list means it will not be included in find annotations.
     */
     "clipLayers": ["subtitles", "keywords", "notes"],
+    /*
+    "documentKeys" defines the metadata associated with each document. Required keys
+    are "*", "id" and "title". 
+    A documentKey must have the following properties:
+        "id": The unique id of the key (as used by the server)
+        "title": The title of the key (as displayed by the client)
+        "type": Can be "boolean", "date", "enum", "float", "hue", "integer",
+            "layer", "string", "text", "time" or ["..."] (list of values of
+            this type). If type is "layer", this is a reference to the
+            annotations layer with the same id.
+    and can have any of the following properties:
+        "additionalSort": Ordered list of {key, operator} objects, where key is
+            another itemKey and operator is "+" or "-". This can be used to
+            override user.ui.listSort when results are sorted by this key.
+        "autocomplete": If true, the find element will provide autocomplete
+        "autocompleteSort": Sort order of autocomplete suggestions
+        "capability": A capability required to see data for this key
+        "columnRequired": If true, the column can't be removed from list view
+        "columnWidth": Default column width in px. If absent, no column for
+            this key can be added in list view.
+        "filter": If true, one can filter results by this key
+        "find": If true, this key will appear as an option in the find element
+        "flag": Can be "country" or "language". If set (and filter is true), a
+            flag icon corresponding to the field's value will be displayed.
+        "format": {type: string, args: [value, value, ...]}, used for special
+            formatting. This will invoke Ox.formatType(args). For details, see
+            https://oxjs.org/#doc/Ox.formatArea etc.
+        "secondaryId": If true, loading the URL "/value" will redirect to the
+            corresponding item, in case there is an exact match for this key
+        "sort": If true, one can sort results by this key
+        "sortOperator": Sort order ("+" or "-"), in case it differs from the
+            default for the key's type ("+" for strings, "-" for numbers)
+        "sortType": Special sort type ("person" or "title") which can be
+            further configured in "Manage Names" or "Manage Titles"
+        "value": {key: string, type: string} or {layer: string, type: string},
+            for keys whose value is derived from other keys or layers (like
+            "number of actors" or "words per minute"). Possible values for type
+            are "length", "lengthperminute", "words", and "wordsperminute".
+            Alternatively, "value" can be set to the string "capability", which
+            results in an itemKey whose boolean value indicates the presence or
+            absence of a userLevel-dependent capability. This can be used to
+            create queries and lists like "all items this user can play" etc.
+        "values": [value, value, ...] Ordered list of values, in case "type" is
+            "enum"
+    */
+    "documentKeys": [
+        {
+            "id": "*",
+            "title": "All",
+            "type": "text",
+            "find": true
+        },
+        {
+            "id": "title",
+            "operator": "+",
+            "title": "Title",
+            "type": "string",
+            "find": true,
+            "sort": true,
+            "sortType": "title",
+            "autocomplete": true,
+            "columnWidth": 256
+        },
+        {
+            "id": "type",
+            "operator": "+",
+            "title": "Type",
+            "type": "string",
+            "filter": true,
+            "find": true,
+            "sort": true,
+            "autocomplete": true,
+            "columnWidth": 128
+        },
+        {
+            "id": "author",
+            "operator": "+",
+            "title": "Author",
+            "type": ["string"],
+            "filter": true,
+            "find": true,
+            "sort": true,
+            "sortType": "person",
+            "autocomplete": true,
+            "columnWidth": 256
+        },
+        {
+            "id": "publisher",
+            "operator": "+",
+            "title": "Publisher",
+            "type": "string",
+            "filter": true,
+            "find": true,
+            "sort": true,
+            "autocomplete": true,
+            "columnWidth": 256
+        },
+        {
+            "id": "place",
+            "title": "Place",
+            "type": ["string"],
+            "columnWidth": 128,
+            "filter": true,
+            "find": true,
+            "sort": true
+        },
+        {
+            "id": "date",
+            "title": "Date",
+            "type": "string",
+            "columnWidth": 120,
+            //"format": {"type": "date", "args": ["%a, %b %e, %Y"]},
+            "sort": true
+        },
+        {
+            "id": "series",
+            "title": "Series",
+            "type": "string",
+            "columnWidth": 128,
+            "find": true,
+            "sort": true
+        },
+        {
+            "id": "edition",
+            "title": "Edition",
+            "type": "string",
+            "columnWidth": 128,
+            "find": true
+        },
+        {
+            "id": "language",
+            "title": "Language",
+            "type": ["string"],
+            "columnWidth": 128,
+            "filter": true,
+            "find": true,
+            "sort": true
+        },
+        {
+            "id": "id",
+            "operator": "+",
+            "title": "ID",
+            "type": "string",
+            "sort": true,
+            "columnWidth": 64
+        },
+        {
+            "id": "extension",
+            "operator": "+",
+            "title": "Extension",
+            "type": "string",
+            "filter": true,
+            "find": true,
+            "sort": true,
+            "autocomplete": true,
+            "columnWidth": 64
+        },
+        {
+            "id": "dimensions",
+            "operator": "-",
+            "title": "Dimensions",
+            "type": "integer",
+            "sort": true,
+            "columnWidth": 128
+        },
+        {
+            "id": "size",
+            "operator": "-",
+            "title": "Size",
+            "type": "integer",
+            "sort": true,
+            "format": {"type": "value", "args": ["B"]},
+            "columnWidth": 64
+        },
+        {
+            "id": "description",
+            "operator": "+",
+            "title": "Description",
+            "type": "text",
+            "find": true,
+            "sort": true,
+            "columnWidth": 256
+        },
+        {
+            "id": "matches",
+            "operator": "-",
+            "title": "Matches",
+            "type": "integer",
+            "sort": true,
+            "columnWidth": 64
+        },
+        {
+            "id": "user",
+            "operator": "+",
+            "title": "User",
+            "type": "string",
+            "filter": true,
+            "find": true,
+            "sort": true,
+            "autocomplete": true,
+            "columnWidth": 128
+        },
+        {
+            "id": "created",
+            "operator": "-",
+            "title": "Created",
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
+            "type": "date",
+            "sort": true,
+            "columnWidth": 144
+        },
+        {
+            "id": "modified",
+            "operator": "-",
+            "title": "Modified",
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
+            "type": "date",
+            "sort": true,
+            "columnWidth": 144
+        },
+        {
+            "id": "accessed",
+            "title": "Last Accessed",
+            "type": "date",
+            "capability": "canSeeAccessed",
+            "columnWidth": 150,
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
+            "sort": true
+        },
+        {
+            "id": "timesaccessed",
+            "title": "Times Accessed",
+            "type": "integer",
+            "capability": "canSeeAccessed",
+            "columnWidth": 60,
+            "format": {"type": "number", "args": []},
+            "sort": true
+        },
+        {
+            "id": "rightslevel",
+            "title": "Rights Level",
+            "type": "enum",
+            "columnWidth": 90,
+            "format": {"type": "ColorLevel", "args": [
+                ["Public", "Out of Copyright", "Under Copyright", "Private"]
+            ]},
+            "sort": true,
+            "sortOperator": "+",
+            "values": ["Public", "Out of Copyright", "Under Copyright", "Private", "Unknown"]
+        }
+    ],
     /*
     "entities" can be used to store arbitrary data. They can be referenced in
     annotations, info view, or elsewhere. Each entry defines a specific class
@@ -1004,16 +1259,26 @@
             "calendarFind": "",
             "calendarSelection": "",
             "clipColumns": 2,
+            "collectionColumns": ["title", "id", "extension", "dimensions", "size", "description", "matches", "user", "created", "modified"],
+            "collectionColumnWidth": {},
+            "collectionSelection": [],
+            "collectionSort": [
+                {"key": "title", "operator": "+"},
+                {"key": "extension", "operator": "+"}
+            ],
+            "collectionView": "grid",
+            "collections": {},
             "columns": {
                 "Colors": {
                     "columns": ["title", "director", "country", "year", "hue", "saturation", "brightness"],
                     "columnWidth": {}
                 }
             },
+            "documentView": "view",
             "documents": {},
             "documentSize": 256,
             "documentsSelection": {},
-            "documentsSort": [{"key": "name", "operator": "+"}],
+            "documentsSort": [{"key": "title", "operator": "+"}],
             "documentsView": "grid",
             "edit": "",
             "edits": {},
@@ -1039,6 +1304,7 @@
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
+            "findDocuments": {"conditions": [], "operator": "&"},
             "followPlayer": true,
             "help": "",
             "icons": "posters",
@@ -1063,7 +1329,6 @@
             "page": "",
             "part": {
                 "api": "",
-                "documents": "",
                 "entities": "",
                 "faq": "",
                 "help": "",
@@ -1104,6 +1369,11 @@
                     "featured": true,
                     "volumes": true
                 },
+                "documents": {
+                    "personal": true,
+                    "favorite": true,
+                    "featured": true
+                },
                 "texts": {
                     "personal": true,
                     "favorite": true,
@@ -1117,6 +1387,8 @@
             "sidebarSize": 256,
             "text": "",
             "texts": {},
+            "documents": {},
+            "document": "",
             "theme": "oxmedium",
             "updateAdvancedFindResults": false,
             "videoLoop": false,

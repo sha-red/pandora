@@ -5,7 +5,7 @@
 pandora.ui.deleteListDialog = function(list) {
 
     var ui = pandora.user.ui,
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = pandora.getFolderItems(ui.section),
         folderItem = folderItems.slice(0, -1),
         listData = pandora.getListData(list),
         $folderList = pandora.$ui.folderList[listData.folder],
@@ -42,6 +42,14 @@ pandora.ui.deleteListDialog = function(list) {
                                             pandora.UI.set({
                                                 find: pandora.site.user.ui.find
                                             });
+                                        } else if (ui.section == 'documents') {
+                                            pandora.UI.set(
+                                                'collections.' + listData.id, null
+                                            );
+                                            pandora.UI.set({
+                                                findDocuments: pandora.site.user.ui.findDocuments
+                                            });
+
                                         } else {
                                             pandora.UI.set(
                                                 folderItem.toLowerCase(), ''

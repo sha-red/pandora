@@ -144,7 +144,7 @@ def autocompleteEntities(request, data):
         values = leading_matches + leading_word_matches + matches
     else:
         values = [e.name for e in qs]
-    values  = values[data['range'][0]:data['range'][1]]
+    values = values[data['range'][0]:data['range'][1]]
     response = json_response({})
     response['data']['items'] = values
     return render_to_json_response(response)

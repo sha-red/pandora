@@ -15,7 +15,7 @@ pandora.ui.listDialog = function(section) {
         ),
         ui = pandora.user.ui,
         width = getWidth(section),
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = pandora.getFolderItems(pandora.user.ui.section),
         folderItem = folderItems.slice(0, -1);
     Ox.getObjectById(tabs, section).selected = true;
 
@@ -26,7 +26,10 @@ pandora.ui.listDialog = function(section) {
                 } else if (id == 'icon') {
                     return pandora.$ui.listIconPanel = pandora.ui.listIconPanel(listData);
                 } else if (id == 'query') {
-                    return pandora.$ui.filterForm = pandora.ui.filterForm({
+                    return pandora.$ui.filterForm = (pandora.user.ui.section == 'documents'
+                        ? pandora.ui.documentFilterForm
+                        : pandora.ui.filterForm
+                    )({
                             mode: 'list',
                             list: listData
                         })
@@ -158,7 +161,7 @@ pandora.ui.listDialog = function(section) {
 pandora.ui.listGeneralPanel = function(listData) {
     var that = Ox.Element(),
         ui = pandora.user.ui,
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = pandora.getFolderItems(ui.section),
         folderItem = folderItems.slice(0, -1);
     pandora.api['find' + folderItems]({
         query: {conditions: [{key: 'id', value: listData.id, operator: '=='}]},
@@ -171,7 +174,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                     tooltip: Ox._('Doubleclick to edit icon')
                 })
                 .attr({
-                    src: pandora.getMediaURL('/' + folderItem.toLowerCase() + '/' + encodeURIComponent(listData.id) + '/icon256.jpg?' + Ox.uid())
+                    src: pandora.getListIcon(ui.section, listData.id, 256)
                 })
                 .css({
                     position: 'absolute',
@@ -382,13 +385,16 @@ pandora.ui.listIconPanel = function(listData) {
         quarters = ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
 
         ui = pandora.user.ui,
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = pandora.getFolderItems(ui.section),
         folderItem = folderItems.slice(0, -1),
+
 
         $iconPanel = Ox.Element(),
 
         $icon = $('<img>')
-            .attr({src: pandora.getMediaURL('/' + folderItem.toLowerCase() + '/' + encodeURIComponent(listData.id) + '/icon256.jpg?' + Ox.uid())})
+            .attr({
+                src: pandora.getListIcon(ui.section, listData.id, 256)
+            })
             .css({position: 'absolute', borderRadius: '64px', margin: '16px'})
             .appendTo($iconPanel),
 
@@ -399,8 +405,6 @@ pandora.ui.listIconPanel = function(listData) {
         $list = Ox.Element(),
 
         ui = pandora.user.ui,
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
-        folderItem = folderItems.slice(0, -1),
 
         that = Ox.SplitPanel({
             elements: [
@@ -586,9 +590,7 @@ pandora.ui.listIconPanel = function(listData) {
                 posterFrames: posterFrames
             }, function() {
                 $icon.attr({
-                    src: pandora.getMediaURL('/' + folderItem.toLowerCase()
-                        + '/' + encodeURIComponent(listData.id) + '/icon256.jpg?' + Ox.uid()
-                    )
+                    src: pandora.getListIcon(ui.section, listData.id, 256)
                 });
                 pandora.$ui.folderList[listData.folder].$element
                     .find('img[src*="'
@@ -596,10 +598,7 @@ pandora.ui.listIconPanel = function(listData) {
                         + '/"]'
                     )
                     .attr({
-                        src: pandora.getMediaURL('/' + folderItem.toLowerCase()
-                            + '/' + encodeURIComponent(listData.id)
-                            + '/icon.jpg?' + Ox.uid()
-                        )
+                        src: pandora.getListIcon(ui.section, listData.id, 256)
                     });
                 pandora.$ui.info.updateListInfo();
             });
@@ -619,7 +618,7 @@ pandora.ui.listIconPanel = function(listData) {
                 pandora.api.find(Ox.extend(data, {
                     query: {
                         conditions: (
-                        ui.section == 'items'
+                            Ox.contains(pandora.site.listSections, ui.section)
                             ? [{key: 'list', value: listData.id, operator: '=='}]
                             : []).concat(
                         value !== ''

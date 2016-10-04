@@ -6,12 +6,13 @@ pandora.ui.folderPlaceholder = function(id, section) {
             .css({
                 height: '14px',
                 padding: '1px 4px',
-            });
+            }),
+        folderItems = pandora.getFolderItems(section);
     that.updateText = function(string, isFind) {
         return that.html(
             string != 'volumes'
             ? Ox._('No {0} {1}' + (isFind ? ' found' : ''),
-                [Ox._(string), Ox._(section == 'items' ? 'lists' : section)])
+                [Ox._(string), Ox._(folderItems.toLowerCase())])
             : Ox._('No local volumes')
         );
     };

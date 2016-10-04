@@ -5,7 +5,7 @@ pandora.ui.folderList = function(id, section) {
     section = section || pandora.user.section;
     var ui = pandora.user.ui,
         i = Ox.getIndexById(pandora.site.sectionFolders[section], id),
-        folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
+        folderItems = pandora.getFolderItems(section),
         folderItem = folderItems.slice(0, -1),
         canEditFeatured = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
         $placeholder,
@@ -20,9 +20,7 @@ pandora.ui.folderList = function(id, section) {
                 },
                 format: function(value, data) {
                     return $('<img>').attr({
-                            src: '/' + folderItem.toLowerCase() + '/'
-                                + encodeURIComponent(data.id) + '/icon.jpg?'
-                                + data.modified
+                            src: pandora.getListIcon(section, data.id, '', data.modified)
                         }).css({
                             width: '14px',
                             height: '14px',
@@ -337,7 +335,7 @@ pandora.ui.folderList = function(id, section) {
                 pandora.api['unsubscribeFrom' + folderItem]({
                     id: data.ids[0]
                 }, function(result) {
-                    Ox.Request.clearCache('findList');
+                    Ox.Request.clearCache('find' + folderItems);
                     that.reloadList();
                 });
             } else if (id == 'featured' && canEditFeatured) {
@@ -346,7 +344,7 @@ pandora.ui.folderList = function(id, section) {
                     id: data.ids[0],
                     status: 'public'
                 }, function(result) {
-                    Ox.Request.clearCache('findList');
+                    Ox.Request.clearCache('find' + folderItems);
                     // fixme: duplicated
                     if (result.data.user == pandora.user.username || result.data.subscribed) {
                         pandora.$ui.folderList[
@@ -412,6 +410,20 @@ pandora.ui.folderList = function(id, section) {
                     listView: list
                         ? pandora.user.ui.lists[list]
                             ? pandora.user.ui.lists[list].view
+                            : that.value(list).view
+                        : void 0
+                });
+            } else if (section == 'documents') {
+                pandora.UI.set({
+                    findDocuments: {
+                        conditions: list ? [
+                            {key: 'collection', value: list, operator: '=='}
+                        ] : [],
+                        operator: '&'
+                    },
+                    collectionView: list
+                        ? pandora.user.ui.collections[list]
+                            ? pandora.user.ui.collections[list].view
                             : that.value(list).view
                         : void 0
                 });

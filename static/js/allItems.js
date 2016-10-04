@@ -8,8 +8,10 @@ pandora.ui.allItems = function(section) {
 
     var canAddItems = !pandora.site.itemRequiresVideo && pandora.site.capabilities.canAddItems[pandora.user.level],
         canUploadVideo = pandora.site.capabilities.canAddItems[pandora.user.level],
+        canAddDocuments = pandora.site.capabilities.canAddDocuments[pandora.user.level],
+        isSelected = pandora.user.ui._list || pandora.user.ui._collection,
         that = Ox.Element()
-            .addClass('OxSelectableElement' + (pandora.user.ui._list ? '' : ' OxSelected'))
+            .addClass('OxSelectableElement' + (isSelected ? '' : ' OxSelected'))
             .css({
                 height: '16px',
                 cursor: 'default',
@@ -19,13 +21,21 @@ pandora.ui.allItems = function(section) {
                 click: function() {
                     that.gainFocus();
                     if (section == 'items') {
-                        pandora.user.ui._list && pandora.UI.set({find: {conditions: [], operator: '&'}});
+                        pandora.user.ui._list && pandora.UI.set({
+                            find: {conditions: [], operator: '&'}
+                        });
+                    } else if (section == 'documents') {
+                        pandora.user.ui._collection && pandora.UI.set({
+                            findDocuments: {conditions: [], operator: '&'}
+                        });
                     } else {
                         pandora.UI.set(section.slice(0, -1), '');
                     }
                 }
             })
             .bindEvent({
+                pandora_document: updateSelected,
+                pandora_finddocuments: updateSelected,
                 pandora_edit: updateSelected,
                 pandora_find: updateSelected,
                 pandora_section: updateSelected,
@@ -95,6 +105,56 @@ pandora.ui.allItems = function(section) {
         }, function(result) {
             that.update(result.data.items);
         });
+    } else if (section == 'documents') {
+        $items = $('<div>')
+            .css({
+                float: 'left',
+                width: '42px',
+                margin: '1px 4px 1px 3px',
+                textAlign: 'right'
+            })
+            .appendTo(that);
+        $buttons[0] = Ox.Button({
+                style: 'symbol',
+                title: 'add',
+                tooltip: canAddDocuments ? Ox._('Add {0}', [Ox._('Document')]) : '',
+                type: 'image'
+            })
+            .css({opacity: canAddDocuments ? 1 : 0.25})
+            .hide()
+            .bindEvent({
+                click: function(data) {
+                    if (canAddDocuments) {
+                        pandora.$ui.addDocumentDialog = pandora.ui.addDocumentDialog({
+                            selected: 'add'
+                        }).open();
+                    }
+                }
+            })
+            .appendTo(that);
+        $buttons[1] = Ox.Button({
+                style: 'symbol',
+                title: 'upload',
+                tooltip: canAddDocuments ? Ox._('Upload {0}', [Ox._('Document')]) : '',
+                type: 'image'
+            })
+            .css({opacity: canAddDocuments ? 1 : 0.25})
+            .hide()
+            .bindEvent({
+                click: function() {
+                    if (canAddDocuments) {
+                        pandora.$ui.addDocumentDialog = pandora.ui.addDocumentDialog({
+                            selected: 'upload'
+                        }).open();
+                    }
+                }
+            })
+            .appendTo(that);
+        pandora.api.findDocuments({
+            query: {conditions: [], operator: '&'}
+        }, function(result) {
+            that.update(result.data.items);
+        });
     } else if (section == 'texts') {
         $buttons[0] = Ox.Button({
                 style: 'symbol',
@@ -124,6 +184,7 @@ pandora.ui.allItems = function(section) {
     function updateSelected() {
         that[
             (section == 'items' && pandora.user.ui._list)
+            || (section == 'documents' && pandora.user.ui._collection)
             || (section == 'edits' && pandora.user.ui.edit)
             || (section == 'texts' && pandora.user.ui.text)
             ? 'removeClass' : 'addClass'

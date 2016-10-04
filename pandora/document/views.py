@@ -3,7 +3,9 @@
 from __future__ import division, print_function, absolute_import
 
 import os
+import re
 from glob import glob
+import unicodedata
 
 from six import string_types
 import ox
@@ -13,7 +15,8 @@ from oxdjango.decorators import login_required_json
 from oxdjango.http import HttpFileResponse
 from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response, HttpErrorJson
 from django import forms
-from django.db.models import Sum
+from django.db.models import Count, Sum
+from django.conf import settings
 
 from item import utils
 from item.models import Item
@@ -35,6 +38,13 @@ def get_document_or_404_json(id):
 @login_required_json
 def addDocument(request, data):
     '''
+    Create new html document
+    takes {
+        title: string
+    }
+
+    or
+
     Adds one or more documents to one or more items
     takes {
         item: string or [string], // one or more item ids (optional)
@@ -46,46 +56,54 @@ def addDocument(request, data):
     see: editDocument, findDocuments, getDocument, removeDocument, sortDocuments
     '''
     response = json_response()
-    if 'ids' in data:
-        ids = data['ids']
+    if 'title' in data:
+        doc = models.Document(user=request.user, extension='html')
+        doc.data['title'] = data['title']
+        doc.save()
+        response = json_response(status=200, text='created')
+        response['data'] = doc.json(user=request.user)
+        add_changelog(request, data, doc.get_id())
     else:
-        ids = [data['id']]
-    if 'item' in data:
-        if isinstance(data['item'], string_types):
-            item = Item.objects.get(public_id=data['item'])
-            if item.editable(request.user):
-                for id in ids:
-                    document = models.Document.get(id)
-                    document.add(item)
-                add_changelog(request, data, item.public_id)
-            else:
-                response = json_response(status=403, text='permission denied')
+        if 'ids' in data:
+            ids = data['ids']
         else:
-            for item in Item.objects.filter(public_id__in=data['item']):
+            ids = [data['id']]
+        if 'item' in data:
+            if isinstance(data['item'], string_types):
+                item = Item.objects.get(public_id=data['item'])
                 if item.editable(request.user):
                     for id in ids:
                         document = models.Document.get(id)
                         document.add(item)
-            add_changelog(request, data, data['item'])
-    elif 'entity' in data:
-        if isinstance(data['entity'], string_types):
-            entity = Entity.get(data['entity'])
-            if entity.editable(request.user):
-                for id in ids:
-                    document = models.Document.get(id)
-                    entity.add(document)
-                add_changelog(request, data, entity.get_id())
+                    add_changelog(request, data, item.public_id)
+                else:
+                    response = json_response(status=403, text='permission denied')
             else:
-                response = json_response(status=403, text='permission denied')
-        else:
-            for entity in Entity.objects.filter(id__in=map(ox.fromAZ, data['entity'])):
+                for item in Item.objects.filter(public_id__in=data['item']):
+                    if item.editable(request.user):
+                        for id in ids:
+                            document = models.Document.get(id)
+                            document.add(item)
+                add_changelog(request, data, data['item'])
+        elif 'entity' in data:
+            if isinstance(data['entity'], string_types):
+                entity = Entity.get(data['entity'])
                 if entity.editable(request.user):
                     for id in ids:
                         document = models.Document.get(id)
                         entity.add(document)
-            add_changelog(request, data, data['entity'])
-    else:
-        response = json_response(status=500, text='invalid request')
+                    add_changelog(request, data, entity.get_id())
+                else:
+                    response = json_response(status=403, text='permission denied')
+            else:
+                for entity in Entity.objects.filter(id__in=map(ox.fromAZ, data['entity'])):
+                    if entity.editable(request.user):
+                        for id in ids:
+                            document = models.Document.get(id)
+                            entity.add(document)
+                add_changelog(request, data, data['entity'])
+        else:
+            response = json_response(status=500, text='invalid request')
     return render_to_json_response(response)
 actions.register(addDocument, cache=False)
 
@@ -95,7 +113,8 @@ def editDocument(request, data):
     Edits data for a document
     takes {
         id: string, // document id
-        name: string, // new document name
+
+        key: value, // set new data
         description: string // new document description
         item: string // item id (optional)
     }
@@ -126,28 +145,50 @@ actions.register(editDocument, cache=False)
 
 
 def _order_query(qs, sort, item=None):
+    prefix = 'sort__'
     order_by = []
     for e in sort:
         operator = e['operator']
         if operator != '-':
             operator = ''
         key = {
-            'name': 'name_sort',
             'description': 'descriptions__description_sort'
-                if item else 'description_sort',
-            'dimensions': 'dimensions_sort',
+                if item else 'description',
             'index': 'items__itemproperties__index',
+            #fixme:
+            'position': 'id',
+            'name': 'title',
         }.get(e['key'], e['key'])
         if key == 'resolution':
             order_by.append('%swidth'%operator)
             order_by.append('%sheight'%operator)
         else:
+            if '__' not in key:
+                key = "%s%s" % (prefix, key)
             order = '%s%s' % (operator, key)
             order_by.append(order)
     if order_by:
         qs = qs.order_by(*order_by, nulls_last=True)
     qs = qs.distinct()
     return qs
+
+def _order_by_group(query):
+    if 'sort' in query:
+        if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
+            order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
+            if query['group'] == "year":
+                secondary = query['sort'][0]['operator'] == '-' and '-sortvalue' or 'sortvalue'
+                order_by = (order_by, secondary)
+            elif query['group'] != "keyword":
+                order_by = (order_by, 'sortvalue')
+            else:
+                order_by = (order_by, 'value')
+        else:
+            order_by = query['sort'][0]['operator'] == '-' and '-sortvalue' or 'sortvalue'
+            order_by = (order_by, 'items')
+    else:
+        order_by = ('-sortvalue', 'items')
+    return order_by
 
 def get_item(query):
     for c in query.get('conditions', []):
@@ -162,7 +203,7 @@ def parse_query(data, user):
     for key in ('keys', 'group', 'file', 'range', 'position', 'positions', 'sort'):
         if key in data:
             query[key] = data[key]
-    query['qs'] = models.Document.objects.find(data, user).exclude(name='')
+    query['qs'] = models.Document.objects.find(data, user)
     query['item'] = get_item(data.get('query', {}))
     return query
 
@@ -192,7 +233,24 @@ def findDocuments(request, data):
     #order
     qs = _order_query(query['qs'], query['sort'], query['item'])
     response = json_response()
-    if 'keys' in data:
+    if 'group' in query:
+        response['data']['items'] = []
+        items = 'items'
+        document_qs = query['qs']
+        order_by = _order_by_group(query)
+        qs = models.Facet.objects.filter(key=query['group']).filter(document__id__in=document_qs)
+        qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
+
+        if 'positions' in query:
+            response['data']['positions'] = {}
+            ids = [j['value'] for j in qs]
+            response['data']['positions'] = utils.get_positions(ids, query['positions'])
+        elif 'range' in data:
+            qs = qs[query['range'][0]:query['range'][1]]
+            response['data']['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
+        else:
+            response['data']['items'] = qs.count()
+    elif 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
 
         response['data']['items'] = [l.json(data['keys'], request.user, query['item']) for l in qs]
@@ -330,23 +388,15 @@ def upload(request):
     if 'chunk' in request.FILES:
         if file.editable(request.user):
             response = process_chunk(request, file.save_chunk)
-            response['resultUrl'] = request.build_absolute_uri(file.get_absolute_url())
+            response['resultUrl'] = file.get_absolute_url()
             # id is used to select document in dialog after upload
             response['id'] = file.get_id()
             return render_to_json_response(response)
     #init upload
     else:
         if not file:
-            created = False
-            num = 1
-            _name = name
-            while not created:
-                file, created = models.Document.objects.get_or_create(
-                    user=request.user, name=name, extension=extension)
-                if not created:
-                    num += 1
-                    name = _name + ' [%d]' % num
-            file.name = name
+            file = models.Document(user=request.user, extension=extension)
+            file.data['title'] = name
             file.extension = extension
             file.uploading = True
             file.save()
@@ -361,10 +411,81 @@ def upload(request):
             file.width = -1
             file.pages = -1
             file.save()
-        upload_url = request.build_absolute_uri('/api/upload/document?id=%s' % file.get_id())
+        upload_url = '/api/upload/document?id=%s' % file.get_id()
         return render_to_json_response({
             'uploadUrl': upload_url,
-            'url': request.build_absolute_uri(file.get_absolute_url()),
+            'url': file.get_absolute_url(),
             'result': 1
         })
     return render_to_json_response(response)
+
+def autocompleteDocuments(request, data):
+    '''
+    Returns autocomplete strings for a given documeny key and search string
+    takes {
+        key: string, // document key
+        value: string, // search string
+        operator: string, // '=', '==', '^', '$'
+        query: object, // document query to limit results, see `find`
+        range: [int, int] // range of results to return
+    }
+    returns {
+        items: [string, ...] // list of matching strings
+    }
+    see: autocomplete, autocompleteEntities
+    '''
+    if 'range' not in data:
+        data['range'] = [0, 10]
+    op = data.get('operator', '=')
+
+    key = utils.get_by_id(settings.CONFIG['documentKeys'], data['key'])
+    order_by = key.get('autocompleteSort', False)
+    if order_by:
+        for o in order_by:
+            if o['operator'] != '-':
+                o['operator'] = ''
+        order_by = ['%(operator)ssort__%(key)s' % o for o in order_by]
+    else:
+        order_by = ['-items']
+
+    qs = parse_query({'query': data.get('query', {})}, request.user)['qs']
+    response = json_response({})
+    response['data']['items'] = []
+    '''
+    for d in qs:
+        value = d.json().get(data['key'])
+        add = False
+        if value:
+            if op == '=' and data['value'] in value:
+                add = True
+            elif op == '==' and data['value'].lower() == value.lower():
+                add = True
+            elif op == '^' and value.lower().startswith(data['value'].lower()):
+                add = True
+        if add and value not in response['data']['items']:
+            response['data']['items'].append(value)
+
+    '''
+
+    sort_type = key.get('sortType', key.get('type', 'string'))
+    qs = models.Facet.objects.filter(key=data['key'])
+    if data['value']:
+        value = unicodedata.normalize('NFKD', data['value']).lower()
+        if op == '=':
+            qs = qs.filter(value__icontains=value)
+        elif op == '==':
+            qs = qs.filter(value__iexact=value)
+        elif op == '^':
+            qs = qs.filter(value__istartswith=value)
+        elif op == '$':
+            qs = qs.filter(value__iendswith=value)
+    if 'query' in data:
+        document_query = parse_query({'query': data.get('query', {})}, request.user)['qs']
+        qs = qs.filter(document__in=document_query)
+    qs = qs.values('value').annotate(items=Count('id'))
+    qs = qs.order_by(*order_by)
+    qs = qs[data['range'][0]:data['range'][1]]
+    response = json_response({})
+    response['data']['items'] = [i['value'] for i in qs]
+    return render_to_json_response(response)
+actions.register(autocompleteDocuments)

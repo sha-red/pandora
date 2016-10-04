@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'user',
     'urlalias',
     'tv',
+    'documentcollection',
     'document',
     'entity',
     'websocket',

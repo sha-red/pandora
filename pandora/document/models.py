@@ -5,17 +5,23 @@ from __future__ import division, print_function, absolute_import
 import os
 import re
 from glob import glob
+import unicodedata
 
 from six import string_types
 from six.moves.urllib.parse import quote, unquote
-from django.db import models
-from django.db.models import Max
-from django.contrib.auth.models import User
+from django.db import models, transaction
+from django.db.models import Q, Sum, Max
+from django.contrib.auth.models import User, Group
 from django.db.models.signals import pre_delete
+from django.conf import settings
 
 from PIL import Image
 import ox
 
+
+from oxdjango import fields
+from oxdjango.sortmodel import get_sort_field
+from person.models import get_name_sort
 from item.models import Item
 from archive.extract import resize_image
 from archive.chunk import save_chunk
@@ -23,57 +29,249 @@ from archive.chunk import save_chunk
 from . import managers
 from . import utils
 
-def get_path(f, x): return f.path(x)
+
+def get_path(f, x):
+    return f.path(x)
 
 class Document(models.Model):
-
-    class Meta:
-        unique_together = ("user", "name", "extension")
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    user = models.ForeignKey(User, related_name='files')
-    name = models.CharField(max_length=255)
+    user = models.ForeignKey(User, related_name='documents')
+    groups = models.ManyToManyField(Group, blank=True, related_name='documents')
+
     extension = models.CharField(max_length=255)
     size = models.IntegerField(default=0)
     matches = models.IntegerField(default=0)
-    ratio = models.FloatField(default=1)
+    ratio = models.FloatField(default=640/1024)
     pages = models.IntegerField(default=-1)
     width = models.IntegerField(default=-1)
     height = models.IntegerField(default=-1)
-    description = models.TextField(default="")
+
     oshash = models.CharField(max_length=16, unique=True, null=True)
 
-    file = models.FileField(default=None, blank=True,null=True, upload_to=get_path)
+    file = models.FileField(default=None, blank=True, null=True, upload_to=get_path)
 
     objects = managers.DocumentManager()
-    uploading = models.BooleanField(default = False)
-
-    name_sort = models.CharField(max_length=255, null=True)
-    description_sort = models.CharField(max_length=512, null=True)
-    dimensions_sort = models.CharField(max_length=512)
+    uploading = models.BooleanField(default=False)
 
     items = models.ManyToManyField(Item, through='ItemProperties', related_name='documents')
+
+    rightslevel = models.IntegerField(db_index=True, default=0)
+    data = fields.DictField(default={})
+
+    def update_access(self, user):
+        if not user.is_authenticated():
+            user = None
+        access, created = Access.objects.get_or_create(document=self, user=user)
+        if not created:
+            access.save()
+
+    def update_facet(self, key):
+        current_values = self.get_value(key, [])
+        if key == 'name':
+            current_values = []
+            for k in settings.CONFIG['documentKeys']:
+                if k.get('sortType') == 'person':
+                    current_values += self.get(k['id'], [])
+        if not isinstance(current_values, list):
+            if not current_values:
+                current_values = []
+            else:
+                current_values = [unicode(current_values)]
+
+        filter_map = utils.get_by_id(settings.CONFIG['documentKeys'], key).get('filterMap')
+        if filter_map:
+            filter_map = re.compile(filter_map)
+            _current_values = []
+            for value in current_values:
+                value = filter_map.findall(value)
+                if value:
+                    _current_values.append(value[0])
+            current_values = _current_values
+
+        current_values = list(set(current_values))
+        current_values = [ox.decode_html(ox.strip_tags(v)) for v in current_values]
+        current_values = [unicodedata.normalize('NFKD', v) for v in current_values]
+        self.update_facet_values(key, current_values)
+
+    def update_facet_values(self, key, current_values):
+        current_sortvalues = set([value.lower() for value in current_values])
+        saved_values = [i.value.lower() for i in Facet.objects.filter(document=self, key=key)]
+        removed_values = filter(lambda i: i not in current_sortvalues, saved_values)
+
+        if removed_values:
+            q = Q()
+            for v in removed_values:
+                q |= Q(value__iexact=v)
+            Facet.objects.filter(document=self, key=key).filter(q).delete()
+
+        for value in current_values:
+            if value.lower() not in saved_values:
+                sortvalue = value
+                if key in self.person_keys + ['name']:
+                    sortvalue = get_name_sort(value)
+                sortvalue = utils.sort_string(sortvalue).lower()[:900]
+                f, created = Facet.objects.get_or_create(document=self, key=key, value=value, sortvalue=sortvalue)
+                if created:
+                    Facet.objects.filter(document=self, key=key, value__iexact=value).exclude(value=value).delete()
+                    Facet.objects.filter(key=key, value__iexact=value).exclude(value=value).update(value=value)
+                saved_values.append(value.lower())
+
+    def update_facets(self):
+        for key in set(self.facet_keys + ['title']):
+            self.update_facet(key)
+
+    def update_find(self):
+
+        def save(key, value):
+            if value not in ('', None):
+                f, created = Find.objects.get_or_create(document=self, key=key)
+                if isinstance(value, bool):
+                    value = value and 'true' or 'false'
+                if isinstance(value, string_types):
+                    value = ox.decode_html(ox.strip_tags(value.strip()))
+                    value = unicodedata.normalize('NFKD', value).lower()
+                f.value = value
+                f.save()
+            else:
+                Find.objects.filter(document=self, key=key).delete()
+
+        with transaction.atomic():
+            data = self.json()
+            for key in settings.CONFIG['documentKeys']:
+                i = key['id']
+                if i == 'rightslevel':
+                    save(i, self.rightslevel)
+                elif i not in ('*', 'dimensions') and i not in self.facet_keys:
+                    value = data.get(i)
+                    if isinstance(value, list):
+                        value = u'\n'.join(value)
+                    save(i, value)
+
+    base_keys = ('id', 'size', 'dimensions', 'extension', 'matches')
+
+    def update_sort(self):
+        try:
+            s = self.sort
+        except Sort.DoesNotExist:
+            s = Sort(document=self)
+
+        s.id = self.id
+        s.extension = self.extension
+        s.size = self.size
+        s.matches = self.matches
+        if self.extension == 'pdf':
+            s.dimensions = ox.sort_string('2') + ox.sort_string('%d' % self.pages)
+        else:
+            if self.extension == 'html':
+                resolution_sort = self.dimensions
+                s.dimensions = ox.sort_string('1') + ox.sort_string('%d' % resolution_sort)
+            else:
+                resolution_sort = self.width * self.height
+                s.dimensions = ox.sort_string('0') + ox.sort_string('%d' % resolution_sort)
+
+        def sortNames(values):
+            sort_value = u''
+            if values:
+                sort_value = u'; '.join([get_name_sort(name) for name in values])
+            if not sort_value:
+                sort_value = u''
+            return sort_value
+
+        def set_value(s, name, value):
+            if isinstance(value, string_types):
+                value = ox.decode_html(value.lower())
+                if not value:
+                    value = None
+            setattr(s, name, value)
+
+        def get_value(source, key):
+            if 'value' in key and 'layer' in key['value']:
+                value = [a.value for a in self.annotations.filter(layer=key['value']['layer']).exclude(value='')]
+            else:
+                value = self.get_value(source)
+            return value
+
+        def get_words(source, key):
+            value = get_value(source, key)
+            if isinstance(value, list):
+                value = '\n'.join(value)
+            value = len(value.split(' ')) if value else 0
+            return value
+
+        for key in filter(lambda k: k.get('sort', False), settings.CONFIG['documentKeys']):
+            name = key['id']
+            if name not in self.base_keys:
+                source = name
+                sort_type = key.get('sortType', key['type'])
+                if 'value' in key:
+                    if 'key' in key['value']:
+                        source = key['value']['key']
+                    sort_type = key['value'].get('type', sort_type)
+                if isinstance(sort_type, list):
+                    sort_type = sort_type[0]
+                if sort_type == 'title':
+                    value = self.get_value(source, u'Untitled')
+                    value = utils.sort_title(value)[:955]
+                    set_value(s, name, value)
+                elif sort_type == 'person':
+                    value = sortNames(self.get_value(source, []))
+                    value = utils.sort_string(value)[:955]
+                    set_value(s, name, value)
+                elif sort_type == 'string':
+                    value = self.get_value(source, u'')
+                    if isinstance(value, list):
+                        value = u','.join(value)
+                    value = utils.sort_string(value)[:955]
+                    set_value(s, name, value)
+                elif sort_type == 'words':
+                    value = get_words(source, key) if s.duration else None
+                    set_value(s, name, value)
+                elif sort_type == 'wordsperminute':
+                    value = get_words(source, key)
+                    value = value / (s.duration / 60) if value and s.duration else None
+                    set_value(s, name, value)
+                elif sort_type in ('length', 'integer', 'time', 'float'):
+                    # can be length of strings or length of arrays, i.e. keywords
+                    if 'layer' in key.get('value', []):
+                        value = self.annotations.filter(layer=key['value']['layer']).count()
+                    else:
+                        value = self.get_value(source)
+                    if isinstance(value, list):
+                        value = len(value)
+                    set_value(s, name, value)
+                elif sort_type == 'year':
+                    value = self.get_value(source)
+                    set_value(s, name, value)
+                elif sort_type == 'date':
+                    value = self.get_value(source)
+                    if isinstance(value, string_types):
+                        value = datetime_safe.datetime.strptime(value, '%Y-%m-%d')
+                    set_value(s, name, value)
+        s.save()
 
     def save(self, *args, **kwargs):
         if not self.uploading:
             if self.file:
                 self.size = self.file.size
                 self.get_info()
-
-        self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
-        if self.description:
-            self.description_sort = ox.sort_string(self.description)[:512].lower()
+        if self.extension == 'html':
+            self.size = len(self.data.get('text', ''))
+        
+        if self.id:
+            self.update_sort()
+            self.update_find()
+            self.update_facets()
+            new = False
         else:
-            self.description_sort = None
-        if self.extension == 'pdf':
-            self.dimensions_sort = ox.sort_string('1') + ox.sort_string('%d' % self.pages)
-        else:
-            resolution_sort = self.width * self.height
-            self.dimensions_sort = ox.sort_string('0') + ox.sort_string('%d' % resolution_sort)
-
+            new = True
         super(Document, self).save(*args, **kwargs)
+        if new:
+            self.update_sort()
+            self.update_find()
+            self.update_facets()
         self.update_matches()
 
     def __unicode__(self):
@@ -100,40 +298,61 @@ class Document(models.Model):
     def get_id(self):
         return ox.toAZ(self.id)
 
+    def accessible(self, user):
+        return self.user == user or self.status in ('public', 'featured')
+
     def editable(self, user, item=None):
         if not user or user.is_anonymous():
             return False
         if self.user == user or \
            user.is_staff or \
-           user.profile.capability('canEditDocuments') == True or \
+           user.profile.capability('canEditDocuments') is True or \
            (item and item.editable(user)):
             return True
         return False
 
     def edit(self, data, user, item=None):
-        for key in data:
-            if key == 'name':
-                data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
-                if not data['name']:
-                    data['name'] = "Untitled"
-                name = data['name']
-                num = 1
-                while Document.objects.filter(name=name, user=self.user, extension=self.extension).exclude(id=self.id).count()>0:
-                    num += 1
-                    name = data['name'] + ' [%d]' % num
-                self.name = name
-            elif key == 'description' and not item:
-                self.description = ox.sanitize_html(data['description'])
         if item:
             p, created = ItemProperties.objects.get_or_create(item=item, document=self)
             if 'description' in data:
                 p.description = ox.sanitize_html(data['description'])
                 p.save()
+        else:
+            for key in data:
+                k = list(filter(lambda i: i['id'] == key, settings.CONFIG['documentKeys']))
+                ktype = k and k[0].get('type') or ''
+                if key == 'text' and self.extension == 'html':
+                    self.data['text'] = ox.sanitize_html(data['text'], global_attributes=[
+                        'data-name',
+                        'data-type',
+                        'data-value',
+                        'lang'
+                    ])
+                elif ktype == 'text':
+                    self.data[key] = ox.sanitize_html(data[key])
+                elif ktype == '[text]':
+                    self.data[key] = [ox.sanitize_html(t) for t in data[key]]
+                elif ktype == '[string]':
+                    self.data[key] = [ox.escape_html(t) for t in data[key]]
+                elif isinstance(data[key], string_types):
+                    self.data[key] = ox.escape_html(data[key])
+                elif isinstance(data[key], list):
+                    def cleanup(i):
+                        if isinstance(i, string_types):
+                            i = ox.escape_html(i)
+                        return i
+                    self.data[key] = [cleanup(i) for i in data[key]]
+                elif isinstance(data[key], int) or isinstance(data[key], float):
+                    self.data[key] = data[key]
+                else:
+                    self.data[key] = ox.escape_html(data[key])
 
     @property
     def dimensions(self):
         if self.extension == 'pdf':
             return self.pages
+        elif self.extension == 'html':
+            return len(self.data.get('text', '').split(' '))
         else:
             return self.resolution
 
@@ -141,21 +360,43 @@ class Document(models.Model):
     def resolution(self):
         return [self.width, self.height]
 
+    def get_value(self, key, default=None):
+        if key in (
+            'extension',
+            'id',
+            'matches',
+            'ratio',
+            'size',
+        ):
+            return getattr(self, key)
+        elif key == 'user':
+            return self.user.username
+        else:
+            return self.data.get(key, default)
+
     def json(self, keys=None, user=None, item=None):
         if not keys:
-            keys=[
+            keys = [
                 'description',
                 'dimensions',
                 'editable',
                 'entities',
                 'extension',
                 'id',
-                'name',
                 'oshash',
+                'title',
                 'ratio',
+                'matches',
                 'size',
                 'user',
             ]
+            if self.extension in ('html', 'txt'):
+                keys.append('text')
+            for key in settings.CONFIG['documentKeys']:
+                if key['id'] in ('*', ):
+                    continue
+                if key['id'] not in keys:
+                    keys.append(key['id'])
         response = {}
         _map = {
         }
@@ -166,6 +407,10 @@ class Document(models.Model):
                 response[key] = self.editable(user)
             elif key == 'user':
                 response[key] = self.user.username
+            elif key == 'accessed':
+                response[key] = self.accessed.aggregate(Max('access'))['access__max']
+            elif key == 'timesaccessed':
+                response[key] = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
             elif key == 'entities':
                 dps = self.documentproperties.select_related('entity').order_by('index')
                 response[key] = entity_jsons = []
@@ -175,8 +420,12 @@ class Document(models.Model):
                     entity_jsons.append(entity_json)
             elif key == 'items':
                 response[key] = [i['public_id'] for i in self.items.all().values('public_id')]
+            elif key in self.data:
+                response[key] = self.data[key]
             elif hasattr(self, _map.get(key, key)):
-                response[key] = getattr(self, _map.get(key,key)) or ''
+                response[key] = getattr(self, _map.get(key, key)) or ''
+        if self.extension == 'html':
+            response['text'] = self.data.get('text', '')
         if item:
             if isinstance(item, string_types):
                 item = Item.objects.get(public_id=item)
@@ -185,6 +434,10 @@ class Document(models.Model):
                 if 'description' in keys and d[0].description:
                     response['description'] = d[0].description
                 response['index'] = d[0].index
+        if keys:
+            for key in list(response):
+                if key not in keys:
+                    del response[key]
         return response
 
     def path(self, name=''):
@@ -211,6 +464,9 @@ class Document(models.Model):
         return False, 0
 
     def thumbnail(self, size=None, page=None):
+        if not self.file:
+            return os.path.join(settings.STATIC_ROOT, 'png/cover.png')
+            return os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
         src = self.file.path
         folder = os.path.dirname(src)
         if size:
@@ -278,12 +534,12 @@ class Document(models.Model):
             try:
                 size = Image.open(image).size
             except:
-                size = [1,1]
+                size = [1, 1]
         else:
             if self.width > 0:
                 size = self.resolution
             else:
-                size = [1,1]
+                size = [640, 1024]
         self.ratio = size[0] / size[1]
         return self.ratio
 
@@ -337,6 +593,97 @@ class ItemProperties(models.Model):
         if self.description:
             self.description_sort = ox.sort_string(self.description)[:512].lower()
         else:
-            self.description_sort = self.document.description_sort
+            self.description_sort = self.document.sort.description
 
         super(ItemProperties, self).save(*args, **kwargs)
+
+
+class Access(models.Model):
+    class Meta:
+        unique_together = ("document", "user")
+
+    access = models.DateTimeField(auto_now=True)
+    document = models.ForeignKey(Document, related_name='accessed')
+    user = models.ForeignKey(User, null=True, related_name='accessed_documents')
+    accessed = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.accessed:
+            self.accessed = 0
+        self.accessed += 1
+        super(Access, self).save(*args, **kwargs)
+        timesaccessed = Access.objects.filter(document=self.document).aggregate(Sum('accessed'))['accessed__sum']
+        Sort.objects.filter(document=self.document).update(timesaccessed=timesaccessed, accessed=self.access)
+
+    def __unicode__(self):
+        if self.user:
+            return u"%s/%s/%s" % (self.user, self.document, self.access)
+        return u"%s/%s" % (self.item, self.access)
+
+class Facet(models.Model):
+    '''
+        used for keys that can have multiple values like people, languages etc.
+        does not perform to well if total number of items goes above 10k
+        this happens for keywords in 0xdb right now
+    '''
+
+    class Meta:
+        unique_together = ("document", "key", "value")
+
+    document = models.ForeignKey('Document', related_name='facets')
+    key = models.CharField(max_length=200, db_index=True)
+    value = models.CharField(max_length=1000, db_index=True)
+    sortvalue = models.CharField(max_length=1000, db_index=True)
+
+    def __unicode__(self):
+        return u"%s=%s" % (self.key, self.value)
+
+    def save(self, *args, **kwargs):
+        if not self.sortvalue:
+            self.sortvalue = utils.sort_string(self.value).lower()[:900]
+        self.sotvalue = self.sortvalue.lower()
+        super(Facet, self).save(*args, **kwargs)
+
+Document.facet_keys = []
+for key in settings.CONFIG['documentKeys']:
+    if 'autocomplete' in key and 'autocompleteSortKey' not in key or \
+            key.get('filter'):
+        Document.facet_keys.append(key['id'])
+
+Document.person_keys = []
+for key in settings.CONFIG['itemKeys']:
+    if key.get('sortType') == 'person':
+        Document.person_keys.append(key['id'])
+
+class Find(models.Model):
+
+    class Meta:
+        unique_together = ('document', 'key')
+
+    document = models.ForeignKey('Document', related_name='find', db_index=True)
+    key = models.CharField(max_length=200, db_index=True)
+    value = models.TextField(blank=True, db_index=settings.DB_GIN_TRGM)
+
+    def __unicode__(self):
+        return u'%s=%s' % (self.key, self.value)
+
+'''
+Sort
+table constructed based on info in settings.CONFIG['documentKeys']
+'''
+attrs = {
+    '__module__': 'document.models',
+    'document': models.OneToOneField('Document', related_name='sort', primary_key=True),
+    'created': models.DateTimeField(null=True, blank=True, db_index=True),
+}
+for key in filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['documentKeys']):
+    name = key['id']
+    sort_type = key.get('sortType', key['type'])
+    if isinstance(sort_type, list):
+        sort_type = sort_type[0]
+    field = get_sort_field(sort_type)
+    if name not in attrs:
+        attrs[name] = field[0](**field[1])
+
+Sort = type('Sort', (models.Model,), attrs)
+Sort.fields = [f.name for f in Sort._meta.fields]

@@ -3,7 +3,7 @@
 pandora.ui.folderBrowserBar = function(id, section) {
     section = section || pandora.user.ui.section;
     var ui = pandora.user.ui,
-        folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
+        folderItems = pandora.getFolderItems(section),
         folderItem = folderItems.slice(0, -1),
         that = Ox.Bar({
             size: 24

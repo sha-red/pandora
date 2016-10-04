@@ -11,6 +11,7 @@ pandora.ui.textPanel = function() {
             orientation: 'vertical'
         }),
         embedURLs,
+        scrolling = false,
         selected = -1,
         selectedURL;
 
@@ -233,12 +234,23 @@ pandora.ui.textHTML = function(text) {
                 scroll: function(event) {
                     var position = Math.round(100 * that[0]. scrollTop / Math.max(1,
                             that[0].scrollHeight - that.height())),
+                        settings;
+                    if (pandora.user.ui.section == 'texts') {
                         settings = pandora.user.ui.texts[pandora.user.ui.text];
+                    } else {
+                        settings = pandora.user.ui.documents[pandora.user.ui.document] || {};
+                    }
                     position = position - position % 10;
                     if (!scrolling && settings && (settings.name || (position != settings.position))) {
-                        pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text), {
-                            position: position ? position : 0
-                        });
+                        if (pandora.user.ui.section == 'documents') {
+                            pandora.UI.set('documents.' + pandora.user.ui.document, {
+                                position: position ? position : 0
+                            });
+                        } else {
+                            pandora.UI.set('texts.' + pandora.UI.encode(pandora.user.ui.text), {
+                                position: position ? position : 0
+                            });
+                        }
                     }
                     scrolling = false;
                 },
@@ -247,6 +259,9 @@ pandora.ui.textHTML = function(text) {
                 pandora_showsidebar: function(data) {
                     that.update();
                 },
+            })
+            .bindEvent('pandora_documents.' + text.id.toLowerCase(), function(data) {
+                data.value && data.value.name && scrollToPosition();
             })
             .bindEvent('pandora_texts.' + text.id.toLowerCase(), function(data) {
                 data.value && data.value.name && scrollToPosition();
@@ -257,10 +272,10 @@ pandora.ui.textHTML = function(text) {
             .appendTo(that),
 
         $title = Ox.EditableContent({
-                editable: text.name ? text.editable : false,
+                editable: text.title ? text.editable : false,
                 placeholder: text.editable ? Ox._('Doubleclick to edit title') : Ox._('Untitled'),
                 tooltip: text.editable ? pandora.getEditTooltip('title') : '',
-                value: text.name || Ox._('{0} Texts', [pandora.site.site.name]),
+                value: text.title || Ox._('{0} Texts', [pandora.site.site.name]),
                 width: width
             })
             .css({
@@ -271,17 +286,31 @@ pandora.ui.textHTML = function(text) {
             })
             .bindEvent({
                 submit: function(data) {
-                    Ox.Request.clearCache('getText');
-                    pandora.api.editText({
-                        id: pandora.user.ui.text,
-                        name: data.value
-                    }, function(result) {
-                        if (result.data.id != pandora.user.ui.text) {
-                            Ox.Request.clearCache();
-                            pandora.renameList(pandora.user.ui.text, result.data.id, result.data.name);
-                            pandora.$ui.info.updateListInfo();
-                        }
-                    });
+                    if (pandora.user.ui.section == 'documents') {
+                        pandora.api.editDocument({
+                            id: pandora.user.ui.document,
+                            name: data.value
+                        }, function(result) {
+                            if (result.data.name != data.value) {
+                                Ox.Request.clearCache();
+                                $title.options({
+                                    value: result.data.title
+                                })
+                            }
+                        });
+                    } else {
+                        Ox.Request.clearCache('getText');
+                        pandora.api.editText({
+                            id: pandora.user.ui.text,
+                            name: data.value
+                        }, function(result) {
+                            if (result.data.id != pandora.user.ui.text) {
+                                Ox.Request.clearCache();
+                                pandora.renameList(pandora.user.ui.text, result.data.id, result.data.name);
+                                pandora.$ui.info.updateListInfo();
+                            }
+                        });
+                    }
                 }
             })
             .appendTo($content),
@@ -373,12 +402,23 @@ pandora.ui.textHTML = function(text) {
             })
             .bindEvent({
                 submit: function(data) {
-                    Ox.Request.clearCache('getText');
-                    pandora.api.editText({
-                        id: pandora.user.ui.text,
-                        text: data.value
-                    });
-                    pandora.$ui.textPanel.update(data.value);
+                    if (pandora.user.ui.section == 'documents') {
+                        Ox.Request.clearCache('getDocument');
+                        pandora.api.editDocument({
+                            id: pandora.user.ui.document,
+                            text: data.value
+                        }, function(result) {
+                            //fixme: just reload as it was done with textPanel
+                            pandora.$ui.document = pandora.ui.document();
+                        });
+                    } else {
+                        Ox.Request.clearCache('getText');
+                        pandora.api.editText({
+                            id: pandora.user.ui.text,
+                            text: data.value
+                        });
+                        pandora.$ui.textPanel.update(data.value);
+                    }
                 }
             })
             .appendTo($content);
@@ -404,7 +444,9 @@ pandora.ui.textHTML = function(text) {
     }
 
     function scrollToPosition() {
-        var settings = pandora.user.ui.texts[pandora.user.ui.text] || {},
+        var settings = (pandora.user.ui.section == 'documents'
+                ? pandora.user.ui.documents[pandora.user.ui.document]
+                : pandora.user.ui.texts[pandora.user.ui.text]) || {},
             position = settings.position || 0,
             element,
             scrollTop;
@@ -505,6 +547,7 @@ pandora.ui.textEmbed = function() {
                 resize: function(data) {
                     pandora.user.ui.embedSize = data.size;
                     pandora.$ui.text.update();
+                    pandora.$ui.document && pandora.$ui.document.update();
                 },
                 resizeend: function(data) {
                     $iframe.attr('src') && $overlay.hide();

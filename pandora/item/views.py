@@ -326,7 +326,7 @@ def autocomplete(request, data):
     returns {
         items: [string, ...] // list of matching strings
     }
-    see: autocompleteEntities
+    see: autocompleteDocuments, autocompleteEntities
     '''
     if 'range' not in data:
         data['range'] = [0, 10]

@@ -20,13 +20,15 @@ pandora.URL = (function() {
                 Ox.contains(Object.keys(pandora.site.user.ui.part), state.page)
             ) {
                 state.part = pandora.user.ui.part[state.page];
+                /*
                 if (
                     state.page == 'documents'
                     && pandora.user.ui.documents[state.part] 
- 	                && pandora.user.ui.documents[state.part].position
+                    && pandora.user.ui.documents[state.part].position
                 ) {
                     state.span = pandora.user.ui.documents[state.part].position;
                 }
+                */
             }
 
         } else {
@@ -64,6 +66,25 @@ pandora.URL = (function() {
                             ? [videoPoints['in'], videoPoints.out]
                             : []
                     );
+                }
+            } else if (pandora.user.ui.section == 'documents') {
+                if (!pandora.user.ui.document) {
+                    state.view = pandora.user.ui.collectionView;
+                    state.sort = [pandora.user.ui.collectionSort[0]];
+                    state.find = pandora.user.ui.findDocuments;
+                } else {
+                    var documentState = pandora.user.ui.documents[state.item] || {},
+                        position = documentState.position || 0;
+                    if (pandora.user.ui.documentView == 'view') {
+                        if (documentState.name) {
+                            state.span = documentState.name;
+                        } else if (position) {
+                            state.span = [position];
+                        }
+                    } else {
+                        state.view = pandora.user.ui.documentView;
+                    }
+                    state.sort = [pandora.user.ui.collectionSort[0]];
                 }
             } else if (pandora.user.ui.section == 'edits') {
                 var editPoints = pandora.user.ui.edits[state.item] || {};
@@ -118,10 +139,15 @@ pandora.URL = (function() {
         var set = {};
 
         Ox.Log('URL', 'setState:', state);
+        if (state.type == 'texts') {
+            state.type = 'documents';
+        }
 
         pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
         pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
         pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+        pandora.user.ui._collection = pandora.getCollectionState(pandora.user.ui.findDocuments);
+        pandora.user.ui._findDocumentsState = pandora.getFindDocumentsState(pandora.user.ui.findDocuments);
 
         if (Ox.isEmpty(state)) {
 
@@ -147,9 +173,6 @@ pandora.URL = (function() {
                     Object.keys(pandora.site.user.ui.part), state.page
                 ) && state.part) {
                     set['part.' + state.page] = state.part;
-                }
-                if (state.span) {
-                    set['documents.' + state.part] = {position: state.span};
                 }
                 pandora.UI.set(set);
                 callback && callback();
@@ -222,7 +245,16 @@ pandora.URL = (function() {
                             set.find = pandora.site.user.ui.find;
                         }
                     }
-
+                } else if (state.type == 'documents') {
+                    if (state.view) {
+                        set[!state.item ? 'collectionView' : 'documentView'] = state.view;
+                    }
+                    if (state.span) {
+                        set['documents.' + state.item] = {position: state.span};
+                    }
+                    if (!state.item && state.find) {
+                        set.findDocuments = state.find;
+                    }
                 } else if (state.type == 'edits') {
 
                     if (state.view) {
@@ -248,16 +280,6 @@ pandora.URL = (function() {
                             set[key + '.clip'] = state.span;
                         }
                     }
-
-                } else if (state.type == 'texts') {
-
-                    if (state.span) {
-                        set['texts.' + pandora.UI.encode(state.item)] = {
-                            position: Ox.isArray(state.span) ? state.span[0] : 0,
-                            name: Ox.isArray(state.span) ? '' : state.span
-                        };
-                    }
-
                 }
 
                 Ox.Request.cancel();
@@ -368,6 +390,19 @@ pandora.URL = (function() {
                 .concat(pandora.site.itemKeys);
         });
 
+        // Documents
+        views['documents'] = {
+            list: ['grid', 'list'],
+            item: ['view', 'info']
+        };
+        sortKeys['documents'] = {
+            list: {
+                list: pandora.site.documentKeys,
+                grid: pandora.site.documentKeys
+            },
+            item: {}
+        };
+
         // Texts
         views['texts'] = {
             list: [],
@@ -377,7 +412,6 @@ pandora.URL = (function() {
             list: {},
             item: {}
         };
-
         return {
             views: views,
             sortKeys: sortKeys
@@ -388,7 +422,7 @@ pandora.URL = (function() {
     that.init = function() {
 
         var itemsSection = pandora.site.itemsSection,
-            findKeys, spanType = {};
+            findKeys = {}, spanType = {};
 
         spanType[itemsSection] = {
             list: {
@@ -411,12 +445,25 @@ pandora.URL = (function() {
                 annotations: 'duration'
             }
         };
+        spanType['documents'] = {
+            list: {},
+            item: {
+                view: 'string',
+            }
+        };
         spanType['texts'] = {
             list: {},
             item: {text: 'string'}
         };
 
-        findKeys = [{id: 'list', type: 'string'}].concat(pandora.site.itemKeys);
+        findKeys[itemsSection] = [
+            {id: 'list', type: 'string'},
+        ].concat(pandora.site.itemKeys);
+
+        findKeys['edits'] = [];
+        findKeys['documents'] = [
+            {id: 'collection', type: 'string'}
+        ].concat(pandora.site.documentKeys);
 
         self.URL = Ox.URL(Ox.extend({
             findKeys: findKeys,
@@ -426,14 +473,14 @@ pandora.URL = (function() {
             getSort: pandora.getSort,
             getSpan: pandora.getSpan,
             pages: [].concat(
-                ['home', 'software', 'api', 'help', 'tv', 'documents', 'entities'],
+                ['home', 'software', 'api', 'help', 'tv', 'entities'],
                 pandora.site.sitePages.map(function(page) {
                     return page.id;
                 }),
                 ['preferences', 'signup', 'signin', 'signout']
             ),
             spanType: spanType,
-            types: [pandora.site.itemName.plural.toLowerCase(), 'edits', 'texts'],
+            types: [pandora.site.itemName.plural.toLowerCase(), 'edits', 'documents', 'texts'],
         }, getOptions()));
 
         window.addEventListener('hashchange', function() {
@@ -508,7 +555,7 @@ pandora.URL = (function() {
     that.push = function(stateOrURL, expandURL) {
         var state,
             title = pandora.getPageTitle(stateOrURL)
-                || pandora.getDocumentTitle(),
+                || pandora.getWindowTitle(),
             url;
         pandora.replaceURL = expandURL;
         if (Ox.isObject(stateOrURL)) {
@@ -524,7 +571,7 @@ pandora.URL = (function() {
     that.replace = function(stateOrURL, title) {
         var state,
             title = pandora.getPageTitle(stateOrURL)
-                || pandora.getDocumentTitle(),
+                || pandora.getWindowTitle(),
             url;
         if (Ox.isObject(stateOrURL)) {
             state = stateOrURL;
@@ -576,7 +623,7 @@ pandora.URL = (function() {
             state = getState();
             self.URL[action](
                 state,
-                pandora.getPageTitle(state) || pandora.getDocumentTitle()
+                pandora.getPageTitle(state) || pandora.getWindowTitle()
             );
             pandora.replaceURL = false;
         }

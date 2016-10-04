@@ -2,8 +2,12 @@
 'use strict';
 pandora.ui.backButton = function() {
     var that = Ox.Button({
-        title: Ox._('Back to {0}', [Ox._(pandora.site.itemName.plural)]),
-        width: 96
+        title: Ox._('Back to {0}', [
+            pandora.user.ui.section == 'items'
+                ? Ox._(pandora.site.itemName.plural)
+                : Ox._(Ox.toTitleCase(pandora.user.ui.section))
+        ]),
+        width: pandora.user.ui.section == 'documents' ? 124 : 96
     }).css({
         float: 'left',
         margin: '4px 0 0 4px'
@@ -21,7 +25,11 @@ pandora.ui.backButton = function() {
             if (['accessed', 'timesaccessed'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
                 Ox.Request.clearCache('find');
             }
-            pandora.UI.set({item: ''});
+            if (pandora.user.ui.section == 'documents') {
+                pandora.UI.set({document: ''});
+            } else {
+                pandora.UI.set({item: ''});
+            }
         }
     });
     return that;

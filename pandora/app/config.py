@@ -94,10 +94,20 @@ def load_config(init=False):
         for key in config['itemKeys']:
             config['keys'][key['id']] = key
 
+        # add entities if needed
+        if len(config.get('entities', [])) and not [k for k in config['documentKeys'] if k['id'] == 'entites']:
+            config['documentKeys'].append({
+                'id': 'entity',
+                'title': 'Entity',
+                'type': 'string',
+                'find': True
+            })
 
         # add missing defaults
         for section in sorted((
-            'capabilities', 'cantPlay', 'entities', 'itemName', 'itemTitleKeys', 'media', 'posters',
+            'capabilities', 'cantPlay',
+            'documentKeys',
+            'entities', 'itemName', 'itemTitleKeys', 'itemKeys', 'media', 'posters',
             'site', 'tv', 'user.ui', 'user.ui.part', 'user.ui.showFolder',
             'menuExtras', 'languages'
         )):

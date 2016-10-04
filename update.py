@@ -216,6 +216,8 @@ if __name__ == "__main__":
             run('./bin/pip', 'install', '-r', 'requirements.txt')
             update_service('pandora-encoding')
             update_service('pandora-tasks')
+        if old <=  5673:
+            run('./pandora/manage.py', 'rebuild_documentfind')
     else:
         if len(sys.argv) == 1:
             release = get_release()

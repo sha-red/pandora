@@ -28,6 +28,12 @@ pandora.UI = (function() {
             pandora.user.ui._findState = pandora.getFindState(
                 pandora.user.ui.find
             );
+            pandora.user.ui._collection = pandora.getCollectionState(
+                pandora.user.ui.findDocuments
+            );
+            pandora.user.ui._findDocumentsState = pandora.getFindDocumentsState(
+                pandora.user.ui.findDocuments
+            );
             Ox.Theme(pandora.user.ui.theme);
             pandora.$ui.appPanel.reload();
         });
@@ -40,6 +46,9 @@ pandora.UI = (function() {
 
         var add = {},
             args,
+            collection,
+            collectionView,
+            collectionSettings = pandora.site.collectionSettings,
             editSettings = pandora.site.editSettings,
             item,
             list,
@@ -69,6 +78,76 @@ pandora.UI = (function() {
         } else if (args.section == 'edits') {
             trigger.section = args.section;
             trigger.edit = args.edit;
+        } else if (pandora.user.ui.section == 'documents' || args.section == 'documents') {
+            if ('findDocuments' in args) {
+                // the challenge here is that find may change list,
+                // and list may then change listSort and listView,
+                // which we don't want to trigger, since find triggers
+                // (values we put in add will be changed, but won't trigger)
+                collection = pandora.getCollectionState(args.findDocuments);
+                pandora.user.ui._collection = collection;
+                pandora.user.ui._findDocumentsState = pandora.getFindDocumentsState(args.findDocuments);
+                if (pandora.$ui.appPanel && !pandora.stayInItemView) {
+                    // if we're not on page load, and if find isn't a context change
+                    // caused by an edit, then switch from item view to list view
+                    args['document'] = '';
+                }
+                if (collection != self.previousUI._collection) {
+                    Ox.Log('UI', 'FIND HAS CHANGED COLLECTION', self.previousUI._collection, '>', collection);
+                    // if find has changed collection
+                    Ox.forEach(collectionSettings, function(collectionSetting, setting) {
+                        // then for each setting that corresponds to a collection setting
+                        if (!Ox.isUndefined(args[setting])) {
+                            add[setting] = args[setting];
+                        } else if (
+                            !pandora.user.ui.collections[collection]
+                            || Ox.isUndefined(pandora.user.ui.collections[collection][collectionSetting])
+                        ) {
+                            // either add the default setting
+                            add[setting] = pandora.site.user.ui[setting];
+                        } else {
+                            // or the existing collection setting
+                            add[setting] = pandora.user.ui.collections[collection][collectionSetting];
+                        }
+                    });
+                }
+            } else {
+                collection = self.previousUI._collection;
+            }
+            if (!pandora.user.ui.collections[collection]) {
+                add['collections.' + that.encode(collection)] = {};
+            }
+            Ox.forEach(collectionSettings, function(collectionSetting, setting) {
+                // for each setting that corresponds to a collection setting
+                // set that collection setting to
+                var key = 'collections.' + that.encode(collection) + '.' + collectionSetting;
+                if (setting in args) {
+                    // the setting passed to UI.set
+                    add[key] = args[setting];
+                } else if (setting in add) {
+                    // or the setting changed via find
+                    add[key] = add[setting];
+                } else if (!pandora.user.ui.collections[collection]) {
+                    // or the default setting
+                    add[key] = pandora.site.user.ui[setting];
+                }
+            });
+            // set nested lisColumnWidth updates
+            Ox.forEach(args, function(value, key) {
+                if (Ox.startsWith(key, 'collectionColumnWidth.')) {
+                    key = 'collections.' + that.encode(collection) + '.columnWidth.'
+                        + key.slice('collectionColumnWidth.'.length);
+                    if (!(key in add)) {
+                        add[key] = value;
+                    }
+                }
+            });
+
+            if (args.document) {
+                // when switching to an item, update list selection
+                add['collectionSelection'] = [args.document];
+                add['collections.' + that.encode(collection) + '.selection'] = [args.document];
+            }
         } else {
             if ('find' in args) {
                 // the challenge here is that find may change list,
@@ -296,7 +375,7 @@ pandora.UI = (function() {
                 }
             });
         });
-        
+
         pandora.URL.update(Object.keys(
             !pandora.$ui.appPanel ? args : trigger
         ));

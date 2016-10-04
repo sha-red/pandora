@@ -46,3 +46,13 @@ def update_numberoflists(username):
     ).update(
         numberoflists=user.lists.count()
     )
+
+@task(ignore_results=True, queue='default')
+def update_numberofcollections(username):
+    from . import models
+    user = models.User.objects.get(username=username)
+    models.SessionData.objects.filter(
+        user=user
+    ).update(
+        numberofcollections=user.collections.count()
+    )

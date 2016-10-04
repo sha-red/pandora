@@ -46,7 +46,7 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
                             if (title == Ox._('Cancel Upload')) {
                                 upload && upload.abort();
                             } else if (title == Ox._('Done')) {
-                                callback({
+                                callback && callback({
                                     ids: ids
                                 });
                             }
@@ -81,7 +81,7 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
                     + (extension == 'jpeg' ? 'jpg' : extension);
             valid && Ox.oshash(file, function(oshash) {
                 pandora.api.findDocuments({
-                    keys: ['id', 'user', 'name', 'extension'],
+                    keys: ['id', 'user', 'title', 'extension'],
                     query: {
                         conditions: [{
                             key: 'oshash',
@@ -91,10 +91,10 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
                         operator: '&'
                     },
                     range: [0, 1],
-                    sort: [{key: 'name', operator: '+'}]
+                    sort: [{key: 'title', operator: '+'}]
                 }, function(result) {
                     if (result.data.items.length) {
-                        var id = result.data.items[0].name + '.'
+                        var id = result.data.items[0].title + '.'
                             + result.data.items[0].extension;
                         valid && errorDialog(
                             filename == id
@@ -161,7 +161,7 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
                         ids.push(data.response.id);
                         if (part == files.length) {
                             $progress.options({progress: data.progress});
-                            callback({ids: ids});
+                            callback && callback({ids: ids});
                             $uploadDialog.close();
                         } else {
                             uploadFile(part);

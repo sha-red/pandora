@@ -40,6 +40,9 @@ pandora.addFolderItem = function(section) {
             if (!isSmart) {
                 if (isItems) {
                     data.items = ui.listSelection;
+                } else if (section == 'documents') {
+                    //fixme
+                    data.items = ui.collectionSelection;
                 } else {
                     data.clips = pandora.getClipData(
                         ui.section == 'items'
@@ -66,7 +69,11 @@ pandora.addFolderItem = function(section) {
         if (data.type == 'smart') {
             data.query = listData.query;
         }
-        pandora.api[isItems ? 'findLists' : 'findEdits']({
+        pandora.api[{
+            items: 'findLists',
+            documents: 'findCollections',
+            edits: 'findEdits',
+        }[section]]({
             query: {conditions: [{
                 key: 'id',
                 operator: '==',
@@ -103,6 +110,9 @@ pandora.addFolderItem = function(section) {
                             addList();
                         }
                     });
+                } else if(section == 'documents') {
+                    //fixme
+                    addList();
                 } else {
                     pandora.api.getEdit({
                         id: list,
@@ -127,7 +137,11 @@ pandora.addFolderItem = function(section) {
         });
     }
     function addList() {
-        pandora.api[isItems ? 'addList' : 'addEdit'](data, function(result) {
+        pandora.api[{
+            items: 'addList',
+            documents: 'addCollection',
+            edits: 'addEdit'
+        }[section]](data, function(result) {
             getPosterFrames(result.data.id);
         });
     }
@@ -136,23 +150,41 @@ pandora.addFolderItem = function(section) {
             sortKey = Ox.getObjectById(pandora.site.itemKeys, 'votes')
                 ? 'votes' : 'timesaccessed';
         if (!isDuplicate) {
-            (isItems ? Ox.noop : pandora.api.getEdit)({
+            ({
+                items: Ox.noop,
+                documents: Ox.noop,
+                edits: pandora.api.getEdit
+            }[section])({
                 id: newList,
                 keys: ['clips']
             }, function(result) {
-                query = isItems ? {
-                    conditions: [{key: 'list', value: newList, operator: '=='}],
-                    operator: '&'
-                } : {
-                    conditions: Ox.unique(result.data.clips.map(function(clip) {
-                        return {key: 'id', value: clip.item, operator: '=='};
-                    })),
-                    operator: '|'
-                };
-                (isItems ? pandora.api.find : Ox.noop)({
+                if (Ox.contains(pandora.site.listSections, section)) {
+                    query = {
+                        conditions: [{
+                            key: section == 'documents' ? 'collection' : 'list',
+                            value: newList, operator: '=='
+                        }],
+                        operator: '&'
+                    };
+                } else{
+                    query = {
+                        conditions: Ox.unique(result.data.clips.map(function(clip) {
+                            return {key: 'id', value: clip.item, operator: '=='};
+                        })),
+                        operator: '|'
+                    };
+                }
+                ({
+                    items: pandora.api.find,
+                    documents: pandora.api.findDocuments,
+                    edits: Ox.noop
+                }[section])({
                     query: {
                         conditions: [
-                            {key: 'list', value: newList, operator: '=='}
+                            {
+                                key: section == 'documents' ? 'collection' : 'list',
+                                value: newList, operator: '=='
+                            }
                         ],
                         operator: '&'
                     },
@@ -181,7 +213,11 @@ pandora.addFolderItem = function(section) {
                 });
             });
         } else {
-            pandora.api[isItems ? 'findLists' : 'findEdits']({
+            pandora.api[{
+                items: 'findLists',
+                documents: 'findCollections',
+                edits: 'findEdits'
+            }[section]]({
                 query: {
                     conditions: [{key: 'id', value: list, operator: '=='}],
                     operator: '&'
@@ -193,7 +229,11 @@ pandora.addFolderItem = function(section) {
         }
     }
     function setPosterFrames(newList, posterFrames) {
-        pandora.api[isItems ? 'editList' : 'editEdit']({
+        pandora.api[{
+            items: 'editList',
+            documents: 'editCollection',
+            edits: 'editEdit'
+        }[section]]({
             id: newList,
             posterFrames: posterFrames
         }, function() {
@@ -206,22 +246,37 @@ pandora.addFolderItem = function(section) {
         // (same applies to addText, below)
         $folderList = pandora.$ui.folderList.personal;
         pandora.$ui.folder[0].options({collapsed: false});
-        Ox.Request.clearCache(isItems ? 'findLists' : 'findEdits');
+        Ox.Request.clearCache({
+            items: 'findLists',
+            documents: 'findCollections',
+            edits: 'findEdits'
+        }[section]);
         $folderList.bindEventOnce({
             load: function() {
                 $folderList.gainFocus()
                     .options({selected: [newList]})
                     .editCell(newList, 'name', true);
-                pandora.UI.set(isItems ? {
-                    find: {
-                        conditions: [
-                            {key: 'list', value: newList, operator: '=='}
-                        ],
-                        operator: '&'
+                pandora.UI.set({
+                    items: {
+                        find: {
+                            conditions: [
+                                {key: 'list', value: newList, operator: '=='}
+                            ],
+                            operator: '&'
+                        }
+                    },
+                    documents: {
+                        findDocuments: {
+                            conditions: [
+                                {key: 'collection', value: newList, operator: '=='}
+                            ],
+                            operator: '&'
+                        }
+                    },
+                    edits: {
+                        edit: newList
                     }
-                } : {
-                    edit: newList
-                });
+                }[section]);
             }
         }).reloadList();
     }
@@ -229,7 +284,7 @@ pandora.addFolderItem = function(section) {
 
 pandora.addList = function() {
     // addList(isSmart, isFrom) or addList(list) [=duplicate]
-    pandora.addFolderItem.apply(null, ['items'].concat(Ox.slice(arguments)));
+    pandora.addFolderItem.apply(null, [pandora.user.ui.section].concat(Ox.slice(arguments)));
 };
 
 pandora.addText = function(options) {
@@ -271,8 +326,7 @@ pandora.beforeUnloadWindow = function() {
 
 pandora.changeFolderItemStatus = function(id, status, callback) {
     var ui = pandora.user.ui,
-        folderItems = ui.section == 'items'
-            ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = pandora.getFolderItems(ui.section),
         folderItem = folderItems.slice(0, -1);
     if (status == 'private') {
         pandora.api['find' + folderItems]({
@@ -491,7 +545,31 @@ pandora.createLinks = function($element) {
                         list: target
                     }, function(result) {
                         callback(result, addedItems);
-                    });                    
+                    });
+                } else {
+                    callback(null, []);
+                }
+            });
+        } else if (type == 'documents') {
+            //fixme
+            pandora.api.findDocuments({
+                query: {
+                    conditions: [{key: 'collection', operator: '==', value: target}],
+                    operator: '&'
+                },
+                positions: items
+            }, function(result) {
+                var existingItems = Object.keys(result.data.positions),
+                    addedItems = items.filter(function(item) {
+                        return !Ox.contains(existingItems, item);
+                    });
+                if (addedItems.length) {
+                    pandora.api.addCollectionItems({
+                        items: addedItems,
+                        collection: target
+                    }, function(result) {
+                        callback(result, addedItems);
+                    });
                 } else {
                     callback(null, []);
                 }
@@ -525,6 +603,31 @@ pandora.createLinks = function($element) {
                     query: {
                         conditions: [{
                             key: 'list',
+                            operator: '==',
+                            value: list
+                        }],
+                        operator: '&'
+                    }
+                }, function(result) {
+                    pandora.$ui.folderList[listData.folder].value(
+                        list, 'items', result.data.items
+                    );
+                });
+            });
+            if (Ox.contains(object.targets, ui._list)) {
+                // FIXME: Why is this timeout needed?
+                setTimeout(pandora.reloadList, 250);
+            }
+        } else if (type == 'document' && ui.section == 'documents') {
+            Ox.Request.clearCache('findDocuments');
+            object.targets.filter(function(list) {
+                return list != ui._list;
+            }).forEach(function(list) {
+                listData = pandora.getListData(list);
+                pandora.api.findDocuments({
+                    query: {
+                        conditions: [{
+                            key: 'collection',
                             operator: '==',
                             value: list
                         }],
@@ -743,6 +846,36 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                             });
                             drag.action == 'move' && pandora.reloadList();
                         });
+                    } else if (section == 'documents') {
+                        var targets = drag.action == 'copy' ? drag.target.id
+                            : [pandora.user.ui._collection, drag.target.id];
+                        //fixme use history
+                        //pandora.doHistory(drag.action, drag.ids, targets, function() {
+                        pandora.api.addCollectionItems({
+                            collection: drag.target.id,
+                            items: drag.ids
+
+                        }, function() {
+                            Ox.Request.clearCache('find');
+                            pandora.api.findDocuments({
+                                query: {
+                                    conditions: [{
+                                        key: 'collection',
+                                        operator: '==',
+                                        value: drag.target.id
+                                    }],
+                                    operator: '&'
+                                }
+                            }, function(result) {
+                                var folder = drag.target.status != 'featured'
+                                    ? 'personal' : 'featured';
+                                pandora.$ui.folderList[folder].value(
+                                    drag.target.id, 'items', result.data.items
+                                );
+                                cleanup(250);
+                            });
+                            drag.action == 'move' && pandora.reloadList();
+                        });
                     } else if (section == 'edits') {
                         var targets = drag.action == 'copy' ? drag.target.id
                             : [pandora.user.ui.edit, drag.target.id];
@@ -751,7 +884,10 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                             pandora.$ui.editPanel && pandora.$ui.editPanel.updatePanel();
                             cleanup(250);
                         });
-                    } 
+                    } else {
+                        Ox.print('no drop support for', section);
+                        cleanup(250);
+                    }
                 }
             } else {
                 cleanup(0);
@@ -781,13 +917,20 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
             itemName = section == 'items' ? {
                 plural: Ox._(pandora.site.itemName.plural.toLowerCase()),
                 singular: Ox._(pandora.site.itemName.singular.toLowerCase())
-            } : {
+            } : section == 'documents' ? {
+                plural: Ox._('Documents'),
+                singular: Ox._('Document')
+
+            } :{
                 plural: Ox._('clips'),
                 singular: Ox._('clip')
             },
             targetName = section == 'items' ? {
                 plural: Ox._('lists'),
                 singular: Ox._('list')
+            } : section == 'documents' ? {
+                plural: Ox._('collections'),
+                singular: Ox._('collection')
             } : {
                 plural: Ox._('edits'),
                 singular: Ox._('edit')
@@ -946,11 +1089,36 @@ pandora.exitFullscreen = function() {
     }
 };
 
+pandora.formatDocumentKey = function(key, data) {
+    var value;
+    if (key.format) {
+        value  = (
+            /^color/.test(key.format.type.toLowerCase()) ? Ox.Theme : Ox
+        )['format' + Ox.toTitleCase(key.format.type)].apply(
+            this, [data[key.id]].concat(key.format.args || [])
+        );
+        if (key.id == 'rightslevel') {
+            value.css({width: size * 0.75 + 'px'});
+        }
+    } else {
+        value = data[key.id];
+        if (key.id == 'extension') {
+            value = value.toUpperCase();
+        } else if (key.id == 'dimensions') {
+            value = Ox.isArray(value)
+                ? Ox.formatDimensions(value, 'px')
+                : Ox.formatCount(value, data.extension == 'html' ? 'word' : 'page');
+        }
+    }
+    return value;
+}
+
 pandora.getAllItemsTitle = function(section) {
     section = section || pandora.user.ui.section;
-    return section == 'items'
-        ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
-        : Ox._('{0} ' + Ox.toTitleCase(section), [pandora.site.site.name]);
+    return {
+        items: Ox._('All {0}', [Ox._(pandora.site.itemName.plural)]),
+        documents: Ox._('All {0}', [Ox._('Documents')])
+    }[section] || Ox._('{0} ' + Ox.toTitleCase(section), [pandora.site.site.name]);
 };
 
 pandora.getClipData = function(items) {
@@ -1068,13 +1236,19 @@ pandora.getClipVideos = function(clip, resolution) {
 };
 
 (function() {
-    var itemTitles = {};
-    pandora.getDocumentTitle = function(itemData) {
+    var itemTitles = {}, documentTitles = {};
+    pandora.getWindowTitle = function(itemData) {
         var parts = [];
         if (itemData) {
-            itemTitles[pandora.user.ui.item] = Ox.decodeHTMLEntities(
-                pandora.getItemTitle(itemData)
-            );
+            if (pandora.user.ui.section == 'documents') {
+                documentTitles[pandora.user.ui.document] = Ox.decodeHTMLEntities(
+                    pandora.getDocumentTitle(itemData)
+                );
+            } else {
+                itemTitles[pandora.user.ui.item] = Ox.decodeHTMLEntities(
+                    pandora.getItemTitle(itemData)
+                );
+            }
         }
         if (pandora.user.ui.section == 'items') {
             if (!pandora.user.ui.item) {
@@ -1094,16 +1268,33 @@ pandora.getClipVideos = function(clip, resolution) {
                     Ox._(Ox.toTitleCase(pandora.user.ui.itemView))
                 ]));
             }
+        } else if (pandora.user.ui.section == 'documents') {
+            if (!pandora.user.ui.document) {
+                parts.push(
+                    pandora.user.ui._collection
+                    ? pandora.user.ui._collection.split(':').slice(1).join(':')
+                    : pandora.getAllItemsTitle('documents')
+                );
+                parts.push(Ox._('{0} View', [
+                    Ox._(Ox.toTitleCase(pandora.user.ui.collectionView))
+                ]));
+                parts.push(Ox._('Documents'));
+            } else {
+                parts.push(
+                    documentTitles[pandora.user.ui.document] || pandora.user.ui.document
+                );
+                /*
+                parts.push(Ox._('{0} View', [
+                    Ox._(Ox.toTitleCase(pandora.user.ui.documentView))
+                ]));
+                */
+                parts.push(Ox._('Document'));
+            }
         } else if (pandora.user.ui.section == 'edits') {
             if (pandora.user.ui.edit) {
                 parts.push(pandora.user.ui.edit.split(':').slice(1).join(':'));
             }
             parts.push(Ox._('Edits'));
-        } else if (pandora.user.ui.section == 'texts') {
-            if (pandora.user.ui.text) {
-                parts.push(pandora.user.ui.text.split(':').slice(1).join(':'));
-            }
-            parts.push(Ox._('Texts'));
         }
         parts.push(pandora.site.site.name);
         return parts.join(' – ');
@@ -1137,6 +1328,12 @@ pandora.getFilterSizes = function() {
         5
     );
 };
+
+pandora.getFolderItems = function(section) {
+    return section == 'items' ? 'Lists'
+        : section == 'documents' ? 'Collections'
+        : Ox.toTitleCase(section);
+}
 
 pandora.getFoldersHeight = function(section) {
     section = section || pandora.user.ui.section;
@@ -1299,6 +1496,16 @@ pandora.getItem = function(state, str, callback) {
                 });
             }
         });
+    } else if (state.type == 'documents') {
+        pandora.api.getDocument({id: str, keys: ['id']}, function(result) {
+            if (result.status.code == 200) {
+                state.item = result.data.id;
+                callback();
+            } else {
+                state.item = '';
+                callback();
+            }
+        });
     } else if (state.type == 'edits') {
         pandora.api.getEdit({id: str, keys: ['id']}, function(result) {
             if (result.status.code == 200) {
@@ -1310,21 +1517,23 @@ pandora.getItem = function(state, str, callback) {
             }
         });
     } else if (state.type == 'texts') {
-        pandora.api.getText({
-            id: str,
-            keys: ['id', 'names', 'pages', 'type']
+        pandora.api.findDocuments({
+            query: {
+                conditions: [
+                    {key: 'user', value: str.split(':')[0]},
+                    {key: 'title', value: str.split(':').slice(1).join(':')}
+                ],
+                operator: '&'},
+            keys: ['id', 'extension'],
+            range: [0, 2]
         }, function(result) {
-            if (result.status.code == 200) {
-                state.item = result.data.id;
-                callback();
+            state.type = 'documents';
+            if (result.data.items.length == 1) {
+                state.item = result.data.items[0].id;
             } else {
-                // FIXME: add findText call here?
-                // FIXME: it's obscure that in the texts case,
-                // we have to set item to '', while for videos,
-                // it remains undefined 
                 state.item = '';
-                callback();
             }
+            callback();
         });
     } else {
         callback();
@@ -1471,12 +1680,19 @@ pandora.getLargeEditTimelineURL = function(edit, type, i, callback) {
 };
 
 pandora.getListData = function(list) {
-    var data = {}, folder;
+    var data = {}, folder, _list = pandora.user.ui._list;
     if (Ox.isUndefined(list)) {
-        list = pandora.user.ui[
-            pandora.user.ui.section == 'items' ? '_list'
-            : pandora.user.ui.section.slice(0, -1)
-        ];
+        if (pandora.user.ui.section == 'items') {
+            list = pandora.user.ui._list;
+        } else if (pandora.user.ui.section == 'documents') {
+            list = pandora.user.ui._collection;
+            _list = pandora.user.ui._collection;
+        } else {
+            list = pandora.user.ui.section.slice(0, -1)
+        }
+    }
+    if (pandora.user.ui.section == 'documents') {
+        _list = pandora.user.ui._collection;
     }
     if (list && pandora.$ui.folderList) {
         Ox.forEach(pandora.$ui.folderList, function($list, id) {
@@ -1485,7 +1701,7 @@ pandora.getListData = function(list) {
             // folder it is selected, since for example, a personal
             // list may appear again in the featured lists browser
             if (
-                (list == pandora.user.ui._list && $list.options('selected').length)
+                (list == _list && $list.options('selected').length)
                 || !Ox.isEmpty($list.value(list))
             ) {
                 folder = id;
@@ -1504,6 +1720,16 @@ pandora.getListData = function(list) {
         }
     }
     return data;
+};
+
+pandora.getListIcon = function(section, id, size, modified) {
+    var folderItems = pandora.getFolderItems(section),
+        folderItem = folderItems.slice(0, -1);
+    size = size || '';
+    modified = modified || Ox.uid();
+    return pandora.getMediaURL('/'
+        + folderItem.toLowerCase() + '/'
+        + encodeURIComponent(id) + '/icon' + size + '.jpg?' + modified);
 };
 
 pandora.getPageTitle = function(stateOrURL) {
@@ -1529,6 +1755,7 @@ pandora.getPageTitle = function(stateOrURL) {
 };
 
 pandora.getPart = function(state, str, callback) {
+    Ox.Log('URL', 'getPart', state, str);
     if (state.page == 'api') {
         pandora.api.api(function(result) {
             if (Ox.contains(Object.keys(result.data.actions), str)) {
@@ -1656,6 +1883,8 @@ pandora.getSort = function(state, val, callback) {
         // TODO in the future: If str is index, fall back if list is smart
         // (but this can only be tested after find has been parsed)
         callback();
+    } else if (state.type == 'documents') {
+        callback();
     } else if (state.type == 'edits') {
         if (val[0].key == 'index') {
             pandora.api.getEdit({id: state.item, keys: ['id', 'type']}, function(result) {
@@ -1675,8 +1904,6 @@ pandora.getSort = function(state, val, callback) {
         } else {
             callback();
         }
-    } else if (state.type == 'texts') {
-        callback();
     }
 };
 
@@ -1705,6 +1932,29 @@ pandora.getSortOperator = function(key) {
     ) > -1 ? '+' : '-';
 };
 
+pandora.getDocumentSortKeys = function() {
+    return pandora.site.documentKeys.filter(function(key) {
+        return key.sort && (
+            !key.capability
+            || pandora.site.capabilities[key.capability][pandora.user.level]
+        );
+    }).map(function(key) {
+        return Ox.extend(key, {
+            operator: pandora.getDocumentSortOperator(key.id)
+        });
+    });
+};
+pandora.getDocumentSortOperator = function(key) {
+    var data = Ox.getObjectById(pandora.site.documentKeys, key);
+    return data.sortOperator || ['string', 'text'].indexOf(
+        Ox.isArray(data.type) ? data.type[0] : data.type
+    ) > -1 ? '+' : '-';
+};
+
+pandora.getDocumentTitle = function(data) {
+    return data.title || Ox._('Untitled');
+};
+
 pandora.getSpan = function(state, val, callback) {
     // For a given item, or none (state.item), and a given view, or any
     // (state.view), this takes a value (array of numbers or string) and checks
@@ -1712,9 +1962,10 @@ pandora.getSpan = function(state, val, callback) {
     // event/place name (string), and in that case sets state.span, and may
     // modify state.view.
     // fixme: "subtitles:23" is still missing
-    if (state.page == 'documents') {
+    Ox.Log('URL', 'getSpan', state, val);
+    if (state.type == 'documents') {
         pandora.api.getDocument({
-            id: state.part,
+            id: state.item,
             keys: ['dimensions', 'extension']
         }, function(result) {
             var dimensions = result.data.dimensions,
@@ -1722,6 +1973,8 @@ pandora.getSpan = function(state, val, callback) {
             values;
             if (Ox.contains(['epub', 'pdf', 'txt'], extension)) {
                 state.span = Ox.limit(parseInt(val), 1, dimensions);
+            } else if (Ox.contains(['html'], extension)) {
+                state.span = Ox.limit(parseInt(val), 0, 100);
             } else if (Ox.contains(['gif', 'jpg', 'png'], extension)) {
                 values = val.split(',');
                 if (values.length == 4) {
@@ -1738,6 +1991,7 @@ pandora.getSpan = function(state, val, callback) {
                     state.span = '';
                 }
             }
+            Ox.Log('URL', 'getSpan result', state);
             callback();
         });
     } else if (state.type == pandora.site.itemName.plural.toLowerCase()) {
@@ -1817,24 +2071,6 @@ pandora.getSpan = function(state, val, callback) {
                 callback();
             });
         }
-    } else if (state.type == 'texts') {
-        pandora.api.getText({id: state.item}, function(result) {
-            if (isArray) {
-                if (result.data.type == 'html') {
-                    state.span = Ox.limit(val[0], 0, 100);
-                } else {
-                    state.span = Math.floor(
-                        Ox.limit(val[0], 1, result.data.pages)
-                    );
-                }
-            } else if (
-                result.data.type == 'html'
-                && Ox.contains(result.data.names, val)
-            ) {
-                state.span = val;
-            }
-            callback();
-        });
     }
 
     function getId(type, callback) {
@@ -1898,6 +2134,9 @@ pandora.getStatusText = function(data) {
                 data.items == 1 ? 'singular' : 'plural'
             ]),
         parts = [];
+    if (ui.section == 'documents') {
+        itemName = Ox._(Ox.toTitleCase(data.items == 1 ? ui.section.slice(0, -1) : ui.section));
+    }
     parts.push(Ox.formatNumber(data.items) + ' '+ itemName);
     if (data.runtime) {
         parts.push(Ox.formatDuration(data.runtime, 'short'));
@@ -2263,6 +2502,8 @@ pandora.signin = function(data) {
     pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
     pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
     pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+    pandora.user.ui._collection = pandora.getCollectionState(pandora.user.ui.findDocuments);
+    pandora.user.ui._findDocumentsState = pandora.getFindDocumentsState(pandora.user.ui.findDocuments);
     pandora.site.sortKeys = pandora.getSortKeys();
     pandora.URL.init();
     pandora.URL.update();
@@ -2277,6 +2518,8 @@ pandora.signout = function(data) {
     pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
     pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
     pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+    pandora.user.ui._collection = pandora.getCollectionState(pandora.user.ui.findDocuments);
+    pandora.user.ui._findDocumentsState = pandora.getFindDocumentsState(pandora.user.ui.findDocuments);
     pandora.site.sortKeys = pandora.getSortKeys();
     pandora.URL.init();
     pandora.URL.update();
@@ -2288,9 +2531,11 @@ pandora.reloadList = function() {
     Ox.Log('', 'reloadList')
     var listData = pandora.getListData();
     Ox.Request.clearCache(); // fixme: remove
-    pandora.$ui.filters.forEach(function($filter) {
-        $filter.reloadList();
-    });
+    if (pandora.$ui.filters) {
+        pandora.$ui.filters.forEach(function($filter) {
+            $filter.reloadList();
+        });
+    }
     pandora.$ui.list
         .bindEvent({
             init: function(data) {
@@ -2336,6 +2581,20 @@ pandora.renameList = function(oldId, newId, newName, folder) {
             }
         }, false);
         pandora.UI.set('lists.' + pandora.UI.encode(oldId), null, false);
+    } else if (pandora.user.ui.section == 'documents') {
+        pandora.replaceURL = true;
+        pandora.UI.set(
+            'collections.' + pandora.UI.encode(newId),
+            pandora.user.ui.lists[oldId],
+            false
+        );
+        pandora.UI.set({
+            findDocuments: {
+                conditions: [{key: 'collection', value: newId, operator: '=='}],
+                operator: '&'
+            }
+        }, false);
+        pandora.UI.set('collections.' + pandora.UI.encode(oldId), null, false);
     } else {
         pandora.replaceURL = true;
         pandora.UI.set(
@@ -2380,7 +2639,7 @@ pandora.resizeFolders = function(section) {
         userColumnWidth = Math.round(columnWidth * 0.4),
         nameColumnWidth = columnWidth - userColumnWidth;
     pandora.$ui.allItems && pandora.$ui.allItems.resizeElement((
-        section == 'items' ? columnWidth
+        Ox.contains(pandora.site.listSections, section) ? columnWidth
         : section == 'edits' ? width - 16
         : width - 48
     ) - 8);
@@ -2489,6 +2748,12 @@ pandora.resizeWindow = function() {
                 pandora.$ui.calendar.resizeCalendar();
             }
         }
+    } else if (pandora.user.ui.section == 'documents') {
+        if (pandora.user.ui.document) {
+            pandora.$ui.document && pandora.$ui.document.update();
+        } else {
+            pandora.$ui.list && pandora.$ui.list.size();
+        }
     } else if (pandora.user.ui.section == 'edits') {
         if (!pandora.user.ui.edit) {
             // ...
@@ -2528,6 +2793,38 @@ pandora.selectList = function() {
                     );
                     pandora.$ui.folderList[folder]
                         .options({selected: [pandora.user.ui._list]});
+                    if (
+                        !pandora.hasDialogOrScreen()
+                        && !Ox.Focus.focusedElementIsInput()
+                    ) {
+                        pandora.$ui.folderList[folder].gainFocus();
+                    }
+                }
+            });
+        }
+    } else if (pandora.user.ui.section == 'documents') {
+        if (pandora.user.ui._collection) {
+            pandora.api.findCollections({
+                keys: ['status', 'user'],
+                query: {
+                    conditions: [{
+                        key: 'id',
+                        operator: '==',
+                        value: pandora.user.ui._collection
+                    }],
+                    operator: ''
+                },
+                range: [0, 1]
+            }, function(result) {
+                var folder, list;
+                if (result.data.items.length) {
+                    list = result.data.items[0];
+                    folder = list.status == 'featured' ? 'featured' : (
+                        list.user == pandora.user.username
+                        ? 'personal' : 'favorite'
+                    );
+                    pandora.$ui.folderList[folder]
+                        .options({selected: [pandora.user.ui._collection]});
                     if (
                         !pandora.hasDialogOrScreen()
                         && !Ox.Focus.focusedElementIsInput()
@@ -2891,16 +3188,74 @@ pandora.wait = function(id, callback, timeout) {
         }
         return state;
     };
+    function getState(find, key) {
+        var index, state = '';
+        if (find.operator == '&') {
+            index = oneCondition(find.conditions, key, '==');
+            if (index > -1) {
+                state = find.conditions[index].value;
+            }
+        }
+        return state;
+    }
+
+    pandora.getCollectionState = function(find) {
+        // A collection is selected if exactly one condition in an & query has "collection"
+        // as key and "==" as operator
+        return getState(find, 'collection');
+    };
 
     pandora.getListState = function(find) {
         // A list is selected if exactly one condition in an & query has "list"
         // as key and "==" as operator
-        var index, state = '';
+        return getState(find, 'list');
+    };
+
+    pandora.getFindDocumentsState = function(find) {
+        // The find element is populated if exactly one condition in an & query
+        // has a findKey as key and "=" as operator (and all other conditions
+        // are either list or filters), or if all conditions in an | query have
+        // the same filter id as key and "==" as operator
+        Ox.Log('Find', 'getFindDocumentsState', find)
+        var conditions, indices, state = {index: -1, key: '*', value: ''};
         if (find.operator == '&') {
-            index = oneCondition(find.conditions, 'list', '==');
-            if (index > -1) {
-                state = find.conditions[index].value;
-            }
+            // number of conditions that are not list or filters
+            conditions = find.conditions.length
+                - !!pandora.user.ui._collection;
+            /*
+                - pandora.user.ui._filterState.filter(function(filter) {
+                    return filter.index > -1;
+                }).length;
+            */
+            // indices of non-advanced find queries
+            indices = pandora.site.documentKeys.map(function(findKey) {
+                return oneCondition(find.conditions, findKey.id, '=');
+            }).filter(function(index) {
+                return index > -1;
+            });
+            state = conditions == 1 && indices.length == 1 ? {
+                index: indices[0],
+                key: find.conditions[indices[0]].key,
+                value: Ox.decodeURIComponent(find.conditions[indices[0]].value)
+            } : {
+                index: -1,
+                key: conditions == 0 && indices.length == 0 ? '*' : 'advanced',
+                value: ''
+            };
+        } else {
+            state = {
+                index: -1,
+                key: 'advanced',
+                value: ''
+            };
+            /*
+            Ox.forEach(pandora.user.ui.documentFilters, function(key) {
+                if (everyCondition(find.conditions, key, '==')) {
+                    state.key = '*';
+                    return false;
+                }
+            });
+            */
         }
         return state;
     };

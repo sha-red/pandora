@@ -19,7 +19,7 @@ pandora.openDocumentDialog = function(options) {
                 operator: '|'
             },
             range: [0, options.ids.length],
-            keys: ['description', 'dimensions', 'extension', 'id', 'name', 'modified']
+            keys: ['description', 'dimensions', 'extension', 'id', 'title', 'modified']
         }, function(result) {
             var i = 0,
                 documents = Ox.sort(result.data.items, function(item) {
@@ -173,7 +173,7 @@ pandora.ui.documentDialog = function(options) {
                         ? pandora.user.ui.documents[item.id].position
                         : 1,
                     url: '/documents/' + item.id + '/'
-                        + item.name + '.' + item.extension,
+                        + item.title + '.' + item.extension,
                     width: dialogWidth,
                     zoom: 'fit'
                 })
@@ -185,7 +185,7 @@ pandora.ui.documentDialog = function(options) {
                     imageHeight: item.dimensions[1],
                     imagePreviewURL: pandora.getMediaURL('/documents/' + item.id + '/256p.jpg?' + item.modified),
                     imageURL: pandora.getMediaURL('/documents/' + item.id + '/'
-                        + item.name + '.' + item.extension + '?' + item.modified),
+                        + item.title + '.' + item.extension + '?' + item.modified),
                     imageWidth: item.dimensions[0],
                     width: dialogWidth
                 })
@@ -217,7 +217,7 @@ pandora.ui.documentDialog = function(options) {
     }
 
     function setTitle() {
-        that.options({title: item.name + '.' + item.extension});
+        that.options({title: item.title + '.' + item.extension});
     }
 
     that.getItems = function() {

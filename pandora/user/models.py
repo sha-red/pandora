@@ -18,6 +18,7 @@ from ox.utils import json
 from itemlist.models import List, Position
 import text
 import edit
+import documentcollection.models
 
 from . import managers
 from . import tasks
@@ -44,6 +45,7 @@ class SessionData(models.Model):
     browser = models.CharField(max_length=255, null=True)
 
     numberoflists = models.IntegerField(default=0, null=True)
+    numberofcollections = models.IntegerField(default=0, null=True)
 
     objects = managers.SessionDataManager()
 
@@ -96,6 +98,7 @@ class SessionData(models.Model):
             else:
                 self.groupssort = None
             self.numberoflists = self.user.lists.count()
+            self.numberofcollections = self.user.collections.count()
         else:
             self.groupssort = None
         super(SessionData, self).save(*args, **kwargs)
@@ -157,6 +160,7 @@ class SessionData(models.Model):
             'newsletter': False,
             'notes': '',
             'numberoflists': 0,
+            'numberofcollections': 0,
             'screensize': self.screensize,
             'system': ua['system']['string'],
             'timesseen': self.timesseen,
@@ -173,6 +177,7 @@ class SessionData(models.Model):
             j['newsletter'] = p.newsletter
             j['notes'] = p.notes
             j['numberoflists'] = self.numberoflists
+            j['numberofcollections'] = self.numberofcollections
         if keys:
             for key in list(j):
                 if key not in keys:
@@ -249,8 +254,11 @@ def get_ui(user_ui, user=None):
                 ui[key] = new[key]
         return ui
     ui = update_ui(ui, user_ui)
-    if not 'lists' in ui:
+    if 'lists' not in ui:
         ui['lists'] = {}
+
+    if 'collections' not in ui:
+        ui['collections'] = {}
 
     def add(lists, section):
         ids = []
@@ -278,7 +286,30 @@ def get_ui(user_ui, user=None):
             '''
             ids.append(id)
         return ids
-    
+
+    def add_collections(collections, section):
+        Position = documentcollection.models.Position
+        ids = []
+        for l in collections:
+            qs = Position.objects.filter(section=section)
+            if section == 'featured':
+                try:
+                    pos = Position.objects.get(collection=l, section=section)
+                    created = False
+                except Position.DoesNotExist:
+                    pos = Position(collection=l, section=section, user=l.user)
+                    pos.save()
+                    created = True 
+            else:
+                pos, created = Position.objects.get_or_create(collection=l, user=user, section=section)
+                qs = qs.filter(user=user)
+            if created:
+                pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                pos.save()
+            id = l.get_id()
+            ids.append(id)
+        return ids
+
     def add_texts(texts, section):
         P = text.models.Position
         ids = []
@@ -323,6 +354,7 @@ def get_ui(user_ui, user=None):
             ids.append(t.get_id())
         return ids
 
+    # lists (items)
     ids = ['']
     if user:
         ids += add(user.lists.exclude(status="featured"), 'personal')
@@ -331,11 +363,26 @@ def get_ui(user_ui, user=None):
     for i in list(ui['lists']):
         if i not in ids:
             del ui['lists'][i]
+
+    # collections (documents)
+    ids = ['']
+    if user:
+        ids += add_collections(user.collections.exclude(status="featured"), 'personal')
+        ids += add_collections(user.subscribed_collections.filter(status='public'), 'public')
+    ids += add_collections(documentcollection.models.Collection.objects.filter(status='featured'), 'featured')
+    for i in list(ui['collections']):
+        if i not in ids:
+            del ui['collections'][i]
+
+    # texts (remove)
     tids = ['']
     if user:
         tids += add_texts(user.texts.exclude(status="featured"), 'personal')
         tids += add_texts(user.subscribed_texts.filter(status='public'), 'public')
     tids += add_texts(text.models.Text.objects.filter(status='featured'), 'featured')
+
+    # edits
+    tids = ['']
     if user:
         tids += add_edits(user.edits.exclude(status="featured"), 'personal')
         tids += add_edits(user.subscribed_edits.filter(status='public'), 'public')

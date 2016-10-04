@@ -3,7 +3,7 @@
 pandora.ui.info = function() {
 
     var ui = pandora.user.ui,
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = pandora.getFolderItems(ui.section),
         folderItem = folderItems.slice(0, -1),
         view = getView(),
 
@@ -12,6 +12,11 @@ pandora.ui.info = function() {
             .bindEvent({
                 toggle: function(data) {
                     pandora.UI.set({showInfo: !data.collapsed});
+                },
+                pandora_documentlist: function() {
+                    if (pandora.user.ui._collection != pandora.UI.getPrevious('_collection')) {
+                        updateInfo();
+                    }
                 },
                 pandora_edit: updateInfo,
                 pandora_find: function() {
@@ -29,6 +34,8 @@ pandora.ui.info = function() {
                         updateInfo();
                     }
                 },
+                pandora_document: updateInfo,
+                pandora_collectionselection: updateInfo,
                 pandora_text: updateInfo
             });
 
@@ -184,16 +191,14 @@ pandora.ui.info = function() {
 
 pandora.ui.listInfo = function() {
     var ui = pandora.user.ui,
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = pandora.getFolderItems(ui.section),
         folderItem = folderItems.slice(0, -1),
         list = pandora.user.ui.section == 'items' ? pandora.user.ui._list : ui[folderItem.toLowerCase()],
         canEditFeaturedLists = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
         that = Ox.Element().css({padding: '16px', textAlign: 'center'}),
         $icon = Ox.Element('<img>')
             .attr({
-                src: list
-                    ? '/' + folderItem.toLowerCase() + '/' + encodeURIComponent(list) + '/icon256.jpg?' + Ox.uid()
-                    : '/static/png/icon.png'
+                src: list ? pandora.getListIcon(ui.section, list, 256) : '/static/png/icon.png'
             })
             .css(getIconCSS())
             .appendTo(that),

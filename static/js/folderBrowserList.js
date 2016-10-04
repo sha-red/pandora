@@ -7,7 +7,7 @@ pandora.ui.folderBrowserList = function(id, section) {
     var ui = pandora.user.ui,
         columnWidth = (ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - (section != 'texts' ? 96 : 48)) / 2,
         i = Ox.getIndexById(pandora.site.sectionFolders[section], id),
-        folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
+        folderItems = pandora.getFolderItems(section),
         folderItem = folderItems.slice(0, -1),
         that = Ox.TableList({
             columns: [
@@ -152,7 +152,12 @@ pandora.ui.folderBrowserList = function(id, section) {
             // not-featured list may be in the user's favorites folder
             keys: id == 'featured' ? ['subscribed'] : [],
             pageLength: 1000,
-            selected: pandora.getListData().folder == id ? [section == 'items' ? ui._list : ui[section.slice(0, -1)]] : [],
+            selected: pandora.getListData().folder == id
+                ? [{
+                    items: ui._list,
+                    documents: ui._documentlist
+                }[section] || ui[section.slice(0, -1)]]
+                : [],
             sort: [{key: 'name', operator: '+'}],
             unique: 'id'
         })
@@ -220,6 +225,15 @@ pandora.ui.folderBrowserList = function(id, section) {
                 if (section == 'items') {
                     pandora.UI.set({
                         find: {
+                            conditions: list ? [
+                                {key: 'list', value: data.ids[0], operator: '=='}
+                            ] : [],
+                            operator: '&'
+                        }
+                    });
+                } else if (section == 'documents') {
+                    pandora.UI.set({
+                        findDocuments: {
                             conditions: list ? [
                                 {key: 'list', value: data.ids[0], operator: '=='}
                             ] : [],

@@ -31,7 +31,7 @@ pandora.ui.deleteDocumentDialog = function(files, callback) {
                 })
             ],
             content: files.length == 1
-                ? Ox._('Are you sure you want to delete the document "{0}"?', [files[0].name + '.' + files[0].extension])
+                ? Ox._('Are you sure you want to delete the document "{0}"?', [files[0].title + '.' + files[0].extension])
                 : Ox._('Are you sure you want to delete {0} documents?', [files.length]),
             keys: {enter: 'delete', escape: 'keep'},
             title: files.length == 1

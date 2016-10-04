@@ -19,6 +19,7 @@ import oxdjango.api.urls
 import app.views
 import archive.views
 import document.views
+import documentcollection.views
 import text.views
 import user.views
 import edit.views
@@ -42,6 +43,7 @@ urlpatterns = [
     url(r'^file/(?P<oshash>.*)$', archive.views.lookup_file),
     url(r'^api/?', include(oxdjango.api.urls)),
     url(r'^resetUI$', user.views.reset_ui),
+    url(r'^collection/(?P<id>.*?)/icon(?P<size>\d*).jpg$', documentcollection.views.icon),
     url(r'^documents/(?P<id>[A-Z0-9]+)/(?P<size>\d*)p(?P<page>[\d,]*).jpg$', document.views.thumbnail),
     url(r'^documents/(?P<id>[A-Z0-9]+)/(?P<name>.*?\.[^\d]{3})$', document.views.file),
     url(r'^edit/(?P<id>.*?)/icon(?P<size>\d*).jpg$', edit.views.icon),

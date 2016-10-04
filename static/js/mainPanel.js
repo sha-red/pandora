@@ -21,6 +21,17 @@ pandora.ui.mainPanel = function() {
             orientation: 'horizontal'
         })
         .bindEvent({
+            pandora_finddocuments: function() {
+                var previousUI = pandora.UI.getPrevious();
+                if (!previousUI.document && ui._list == previousUI._list) {
+                    that.replaceElement(1, pandora.$ui.documentPanel = pandora.ui.documentPanel());
+                }
+            },
+            pandora_document: function(data) {
+                if (!data.value || !data.previousValue) {
+                    that.replaceElement(1, pandora.$ui.documentPanel = pandora.ui.documentPanel());
+                }
+            },
             pandora_edit: function(data) {
                 that.replaceElement(1, pandora.$ui.editPanel = pandora.ui.editPanel());
             },
@@ -92,6 +103,7 @@ pandora.ui.mainPanel = function() {
     function getRightPanel() {
         return ui.section == 'items' ? pandora.$ui.rightPanel = pandora.ui.rightPanel()
             : ui.section == 'edits' ? pandora.$ui.editPanel = pandora.ui.editPanel()
+            : ui.section == 'documents' ? pandora.$ui.documentPanel = pandora.ui.documentPanel()
             : pandora.$ui.textPanel = pandora.ui.textPanel();
     }
     return that;

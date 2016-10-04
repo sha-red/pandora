@@ -34,11 +34,13 @@ class Command(BaseCommand):
 
         if settings.DB_GIN_TRGM:
             import entity.models
+            import document.models
             for table, column in (
                 (models.ItemFind._meta.db_table, 'value'),    # Item Find
                 (models.Clip._meta.db_table, 'findvalue'),    # Clip Find
                 (models.Annotation._meta.db_table, 'findvalue'),    # Annotation Find
                 (entity.models.Find._meta.db_table, 'value'), # Entity Find
+                (document.models.Find._meta.db_table, 'value'),    # Document Find
             ):
                 cursor = connection.cursor()
                 indexes = connection.introspection.get_indexes(cursor, table)

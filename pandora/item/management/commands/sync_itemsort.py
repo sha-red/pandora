@@ -52,7 +52,7 @@ class Command(BaseCommand):
                     changes.append(sql)
                     rebuild = True
                 elif f.__class__.__name__ != db_types[name]:
-                    sql = 'ALTER TABLE "%s" DROP COLUMN "%s"' % (table_name, name )
+                    sql = 'ALTER TABLE "%s" DROP COLUMN "%s"' % (table_name, name)
                     changes.append(sql)
                     sql = 'ALTER TABLE "%s" ADD COLUMN "%s" %s' % (table_name, name, col_type)
                     changes.append(sql)
@@ -116,3 +116,6 @@ class Command(BaseCommand):
                     if options['debug']:
                         print(i)
                     i.update_sort()
+        # and udpate doucments
+        import document.sync_sort
+        document.sync_sort.update_tables(options['debug'])

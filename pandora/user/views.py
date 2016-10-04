@@ -800,7 +800,10 @@ def setUI(request, data):
             access, created = Access.objects.get_or_create(item=item, user=None)
         if not created:
             access.save()
-
+    if data.get('document'):
+        import document.models
+        doc = get_object_or_404_json(document.models.Document, id=ox.fromAZ(data['document']))
+        doc.update_access(request.user)
     response = json_response()
     return render_to_json_response(response)
 actions.register(setUI, cache=False)

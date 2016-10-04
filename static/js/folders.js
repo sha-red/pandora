@@ -10,10 +10,13 @@ pandora.ui.folders = function(section) {
                     pandora.resizeFolders();
                 }
             }),
-        editable = (ui[
-            section == 'items' ? '_list' : section.slice(0, -1)
-        ] || '').split(':')[0] == pandora.user.username,
-        folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
+        editable = (ui[{
+            items: '_list',
+            edits: 'edit',
+            documents: '_collection',
+            texts: 'text'
+        }[section]] || '').split(':')[0] == pandora.user.username,
+        folderItems = pandora.getFolderItems(section),
         folderItem = folderItems.slice(0, -1),
         canEditFeatured = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
         initCounter = 0,
@@ -38,21 +41,21 @@ pandora.ui.folders = function(section) {
                     : Ox._('To create and share your own {0}, please sign up or sign in.', [section])
                 )];
             } else {
-                if (section == 'items') {
+                if (Ox.contains(pandora.site.listSections, section)) {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
-                                { id: 'newlist', title: Ox._('New List'), keyboard: 'control n' },
-                                { id: 'newlistfromselection', title: Ox._('New List from Selection'), keyboard: 'shift control n', disabled: ui.listSelection.length == 0 },
-                                { id: 'newsmartlist', title: Ox._('New Smart List'), keyboard: 'alt control n' },
-                                { id: 'newsmartlistfromresults', title: Ox._('New Smart List from Results'), keyboard: 'shift alt control n' },
+                                { id: 'newlist', title: Ox._('New {0}', [Ox._(folderItem)]), keyboard: 'control n' },
+                                { id: 'newlistfromselection', title: Ox._('New {0} from Selection', [Ox._(folderItem)]), keyboard: 'shift control n', disabled: ui.listSelection.length == 0 },
+                                { id: 'newsmartlist', title: Ox._('New Smart {0}', [Ox._(folderItem)]), keyboard: 'alt control n' },
+                                { id: 'newsmartlistfromresults', title: Ox._('New Smart {0} from Results', [Ox._(folderItem)]), keyboard: 'shift alt control n' },
                                 {},
-                                { id: 'duplicatelist', title: Ox._('Duplicate Selected List'), keyboard: 'control d', disabled: !ui._list },
-                                { id: 'editlist', title: Ox._('Edit Selected List...'), keyboard: 'control e', disabled: !editable },
-                                { id: 'deletelist', title: Ox._('Delete Selected List...'), keyboard: 'delete', disabled: !editable }
+                                { id: 'duplicatelist', title: Ox._('Duplicate Selected {0}', [Ox._(folderItem)]), keyboard: 'control d', disabled: !ui._list },
+                                { id: 'editlist', title: Ox._('Edit Selected {0}...', [Ox._(folderItem)]), keyboard: 'control e', disabled: !editable },
+                                { id: 'deletelist', title: Ox._('Delete Selected {0}...', [Ox._(folderItem)]), keyboard: 'delete', disabled: !editable }
                             ],
                             title: 'edit',
-                            tooltip: Ox._('Manage Personal Lists'),
+                            tooltip: Ox._('Manage Personal ' + folderItems),
                             type: 'image'
                         })
                         .bindEvent({
@@ -64,7 +67,7 @@ pandora.ui.folders = function(section) {
                                 ], data.id)) {
                                     pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
                                 } else if (data.id == 'duplicatelist') {
-                                    pandora.addList(pandora.user.ui._list);
+                                    pandora.addList(ui._list);
                                 } else if (data.id == 'editlist') {
                                     pandora.ui.listDialog().open();
                                 } else if (data.id == 'deletelist') {
@@ -222,9 +225,17 @@ pandora.ui.folders = function(section) {
                                     pandora.$ui.folderList.featured.options({selected: [listData.id]});
                                 } else {
                                     // and nowhere else
-                                    pandora.UI.set({
-                                        find: pandora.site.user.ui.find
-                                    });
+                                    if (section == 'items') {
+                                        pandora.UI.set({
+                                            find: pandora.site.user.ui.find
+                                        });
+                                    } else if (section == 'documents') {
+                                        pandora.UI.set({
+                                            findDocuments: pandora.site.user.ui.findDocuments
+                                        });
+                                    } else {
+                                        Ox.print('unknown section', section);
+                                    }
                                 }
                             }
                             pandora.$ui.folderBrowser.favorite.replaceWith(
@@ -280,9 +291,17 @@ pandora.ui.folders = function(section) {
                                     pandora.$ui.folderList.favorite.options({selected: [listData.id]});
                                 } else {
                                     // and nowhere else
-                                    pandora.UI.set({
-                                        find: pandora.site.user.ui.find
-                                    });
+                                    if (section == 'items') {
+                                        pandora.UI.set({
+                                            find: pandora.site.user.ui.find
+                                        });
+                                    } else if (section == 'documents') {
+                                        pandora.UI.set({
+                                            findDocuments: pandora.site.user.ui.findDocuments
+                                        });
+                                    } else {
+                                        Ox.print('unknown section', section);
+                                    }
                                 }
                             }
                             pandora.$ui.folderBrowser.featured.replaceWith(
@@ -336,7 +355,7 @@ pandora.ui.folders = function(section) {
                 },
                 toggle: function(data) {
                     data.collapsed && pandora.$ui.folderList[folder.id].loseFocus();
-                    pandora.UI.set('showFolder.items.' + folder.id, !data.collapsed);
+                    pandora.UI.set('showFolder.' + section + '.' + folder.id, !data.collapsed);
                     pandora.resizeFolders();
                 }
             });
@@ -378,7 +397,7 @@ pandora.ui.folders = function(section) {
         }).bindEvent({
             click: function() {
                 var $dialog = pandora.ui.iconDialog({
-                    buttons: title != Ox._('Featured Lists') ? [
+                    buttons: title != Ox._('Featured ' + folderItems) ? [
                         Ox.Button({title: Ox._('Sign Up...')}).bindEvent({
                             click: function() {
                                 $dialog.close();
@@ -440,6 +459,17 @@ pandora.ui.folders = function(section) {
                 });
             }
             */
+        },
+        pandora_finddocuments: function() {
+            var folder = pandora.getListData().folder,
+                list = pandora.user.ui._collection,
+                previousList = pandora.UI.getPrevious()._collection;
+            if (list != previousList) {
+                Ox.forEach(pandora.$ui.folderList, function($list, id) {
+                    id != folder && $list.options('selected', []);
+                });
+                folder && pandora.$ui.folderList[folder].options({selected: [list]});
+            }
         },
         pandora_text: function() {
             if (!pandora.user.ui.text) {

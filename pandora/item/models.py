@@ -24,6 +24,7 @@ from django.utils import datetime_safe
 
 import ox
 from oxdjango import fields
+from oxdjango.sortmodel import get_sort_field
 import ox.web.imdb
 import ox.image
 
@@ -1741,27 +1742,9 @@ for key in filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'ti
     sort_type = key.get('sortType', key['type'])
     if isinstance(sort_type, list):
         sort_type = sort_type[0]
-    model = {
-        'char': (models.CharField, dict(null=True, max_length=1000, db_index=True)),
-        'year': (models.CharField, dict(null=True, max_length=4, db_index=True)),
-        'integer': (models.BigIntegerField, dict(null=True, blank=True, db_index=True)),
-        'float': (models.FloatField, dict(null=True, blank=True, db_index=True)),
-        'date': (models.DateTimeField, dict(null=True, blank=True, db_index=True))
-    }[{
-        'layer': 'char',
-        'string': 'char',
-        'title': 'char',
-        'person': 'char',
-        'year': 'year',
-        'words': 'integer',
-        'length': 'integer',
-        'date': 'date',
-        'hue': 'float',
-        'time': 'integer',
-        'enum': 'integer',
-    }.get(sort_type, sort_type)]
+    field = get_sort_field(sort_type)
     if name not in attrs:
-        attrs[name] = model[0](**model[1])
+        attrs[name] = field[0](**field[1])
 
 ItemSort = type('ItemSort', (models.Model,), attrs)
 ItemSort.fields = [f.name for f in ItemSort._meta.fields]

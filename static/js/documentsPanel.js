@@ -2,151 +2,108 @@
 
 'use strict';
 
-pandora.ui.documentsPanel = function(options) {
+pandora.documentColumns = [
+    {
+        id: 'title',
+        operator: '+',
+        title: Ox._('Title'),
+        find: true,
+        visible: true,
+        width: 256
+    },
+    {
+        id: 'id',
+        operator: '+',
+        title: Ox._('ID'),
+        visible: true,
+        width: 64
+    },
+    {
+        format: function(value) {
+            return value.toUpperCase();
+        },
+        id: 'extension',
+        operator: '+',
+        title: Ox._('Extension'),
+        find: true,
+        visible: true,
+        width: 64
+    },
+    {
+        align: 'right',
+        format: function(value, data) {
+            return Ox.isArray(value)
+                ? Ox.formatDimensions(value, 'px')
+                : Ox.formatCount(value, data.extension == 'html' ? 'word' : 'page');
+        },
+        id: 'dimensions',
+        operator: '-',
+        title: Ox._('Dimensions'),
+        visible: true,
+        width: 128
+    },
+    {
+        align: 'right',
+        format: function(value) {
+            return Ox.formatValue(value, 'B');
+        },
+        id: 'size',
+        operator: '-',
+        title: Ox._('Size'),
+        visible: true,
+        width: 64
+    },
+    {
+        id: 'description',
+        operator: '+',
+        title: Ox._('Description'),
+        find: true,
+        visible: true,
+        width: 256
+    },
+    {
+        align: 'right',
+        id: 'matches',
+        operator: '-',
+        title: Ox._('Matches'),
+        visible: true,
+        width: 64
+    },
+    {
+        id: 'user',
+        operator: '+',
+        title: Ox._('User'),
+        find: true,
+        visible: true,
+        width: 128
+    },
+    {
+        align: 'right',
+        format: function(value) {
+            return Ox.formatDate(value, '%F %T');
+        },
+        id: 'created',
+        operator: '-',
+        title: Ox._('Created'),
+        visible: true,
+        width: 144
+    },
+    {
+        align: 'right',
+        format: function(value) {
+            return Ox.formatDate(value, '%F %T');
+        },
+        id: 'modified',
+        operator: '-',
+        title: Ox._('Modified'),
+        visible: true,
+        width: 144
+    }
+];
 
+pandora.ui.documentSortSelect = function() {
     var ui = pandora.user.ui,
-        hasItemView = ui.section == 'items' && ui.item,
-        hasListSelection = ui.section == 'items' && !ui.item && ui.listSelection.length,
-        isItemView = options.isItemView,
-        listLoaded = false,
-        allFindKeys = ['user', 'name', 'entity', 'extension', 'description'].filter(function(key) {
-            return key != 'entity' || pandora.site.entities.length;
-        }),
-
-        columns = [
-            {
-                id: 'name',
-                operator: '+',
-                title: Ox._('Name'),
-                visible: true,
-                width: 256
-            },
-            {
-                id: 'id',
-                operator: '+',
-                title: Ox._('ID'),
-                visible: true,
-                width: 64
-            },
-            {
-                format: function(value) {
-                    return value.toUpperCase();
-                },
-                id: 'extension',
-                operator: '+',
-                title: Ox._('Extension'),
-                visible: true,
-                width: 64
-            },
-            {
-                align: 'right',
-                format: function(value) {
-                    return Ox.isArray(value)
-                        ? Ox.formatDimensions(value, 'px')
-                        : Ox.formatCount(value, 'page');
-                },
-                id: 'dimensions',
-                operator: '-',
-                title: Ox._('Dimensions'),
-                visible: true,
-                width: 128
-            },
-            {
-                align: 'right',
-                format: function(value) {
-                    return Ox.formatValue(value, 'B');
-                },
-                id: 'size',
-                operator: '-',
-                title: Ox._('Size'),
-                visible: true,
-                width: 64
-            },
-            {
-                id: 'description',
-                operator: '+',
-                title: Ox._('Description'),
-                visible: true,
-                width: 256
-            },
-            {
-                align: 'right',
-                id: 'matches',
-                operator: '-',
-                title: Ox._('Matches'),
-                visible: true,
-                width: 64
-            },
-            {
-                id: 'user',
-                operator: '+',
-                title: Ox._('User'),
-                visible: true,
-                width: 128
-            },
-            {
-                align: 'right',
-                format: function(value) {
-                    return Ox.formatDate(value, '%F %T');
-                },
-                id: 'created',
-                operator: '-',
-                title: Ox._('Created'),
-                visible: true,
-                width: 144
-            },
-            {
-                align: 'right',
-                format: function(value) {
-                    return Ox.formatDate(value, '%F %T');
-                },
-                id: 'modified',
-                operator: '-',
-                title: Ox._('Modified'),
-                visible: true,
-                width: 144
-            }
-        ],
-
-        $listBar = Ox.Bar({size: 24}),
-
-        $viewSelect = Ox.Select({
-            items: [
-                {id: 'list', title: Ox._('View as List')},
-                {id: 'grid', title: Ox._('View as Grid')}
-            ],
-            value: ui.documentsView,
-            width: 128
-        })
-        .css({float: 'left', margin: '4px 2px 4px 4px'})
-        .bindEvent({
-            change: function(data) {
-                pandora.UI.set({documentsView: data.value});
-            }
-        })
-        .appendTo($listBar),
-
-        $sortSelect = Ox.Select({
-            items: columns.map(function(column) {
-                return {
-                    id: column.id,
-                    title: Ox._('Sort by {0}', [column.title])
-                };
-            }),
-            value: ui.documentsSort[0].key,
-            width: 128
-        })
-        .bindEvent({
-            change: function(data) {
-                var key = data.value;
-                pandora.UI.set({documentsSort: [{
-                    key: key,
-                    operator: Ox.getObjectById(columns, key).operator
-                }]});
-            }
-        }),
-
-        $orderButton = Ox.Button({
+            $orderButton = Ox.Button({
             overlap: 'left',
             title: getOrderButtonTitle(),
             tooltip: getOrderButtonTooltip(),
@@ -160,55 +117,85 @@ pandora.ui.documentsPanel = function(options) {
                 }]});
             }
         }),
-
-        $sortElement = Ox.FormElementGroup({
-            elements: [$sortSelect, $orderButton],
-            float: 'right'
-        })
-        .css({float: 'left', margin: '4px 2px'})
-        .appendTo($listBar),
-
-        $findSelect = Ox.Select({
-            items: [
-                {id: 'all', title: Ox._('Find: All')},
-                {id: 'name', title: Ox._('Find: Name')},
-                {id: 'user', title: Ox._('Find: User')},
-                {id: 'entity', title: Ox._('Find: Entity')}
-            ].filter(function(item) {
-                if (item.id == 'user') {
-                    return !isItemView;
-                } else if (item.id == 'entity') {
-                    return pandora.site.entities.length;
-                }
-                return true;
+        $sortSelect = Ox.Select({
+            items: pandora.documentColumns.map(function(column) {
+                return {
+                    id: column.id,
+                    title: Ox._('Sort by {0}', [column.title])
+                };
             }),
-            overlap: 'right',
-            type: 'image'
+            value: ui.documentsSort[0].key,
+            width: 128
         })
         .bindEvent({
             change: function(data) {
-                $findInput.options({placeholder: data.title}).focusInput();
+                var key = data.value;
+                pandora.UI.set({documentsSort: [{
+                    key: key,
+                    operator: Ox.getObjectById(pandora.documentColumns, key).operator
+                }]});
             }
         }),
-
-        $findInput = Ox.Input({
-            changeOnKeypress: true,
-            clear: true,
-            placeholder: Ox._('Find: All'),
-            width: 192
+        that = Ox.FormElementGroup({
+            elements: [$sortSelect, $orderButton],
+            float: 'right'
         })
+        .css({float: 'left', margin: '4px 2px'});
+
+    function getOrderButtonTitle() {
+        return ui.documentsSort[0].operator == '+' ? 'up' : 'down';
+    }
+
+    function getOrderButtonTooltip() {
+        return Ox._(ui.documentsSort[0].operator == '+' ? 'Ascending' : 'Descending');
+    }
+
+    that.sortValue = function(value) {
+        $sortSelect.value(value);
+        $orderButton.options({
+            title: getOrderButtonTitle(),
+            tooltip: getOrderButtonTooltip()
+        });
+    };
+    return that;
+};
+
+pandora.ui.documentViewSelect = function() {
+    var ui = pandora.user.ui,
+        that = Ox.Select({
+            items: [
+                {id: 'list', title: Ox._('View as List')},
+                {id: 'grid', title: Ox._('View as Grid')}
+            ],
+            value: ui.documentsView,
+            width: 128
+        })
+        .css({float: 'left', margin: '4px 2px 4px 4px'})
         .bindEvent({
-            change: updateList
+            change: function(data) {
+                pandora.UI.set({documentsView: data.value});
+            }
+        });
+    return that;
+};
+
+pandora.ui.documentsPanel = function(options) {
+
+    var ui = pandora.user.ui,
+        hasItemView = ui.section == 'items' && ui.item,
+        hasListSelection = ui.section == 'items' && !ui.item && ui.listSelection.length,
+        isItemView = options.isItemView,
+        listLoaded = false,
+        allFindKeys = ['user', 'title', 'entity', 'extension', 'description'].filter(function(key) {
+            return key != 'entity' || pandora.site.entities.length;
         }),
 
-        $findElement = Ox.FormElementGroup({
-                elements: [
-                    $findSelect,
-                    $findInput
-                ]
-            })
-            .css({float: 'right', margin: '4px 4px 4px 2px'})
-            .appendTo($listBar),
+        $listBar = Ox.Bar({size: 24}),
+
+        $viewSelect = pandora.ui.documentViewSelect().appendTo($listBar),
+        $sortElement = pandora.ui.documentSortSelect().appendTo($listBar),
+
+        $findElement = findElement(updateList, isItemView).appendTo($listBar),
 
         $list = renderList(),
 
@@ -389,7 +376,7 @@ pandora.ui.documentsPanel = function(options) {
                 that.size(1, data.value);
             },
             pandora_documentssort: function(data) {
-                updateSortElement();
+                $sortElement.sortValue(ui.documentsSort[0].key);
                 $list.options({sort: data.value});
             },
             pandora_documentsview: function(data) {
@@ -409,12 +396,6 @@ pandora.ui.documentsPanel = function(options) {
     if (isItemView) {
         pandora.$ui.documentsList = $list;
     }
-
-    // to determine the width of the find input inside
-    // the documents dialog, that dialog has to be present
-    setTimeout(function() {
-        $findInput.options({width: getFindInputWidth()});
-    });
 
     function addDocuments() {
         var ids = ui.documentsSelection[''];
@@ -460,12 +441,59 @@ pandora.ui.documentsPanel = function(options) {
         openDocumentsDialog();
     }
 
-    function getOrderButtonTitle() {
-        return ui.documentsSort[0].operator == '+' ? 'up' : 'down';
-    }
+    function findElement(callback, isItemView) {
+        var $findSelect = Ox.Select({
+                items: [
+                    {id: 'all', title: Ox._('Find: All')},
+                    {id: 'title', title: Ox._('Find: Title')},
+                    {id: 'user', title: Ox._('Find: User')},
+                    {id: 'entity', title: Ox._('Find: Entity')}
+                ].filter(function(item) {
+                    if (item.id == 'user') {
+                        return !isItemView;
+                    } else if (item.id == 'entity') {
+                        return pandora.site.entities.length;
+                    }
+                    return true;
+                }),
+                overlap: 'right',
+                type: 'image'
+            })
+            .bindEvent({
+                change: function(data) {
+                    $findInput.options({placeholder: data.title}).focusInput();
+                }
+            }),
 
-    function getOrderButtonTooltip() {
-        return Ox._(ui.documentsSort[0].operator == '+' ? 'Ascending' : 'Descending');
+            $findInput = Ox.Input({
+                changeOnKeypress: true,
+                clear: true,
+                placeholder: Ox._('Find: All'),
+                width: 192
+            })
+            .bindEvent({
+                change: function(data) {
+                    data.key = $findSelect.value();
+                    data.value = $findInput.value()
+                    callback(data);
+                }
+            }),
+
+            that = Ox.FormElementGroup({
+                elements: [
+                    $findSelect,
+                    $findInput
+                ]
+            })
+            .css({float: 'right', margin: '4px 4px 4px 2px'});
+
+        // to determine the width of the find input inside
+        // the documents dialog, that dialog has to be present
+        setTimeout(function() {
+            $findInput.options({width: getFindInputWidth()});
+        });
+
+        return that;
     }
 
     function getFindInputWidth() {
@@ -564,8 +592,8 @@ pandora.ui.documentsPanel = function(options) {
                 .append(
                     $name = Ox.EditableContent({
                         editable: editable,
-                        tooltip: editable ? pandora.getEditTooltip('name') : '',
-                        value: item.name,
+                        tooltip: editable ? pandora.getEditTooltip('title') : '',
+                        value: item.title,
                         width: width
                     })
                     .css({
@@ -580,11 +608,11 @@ pandora.ui.documentsPanel = function(options) {
                         },
                         submit: function(data) {
                             pandora.api.editDocument({
-                                name: data.value,
+                                title: data.value,
                                 id: item.id,
                                 item: ui.item,
                             }, function(result) {
-                                $name.options({value: result.data.name});
+                                $name.options({value: result.data.title});
                                 Ox.Request.clearCache('findDocuments');
                                 $list.reloadList();
                             });
@@ -631,10 +659,10 @@ pandora.ui.documentsPanel = function(options) {
                 items: [
                     Ox.Input({
                         disabled: !editable,
-                        id: 'name',
-                        label: Ox._('Name'),
+                        id: 'title',
+                        label: Ox._('Title'),
                         labelWidth: labelWidth,
-                        value: item.name,
+                        value: item.title,
                         width: width
                     }),
                     Ox.Input({
@@ -839,7 +867,7 @@ pandora.ui.documentsPanel = function(options) {
     function renderList() {
         var options = {
             items: pandora.api.findDocuments,
-            keys: ['description', 'dimensions', 'extension', 'id', 'name', 'ratio', 'size', 'user', 'entities', 'modified'],
+            keys: ['description', 'dimensions', 'extension', 'id', 'title', 'ratio', 'size', 'user', 'entities', 'modified'],
             query: {
                 conditions: isItemView ? [{ key: 'item', value: ui.item, operator: '==' }] : [],
                 operator: '&'
@@ -847,27 +875,27 @@ pandora.ui.documentsPanel = function(options) {
             selected: ui.documentsSelection[isItemView ? ui.item : ''] || [],
             sort: ui.documentsSort.concat([
                 {key: 'extension', operator: '+'},
-                {key: 'name', operator: '+'}
+                {key: 'title', operator: '+'}
             ]),
             unique: 'id'
         };
         return (ui.documentsView == 'list' ? Ox.TableList(Ox.extend(options, {
-            columns: columns,
+            columns: pandora.documentColumns,
             columnsVisible: true,
             scrollbarVisible: true,
         })) : Ox.IconList(Ox.extend(options, {
             item: function(data, sort, size) {
                 var sortKey = sort[0].key,
-                    infoKey = sortKey == 'name' ? 'extension' : sortKey,
+                    infoKey = sortKey == 'title' ? 'extension' : sortKey,
                     info = (
-                        Ox.getObjectById(columns, infoKey).format || Ox.identity
+                        Ox.getObjectById(pandora.documentColumns, infoKey).format || Ox.identity
                     )(data[infoKey]),
                     size = size || 128;
                 return {
                     height: Math.round(data.ratio > 1 ? size / data.ratio : size),
                     id: data.id,
                     info: info,
-                    title: data.name,
+                    title: data.title,
                     url: pandora.getMediaURL('/documents/' + data.id + '/256p.jpg?' + data.modified),
                     width: Math.round(data.ratio > 1 ? size : size * data.ratio)
                 };
@@ -878,6 +906,9 @@ pandora.ui.documentsPanel = function(options) {
             add: function() {
                 // we can't open upload dialog via control+n
                 isItemView && openDocumentsDialog();
+            },
+            copy: function(data) {
+                pandora.clipboard.copy(data.ids, 'document');
             },
             closepreview: closeDocuments,
             'delete': isItemView ? removeDocuments : deleteDocuments,
@@ -892,6 +923,22 @@ pandora.ui.documentsPanel = function(options) {
             },
             open: openDocuments,
             openpreview: openDocuments,
+            paste: function(data) {
+                if (isItemView) {
+                    //fixme permissions!
+                    var items = pandora.clipboard.paste();
+                    if (items.length && pandora.clipboard.type() == 'document') {
+                        //fixme use history
+                        pandora.api.addDocument({
+                            item: ui.item,
+                            ids: items
+                        }, function(result) {
+                            Ox.Request.clearCache('findDocuments');
+                            $list.reloadList();
+                        });
+                    }
+                }
+            },
             select: function(data) {
                 pandora.UI.set(
                     'documentsSelection.' + (isItemView ? ui.item : ''), data.ids
@@ -1017,9 +1064,10 @@ pandora.ui.documentsPanel = function(options) {
         );
     }
 
-    function updateList() {
-        var key = $findSelect.value(),
-            value = $findInput.value(),
+    function updateList(data) {
+
+        var key = data.key,
+            value = data.value,
             itemCondition = isItemView
                 ? {key: 'item', operator: '==', value: ui.item}
                 : null,
@@ -1040,11 +1088,7 @@ pandora.ui.documentsPanel = function(options) {
     }
 
     function updateSortElement() {
-        $sortSelect.value(ui.documentsSort[0].key);
-        $orderButton.options({
-            title: getOrderButtonTitle(),
-            tooltip: getOrderButtonTooltip()
-        });
+        $sortElement.sortValue(ui.documentsSort[0].key);
     }
 
     function uploadDocuments(data) {

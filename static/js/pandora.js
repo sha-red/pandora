@@ -351,7 +351,11 @@ appPanel
             findKeys: data.site.itemKeys.filter(function(key) {
                 return key.find;
             }),
+            documentFindKeys: data.site.documentKeys.filter(function(key) {
+                return key.find;
+            }),
             itemsSection: pandora.site.itemName.plural.toLowerCase(),
+            listSections: ['items', 'documents'],
             map: data.site.layers.some(function(layer) {
                 return layer.type == 'place'
             }) ? 'manual' : data.site.layers.some(function(layer) {
@@ -364,6 +368,11 @@ appPanel
                     {id: 'featured', title: 'Featured Lists', showBrowser: false},
                     {id: 'volumes', title: 'Local Volumes'}
                 ],
+                documents: [
+                    {id: 'personal', title: 'Personal Collections'},
+                    {id: 'favorite', title: 'Favorite Collections', showBrowser: false},
+                    {id: 'featured', title: 'Featured Collections', showBrowser: false}
+                ],
                 edits: [
                     {id: 'personal', title: 'Personal Edits'},
                     {id: 'favorite', title: 'Favorite Edits', showBrowser: false},
@@ -375,12 +384,23 @@ appPanel
                     {id: 'featured', title: 'Featured Texts', showBrowser: false}
                 ]
             },
-            sortKeys: pandora.getSortKeys()
+            sortKeys: pandora.getSortKeys(),
+            documentSortKeys: pandora.getDocumentSortKeys(),
+            collectionViews: [
+                {id: 'list', title: Ox._('View as List')},
+                {id: 'grid', title: Ox._('View as Grid')}
+            ]
         });
         pandora.site.listSettings = {};
         Ox.forEach(pandora.site.user.ui, function(val, key) {
             if (/^list[A-Z]/.test(key)) {
                 pandora.site.listSettings[key] = key[4].toLowerCase()+ key.slice(5);
+            }
+        });
+        pandora.site.collectionSettings = {};
+        Ox.forEach(pandora.site.user.ui, function(val, key) {
+            if (/^collection[A-Z]/.test(key)) {
+                pandora.site.collectionSettings[key] = key[10].toLowerCase()+ key.slice(11);
             }
         });
         pandora.site.editSettings = {
