@@ -9,8 +9,6 @@ User=pandora
 Group=pandora
 PIDFile=/run/pandora/websocketd.pid
 WorkingDirectory=/srv/pandora/pandora
-StandardOutput=syslog
-StandardError=syslog
 ExecStart=/srv/pandora/bin/python /srv/pandora/pandora/manage.py websocketd \
        --pidfile /run/pandora/websocketd.pid
 ExecReload=/bin/kill -HUP $MAINPID

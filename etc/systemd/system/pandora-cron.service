@@ -9,8 +9,6 @@ User=pandora
 Group=pandora
 PIDFile=/run/pandora/cron.pid
 WorkingDirectory=/srv/pandora/pandora
-StandardOutput=syslog
-StandardError=syslog
 ExecStart=/srv/pandora/bin/python /srv/pandora/pandora/manage.py \
     celerybeat -s /run/pandora/celerybeat-schedule \
     --pidfile /run/pandora/cron.pid \
