@@ -16,6 +16,7 @@ urlpatterns = [
     #download
     url(r'^(?P<id>[A-Z0-9].*)/download$', views.download),
     url(r'^(?P<id>[A-Z0-9].*)/download/$', views.download),
+    url(r'^(?P<id>[A-Z0-9].*)/download/source/(?P<part>\d+)?$', views.download_source),
     url(r'^(?P<id>[A-Z0-9].*)/download/(?P<resolution>\d+)p\.(?P<format>webm|ogv|mp4)$', views.download),
 
     #video

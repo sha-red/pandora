@@ -892,6 +892,31 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
         response.allow_access()
     return response
 
+def download_source(request, id, part=None):
+    item = get_object_or_404(models.Item, public_id=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
+    if part:
+        part = int(part) - 1
+    else:
+        part = 0
+    if not item.files.all().count() > part:
+        raise Http404
+    f = item.files.all()[part]
+    if not f.data:
+        raise Http404
+
+    parts = ['%s - %s ' % (item.get('title'), settings.SITENAME), item.public_id]
+    parts.append('.')
+    parts.append(f.extension)
+    filename = ''.join(parts)
+
+    path = f.data.path
+    content_type = mimetypes.guess_type(path)[0]
+    response = HttpFileResponse(path, content_type=content_type)
+    response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
+    return response
+
 def download(request, id, resolution=None, format='webm'):
     item = get_object_or_404(models.Item, public_id=id)
     if not resolution or int(resolution) not in settings.CONFIG['video']['resolutions']:
