@@ -93,7 +93,9 @@ def download(item_id, url):
         return '%s contains no videos' % url
     media = info[0]
     cdir = os.path.abspath(os.curdir)
-    tmp = tempfile.mkdtemp().decode('utf-8')
+    tmp = tempfile.mkdtemp()
+    if isinstance(tmp, bytes):
+        tmp = tmp.decode('utf-8')
     os.chdir(tmp)
     cmd = ['youtube-dl', '-q', media['url']]
     p = subprocess.Popen(cmd,
