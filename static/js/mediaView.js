@@ -256,6 +256,7 @@ pandora.ui.mediaView = function(options) {
                 }), callback);
             },
             keys: ['state', 'instances', 'wanted', 'error'],
+            pageLength: 1000,
             scrollbarVisible: true,
             sort: [{key: 'path', operator: '+'}],
             unique: 'id'
