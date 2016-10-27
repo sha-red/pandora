@@ -341,7 +341,7 @@ def direct_upload(request):
             file.uploading = True
             file.save()
             Task.start(file.item, request.user)
-            upload_url = request.build_absolute_uri('/api/upload/direct/?id=%s' % file.oshash)
+            upload_url = '/api/upload/direct/?id=%s' % file.oshash
             return render_to_json_response({
                 'uploadUrl': upload_url,
                 'url': request.build_absolute_uri(file.item.get_absolute_url()),
