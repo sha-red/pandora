@@ -674,7 +674,6 @@ def setPoster(request, data):
         if data['source'] in valid_sources:
             item.poster_source = data['source']
             item.remove_poster()
-            item.clear_poster_cache(item.path('siteposter.jpg'))
             item.save()
             tasks.update_poster(item.public_id)
             response = json_response()

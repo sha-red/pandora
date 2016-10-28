@@ -1375,6 +1375,7 @@ class Item(models.Model):
             f.write(data)
         self.poster_height = self.poster.height
         self.poster_width = self.poster.width
+        self.clear_poster_cache(self.poster.path)
         if self.json.get('posterRatio') != self.poster_width / self.poster_height:
             self.json = self.get_json()
             Item.objects.filter(id=self.id).update(json=self.json,
@@ -1411,6 +1412,7 @@ class Item(models.Model):
         if self.poster:
             self.clear_poster_cache(self.poster.path)
             self.poster.delete()
+        self.clear_poster_cache(os.path.join(settings.MEDIA_ROOT, self.path('siteposter.jpg')))
 
     def clear_poster_cache(self, poster=None):
         if poster is None:
@@ -1442,7 +1444,7 @@ class Item(models.Model):
                     data = f.read()
                     if data:
                         self.save_poster(data)
-            self.clear_poster_cache(poster)
+                self.clear_poster_cache(poster)
 
     def make_siteposter(self):
         poster = self.path('siteposter.jpg')
