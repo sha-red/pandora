@@ -1412,7 +1412,9 @@ class Item(models.Model):
             self.clear_poster_cache(self.poster.path)
             self.poster.delete()
 
-    def clear_poster_cache(self, poster):
+    def clear_poster_cache(self, poster=None):
+        if poster is None:
+            poster = self.poster.path
         for f in glob(poster.replace('.jpg', '*.jpg')):
             if f != poster:
                 try:
