@@ -407,7 +407,7 @@ def upload(request):
                 file.file.delete()
             file.uploading = True
             name, extension = request.POST['filename'].rsplit('.', 1)
-            file.extension = extension
+            file.extension = extension.lower()
             file.width = -1
             file.pages = -1
             file.save()
