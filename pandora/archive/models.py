@@ -594,9 +594,9 @@ class Instance(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    atime = models.IntegerField(default=inttime, editable=False)
-    ctime = models.IntegerField(default=inttime, editable=False)
-    mtime = models.IntegerField(default=inttime, editable=False)
+    atime = models.BigIntegerField(default=inttime, editable=False)
+    ctime = models.BigIntegerField(default=inttime, editable=False)
+    mtime = models.BigIntegerField(default=inttime, editable=False)
 
     path = models.CharField(max_length=2048)
     ignore = models.BooleanField(default=False)
