@@ -200,7 +200,7 @@ pandora.ui.mediaView = function(options) {
                     operator: '-',
                     title: Ox._('Resolution'),
                     visible: true,
-                    width: 90
+                    width: 112
                 },
                 {
                     align: 'right',
@@ -234,7 +234,7 @@ pandora.ui.mediaView = function(options) {
                     operator: '+',
                     title: Ox._('ID'),
                     visible: false,
-                    width: 120
+                    width: 128
                 },
                 {
                     align: 'left',
