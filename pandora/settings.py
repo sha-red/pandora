@@ -3,6 +3,7 @@
 # Django settings for pan.do/ra project defaults,
 # create local_settings.py to overwrite
 # check pan.do/ra section below for relevant settings
+from __future__ import absolute_import
 
 import os
 from os.path import join, normpath, dirname
@@ -255,7 +256,7 @@ except NameError:
             from django.utils.crypto import get_random_string
             chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
             SECRET_KEY = get_random_string(50, chars)
-            secret = file(SECRET_FILE, 'w')
+            secret = open(SECRET_FILE, 'w')
             secret.write(SECRET_KEY)
             secret.close()
         except IOError:
