@@ -323,7 +323,7 @@ class File(models.Model):
 
     def editable(self, user):
         p = user.profile
-        return p.get_level() in ('admin', 'staff') or \
+        return p.capability('canEditMedia') or \
             (not self.available and p.capability('canAddItems')) or \
             self.instances.filter(volume__user=user).count() > 0 or \
             (not self.item or self.item.user == user)
