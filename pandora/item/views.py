@@ -241,7 +241,7 @@ def find(request, data):
             if request.user.profile.capability('canEditMetadata') or \
                     request.user.is_staff or \
                     item.get('user') == request.user.username or \
-                    item.get('groups', []) & groups:
+                    set(item.get('groups', [])) & groups:
                 return True
             return False
 
