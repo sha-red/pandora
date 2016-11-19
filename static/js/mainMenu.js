@@ -1344,7 +1344,7 @@ pandora.ui.mainMenu = function() {
                         Ox.contains(['list', 'grid', 'clips', 'timelines'], ui.listView)
                         && ui.listSelection.length == 1
                     )
-                ) && pandora.$ui.list.value(ui.listSelection[0], 'editable')
+                ) && pandora.$ui.list && pandora.$ui.list.value(ui.listSelection[0], 'editable')
             ),
             canDelete = (
                 ui.section == 'items' && (
@@ -1355,7 +1355,7 @@ pandora.ui.mainMenu = function() {
                 ) && (
                     pandora.site.capabilities.canRemoveItems[pandora.user.level] ||
                     ui.listSelection.every(function(item) {
-                        return pandora.$ui.list.value(item, 'editable');
+                        return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
                     })
                 )
             ),
