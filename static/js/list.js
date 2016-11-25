@@ -241,7 +241,7 @@ pandora.ui.list = function() {
                 });
                 return Ox.clone(data, true);
             },
-            keys: ['clips', 'duration', 'editable', 'id', 'modified', 'posterRatio', 'videoRatio'].concat(pandora.site.itemTitleKeys),
+            keys: ['clips', 'duration', 'editable', 'id', 'modified', 'posterRatio', 'videoRatio', 'streams'].concat(pandora.site.itemTitleKeys),
             selected: ui.listSelection,
             size: 192,
             sort: ui.listSort,
