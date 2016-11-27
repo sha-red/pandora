@@ -4,6 +4,7 @@
 
 pandora.ui.mainMenu = function() {
     var isGuest = pandora.user.level == 'guest',
+        documentViewKey = 1,
         itemViewKey = 1,
         listViewKey = 1,
         ui = pandora.user.ui,
@@ -132,6 +133,18 @@ pandora.ui.mainMenu = function() {
                         { id: 'clips', title: Ox._('Open Clips'), items: [
                             { group: 'videoview', min: 1, max: 1, items: ['player', 'editor', 'timeline'].map(function(view) {
                                 return {id: view, title: Ox._(Ox.toTitleCase(view)), checked: ui.videoView == view};
+                            }) }
+                        ] },
+                        { id: 'documents', title: Ox._('Open Documents'), items: [
+                            { group: 'documentview', min: 1, max: 1, items: ['info', 'view'].map(function(id) {
+                                return {
+                                    id: id,
+                                    checked: ui.documentView == id,
+                                    keyboard: documentViewKey <= 10
+                                        ? 'shift ' + (documentViewKey++%10)
+                                        : void 0,
+                                    title: Ox._(Ox.toTitleCase(id))
+                                }
                             }) }
                         ] },
                         {},
@@ -306,6 +319,8 @@ pandora.ui.mainMenu = function() {
                         set.listSort = pandora.site.user.ui.listSort;
                     }
                     pandora.UI.set(set);
+                } else if (data.id == 'documentview') {
+                    pandora.UI.set({documentView: value});
                 } else if (Ox.startsWith(data.id, 'orderfilter')) {
                     var filters = Ox.clone(ui.filters),
                         id = data.id.replace('orderfilter', ''),
@@ -979,16 +994,28 @@ pandora.ui.mainMenu = function() {
     Ox.range(10).forEach(function(i) {
         Ox.Event.bind('key_shift_' + (i + 1) % 10, function() {
             var view;
-            if (ui.item) {
-                view = pandora.site.itemViews[i];
-                if (view && (view.id != 'data' && view.id != 'media' ||
-                    pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level])) {
-                    pandora.UI.set({itemView: view.id});
+            if (ui.section == 'items') {
+                if (ui.item) {
+                    view = pandora.site.itemViews[i];
+                    if (view && (view.id != 'data' && view.id != 'media' ||
+                        pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level])) {
+                        pandora.UI.set({itemView: view.id});
+                    }
+                } else {
+                    view = pandora.site.listViews[i];
+                    if (view) {
+                        pandora.UI.set({listView: view.id});
+                    }
                 }
-            } else {
-                view = pandora.site.listViews[i];
-                if (view) {
-                    pandora.UI.set({listView: view.id});
+            } else if (ui.section == 'edits') {
+                if (ui.edit && i < 3) {
+                    pandora.UI.set({editView: ['list', 'grid', 'annotations'][i]});
+                }
+            } else if (ui.section == 'documents') {
+                if (ui.document && i < 2) {
+                    pandora.UI.set({documentView: ['info', 'view'][i]});
+                } else if (i < 2) {
+                    pandora.UI.set({collectionView: ['list', 'grid'][i]});
                 }
             }
         });
