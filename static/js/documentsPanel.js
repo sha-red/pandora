@@ -229,13 +229,6 @@ pandora.ui.documentsPanel = function(options) {
 
         $itemMenu = Ox.MenuButton({
             items: isItemView ? [
-                {
-                    id: 'add', 
-                    disabled: !pandora.site.capabilities.canManageDocuments[pandora.user.level],
-                    title: Ox._('Add Documents to {0}...', [pandora.site.itemName.singular]),
-                    keyboard: 'control n'
-                },
-                {},
                 {id: 'open', title: '', keyboard: 'return'},
                 {id: 'edit', title: ''},
                 {id: 'embed', title: Ox._('Embed Document...')},
@@ -263,7 +256,11 @@ pandora.ui.documentsPanel = function(options) {
                 } else if (data.id == 'delete') {
                     deleteDocuments();
                 } else if (data.id == 'edit') {
-                    editDocuments();
+                    pandora.UI.set({
+                        section: 'documents',
+                        document: ui.documentsSelection[ui.item][0],
+                        documentView: 'info'
+                    });
                 } else if (data.id == 'embed') {
                     openEmbedDialog();
                 } else if (data.id == 'open') {
