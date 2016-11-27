@@ -371,6 +371,9 @@ pandora.ui.editPanel = function(isEmbed) {
             volume: function(data) {
                 pandora.UI.set({videoVolume: data.volume});
             },
+            pandora_editview: function(data) {
+                that.options({clipView: data.value});
+            },
             pandora_editselection: function(data) {
                 that.options({selected: data.value});
             },
