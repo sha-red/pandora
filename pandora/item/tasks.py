@@ -54,13 +54,19 @@ def update_random_clip_sort():
 @task(ignore_results=True, queue='default')
 def update_clips(public_id):
     from . import models
-    item = models.Item.objects.get(public_id=public_id)
+    try:
+        item = models.Item.objects.get(public_id=public_id)
+    except models.Item.DoesNotExist:
+        return
     item.clips.all().update(user=item.user.id)
 
 @task(ignore_results=True, queue='default')
 def update_poster(public_id):
     from . import models
-    item = models.Item.objects.get(public_id=public_id)
+    try:
+        item = models.Item.objects.get(public_id=public_id)
+    except models.Item.DoesNotExist:
+        return
     item.remove_poster()
     item.make_poster()
     item.make_icon()
@@ -75,19 +81,28 @@ def update_poster(public_id):
 @task(ignore_results=True, queue='default')
 def update_file_paths(public_id):
     from . import models
-    item = models.Item.objects.get(public_id=public_id)
+    try:
+        item = models.Item.objects.get(public_id=public_id)
+    except models.Item.DoesNotExist:
+        return
     item.update_file_paths()
 
 @task(ignore_results=True, queue='default')
 def update_external(public_id):
     from . import models
-    item = models.Item.objects.get(public_id=public_id)
+    try:
+        item = models.Item.objects.get(public_id=public_id)
+    except models.Item.DoesNotExist:
+        return
     item.update_external()
 
 @task(queue="encoding")
 def update_timeline(public_id):
     from . import models
-    item = models.Item.objects.get(public_id=public_id)
+    try:
+        item = models.Item.objects.get(public_id=public_id)
+    except models.Item.DoesNotExist:
+        return
     item.update_timeline(async=False)
     Task.finish(item)
 
@@ -102,7 +117,10 @@ def rebuild_timeline(public_id):
 @task(queue="encoding")
 def load_subtitles(public_id):
     from . import models
-    item = models.Item.objects.get(public_id=public_id)
+    try:
+        item = models.Item.objects.get(public_id=public_id)
+    except models.Item.DoesNotExist:
+        return
     if item.load_subtitles():
         item.update_find()
         item.update_sort()
