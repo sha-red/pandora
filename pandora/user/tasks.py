@@ -8,15 +8,18 @@ from datetime import timedelta
 from six.moves import zip_longest
 from celery.task import task, periodic_task
 
+from app.utils import limit_rate
 from app.models import Settings
 from .statistics import Statistics
 
 @periodic_task(run_every=timedelta(hours=1), queue='encoding')
 def cronjob(**kwargs):
-    update_statistics()
+    if limit_rate('user.tasks.cronjob', 30 * 60):
+        update_statistics()
 
 def update_statistics():
     from . import models
+
     def chunker(iterable, chunksize, filler):
         return zip_longest(*[iter(iterable)]*chunksize, fillvalue=filler)
 
