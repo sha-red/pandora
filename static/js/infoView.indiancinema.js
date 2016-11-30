@@ -318,7 +318,7 @@ pandora.ui.infoView = function(data) {
 
     renderGroup(['actor']);
 
-    renderGroup(canSeeAllMetadata ? ['genre', 'keyword'] : ['genre']);
+    renderGroup(canSeeAllMetadata ? ['genre', 'topic'] : ['genre']);
 
     renderGroup(['imdbId', 'links']);
 
@@ -363,6 +363,90 @@ pandora.ui.infoView = function(data) {
             .appendTo($text);
     }
 
+    // Extra Metadata
+    renderGroup([
+        'censorshipcertificatenumber',
+        'dateofcensorcertificate',
+        'ratingcertificate',
+        'length',
+        'numberofreels',
+        'format'
+    ]);
+    renderGroup([
+        'presentedby',
+        'coproducer',
+        'associateproducer',
+        'executiveproducer',
+        'associatedirector',
+        'chiefassistantdirector',
+        'assistantdirector',
+        'story',
+        'screenplay',
+        'dialogue',
+        'adaptation'
+    ]);
+    renderGroup([
+        'musicdirector',
+        'backgroundmusic',
+        'orchestration',
+        'arranger',
+        'sounddesign',
+        'soundrecording',
+        'rerecording',
+        'musiclabel'
+    ]);
+    renderGroup([
+        'assistantcinematographer',
+        'artdirector',
+        'costumedesign',
+        'productiondesign',
+        'specialeffects',
+        'animation',
+        'singer',
+        'coeditor',
+        'stills',
+        'publicitydesign',
+        'makeup',
+        'hairstyles',
+        'dancedirector',
+        'productioncontroller',
+        'stuntdirector',
+        'continuity',
+        'publicity',
+        'courtesy',
+    ]);
+
+    // Songs
+    if (data.songs || canEdit) {
+        Ox.EditableContent({
+                clickLink: pandora.clickLink,
+                collapseToEnd: false,
+                editable: canEdit,
+                format: function(value) {
+                    return value.replace(
+                        /<img src=/g,
+                        '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
+                    );
+                },
+                placeholder: formatLight(Ox._('No Songs')),
+                tooltip: canEdit ? pandora.getEditTooltip() : '',
+                type: 'textarea',
+                value: data.songs || ''
+
+            })
+            .css(css)
+            .css({
+                marginTop: '12px',
+                overflow: 'hidden'
+            })
+            .bindEvent({
+                submit: function(data) {
+                    editMetadata('songs', data.value);
+                }
+            })
+            .appendTo($text);
+    }
+
     // Descriptions ------------------------------------------------------------
 
     $descriptions = $('<div>').attr({id: 'descriptions'}).appendTo($text);
@@ -371,55 +455,89 @@ pandora.ui.infoView = function(data) {
 
     $('<div>').css({height: '16px'}).appendTo($text);
 
-    // Duration, Aspect Ratio --------------------------------------------------
+    if (data.parts && data.rendered) {
+        // Duration, Aspect Ratio --------------------------------------------------
 
-    ['duration', 'aspectratio'].forEach(function(key) {
-        var itemKey = Ox.getObjectById(pandora.site.itemKeys, key),
-            value = data[key] || 0;
+        ['duration', 'aspectratio'].forEach(function(key) {
+            var itemKey = Ox.getObjectById(pandora.site.itemKeys, key),
+                value = data[key] || 0;
+            $('<div>')
+                .css({marginBottom: '4px'})
+                .append(formatKey(itemKey.title, 'statistics'))
+                .append(
+                    Ox.Theme.formatColor(null, 'gradient')
+                        .css({textAlign: 'right'})
+                        .html(
+                            Ox['format' + Ox.toTitleCase(itemKey.format.type)]
+                                .apply(null, [value].concat(itemKey.format.args))
+                        )
+                )
+                .appendTo($statistics);
+        });
+
+        // Hue, Saturation, Lightness, Volume --------------------------------------
+
+        ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
+            var value = data[key] || 0;
+            $('<div>')
+                .css({marginBottom: '4px'})
+                .append(formatKey(key, 'statistics'))
+                .append(
+                    Ox.Theme.formatColor(value, key == 'volume' ? 'lightness' : key)
+                        .css({textAlign: 'right'})
+                )
+                .appendTo($statistics);
+        });
+
+        // Cuts per Minute, Words per Minute ---------------------------------------
+
+        ['cutsperminute', 'wordsperminute'].forEach(function(key) {
+            var value = data[key] || 0;
+            $('<div>')
+                .css({marginBottom: '4px'})
+                .append(
+                    formatKey(Ox.toTitleCase(key.slice(0, -9)) + ' per Minute', 'statistics')
+                )
+                .append(
+                    Ox.Theme.formatColor(null, 'gradient')
+                        .css({textAlign: 'right'})
+                        .html(Ox.formatNumber(value, 3))
+                )
+                .appendTo($statistics);
+        });
+
         $('<div>')
             .css({marginBottom: '4px'})
-            .append(formatKey(itemKey.title, 'statistics'))
+            .append(formatKey('Annotations', 'statistics'))
             .append(
                 Ox.Theme.formatColor(null, 'gradient')
                     .css({textAlign: 'right'})
-                    .html(
-                        Ox['format' + Ox.toTitleCase(itemKey.format.type)]
-                            .apply(null, [value].concat(itemKey.format.args))
-                    )
+                    .html(Ox.formatNumber(data.numberofannotations || 0))
             )
             .appendTo($statistics);
-    });
+    } else {
+        // no video placeholder
+    }
 
-    // Hue, Saturation, Lightness, Volume --------------------------------------
+   $('<div>')
+        .css({marginBottom: '4px'})
+        .append(formatKey('Documents', 'statistics'))
+        .append(
+            Ox.Theme.formatColor(null, 'gradient')
+                .css({textAlign: 'right'})
+                .html(Ox.formatNumber(data.numberofdocuments || 0))
+        )
+        .on({
+            click: function() {
+                if (data.numberofdocuments) {
+                    pandora.UI.set({
+                        itemView: 'documents'
+                    });
+                }
+            }
+        })
+        .appendTo($statistics);
 
-    ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
-        var value = data[key] || 0;
-        $('<div>')
-            .css({marginBottom: '4px'})
-            .append(formatKey(key, 'statistics'))
-            .append(
-                Ox.Theme.formatColor(value, key == 'volume' ? 'lightness' : key)
-                    .css({textAlign: 'right'})
-            )
-            .appendTo($statistics);
-    });
-
-    // Cuts per Minute, Words per Minute ---------------------------------------
-
-    ['cutsperminute', 'wordsperminute'].forEach(function(key) {
-        var value = data[key] || 0;
-        $('<div>')
-            .css({marginBottom: '4px'})
-            .append(
-                formatKey(Ox.toTitleCase(key.slice(0, -9)) + ' per Minute', 'statistics')
-            )
-            .append(
-                Ox.Theme.formatColor(null, 'gradient')
-                    .css({textAlign: 'right'})
-                    .html(Ox.formatNumber(value, 3))
-            )
-            .appendTo($statistics);
-    });
 
     // Rights Level ------------------------------------------------------------
 
@@ -792,7 +910,7 @@ pandora.ui.infoView = function(data) {
                 .css({marginLeft: '52px'})
                 .bindEvent({
                     click: function() {
-                        pandora.UI.set({page: 'rights'});
+                        pandora.UI.set({page: 'copyrights'});
                     }
                 })
                 .appendTo($line);
@@ -998,8 +1116,10 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($rightsLevel);
         }
-        $capabilities = $('<div>').appendTo($rightsLevel);
-        renderCapabilities(data.rightslevel);
+        if (data.parts) {
+            $capabilities = $('<div>').appendTo($rightsLevel);
+            renderCapabilities(data.rightslevel);
+        }
     }
 
     function toggleIconSize() {

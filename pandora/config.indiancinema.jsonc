@@ -670,8 +670,8 @@
             "sort": true
         },
         {
-            "id": "keyword", 
-            "title": "Keyword",
+            "id": "topic",
+            "title": "Topic",
             "type": ["string"],
             "autocomplete": true,
             "filter": true,
@@ -680,6 +680,380 @@
         {
             "id": "summary",
             "title": "Summary",
+            "type": "text",
+            "find": true
+        },
+        {
+            "id": "releasedate",
+            "title": "Release Date",
+            "type": "date"
+        },
+        {
+            "id": "censorshipcertificatenumber",
+            "title": "Censorship Certificate Number",
+            "type": "integer"
+        },
+        {
+            "id": "dateofcensorcertificate",
+            "title": "Date of Censor Certificate",
+            "type": "date"
+        },
+        {
+            "id": "ratingcertificate",
+            "title": "Rating/Certificate",
+            "type": "string"
+        },
+        {
+            "id": "length",
+            "title": "Length",
+            "type": "integer"
+        },
+        {
+            "id": "numberofreels",
+            "title": "Number of Reels",
+            "type": "integer"
+        },
+        {
+            "id": "format",
+            "title": "Format",
+            "type": "string"
+        },
+        {
+            "id": "presentedby",
+            "title": "Presented by",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "coproducer",
+            "title": "Co-Producer",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "associateproducer",
+            "title": "Associate Producer",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "executiveproducer",
+            "title": "Executive Producer",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "associatedirector",
+            "title": "Associate Director",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "chiefassistantdirector",
+            "title": "Chief Assistant Director",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "assistantdirector",
+            "title": "Assistant Director",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "story",
+            "title": "Story",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "screenplay",
+            "title": "Screenplay",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "dialogue",
+            "title": "Dialogue",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "adaptation",
+            "title": "Adaptation",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "musicdirector",
+            "title": "Music Director",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "backgroundmusic",
+            "title": "Background Music",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "orchestration",
+            "title": "Orchestration",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "arranger",
+            "title": "Arranger",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "sounddesign",
+            "title": "Sound design",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "soundrecording",
+            "title": "Sound recording",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "rerecording",
+            "title": "Re-Recording",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "musiclabel",
+            "title": "Music Label",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "assistantcinematographer",
+            "title": "Assistant Cinematographer",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "artdirector",
+            "title": "Art Director",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "costumedesign",
+            "title": "Costume design",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "productiondesign",
+            "title": "Production design",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "specialeffects",
+            "title": "Special Effects",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "animation",
+            "title": "Animation",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "singer",
+            "title": "Singer",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "coeditor",
+            "title": "Co-Editor",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "stills",
+            "title": "Stills",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "publicitydesign",
+            "title": "Publicity Design",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "makeup",
+            "title": "Make-Up",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "hairstyles",
+            "title": "Hair Styles",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "dancedirector",
+            "title": "Dance Director",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "productioncontroller",
+            "title": "Production Controller",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "stuntdirector",
+            "title": "Stunt Director",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "continuity",
+            "title": "Continuity",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "publicity",
+            "title": "Publicity",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "courtesy",
+            "title": "Courtesy",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "songs",
+            "title": "Song Titles",
             "type": "text",
             "find": true
         },
@@ -746,6 +1120,13 @@
             "title": "Subtitles",
             "type": "layer",
             "find": true
+        },
+        {
+            "id": "numberofannotations",
+            "title": "Number of Annotations",
+            "type": "integer",
+            "columnWidth": 60,
+            "sort": true
         },
         {
             "id": "duration",

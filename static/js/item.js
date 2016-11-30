@@ -36,18 +36,38 @@ pandora.ui.item = function() {
         if (!result.data.rendered && [
             'clips', 'timeline', 'player', 'editor', 'map', 'calendar'
         ].indexOf(pandora.user.ui.itemView) > -1) {
+            var html = Ox._('Sorry, <i>{0}</i>'
+                + ' currently doesn\'t have '
+                + (['a', 'e', 'i', 'o'].indexOf(
+                    pandora.user.ui.itemView.slice(0, 1)
+                ) > -1 ? 'an': 'a') + ' '
+                +'{1} view.', [result.data.title, Ox._(pandora.user.ui.itemView)]);
             pandora.$ui.contentPanel.replaceElement(1,
                 Ox.Element()
                     .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
-                    .html(
-                        Ox._('Sorry, <i>{0}</i>'
-                        + ' currently doesn\'t have '
-                        + (['a', 'e', 'i', 'o'].indexOf(
-                            pandora.user.ui.itemView.slice(0, 1)
-                        ) > -1 ? 'an': 'a') + ' '
-                        +'{1} view.', [result.data.title, Ox._(pandora.user.ui.itemView)])
-                    )
+                    .html(html)
             );
+            pandora.site.itemViews.filter(function(view) {
+                return view.id == 'documents';
+            }).length && pandora.api.get({
+                id: pandora.user.ui.item,
+                keys: ['numberofdocuments']
+            }, function(result) {
+                if (result.data.numberofdocuments) {
+                    var $text = Ox.Element()
+                        .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
+                        .html(
+                            html
+                            + '<br>'
+                            + Ox._('There are <a href="{0}">{1}</a>', [
+                                '/' + pandora.user.ui.item + '/documents',
+                                Ox.formatCount(result.data.numberofdocuments, 'document')
+                            ])
+                        )
+                    pandora.$ui.contentPanel.replaceElement(1, $text);
+                    pandora.createLinks($text);
+                }
+            });
             result.data.parts > 0 && pandora.updateStatus(pandora.user.ui.item);
         } else if (pandora.user.ui.itemView == 'info') {
             
