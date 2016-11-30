@@ -162,15 +162,20 @@ class Document(models.Model):
         s.extension = self.extension
         s.size = self.size
         s.matches = self.matches
+
         if self.extension == 'pdf':
-            s.dimensions = ox.sort_string('2') + ox.sort_string('%d' % self.pages)
+            prefix = 2
+            value = self.pages
         else:
             if self.extension == 'html':
-                resolution_sort = self.dimensions
-                s.dimensions = ox.sort_string('1') + ox.sort_string('%d' % resolution_sort)
+                prefix = 1
+                value = self.dimensions
             else:
-                resolution_sort = self.width * self.height
-                s.dimensions = ox.sort_string('0') + ox.sort_string('%d' % resolution_sort)
+                prefix = 0
+                value = self.width * self.height
+        if value < 0:
+            value = 0
+        s.dimensions = ox.sort_string('%d' % prefix) + ox.sort_string('%d' % value)
 
         def sortNames(values):
             sort_value = u''
@@ -259,19 +264,23 @@ class Document(models.Model):
                 self.get_info()
         if self.extension == 'html':
             self.size = len(self.data.get('text', ''))
-        
+
+        is_ready = not self.uploading and (self.file or self.extension == 'html')
+
         if self.id:
-            self.update_sort()
-            self.update_find()
-            self.update_facets()
+            if is_ready:
+                self.update_sort()
+                self.update_find()
+                self.update_facets()
             new = False
         else:
             new = True
         super(Document, self).save(*args, **kwargs)
         if new:
-            self.update_sort()
-            self.update_find()
-            self.update_facets()
+            if is_ready:
+                self.update_sort()
+                self.update_find()
+                self.update_facets()
         self.update_matches()
 
     def __unicode__(self):
