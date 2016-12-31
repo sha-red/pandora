@@ -36,18 +36,18 @@ class Command(BaseCommand):
             import entity.models
             import document.models
             for table, column in (
-                (models.ItemFind._meta.db_table, 'value'),    # Item Find
-                (models.Clip._meta.db_table, 'findvalue'),    # Clip Find
-                (models.Annotation._meta.db_table, 'findvalue'),    # Annotation Find
-                (entity.models.Find._meta.db_table, 'value'), # Entity Find
-                (document.models.Find._meta.db_table, 'value'),    # Document Find
+                (models.ItemFind._meta.db_table, 'value'),        # Item Find
+                (models.Clip._meta.db_table, 'findvalue'),        # Clip Find
+                (models.Annotation._meta.db_table, 'findvalue'),  # Annotation Find
+                (entity.models.Find._meta.db_table, 'value'),     # Entity Find
+                (document.models.Find._meta.db_table, 'value'),   # Document Find
             ):
                 cursor = connection.cursor()
                 indexes = connection.introspection.get_indexes(cursor, table)
                 drop = []
                 if column in indexes:
                     sql = "SELECT indexname, indexdef FROM pg_catalog.pg_indexes " + \
-                          "WHERE indexname LIKE '%{table}%' AND indexname LIKE '%{column}%'".format(table=table, column=column)
+                          "WHERE indexdef LIKE '%ON {table}%' AND indexdef LIKE '%{column}%'".format(table=table, column=column)
                     cursor.execute(sql)
                     for r in cursor:
                         if 'USING gin' not in r[1]:
