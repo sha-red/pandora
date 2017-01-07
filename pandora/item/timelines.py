@@ -116,11 +116,11 @@ def join_tiles(source_paths, durations, target_path):
     offset = 0
     for i, path in enumerate(source_paths):
         file_info = map(get_file_info, os.listdir(path))
-        file_info = filter(lambda x: x != None, file_info)
+        file_info = filter(lambda x: x is not None, file_info)
         files = {}
         for info in sorted(file_info, key=lambda x: x['index']):
             mode = info['mode']
-            if not mode in files:
+            if mode not in files:
                 files[mode] = []
             files[mode].append(path + info['file'])
         if i:
@@ -223,9 +223,9 @@ def split_tiles(path, paths, durations):
         print(file_name, mode)
         split = re.split('[a-z]+', file_name[8 + len(mode):-4])
         height, index = map(lambda x: int(x) if len(x) else -1, split)
-        if not mode in tiles:
+        if mode not in tiles:
             tiles[mode] = {}
-        if not height in tiles[mode]:
+        if height not in tiles[mode]:
             tiles[mode][height] = 0
         if index + 1 > tiles[mode][height]:
             tiles[mode][height] = index + 1
