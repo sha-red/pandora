@@ -181,6 +181,8 @@ def join_tiles(source_paths, durations, target_path):
         target_w += large_tile_w
         save_and_open(data)
 
+    if data['full_tile_offset'] < full_tile_w:
+        data['target_images']['full'] = data['target_images']['full'].crop((0,0, data['full_tile_offset'], large_tile_h))
     # save full timelines
     image_file = '%stimeline%s%dp.jpg' % (target_path, full_tile_mode, large_tile_h)
     data['target_images']['full'].save(image_file)
