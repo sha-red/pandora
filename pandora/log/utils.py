@@ -8,7 +8,7 @@ import sys
 
 class ErrorHandler(logging.Handler):
     def __init__(self):
-        logging.Handler.__init__(self)        
+        logging.Handler.__init__(self)
 
     """An exception log handler that log entries into log database.
 
