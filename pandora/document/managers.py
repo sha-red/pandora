@@ -142,7 +142,8 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
         k = str(k)
         value_key = str(value_key)
         if k == '*':
-            q = Q(**{value_key: v})
+            q = Q(**{'find__value' + get_operator(op): v}) | \
+                Q(**{'facets__value' + get_operator(op, 'istr'): v})
         elif in_find:
             q = Q(**{'find__key': k, value_key: v})
         else:
@@ -257,6 +258,7 @@ class DocumentManager(Manager):
                                      user, item)
         if conditions:
             qs = qs.filter(conditions)
+        qs = qs.distinct()
 
         #anonymous can only see public items
         if not user or user.is_anonymous():
