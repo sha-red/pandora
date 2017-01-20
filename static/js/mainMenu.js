@@ -1116,7 +1116,7 @@ pandora.ui.mainMenu = function() {
             ) && (
                 pandora.site.capabilities.canRemoveDocuments[pandora.user.level] ||
                 ui.collectionSelection.every(function(item) {
-                    return pandora.$ui.list.value(item, 'editable');
+                    return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
                 })
             ),
             canSelect = isListView,
