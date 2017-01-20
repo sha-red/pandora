@@ -189,6 +189,9 @@ class ClipManager(Manager):
                                      user)
         if conditions:
             qs = qs.filter(conditions)
+
+        qs = qs.distinct()
+
         if 'keys' in data:
             layer_ids = [k['id'] for k in settings.CONFIG['layers']]
             for l in filter(lambda k: k in layer_ids, data['keys']):
