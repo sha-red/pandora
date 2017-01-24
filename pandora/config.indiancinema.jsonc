@@ -58,6 +58,7 @@
         "canImportItems": {},
         "canManageDocuments": {"member": true, "researcher": true, "staff": true, "admin": true},
         "canManageEntities": {"member": true, "researcher": true, "staff": true, "admin": true},
+        "canManageHome": {"staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "researcher": true, "staff": true, "admin": true},
         "canManageTitlesAndNames": {"member": true, "researcher": true, "staff": true, "admin": true},
         "canManageUsers": {"staff": true, "admin": true},

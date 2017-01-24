@@ -144,6 +144,7 @@ INSTALLED_APPS = (
     'entity',
     'websocket',
     'taskqueue',
+    'home',
 )
 
 # Log errors into db
