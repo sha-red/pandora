@@ -61,7 +61,7 @@ pandora.ui.document = function() {
         that.replaceElement(1, $content = (
                 item.extension == 'pdf'
                 ? Ox.PDFViewer({
-                    height: that.height(),
+                    height: that.height() - 16,
                     page: pandora.user.ui.documents[item.id]
                         ? pandora.user.ui.documents[item.id].position
                         : 1,
@@ -77,7 +77,7 @@ pandora.ui.document = function() {
                     area: pandora.user.ui.documents[item.id]
                         ? pandora.user.ui.documents[item.id].position
                         : [],
-                    height: that.height(),
+                    height: that.height() - 16,
                     imageHeight: item.dimensions[1],
                     imagePreviewURL: pandora.getMediaURL('/documents/' + item.id + '/256p.jpg?' + item.modified),
                     imageURL: pandora.getMediaURL('/documents/' + item.id + '/'
