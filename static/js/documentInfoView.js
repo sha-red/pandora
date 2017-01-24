@@ -281,6 +281,7 @@ pandora.ui.documentInfoView = function(data) {
             )
             .appendTo($statistics);
     });
+    /*
     $('<div>')
         .css({marginBottom: '4px'})
         .append(formatKey('timesaccessed', 'statistics'))
@@ -288,10 +289,10 @@ pandora.ui.documentInfoView = function(data) {
             $('<div>').html(data.timesaccessed)
         )
         .appendTo($statistics);
+    */
 
     // Rights Level ------------------------------------------------------------
 
-    /*
     var $rightsLevel = $('<div>');
     $('<div>')
         .css({marginBottom: '4px'})
@@ -299,8 +300,6 @@ pandora.ui.documentInfoView = function(data) {
         .append($rightsLevel)
         .appendTo($statistics);
     renderRightsLevel();
-    */
-
 
     function editMetadata(key, value) {
         if (value != data[key]) {
@@ -521,7 +520,7 @@ pandora.ui.documentInfoView = function(data) {
                         $rightsLevelSelect
                             .css({background: $rightsLevelElement.css('background')})
                             .data({OxColor: $rightsLevelElement.data('OxColor')})
-                        renderCapabilities(rightsLevel);
+                        //renderCapabilities(rightsLevel);
                         pandora.api.editDocument({id: data.id, rightslevel: rightsLevel}, function(result) {
                             // ...
                         });
@@ -536,7 +535,7 @@ pandora.ui.documentInfoView = function(data) {
                 .appendTo($rightsLevel);
         }
         $capabilities = $('<div>').appendTo($rightsLevel);
-        renderCapabilities(data.rightslevel);
+        //renderCapabilities(data.rightslevel);
     }
 
     function open() {
