@@ -309,8 +309,18 @@ class Document(models.Model):
     def get_id(self):
         return ox.toAZ(self.id)
 
-    def accessible(self, user):
-        return self.user == user or self.status in ('public', 'featured')
+    def access(self, user):
+        if user.is_anonymous():
+            level = 'guest'
+        else:
+            level = user.profile.get_level()
+        editable = self.editable(user)
+        if editable:
+            return True
+        allowed_level = settings.CONFIG['capabilities']['canSeeDocument'][level]
+        if self.rightslevel <= allowed_level:
+            return True
+        return False
 
     def editable(self, user, item=None):
         if not user or user.is_anonymous():
@@ -339,6 +349,8 @@ class Document(models.Model):
                         'data-value',
                         'lang'
                     ])
+                elif key == 'rightslevel':
+                    setattr(self, key, int(data[key]))
                 elif ktype == 'text':
                     self.data[key] = ox.sanitize_html(data[key])
                 elif ktype == '[text]':
@@ -378,6 +390,7 @@ class Document(models.Model):
             'matches',
             'ratio',
             'size',
+            'rightslevel',
         ):
             return getattr(self, key)
         elif key == 'user':

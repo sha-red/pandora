@@ -1964,36 +1964,40 @@ pandora.getSpan = function(state, val, callback) {
     // fixme: "subtitles:23" is still missing
     Ox.Log('URL', 'getSpan', state, val);
     if (state.type == 'documents') {
-        pandora.api.getDocument({
-            id: state.item,
-            keys: ['dimensions', 'extension']
-        }, function(result) {
-            var dimensions = result.data.dimensions,
-                extension = result.data.extension,
-            values;
-            if (Ox.contains(['epub', 'pdf', 'txt'], extension)) {
-                state.span = Ox.limit(parseInt(val), 1, dimensions);
-            } else if (Ox.contains(['html'], extension)) {
-                state.span = Ox.limit(parseInt(val), 0, 100);
-            } else if (Ox.contains(['gif', 'jpg', 'png'], extension)) {
-                values = val.split(',');
-                if (values.length == 4) {
-                    state.span = values.map(function(number, index) {
-                        return Ox.limit(number, 0, dimensions[index % 2]);
-                    });
-                    state.span = [
-                        Math.min(state.span[0], state.span[2]),
-                        Math.min(state.span[1], state.span[3]),
-                        Math.max(state.span[0], state.span[2]),
-                        Math.max(state.span[1], state.span[3]),
-                    ];
-                } else {
-                    state.span = '';
+        if (state.item) {
+            pandora.api.getDocument({
+                id: state.item,
+                keys: ['dimensions', 'extension']
+            }, function(result) {
+                var dimensions = result.data.dimensions,
+                    extension = result.data.extension,
+                values;
+                if (Ox.contains(['epub', 'pdf', 'txt'], extension)) {
+                    state.span = Ox.limit(parseInt(val), 1, dimensions);
+                } else if (Ox.contains(['html'], extension)) {
+                    state.span = Ox.limit(parseInt(val), 0, 100);
+                } else if (Ox.contains(['gif', 'jpg', 'png'], extension)) {
+                    values = val.split(',');
+                    if (values.length == 4) {
+                        state.span = values.map(function(number, index) {
+                            return Ox.limit(number, 0, dimensions[index % 2]);
+                        });
+                        state.span = [
+                            Math.min(state.span[0], state.span[2]),
+                            Math.min(state.span[1], state.span[3]),
+                            Math.max(state.span[0], state.span[2]),
+                            Math.max(state.span[1], state.span[3]),
+                        ];
+                    } else {
+                        state.span = '';
+                    }
                 }
-            }
-            Ox.Log('URL', 'getSpan result', state);
+                Ox.Log('URL', 'getSpan result', state);
+                callback();
+            });
+        } else {
             callback();
-        });
+        }
     } else if (state.type == pandora.site.itemName.plural.toLowerCase()) {
         var isArray = Ox.isArray(val),
             isName, isVideoView, canBeAnnotation, canBeEvent, canBePlace;

@@ -27,13 +27,16 @@ from changelog.models import add_changelog
 
 from . import models
 
-def get_document_or_404_json(id):
+def get_document_or_404_json(request, id):
+    response = {'status': {'code': 404,
+                           'text': 'Document not found'}}
     try:
-        return models.Document.get(id)
+        document = models.Document.get(id)
     except:
-        response = {'status': {'code': 404,
-                               'text': 'Document not found'}}
         raise HttpErrorJson(response)
+    if not document.access(request.user):
+        raise HttpErrorJson(response)
+    return document
 
 @login_required_json
 def addDocument(request, data):
@@ -284,7 +287,7 @@ def getDocument(request, data):
     '''
     response = json_response({})
     data['keys'] = data.get('keys', [])
-    document = get_document_or_404_json(data['id'])
+    document = get_document_or_404_json(request, data['id'])
     response['data'] = document.json(keys=data['keys'], user=request.user)
     return render_to_json_response(response)
 actions.register(getDocument)
@@ -367,12 +370,12 @@ def sortDocuments(request, data):
 actions.register(sortDocuments, cache=False)
 
 def file(request, id, name=None):
-    document = models.Document.get(id)
+    document = get_document_or_404_json(request, id)
     return HttpFileResponse(document.file.path)
 
 def thumbnail(request, id, size=256, page=None):
     size = int(size)
-    document = get_document_or_404_json(id)
+    document = get_document_or_404_json(request, id)
     return HttpFileResponse(document.thumbnail(size, page=page))
 
 @login_required_json
@@ -400,7 +403,7 @@ def upload(request):
             file.extension = extension
             file.uploading = True
             file.save()
-        else:
+        elif file.editable(request.user):
             #replace existing file
             if file.file:
                 file.delete_cache()
@@ -411,6 +414,8 @@ def upload(request):
             file.width = -1
             file.pages = -1
             file.save()
+        else:
+            return render_to_json_response(response)
         upload_url = '/api/upload/document?id=%s' % file.get_id()
         return render_to_json_response({
             'uploadUrl': upload_url,

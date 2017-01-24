@@ -72,7 +72,7 @@
         "canSeeDebugMenu": {"researcher": true, "staff": true, "admin": true},
         "canSeeExtraItemViews": {"researcher": true, "staff": true, "admin": true},
         "canSeeMedia": {"researcher": true, "staff": true, "admin": true},
-        "canSeeDocument": {"guest": 3, "member": 3, "researcher": 3, "staff": 3, "admin": 3},
+        "canSeeDocument": {"guest": 1, "member": 1, "researcher": 2, "staff": 3, "admin": 3},
         "canSeeItem": {"guest": 3, "member": 3, "researcher": 3, "staff": 3, "admin": 3},
         "canSeeSize": {"researcher": true, "staff": true, "admin": true},
         "canSeeSoftwareVersion": {"researcher": true, "staff": true, "admin": true},
