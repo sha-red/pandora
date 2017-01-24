@@ -7,7 +7,7 @@ import re
 from glob import glob
 import unicodedata
 
-from six import string_types
+from six import PY2, string_types
 from six.moves.urllib.parse import quote, unquote
 from django.db import models, transaction
 from django.db.models import Q, Sum, Max
@@ -29,6 +29,8 @@ from archive.chunk import save_chunk
 from . import managers
 from . import utils
 
+if not PY2:
+    unicode = str
 
 def get_path(f, x):
     return f.path(x)
