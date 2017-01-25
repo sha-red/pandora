@@ -27,14 +27,15 @@ class Item(models.Model):
             'contentid',
             'crop',
             'image',
+            'link',
             'text',
             'title',
             'type',
         ):
             if key in data and self.data.get(key) != data[key]:
                 if key == 'crop':
-                    if not (isinstance(data[key], list)
-                            and len([d for d in data[key] if isinstance(d, int)]) == 4):
+                    if not (isinstance(data[key], list) and
+                            len([d for d in data[key] if isinstance(d, int)]) == 4):
                         return False
                 else:
                     if not isinstance(data[key], string_types):
@@ -67,6 +68,18 @@ class Item(models.Model):
             'index': self.index,
         }
         j.update(self.data)
+        if 'contentid' in j and (not keys or 'content' in keys):
+            content_keys = ['description', 'modified', 'name', 'user']
+            type = j.get('type')
+            if type == 'list':
+                from itemlist.models import List
+                j['content'] = List.get(j['contentid']).json(keys=content_keys)
+            elif type == 'edit':
+                from edit.models import Edit
+                j['content'] = Edit.get(j['contentid']).json(keys=content_keys)
+            elif type == 'collection':
+                from documentcollection.models import Collection
+                j['content'] = Collection.get(j['contentid']).json(keys=content_keys)
         if keys:
             for key in list(j):
                 if key not in keys:
