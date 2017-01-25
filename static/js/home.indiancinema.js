@@ -317,25 +317,12 @@ pandora.ui.home = function() {
                 sort: [{key: 'position', operator: '+'}]
             },
             items, lists, edits, texts;
-        pandora.api.findLists(find, function(result) {
-            lists = result.data.items.length;
-            items = result.data.items.map(function(item) {
-                return Ox.extend(item, {type: 'list'});
-            });
-            pandora.api.findEdits(find, function(result) {
-                edits = result.data.items.length;
-                items = items.concat(result.data.items.map(function(item) {
-                    return Ox.extend(item, {type: 'edit'});
-                }));
-                pandora.api.findTexts(find, function(result) {
-                    texts = result.data.items.length;
-                    items = items.concat(result.data.items.map(function(item) {
-                        return Ox.extend(item, {type: 'text'});
-                    }));
-                    $features.empty();
-                    show();
-                });
-            });
+        pandora.api.getHomeItems({active: true}, function(result) {
+            items = result.data.items;
+            lists = 1;
+            edits = 1;
+            texts = 1;
+            show();
         });
         function show() {
             var counter = 0, max = 8, mouse = false, position = 0, selected = 0,
@@ -593,17 +580,23 @@ pandora.ui.home = function() {
             }
 
             function getHTML(item) {
+                if (item.type == 'custom') {
+                    return '<b>' + item.title + '</b><br><br>' + item.text;
+                }
                 return '<b>'
                     + (
                         (lists && edits) || (lists && texts) || (edits && texts)
                         ? Ox._(Ox.toTitleCase(item.type)) + ': '
                         : ''
                     )
-                    + Ox.encodeHTMLEntities(item.name) + '</b><br><br>'
-                    + item.description;
+                    + Ox.encodeHTMLEntities(item.content.name) + '</b><br><br>'
+                    + item.content.description;
             }
 
             function getImageURL(item) {
+                if (item.type == 'custom') {
+                    return item.image;
+                }
                 return '/' + item.type + '/' + item.user
                     + ':' + encodeURIComponent(item.name) + '/icon256.jpg?' + item.modified;
             }
@@ -614,24 +607,28 @@ pandora.ui.home = function() {
 
             function openItem(i) {
                 that.fadeOutScreen();
-                pandora.UI.set(Ox.extend({
-                    section: items[i].type == 'list' ? 'items' : items[i].type + 's',
-                    page: ''
-                }, items[i].type == 'list' ? {
-                    find: {
-                        conditions: [{
-                            key: 'list',
-                            value: items[i].user + ':'
-                                + items[i].name,
-                            operator: '=='
-                        }],
-                        operator: '&'
-                    }
-                } : items[i].type == 'edit' ? {
-                    edit: items[i].user + ':' + items[i].name
-                } : {
-                    text: items[i].user + ':' + items[i].name
-                }));
+                if (items[i].type == 'custom') {
+                    pandora.URL.push(items[i].link);
+                } else {
+                    pandora.UI.set(Ox.extend({
+                        section: items[i].type == 'list' ? 'items' : items[i].type + 's',
+                        page: ''
+                    }, items[i].type == 'list' ? {
+                        find: {
+                            conditions: [{
+                                key: 'list',
+                                value: items[i].content.user + ':'
+                                    + items[i].content.name,
+                                operator: '=='
+                            }],
+                            operator: '&'
+                        }
+                    } : items[i].type == 'edit' ? {
+                        edit: items[i].content.user + ':' + items[i].content.name
+                    } : {
+                        text: items[i].content.user + ':' + items[i].content.name
+                    }));
+                }
             }
 
             function scrollToPosition(i, animate) {
@@ -689,8 +686,7 @@ pandora.ui.home = function() {
                     );
                 }
             }
-
-        }        
+        }
     }
 
     that.fadeInScreen = function() {
