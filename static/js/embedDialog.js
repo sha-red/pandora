@@ -87,12 +87,6 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                     'edit', 'editMode', 'position',
                     'showTimeline', 'showAnnotations', 'matchRatio'
                 ]
-            },
-            {
-                id: 'text',
-                title: Ox._('Text'),
-                description: Ox._('Embed a Text Icon with Description'),
-                inputs: ['text']
             }
         ].map(function(item, index) {
             return Ox.extend(item, {index: index});
@@ -321,7 +315,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
 
         $input.type = Ox.ButtonGroup({
                 buttons: [
-                    {id: 'link', title: Ox._('Embed in Texts Section'), width: formWidth / 2, selected: true},
+                    {id: 'link', title: Ox._('Embed in Text'), width: formWidth / 2, selected: true},
                     {id: 'iframe', title: Ox._('Embed in External Site'), width: formWidth / 2}
                 ],
                 selectable: true
