@@ -375,7 +375,7 @@ pandora.ui.documentInfoView = function(data) {
     function getRightsLevelElement(rightsLevel) {
         return Ox.Theme.formatColorLevel(
             rightsLevel,
-            pandora.site.rightsLevels.map(function(rightsLevel) {
+            pandora.site.documentRightsLevels.map(function(rightsLevel) {
                 return rightsLevel.name;
             })
         );
@@ -501,7 +501,7 @@ pandora.ui.documentInfoView = function(data) {
         $rightsLevel.empty();
         if (canEdit) {
             $rightsLevelSelect = Ox.Select({
-                    items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
+                    items: pandora.site.documentRightsLevels.map(function(rightsLevel, i) {
                         return {id: i, title: rightsLevel.name};
                     }),
                     width: 128,

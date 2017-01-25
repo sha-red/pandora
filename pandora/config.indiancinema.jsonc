@@ -350,6 +350,20 @@
         }
     ],
     /*
+    "documentRightsLevel" defines which initial rights level will be assigned to documents
+    created by users of these user levels.
+    */
+    "documentRightsLevel": {"member": 0, "researcher": 0, "staff": 0, "admin": 0},
+    /*
+    "documentRightsLevels" is an ordered list of rights levels, one of which will be
+    assigned to each document.
+    */
+    "documentRightsLevels": [
+        {"name": "Public", "color": [128, 255, 128]},
+        {"name": "Restricted", "color": [255, 212, 128]},
+        {"name": "Private", "color": [255, 128, 128]}
+    ],
+    /*
     "entities" can be used to store arbitrary data. They can be referenced in
     annotations, info view, or elsewhere. Each entry defines a specific class
     of entity object, its properties and their types (for example an "actor"
