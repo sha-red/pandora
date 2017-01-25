@@ -385,7 +385,7 @@ pandora.ui.infoView = function(data) {
         'screenplay',
         'dialogue',
         'adaptation'
-    ]);
+    ]).css({marginTop: '12px'});
     renderGroup([
         'musicdirector',
         'backgroundmusic',
@@ -417,8 +417,6 @@ pandora.ui.infoView = function(data) {
     ]);
     renderGroup([
         'courtesy',
-    ]);
-    renderGroup([
         'subtitledby',
         'annotatedby',
     ]);
@@ -462,8 +460,41 @@ pandora.ui.infoView = function(data) {
 
     $('<div>').css({height: '16px'}).appendTo($text);
 
+    // Documents ---------------------------------------------------------------
+
+    var $div = $('<div>')
+         .css({marginBottom: '4px'})
+         .append(formatKey(
+             'Documents', 'link', '/' + data['id'] + '/documents'
+         ))
+         .append(
+             Ox.Theme.formatColor(null, 'gradient')
+                 .css({textAlign: 'right'})
+                 .html(Ox.formatNumber(data.numberofdocuments || 0))
+         )
+         .appendTo($statistics);
+
+    pandora.createLinks($div);
+
     if (data.parts && data.rendered) {
-        // Duration, Aspect Ratio --------------------------------------------------
+
+        // Annotations ---------------------------------------------------------
+
+        $div = $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey(
+                 'Annotations', 'link', '/' + data['id'] + '/' + ui.videoView
+            ))
+            .append(
+                Ox.Theme.formatColor(null, 'gradient')
+                    .css({textAlign: 'right'})
+                    .html(Ox.formatNumber(data.numberofannotations || 0))
+            )
+            .appendTo($statistics);
+
+        pandora.createLinks($div);
+
+        // Duration, Aspect Ratio ----------------------------------------------
 
         ['duration', 'aspectratio'].forEach(function(key) {
             var itemKey = Ox.getObjectById(pandora.site.itemKeys, key),
@@ -482,7 +513,7 @@ pandora.ui.infoView = function(data) {
                 .appendTo($statistics);
         });
 
-        // Hue, Saturation, Lightness, Volume --------------------------------------
+        // Hue, Saturation, Lightness, Volume ----------------------------------
 
         ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
             var value = data[key] || 0;
@@ -496,7 +527,7 @@ pandora.ui.infoView = function(data) {
                 .appendTo($statistics);
         });
 
-        // Cuts per Minute, Words per Minute ---------------------------------------
+        // Cuts per Minute, Words per Minute -----------------------------------
 
         ['cutsperminute', 'wordsperminute'].forEach(function(key) {
             var value = data[key] || 0;
@@ -513,47 +544,19 @@ pandora.ui.infoView = function(data) {
                 .appendTo($statistics);
         });
 
-        $('<div>')
-            .css({marginBottom: '4px'})
-            .append(formatKey('Annotations', 'statistics'))
-            .append(
-                Ox.Theme.formatColor(null, 'gradient')
-                    .css({textAlign: 'right'})
-                    .html(Ox.formatNumber(data.numberofannotations || 0))
-            )
-            .appendTo($statistics);
     } else {
         // no video placeholder
     }
 
-   $('<div>')
-        .css({marginBottom: '4px'})
-        .append(formatKey('Documents', 'statistics'))
-        .append(
-            Ox.Theme.formatColor(null, 'gradient')
-                .css({textAlign: 'right'})
-                .html(Ox.formatNumber(data.numberofdocuments || 0))
-        )
-        .on({
-            click: function() {
-                if (data.numberofdocuments) {
-                    pandora.UI.set({
-                        itemView: 'documents'
-                    });
-                }
-            }
-        })
-        .appendTo($statistics);
-
-
     // Rights Level ------------------------------------------------------------
 
     var $rightsLevel = $('<div>');
-    $('<div>')
+    var $div = $('<div>')
         .css({marginBottom: '4px'})
-        .append(formatKey('Rights Level', 'statistics'))
+        .append(formatKey('Rights Level', 'link', '/copyrights'))
         .append($rightsLevel)
         .appendTo($statistics);
+    pandora.createLinks($div);
     renderRightsLevel();
 
     // Comments ----------------------------------------------------------------
@@ -653,7 +656,7 @@ pandora.ui.infoView = function(data) {
         }
     }
 
-    function formatKey(key, mode) {
+    function formatKey(key, mode, link) {
         var item = Ox.getObjectById(pandora.site.itemKeys, key);
         key = Ox._(item ? item.title : key);
         mode = mode || 'text';
@@ -664,13 +667,20 @@ pandora.ui.infoView = function(data) {
         } else if (key == 'keyword') {
             key = 'keywords'
         }
+        var value = Ox.toTitleCase(key)
+            .replace(' Of ', ' of ')
+            .replace(' Per ', ' per ')
         return mode == 'text'
-            ? '<span style="font-weight: bold">' + Ox.toTitleCase(key) + ':</span> '
+            ? '<span style="font-weight: bold">' + value + ':</span> '
             : mode == 'description'
-            ? Ox.toTitleCase(key)
+            ? value
+            : mode == 'link'
+            ? Ox.Element()
+                .css({marginBottom: '4px', fontWeight: 'bold'})
+                .html('<a href="' + link + '">' + value + '</a>')
             : Ox.Element()
                 .css({marginBottom: '4px', fontWeight: 'bold'})
-                .html(Ox.toTitleCase(key).replace(' Per ', ' per '));
+                .html(value);
     }
 
     function formatLight(str) {
@@ -1077,6 +1087,7 @@ pandora.ui.infoView = function(data) {
             });
             $element.appendTo($text);
         }
+        return $element;
     }
 
     function renderRightsLevel() {
@@ -1109,7 +1120,7 @@ pandora.ui.infoView = function(data) {
                         $rightsLevelSelect
                             .css({background: $rightsLevelElement.css('background')})
                             .data({OxColor: $rightsLevelElement.data('OxColor')})
-                        renderCapabilities(rightsLevel);
+                        // renderCapabilities(rightsLevel);
                         pandora.api.edit({id: data.id, rightslevel: rightsLevel}, function(result) {
                             // ...
                         });
@@ -1123,10 +1134,12 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($rightsLevel);
         }
+        /*
         if (data.parts) {
             $capabilities = $('<div>').appendTo($rightsLevel);
             renderCapabilities(data.rightslevel);
         }
+        */
     }
 
     function toggleIconSize() {
