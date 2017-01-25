@@ -69,6 +69,7 @@ def migrate_texts(apps, schema_editor):
             d.name = t.name
         d.user = t.user
         d.description = t.description
+        d.rightslevel = 2 if t.status == 'private' else 0
         d.data['text'] = t.text
         d.data['embeds'] = t.embeds
         d.save()
