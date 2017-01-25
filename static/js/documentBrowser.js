@@ -69,6 +69,9 @@ pandora.ui.documentBrowser = function() {
             },
             toggle: function(data) {
                 pandora.UI.set({showBrowser: !data.collapsed});
+            },
+            pandora_document: function(data) {
+                that.options({selected: [data.value]});
             }
         })
         .bindEventOnce({
