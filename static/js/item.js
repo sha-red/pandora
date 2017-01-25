@@ -59,7 +59,8 @@ pandora.ui.item = function() {
                         .html(
                             html
                             + '<br>'
-                            + Ox._('There are <a href="{0}">{1}</a>', [
+                            + Ox._('There {0} <a href="{1}">{2}</a>', [
+                                (result.data.numberofdocuments == 1 ? 'is' : 'are'),
                                 '/' + pandora.user.ui.item + '/documents',
                                 Ox.formatCount(result.data.numberofdocuments, 'document')
                             ])
