@@ -1053,6 +1053,24 @@
             "sortType": "person"
         },
         {
+            "id": "subtitledby",
+            "title": "Subtitled by",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
+            "id": "annotatedby",
+            "title": "Annotated by",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true,
+            "sortType": "person"
+        },
+        {
             "id": "songs",
             "title": "Song Titles",
             "type": "text",

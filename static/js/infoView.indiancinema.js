@@ -320,6 +320,15 @@ pandora.ui.infoView = function(data) {
 
     renderGroup(canSeeAllMetadata ? ['genre', 'topic'] : ['genre']);
 
+    renderGroup([
+        'censorshipcertificatenumber',
+        'dateofcensorcertificate',
+        'ratingcertificate',
+        'length',
+        'numberofreels',
+        'format'
+    ]);
+
     renderGroup(['imdbId', 'links']);
 
     if (canEdit) {
@@ -365,14 +374,6 @@ pandora.ui.infoView = function(data) {
 
     // Extra Metadata
     renderGroup([
-        'censorshipcertificatenumber',
-        'dateofcensorcertificate',
-        'ratingcertificate',
-        'length',
-        'numberofreels',
-        'format'
-    ]);
-    renderGroup([
         'presentedby',
         'coproducer',
         'associateproducer',
@@ -412,8 +413,14 @@ pandora.ui.infoView = function(data) {
         'productioncontroller',
         'stuntdirector',
         'continuity',
-        'publicity',
+        'publicity'
+    ]);
+    renderGroup([
         'courtesy',
+    ]);
+    renderGroup([
+        'subtitledby',
+        'annotatedby',
     ]);
 
     // Songs
