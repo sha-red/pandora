@@ -107,7 +107,7 @@ class Document(models.Model):
             q = Q()
             for v in removed_values:
                 q |= Q(value__iexact=v)
-            Facet.objects.filter(document=self, key=key).filter(q).delete()
+            r = Facet.objects.filter(document=self, key=key).filter(q).delete()
 
         for value in current_values:
             if value.lower() not in saved_values:
@@ -368,7 +368,10 @@ class Document(models.Model):
                 elif isinstance(data[key], int) or isinstance(data[key], float):
                     self.data[key] = data[key]
                 else:
-                    self.data[key] = ox.escape_html(data[key])
+                    if data[key]:
+                        self.data[key] = ox.escape_html(data[key])
+                    else:
+                        del self.data[key]
 
     @property
     def dimensions(self):
@@ -413,6 +416,7 @@ class Document(models.Model):
                 'matches',
                 'size',
                 'user',
+                'referenced',
             ]
             if self.extension in ('html', 'txt'):
                 keys.append('text')
@@ -442,8 +446,8 @@ class Document(models.Model):
                     entity_json = dp.entity.json(['id', 'type', 'name'])
                     entity_json['data'] = dp.data
                     entity_jsons.append(entity_json)
-            elif key == 'items':
-                response[key] = [i['public_id'] for i in self.items.all().values('public_id')]
+            elif key == 'referenced':
+                response[key] = self.referenced()
             elif key in self.data:
                 response[key] = self.data[key]
             elif hasattr(self, _map.get(key, key)):
@@ -568,19 +572,44 @@ class Document(models.Model):
         self.ratio = size[0] / size[1]
         return self.ratio
 
-    def update_matches(self):
-        import annotation.models
-        import item.models
-        import text.models
+    def urls(self):
         urls = [self.get_absolute_url()]
         url = unquote(urls[0])
         if url != urls[0]:
             urls.append(url)
+        return urls
+
+    def referenced(self):
+        import annotation.models
+        import item.models
+        result = {}
+        result['items'] = [i.get_json(keys=['id', 'title']) for i in self.items.all().order_by('sort__title')]
+        urls = self.urls()
+        # annotations
+        q = Q()
+        for url in urls:
+            q |= Q(value__contains=url)
+        qs = annotation.models.Annotation.objects.filter(q)
+        result['annotations'] = [a.json(keys=['id', 'title', 'in']) for a in qs]
+        # documents
+        q = Q()
+        for url in urls:
+            q |= Q(data__contains=url)
+        qs = Document.objects.filter(q)
+        result['documents'] = [d.json(keys=['id', 'title']) for d in qs]
+
+        result['entities'] = [e.json(keys=['id', 'name']) for e in self.entities.all()]
+        return result
+
+    def update_matches(self):
+        import annotation.models
+        import item.models
+        urls = self.urls()
         matches = self.items.count() + self.entities.count()
         for url in urls:
             matches += annotation.models.Annotation.objects.filter(value__contains=url).count()
             matches += item.models.Item.objects.filter(data__contains=url).count()
-            matches += text.models.Text.objects.filter(text__contains=url).count()
+            matches += Document.objects.filter(extension='html', data__contains=url).count()
         if matches != self.matches:
             Document.objects.filter(id=self.id).update(matches=matches)
             self.matches = matches
