@@ -8,7 +8,7 @@ pandora.ui.documentBrowser = function() {
         var that = Ox.IconList({
             borderRadius: 0,
             centered: true,
-            defaultRatio: 640/1024,
+            defaultRatio: pandora.site.posters.ratio,
             draggable: true,
             id: 'list',
             item: function(data, sort, size) {

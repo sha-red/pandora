@@ -21,6 +21,7 @@ scripts/list_icon.py
 scripts/item_icon.py
 static/png/icon.png
 static/png/logo.png
+static/png/document.png
 ._*
 static/django_extensions
 *.pyc

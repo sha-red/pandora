@@ -279,7 +279,7 @@ def update_static():
                     f = os.path.join(root, f)
                     os.system('gzip -9 -c "%s" > "%s.gz"' % (f, f))
     
-    for name in ('logo', 'icon'):
+    for name in ('logo', 'icon', 'document'):
         site = os.path.join(settings.STATIC_ROOT, 'png/%s.%s.png'%(name, settings.CONFIG['site']['id']))
         pandora = os.path.join(settings.STATIC_ROOT, 'png/%s.pandora.png'%name)
         image = os.path.join(settings.STATIC_ROOT, 'png/%s.png'%name)

@@ -46,7 +46,7 @@ class Document(models.Model):
     extension = models.CharField(max_length=255)
     size = models.IntegerField(default=0)
     matches = models.IntegerField(default=0)
-    ratio = models.FloatField(default=640/1024)
+    ratio = models.FloatField(default=-1)
     pages = models.IntegerField(default=-1)
     width = models.IntegerField(default=-1)
     height = models.IntegerField(default=-1)
@@ -458,6 +458,8 @@ class Document(models.Model):
                 if 'description' in keys and d[0].description:
                     response['description'] = d[0].description
                 response['index'] = d[0].index
+        if response.get('ratio') == -1:
+            response['ratio'] = settings.CONFIG['posters']['ratio']
         if keys:
             for key in list(response):
                 if key not in keys:
@@ -489,8 +491,7 @@ class Document(models.Model):
 
     def thumbnail(self, size=None, page=None):
         if not self.file:
-            return os.path.join(settings.STATIC_ROOT, 'png/cover.png')
-            return os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
+            return os.path.join(settings.STATIC_ROOT, 'png/document.png')
         src = self.file.path
         folder = os.path.dirname(src)
         if size:
@@ -563,7 +564,7 @@ class Document(models.Model):
             if self.width > 0:
                 size = self.resolution
             else:
-                size = [640, 1024]
+                size = [-1, 1]
         self.ratio = size[0] / size[1]
         return self.ratio
 
