@@ -15,7 +15,6 @@ pandora.ui.documentInfoView = function(data) {
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
-        borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         margin = 16,
         nameKeys = pandora.site.documentKeys.filter(function(key) {
             return key.sortType == 'person';
@@ -27,7 +26,6 @@ pandora.ui.documentInfoView = function(data) {
         }).map(function(key){
             return key.id;
         }),
-        posterKeys = nameKeys.concat(['title', 'year']),
         statisticsWidth = 128,
 
         $bar = Ox.Bar({size: 16})
@@ -122,12 +120,10 @@ pandora.ui.documentInfoView = function(data) {
                 left: margin + iconLeft + 'px',
                 top: margin + 'px',
                 width: iconWidth + 'px',
-                height: iconHeight + 'px',
-                borderRadius: borderRadius + 'px',
-                cursor: 'pointer'
+                height: iconHeight + 'px'
             })
             .bindEvent({
-                singleclick: open
+                // singleclick: toggleIconSize
             })
             .appendTo($info),
 
@@ -152,7 +148,6 @@ pandora.ui.documentInfoView = function(data) {
                 left: iconLeft + 'px',
                 width: iconWidth + 'px',
                 height: iconHeight + 'px',
-                borderRadius: borderRadius + 'px'
             })
             .appendTo($reflection),
 
@@ -230,13 +225,10 @@ pandora.ui.documentInfoView = function(data) {
 
     // Director, Year and Country ----------------------------------------------
 
-    renderGroup(['author', 'type', 'date']);
-    renderGroup(['publisher', 'place', 'series', 'edition']);
-    renderGroup(['language']);
-    renderGroup(['extension', 'dimensions', 'size', 'user', 'matches']);
+    renderGroup(['author', 'date', 'type']);
+    renderGroup(['publisher', 'place', 'series', 'edition', 'language']);
 
-
-    // Description -----------------------------------------------------------------
+    // Description -------------------------------------------------------------
 
     if (canEdit || data.description) {
         $('<div>')
@@ -270,8 +262,74 @@ pandora.ui.documentInfoView = function(data) {
             .appendTo($text);
     }
 
-    // Created and Modified ----------------------------------------------------
+    // Referenced --------------------------------------------------------------
 
+    if (
+        data.referenced.items.length
+        || data.referenced.annotations.length
+        || data.referenced.documents.length
+        || data.referenced.entities.length  
+    ) {
+    
+        var itemsById = {}
+        data.referenced.items.forEach(function(item) {
+            itemsById[item.id] = Ox.extend(item, {annotations: [], referenced: true});
+        });
+        data.referenced.annotations.forEach(function(annotation) {
+            var itemId = annotation.id.split('/')[0];
+            if (!itemsById[itemId]) {
+                itemsById[itemId] = {
+                    id: itemId,
+                    title: annotation.title,
+                    annotations: []
+                };
+            }
+            itemsById[itemId].annotations = itemsById[itemId].annotations.concat(annotation);
+        });
+        var html = Ox.sortBy(Object.values(itemsById), 'title').map(function(item) {
+            console.log('item', item)
+            return (item.referenced ? '<a href="/' + item.id + '/documents">' : '')
+                + item.title //Ox.encodeHTMLEntities(item.title)
+                + (item.referenced ? '</a>' : '')
+                + (item.annotations.length
+                ? ' (' + Ox.sortBy(item.annotations, 'in').map(function(annotation) {
+                    return '<a href="/' + annotation.id + '">'
+                        + Ox.formatDuration(annotation.in) + '</a>'
+                }).join(', ')
+                + ')'
+                : '')
+        }).join(', ');
+        html += data.referenced.documents.map(function(document) {
+            return ', <a href="/documents/' + document.id + '/info">' + document.title + '</a>';
+        }).join('');
+        html += data.referenced.entities.map(function(entity) {
+            return ', <a href="/entities/' + entity.id + '">' + entity.name + '</a>';
+        }).join('');
+    
+        var $div = $('<div>')
+            .css({marginTop: '12px'})
+            .html(formatKey('Referenced', 'text') + html)
+            .appendTo($text);
+
+        pandora.createLinks($div);
+
+    }
+
+    // Extension, Dimensions, Size ---------------------------------------------
+
+    ['extension', 'dimensions', 'size'].forEach(function(key) {
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey(key, 'statistics'))
+            .append(
+                Ox.Theme.formatColor(null, 'gradient')
+                    .css({textAlign: 'right'})
+                    .html(formatValue(key, data[key]))
+            )
+            .appendTo($statistics);
+    });
+
+    /*
     ['created', 'modified'].forEach(function(key) {
         $('<div>')
             .css({marginBottom: '4px'})
@@ -281,7 +339,6 @@ pandora.ui.documentInfoView = function(data) {
             )
             .appendTo($statistics);
     });
-    /*
     $('<div>')
         .css({marginBottom: '4px'})
         .append(formatKey('timesaccessed', 'statistics'))
@@ -364,7 +421,7 @@ pandora.ui.documentInfoView = function(data) {
             ret = formatLink(value.split(', '), key);
         } else if (listKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), key);
-        } else if (['type'].indexOf(key) > -1) {
+        } else if (['type', 'publisher'].indexOf(key) > -1) {
             ret = formatLink(value, key);
         } else {
             ret = pandora.formatDocumentKey(Ox.getObjectById(pandora.site.documentKeys, key), data);
@@ -493,6 +550,7 @@ pandora.ui.documentInfoView = function(data) {
             });
             $element.appendTo($text);
         }
+        return $element;
     }
 
     function renderRightsLevel() {
@@ -538,13 +596,8 @@ pandora.ui.documentInfoView = function(data) {
         //renderCapabilities(data.rightslevel);
     }
 
-    function open() {
-        pandora.UI.set({
-            documentView: 'view',
-        });
-    }
-
     that.reload = function() {
+        /*
         var src = '/documents/' + data.id + '/512p.jpg?' + data.modified;
         $icon.attr({src: src});
         $reflectionIcon.attr({src: src});
@@ -552,6 +605,7 @@ pandora.ui.documentInfoView = function(data) {
         iconRatio = ui.icons == 'posters'
             ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1;
         toggleIconSize();
+        */
     };
 
     that.bindEvent({
@@ -559,10 +613,6 @@ pandora.ui.documentInfoView = function(data) {
             setTimeout(function() {
                 !Ox.Focus.focusedElementIsInput() && that.gainFocus();
             });
-        },
-        pandora_icons: that.reload,
-        pandora_showsiteposters: function() {
-            ui.icons == 'posters' && that.reload();
         }
     });
 
