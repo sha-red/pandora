@@ -34,7 +34,7 @@ pandora.documentColumns = [
         format: function(value, data) {
             return Ox.isArray(value)
                 ? Ox.formatDimensions(value, 'px')
-                : Ox.formatCount(value, data.extension == 'html' ? 'word' : 'page');
+                : Ox.formatCount(value, (data && data.extension == 'html') ? 'word' : 'page');
         },
         id: 'dimensions',
         operator: '-',

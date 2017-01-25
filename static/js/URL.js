@@ -20,15 +20,13 @@ pandora.URL = (function() {
                 Ox.contains(Object.keys(pandora.site.user.ui.part), state.page)
             ) {
                 state.part = pandora.user.ui.part[state.page];
-                /*
                 if (
-                    state.page == 'documents'
-                    && pandora.user.ui.documents[state.part] 
+                    state.page == 'document'
+                    && pandora.user.ui.documents[state.part]
                     && pandora.user.ui.documents[state.part].position
                 ) {
                     state.span = pandora.user.ui.documents[state.part].position;
                 }
-                */
             }
 
         } else {
@@ -173,6 +171,9 @@ pandora.URL = (function() {
                     Object.keys(pandora.site.user.ui.part), state.page
                 ) && state.part) {
                     set['part.' + state.page] = state.part;
+                }
+                if (state.span) {
+                    set['documents.' + state.part] = {position: state.span};
                 }
                 pandora.UI.set(set);
                 callback && callback();
@@ -473,7 +474,7 @@ pandora.URL = (function() {
             getSort: pandora.getSort,
             getSpan: pandora.getSpan,
             pages: [].concat(
-                ['home', 'software', 'api', 'help', 'tv', 'entities'],
+                ['home', 'software', 'api', 'help', 'tv', 'document', 'entities'],
                 pandora.site.sitePages.map(function(page) {
                     return page.id;
                 }),

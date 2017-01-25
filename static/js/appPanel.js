@@ -71,10 +71,10 @@ pandora.ui.appPanel = function() {
                 !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
             ]();
             pandora.$ui.home && pandora.$ui.tv.mute();
-        } else if (page == 'documents') {
-            if (pandora.user.ui.part.documents) {
+        } else if (page == 'document') {
+            if (pandora.user.ui.part.document) {
                 pandora.openDocumentDialog({
-                    ids: [pandora.user.ui.part.documents.split('/')[0]]
+                    ids: [pandora.user.ui.part.document.split('/')[0]]
                 });
             } else {
                 pandora.UI.set({page: ''});

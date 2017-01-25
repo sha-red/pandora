@@ -1159,6 +1159,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "page": "",
             "part": {
                 "api": "",
+                "document": "",
                 "entities": "",
                 "faq": "",
                 "help": "",

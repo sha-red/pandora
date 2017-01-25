@@ -1497,9 +1497,14 @@ pandora.getItem = function(state, str, callback) {
             }
         });
     } else if (state.type == 'documents') {
-        pandora.api.getDocument({id: str, keys: ['id']}, function(result) {
+        pandora.api.getDocument({
+            id: str,
+            // send keys so that subsequent request when parsing
+            // page number etc. is already in the cache
+            keys: ['dimensions', 'extension']
+        }, function(result) {
             if (result.status.code == 200) {
-                state.item = result.data.id;
+                state.item = str;
                 callback();
             } else {
                 state.item = '';
@@ -1808,7 +1813,7 @@ pandora.getPart = function(state, str, callback) {
         } else {
             callback();
         }
-    } else if (state.page == 'documents') {
+    } else if (state.page == 'document') {
         var id = str.split('/')[0];
         if (id) {
             pandora.api.getDocument({
@@ -1963,10 +1968,12 @@ pandora.getSpan = function(state, val, callback) {
     // modify state.view.
     // fixme: "subtitles:23" is still missing
     Ox.Log('URL', 'getSpan', state, val);
-    if (state.type == 'documents') {
-        if (state.item) {
+    if (state.page == 'document' ||  // document dialog
+        state.type == 'documents'    // document section
+    ) {
+        if (state.page == 'document' || state.item) {
             pandora.api.getDocument({
-                id: state.item,
+                id: state.page == 'document' ? state.part : state.item,
                 keys: ['dimensions', 'extension']
             }, function(result) {
                 var dimensions = result.data.dimensions,

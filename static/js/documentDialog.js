@@ -9,7 +9,7 @@ pandora.openDocumentDialog = function(options) {
         pandora.$ui.documentDialog && options.ids && options.ids.length == 1
         && Ox.getObjectById(pandora.$ui.documentDialog.getItems(), options.ids[0])
     ) {
-        pandora.UI.set({'part.documents': options.ids[0]});
+        pandora.UI.set({'part.document': options.ids[0]});
     } else if (options.ids) {
         pandora.api.findDocuments({
             query: {
@@ -37,7 +37,7 @@ pandora.openDocumentDialog = function(options) {
             })
             .bindEvent({
                 close: function() {
-                    pandora.user.ui.page == 'documents' && pandora.UI.set({page: ''});
+                    pandora.user.ui.page == 'document' && pandora.UI.set({page: ''});
                 }
             })
             .open();
@@ -48,8 +48,8 @@ pandora.openDocumentDialog = function(options) {
             });
         }
         pandora.UI.set({
-            page: 'documents',
-            'part.documents': options.documents[0].id
+            page: 'document',
+            'part.document': options.documents[0].id
         });
         return pandora.$ui.documentDialog;
     }
