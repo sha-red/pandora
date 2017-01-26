@@ -13,14 +13,14 @@ pandora.ui.info = function() {
                 toggle: function(data) {
                     pandora.UI.set({showInfo: !data.collapsed});
                 },
-                pandora_documentlist: function() {
-                    if (pandora.user.ui._collection != pandora.UI.getPrevious('_collection')) {
+                pandora_edit: updateInfo,
+                pandora_find: function() {
+                    if (ui._list != pandora.UI.getPrevious('_list')) {
                         updateInfo();
                     }
                 },
-                pandora_edit: updateInfo,
-                pandora_find: function() {
-                    if (pandora.user.ui._list != pandora.UI.getPrevious('_list')) {
+                pandora_finddocuments: function() {
+                    if (ui._collection != pandora.UI.getPrevious('_collection')) {
                         updateInfo();
                     }
                 },
@@ -54,6 +54,13 @@ pandora.ui.info = function() {
     }
 
     function getId() {
+        if (ui.section == 'documents') {
+            return ui[folderItem.toLowerCase()] || (
+                ui.collectionSelection.length
+                ? ui.collectionSelection[0]
+                : null
+            );
+        }
         return ui[folderItem.toLowerCase()] || (
             ui.listSelection.length
             ? ui.listSelection[0]
@@ -62,13 +69,17 @@ pandora.ui.info = function() {
     }
 
     function getView() {
-        return ui.section == 'items'
-            ? !getId()
+        if (ui.section == 'items') {
+            return !getId()
                 ? 'list'
                 : !ui.item && pandora.isClipView()
                     ? 'poster'
-                    : 'video'
-            : folderItem.toLowerCase();
+                    : 'video';
+        } else if (ui.section == 'documents') {
+            return !getId() ? 'collection' : 'document';
+        } else {
+            return folderItem.toLowerCase();
+        }
     }
 
     function resizeInfo() {
@@ -82,7 +93,7 @@ pandora.ui.info = function() {
         var id = getId(),
             previousView = view;
         view = getView();
-        if (view == 'list' || view == 'edit' || view == 'text') {
+        if (view == 'list' || view == 'edit' || view == 'collection') {
             emptyInfo();
             that.append(pandora.$ui.listInfo = pandora.ui.listInfo());
             previousView == 'video' && resizeInfo();
@@ -96,6 +107,12 @@ pandora.ui.info = function() {
                 );
                 previousView == 'video' && resizeInfo();
             });
+        } else if (view == 'document') {
+            //FIXME: document info
+            emptyInfo();
+            if(!pandora.user.ui.document) {
+                that.append(pandora.$ui.listInfo = pandora.ui.listInfo());
+            }
         } else if (view == 'video') {
             pandora.api.get({
                 id: id,
@@ -193,7 +210,11 @@ pandora.ui.listInfo = function() {
     var ui = pandora.user.ui,
         folderItems = pandora.getFolderItems(ui.section),
         folderItem = folderItems.slice(0, -1),
-        list = pandora.user.ui.section == 'items' ? pandora.user.ui._list : ui[folderItem.toLowerCase()],
+        list = pandora.user.ui.section == 'items'
+            ? pandora.user.ui._list
+            : pandora.user.ui.section == 'documents'
+            ? pandora.user.ui._collection
+            : ui[folderItem.toLowerCase()],
         canEditFeaturedLists = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
         that = Ox.Element().css({padding: '16px', textAlign: 'center'}),
         $icon = Ox.Element('<img>')
@@ -203,7 +224,6 @@ pandora.ui.listInfo = function() {
             .css(getIconCSS())
             .appendTo(that),
         $title, $description;
-
     that.append($('<div>').css({height: '16px'}));
 
     //fixme: allow editing
@@ -323,6 +343,8 @@ pandora.ui.listInfo = function() {
                 .css({fontWeight: 'bold'})
                 .html(ui.section == 'items'
                     ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
+                    : ui.section == 'documents'
+                    ? Ox._('All {0}', [Ox._('Documents')])
                     : Ox._('{0} ' + folderItems, [pandora.site.site.name])
                 )
         );
