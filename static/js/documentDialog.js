@@ -113,6 +113,28 @@ pandora.ui.documentDialog = function(options) {
                 }
             }),
 
+        $infoButton = Ox.Button({
+                title: 'info',
+                tooltip: Ox._('Info'),
+                type: 'image'
+            })
+            .css({
+                position: 'absolute',
+                right: '24px',
+                top: '4px'
+            })
+            .bindEvent({
+                click: function(data) {
+                    var id = options.items[options.index].id;
+                    that.close();
+                    pandora.UI.set({
+                        section: 'documents',
+                        document: id,
+                        documentView: 'info'
+                    });
+                }
+            }),
+
         $embedButton = Ox.Button({
                 title: 'embed',
                 tooltip: Ox._('Embed'), 
@@ -144,7 +166,7 @@ pandora.ui.documentDialog = function(options) {
             })
             .css({
                 position: 'absolute',
-                right: '24px',
+                right: '44px',
                 top: '4px'
             })
             [items.length > 1 ? 'show' : 'hide']()
@@ -156,7 +178,10 @@ pandora.ui.documentDialog = function(options) {
                 }
             });
 
-    $(that.find('.OxBar')[0]).append($embedButton).append($selectButton);
+    $(that.find('.OxBar')[0])
+        .append($infoButton)
+        .append($embedButton)
+        .append($selectButton);
     // fixme: why is this needed?
     $(that.find('.OxContent')[0]).css({overflow: 'hidden'});
 
