@@ -22,10 +22,11 @@ def addHomeItem(request, data):
     }
     '''
     item = models.Item()
+    response = json_response()
     if not item.edit(data):
         response = json_response(status=500, text='invalid data')
     else:
-        response = json_response()
+        response['data'] = item.json()
     return render_to_json_response(response)
 actions.register(addHomeItem, cache=False)
 
@@ -43,10 +44,11 @@ def editHomeItem(request, data):
     }
     '''
     item = get_object_or_404_json(models.Item, id=ox.fromAZ(data['id']))
+    response = json_response()
     if not item.edit(data):
         response = json_response(status=500, text='failed to edit item')
     else:
-        response = json_response()
+        response['data'] = item.json()
     return render_to_json_response(response)
 actions.register(editHomeItem, cache=False)
 
