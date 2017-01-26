@@ -54,7 +54,7 @@ pandora.ui.timeline = function(data) {
             video: data.video,
             videoRatio: data.videoRatio,
             volume: ui.videoVolume,
-            width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+            width: Ox.$document.width() - pandora.$ui.mainPanel.size(0) - 1
         })
         .bindEvent({
             annotationsrange: function(data) {

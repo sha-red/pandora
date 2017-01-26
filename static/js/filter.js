@@ -3,7 +3,7 @@
 pandora.ui.filter = function(id) {
     var i = Ox.getIndexById(pandora.user.ui.filters, id),
         filter = Ox.getObjectById(pandora.site.filters, id),
-        panelWidth = pandora.$ui.document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
+        panelWidth = Ox.$document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
         title = Ox._(Ox.getObjectById(pandora.site.filters, id).title),
         //width = pandora.getFilterWidth(i, panelWidth),
         that = Ox.TableList({

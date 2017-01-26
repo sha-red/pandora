@@ -105,7 +105,7 @@ pandora.ui.editor = function(data) {
             videoRatio: data.videoRatio,
             videoSize: ui.videoSize,
             volume: ui.videoVolume,
-            width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+            width: Ox.$document.width() - pandora.$ui.mainPanel.size(0) - 1
         }).bindEvent({
             addannotation: function(data) {
                 Ox.Log('', 'addAnnotation', data);

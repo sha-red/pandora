@@ -152,7 +152,7 @@ pandora.ui.editPanel = function(isEmbed) {
             timelineTooltip: Ox._('timeline') + ' <span class="OxBright">' + Ox.SYMBOLS.shift + 'T</span>',
             video: getVideos(),
             volume: ui.videoVolume,
-            width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+            width: Ox.$document.width() - pandora.$ui.mainPanel.size(0) - 1
         })
         .bindEvent({
             copy: function(data) {
@@ -479,7 +479,7 @@ pandora.ui.editPanel = function(isEmbed) {
             enableSubtitles: ui.videoSubtitles,
             enableTimeline: true,
             enableVolume: true,
-            height: pandora.$ui.document.height(),
+            height: Ox.$document.height(),
             paused: true,
             showIconOnLoad: true,
             subtitles: getSubtitles(edit.clips),
@@ -488,7 +488,7 @@ pandora.ui.editPanel = function(isEmbed) {
             timeline: getSmallTimelineURL(),
             video: getVideos(),
             volume: ui.videoVolume,
-            width: pandora.$ui.document.width()
+            width: Ox.$document.width()
         }).bindEvent({
             fullscreen: function(data) {
                 Ox.Fullscreen.toggle();

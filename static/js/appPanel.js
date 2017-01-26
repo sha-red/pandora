@@ -20,16 +20,16 @@ pandora.ui.appPanel = function() {
         // fixme: move animation into Ox.App
         var animate = $('.OxScreen').length == 0;
         Ox.Log('', 'ANIMATE?', animate)
-        animate && pandora.$ui.body.css({opacity: 0});
-        that.appendTo(pandora.$ui.body);
-        animate && pandora.$ui.body.animate({opacity: 1}, 1000);
+        animate && Ox.$body.css({opacity: 0});
+        that.appendTo(Ox.$body);
+        animate && Ox.$body.animate({opacity: 1}, 1000);
         return that;
     };
     that.reload = function() {
         Ox.Request.cancel();
         Ox.Request.clearCache();
         pandora.$ui.appPanel.remove();
-        pandora.$ui.appPanel = pandora.ui.appPanel().appendTo(pandora.$ui.body);
+        pandora.$ui.appPanel = pandora.ui.appPanel().appendTo(Ox.$body);
         return that;
     };
     that.bindEvent({

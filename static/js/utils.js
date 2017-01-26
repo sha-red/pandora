@@ -2736,21 +2736,21 @@ pandora.resizeWindow = function() {
                 pandora.$ui.timeline && pandora.$ui.timeline.options({
                     // fixme: duplicated
                     height: pandora.$ui.contentPanel.size(1),
-                    width: pandora.$ui.document.width()
+                    width: Ox.$document.width()
                         - pandora.$ui.mainPanel.size(0) - 1
                 });
             } else if (pandora.user.ui.itemView == 'player') {
                 pandora.$ui.player && pandora.$ui.player.options({
                     // fixme: duplicated
                     height: pandora.$ui.contentPanel.size(1),
-                    width: pandora.$ui.document.width()
+                    width: Ox.$document.width()
                         - pandora.$ui.mainPanel.size(0) - 1
                 });
             } else if (pandora.user.ui.itemView == 'editor') {
                 pandora.$ui.editor && pandora.$ui.editor.options({
                     // fixme: duplicated
                     height: pandora.$ui.contentPanel.size(1),
-                    width: pandora.$ui.document.width()
+                    width: Ox.$document.width()
                         - pandora.$ui.mainPanel.size(0) - 1
                 });
             } else if (pandora.user.ui.itemView == 'map') {
@@ -2771,7 +2771,7 @@ pandora.resizeWindow = function() {
         } else {
             pandora.$ui.editPanel && pandora.$ui.editPanel.options({
                 height: pandora.$ui.appPanel.size(1),
-                width: pandora.$ui.document.width()
+                width: Ox.$document.width()
                     - pandora.$ui.mainPanel.size(0) - 1
             });
         }

@@ -57,7 +57,7 @@ pandora.ui.player = function(data) {
             timelineTooltip: Ox._('timeline') + ' <span class="OxBright">' + Ox.SYMBOLS.shift + 'T</span>',
             video: data.video,
             volume: ui.videoVolume,
-            width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+            width: Ox.$document.width() - pandora.$ui.mainPanel.size(0) - 1
         }).bindEvent({
             annotationsrange: function(data) {
                 pandora.UI.set({annotationsRange: data.range});

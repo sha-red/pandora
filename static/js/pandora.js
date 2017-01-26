@@ -278,17 +278,13 @@ appPanel
     function initPandora(data) {
 
         Ox.Log('', 'Ox.App load', data);
+        Ox.$window.on({
+            beforeunload: pandora.beforeUnloadWindow,
+            resize: pandora.resizeWindow,
+            unload: pandora.unloadWindow
+        })
         Ox.extend(pandora, {
-            $ui: {
-                body: $('body'),
-                document: $(document),
-                window: $(window)
-                    .on({
-                        beforeunload: pandora.beforeUnloadWindow,
-                        resize: pandora.resizeWindow,
-                        unload: pandora.unloadWindow
-                    })
-            },
+            $ui: {},
             site: data.site,
             user: data.user
         });
