@@ -23,6 +23,7 @@ from oxdjango import fields
 from oxdjango.sortmodel import get_sort_field
 from person.models import get_name_sort
 from item.models import Item
+from annotation.models import Annotation
 from archive.extract import resize_image
 from archive.chunk import save_chunk
 
@@ -59,6 +60,8 @@ class Document(models.Model):
     uploading = models.BooleanField(default=False)
 
     items = models.ManyToManyField(Item, through='ItemProperties', related_name='documents')
+    annotations = models.ManyToManyField(Annotation, related_name='documents')
+    linked_documents = models.ManyToManyField('Document', related_name='linking_documents')
 
     rightslevel = models.IntegerField(db_index=True, default=0)
     data = fields.DictField(default={})
@@ -195,10 +198,7 @@ class Document(models.Model):
             setattr(s, name, value)
 
         def get_value(source, key):
-            if 'value' in key and 'layer' in key['value']:
-                value = [a.value for a in self.annotations.filter(layer=key['value']['layer']).exclude(value='')]
-            else:
-                value = self.get_value(source)
+            value = self.get_value(source)
             return value
 
         def get_words(source, key):
@@ -242,10 +242,7 @@ class Document(models.Model):
                     set_value(s, name, value)
                 elif sort_type in ('length', 'integer', 'time', 'float'):
                     # can be length of strings or length of arrays, i.e. keywords
-                    if 'layer' in key.get('value', []):
-                        value = self.annotations.filter(layer=key['value']['layer']).count()
-                    else:
-                        value = self.get_value(source)
+                    value = self.get_value(source)
                     if isinstance(value, list):
                         value = len(value)
                     set_value(s, name, value)
@@ -284,6 +281,7 @@ class Document(models.Model):
                 self.update_find()
                 self.update_facets()
         self.update_matches()
+        self.update_linked_documents()
 
     def __unicode__(self):
         return self.get_id()
@@ -580,35 +578,44 @@ class Document(models.Model):
         return urls
 
     def referenced(self):
-        import annotation.models
-        import item.models
         result = {}
-        result['items'] = [i.get_json(keys=['id', 'title']) for i in self.items.all().order_by('sort__title')]
-        urls = self.urls()
-        # annotations
-        q = Q()
-        for url in urls:
-            q |= Q(value__contains=url)
-        qs = annotation.models.Annotation.objects.filter(q)
-        result['annotations'] = [a.json(keys=['id', 'title', 'in']) for a in qs]
-        # documents
-        q = Q()
-        for url in urls:
-            q |= Q(data__contains=url)
-        qs = Document.objects.filter(q)
-        result['documents'] = [d.json(keys=['id', 'title']) for d in qs]
-
-        result['entities'] = [e.json(keys=['id', 'name']) for e in self.entities.all()]
+        result['items'] = [
+            i.get_json(keys=['id', 'title'])
+            for i in self.items.all().order_by('sort__title')
+        ]
+        result['annotations'] = [
+            a.json(keys=['id', 'title', 'in'])
+            for a in self.annotations.all().order_by('start', 'end')
+        ]
+        result['documents'] = [
+            d.json(keys=['id', 'title'])
+            for d in self.linking_documents.all().order_by('sort__title')
+        ]
+        result['entities'] = [
+            e.json(keys=['id', 'name'])
+            for e in self.entities.all()
+        ]
         return result
 
+    def update_linked_documents(self):
+        if self.extension == 'html':
+            old = [d.id for id in self.linked_documents.all()]
+            current = utils.get_documents(self.data['text'])
+            removed = list(set(old) - set(current))
+            added = list(set(current) - set(old))
+            if removed:
+                for document in Document.objects.filter(id__in=removed):
+                    self.linked_documents.remove(document)
+            if added:
+                for document in Document.objects.filter(id__in=added):
+                    self.linked_documents.add(document)
+
     def update_matches(self):
-        import annotation.models
-        import item.models
         urls = self.urls()
         matches = self.items.count() + self.entities.count()
         for url in urls:
-            matches += annotation.models.Annotation.objects.filter(value__contains=url).count()
-            matches += item.models.Item.objects.filter(data__contains=url).count()
+            matches += Annotation.objects.filter(value__contains=url).count()
+            matches += Item.objects.filter(data__contains=url).count()
             matches += Document.objects.filter(extension='html', data__contains=url).count()
         if matches != self.matches:
             Document.objects.filter(id=self.id).update(matches=matches)

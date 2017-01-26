@@ -27,3 +27,11 @@ class Command(BaseCommand):
                 i.save()
             except:
                 pass
+        import annotation.models
+        ids = [i['id'] for i in annotation.models.Annotation.objects.all().values('id')]
+        for id in ids:
+            try:
+                a = annotation.models.Annotation.objects.get(id=id)
+                a.update_documents()
+            except:
+                pass

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-
-
+import re
 import subprocess
+
+import ox
 
 from item.utils import sort_title, sort_string, get_by_id
 
@@ -28,3 +29,8 @@ def extract_pdfpage(pdf, image, page):
     p = subprocess.Popen(cmd, close_fds=True)
     p.wait()
     return image
+
+def get_documents(text):
+    ids = re.compile('/documents/([A-Z]+)').findall(text)
+    ids += re.compile('/document/([A-Z]+)').findall(text)
+    return [ox.fromAZ(id) for id in set(ids)]

@@ -183,6 +183,7 @@ class Annotation(models.Model):
             # update matches in bulk if called from load_subtitles
             if not delay_matches:
                 self.update_matches()
+            self.update_documents()
 
     def update_matches(self):
         from place.models import Place
@@ -246,6 +247,20 @@ class Annotation(models.Model):
                 # annotation has no value, remove all exisint matches
                 for e in a_matches.all():
                     e.update_matches(Annotation.objects.filter(pk=self.id))
+
+    def update_documents(self):
+        from document.models import Document
+        from document.utils import get_documents
+        old = [d.id for id in self.documents.all()]
+        current = get_documents(self.value) if self.value else []
+        removed = list(set(old) - set(current))
+        added = list(set(current) - set(old))
+        if removed:
+            for document in Document.objects.filter(id__in=removed):
+                self.documents.remove(document)
+        if added:
+            for document in Document.objects.filter(id__in=added):
+                self.documents.add(document)
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
