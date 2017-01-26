@@ -44,6 +44,7 @@ class Item(models.Model):
                 changed = True
         if 'active' in data:
             self.active = data['active'] is True
+            changed = True
         if changed:
             self.save()
         return True

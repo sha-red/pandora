@@ -230,6 +230,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'places', title: Ox._('Manage Places...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
                         { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
                         {},
+                        { id: 'managehome', title: Ox._('Manage Home...'), disabled: !pandora.site.capabilities.canManageHome[pandora.user.level] },
                         { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
                         { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
                         {},
@@ -626,6 +627,8 @@ pandora.ui.mainMenu = function() {
                     (pandora.$ui.eventsDialog || (
                         pandora.$ui.eventsDialog = pandora.ui.eventsDialog()
                     )).open();
+                } else if (data.id == 'managehome') {
+                    pandora.$ui.homeDialog = pandora.ui.homeDialog().open();
                 } else if (data.id == 'users') {
                     pandora.$ui.usersDialog = pandora.ui.usersDialog().open();
                 } else if (data.id == 'statistics') {
