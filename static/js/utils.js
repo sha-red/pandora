@@ -361,10 +361,10 @@ pandora.changeFolderItemStatus = function(id, status, callback) {
     }
 };
 
-pandora.clickLink = function(e) {
+pandora.clickLink = function(e, selectEmbed) {
     var match = e.target.id.match(/^embed(\d+)$/);
     if (match) {
-        pandora.$ui.textPanel.selectEmbed(parseInt(match[1]));
+        (selectEmbed || pandora.$ui.textPanel.selectEmbed)(parseInt(match[1]));
     } else if (
         e.target.hostname == document.location.hostname
         && !Ox.startsWith(e.target.pathname, '/static')
@@ -2679,9 +2679,6 @@ pandora.resizeFolders = function(section) {
             pandora.$ui.folder[pos].updatePanel();
         }
     });
-    if (pandora.user.ui.section == 'texts') {
-        pandora.$ui.text && pandora.$ui.text.update();
-    }
 };
 
 pandora.resizeWindow = function() {
@@ -2775,8 +2772,6 @@ pandora.resizeWindow = function() {
                     - pandora.$ui.mainPanel.size(0) - 1
             });
         }
-    } else if (pandora.user.ui.section == 'texts') {
-        pandora.$ui.text && pandora.$ui.text.update();
     }
 };
 

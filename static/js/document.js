@@ -7,7 +7,7 @@ pandora.ui.document = function() {
         .bindEvent({
             doubleclick: function(e) {
                 if ($(e.target).is('.OxBar')) {
-                    pandora.$ui.text && pandora.$ui.text.animate({scrollTop:0}, 250);
+                    pandora.$ui.textPanel && pandora.$ui.textPanel.scrollTextTop();
                 }
             }
         }),
@@ -29,11 +29,7 @@ pandora.ui.document = function() {
                 that.update();
             }
         }),
-        item,
-        $find,
-        $nextButton,
-        $currentButton,
-        $previousButton;
+        item;
 
     pandora.api.getDocument({
         id: pandora.user.ui.document
@@ -71,8 +67,7 @@ pandora.ui.document = function() {
                     zoom: 'fit'
                 })
                 : item.extension == 'html'
-                ? pandora.$ui.textPanel = textPanel(item).css({
-                })
+                ? pandora.$ui.textPanel = pandora.ui.textPanel(item, $toolbar)
                 : Ox.ImageViewer({
                     area: pandora.user.ui.documents[item.id]
                         ? pandora.user.ui.documents[item.id].position
@@ -120,149 +115,6 @@ pandora.ui.document = function() {
         }
     }
 
-    function textPanel(text) {
-        var textElement,
-            embedURLs = getEmbedURLs(text.text),
-            that = Ox.SplitPanel({
-                elements: [
-                    {
-                        element: pandora.$ui.text = textElement = pandora.ui.textHTML(text)
-                    },
-                    {
-                        element: pandora.$ui.textEmbed = pandora.ui.textEmbed(),
-                        collapsed: !embedURLs.length,
-                        size: pandora.user.ui.embedSize,
-                        resizable: true,
-                        resize: [192, 256, 320, 384, 448, 512]
-                    }
-                ],
-                orientation: 'horizontal'
-            }),
-            selected = -1,
-            selectedURL;
-        /*
-        $find = Ox.Input({
-                clear: true,
-                placeholder: Ox._('Find in Texts'),
-                value: pandora.user.ui.textFind,
-                width: 188
-            })
-            .css({
-                float: 'right',
-            })
-            .bindEvent({
-                submit: function(data) {
-                    Ox.print('SUBMIT', data);
-                }
-            })
-            .appendTo($toolbar);
-        */
-        $nextButton = Ox.Button({
-                disabled: embedURLs.length < 2,
-                title: 'arrowRight',
-                tooltip: Ox._('Next Reference'),
-                type: 'image'
-            })
-            .css({
-                'margin-right': (pandora.user.ui.embedSize + Ox.SCROLLBAR_SIZE) + 'px',
-                float: 'right',
-            })
-            .bindEvent({
-                click: function() {
-                    that.selectEmbed(
-                        selected < embedURLs.length - 1 ? selected + 1 : 0,
-                        true
-                    );
-                }
-            })
-            .appendTo($toolbar);
-
-        $currentButton = Ox.Button({
-                disabled: embedURLs.length < 1,
-                title: 'center',
-                tooltip: Ox._('Current Reference'),
-                type: 'image'
-            })
-            .css({
-                float: 'right',
-            })
-            .bindEvent({
-                click: scrollToSelectedEmbed
-            })
-            .appendTo($toolbar);
-
-        $previousButton = Ox.Button({
-                disabled: embedURLs.length < 2,
-                title: 'arrowLeft',
-                tooltip: Ox._('Previous Reference'),
-                type: 'image'
-            })
-            .css({
-                float: 'right',
-            })
-            .bindEvent({
-                click: function() {
-                    that.selectEmbed(
-                        selected ? selected - 1 : embedURLs.length - 1,
-                        true
-                    );
-                }
-            })
-            .appendTo($toolbar);
-
-        function getEmbedURLs(text) {
-            var matches = text.match(/<a [^<>]*?href="(.+?)".*?>/gi),
-                urls = [];
-            if (matches) {
-                matches.forEach(function(match) {
-                    var url = match.match(/"(.+?)"/)[1];
-                    if (pandora.isEmbedURL(url)) {
-                        urls.push(url);
-                    }
-                });
-            }
-            return urls;
-        }
-
-        function scrollToSelectedEmbed() {
-            var scrollTop = Math.max(
-                textElement[0].scrollTop + $('#embed' + selected).offset().top - (
-                    pandora.user.ui.showBrowser
-                        ? pandora.$ui.documentContentPanel.options().elements[0].size
-                        : 0
-                ) - 48,
-                0),
-                position = 100 * scrollTop / Math.max(1, textElement[0].scrollHeight);
-            textElement.scrollTo(position);
-            window.text = textElement;
-        }
-
-        that.selectEmbed = function(index, scroll) {
-            if (index != selected) {
-                selected = index;
-                selectedURL = embedURLs[selected]
-                $('.OxSpecialLink').removeClass('OxActive');
-                selected > -1 && $('#embed' + selected).addClass('OxActive');
-                pandora.$ui.textEmbed.update(selectedURL);
-                scroll && scrollToSelectedEmbed();
-            }
-        };
-
-        that.update = function(text) {
-            var index;
-            embedURLs = getEmbedURLs(text);
-            index = embedURLs.indexOf(selectedURL);
-            if (embedURLs.length && (index == -1 || index >= embedURLs.length)) {
-                index = 0;
-            }
-            selected = -1;
-            that.selectEmbed(index);
-        };
-
-        embedURLs.length && that.selectEmbed(0);
-        return that;
-    }
-
     that.info = function() {
         return item;
     };
@@ -272,9 +124,7 @@ pandora.ui.document = function() {
             height: that.height(),
             width: that.width()
         });
-        $nextButton && $nextButton.css({
-            'margin-right': (pandora.user.ui.embedSize + Ox.SCROLLBAR_SIZE) + 'px',
-        });
+        pandora.$ui.textPanel && pandora.$ui.textPanel.update();
     };
 
     return that;
