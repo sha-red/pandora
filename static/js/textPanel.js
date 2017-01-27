@@ -386,7 +386,7 @@ pandora.ui.textHTML = function(text) {
                 ? pandora.user.ui.documents[pandora.user.ui.part.document]
                 : pandora.user.ui.section == 'documents'
                 ? pandora.user.ui.documents[pandora.user.ui.document]
-                : {}),
+                : {}) || {},
             position = settings.position || 0,
             element,
             scrollTop;

@@ -600,7 +600,7 @@ class Document(models.Model):
     def update_linked_documents(self):
         if self.extension == 'html':
             old = [d.id for id in self.linked_documents.all()]
-            current = utils.get_documents(self.data['text'])
+            current = utils.get_documents(self.data.get('text', ''))
             removed = list(set(old) - set(current))
             added = list(set(current) - set(old))
             if removed:

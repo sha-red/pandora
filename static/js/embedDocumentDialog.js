@@ -18,7 +18,7 @@ pandora.ui.embedDocumentDialog = function(id, position) {
                 marginTop: '8px'
             })
             .val(
-                '<a href="/documents/' + id
+                '<a href="/document/' + id
                 + (position ? '/' + position : '')
                 + '"><img src="/documents/' + id + '/256p'
                 + (position || '') + '.jpg"></a>'
