@@ -230,7 +230,9 @@ pandora.ui.mainMenu = function() {
                         { id: 'places', title: Ox._('Manage Places...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
                         { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
                         {},
-                        { id: 'managehome', title: Ox._('Manage Home...'), disabled: !pandora.site.capabilities.canManageHome[pandora.user.level] },
+                        Ox.isEmpty(pandora.site.capabilities.canManageHome) ? [] : [
+                            { id: 'managehome', title: Ox._('Manage Home...'), disabled: !pandora.site.capabilities.canManageHome[pandora.user.level] }
+                        ],
                         { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
                         { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
                         {},
