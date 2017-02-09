@@ -81,7 +81,7 @@ class Item(models.Model):
             'index': self.index,
         }
         j.update(self.data)
-        if 'contentid' in j and (not keys or 'content' in keys):
+        if 'contentid' in j:
             content_keys = [
                 'description',
                 'modified',

@@ -394,17 +394,7 @@ pandora.ui.home = function() {
             }
 
             function getHTML(item) {
-                if (item.type == 'custom') {
-                    return '<b>' + item.title + '</b><br><br>' + item.text;
-                }
-                return '<b>'
-                    + (
-                        (lists && edits) || (lists && texts) || (edits && texts)
-                        ? Ox._(Ox.toTitleCase(item.type)) + ': '
-                        : ''
-                    )
-                    + Ox.encodeHTMLEntities(item.title) + '</b><br><br>'
-                    + item.text;
+                return '<b>' + Ox.encodeHTMLEntities(item.title) + '</b><br><br>' + item.text;
             }
 
             function getTooltip(item) {

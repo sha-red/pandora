@@ -289,321 +289,122 @@ pandora.ui.home = function() {
                 sort: [{key: 'position', operator: '+'}]
             },
             items, lists, edits, texts;
-        pandora.api.findLists(find, function(result) {
-            lists = result.data.items.length;
-            items = result.data.items.map(function(item) {
-                return Ox.extend(item, {type: 'list'});
-            });
-            pandora.api.findEdits(find, function(result) {
-                edits = result.data.items.length;
-                items = items.concat(result.data.items.map(function(item) {
-                    return Ox.extend(item, {type: 'edit'});
-                }));
-                pandora.api.findTexts(find, function(result) {
-                    texts = result.data.items.length;
-                    items = items.concat(result.data.items.map(function(item) {
-                        return Ox.extend(item, {type: 'text'});
-                    }));
-                    $features.empty();
-                    show();
-                });
-            });
+        pandora.api.getHomeItems({active: true}, function(result) {
+            items = result.data.items;
+            lists = 1;
+            edits = 1;
+            texts = 1;
+            show();
         });
         function show() {
             var counter = 0, max = 8, mouse = false, position = 0, selected = 0,
                 color = Ox.Theme() == 'oxlight' ? 'rgb(0, 0, 0)'
                     : Ox.Theme() == 'oxmedium' ? 'rgb(0, 0, 0)'
                     : 'rgb(255, 255, 255)',
-                $label, $icon, $text,
+                $label, $texts,
                 $featuresBox, $featuresContainer, $featuresContent,
                 $featureBox = [], $featureIcon = [],
                 $previousButton, $nextButton;
             if (items.length) {
-                $label = Ox.Label({
-                        textAlign: 'center',
-                        title: '<b>' + Ox._('Featured ' + (
-                            lists == 1 && edits == 0 && texts == 0 ? 'List'
-                            : lists == 0 && edits == 1 && texts == 0 ? 'Edit'
-                            : lists == 0 && edits == 0 && texts == 1 ? 'Text'
-                            : edits == 0 && texts == 0 ? 'Lists'
-                            : lists == 0 && texts == 0 ? 'Edits'
-                            : lists == 0 && edits == 0 ? 'Texts'
-                            : texts == 0 ? 'Lists and Edits'
-                            : edits == 0 ? 'Lists and Texts'
-                            : lists == 0 ? 'Edits and Texts'
-                            : 'Lists, Edits and Texts'
-                        )) + '</b>',
-                        width: 512
-                    })
-                    .css({
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        margin: '0 auto 0 auto'
-                    })
-                    .appendTo($features);
-                $text = Ox.Label({
-                        width: 386
-                    })
-                    .addClass('OxSelectable')
-                    .css({
-                        position: 'absolute',
-                        left: '24px',
-                        top: '24px',
-                        right: 0,
-                        height: '104px',
-                        borderTopLeftRadius: '32px',
-                        borderBottomLeftRadius: '32px',
-                        padding: '8px 8px 8px 130px',
-                        overflowY: 'auto',
-                        lineHeight: '14px',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'normal'
-                    })
-                    .html(
-                        getHTML(items[selected])
-                    )
-                    .appendTo($features);
-                pandora.createLinks($text);
-                $icon = Ox.Element({
-                        element: '<img>',
-                        tooltip: getTooltip(items[selected])
-                    })
-                    .attr({
-                        src: getImageURL(items[selected])
-                    })
-                    .css({
-                        position: 'absolute',
-                        left: 0,
-                        top: '24px',
-                        right: '390px',
-                        width: '122px',
-                        height: '122px',
-                        borderRadius: '32px',
-                        margin: '0 auto 0 auto',
-                        cursor: 'pointer'
-                    })
-                    .bindEvent({
-                        anyclick: function() {
-                            openItem(selected);
-                        }
-                    })
-                    .appendTo($features);
-                if (items.length > 1) {
-                    $featuresBox = $('<div>')
+                $features.empty();
+                $texts = Ox.Element().appendTo($features);
+                var top = 24;
+                items.forEach(function(item) {
+                    var $text, $icon;
+                    $icon = Ox.Element({
+                            element: '<img>',
+                            tooltip: getTooltip(item)
+                        })
+                        .attr({
+                            src: item.image
+                        })
                         .css({
-                            position: 'absolute',
                             left: 0,
-                            top: '150px',
-                            right: 0,
-                            height: '65px', // 4+57+4
-                            width: '560px', // 16+8+512+8+16
-                            margin: '0 auto 0 auto'
+                            right: '390px',
+                            width: '122px',
+                            height: '122px',
+                            borderRadius: '32px',
+                            marginRight: '8px',
+                            cursor: 'pointer',
+                            float: 'left'
                         })
-                        .appendTo($features);
-                    $featuresContainer = $('<div>')
-                        .css({
-                            position: 'absolute',
-                            left: '20px',
-                            right: '20px',
-                            height: '65px',
-                            width: '520px',
-                            overflow: 'hidden'
-                        })
-                        .appendTo($featuresBox);
-                    $featuresContent = $('<div>')
-                        .css({
-                            position: 'absolute',
-                            width: items.length * 65 + 'px',
-                            height: '65px',
-                            marginLeft: items.length < max
-                                ? (max - items.length) * 65 / 2 + 'px'
-                                : 0
-                        })
-                        .appendTo($featuresContainer);
-                    if (items.length > max) {
-                        $previousButton = Ox.Button({
-                                title: 'left',
-                                type: 'image'
-                            })
-                            .addClass(position > 0 ? 'visible' : '')
-                            .css({
-                                position: 'absolute',
-                                left: 0,
-                                top: '25px',
-                                opacity: 0
-                            })
-                            .hide()
-                            .bindEvent({
-                                mousedown: function() {
-                                    counter = 0;
-                                    scrollToPosition(position - 1, true);
-                                },
-                                mouserepeat: function() {
-                                    // fixme: arbitrary
-                                    if (counter++ % 5 == 0) {
-                                        scrollToPosition(position - 1, false);
-                                    }
-                                }
-                            })
-                            .appendTo($featuresBox);
-                        $nextButton = Ox.Button({
-                                title: 'right',
-                                type: 'image'
-                            })
-                            .addClass(position < items.length - 1 ? 'visible' : '')
-                            .css({
-                                position: 'absolute',
-                                right: 0,
-                                top: '25px',
-                                opacity: 0
-                            })
-                            .hide()
-                            .bindEvent({
-                                mousedown: function() {
-                                    counter = 0;
-                                    scrollToPosition(position + 1, true);
-                                },
-                                mouserepeat: function() {
-                                    // fixme: arbitrary
-                                    if (counter++ % 5 == 0) {
-                                        scrollToPosition(position + 1, false);
-                                    }
-                                }
-                            })
-                            .appendTo($featuresBox);
-                        $featuresBox.on({
-                            mouseenter: function() {
-                                mouse = true;
-                                $('.visible').show().stop().animate({
-                                    opacity: 1
-                                }, 250);
-                            },
-                            mouseleave: function() {
-                                mouse = false;
-                                $('.visible').stop().animate({
-                                    opacity: 0
-                                }, 250, function() {
-                                    $(this).hide();
-                                });
-                            },
-                            mousewheel: function(e, delta, deltaX, deltaY) {
-                                // fixme: arbitrary
-                                scrollToPosition(position + Math.round(deltaX * 2), true);
+                        .bindEvent({
+                            anyclick: function() {
+                                openItem(item);
                             }
                         });
-                    }
-                    items.forEach(function(item, i) {
-                        $featureBox[i] = $('<div>')
-                            .css({
-                                float: 'left',
-                                width: '57px',
-                                height: '57px',
-                                padding: '2px',
-                                margin: '2px',
-                                borderRadius: '16px',
-                                boxShadow: '0 0 2px ' + (i == selected ? color : 'transparent')
-                            })
-                            .appendTo($featuresContent);
-                        $featureIcon[i] = Ox.Element({
-                                element: '<img>',
-                                tooltip: (
-                                        (lists && edits) || (lists && texts) || (edits && texts)
-                                        ? Ox._(Ox.toTitleCase(item.type)) + ': '
-                                        : ''
-                                    )
-                                    + Ox.encodeHTMLEntities(item.name)
-                            })
-                            .attr({
-                                src: getImageURL(item)
-                            })
-                            .css({
-                                width: '57px',
-                                height: '57px',
-                                borderRadius: '16px',
-                                cursor: 'pointer'
-                            })
-                            .bindEvent({
-                                doubleclick: function() {
-                                    openItem(i);
-                                },
-                                singleclick: function() {
-                                    selectItem(i);
-                                }
-                            })
-                            .appendTo($featureBox[i]);
-                    });
-                    self.keydown = function(e) {
-                        var key = Ox.KEYS[e.keyCode];
-                        if (!Ox.Focus.focusedElementIsInput()) {
-                            if (key == 'left' && selected > 0) {
-                                selectItem(selected - 1);
-                            } else if (key == 'up' && selected > 0) {
-                                selectItem(0);
-                            } else if (key == 'right' && selected < items.length - 1) {
-                                selectItem(selected + 1);
-                            } else if (key == 'down' && selected < items.length - 1) {
-                                selectItem(items.length - 1);
-                            }
-                        }
-                    };
-                    Ox.$document.on({keydown: self.keydown});
-                }
-                $space = $('<div>')
-                    .css({
-                        position: 'absolute',
-                        top: items.length == 0 ? '0px'
-                            : items.length == 1 ? '150px'
-                            : '215px',
-                        width: '560px',
-                        height: '80px'
-                    })
-                    .appendTo($features);
+                    $text = Ox.Label({
+                            //width: 386 + 122
+                        })
+                        .addClass('OxSelectable')
+                        .css({
+                            //position: 'absolute',
+                            left: '24px',
+                            //top: top + 'px',
+                            right: 0,
+                            height: 'auto',
+                            padding: '8px 8px 8px 8px',
+                            borderRadius: '32px',
+                            marginBottom: '16px',
+                            overflowY: 'auto',
+                            lineHeight: '14px',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'normal'
+                        })
+                        .append($icon)
+                        .append(
+                            Ox.Element().css({
+                                //padding: '8px',
+                            }).html(getHTML(item))
+
+                        )
+                        .appendTo($texts);
+                    pandora.createLinks($text);
+                    top += 130;
+                });
                 $features.animate({opacity: 1}, 250);
             }
 
             function getHTML(item) {
-                return '<b>'
-                    + (
-                        (lists && edits) || (lists && texts) || (edits && texts)
-                        ? Ox._(Ox.toTitleCase(item.type)) + ': '
-                        : ''
-                    )
-                    + Ox.encodeHTMLEntities(item.name) + '</b><br><br>'
-                    + item.description;
-            }
-
-            function getImageURL(item) {
-                return '/' + item.type + '/' + item.user
-                    + ':' + encodeURIComponent(item.name) + '/icon256.jpg?' + item.modified;
+                return '<b>' + Ox.encodeHTMLEntities(item.title) + '</b><br><br>' + item.text;
             }
 
             function getTooltip(item) {
-                return Ox._('View {0}', [Ox._(Ox.toTitleCase(item.type))])
+                return Ox._('View {0}', [Ox._(Ox.toTitleCase(item.title))])
             }
 
-            function openItem(i) {
+            function openItem(item) {
                 that.fadeOutScreen();
-                pandora.UI.set(Ox.extend({
-                    section: items[i].type == 'list' ? 'items' : items[i].type + 's',
-                    page: ''
-                }, items[i].type == 'list' ? {
-                    find: {
-                        conditions: [{
-                            key: 'list',
-                            value: items[i].user + ':'
-                                + items[i].name,
-                            operator: '=='
-                        }],
-                        operator: '&'
-                    }
-                } : items[i].type == 'edit' ? {
-                    edit: items[i].user + ':' + items[i].name
-                } : {
-                    text: items[i].user + ':' + items[i].name
-                }));
+                if (item.type == 'custom') {
+                    pandora.URL.push(item.link);
+                } else {
+                    pandora.UI.set(Ox.extend({
+
+                        section: item.type == 'list' ? 'items' : item.type + 's',
+                        page: ''
+                    }, item.type == 'list' ? {
+                        find: {
+                            conditions: [{
+                                key: 'list',
+                                value: item.contentid,
+                                operator: '=='
+                            }],
+                            operator: '&'
+                        }
+                    } : item.type == 'collection' ? {
+                        findDocuments: {
+                            conditions: [{
+                                key: 'collection',
+                                value: item.contentid,
+                                operator: '=='
+                            }],
+                            operator: '&'
+                        }
+                    } : item.type == 'edit' ? {
+                        edit: item.contentid
+                    } : {
+                    }));
+                }
             }
 
             function scrollToPosition(i, animate) {
@@ -637,32 +438,7 @@ pandora.ui.home = function() {
                 }
             }
 
-            function selectItem(i) {
-                if (i >= 0 && i <= items.length - 1 && i != selected) {
-                    $featureBox[selected].css({
-                        boxShadow: 'none'
-                    });
-                    selected = i;
-                    $featureBox[selected].css({
-                        boxShadow: '0 0 2px ' + color
-                    });
-                    if (selected < position) {
-                        scrollToPosition(selected, true);
-                    } else if (selected > position + max - 1) {
-                        scrollToPosition(selected - max + 1, true);
-                    }
-                    $icon.attr({
-                        src: getImageURL(items[selected])
-                    }).options({
-                        tooltip: getTooltip(items[selected])
-                    });
-                    $text.html(
-                        getHTML(items[selected])
-                    );
-                }
-            }
-
-        }        
+        }
     }
 
     that.fadeInScreen = function() {

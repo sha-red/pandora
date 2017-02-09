@@ -53,7 +53,7 @@ pandora.ui.homeDialog = function() {
                 renderForm(item);
             }
         });
-    });    
+    });
 
     function editItem(id, key, value) {
         var title = $title.value();
@@ -64,16 +64,37 @@ pandora.ui.homeDialog = function() {
             var link = $linkInput.value();
         } else {
             var name = $nameInput.value();
+            title = true;
+            text = true;
+            key = 'contentid';
         }
         if (
             !title || !text
             || (type == 'custom' && (!image || !link))
-            || (type != 'custom' && !name)   
+            || (type != 'custom' && !name)
         ) {
             return;
         }
-        pandora.api.editHomeItem(Ox.extend({id: id}, key, value), function(result) {
-            // ...
+        Ox.print('id', id, 'k', key, 'v', value);
+        var data = {id: id};
+        data[key] = value;
+        if (key == 'contentid') {
+            data.type = type;
+        }
+        pandora.api.editHomeItem(data, function(result) {
+            Ox.Request.clearCache(); // FIXME: too much?
+            items.some(function(item) {
+                if (item.id == id) {
+                    item[key] = value;
+                    if (key == 'contentid') {
+                        item.image = result.data.image;
+                        item.text = result.data.text;
+                        item.title = result.data.title;
+                        renderItem(item);
+                    }
+                    return true;
+                };
+            });
         });
     }
 
@@ -174,8 +195,8 @@ pandora.ui.homeDialog = function() {
         }).css({
             margin: '8px'
         }).bindEvent({
-            change: function(data) {
-                var item = {type: data.value};
+            change: function(data_) {
+                var item = {id: data.id, type: data_.value};
                 renderItem(item);
                 renderForm(item, true);
             }
@@ -189,8 +210,8 @@ pandora.ui.homeDialog = function() {
             }).css({
                 margin: '8px'
             }).bindEvent({
-                change: function(data) {
-                    editItem(data.id, 'image', data.value);
+                change: function(data_) {
+                    editItem(data.id, 'image', data_.value);
                 }
             }).appendTo($form);
             $linkInput = Ox.Input({
@@ -201,8 +222,8 @@ pandora.ui.homeDialog = function() {
             }).css({
                 margin: '8px'
             }).bindEvent({
-                change: function(data) {
-                    editItem(data.id, 'link', data.value);
+                change: function(data_) {
+                    editItem(data.id, 'link', data_.value);
                 }
             }).appendTo($form);
         } else {
@@ -217,8 +238,8 @@ pandora.ui.homeDialog = function() {
             }).css({
                 margin: '8px'
             }).bindEvent({
-                change: function(data) {
-                    editItem(data.id, 'name', data.value);
+                change: function(data_) {
+                    editItem(data.id, 'name', data_.value);
                 }
             }).appendTo($form);
         }
@@ -265,8 +286,9 @@ pandora.ui.homeDialog = function() {
             fontSize: '13px',
             fontWeight: 'bold'
         }).bindEvent({
-            submit: function(data) {
-                editItem(data.id, 'title', data.value);
+            submit: function(data_) {
+                editItem(data.id, 'title', data_.value);
+                //fixme: update list
             }
         }).appendTo($container);
         $text = Ox.EditableContent({
@@ -277,8 +299,8 @@ pandora.ui.homeDialog = function() {
         }).css({
             margin: '0 12px 0 0'
         }).bindEvent({
-            submit: function(data) {
-                editItem(data.id, 'text', data.value);
+            submit: function(data_) {
+                editItem(data.id, 'text', data_.value);
             }
         }).appendTo($item);
     }
@@ -299,7 +321,7 @@ pandora.ui.homeDialog = function() {
                         })
                     },
                     visible: true,
-                    width: 16,  
+                    width: 16,
                 },
                 {
                     id: 'title',
@@ -341,6 +363,13 @@ pandora.ui.homeDialog = function() {
             },
             selectbefore: function() {
                 // ...
+            },
+            move: function(data) {
+                pandora.api.sortHomeItems({
+                    ids: data.ids
+                }, function() {
+                    Ox.Request.clearCache('HomeItems');
+                });
             }
         })
         .css({
