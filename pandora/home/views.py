@@ -100,7 +100,7 @@ def getHomeItems(request, data):
     }
     '''
     response = json_response()
-    qs = models.Item.objects.all().order_by('index', 'created')
+    qs = models.Item.objects.all().order_by('-active', 'index', 'created')
     if 'active' in data:
         qs = qs.filter(active=data['active'] is True)
     response['data']['items'] = [i.json() for i in qs]

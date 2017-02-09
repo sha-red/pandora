@@ -3,6 +3,8 @@
 from __future__ import division, print_function, absolute_import
 
 from six import string_types
+from six.moves.urllib.parse import quote
+
 from django.db import models
 from django.db.models import Max
 import ox
@@ -42,6 +44,16 @@ class Item(models.Model):
                         return False
                 self.data[key] = data[key]
                 changed = True
+        if 'type' in data:
+            if data['type'] == 'custom':
+                if 'contentid' in self.data:
+                    del self.data['contentid']
+                    changed = True
+            else:
+                for key in list(self.data):
+                    if key not in ('contentid', 'type'):
+                        del self.data[key]
+                        changed = True
         if 'active' in data:
             self.active = data['active'] is True
             changed = True
@@ -70,17 +82,29 @@ class Item(models.Model):
         }
         j.update(self.data)
         if 'contentid' in j and (not keys or 'content' in keys):
-            content_keys = ['description', 'modified', 'name', 'user']
+            content_keys = [
+                'description',
+                'modified',
+                'name',
+                'user',
+            ]
             type = j.get('type')
             if type == 'list':
                 from itemlist.models import List
-                j['content'] = List.get(j['contentid']).json(keys=content_keys)
+                content = List.get(j['contentid']).json(keys=content_keys)
             elif type == 'edit':
                 from edit.models import Edit
-                j['content'] = Edit.get(j['contentid']).json(keys=content_keys)
+                content = Edit.get(j['contentid']).json(keys=content_keys)
             elif type == 'collection':
                 from documentcollection.models import Collection
-                j['content'] = Collection.get(j['contentid']).json(keys=content_keys)
+                content = Collection.get(j['contentid']).json(keys=content_keys)
+            j['title'] = content['name']
+            j['text'] = content['description']
+
+            j['image'] = '/' + '/'.join([
+                type, quote(content['user'] + ':' + content['name']),
+                'icon256.jpg?%s' % content['modified'].strftime('%Y-%m-%dT%H:%M:%SZ')
+            ])
         if keys:
             for key in list(j):
                 if key not in keys:
@@ -88,4 +112,4 @@ class Item(models.Model):
         return j
 
     def __unicode__(self):
-        return u"%s" %(self.get_id())
+        return u"%s" % (self.get_id())
