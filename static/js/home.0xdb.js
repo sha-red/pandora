@@ -121,10 +121,6 @@ pandora.ui.home = function() {
                     var folder = pandora.getListData().folder,
                         value = $findInput.value();
                     folder && pandora.$ui.folderList[folder].options({selected: []});
-                    if (pandora.user.ui.section == 'items') {
-                        pandora.$ui.findSelect.value('*');
-                        pandora.$ui.findInput.value(value);
-                    }
                     that.fadeOutScreen();
                     pandora.UI.set({
                         page: '',
@@ -136,6 +132,8 @@ pandora.ui.home = function() {
                         },
                         section: 'items'
                     });
+                    pandora.$ui.findSelect && pandora.$ui.findSelect.value('*');
+                    pandora.$ui.findInput && pandora.$ui.findInput.value(value);
                 }
             })
             .appendTo(that),

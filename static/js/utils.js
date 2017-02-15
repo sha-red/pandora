@@ -357,7 +357,10 @@ pandora.changeFolderItemStatus = function(id, status, callback) {
         pandora.api['edit' + folderItem]({
             id: id,
             status: status
-        }, callback);
+        }, function(result) {
+            Ox.Request.clearCache('find' + folderItem);
+            callback(result);
+        });
     }
 };
 
@@ -365,20 +368,8 @@ pandora.clickLink = function(e, selectEmbed) {
     var match = e.target.id.match(/^embed(\d+)$/);
     if (match) {
         (selectEmbed || pandora.$ui.textPanel.selectEmbed)(parseInt(match[1]));
-    } else if (
-        e.target.hostname == document.location.hostname
-        && !Ox.startsWith(e.target.pathname, '/static')
-        && (
-            window.self == window.top
-            || pandora.isEmbeddableView(e.target.href)
-        )
-    ) {
-        if (pandora.$ui.home && e.target.pathname != '/home') {
-            pandora.$ui.home.fadeOutScreen();
-        }
-        pandora.URL.push(e.target.pathname, true);
     } else {
-        pandora.openLink(e.target.href);
+        pandora.openURL(e.target.href);
     }
 };
 
@@ -2390,6 +2381,7 @@ pandora.hasPlacesLayer = function() {
     });
 };
 
+
 pandora.isClipView = function(view, item) {
     if (pandora.user.ui.section == 'items') {
         if (arguments.length == 0) {
@@ -2402,6 +2394,10 @@ pandora.isClipView = function(view, item) {
     return (
         !item ? ['calendar', 'clip', 'map'] : ['calendar', 'clips', 'map']
     ).indexOf(view) > -1;
+};
+
+pandora.isCompleteHomeItem = function(data) {
+    return data.image && data.title && data.text && data.link;
 };
 
 pandora.isEmbeddableView = function(url) {
@@ -2501,6 +2497,26 @@ pandora.openLink = function(url) {
         window.open(url);
     } else {
         window.open('/url=' + encodeURIComponent(url), '_blank');
+    }
+};
+
+pandora.openURL = function(url) {
+    var a = document.createElement('a');
+    a.href = url;
+    if (
+        a.hostname == document.location.hostname
+        && !Ox.startsWith(a.pathname, '/static')
+        && (
+            window.self == window.top
+            || pandora.isEmbeddableView(a.href)
+        )
+    ) {
+        pandora.URL.push(a.pathname, true);
+        if (pandora.$ui.home && a.pathname != '/home') {
+            pandora.$ui.home.fadeOutScreen();
+        }
+    } else {
+        pandora.openLink(a.href);
     }
 };
 
@@ -2620,6 +2636,90 @@ pandora.renameList = function(oldId, newId, newName, folder) {
             false
         );
     }
+};
+
+pandora.renderHomeItem = function(options) {
+    var data = options.data,
+        editItem = options.editItem,
+        isEditable = editItem && data.type == 'custom';
+
+    var $item = Ox.Element().addClass('OxTextPage').css({
+        clear: 'both'
+    });
+    var $title, $text;
+    if (!data) {
+        return $item;
+    }
+    if (data.image && data.image.length) {
+        var $image = Ox.Element({
+            element: '<img>',
+            tooltip: Ox._('View {0}', [data.title]),
+        }).attr({
+            src: data.image
+        }).css({
+            borderRadius: '32px',
+            float: 'left',
+            height: '128px',
+            marginBottom: '16px',
+            width: '128px',
+            cursor: 'pointer'
+        }).on({
+            click: function() {
+                pandora.openURL(data.link);
+            }
+        }).appendTo($item)
+    } else {
+        var $placeholder = $('<div>').css({
+            border: 'dotted 1px rgb(0, 0, 0)', // FIXME: make themes
+            borderRadius: '32px',
+            float: 'left',
+            height: '128px',
+            marginBottom: '16px',
+            width: '128px',
+        }).appendTo($item);
+    }
+    var $container = $('<div>').css({
+        marginLeft: '144px'
+    }).appendTo($item);
+    var title = data.title ? (
+        (
+            data.type == 'custom' ? '' : Ox._(Ox.toTitleCase(data.type) + ': ')
+        ) + data.title
+    ) : '';
+    $title = Ox.EditableContent({
+        editable: isEditable,
+        placeholder: '<span class="OxLight">' + Ox._('Title') + '</span>',
+        value: title
+    }).css({
+        cursor: 'pointer',
+        fontSize: '13px',
+        fontWeight: 'bold'
+    }).bindEvent({
+        anyclick: function() {
+            if (!isEditable) {
+                pandora.openURL(data.link);
+            }
+        },
+        submit: function(data_) {
+            editItem(data.id, 'title', data_.value);
+        }
+    }).appendTo($container);
+    $text = Ox.EditableContent({
+        clickLink: pandora.clickLink,
+        editable: isEditable,
+        placeholder: '<span class="OxLight">' + Ox._('Text') + '</span>',
+        type: 'textarea',
+        value: data.text || ''
+    }).css({
+        marginTop: '6px',
+        paddingBottom: '16px',
+        textAlign: 'justify'
+    }).bindEvent({
+        submit: function(data_) {
+            editItem(data.id, 'text', data_.value);
+        }
+    }).appendTo($container);
+    return $item;
 };
 
 pandora.resizeFilters = function(width) {

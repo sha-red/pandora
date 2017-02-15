@@ -8,11 +8,13 @@ pandora.ui.homeDialog = function() {
 
     var $folders = $('<div>').css({overflowX: 'hidden', overflowY: 'auto'});
 
-    var $item = $('<div>').addClass('OxTextPage');
+    var $activeList, $inactiveList, $activeMenu, $inactiveMenu;
+
+    var $item = $('<div>').addClass('OxTextPage').css({overflow: 'auto'});
 
     var $form = $('<div>');
 
-    var $title, $text, $typeSelect, $imageInput, $linkInput, $nameInput;
+    var $statusSelect, $typeSelect, $imageInput, $linkInput, $nameInput;
 
     var $dialogPanel = Ox.SplitPanel({
         elements: [
@@ -36,10 +38,10 @@ pandora.ui.homeDialog = function() {
         ],
         closeButton: true,
         content: $dialogPanel,
-        height: 256, //576,
+        height: Math.round((window.innerHeight - 48) * 0.9),
         removeOnClose: true,
         title: Ox._('Manage Home Screen'),
-        width: 1050 // 256 + 17 + 512 + 17 + 256
+        width: 1058 // 256 + 17 + 512 + 17 + 256
     });
 
     pandora.api.getHomeItems({}, function(result) {
@@ -55,46 +57,63 @@ pandora.ui.homeDialog = function() {
         });
     });
 
-    function editItem(id, key, value) {
-        var title = $title.value();
-        var text = $text.value();
-        var type = $typeSelect.value();
-        if (type == 'custom') {
-            var image = $imageInput.value();
-            var link = $linkInput.value();
-        } else {
-            var name = $nameInput.value();
-            title = true;
-            text = true;
+    function addItem(active, callback) {
+        pandora.api.addHomeItem({
+            active: active,
+        }, function(response) {
+            items.push(response.data);
+            var selected = response.data.id;
+            renderFolders(items, selected);
+            var item = Ox.getObjectById(items, selected);
+            renderItem(item);
+            renderForm(item);
+            callback && callback();
+        });
+    }
+    function deleteItem(id, callback) {
+        pandora.api.removeHomeItem({
+            id: id
+        }, function() {
+            items = items.filter(function(item) {
+                return item.id != id;
+            });
+            var selected = items[0].id;
+            renderFolders(items, selected);
+            var item = Ox.getObjectById(items, selected);
+            renderItem(item);
+            renderForm(item);
+            callback && callback();
+        });
+    }
+
+    function editItem(id, key, value, callback) {
+        if (key == 'name') {
             key = 'contentid';
         }
-        if (
-            !title || !text
-            || (type == 'custom' && (!image || !link))
-            || (type != 'custom' && !name)
-        ) {
-            return;
-        }
-        Ox.print('id', id, 'k', key, 'v', value);
-        var data = {id: id};
-        data[key] = value;
-        if (key == 'contentid') {
-            data.type = type;
+        var data = Ox.extend({id: id}, key, value);
+        if (key == 'type') {
+            Ox.extend(data, {'contentid': ''});
         }
         pandora.api.editHomeItem(data, function(result) {
-            Ox.Request.clearCache(); // FIXME: too much?
-            items.some(function(item) {
-                if (item.id == id) {
-                    item[key] = value;
-                    if (key == 'contentid') {
-                        item.image = result.data.image;
-                        item.text = result.data.text;
-                        item.title = result.data.title;
-                        renderItem(item);
-                    }
-                    return true;
-                };
+            Ox.Request.clearCache('Home');
+            var item = Ox.getObjectById(items, id);
+            Ox.unique(Object.keys(item).concat(Object.keys(result.data))).forEach(function(key) {
+                item[key] = result.data[key] || '';
             });
+            renderFolders(items, item.id);
+            /*
+            console.log('1', item)
+            console.log('2', (item.status == 'active' ? $activeList : $inactiveList).value(id));
+            (item.status == 'active' ? $activeList : $inactiveList).value(id, {
+                image: item.image,
+                title: item.title,
+                text: item.text,
+                link: item.link
+            });
+            */
+            renderItem(item);
+            renderForm(item);
+            callback && callback();
         });
     }
 
@@ -112,9 +131,9 @@ pandora.ui.homeDialog = function() {
                     },
                     range: [0, 1000]
                 }, function(result) {
-                    autocompleteData[value] = result.data.items.map(function(item) {
+                    autocompleteData[value] = [''].concat(result.data.items.map(function(item) {
                         return item.id;
-                    });
+                    }));
                     callback();
                 });
             },
@@ -122,14 +141,14 @@ pandora.ui.homeDialog = function() {
         );
     }
 
-    function renderFolder(type, items, selected) {
+    function renderFolder(status, items, selected) {
         var extras = [
             Ox.MenuButton({
                 items: [
                     {id: 'newitem', title: Ox._(
-                        'New ' + (type == 'active' ? 'Active' : 'Inactive') + ' Item'
+                        'New ' + (status == 'active' ? 'Active' : 'Inactive') + ' Item'
                     )},
-                    {id: 'deleteitem', title: Ox._('Delete Selected Item')}
+                    {id: 'deleteitem', title: Ox._('Delete Selected Item'), disabled: !selected}
                 ],
                 title: 'edit',
                 tooltip: Ox._('Manage Items'),
@@ -137,18 +156,26 @@ pandora.ui.homeDialog = function() {
             }).bindEvent({
                 click: function(data) {
                     if (data.id == 'newitem') {
-                        // ...
+                        addItem(status == 'active');
                     } else if (data.id == 'deleteitem') {
-                        // ...
+                        var id = (
+                                status == 'active' ? $activeList : $inactiveList
+                            ).options('selected')[0];
+                        id && deleteItem(id);
                     }
-                }
+                },
             })
         ];
+        if (status == 'active') {
+            $activeMenu = extras[0];
+        } else {
+            $inactiveMenu = extras[0];
+        }
         var $folder = Ox.CollapsePanel({
             collapsed: false,
             extras: extras,
             size: 16,
-            title: Ox._((type == 'active' ? 'Active' : 'Inactive') + ' Items')
+            title: Ox._((status == 'active' ? 'Active' : 'Inactive') + ' Items')
         }).bindEvent({
             toggle: function(data) {
                 data.collapsed && $list.loseFocus();
@@ -159,31 +186,63 @@ pandora.ui.homeDialog = function() {
             padding: '1px 4px',
         }).html(Ox._('No items')).hide().appendTo($folder.$content)
         var $list = renderList(items.filter(function(item) {
-            return item.active == (type == 'active');
+            return item.active == (status == 'active');
         }), selected).bindEventOnce({
             init: function(data) {
+                updateMenu(status, $list.options('selected').length);
                 $placeholder[data.items ? 'hide' : 'show']();
                 $folder.$content.css({
                     height: (data.items || 1) * 16 + 'px'
                 });
             }
+        }).bindEvent({
+            add: function(event) {
+                addItem(status == 'active');
+            },
+            'delete': function(data) {
+                data.ids.length && deleteItem(data.ids[0]);
+            }
         }).appendTo($folder.$content);
-
+        if (status == 'active') {
+            $activeList = $list;
+        } else {
+            $inactiveList = $list;
+        }
         return $folder;
     }
 
     function renderFolders(items, selected) {
         $folders.empty();
-        ['active', 'inactive'].forEach(function(type) {
-            var $folder = renderFolder(type, items, selected).appendTo($folders);
+        ['active', 'inactive'].forEach(function(status) {
+            var $folder = renderFolder(status, items, selected).appendTo($folders);
         });
     }
 
     function renderForm(data, focus) {
         $form.empty();
+        if (!data) {
+            return;
+        }
+        $statusSelect = Ox.Select({
+            items: [
+                {id: 'active', title: Ox._('Active')},
+                {id: 'inactive', title: Ox._('Inactive')}
+            ],
+            label: Ox._('Status'),
+            labelWidth: 80,
+            value: data.active ? 'active' : 'inactive',
+            width: 240
+        }).css({
+            margin: '8px'
+        }).bindEvent({
+            change: function(data_) {
+                editItem(data.id, 'active', data_.value == 'active');
+            }
+        }).appendTo($form);
         $typeSelect = Ox.Select({
             items: [
                 {id: 'custom', title: Ox._('Custom')},
+                {},
                 {id: 'list', title: Ox._('List')},
                 {id: 'edit', title: Ox._('Edit')},
                 {id: 'collection', title: Ox._('Collection')}
@@ -196,9 +255,9 @@ pandora.ui.homeDialog = function() {
             margin: '8px'
         }).bindEvent({
             change: function(data_) {
-                var item = {id: data.id, type: data_.value};
-                renderItem(item);
-                renderForm(item, true);
+                editItem(data.id, 'type', data_.value, function() {
+                    (data.type == 'custom' ? $imageInput : $nameInput).focusInput();
+                });
             }
         }).appendTo($form);
         if (data.type == 'custom') {
@@ -229,6 +288,8 @@ pandora.ui.homeDialog = function() {
         } else {
             $nameInput = Ox.Input({
                 autocomplete: autocompleteData[data.type],
+                autocompleteReplace: true,
+                autocompleteReplaceCorrect: true,
                 autocompleteSelect: true,
                 autocompleteSelectMaxWidth: 256,
                 label: Ox._('Name'),
@@ -243,66 +304,17 @@ pandora.ui.homeDialog = function() {
                 }
             }).appendTo($form);
         }
-        if (focus) {
-            (data.type == 'custom' ? $imageInput : $nameInput).focusInput();
-        }
     }
 
     function renderItem(data) {
-        $item.empty();
-        if (data.image) {
-            var $image = $('<img>').attr({
-                src: data.image
+        $item.empty().append(
+            pandora.renderHomeItem({
+                data: data,
+                editItem: editItem
             }).css({
-                borderRadius: '32px',
-                float: 'left',
-                height: '128px',
-                margin: '12px',
-                width: '128px'
-            }).appendTo($item)
-        } else {
-            var $placeholder = $('<div>').css({
-                border: 'dotted 1px rgb(0, 0, 0)', // FIXME: make themes
-                borderRadius: '32px',
-                height: '128px',
-                margin: '8px',
-                width: '128px'
-            }).appendTo($item);
-        }
-        var $container = $('<div>').css({
-            margin: '10px 12px 8px 0'
-        }).appendTo($item);
-        var title = data.title ? (
-            (
-                data.type == 'custom' ? ''
-                : Ox._('Featured ' + Ox.toTitleCase(data.type) + ': ')
-            ) + data.title
-        ) : '';
-        $title = Ox.EditableContent({
-            editable: data.type == 'custom',
-            placeholder: '<span class="OxLight">' + Ox._('Title') + '</span>',
-            value: title
-        }).css({
-            fontSize: '13px',
-            fontWeight: 'bold'
-        }).bindEvent({
-            submit: function(data_) {
-                editItem(data.id, 'title', data_.value);
-                //fixme: update list
-            }
-        }).appendTo($container);
-        $text = Ox.EditableContent({
-            editable: data.type == 'custom',
-            placeholder: '<span class="OxLight">' + Ox._('Text') + '</span>',
-            type: 'textarea',
-            value: data.text || ''
-        }).css({
-            margin: '0 12px 0 0'
-        }).bindEvent({
-            submit: function(data_) {
-                editItem(data.id, 'text', data_.value);
-            }
-        }).appendTo($item);
+                margin: '16px'
+            })
+        );
     }
 
     function renderList(items, selected) {
@@ -329,9 +341,20 @@ pandora.ui.homeDialog = function() {
                     width: 224
                 },
                 {
-                    id: 'active',
-                    format: function(value) {
-                        return value ? $('<img>').attr({
+                    id: 'text',
+                    visible: false,
+                    width: 0
+                },
+                {
+                    id: 'link',
+                    visible: false,
+                    width: 0
+                },
+                {
+                    id: 'complete',
+                    format: function(value, data) {
+                        console.log('##', data);
+                        return pandora.isCompleteHomeItem(data) ? $('<img>').attr({
                             src: Ox.UI.getImageURL('symbolCheck')
                         }).css({
                             width: '10px',
@@ -352,8 +375,16 @@ pandora.ui.homeDialog = function() {
         })
         .bindEvent({
             select: function(data) {
+                var item = Ox.getObjectById($list.options('items'), data.ids[0]),
+                    status = $list == $activeList ? 'active' : 'inactive';
+
                 if (data.ids.length) {
-                    var item = Ox.getObjectById(items, data.ids[0])
+                    (
+                        status == 'active' ? $inactiveList : $activeList
+                    ).options({selected: []});
+                }
+                updateMenu(status, data.ids.length);
+                if (item || $activeList.options('selected').length + $inactiveList.options('selected').length == 0) {
                     renderItem(item);
                     renderForm(item);
                 }
@@ -376,6 +407,12 @@ pandora.ui.homeDialog = function() {
             width: '256px'
         });
         return $list;
+    }
+
+    function updateMenu(status, value) {
+        (
+            status == 'active' ? $activeMenu : $inactiveMenu
+        )[value ? 'enableItem' : 'disableItem']('deleteitem');
     }
 
     return that;

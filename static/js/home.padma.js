@@ -132,10 +132,6 @@ pandora.ui.home = function() {
                     var folder = pandora.getListData().folder,
                         value = $findInput.value();
                     folder && pandora.$ui.folderList[folder].options({selected: []});
-                    if (pandora.user.ui.section == 'items') {
-                        pandora.$ui.findSelect.value('*');
-                        pandora.$ui.findInput.value(value);
-                    }
                     that.fadeOutScreen();
                     pandora.UI.set({
                         page: '',
@@ -147,6 +143,8 @@ pandora.ui.home = function() {
                         },
                         section: 'items'
                     });
+                    pandora.$ui.findSelect && pandora.$ui.findSelect.value('*');
+                    pandora.$ui.findInput && pandora.$ui.findInput.value(value);
                 }
             })
             .appendTo($box),
@@ -175,18 +173,17 @@ pandora.ui.home = function() {
             })
             .appendTo($box),
 
+        $footer = Ox.Element().css({
+            clear: 'both',
+            height: '64px',
+            paddingTop: '12px'
+        }),
+
         $signupButton = Ox.Button({
                 title: Ox._('Sign Up'),
                 width: 122
             })
             .css({
-                position: 'absolute',
-                left: 0,
-                top: '144px',
-                right: '390px',
-                bottom: 0,
-                margin: '0 auto 0 auto',
-                opacity: 0
             })
             .bindEvent({
                 click: function() {
@@ -200,13 +197,7 @@ pandora.ui.home = function() {
                 width: 122
             })
             .css({
-                position: 'absolute',
-                left: 0,
-                top: '144px',
-                right: '130px',
-                bottom: 0,
-                margin: '0 auto 0 auto',
-                opacity: 0
+                marginLeft: '8px',
             })
             .bindEvent({
                 click: function() {
@@ -220,13 +211,6 @@ pandora.ui.home = function() {
                 width: 252
             })
             .css({
-                position: 'absolute',
-                left: 0,
-                top: '144px',
-                right: '260px',
-                bottom: 0,
-                margin: '0 auto 0 auto',
-                opacity: 0
             })
             .bindEvent({
                 click: function() {
@@ -240,205 +224,57 @@ pandora.ui.home = function() {
                 width: 252
             })
             .css({
-                position: 'absolute',
-                left: '260px',
-                top: '144px',
-                right: 0,
-                bottom: 0,
-                margin: '0 auto 0 auto',
-                opacity: 0
+                marginLeft: '8px'
             })
             .bindEvent({
                 click: function() {
                     pandora.UI.set({page: 'about'});
                     that.fadeOutScreen();
                 }
-            })
-            .appendTo($box),
+            }),
 
         $features = $('<div>')
             .attr({id: 'lists'})
             .css({
                 position: 'absolute',
                 left: 0,
-                top: '184px',
+                top: '152px',
                 right: 0,
                 bottom: 0,
-                width: '560px',
+                width: '512px',
                 margin: '0 auto 0 auto',
                 opacity: 0
             })
             .appendTo($box);
 
     if (pandora.user.level == 'guest') {
-        $signupButton.appendTo($box);
-        $signinButton.appendTo($box);
+        $signupButton.appendTo($footer);
+        $signinButton.appendTo($footer);
     } else {
-        $preferencesButton.appendTo($box);
+        $preferencesButton.appendTo($footer);
     }
+    $aboutButton.appendTo($footer);
 
     function showFeatures() {
-        var $space,
-            featured = {},
-            find = {
-                query: {
-                    conditions: [{key: 'status', value: 'featured', operator: '=='}],
-                    operator: '&'
-                },
-                keys: ['description', 'modified', 'name', 'user'],
-                sort: [{key: 'position', operator: '+'}]
-            },
-            items, lists, edits, texts;
         pandora.api.getHomeItems({active: true}, function(result) {
-            items = result.data.items;
-            lists = 1;
-            edits = 1;
-            texts = 1;
-            show();
-        });
-        function show() {
-            var counter = 0, max = 8, mouse = false, position = 0, selected = 0,
-                color = Ox.Theme() == 'oxlight' ? 'rgb(0, 0, 0)'
-                    : Ox.Theme() == 'oxmedium' ? 'rgb(0, 0, 0)'
-                    : 'rgb(255, 255, 255)',
-                $label, $texts,
-                $featuresBox, $featuresContainer, $featuresContent,
-                $featureBox = [], $featureIcon = [],
-                $previousButton, $nextButton;
+            var items = result.data.items.filter(pandora.isCompleteHomeItem),
+                $texts;
+            $features.empty();
             if (items.length) {
-                $features.empty();
                 $texts = Ox.Element().appendTo($features);
-                var top = 24;
                 items.forEach(function(item) {
-                    var $text, $icon;
-                    $icon = Ox.Element({
-                            element: '<img>',
-                            tooltip: getTooltip(item)
-                        })
-                        .attr({
-                            src: item.image
-                        })
-                        .css({
-                            left: 0,
-                            right: '390px',
-                            width: '122px',
-                            height: '122px',
-                            borderRadius: '32px',
-                            marginRight: '8px',
-                            cursor: 'pointer',
-                            float: 'left'
-                        })
-                        .bindEvent({
-                            anyclick: function() {
-                                openItem(item);
-                            }
-                        });
-                    $text = Ox.Label({
-                            //width: 386 + 122
-                        })
-                        .addClass('OxSelectable')
-                        .css({
-                            //position: 'absolute',
-                            left: '24px',
-                            //top: top + 'px',
-                            right: 0,
-                            height: 'auto',
-                            padding: '8px 8px 8px 8px',
-                            borderRadius: '32px',
-                            marginBottom: '16px',
-                            overflowY: 'auto',
-                            lineHeight: '14px',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'normal'
-                        })
-                        .append($icon)
-                        .append(
-                            Ox.Element().css({
-                                //padding: '8px',
-                            }).html(getHTML(item))
-
-                        )
-                        .appendTo($texts);
-                    pandora.createLinks($text);
-                    top += 130;
+                    var $item = pandora.renderHomeItem({
+                        data: item
+                    }).appendTo($texts);
                 });
-                $features.animate({opacity: 1}, 250);
+            } else {
+                $features.css({
+                    top: '132px'
+                });
             }
-
-            function getHTML(item) {
-                return '<b>' + Ox.encodeHTMLEntities(item.title) + '</b><br><br>' + item.text;
-            }
-
-            function getTooltip(item) {
-                return Ox._('View {0}', [Ox._(Ox.toTitleCase(item.title))])
-            }
-
-            function openItem(item) {
-                that.fadeOutScreen();
-                if (item.type == 'custom') {
-                    pandora.URL.push(item.link);
-                } else {
-                    pandora.UI.set(Ox.extend({
-
-                        section: item.type == 'list' ? 'items' : item.type + 's',
-                        page: ''
-                    }, item.type == 'list' ? {
-                        find: {
-                            conditions: [{
-                                key: 'list',
-                                value: item.contentid,
-                                operator: '=='
-                            }],
-                            operator: '&'
-                        }
-                    } : item.type == 'collection' ? {
-                        findDocuments: {
-                            conditions: [{
-                                key: 'collection',
-                                value: item.contentid,
-                                operator: '=='
-                            }],
-                            operator: '&'
-                        }
-                    } : item.type == 'edit' ? {
-                        edit: item.contentid
-                    } : {
-                    }));
-                }
-            }
-
-            function scrollToPosition(i, animate) {
-                if (i >= 0 && i <= items.length - max && i != position) {
-                    position = i;
-                    $featuresContent.stop().animate({
-                        left: (position * -65) + 'px'
-                    }, animate ? 250 : 0, function() {
-                        if (position == 0) {
-                            $previousButton.removeClass('visible').stop().animate({
-                                opacity: 0
-                            }, 250, function() {
-                                $previousButton.hide();
-                            });
-                        } else {
-                            $previousButton.addClass('visible');
-                        }
-                        if (position == items.length - max) {
-                            $nextButton.removeClass('visible').stop().animate({
-                                opacity: 0
-                            }, 250, function() {
-                                $nextButton.hide();
-                            });
-                        } else {
-                            $nextButton.addClass('visible');
-                        }
-                        if (mouse) {
-                            $featuresBox.trigger('mouseenter');
-                        }
-                    });
-                }
-            }
-
-        }
+            $features.append($footer);
+            $features.animate({opacity: 1}, 250);
+        });
     }
 
     that.fadeInScreen = function() {

@@ -221,18 +221,18 @@ pandora.ui.mainMenu = function() {
                     getSortMenu(),
                     getFindMenu(),
                     { id: 'dataMenu', title: Ox._('Data'), items: [
-                        { id: 'documents', title: Ox._('Manage Documents...'), disabled: !pandora.site.capabilities.canManageDocuments[pandora.user.level] },
-                        { id: 'entities', title: Ox._('Manage Entities...'), disabled: !pandora.site.entities.length || !pandora.site.capabilities.canManageEntities[pandora.user.level] },
-                        {},
+                        !Ox.isEmpty(pandora.site.capabilities.canManageHome)
+                            ? [{ id: 'managehome', title: Ox._('Manage Home...'), disabled: !pandora.site.capabilities.canManageHome[pandora.user.level] }] : [],
+                        pandora.site.entities.length
+                            ? [{ id: 'entities', title: Ox._('Manage Entities...'), disabled: !pandora.site.entities.length || !pandora.site.capabilities.canManageEntities[pandora.user.level] }] : [],
+                        (!Ox.isEmpty(pandora.site.capabilities.canManageHome) || pandora.site.entities.length)
+                            ? [{}] : [],
                         { id: 'titles', title: Ox._('Manage Titles...'), disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
                         { id: 'names', title: Ox._('Manage Names...'), disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
                         {},
                         { id: 'places', title: Ox._('Manage Places...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
                         { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
                         {},
-                        Ox.isEmpty(pandora.site.capabilities.canManageHome) ? [] : [
-                            { id: 'managehome', title: Ox._('Manage Home...'), disabled: !pandora.site.capabilities.canManageHome[pandora.user.level] }
-                        ],
                         { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
                         { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
                         {},
@@ -609,8 +609,6 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.filters.clearFilters();
                 } else if (data.id == 'findsimilar') {
                     pandora.$ui.similarClipsDialog = pandora.ui.similarClipsDialog().open();
-                } else if (data.id == 'documents') {
-                    pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
                 } else if (data.id == 'entities') {
                     pandora.$ui.entitiesDialog = pandora.ui.entitiesDialog().open();
                 } else if (data.id == 'titles') {
