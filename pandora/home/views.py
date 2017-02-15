@@ -23,6 +23,8 @@ def addHomeItem(request, data):
     '''
     item = models.Item()
     response = json_response()
+    if not 'type' in data:
+        data['type'] = 'custom'
     if not item.edit(data):
         response = json_response(status=500, text='invalid data')
     else:

@@ -7,9 +7,13 @@ from six.moves.urllib.parse import quote
 
 from django.db import models
 from django.db.models import Max
+from django.db.models.signals import pre_delete
 import ox
 
 from oxdjango import fields
+from itemlist.models import List
+from edit.models import Edit
+from documentcollection.models import Collection
 
 
 class Item(models.Model):
@@ -43,6 +47,11 @@ class Item(models.Model):
                     if not isinstance(data[key], string_types):
                         return False
                 self.data[key] = data[key]
+                if key == 'contentid':
+                    try:
+                        content = self.get_content()
+                    except:
+                        return False
                 changed = True
         if 'type' in data:
             if data['type'] == 'custom':
@@ -56,6 +65,11 @@ class Item(models.Model):
                         changed = True
         if 'active' in data:
             self.active = data['active'] is True
+            idx = Item.objects.filter(active=self.active).aggregate(Max('index'))['index__max']
+            if idx is None:
+                self.index = 0
+            else:
+                self.index = idx + 1
             changed = True
         if changed:
             self.save()
@@ -74,6 +88,30 @@ class Item(models.Model):
     def get_id(self):
         return ox.toAZ(self.id)
 
+    def get_content(self):
+        content_keys = [
+            'description',
+            'modified',
+            'name',
+            'user',
+        ]
+        type = self.data.get('type')
+        contentid = self.data.get('contentid')
+        if not contentid:
+            return None
+        if type == 'list':
+            content = List.get(contentid).json(keys=content_keys)
+            content['link'] = '/list==' + quote(content['user'] + ':' + content['name'])
+        elif type == 'edit':
+            content = Edit.get(contentid).json(keys=content_keys)
+            content['link'] = '/edits' + quote(content['user'] + ':' + content['name'])
+        elif type == 'collection':
+            content = Collection.get(contentid).json(keys=content_keys)
+            content['link'] = '/documents/collection==' + quote(content['user'] + ':' + content['name'])
+        else:
+            content = None
+        return content
+
     def json(self, keys=None):
         j = {
             'id': self.get_id(),
@@ -82,29 +120,18 @@ class Item(models.Model):
         }
         j.update(self.data)
         if 'contentid' in j:
-            content_keys = [
-                'description',
-                'modified',
-                'name',
-                'user',
-            ]
-            type = j.get('type')
-            if type == 'list':
-                from itemlist.models import List
-                content = List.get(j['contentid']).json(keys=content_keys)
-            elif type == 'edit':
-                from edit.models import Edit
-                content = Edit.get(j['contentid']).json(keys=content_keys)
-            elif type == 'collection':
-                from documentcollection.models import Collection
-                content = Collection.get(j['contentid']).json(keys=content_keys)
-            j['title'] = content['name']
-            j['text'] = content['description']
-
-            j['image'] = '/' + '/'.join([
-                type, quote(content['user'] + ':' + content['name']),
-                'icon256.jpg?%s' % content['modified'].strftime('%Y-%m-%dT%H:%M:%SZ')
-            ])
+            try:
+                content = self.get_content()
+                if content:
+                    j['title'] = content['name']
+                    j['text'] = content['description']
+                    j['link'] = content['link']
+                    j['image'] = '/' + '/'.join([
+                        j['type'], quote(content['user'] + ':' + content['name']),
+                        'icon256.jpg?%s' % content['modified'].strftime('%Y-%m-%dT%H:%M:%SZ')
+                    ])
+            except:
+                pass
         if keys:
             for key in list(j):
                 if key not in keys:
@@ -113,3 +140,20 @@ class Item(models.Model):
 
     def __unicode__(self):
         return u"%s" % (self.get_id())
+
+def delete_item(type, contentid):
+    for home in Item.objects.all():
+        if type == home.data.get('type') and contentid == home.data.get('contentid'):
+            home.delete()
+
+def delete_list(sender, **kwargs):
+    delete_item('list', kwargs['instance'].get_id())
+pre_delete.connect(delete_list, sender=List)
+
+def delete_edit(sender, **kwargs):
+    delete_item('edit', kwargs['instance'].get_id())
+pre_delete.connect(delete_edit, sender=Edit)
+
+def delete_collection(sender, **kwargs):
+    delete_item('collection', kwargs['instance'].get_id())
+pre_delete.connect(delete_collection, sender=Collection)
