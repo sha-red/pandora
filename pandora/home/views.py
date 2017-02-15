@@ -105,6 +105,6 @@ def getHomeItems(request, data):
     qs = models.Item.objects.all().order_by('-active', 'index', 'created')
     if 'active' in data:
         qs = qs.filter(active=data['active'] is True)
-    response['data']['items'] = [i.json() for i in qs]
+    response['data']['items'] = [i.json() for i in qs if i.is_public()]
     return render_to_json_response(response)
 actions.register(getHomeItems)

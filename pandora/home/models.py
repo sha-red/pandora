@@ -99,18 +99,28 @@ class Item(models.Model):
         contentid = self.data.get('contentid')
         if not contentid:
             return None
+        data = None
+        content = None
         if type == 'list':
-            content = List.get(contentid).json(keys=content_keys)
-            content['link'] = '/list==' + quote(content['user'] + ':' + content['name'])
+            content = List.get(contentid)
+            data = content.json(keys=content_keys)
+            data['link'] = '/list==' + quote(data['user'] + ':' + data['name'])
         elif type == 'edit':
-            content = Edit.get(contentid).json(keys=content_keys)
-            content['link'] = '/edits' + quote(content['user'] + ':' + content['name'])
+            content = Edit.get(contentid)
+            data = content.json(keys=content_keys)
+            data['link'] = '/edits' + quote(data['user'] + ':' + data['name'])
         elif type == 'collection':
-            content = Collection.get(contentid).json(keys=content_keys)
-            content['link'] = '/documents/collection==' + quote(content['user'] + ':' + content['name'])
-        else:
-            content = None
-        return content
+            content = Collection.get(contentid)
+            data = content.json(keys=content_keys)
+            data['link'] = '/documents/collection==' + quote(data['user'] + ':' + data['name'])
+        if content and content.status == 'private':
+            self.delete()
+            data = None
+        return data
+
+    def is_public(self):
+        type = self.data.get('type')
+        return type == 'custom' or self.get_content() is not None
 
     def json(self, keys=None):
         j = {
