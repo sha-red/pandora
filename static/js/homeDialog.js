@@ -382,6 +382,7 @@ pandora.ui.homeDialog = function() {
                     (
                         status == 'active' ? $inactiveList : $activeList
                     ).options({selected: []});
+                    updateMenu(status == 'active' ? 'inactive' : 'active', false);
                 }
                 updateMenu(status, data.ids.length);
                 if (item || $activeList.options('selected').length + $inactiveList.options('selected').length == 0) {
