@@ -10,9 +10,10 @@ Group=pandora
 PIDFile=/run/pandora/tasks.pid
 WorkingDirectory=/srv/pandora/pandora
 ExecStart=/srv/pandora/bin/python /srv/pandora/pandora/manage.py \
-    celeryd \
+    celery worker \
     -Q default,celery -n pandora-default \
     --pidfile /run/pandora/tasks.pid \
+    --maxtasksperchild 1000 \
     -l INFO
 ExecReload=/bin/kill -TERM $MAINPID
 

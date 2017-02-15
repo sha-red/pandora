@@ -139,7 +139,7 @@ fi
 /srv/pandora/ctl start
 
 #logrotate
-cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logrotate.d/pandora"
+#cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logrotate.d/pandora"
 
 #nginx
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
