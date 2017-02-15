@@ -297,6 +297,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                 }, function(result) {
                     description = result.data.description;
                     Ox.Request.clearCache('find' + folderItems);
+                    Ox.Request.clearCache('Home');
                     pandora.$ui.info.updateListInfo();
                 });
             }

@@ -277,6 +277,8 @@ pandora.ui.listInfo = function() {
                                         name: data.value
                                     }, function(result) {
                                         if (result.data.id != list) {
+                                            Ox.Request.clearCache('find' + folderItems);
+                                            Ox.Request.clearCache('Home');
                                             pandora.renameList(list, result.data.id, result.data.name);
                                             list = result.data.id;
                                             item.name = result.data.name;
@@ -324,6 +326,7 @@ pandora.ui.listInfo = function() {
                                     }, function(result) {
                                         item.description = result.data.description;
                                         Ox.Request.clearCache('find' + folderItems);
+                                        Ox.Request.clearCache('Home');
                                     });
                                 }
                             }
