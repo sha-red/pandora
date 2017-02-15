@@ -224,7 +224,7 @@ pandora.ui.textHTML = function(text) {
                     if (pandora.user.ui.section == 'documents') {
                         pandora.api.editDocument({
                             id: pandora.user.ui.document,
-                            name: data.value
+                            title: data.value
                         }, function(result) {
                             if (result.data.name != data.value) {
                                 Ox.Request.clearCache();
