@@ -231,6 +231,10 @@ if __name__ == "__main__":
         os.chdir(base)
         current = ''
         new = ''
+        if development:
+            if get('git', 'symbolic-ref', 'HEAD').split('/')[-1] != 'master':
+                print('update only possible if you are on master branch')
+                sys.exit(1)
         for repo in sorted(repos, key=lambda r: repos[r]['path']):
             path = os.path.join(base, repos[repo]['path'])
             if exists(path):
