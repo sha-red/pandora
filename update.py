@@ -1,19 +1,20 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 from __future__ import print_function
 import os
 
 base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
 os.chdir(base)
 
-#using virtualenv's activate_this.py to reorder sys.path
+# using virtualenv's activate_this.py to reorder sys.path
 activate_this = os.path.join(base, 'bin', 'activate_this.py')
-if os.path.exists(activate_this):
-    execfile(activate_this, dict(__file__=activate_this))
+with open(activate_this) as f:
+    code = compile(f.read(), activate_this, 'exec')
+    exec(code, dict(__file__=activate_this))
 
 import sys
 import shutil
 import subprocess
-import urllib2
+import urllib.request
 import json
 from os.path import join, exists
 
@@ -25,10 +26,10 @@ def run(*cmd):
 def get(*cmd):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, error = p.communicate()
-    return stdout
+    return stdout.decode()
 
 def get_json(url):
-    return json.loads(urllib2.urlopen(url).read())
+    return json.loads(urllib.request.urlopen(url).read().decode())
 
 def get_release():
     if os.path.exists('.release'):
@@ -91,7 +92,7 @@ def update_service(service):
 def run_git(path, *args):
     cmd = ['git'] + list(args)
     env = {'GIT_DIR': '%s/.git' % path}
-    return subprocess.check_output(cmd, env=env).strip()
+    return subprocess.check_output(cmd, env=env).decode().strip()
 
 def get_version(path):
     return run_git(path, 'rev-list', 'HEAD', '--count')
@@ -232,7 +233,7 @@ if __name__ == "__main__":
         current = ''
         new = ''
         if development:
-            if get('git', 'symbolic-ref', 'HEAD').split('/')[-1] != 'master':
+            if get('git', 'symbolic-ref', 'HEAD').strip().split('/')[-1] != 'master':
                 print('update only possible if you are on master branch')
                 sys.exit(1)
         for repo in sorted(repos, key=lambda r: repos[r]['path']):
