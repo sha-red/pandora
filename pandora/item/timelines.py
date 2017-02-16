@@ -116,7 +116,7 @@ def join_tiles(source_paths, durations, target_path):
     offset = 0
     for i, path in enumerate(source_paths):
         file_info = map(get_file_info, os.listdir(path))
-        file_info = filter(lambda x: x is not None, file_info)
+        file_info = list(filter(lambda x: x is not None, file_info))
         files = {}
         for info in sorted(file_info, key=lambda x: x['index']):
             mode = info['mode']
@@ -218,7 +218,7 @@ def split_tiles(path, paths, durations):
     def is_timeline_file(file_name):
         return file_name.startswith('timeline') and file_name.endswith('.png')
 
-    file_names = filter(is_timeline_file, os.listdir(path))
+    file_names = list(filter(is_timeline_file, os.listdir(path)))
     tiles = {}
     for file_name in file_names:
         mode = re.split('\d+', file_name[8:])[0]

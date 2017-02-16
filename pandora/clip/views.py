@@ -102,8 +102,8 @@ def findClips(request, data):
         entity_layer_ids = [k['id'] for k in layers if k['type'] == 'entity']
         subtitles = utils.get_by_key(layers, 'isSubtitles', True)
         layer_ids = [k['id'] for k in layers]
-        keys = filter(lambda k: k not in layer_ids + ['annotations'], data['keys'])
-        if filter(lambda k: k not in models.Clip.clip_keys, keys):
+        keys = list(filter(lambda k: k not in layer_ids + ['annotations'], data['keys']))
+        if list(filter(lambda k: k not in models.Clip.clip_keys, keys)):
             qs = qs.select_related('item__sort')
 
         clips = {}
@@ -151,7 +151,7 @@ def findClips(request, data):
                                                 clip__in=clips)
                 add_annotations('annotations', aqs, True)
 
-            for layer in filter(lambda l: l in keys, layer_ids):
+            for layer in list(filter(lambda l: l in keys, layer_ids)):
                 aqs = Annotation.objects.filter(layer=layer, clip__in=clips)
                 add_annotations(layer, aqs)
     elif 'position' in query:

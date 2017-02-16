@@ -121,7 +121,7 @@ def editPlace(request, data):
         names = [names]
     names = [ox.escape_html(n) for n in names]
     alternative_names = [ox.escape_html(n) for n in data.get('alternativeNames', [])]
-    alternative_names = filter(lambda n: n.strip(), alternative_names)
+    alternative_names = list(filter(lambda n: n.strip(), alternative_names))
     if place.editable(request.user):
         conflict = False
         conflict_names = []
@@ -284,8 +284,8 @@ def getPlaces(request, data):
     see: getEvents
     '''
     response = json_response({})
-    layers = [l['id'] for l in filter(lambda l: l['type'] == 'place',
-                                      settings.CONFIG['layers'])]
+    layers = [l['id'] for l in list(filter(lambda l: l['type'] == 'place',
+                                      settings.CONFIG['layers']))]
     items = models.Annotation.objects.filter(layer__in=layers,
                                              places__id=None).order_by('value')
     items = items.values('value').annotate(Count('value'))

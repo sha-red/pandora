@@ -26,7 +26,7 @@ def cronjob(**kwargs):
 
 def update_random_sort():
     from . import models
-    if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):
+    if list(filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys'])):
         random.seed()
         ids = [f['item'] for f in models.ItemSort.objects.values('item')]
         random.shuffle(ids)
@@ -36,7 +36,7 @@ def update_random_sort():
             n += 1
 
 def update_random_clip_sort():
-    if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):
+    if list(filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys'])):
         with transaction.atomic():
             cursor = connection.cursor()
             for row in (

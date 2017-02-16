@@ -104,7 +104,7 @@ class Document(models.Model):
     def update_facet_values(self, key, current_values):
         current_sortvalues = set([value.lower() for value in current_values])
         saved_values = [i.value.lower() for i in Facet.objects.filter(document=self, key=key)]
-        removed_values = filter(lambda i: i not in current_sortvalues, saved_values)
+        removed_values = list(filter(lambda i: i not in current_sortvalues, saved_values))
 
         if removed_values:
             q = Q()
@@ -208,7 +208,7 @@ class Document(models.Model):
             value = len(value.split(' ')) if value else 0
             return value
 
-        for key in filter(lambda k: k.get('sort', False), settings.CONFIG['documentKeys']):
+        for key in list(filter(lambda k: k.get('sort', False), settings.CONFIG['documentKeys'])):
             name = key['id']
             if name not in self.base_keys:
                 source = name
@@ -737,7 +737,7 @@ attrs = {
     'document': models.OneToOneField('Document', related_name='sort', primary_key=True),
     'created': models.DateTimeField(null=True, blank=True, db_index=True),
 }
-for key in filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['documentKeys']):
+for key in list(filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['documentKeys'])):
     name = key['id']
     sort_type = key.get('sortType', key['type'])
     if isinstance(sort_type, list):

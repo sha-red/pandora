@@ -81,7 +81,7 @@ def get_item(info, user=None):
         'director': info.get('director', []),
     }
 
-    if filter(lambda k: k['id'] == 'year', settings.CONFIG['itemKeys']):
+    if list(filter(lambda k: k['id'] == 'year', settings.CONFIG['itemKeys'])):
         item_data['year'] = info.get('year', '') or ''
 
     # add additional item metadata parsed from path
@@ -245,16 +245,16 @@ class Item(models.Model):
         if 'groups' in data:
             groups = data.pop('groups')
             if isinstance(groups, list):
-                groups = filter(lambda g: g.strip(), groups)
+                groups = list(filter(lambda g: g.strip(), groups))
                 groups = [ox.escape_html(g) for g in groups]
                 for g in self.groups.exclude(name__in=groups):
                     self.groups.remove(g)
                 current_groups = [g.name for g in self.groups.all()]
-                for g in filter(lambda g: g not in current_groups, groups):
+                for g in list(filter(lambda g: g not in current_groups, groups)):
                     group, created = Group.objects.get_or_create(name=g)
                     self.groups.add(group)
         keys = [k['id'] for k in
-                filter(lambda i: i.get('description'), settings.CONFIG['itemKeys'])]
+                list(filter(lambda i: i.get('description'), settings.CONFIG['itemKeys']))]
         for k in keys:
             key = '%sdescription' % k
             if key in data:
@@ -299,7 +299,7 @@ class Item(models.Model):
                 else:
                     self.data[key] = ox.escape_html(data[key])
         p = self.save()
-        if not settings.USE_IMDB and filter(lambda k: k in self.poster_keys, data):
+        if not settings.USE_IMDB and list(filter(lambda k: k in self.poster_keys, data)):
             p = tasks.update_poster.delay(self.public_id)
         return p
 
@@ -332,7 +332,7 @@ class Item(models.Model):
                         if i['id'] in known:
                             i['item'] = i['id']
                             i['title'] = known[i['id']]
-                    c[t] = filter(lambda x: x['title'], c[t])
+                    c[t] = list(filter(lambda x: x['title'], c[t]))
                 if not c[t]:
                     del c[t]
         return c
@@ -409,7 +409,7 @@ class Item(models.Model):
 
         # update defaults
         if settings.USE_IMDB:
-            defaults = filter(lambda k: 'default' in k, settings.CONFIG['itemKeys'])
+            defaults = list(filter(lambda k: 'default' in k, settings.CONFIG['itemKeys']))
             for k in defaults:
                 if len(self.public_id) == 7:
                     if k['id'] in self.data and self.data[k['id']] == k['default']:
@@ -657,16 +657,16 @@ class Item(models.Model):
             i['posterFrame'] = self.poster_frame
 
         dkeys = [k['id'] for k in
-                 filter(lambda i: i.get('description'), settings.CONFIG['itemKeys'])]
+                 list(filter(lambda i: i.get('description'), settings.CONFIG['itemKeys']))]
         if keys:
-            dkeys = filter(lambda k: k in keys, dkeys)
+            dkeys = list(filter(lambda k: k in keys, dkeys))
         for key in dkeys:
             k = list(filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys']))
             if isinstance((k and k[0].get('type') or ''), list):
                 i['%sdescription' % key] = {}
                 if key == 'name':
                     values = []
-                    for ikey in filter(lambda i: i.get('sortType') == 'person', settings.CONFIG['itemKeys']):
+                    for ikey in list(filter(lambda i: i.get('sortType') == 'person', settings.CONFIG['itemKeys'])):
                         values += i.get(ikey['id'], [])
                     values = list(set(values))
                 else:
@@ -822,8 +822,8 @@ class Item(models.Model):
                 elif key == 'character':
                     values = self.get('cast', '')
                     if values:
-                        values = filter(lambda x: x.strip(),
-                                        [f['character'] for f in values])
+                        values = list(filter(lambda x: x.strip(),
+                                        [f['character'] for f in values]))
                         values = list(set(values))
                 elif key == 'name':
                     values = []
@@ -976,7 +976,7 @@ class Item(models.Model):
             s.timesaccessed = 0
         s.accessed = self.accessed.aggregate(Max('access'))['access__max']
 
-        for key in filter(lambda k: k.get('sort', False), settings.CONFIG['itemKeys']):
+        for key in list(filter(lambda k: k.get('sort', False), settings.CONFIG['itemKeys'])):
             name = key['id']
             source = name
             sort_type = key.get('sortType', key['type'])
@@ -1042,8 +1042,8 @@ class Item(models.Model):
             if at:
                 current_values += [a[0] for a in at]
         elif key == 'character':
-            current_values = filter(lambda x: x.strip(),
-                                    [f['character'] for f in self.get('cast', [])])
+            current_values = list(filter(lambda x: x.strip(),
+                                    [f['character'] for f in self.get('cast', [])]))
             current_values = [item for sublist in [x.split(' / ') for x in current_values]
                               for item in sublist]
         elif key == 'name':
@@ -1089,7 +1089,7 @@ class Item(models.Model):
     def update_facet_values(self, key, current_values):
         current_sortvalues = set([value.lower() for value in current_values])
         saved_values = [i.value.lower() for i in Facet.objects.filter(item=self, key=key)]
-        removed_values = filter(lambda i: i not in current_sortvalues, saved_values)
+        removed_values = list(filter(lambda i: i not in current_sortvalues, saved_values))
 
         if removed_values:
             q = Q()
@@ -1736,7 +1736,7 @@ attrs = {
     'height': models.BigIntegerField(null=True, blank=True, db_index=True),
     'created': models.DateTimeField(null=True, blank=True, db_index=True),
 }
-for key in filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['itemKeys']):
+for key in list(filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['itemKeys'])):
     name = key['id']
     name = {'id': 'public_id'}.get(name, name)
     sort_type = key.get('sortType', key['type'])

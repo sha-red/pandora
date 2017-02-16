@@ -36,7 +36,7 @@ def get_super_matches(obj, model):
 
 def get_matches(obj, model, layer_type, qs=None):
     super_matches = obj.get_super_matches()
-    exact = [l['id'] for l in filter(lambda l: l['type'] == layer_type, settings.CONFIG['layers'])]
+    exact = [l['id'] for l in list(filter(lambda l: l['type'] == layer_type, settings.CONFIG['layers']))]
     if exact:
         q = Q(value__iexact=obj.name)
         for name in obj.alternativeNames:
@@ -46,7 +46,7 @@ def get_matches(obj, model, layer_type, qs=None):
         f = None
 
     has_type = 'has%ss' % layer_type.capitalize()
-    contains = [l['id'] for l in filter(lambda l: l.get(has_type), settings.CONFIG['layers'])]
+    contains = [l['id'] for l in list(filter(lambda l: l.get(has_type), settings.CONFIG['layers']))]
     if contains:
         name = ox.decode_html(obj.name)
         name = unicodedata.normalize('NFKD', name).lower()

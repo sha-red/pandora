@@ -729,7 +729,7 @@ def lookup(request, data):
     i = None
     if 'id' in data:
         i = models.Item.objects.get(public_id=data['id'])
-    elif not filter(None, [d not in ('title', 'year', 'director') for d in data.keys()]):
+    elif not list(filter(None, [d not in ('title', 'year', 'director') for d in data.keys()])):
         qs = models.Item.objects.find({'query': {
             'conditions': [
                 {'key': key, 'value': data[key], 'operator': '=='} for key in data

@@ -31,7 +31,7 @@ class Command(BaseCommand):
         username, public_id, layer_id, filename = args
         user = User.objects.get(username=username)
         item = Item.objects.get(public_id=public_id)
-        layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
+        layer = list(filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers']))[0]
 
         if filename.endswith('.vtt'):
             annotations = ox.vtt.load(filename)
@@ -53,7 +53,7 @@ class Command(BaseCommand):
                         value=a['value'])
                     annotation.save()
             #update facets if needed
-            if filter(lambda f: f['id'] == layer_id, settings.CONFIG['filters']):
+            if list(filter(lambda f: f['id'] == layer_id, settings.CONFIG['filters'])):
                 item.update_layer_facet(layer_id)
             Item.objects.filter(id=item.id).update(modified=annotation.modified)
             annotation.item.modified = annotation.modified

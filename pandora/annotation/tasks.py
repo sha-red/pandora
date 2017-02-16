@@ -18,7 +18,7 @@ def add_annotations(data):
     from user.models import User
     item = Item.objects.get(public_id=data['item'])
     layer_id = data['layer']
-    layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])
+    layer = list(filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers']))
     if not layer:
         return False
     else:
@@ -61,7 +61,7 @@ def update_item(id, force=False):
         Clip.objects.filter(item__id=a.item.id, annotations__id=None).delete()
         #update facets if needed
         with transaction.atomic():
-            if filter(lambda f: f['id'] == a.layer and f.get('filter'), settings.CONFIG['itemKeys']):
+            if list(filter(lambda f: f['id'] == a.layer and f.get('filter'), settings.CONFIG['itemKeys'])):
                 a.item.update_layer_facet(a.layer)
             Item.objects.filter(id=a.item.id).update(modified=a.modified)
             a.item.modified = a.modified

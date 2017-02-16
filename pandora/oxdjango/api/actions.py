@@ -108,7 +108,7 @@ class ApiActions(dict):
         else:
             f = self[name]
         if name != 'api' and hasattr(f, 'func_closure') and f.func_closure:
-            fc = filter(lambda c: hasattr(c.cell_contents, '__call__'), f.func_closure)
+            fc = list(filter(lambda c: hasattr(c.cell_contents, '__call__'), f.func_closure))
             f = fc[len(fc)-1].cell_contents
         if PY2:
             info = f.func_code.co_filename[len(settings.PROJECT_ROOT)+1:]

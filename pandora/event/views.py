@@ -231,8 +231,8 @@ def getEvents(request, data):
     see: getPlaces
     '''
     response = json_response({})
-    layers = [l['id'] for l in filter(lambda l: l['type'] == 'event',
-                                      settings.CONFIG['layers'])]
+    layers = [l['id'] for l in list(filter(lambda l: l['type'] == 'event',
+                                      settings.CONFIG['layers']))]
     items = models.Annotation.objects.filter(layer__in=layers,
                                              events__id=None).order_by('value')
     items = items.values('value').annotate(Count('value'))

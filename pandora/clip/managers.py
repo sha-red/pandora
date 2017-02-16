@@ -135,7 +135,7 @@ class ClipManager(Manager):
         layer_ids = [k['id'] for k in settings.CONFIG['layers']]
         keys = layer_ids + ['annotations', 'text', '*']
         conditions = data.get('query', {}).get('conditions', [])
-        conditions = filter(lambda c: c['key'] in keys, conditions)
+        conditions = list(filter(lambda c: c['key'] in keys, conditions))
         operator = data.get('query', {}).get('operator', '&')
 
         def parse(condition):
@@ -194,7 +194,7 @@ class ClipManager(Manager):
 
         if 'keys' in data:
             layer_ids = [k['id'] for k in settings.CONFIG['layers']]
-            for l in filter(lambda k: k in layer_ids, data['keys']):
+            for l in list(filter(lambda k: k in layer_ids, data['keys'])):
                 qs = qs.filter(**{l: True})
         #anonymous can only see public clips
         if not user or user.is_anonymous():

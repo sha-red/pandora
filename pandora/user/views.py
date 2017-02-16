@@ -370,12 +370,12 @@ def editUser(request, data):
     if 'groups' in data:
         groups = data['groups']
         if isinstance(groups, list):
-            groups = filter(lambda g: g.strip(), groups)
+            groups = list(filter(lambda g: g.strip(), groups))
             groups = [ox.escape_html(g) for g in groups]
             for g in user.groups.exclude(name__in=groups):
                 user.groups.remove(g)
             current_groups = [g.name for g in user.groups.all()]
-            for g in filter(lambda g: g not in current_groups, groups):
+            for g in list(filter(lambda g: g not in current_groups, groups)):
                 group, created = Group.objects.get_or_create(name=g) 
                 user.groups.add(group)
     if 'username' in data:

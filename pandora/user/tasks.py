@@ -28,7 +28,7 @@ def update_statistics():
            for i in models.SessionData.objects.filter(level__gte=0).values('session_key')]
 
     for chunk in chunker(ids, 100, None):
-        chunk = filter(None, chunk)
+        chunk = list(filter(None, chunk))
         for u in models.SessionData.objects.filter(pk__in=chunk):
             stats.add(u.json())
     Settings.set('statistics', stats)

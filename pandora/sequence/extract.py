@@ -60,7 +60,7 @@ def get_sequences(path, position=0):
         sequences[mode] = []
     position_start = position
     fps = 25
-    file_names = filter(lambda x: 'timelinedata8p' in x, os.listdir(path))
+    file_names = list(filter(lambda x: 'timelinedata8p' in x, os.listdir(path)))
     file_names = sorted(file_names, key=lambda x: int(x[14:-4]))
     file_names = list(map(lambda x: path + x, file_names))
     for file_name in file_names:
@@ -84,7 +84,7 @@ class DataTimeline():
     fps = 25
 
     def __init__(self, path):
-        file_names = filter(lambda x: 'timelinedata8p' in x, os.listdir(path))
+        file_names = list(filter(lambda x: 'timelinedata8p' in x, os.listdir(path)))
         file_names = sorted(file_names, key=lambda x: int(x[14:-4]))
         file_names = list(map(lambda x: path + x, file_names))
         self.file_names = file_names
