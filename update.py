@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 from __future__ import print_function
 import os
 
@@ -14,7 +14,10 @@ with open(activate_this) as f:
 import sys
 import shutil
 import subprocess
-import urllib.request
+try:
+    from urllib.request import urlopen
+except:
+    from urllib2 import urlopen
 import json
 from os.path import join, exists
 
@@ -29,7 +32,7 @@ def get(*cmd):
     return stdout.decode()
 
 def get_json(url):
-    return json.loads(urllib.request.urlopen(url).read().decode())
+    return json.loads(urlopen(url).read().decode())
 
 def get_release():
     if os.path.exists('.release'):
@@ -217,7 +220,7 @@ if __name__ == "__main__":
             run('./bin/pip', 'install', '-r', 'requirements.txt')
             update_service('pandora-encoding')
             update_service('pandora-tasks')
-        if old <=  5673:
+        if old <= 5673:
             run('./pandora/manage.py', 'rebuild_documentfind')
     else:
         if len(sys.argv) == 1:
