@@ -106,7 +106,7 @@ def load_config(init=False):
         # add missing defaults
         for section in sorted((
             'capabilities', 'cantPlay',
-            'documentKeys',
+            'documentKeys', 'documentRightsLevels', 'documentRightsLevel',
             'entities', 'itemName', 'itemTitleKeys', 'itemKeys', 'media', 'posters',
             'site', 'tv', 'user.ui', 'user.ui.part', 'user.ui.showFolder',
             'menuExtras', 'languages'

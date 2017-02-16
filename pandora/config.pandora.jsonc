@@ -355,7 +355,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     "documentRightsLevel" defines which initial rights level will be assigned to documents
     created by users of these user levels.
     */
-    "documentRightsLevel": {"member": 0, "researcher": 0, "staff": 0, "admin": 0},
+    "documentRightsLevel": {"member": 0, "staff": 0, "admin": 0},
     /*
     "documentRightsLevels" is an ordered list of rights levels, one of which will be
     assigned to each document.
