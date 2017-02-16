@@ -11,7 +11,7 @@
 
   To run pan.do/ra you need to install and setup:
 
-    python
+    python 3.5
     postgres
     nginx (or apache2)
     additinal video packages
@@ -28,12 +28,12 @@
 2) install all required packages
 
     apt-get install git subversion mercurial \
-            python-setuptools python-pip python-virtualenv ipython \
-            python-dev python-pil python-numpy python-psycopg2 \
-            python-geoip python-html5lib python-lxml \
+            python3-setuptools python3-pip python3-virtualenv ipython3 \
+            python3-dev python3-pil python3-numpy python3-psycopg2 \
+            python3-geoip python3-html5lib python3-lxml \
             postgresql postgresql-contrib rabbitmq-server \
             poppler-utils mkvtoolnix gpac imagemagick \
-            python-ox oxframe ffmpeg
+            python3-ox oxframe ffmpeg
 
 
 ## Prepare Environment

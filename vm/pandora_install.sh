@@ -51,18 +51,18 @@ apt-get install -y \
     nginx \
     rabbitmq-server \
     git \
-    python-setuptools \
-    python-pip \
-    python-virtualenv \
-    python-dev \
-    python-pil \
-    python-numpy \
-    python-psycopg2 \
-    python-pyinotify \
-    python-simplejson \
-    python-lxml \
-    python-html5lib \
-    python-ox \
+    python3-setuptools \
+    python3-pip \
+    python3-virtualenv \
+    python3-dev \
+    python3-pil \
+    python3-numpy \
+    python3-psycopg2 \
+    python3-pyinotify \
+    python3-simplejson \
+    python3-lxml \
+    python3-html5lib \
+    python3-ox \
     oxframe \
     ffmpeg \
     mkvtoolnix \
@@ -70,7 +70,7 @@ apt-get install -y \
     imagemagick \
     poppler-utils \
     youtube-dl \
-    ipython \
+    ipython3 \
     postfix \
     postgresql \
     postgresql-contrib

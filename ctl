@@ -9,7 +9,7 @@ fi
 if [ "$action" = "init" ]; then
     cd "`dirname "$0"`"
     BASE=`pwd`
-    virtualenv --system-site-packages .
+    virtualenv --system-site-packages -p /usr/bin/python3 .
     if [ ! -d static/oxjs ]; then
         git clone --depth 1 https://git.0x2620.org/oxjs.git static/oxjs
     fi
