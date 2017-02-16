@@ -73,7 +73,7 @@ def migrate_texts(apps, schema_editor):
         d.data['text'] = t.text
         d.data['embeds'] = t.embeds
         d.save()
-        if t.type == 'pdf':
+        if t.type == 'pdf' and t.file:
             d.file.name = path(d, 'data.pdf')
             os.makedirs(os.path.dirname(d.file.path))
             shutil.copy2(t.file.path, d.file.path)
