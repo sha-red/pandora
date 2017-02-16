@@ -83,7 +83,7 @@ def opensearch_xml(request):
     e.attrib['template'] = "%s?q={searchTerms}" % request.build_absolute_uri('/opensearch_suggest')
     '''
     return HttpResponse(
-        '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(osd),
+        '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(osd).decode(),
         'application/xml'
     )
 
