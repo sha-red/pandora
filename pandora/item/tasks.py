@@ -7,6 +7,7 @@ from datetime import timedelta, datetime
 import gzip
 import random
 
+from six.moves.urllib.parse import quote
 from celery.task import task, periodic_task
 from django.conf import settings
 from django.db import connection, transaction
@@ -14,7 +15,6 @@ from django.db.models import Q
 from ox.utils import ET
 
 from app.utils import limit_rate
-from text.models import Text
 from taskqueue.models import Task
 
 
@@ -204,39 +204,78 @@ def update_sitemap(base_url):
             el = ET.SubElement(video, "video:live")
             el.text = "no"
 
-    if Text.objects.filter(name='').exclude(text='').exists():
-        t = Text.objects.filter(name='')[0]
+    # Featured Lists
+    from itemlist.models import List
+    for l in List.objects.filter(Q(status='featured') | Q(status='public')):
         url = ET.SubElement(urlset, "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")
-        loc.text = absolute_url('/texts')
+        loc.text = absolute_url("list==%s" % quote(l.get_id()))
+
         # This date should be in W3C Datetime format, can be %Y-%m-%d
         lastmod = ET.SubElement(url, "lastmod")
-        lastmod.text = t.modified.strftime("%Y-%m-%d")
+        lastmod.text = l.modified.strftime("%Y-%m-%d")
         # always, hourly, daily, weekly, monthly, yearly, never
         changefreq = ET.SubElement(url, "changefreq")
         changefreq.text = 'monthly'
         # priority of page on site values 0.1 - 1.0
         priority = ET.SubElement(url, "priority")
-        priority.text = '1.0'
-
-    for t in Text.objects.filter(Q(status='featured') | Q(status='public')):
+        priority.text = '1.0' if l.status == 'featured' else '0.75'
+    # Featured Edits
+    from edit.models import Edit
+    for l in Edit.objects.filter(Q(status='featured') | Q(status='public')):
         url = ET.SubElement(urlset, "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")
-        loc.text = absolute_url(t.get_absolute_url()[1:])
+        loc.text = absolute_url(l.get_absolute_url()[1:])
 
         # This date should be in W3C Datetime format, can be %Y-%m-%d
         lastmod = ET.SubElement(url, "lastmod")
-        lastmod.text = t.modified.strftime("%Y-%m-%d")
+        lastmod.text = l.modified.strftime("%Y-%m-%d")
         # always, hourly, daily, weekly, monthly, yearly, never
         changefreq = ET.SubElement(url, "changefreq")
         changefreq.text = 'monthly'
         # priority of page on site values 0.1 - 1.0
         priority = ET.SubElement(url, "priority")
-        priority.text = '1.0' if t.status == 'featured' else '0.75'
+        priority.text = '1.0' if l.status == 'featured' else '0.75'
+    # Featured Collections
+    from documentcollection.models import Collection
+    for l in Collection.objects.filter(Q(status='featured') | Q(status='public')):
+        url = ET.SubElement(urlset, "url")
+        # URL of the page. This URL must begin with the protocol (such as http)
+        loc = ET.SubElement(url, "loc")
+        loc.text = absolute_url("documents/collection==%s" % quote(l.get_id()))
 
-    data = '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset)
+        # This date should be in W3C Datetime format, can be %Y-%m-%d
+        lastmod = ET.SubElement(url, "lastmod")
+        lastmod.text = l.modified.strftime("%Y-%m-%d")
+        # always, hourly, daily, weekly, monthly, yearly, never
+        changefreq = ET.SubElement(url, "changefreq")
+        changefreq.text = 'monthly'
+        # priority of page on site values 0.1 - 1.0
+        priority = ET.SubElement(url, "priority")
+        priority.text = '1.0' if l.status == 'featured' else '0.75'
+
+    from document.models import Document
+    for d in Document.objects.filter(rightslevel=0).filter(Q(extension='html') | Q(extension='pdf')):
+        url = ET.SubElement(urlset, "url")
+        # URL of the page. This URL must begin with the protocol (such as http)
+        loc = ET.SubElement(url, "loc")
+        loc.text = absolute_url(d.get_id())
+
+        # This date should be in W3C Datetime format, can be %Y-%m-%d
+        lastmod = ET.SubElement(url, "lastmod")
+        lastmod.text = d.modified.strftime("%Y-%m-%d")
+        # always, hourly, daily, weekly, monthly, yearly, never
+        changefreq = ET.SubElement(url, "changefreq")
+        changefreq.text = 'monthly'
+        # priority of page on site values 0.1 - 1.0
+        priority = ET.SubElement(url, "priority")
+        priority.text = '0.75'
+        if d.collections.filter(Q(status='featured') | Q(status='public')).count():
+            priority.text = '1.0'
+
+    data = '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset).decode()
     with open(sitemap[:-3], 'wb') as f:
         f.write(data)
     with gzip.open(sitemap, 'wb') as f:

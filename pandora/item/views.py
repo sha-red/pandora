@@ -1183,7 +1183,7 @@ def atom_xml(request):
         el.attrib['height'] = str(thumbheight)
         feed.append(entry)     
     return HttpResponse(
-        '<?xml version="1.0" encoding="utf-8" ?>\n' + ET.tostring(feed),
+        '<?xml version="1.0" encoding="utf-8" ?>\n' + ET.tostring(feed).decode(),
         'application/atom+xml'
     )
 
@@ -1233,7 +1233,7 @@ def oembed(request):
             e = ET.SubElement(oxml, key)
             e.text = unicode(oembed[key])
         return HttpResponse(
-            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' + ET.tostring(oxml),
+            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' + ET.tostring(oxml).decode(),
             'application/xml'
         )
     return HttpResponse(json.dumps(oembed, indent=2), 'application/json')
@@ -1293,7 +1293,7 @@ def item_xml(request, id):
         oxml = ET.Element('item')
         xmltree(oxml, 'item', j)
         response = HttpResponse(
-            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' + ET.tostring(oxml),
+            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' + ET.tostring(oxml).decode(),
             'application/xml'
         )
     return response
