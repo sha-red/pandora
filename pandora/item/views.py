@@ -640,7 +640,7 @@ def setPosterFrame(request, data):
     '''
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.editable(request.user):
-        item.poster_frame = data['position']
+        item.poster_frame = float(data['position'])
         item.save()
         tasks.update_poster(item.public_id)
         response = json_response()
