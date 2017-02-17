@@ -17,4 +17,4 @@ def update_program(**kwargs):
         for c in models.Channel.objects.all():
             c.update_program()
         old = datetime.now() - timedelta(days=180)
-        models.Program.filter(created__lt=old).delete()
+        models.Program.objects.filter(created__lt=old).delete()
