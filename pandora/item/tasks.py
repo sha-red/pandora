@@ -198,7 +198,7 @@ def update_sitemap(base_url):
             el = ET.SubElement(video, "video:family_friendly")
             el.text = 'Yes'
             duration = i.sort.duration
-            if duration > 0:
+            if duration and duration > 0:
                 el = ET.SubElement(video, "video:duration")
                 el.text = "%s" % int(duration)
             el = ET.SubElement(video, "video:live")
@@ -275,7 +275,7 @@ def update_sitemap(base_url):
         if d.collections.filter(Q(status='featured') | Q(status='public')).count():
             priority.text = '1.0'
 
-    data = '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset).decode()
+    data = b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset)
     with open(sitemap[:-3], 'wb') as f:
         f.write(data)
     with gzip.open(sitemap, 'wb') as f:
