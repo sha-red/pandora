@@ -1295,7 +1295,7 @@ pandora.getClipVideos = function(clip, resolution) {
 pandora.getDownloadLink = function(item, rightslevel) {
     var torrent = pandora.site.video.torrent;
     if (arguments.length == 2 && torrent &&
-        pandora.site.capabilities.canSeeItem.guest < rightslevel) {
+        pandora.hasCapability('canSeeItem', 'guest') < rightslevel) {
         torrent = false;
     }
     return '/' + item + (torrent ? '/torrent/' : '/download/');
@@ -1912,7 +1912,7 @@ pandora.getSortKeys = function() {
     return pandora.site.itemKeys.filter(function(key) {
         return key.sort && (
             !key.capability
-            || pandora.site.capabilities[key.capability][pandora.user.level]
+            || pandora.hasCapability(key.capability)
         );
     }).map(function(key) {
         return Ox.extend(key, {
@@ -1932,7 +1932,7 @@ pandora.getDocumentSortKeys = function() {
     return pandora.site.documentKeys.filter(function(key) {
         return key.sort && (
             !key.capability
-            || pandora.site.capabilities[key.capability][pandora.user.level]
+            || pandora.hasCapability(key.capability)
         );
     }).map(function(key) {
         return Ox.extend(key, {
@@ -2128,8 +2128,8 @@ pandora.getSpan = function(state, val, callback) {
 
 pandora.getStatusText = function(data) {
     var ui = pandora.user.ui,
-        canSeeMedia = pandora.site.capabilities.canSeeMedia[pandora.user.level],
-        canSeeSize = pandora.site.capabilities.canSeeSize[pandora.user.level],
+        canSeeMedia = pandora.hasCapability('canSeeMedia'),
+        canSeeSize = pandora.hasCapability('canSeeSize'),
         itemName = ['clip', 'video'].indexOf(ui.listView) > -1
             ? (data.items == 1 ? Ox._('Clip') : Ox._('Clips'))
             : Ox._(pandora.site.itemName[
@@ -2272,10 +2272,10 @@ pandora.VIDEO_OPTIONS_KEYS = [
 
 pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable
-            || pandora.site.capabilities.canPlayClips[pandora.user.level]
+            || pandora.hasCapability('canPlayClips')
             >= data.rightslevel,
         canPlayVideo = data.editable
-            || pandora.site.capabilities.canPlayVideo[pandora.user.level]
+            || pandora.hasCapability('canPlayVideo')
             >= data.rightslevel,
         options = {};
     options.subtitlesLayer = pandora.getSubtitlesLayer();
@@ -2325,7 +2325,7 @@ pandora.getVideoOptions = function(data) {
                 annotation.duration = Math.abs(annotation.out - annotation['in']);
                 annotation.editable = annotation.editable
                     || annotation.user == pandora.user.username
-                    || pandora.site.capabilities['canEditAnnotations'][pandora.user.level];
+                    || pandora.hasCapability('canEditAnnotations');
                 annotation.languages = (
                     annotation.languages || [pandora.site.language]
                 ).map(function(language) {
@@ -2362,6 +2362,11 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
     });
     return ret;
 };
+
+pandora.hasCapability = function(capability, level) {
+    level = level || pandora.user.level;
+    return pandora.site.capabilities[capability] && pandora.site.capabilities[capability][level];
+}
 
 pandora.hasDialogOrScreen = function() {
     return !!$('.OxDialog:visible').length

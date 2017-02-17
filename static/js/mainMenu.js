@@ -118,7 +118,7 @@ pandora.ui.mainMenu = function() {
                             ], items: [
                             { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.filter(function(view) {
                                 return view.id != 'data' && view.id != 'media' ||
-                                    pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level];
+                                    pandora.hasCapability('canSeeExtraItemViews');
                             }).map(function(view) {
                                 return Ox.extend({
                                     checked: ui.itemView == view.id
@@ -222,28 +222,28 @@ pandora.ui.mainMenu = function() {
                     getFindMenu(),
                     { id: 'dataMenu', title: Ox._('Data'), items: [
                         !Ox.isEmpty(pandora.site.capabilities.canManageHome)
-                            ? [{ id: 'managehome', title: Ox._('Manage Home...'), disabled: !pandora.site.capabilities.canManageHome[pandora.user.level] }] : [],
+                            ? [{ id: 'managehome', title: Ox._('Manage Home...'), disabled: !pandora.hasCapability('canManageHome') }] : [],
                         pandora.site.entities.length
-                            ? [{ id: 'entities', title: Ox._('Manage Entities...'), disabled: !pandora.site.entities.length || !pandora.site.capabilities.canManageEntities[pandora.user.level] }] : [],
+                            ? [{ id: 'entities', title: Ox._('Manage Entities...'), disabled: !pandora.site.entities.length || !pandora.hasCapability('canManageEntities') }] : [],
                         (!Ox.isEmpty(pandora.site.capabilities.canManageHome) || pandora.site.entities.length)
                             ? [{}] : [],
-                        { id: 'titles', title: Ox._('Manage Titles...'), disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
-                        { id: 'names', title: Ox._('Manage Names...'), disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
+                        { id: 'titles', title: Ox._('Manage Titles...'), disabled: !pandora.hasCapability('canManageTitlesAndNames') },
+                        { id: 'names', title: Ox._('Manage Names...'), disabled: !pandora.hasCapability('canManageTitlesAndNames') },
                         {},
-                        { id: 'places', title: Ox._('Manage Places...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
-                        { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
+                        { id: 'places', title: Ox._('Manage Places...'), disabled: !pandora.hasCapability('canManagePlacesAndEvents') },
+                        { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.hasCapability('canManagePlacesAndEvents') },
                         {},
-                        { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
-                        { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
+                        { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.hasCapability('canManageUsers') },
+                        { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.hasCapability('canManageUsers') },
                         {},
-                        { id: 'changelog', title: Ox._('Changelog...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] }
+                        { id: 'changelog', title: Ox._('Changelog...'), disabled: !pandora.hasCapability('canManageUsers') }
                     ] },
                     { id: 'helpMenu', title: Ox._('Help'), items: [
                         { id: 'help', title: Ox._('Help...'), keyboard: 'control ?' },
                         { id: 'api', title: Ox._('API Documentation...'), keyboard: 'shift control ?' }
                     ] }
                 ],
-                pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
+                pandora.hasCapability('canSeeDebugMenu')
                     ? [
                         { id: 'debugMenu', title: Ox._('Debug'), items: [
                             { id: 'clearcache', title: Ox._('Clear Cache')},
@@ -1001,7 +1001,7 @@ pandora.ui.mainMenu = function() {
                 if (ui.item) {
                     view = pandora.site.itemViews[i];
                     if (view && (view.id != 'data' && view.id != 'media' ||
-                        pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level])) {
+                        pandora.hasCapability('canSeeExtraItemViews'))) {
                         pandora.UI.set({itemView: view.id});
                     }
                 } else {
@@ -1117,7 +1117,7 @@ pandora.ui.mainMenu = function() {
             canDelete = (
                     ui.document || ui.collectionSelection.length
             ) && (
-                pandora.site.capabilities.canRemoveDocuments[pandora.user.level] ||
+                pandora.hasCapability('canRemoveDocuments') ||
                 ui.collectionSelection.every(function(item) {
                     return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
                 })
@@ -1131,7 +1131,7 @@ pandora.ui.mainMenu = function() {
             undoText = pandora.history.undoText(),
             redoText = pandora.history.redoText();
         return { id: 'itemMenu', title: Ox._('Item'), items: [
-            { id: 'add', title: Ox._('Add {0}...', [Ox._('Document')]), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
+            { id: 'add', title: Ox._('Add {0}...', [Ox._('Document')]), disabled: !pandora.hasCapability('canAddItems') },
             { id: 'edit', title: Ox._('Edit {0}...', [Ox._('Document')]), disabled: true /*fixme: !canEdit */ },
             {},
             { id: 'selectall', title: Ox._('Select All {0}', [listItemsName]), disabled: !canSelect, keyboard: 'control a' },
@@ -1368,7 +1368,7 @@ pandora.ui.mainMenu = function() {
                     : clipboardType == 'clip' ? (clipboardItems == 1 ? 'Clip' : 'Clips')
                     : ''
                 ),
-            canEdit = pandora.site.capabilities.canEditMedia[pandora.user.level] || (
+            canEdit = pandora.hasCapability('canEditMedia') || (
                 ui.section == 'items' && (
                     ui.item || (
                         Ox.contains(['list', 'grid', 'clips', 'timelines'], ui.listView)
@@ -1383,7 +1383,7 @@ pandora.ui.mainMenu = function() {
                         && ui.listSelection.length
                     )
                 ) && (
-                    pandora.site.capabilities.canRemoveItems[pandora.user.level] ||
+                    pandora.hasCapability('canRemoveItems') ||
                     ui.listSelection.every(function(item) {
                         return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
                     })
@@ -1405,7 +1405,7 @@ pandora.ui.mainMenu = function() {
             undoText = pandora.history.undoText(),
             redoText = pandora.history.redoText();
         return { id: 'itemMenu', title: Ox._('Item'), items: [
-            { id: 'add', title: Ox._('Add {0}...', [Ox._(pandora.site.itemName.singular)]), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
+            { id: 'add', title: Ox._('Add {0}...', [Ox._(pandora.site.itemName.singular)]), disabled: !pandora.hasCapability('canAddItems') },
             { id: 'edit', title: Ox._('Edit {0}...', [Ox._(pandora.site.itemName.singular)]), disabled: true /*fixme: !canEdit */ },
             {},
             { id: 'selectall', title: Ox._('Select All {0}', [listItemsName]), disabled: !canSelect, keyboard: 'control a' },

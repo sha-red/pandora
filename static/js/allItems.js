@@ -6,9 +6,9 @@ pandora.ui.allItems = function(section) {
 
     section = section || pandora.user.ui.section;
 
-    var canAddItems = !pandora.site.itemRequiresVideo && pandora.site.capabilities.canAddItems[pandora.user.level],
-        canUploadVideo = pandora.site.capabilities.canAddItems[pandora.user.level],
-        canAddDocuments = pandora.site.capabilities.canAddDocuments[pandora.user.level],
+    var canAddItems = !pandora.site.itemRequiresVideo && pandora.hasCapability('canAddItems'),
+        canUploadVideo = pandora.hasCapability('canAddItems'),
+        canAddDocuments = pandora.hasCapability('canAddDocuments'),
         isSelected = pandora.user.ui._list || pandora.user.ui._collection,
         that = Ox.Element()
             .addClass('OxSelectableElement' + (isSelected ? '' : ' OxSelected'))
