@@ -307,14 +307,13 @@ pandora.ui.homeDialog = function() {
     }
 
     function renderItem(data) {
-        $item.empty().append(
-            pandora.renderHomeItem({
-                data: data,
-                editItem: editItem
-            }).css({
-                margin: '16px'
-            })
-        );
+        $item.empty();
+        data && pandora.renderHomeItem({
+            data: data,
+            editItem: editItem
+        }).css({
+            margin: '16px'
+        }).appendTo($item);
     }
 
     function renderList(items, selected) {
