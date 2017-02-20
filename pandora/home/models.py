@@ -108,7 +108,7 @@ class Item(models.Model):
         elif type == 'edit':
             content = Edit.get(contentid)
             data = content.json(keys=content_keys)
-            data['link'] = '/edits' + quote(data['user'] + ':' + data['name'])
+            data['link'] = '/edits/' + quote(data['user'] + ':' + data['name'])
         elif type == 'collection':
             content = Collection.get(contentid)
             data = content.json(keys=content_keys)
