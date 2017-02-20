@@ -231,6 +231,7 @@ SCRIPT_ROOT = normpath(join(PROJECT_ROOT, '..', 'scripts'))
 ITEM_POSTER = join(SCRIPT_ROOT, 'poster.py')
 ITEM_ICON = join(SCRIPT_ROOT, 'item_icon.py')
 LIST_ICON = join(SCRIPT_ROOT, 'list_icon.py')
+COLLECTION_ICON = join(SCRIPT_ROOT, 'list_icon.py')
 
 DB_GIN_TRGM = False
 

@@ -260,6 +260,16 @@ class Collection(models.Model):
                     if frame:
                         frames.append(frame)
         '''
+        from item.models import Item
+        for i in self.poster_frames:
+            try:
+                qs = Item.objects.filter(public_id=i['item'])
+                if qs.count() > 0:
+                    frame = qs[0].frame(i['position'])
+                    if frame:
+                        frames.append(frame)
+            except:
+                pass
         self.icon.name = self.path('icon.jpg')
         icon = self.icon.path
         if frames:
@@ -270,7 +280,7 @@ class Collection(models.Model):
             for f in glob("%s/icon*.jpg" % folder):
                 os.unlink(f)
             cmd = [
-                settings.collection_ICON,
+                settings.COLLECTION_ICON,
                 '-f', ','.join(frames),
                 '-o', icon
             ]

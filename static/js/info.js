@@ -364,7 +364,11 @@ pandora.ui.listInfo = function() {
     }
 
     function getIconCSS() {
-        var list = pandora.user.ui.section == 'items' ? pandora.user.ui._list : ui[folderItem.toLowerCase()],
+        var list = pandora.user.ui.section == 'items'
+                ? pandora.user.ui._list
+                : pandora.user.ui.section == 'documents'
+                ? pandora.user.ui._collection
+                : ui[folderItem.toLowerCase()],
             size = Math.round(pandora.user.ui.sidebarSize / 2);
         return Ox.extend({
             width: size + 'px',
