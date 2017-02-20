@@ -1684,7 +1684,7 @@ pandora.getListData = function(list) {
             list = pandora.user.ui._collection;
             _list = pandora.user.ui._collection;
         } else {
-            list = pandora.user.ui.section.slice(0, -1)
+            list = pandora.user.ui[pandora.user.ui.section.slice(0, -1)];
         }
     }
     if (pandora.user.ui.section == 'documents') {
