@@ -619,12 +619,14 @@ pandora.ui.listIconPanel = function(listData) {
                 pandora.api.find(Ox.extend(data, {
                     query: {
                         conditions: (
-                            Ox.contains(pandora.site.listSections, ui.section)
+                            ui.section == 'items'
                             ? [{key: 'list', value: listData.id, operator: '=='}]
                             : []).concat(
                         value !== ''
                             ? [{key: key, value: value, operator: '='}]
                             : []
+                        ).concat(
+                            [{key: 'duration', value: '00:00:00', operator: '>'}]
                         ),
                         operator: '&'
                     }
