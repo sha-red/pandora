@@ -1104,6 +1104,10 @@ pandora.ui.documentsPanel = function(options) {
         }).open();
     }
 
+    that.reloadList = function() {
+        $list.reloadList();
+    };
+
     that.selectSelected = function(offset) {
         $list.selectSelected(offset);
         return that;

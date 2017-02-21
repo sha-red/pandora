@@ -484,19 +484,34 @@ pandora.ui.mainMenu = function() {
                         clips = pandora.$ui.clipList.options('selected');
                     } else if (ui.section == 'edits') {
                         clips = pandora.$ui.editPanel.getSelectedClips();
+                    } else if (ui.section == 'documents') {
+                        clips = ui.collectionSelection;
+                        type = 'document';
                     } else {
                         clips = ui.listSelection;
-                        section = 'item';
+                        type = 'item';
                     }
                     pandora.clipboard[action](clips, type);
                 } else if (data.id == 'paste') {
                     fromMenu = true;
                     if (ui.section == 'items') {
-                        var items = pandora.clipboard.paste('item');
-                        items.length && pandora.doHistory('paste', items, ui._list, function() {
-                            pandora.UI.set({listSelection: items});
-                            pandora.reloadList();
-                        });
+                        if (pandora.clipboard.type() == 'document') {
+                            //fixme use history
+                            var items = pandora.clipboard.paste('document');
+                            items.length && pandora.api.addDocument({
+                                item: ui.item,
+                                ids: items
+                            }, function(result) {
+                                Ox.Request.clearCache('findDocuments');
+                                pandora.$ui.documents.reloadList();
+                            });
+                        } else {
+                            var items = pandora.clipboard.paste('item');
+                            items.length && pandora.doHistory('paste', items, ui._list, function() {
+                                pandora.UI.set({listSelection: items});
+                                pandora.reloadList();
+                            });
+                        }
                     } else if (ui.section == 'documents') {
                         var items = pandora.clipboard.paste('document');
                         items.length && pandora.doHistory('paste', items, ui._collection, function() {
@@ -1366,6 +1381,7 @@ pandora.ui.mainMenu = function() {
                 ) + Ox._(
                     clipboardType == 'item' ? pandora.site.itemName[clipboardItems == 1 ? 'singular' : 'plural']
                     : clipboardType == 'clip' ? (clipboardItems == 1 ? 'Clip' : 'Clips')
+                    : clipboardType == 'document' ? (clipboardItems == 1 ? 'Document' : 'Documents')
                     : ''
                 ),
             canEdit = pandora.hasCapability('canEditMedia') || (
@@ -1395,10 +1411,11 @@ pandora.ui.mainMenu = function() {
                 : isVideoView ? ui.videoPoints[ui.item]['in'] != ui.videoPoints[ui.item].out
                 : isEditView && ui.editSelection.length,
             canCut = canCopy && isEditable,
-            canPaste = (
+            canPaste = ((
                 (isListView && clipboardType == 'item')
-                || (isEditView && clipboardType == 'clip')
-            ) && isEditable,
+                || (isEditView && clipboardType == 'document')
+            ) && isEditable)
+                || (ui.section == 'items' && ui.itemView == 'documents' && clipboardType == 'document'), // fixme: also check if item is editable: && pandora.$ui.list.value(ui.listSelection[0], 'editable')),
             canAdd = canCopy && clipboardItems > 0
                 && ((clipboardType == 'item') == isListView),
             historyItems = pandora.history.items(),
