@@ -368,7 +368,7 @@ class Document(models.Model):
                 else:
                     if data[key]:
                         self.data[key] = ox.escape_html(data[key])
-                    else:
+                    elif key in self.data:
                         del self.data[key]
 
     @property
