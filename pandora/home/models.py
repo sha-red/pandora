@@ -48,9 +48,8 @@ class Item(models.Model):
                         return False
                 self.data[key] = data[key]
                 if key == 'contentid':
-                    try:
-                        content = self.get_content()
-                    except:
+                    content = self.get_content()
+                    if not content:
                         return False
                 changed = True
         if 'type' in data:
@@ -101,18 +100,21 @@ class Item(models.Model):
             return None
         data = None
         content = None
-        if type == 'list':
-            content = List.get(contentid)
-            data = content.json(keys=content_keys)
-            data['link'] = '/list==' + quote(data['user'] + ':' + data['name'])
-        elif type == 'edit':
-            content = Edit.get(contentid)
-            data = content.json(keys=content_keys)
-            data['link'] = '/edits/' + quote(data['user'] + ':' + data['name'])
-        elif type == 'collection':
-            content = Collection.get(contentid)
-            data = content.json(keys=content_keys)
-            data['link'] = '/documents/collection==' + quote(data['user'] + ':' + data['name'])
+        try:
+            if type == 'list':
+                content = List.get(contentid)
+                data = content.json(keys=content_keys)
+                data['link'] = '/list==' + quote(data['user'] + ':' + data['name'])
+            elif type == 'edit':
+                content = Edit.get(contentid)
+                data = content.json(keys=content_keys)
+                data['link'] = '/edits/' + quote(data['user'] + ':' + data['name'])
+            elif type == 'collection':
+                content = Collection.get(contentid)
+                data = content.json(keys=content_keys)
+                data['link'] = '/documents/collection==' + quote(data['user'] + ':' + data['name'])
+        except:
+            return None
         if content and content.status == 'private':
             self.delete()
             data = None
