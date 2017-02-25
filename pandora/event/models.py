@@ -132,8 +132,8 @@ class Event(models.Model):
             self.set_name_sort()
         self.name_find = '||' + '||'.join((self.name,) + self.alternativeNames) + '||'
         self.name_find = self.name_find.lower()
-        self.defined = len(filter(None, [getattr(self, key)
-                             for key in ('start', 'end')])) > 0
+        self.defined = len(list(filter(None, [getattr(self, key)
+                             for key in ('start', 'end')]))) > 0
         if self.endTime and self.startTime:
             self.durationTime = self.endTime - self.startTime
 

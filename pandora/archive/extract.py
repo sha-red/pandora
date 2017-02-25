@@ -254,7 +254,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         audio_settings = []
         # mix 2 mono channels into stereo(common for fcp dv mov files)
         if audio_track == 0 and len(info['audio']) == 2 \
-                and len(filter(None, [a['channels'] == 1 or None for a in info['audio']])) == 2:
+                and len(list(filter(None, [a['channels'] == 1 or None for a in info['audio']]))) == 2:
             audio_settings += [
                 '-filter_complex',
                 '[0:%s][0:%s] amerge' % (info['audio'][0]['id'], info['audio'][1]['id'])
@@ -482,8 +482,8 @@ def average_color(prefix, start=0, end=0, mode='antialias'):
         start = int(start * 25)
         end = int(end * 25)
     mode = 'timeline' + mode
-    timelines = ox.sorted_strings(filter(lambda t: t != '%s%s%sp.jpg' % (prefix, mode, height),
-                                  glob("%s%s%sp*.jpg" % (prefix, mode, height))))
+    timelines = ox.sorted_strings(list(filter(lambda t: t != '%s%s%sp.jpg' % (prefix, mode, height),
+                                  glob("%s%s%sp*.jpg" % (prefix, mode, height)))))
     for image in timelines:
         start_offset = 0
         if start and frames + 1500 <= start:

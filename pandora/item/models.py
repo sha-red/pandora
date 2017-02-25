@@ -806,7 +806,7 @@ class Item(models.Model):
                     qs = Annotation.objects.filter(item=self).exclude(findvalue=None)
                     qs = qs.filter(layer=i)
                     qs = qs.order_by('start')
-                    save(i, u'\n'.join(filter(None, [l.findvalue for l in qs])))
+                    save(i, u'\n'.join(list(filter(None, [l.findvalue for l in qs]))))
                     layer_keys.append(i)
                 elif i != '*' and i not in self.facet_keys:
                     value = self.get(i)
