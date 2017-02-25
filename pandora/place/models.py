@@ -151,7 +151,7 @@ class Place(models.Model):
             self.geoname_sort = ', '.join(reversed(self.geoname.split(', ')))
         self.name_find = '|%s|' % '|'.join([self.name]+list(self.alternativeNames)).lower()
 
-        self.defined = len(filter(None, [getattr(self, key)
-                             for key in ('south', 'west', 'north', 'east')])) > 0
+        self.defined = len(list(filter(None, [getattr(self, key)
+                             for key in ('south', 'west', 'north', 'east')]))) > 0
 
         super(Place, self).save(*args, **kwargs)

@@ -314,7 +314,7 @@ def editAnnotation(request, data):
                 setattr(a, {
                     'in': 'start',
                     'out': 'end'
-                }.get(key,key), value)
+                }.get(key, key), value)
         add_changelog(request, data)
         a.save()
         #update sort/find tables async
