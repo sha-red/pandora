@@ -387,6 +387,15 @@ def get_ui(user_ui, user=None):
         tids += add_edits(user.edits.exclude(status="featured"), 'personal')
         tids += add_edits(user.subscribed_edits.filter(status='public'), 'public')
     tids += add_edits(edit.models.Edit.objects.filter(status='featured'), 'featured')
+
+    if 'filters' in ui:
+        filterids = [f['id'] for f in settings.CONFIG['itemKeys'] if f.get('filter')]
+        ui['filters'] = [f for f in ui['filters'] if f['id'] in filterids]
+        used = [f['id'] for f in ui['filters']]
+        unused = [f for f in settings.CONFIG['user']['ui']['filters'] if f['id'] not in used]
+        while len(ui['filters']) < len(settings.CONFIG['user']['ui']['filters']):
+            ui['filters'].append(unused.pop())
+
     return ui
 
 def init_user(user, request=None):
