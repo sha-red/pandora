@@ -2,8 +2,10 @@ from django.shortcuts import render
 import ox
 
 from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+
 from user.decorators import capability_required_json
 from oxdjango.api import actions
+from changelog.models import add_changelog
 
 from . import models
 
@@ -29,6 +31,7 @@ def addHomeItem(request, data):
         response = json_response(status=500, text='invalid data')
     else:
         response['data'] = item.json()
+        add_changelog(request, data, item.get_id())
     return render_to_json_response(response)
 actions.register(addHomeItem, cache=False)
 
@@ -51,6 +54,7 @@ def editHomeItem(request, data):
         response = json_response(status=500, text='failed to edit item')
     else:
         response['data'] = item.json()
+        add_changelog(request, data, item.get_id())
     return render_to_json_response(response)
 actions.register(editHomeItem, cache=False)
 
@@ -66,6 +70,7 @@ def removeHomeItem(request, data):
     '''
     item = get_object_or_404_json(models.Item, id=ox.fromAZ(data['id']))
     item.delete()
+    add_changelog(request, data, item.get_id())
     response = json_response()
     return render_to_json_response(response)
 actions.register(removeHomeItem, cache=False)
