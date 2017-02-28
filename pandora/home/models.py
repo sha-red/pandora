@@ -47,7 +47,7 @@ class Item(models.Model):
                     if not isinstance(data[key], string_types):
                         return False
                 self.data[key] = data[key]
-                if key == 'contentid':
+                if key == 'contentid' and self.data[key]:
                     content = self.get_content()
                     if not content:
                         return False
