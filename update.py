@@ -208,7 +208,7 @@ if __name__ == "__main__":
         if old <= 5443:
             gunicorn_config = 'pandora/gunicorn_config.py'
             if not os.path.exists(gunicorn_config):
-                shutil.copy('%s.in'%gunicorn_config, gunicorn_config)
+                shutil.copy('%s.in' % gunicorn_config, gunicorn_config)
                 if os.path.exists('/etc/init/pandora.conf'):
                     with open('/etc/init/pandora.conf') as fd:
                         data = fd.read()
@@ -220,8 +220,6 @@ if __name__ == "__main__":
             run('./bin/pip', 'install', '-r', 'requirements.txt')
             update_service('pandora-encoding')
             update_service('pandora-tasks')
-        if old <= 5673:
-            run('./pandora/manage.py', 'rebuild_documentfind')
     else:
         if len(sys.argv) == 1:
             release = get_release()
