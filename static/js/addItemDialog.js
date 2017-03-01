@@ -5,7 +5,8 @@ pandora.ui.addItemDialog = function(options) {
 
     var input = '';
 
-    var selected = options.selected ? options.selected : 'upload';
+    var selected = options.selected ? options.selected
+        : !pandora.site.itemRequiresVideo && !pandora.user.ui.item ? 'add' : 'upload';
 
     var $button;
 

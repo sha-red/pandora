@@ -100,77 +100,123 @@ pandora.ui.addFilesDialog = function(options) {
         width: 640
     });
 
+    var selectItems = [];
+    if (!pandora.site.itemRequiresVideo && pandora.user.ui.item) {
+        selectItems.push({
+            id: 'add',
+            title: Ox._(
+                'Add to current {0}',
+                [pandora.site.itemName.singular.toLowerCase()]
+            )
+        });
+        selectItems.push({
+            id: 'one',
+            title: Ox._(
+                options.items.length > 1 ? 'Create new {0} with multiple parts' : 'Create new {0}',
+                [pandora.site.itemName.singular.toLowerCase()]
+            )
+        });
+    } else {
+        selectItems.push({
+            id: 'one',
+            title: Ox._(
+                'Create one {0} with multiple parts',
+                [pandora.site.itemName.singular.toLowerCase()]
+            )
+        });
+    }
+    if (options.items.length > 1) {
+        selectItems.push({
+            id: 'multiple',
+            title: Ox._(
+                'Create multiple {0}',
+                [pandora.site.itemName.plural.toLowerCase()]
+            )
+        });
+    }
     var $select = Ox.Select({
-        items: [
-            {
-                id: 'one',
-                title: Ox._(
-                    'Create one {0} with multiple parts',
-                    [pandora.site.itemName.singular.toLowerCase()]
-                )
-            },
-            {
-                id: 'multiple',
-                title: Ox._(
-                    'Create multiple {0}',
-                    [pandora.site.itemName.plural.toLowerCase()]
-                )
-            }
-        ],
+        items: selectItems,
         width: 256
     }).css({
-        display: options.items.length > 1 ? 'block' : 'none',
+        display: selectItems.length > 1 ? 'block' : 'none',
         margin: '4px'
     });
     $($select.find('.OxButton')[0]).css({margin: '-1px'});
     $button.parent().parent().append($select);
 
     function importVideos(callback) {
-        var id;
-        Ox.serialForEach(options.items, function(item, index, items, callback) {
-            var isNewItem = index == 0 || $select.value() == 'multiple';
-            (isNewItem ? pandora.api.add : Ox.noop)({
-                title: item.title
-            }, function(result) {
-                if (isNewItem) {
-                    id = result.data.id;
+        var id, title;
+        ($select.value() == 'add' ? pandora.api.get : Ox.noop)({
+            id: pandora.user.ui.item,
+            keys: ['title']
+        }, function(result) {
+            if ($select.value() == 'add') {
+                title = result.data.title;
+            }
+            Ox.serialForEach(options.items, function(item, index, items, callback) {
+                var isNewItem = index == 0 || $select.value() == 'multiple';
+                if ($select.value() == 'add') {
+                    id = pandora.user.ui.item;
+                    isNewItem = false;
+                } else {
+                    title = items[$select.value() == 'one' ? 0 : index].title;
                 }
-                (isNewItem ? pandora.api.edit : Ox.noop)(Ox.extend(
-                    Ox.filter(item, function(value, key) {
-                        return key != 'title' &&
-                            Object.keys(pandora.site.importMetadata).indexOf(key) > -1;
-                    }),
-                    {'id': id}
-                ), function(result) {
-                    pandora.api.addMediaUrl({
-                        url: item.url,
-                        item: id
-                    }, callback);
+                (isNewItem ? pandora.api.add : Ox.noop)({
+                    title: title
+                }, function(result) {
+                    if (isNewItem) {
+                        id = result.data.id;
+                    }
+                    (isNewItem ? pandora.api.edit : Ox.noop)(Ox.extend(
+                        Ox.filter(item, function(value, key) {
+                            return key != 'title' &&
+                                Object.keys(pandora.site.importMetadata).indexOf(key) > -1;
+                        }),
+                        {'id': id}
+                    ), function(result) {
+                        pandora.api.addMediaUrl({
+                            url: item.url,
+                            item: id
+                        }, callback);
+                    });
                 });
-            });            
-        }, callback);
+            }, callback);
+        });
     }
 
     function uploadVideos(callback) {
-        var id;
-        Ox.serialForEach(options.items, function(item, index, items, callback) {
-            var isNewItem = index == 0 || $select.value() == 'multiple';
-            var title = items[$select.value() == 'one' ? 0 : index].title;
-            (isNewItem ? pandora.api.add : Ox.noop)({
-                title: title
-            }, function(result) {
-                if (isNewItem) {
-                    id = result.data.id;
+        var id, title;
+        ($select.value() == 'add' ? pandora.api.get : Ox.noop)({
+            id: pandora.user.ui.item,
+            keys: ['title']
+        }, function(result) {
+            if ($select.value() == 'add') {
+                title = result.data.title;
+            }
+            Ox.serialForEach(options.items, function(item, index, items, callback) {
+                var isNewItem = index == 0 || $select.value() == 'multiple';
+                if ($select.value() == 'add') {
+                    id = pandora.user.ui.item;
+                    isNewItem = false;
+                } else {
+                    title = items[$select.value() == 'one' ? 0 : index].title;
                 }
-                pandora.uploadQueue.add(Ox.extend(item, {
-                    item: {
-                        id: id,
-                        title: title
-                    } 
-                }));
-                callback();
-            });            
-        }, callback);
+                (isNewItem ? pandora.api.add : Ox.noop)({
+                    title: title
+                }, function(result) {
+                    if (isNewItem) {
+                        id = result.data.id;
+                    }
+                    pandora.uploadQueue.add(Ox.extend(item, {
+                        item: {
+                            id: id,
+                            title: title
+                        } 
+                    }));
+                    callback();
+                })
+            }, callback);
+        });
     }
 
     return that;
