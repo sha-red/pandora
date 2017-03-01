@@ -373,7 +373,7 @@ pandora.ui.infoView = function(data) {
     }
 
     // Extra Metadata
-    renderGroup([
+    var extra = renderGroup([
         'presentedby',
         'coproducer',
         'associateproducer',
@@ -385,7 +385,8 @@ pandora.ui.infoView = function(data) {
         'screenplay',
         'dialogue',
         'adaptation'
-    ]).css({marginTop: '12px'});
+    ])
+    extra && extra.css({marginTop: '12px'});
     renderGroup([
         'musicdirector',
         'backgroundmusic',
