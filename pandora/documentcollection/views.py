@@ -49,7 +49,7 @@ def _order_query(qs, sort):
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
+    query['sort'] = [{'key': 'user', 'operator': '+'}, {'key': 'name', 'operator': '+'}]
     for key in ('keys', 'group', 'collection', 'range', 'position', 'positions', 'sort'):
         if key in data:
             query[key] = data[key]

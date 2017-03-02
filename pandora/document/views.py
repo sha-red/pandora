@@ -163,10 +163,10 @@ def _order_query(qs, sort, item=None):
             'name': 'title',
         }.get(e['key'], e['key'])
         if key == 'resolution':
-            order_by.append('%swidth'%operator)
-            order_by.append('%sheight'%operator)
+            order_by.append('%swidth' % operator)
+            order_by.append('%sheight' % operator)
         else:
-            if '__' not in key:
+            if '__' not in key and key not in ('created', 'modified'):
                 key = "%s%s" % (prefix, key)
             order = '%s%s' % (operator, key)
             order_by.append(order)
@@ -202,10 +202,11 @@ def get_item(query):
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
+    query['sort'] = [{'key': 'user', 'operator': '+'}, {'key': 'name', 'operator': '+'}]
     for key in ('keys', 'group', 'file', 'range', 'position', 'positions', 'sort'):
         if key in data:
             query[key] = data[key]
+    print(query.get('sort'), data.get('sort'))
     query['qs'] = models.Document.objects.find(data, user)
     query['item'] = get_item(data.get('query', {}))
     return query

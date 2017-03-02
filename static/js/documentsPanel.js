@@ -943,7 +943,7 @@ pandora.ui.documentsPanel = function(options) {
                 ui.part.documents && pandora.UI.set('part.documents', data.ids[0]);
             },
             sort: function(data) {
-                pandora.UI.set({documentsSort: [data]});
+                pandora.UI.set({collectionSort: [data]});
             }
         })
         .bindEventOnce({

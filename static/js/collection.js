@@ -56,6 +56,29 @@ pandora.ui.collection = function() {
             columnsVisible: true,
             scrollbarVisible: true,
         })
+        .bindEvent({
+            columnchange: function(data) {
+                var columnWidth = {};
+                pandora.UI.set({collectionColumns: data.ids});
+                /*
+                data.ids.forEach(function(id) {
+                    columnWidth[id] =
+                        ui.collections[ui.collection].columnWidth[id]
+                        || Ox.getObjectById(pandora.site.sortKeys, id).width
+                });
+                pandora.UI.set({collectionColumnWidth: columnWidth});
+                */
+            },
+            columnresize: function(data) {
+                pandora.UI.set('collectionColumnWidth.' + data.id, data.width);
+            },
+            sort: function(data) {
+                pandora.UI.set({
+                    collectionSort: [{key: data.key, operator: data.operator}]
+                });
+            }
+        });
+
     } else if (view == 'grid') {
         that = Ox.IconList({
             borderRadius: 0,
