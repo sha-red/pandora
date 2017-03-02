@@ -46,10 +46,10 @@ pandora.ui.documentBrowser = function() {
         .addClass('OxMedia')
         .bindEvent({
             copy: function() {
-                pandora.clipboard.copy(pandora.user.ui.item, 'document');
+                pandora.clipboard.copy(pandora.user.ui.document, 'document');
             },
             copyadd: function() {
-                pandora.clipboard.add(pandora.user.ui.item, 'document');
+                pandora.clipboard.add(pandora.user.ui.document, 'document');
             },
             gainfocus: function() {
                 pandora.$ui.mainMenu.replaceItemMenu();
@@ -58,9 +58,7 @@ pandora.ui.documentBrowser = function() {
                 that.scrollToSelection();
             },
             openpreview: function() {
-                if (pandora.isVideoView()) {
-                    pandora.$ui[pandora.user.ui.itemView].gainFocus().triggerEvent('key_space');
-                }
+                // ..
             },
             select: function(data) {
                 data.ids.length && pandora.UI.set({
