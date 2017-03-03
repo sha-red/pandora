@@ -9,6 +9,9 @@ pandora.ui.metadataDialog = function(data) {
             'producer', 'writer', 'cinematographer', 'editor', 'composer', 'actor',
             'genre', 'keyword', 'summary'
         ],
+        mapKeys = {
+            'keyword': 'topic'
+        },
         updateKeys,
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
@@ -156,13 +159,21 @@ pandora.ui.metadataDialog = function(data) {
             : key == 'runtime' ? Math.round(value / 60) + ' min'
             : key == 'productionCompany' ? value.join('; ')
             : Ox.isArray(
-                Ox.getObjectById(pandora.site.itemKeys, key).type
+                getItemKey(key).type
             ) ? value.join(', ')
             : value;
     }
 
     function getFormWidth() {
         return dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE;
+    }
+
+    function getItemKey(key) {
+        return Ox.getObjectById(pandora.site.itemKeys, getKey(key));
+    }
+
+    function getKey(key) {
+        return mapKeys[key] || key;
     }
 
     function getMetadata() {
@@ -279,7 +290,7 @@ pandora.ui.metadataDialog = function(data) {
     function getTitle(key) {
         return Ox._(
             key == 'alternativeTitles' ? 'Alternative Titles'
-            : Ox.getObjectById(pandora.site.itemKeys, key).title
+            : getItemKey(key).title
         );
     }
 
@@ -350,8 +361,8 @@ pandora.ui.metadataDialog = function(data) {
         var edit = {id: data.id}, type;
         updateKeys.forEach(function(key) {
             type = key == 'alternativeTitles' ? []
-                : Ox.getObjectById(pandora.site.itemKeys, key).type;
-            edit[key] = imdb[key] || (
+                : getItemKey(key).type;
+            edit[getKey(key)] = imdb[key] || (
                 Ox.isArray(type) ? [] : ''
             );
         });
