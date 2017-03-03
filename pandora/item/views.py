@@ -517,12 +517,45 @@ def get(request, data):
     return render_to_json_response(response)
 actions.register(get)
 
+def edit_item(request, item, data):
+    update_clips = False
+    response = json_response(status=200, text='ok')
+    if 'rightslevel' in data:
+        if request.user.profile.capability('canEditRightsLevel'):
+            item.level = int(data['rightslevel'])
+        else:
+            response = json_response(status=403, text='permission denied')
+        del data['rightslevel']
+    if 'user' in data:
+        if request.user.profile.get_level() in ('admin', 'staff') and \
+                models.User.objects.filter(username=data['user']).exists():
+            new_user = models.User.objects.get(username=data['user'])
+            if new_user != item.user:
+                item.user = new_user
+                update_clips = True
+        del data['user']
+    if 'groups' in data:
+        if not request.user.profile.capability('canManageUsers'):
+            # Users wihtout canManageUsers can only add/remove groups they are not in
+            groups = set([g.name for g in item.groups.all()])
+            user_groups = set([g.name for g in request.user.groups.all()])
+            other_groups = list(groups - user_groups)
+            data['groups'] = [g for g in data['groups'] if g in user_groups] + other_groups
+    r = item.edit(data)
+    if r:
+        r.wait()
+    if update_clips:
+        tasks.update_clips.delay(item.public_id)
+    return response
+
 @login_required_json
 def add(request, data):
     '''
     Adds a new item (without video)
     takes {
         title: string, // title (optional)
+
+        ... // more key/value pairs (like edit, can be passed to add)
     }
     returns {
         id: string, // item id
@@ -535,18 +568,22 @@ def add(request, data):
     if not request.user.profile.capability('canAddItems'):
         response = json_response(status=403, text='permission denied')
     else:
+        response = json_response(status=200, text='created')
         data['title'] = data.get('title', 'Untitled')
-        i = models.Item()
-        i.data['title'] = data['title']
-        i.user = request.user
-        p = i.save()
+        request_data = data.copy()
+        item = models.Item()
+        item.data['title'] = data['title']
+        item.user = request.user
+        p = item.save()
         if p:
             p.wait()
         else:
             i.make_poster()
-        response = json_response(status=200, text='created')
-        response['data'] = i.get_json()
-        add_changelog(request, data, i.public_id)
+        del data['title']
+        if data:
+            response = edit_item(request, item, data)
+        response['data'] = item.get_json()
+        add_changelog(request, request_data, item.public_id)
     return render_to_json_response(response)
 actions.register(add, cache=False)
 
@@ -565,38 +602,12 @@ def edit(request, data):
     }
     see: add, find, get, lookup, remove, upload
     '''
-    update_clips = False
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.editable(request.user):
-        response = json_response(status=200, text='ok')
-        if 'rightslevel' in data:
-            if request.user.profile.capability('canEditRightsLevel'):
-                item.level = int(data['rightslevel'])
-            else:
-                response = json_response(status=403, text='permission denied')
-            del data['rightslevel']
-        if 'user' in data:
-            if request.user.profile.get_level() in ('admin', 'staff') and \
-                    models.User.objects.filter(username=data['user']).exists():
-                new_user = models.User.objects.get(username=data['user'])
-                if new_user != item.user:
-                    item.user = new_user
-                    update_clips = True
-            del data['user']
-        if 'groups' in data:
-            if not request.user.profile.capability('canManageUsers'):
-                # Users wihtout canManageUsers can only add/remove groups they are not in
-                groups = set([g.name for g in item.groups.all()])
-                user_groups = set([g.name for g in request.user.groups.all()])
-                other_groups = list(groups - user_groups)
-                data['groups'] = [g for g in data['groups'] if g in user_groups] + other_groups
-        add_changelog(request, data)
-        r = item.edit(data)
-        if r:
-            r.wait()
-        if update_clips:
-            tasks.update_clips.delay(item.public_id)
+        request_data = data.copy()
+        response = edit_item(request, item, data)
         response['data'] = item.get_json()
+        add_changelog(request, request_data)
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
