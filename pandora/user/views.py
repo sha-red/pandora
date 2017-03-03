@@ -794,12 +794,13 @@ def setUI(request, data):
 
     if data.get('item'):
         item = get_object_or_404_json(Item, public_id=data['item'])
-        if request.user.is_authenticated():
-            access, created = Access.objects.get_or_create(item=item, user=request.user)
-        else:
-            access, created = Access.objects.get_or_create(item=item, user=None)
-        if not created:
-            access.save()
+        with transaction.atomic():
+            if request.user.is_authenticated():
+                access, created = Access.objects.get_or_create(item=item, user=request.user)
+            else:
+                access, created = Access.objects.get_or_create(item=item, user=None)
+            if not created:
+                access.save()
     if data.get('document'):
         import document.models
         doc = get_object_or_404_json(document.models.Document, id=ox.fromAZ(data['document']))
