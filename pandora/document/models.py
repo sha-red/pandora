@@ -14,6 +14,7 @@ from django.db.models import Q, Sum, Max
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import pre_delete
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 
 from PIL import Image
 import ox
@@ -36,6 +37,7 @@ if not PY2:
 def get_path(f, x):
     return f.path(x)
 
+@python_2_unicode_compatible
 class Document(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
@@ -283,7 +285,7 @@ class Document(models.Model):
         self.update_matches()
         self.update_linked_documents()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.get_id()
 
     def add(self, item):
@@ -659,6 +661,7 @@ class ItemProperties(models.Model):
         super(ItemProperties, self).save(*args, **kwargs)
 
 
+@python_2_unicode_compatible
 class Access(models.Model):
     class Meta:
         unique_together = ("document", "user")
@@ -676,11 +679,12 @@ class Access(models.Model):
         timesaccessed = Access.objects.filter(document=self.document).aggregate(Sum('accessed'))['accessed__sum']
         Sort.objects.filter(document=self.document).update(timesaccessed=timesaccessed, accessed=self.access)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.user:
             return u"%s/%s/%s" % (self.user, self.document, self.access)
         return u"%s/%s" % (self.item, self.access)
 
+@python_2_unicode_compatible
 class Facet(models.Model):
     '''
         used for keys that can have multiple values like people, languages etc.
@@ -696,7 +700,7 @@ class Facet(models.Model):
     value = models.CharField(max_length=1000, db_index=True)
     sortvalue = models.CharField(max_length=1000, db_index=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s=%s" % (self.key, self.value)
 
     def save(self, *args, **kwargs):
@@ -716,6 +720,7 @@ for key in settings.CONFIG['itemKeys']:
     if key.get('sortType') == 'person':
         Document.person_keys.append(key['id'])
 
+@python_2_unicode_compatible
 class Find(models.Model):
 
     class Meta:
@@ -725,7 +730,7 @@ class Find(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True, db_index=settings.DB_GIN_TRGM)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s=%s' % (self.key, self.value)
 
 '''

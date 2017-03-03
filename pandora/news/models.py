@@ -3,11 +3,13 @@
 from __future__ import division, print_function, absolute_import
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 import ox
 
 from . import managers
 
 
+@python_2_unicode_compatible
 class News(models.Model):
     objects = managers.NewsManager()
 
@@ -40,6 +42,6 @@ class News(models.Model):
                     del j[key]
         return j
 
-    def __unicode__(self):
-        return u"%s/%s" %(self.date, self.title)
+    def __str__(self):
+        return u"%s/%s" % (self.date, self.title)
 

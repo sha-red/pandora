@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
+from django.utils.encoding import python_2_unicode_compatible
 import celery.task.control
 import kombu.five
 import ox
@@ -40,6 +41,7 @@ def get_tasks(username):
         tasks.append(task.json())
     return tasks
 
+@python_2_unicode_compatible
 class Task(models.Model):
     DONE = ['finished', 'failed', 'canceled']
 
@@ -53,7 +55,7 @@ class Task(models.Model):
     item = models.ForeignKey("item.Item", related_name='tasks')
     user = models.ForeignKey(User, related_name='tasks', null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s [%s]" % (self.item.public_id, self.status)
 
     @property

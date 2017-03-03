@@ -8,6 +8,8 @@ from six.moves.urllib.parse import quote
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import pre_delete
+from django.utils.encoding import python_2_unicode_compatible
+
 import ox
 
 from oxdjango import fields
@@ -16,6 +18,7 @@ from edit.models import Edit
 from documentcollection.models import Collection
 
 
+@python_2_unicode_compatible
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -150,7 +153,7 @@ class Item(models.Model):
                     del j[key]
         return j
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s" % (self.get_id())
 
 def delete_item(type, contentid):

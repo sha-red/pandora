@@ -8,10 +8,12 @@ from random import randint
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 
 from item.models import Item
 
 
+@python_2_unicode_compatible
 class Channel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -20,7 +22,7 @@ class Channel(models.Model):
     list = models.OneToOneField('itemlist.List', related_name='channel', null=True, blank=True)
     #list = models.ForeignKey('itemlist.List', related_name='channel', null=True, unique=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s %s" % (self.list or 'All', self.run)
 
     def update_program(self, now=None):
@@ -72,6 +74,7 @@ class Channel(models.Model):
         else:
             return program.json(user, now)
 
+@python_2_unicode_compatible
 class Program(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -81,7 +84,7 @@ class Program(models.Model):
     item = models.ForeignKey('item.Item', related_name='program')
     channel = models.ForeignKey(Channel, related_name='program')
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s %s" % (self.item, self.start)
 
     def json(self, user, current=False):

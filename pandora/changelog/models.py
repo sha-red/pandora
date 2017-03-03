@@ -6,6 +6,8 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+
 from oxdjango import fields
 import ox
 
@@ -16,12 +18,13 @@ from . import managers
 '''
 FIXME: remove this table more migrate to new ChangeLog
 '''
+@python_2_unicode_compatible
 class Changelog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=255, db_index=True)
     value = fields.DictField(default={})
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s %s' % (self.type, self.created)
 
     def json(self):
@@ -46,6 +49,7 @@ def add_changelog(request, data, id=None):
         'user': c.user.username,
     })
 
+@python_2_unicode_compatible
 class Log(models.Model):
 
     action = models.CharField(max_length=255, db_index=True)
@@ -56,7 +60,7 @@ class Log(models.Model):
 
     objects = managers.LogManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s %s %s' % (self.created, self.action, self.changeid)
 
     def get_id(self):

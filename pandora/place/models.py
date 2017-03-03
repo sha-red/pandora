@@ -4,6 +4,7 @@ from __future__ import division, print_function, absolute_import
 
 from django.db import models, transaction
 from django.contrib.auth.models import User
+from django.utils.encoding import python_2_unicode_compatible
 import ox
 from oxdjango import fields
 
@@ -13,6 +14,7 @@ from item.models import Item
 from . import managers
 
 
+@python_2_unicode_compatible
 class Place(models.Model):
     '''
         Places are named locations, they should have geographical information attached to them.
@@ -52,7 +54,7 @@ class Place(models.Model):
     class Meta:
         ordering = ('name_sort', )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @classmethod

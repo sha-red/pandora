@@ -5,6 +5,7 @@ from __future__ import division, print_function, absolute_import
 import unicodedata
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from oxdjango import fields
 import ox
@@ -27,6 +28,7 @@ def get_name_sort(name, sortname=None):
         sortname = u''
     return sortname
 
+@python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=200, unique=True)
     sortname = models.CharField(max_length=200)
@@ -42,7 +44,7 @@ class Person(models.Model):
 
     objects = managers.PersonManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):

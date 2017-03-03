@@ -11,6 +11,8 @@ from django.db import models
 from django.db.models import Max
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
+
 import ox
 
 from oxdjango.fields import DictField, TupleField
@@ -32,6 +34,7 @@ def get_collectionview():
 def get_collectionsort():
     return tuple(settings.CONFIG['user']['ui']['collectionSort'])
 
+@python_2_unicode_compatible
 class Collection(models.Model):
 
     class Meta:
@@ -107,7 +110,7 @@ class Collection(models.Model):
         if documents:
             CollectionDocument.objects.all().filter(document__id__in=documents, collection=self).delete()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.get_id()
 
     def get_id(self):
@@ -306,6 +309,7 @@ class Collection(models.Model):
                 path = source
         return path
 
+@python_2_unicode_compatible
 class CollectionDocument(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -313,9 +317,10 @@ class CollectionDocument(models.Model):
     index = models.IntegerField(default=0)
     document = models.ForeignKey('document.Document')
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s in %s' % (self.document, self.collection)
 
+@python_2_unicode_compatible
 class Position(models.Model):
 
     class Meta:
@@ -326,6 +331,6 @@ class Position(models.Model):
     section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s/%s/%s' % (self.section, self.position, self.collection)
 

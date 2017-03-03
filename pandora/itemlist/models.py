@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models import Max
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 import ox
 
 from oxdjango.fields import DictField, TupleField
@@ -25,6 +26,7 @@ def get_icon_path(f, x): return get_path(f, 'icon.jpg')
 def get_listview(): return settings.CONFIG['user']['ui']['listView']
 def get_listsort(): return tuple(settings.CONFIG['user']['ui']['listSort'])
 
+@python_2_unicode_compatible
 class List(models.Model):
 
     class Meta:
@@ -101,7 +103,7 @@ class List(models.Model):
         if items:
             ListItem.objects.all().filter(item__public_id__in=items, list=self).delete()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.get_id()
 
     def get_id(self):
@@ -287,6 +289,7 @@ class List(models.Model):
                 path = source
         return path
 
+@python_2_unicode_compatible
 class ListItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -294,10 +297,11 @@ class ListItem(models.Model):
     index = models.IntegerField(default=0)
     item = models.ForeignKey('item.Item')
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s in %s' % (self.item, self.list)
 
 
+@python_2_unicode_compatible
 class Position(models.Model):
 
     class Meta:
@@ -308,6 +312,6 @@ class Position(models.Model):
     section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s/%s/%s' % (self.section, self.position, self.list)
 

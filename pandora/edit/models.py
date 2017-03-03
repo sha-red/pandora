@@ -16,6 +16,7 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth.models import User
+from django.utils.encoding import python_2_unicode_compatible
 
 from annotation.models import Annotation
 from item.models import Item
@@ -29,6 +30,7 @@ from . import managers
 def get_path(f, x): return f.path(x)
 def get_icon_path(f, x): return get_path(f, 'icon.jpg')
 
+@python_2_unicode_compatible
 class Edit(models.Model):
 
     class Meta:
@@ -54,7 +56,7 @@ class Edit(models.Model):
     poster_frames = TupleField(default=[], editable=False)
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_edits')
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s (%s)' % (self.name, self.user)
 
     @classmethod
@@ -413,6 +415,7 @@ class Edit(models.Model):
         #p.wait()
         shutil.rmtree(tmp)
 
+@python_2_unicode_compatible
 class Clip(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -433,7 +436,7 @@ class Clip(models.Model):
 
     objects = managers.ClipManager()
 
-    def __unicode__(self):
+    def __str__(self):
         if self.annotation:
             return u'%s' % self.annotation.public_id
         return u'%s/%0.3f-%0.3f' % (self.item.public_id, self.start, self.end)
@@ -521,6 +524,7 @@ class Clip(models.Model):
 
         return clip.models.get_layers(item=item, interval=(start, end), user=user)
 
+@python_2_unicode_compatible
 class Position(models.Model):
 
     class Meta:
@@ -531,6 +535,6 @@ class Position(models.Model):
     section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s/%s/%s' % (self.section, self.position, self.edit)
 

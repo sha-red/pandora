@@ -4,6 +4,7 @@ from __future__ import division, print_function, absolute_import
 
 from django.db import models
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 
 import ox
 
@@ -45,6 +46,7 @@ def get_layers(item, interval=None, user=None):
     return layers
 
 
+@python_2_unicode_compatible
 class MetaClip(object):
     def update_calculated_values(self):
         start = self.start
@@ -182,7 +184,7 @@ class MetaClip(object):
     def public_id(self):
         return u"%s/%0.03f-%0.03f" % (self.item.public_id, float(self.start), float(self.end))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.public_id
 
 class Meta:
@@ -218,7 +220,7 @@ attrs = {
 for name in [k['id'] for k in settings.CONFIG['layers']]:
     attrs[name] = models.BooleanField(default=False, db_index=True)
 
-Clip = type('Clip', (MetaClip,models.Model), attrs)
+Clip = type('Clip', (MetaClip, models.Model), attrs)
 
 class ClipRandom(models.Model):
     id = models.BigIntegerField(primary_key=True)

@@ -4,10 +4,12 @@ from __future__ import division, print_function, absolute_import
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.encoding import python_2_unicode_compatible
 import ox
 
 from . import managers
 
+@python_2_unicode_compatible
 class Log(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
@@ -18,7 +20,7 @@ class Log(models.Model):
 
     objects = managers.LogManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s" % self.id
 
     def json(self, keys=None):

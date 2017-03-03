@@ -5,6 +5,7 @@ from __future__ import division, print_function, absolute_import
 import unicodedata
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 import ox
 
@@ -25,6 +26,7 @@ def get_title_sort(title):
         sorttitle = u''
     return sorttitle
 
+@python_2_unicode_compatible
 class Title(models.Model):
     title = models.CharField(max_length=1000, unique=True)
     sorttitle = models.CharField(max_length=1000)
@@ -35,7 +37,7 @@ class Title(models.Model):
 
     objects = managers.TitleManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     def save(self, *args, **kwargs):

@@ -13,6 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import pre_delete
+from django.utils.encoding import python_2_unicode_compatible
 
 from oxdjango import fields
 import ox
@@ -33,6 +34,7 @@ if not PY2:
 def data_path(f, x):
     return f.get_path('data.bin')
 
+@python_2_unicode_compatible
 class File(models.Model):
     AV_INFO = (
         'duration', 'video', 'audio', 'oshash', 'size',
@@ -103,7 +105,7 @@ class File(models.Model):
 
     objects = managers.FileManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.path
 
     def parse_info(self):
@@ -562,6 +564,7 @@ def delete_file(sender, **kwargs):
     f.delete_files()
 pre_delete.connect(delete_file, sender=File)
 
+@python_2_unicode_compatible
 class Volume(models.Model):
 
     class Meta:
@@ -573,7 +576,7 @@ class Volume(models.Model):
     user = models.ForeignKey(User, related_name='volumes')
     name = models.CharField(max_length=1024)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s's %s" % (self.user, self.name)
 
     def json(self):
@@ -586,6 +589,7 @@ class Volume(models.Model):
 def inttime():
     return int(time.time())
 
+@python_2_unicode_compatible
 class Instance(models.Model):
 
     class Meta:
@@ -604,7 +608,7 @@ class Instance(models.Model):
     file = models.ForeignKey(File, related_name='instances')
     volume = models.ForeignKey(Volume, related_name='files')
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s's %s <%s>" % (self.volume.user, self.path, self.file.oshash)
 
     @property
@@ -624,7 +628,7 @@ def frame_path(frame, name):
     name = "%s%s" % (frame.position, ext)
     return frame.file.get_path(name)
 
-
+@python_2_unicode_compatible
 class Frame(models.Model):
 
     class Meta:
@@ -643,7 +647,7 @@ class Frame(models.Model):
             self.height = self.frame.height
         super(Frame, self).save(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s/%s' % (self.file, self.position)
 
 def delete_frame(sender, **kwargs):
@@ -655,6 +659,7 @@ pre_delete.connect(delete_frame, sender=Frame)
 def stream_path(f, x):
     return f.path(x)
 
+@python_2_unicode_compatible
 class Stream(models.Model):
 
     class Meta:
@@ -686,7 +691,7 @@ class Stream(models.Model):
     def name(self):
         return u"%sp.%s" % (self.resolution, self.format)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s/%s" % (self.file, self.name())
 
     def get(self, resolution, format):

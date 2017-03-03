@@ -14,6 +14,7 @@ from django.db.models import Max
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete, post_init
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 
 import ox
 from oxdjango import fields
@@ -25,6 +26,7 @@ from document.models import Document
 from . import managers
 
 
+@python_2_unicode_compatible
 class Entity(models.Model):
 
     class Meta:
@@ -64,7 +66,7 @@ class Entity(models.Model):
         self.update_annotations()
         self.update_find()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.get_id()
 
     @classmethod
@@ -253,6 +255,7 @@ post_init.connect(
 )
 
 
+@python_2_unicode_compatible
 class DocumentProperties(models.Model):
 
     class Meta:
@@ -266,13 +269,14 @@ class DocumentProperties(models.Model):
     index = models.IntegerField(default=0)
     data = fields.DictField(default={})
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%r-%r" % (self.document, self.entity)
 
     def save(self, *args, **kwargs):
 
         super(DocumentProperties, self).save(*args, **kwargs)
 
+@python_2_unicode_compatible
 class Find(models.Model):
 
     class Meta:
@@ -282,5 +286,5 @@ class Find(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True, db_index=settings.DB_GIN_TRGM)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s=%s" % (self.key, self.value)

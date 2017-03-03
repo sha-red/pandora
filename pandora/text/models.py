@@ -13,6 +13,7 @@ from django.db.models import Max
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models.signals import pre_delete
+from django.utils.encoding import python_2_unicode_compatible
 import ox
 from oxdjango.fields import TupleField
 
@@ -25,6 +26,7 @@ from . import managers
 def get_path(i, x): return i.path(x)
 def get_icon_path(i, x): return get_path(i, 'icon.jpg')
 
+@python_2_unicode_compatible
 class Text(models.Model):
 
     class Meta:
@@ -55,7 +57,7 @@ class Text(models.Model):
         self.rightslevel = min(self.rightslevel, len(settings.CONFIG['textRightsLevels']) - 1)
         super(Text, self).save(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.get_id()
 
     @classmethod
@@ -302,6 +304,7 @@ def delete_file(sender, **kwargs):
         t.file.delete(save=False)
 pre_delete.connect(delete_file, sender=Text)
 
+@python_2_unicode_compatible
 class Position(models.Model):
 
     class Meta:
@@ -312,6 +315,6 @@ class Position(models.Model):
     section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s/%s/%s' % (self.section, self.position, self.text)
 

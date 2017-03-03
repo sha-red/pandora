@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import Max
 from django.conf import settings
 from django.contrib.gis.geoip2 import GeoIP2
+from django.utils.encoding import python_2_unicode_compatible
 
 import ox
 from oxdjango.fields import DictField
@@ -24,6 +25,7 @@ from . import managers
 from . import tasks
 
 
+@python_2_unicode_compatible
 class SessionData(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
     user = models.OneToOneField(User, null=True, blank=True, related_name='data')
@@ -51,7 +53,7 @@ class SessionData(models.Model):
 
     groupssort = models.CharField(default=None, blank=True, null=True, max_length=255)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s" % self.session_key
 
     def parse_useragent(self):
@@ -184,6 +186,7 @@ class SessionData(models.Model):
                     del j[key]
         return j
 
+@python_2_unicode_compatible
 class UserProfile(models.Model):
     reset_code = models.CharField(max_length=255, blank=True, null=True, unique=True)
     user = models.OneToOneField(User, related_name='profile')
@@ -196,7 +199,7 @@ class UserProfile(models.Model):
 
     notes = models.TextField(default='')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.user.username
 
     def get_ui(self):

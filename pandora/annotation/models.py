@@ -5,6 +5,7 @@ from __future__ import division, print_function, absolute_import
 import re
 import unicodedata
 
+from django.utils.encoding import python_2_unicode_compatible
 from django.db import models, transaction
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -81,6 +82,7 @@ def get_matches(obj, model, layer_type, qs=None):
         matches = [-1]
     return Annotation.objects.filter(id__in=matches)
 
+@python_2_unicode_compatible
 class Annotation(models.Model):
     objects = managers.AnnotationManager()
 
@@ -380,7 +382,7 @@ class Annotation(models.Model):
 
         return j
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s %s-%s" % (self.public_id, self.start, self.end)
 
 def cleanup_related(sender, **kwargs):
