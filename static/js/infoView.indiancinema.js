@@ -326,7 +326,8 @@ pandora.ui.infoView = function(data) {
         'ratingcertificate',
         'length',
         'numberofreels',
-        'format'
+        'format',
+        'releasedate'
     ]);
 
     renderGroup(['imdbId', 'links']);
