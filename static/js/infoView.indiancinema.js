@@ -716,6 +716,11 @@ pandora.ui.infoView = function(data) {
         var ret;
         if (key == 'year') {
             ret = formatLink(value, 'year');
+        } else if (['releasedate', 'dateofcensorcertificate'].indexOf(key) > -1) {
+            ret = value ? Ox.formatDate(value,
+                ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length],
+                true
+            ) : '';
         } else if (key == 'links') {
             ret = value.split(', ').map(function(link) {
                 return '<a href="' + link + '">' + Ox.parseURL(link).host + '</a>';
