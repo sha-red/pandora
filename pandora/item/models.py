@@ -1135,7 +1135,7 @@ class Item(models.Model):
         offset = 0
         streams = self.streams()
         for stream in streams:
-            if stream.duration + offset < float(position):
+            if stream.duration + offset < position:
                 offset += stream.duration
             else:
                 if not stream.file.is_video or not stream.file.info.get('video'):
