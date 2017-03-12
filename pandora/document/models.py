@@ -352,7 +352,10 @@ class Document(models.Model):
                 elif key == 'rightslevel':
                     setattr(self, key, int(data[key]))
                 elif ktype == 'text':
-                    self.data[key] = ox.sanitize_html(data[key])
+                    if data[key]:
+                        self.data[key] = ox.sanitize_html(data[key])
+                    else:
+                        del self.data[key]
                 elif ktype == '[text]':
                     self.data[key] = [ox.sanitize_html(t) for t in data[key]]
                 elif ktype == '[string]':
