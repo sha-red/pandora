@@ -354,7 +354,7 @@ class Document(models.Model):
                 elif ktype == 'text':
                     if data[key]:
                         self.data[key] = ox.sanitize_html(data[key])
-                    else:
+                    elif key in self.data:
                         del self.data[key]
                 elif ktype == '[text]':
                     self.data[key] = [ox.sanitize_html(t) for t in data[key]]
