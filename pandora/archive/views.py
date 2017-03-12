@@ -284,6 +284,13 @@ def firefogg_upload(request):
                 if f.item.rendered and f.selected:
                     Item.objects.filter(id=f.item.id).update(rendered=False)
                 Task.start(f.item, request.user)
+                add_changelog({
+                    'user': request.user,
+                    'action': 'upload',
+                }, {
+                    'profile': profile,
+                    'item': f.item.public_id,
+                }, f.oshash)
                 response = {
                     'uploadUrl': '/api/upload/?id=%s&profile=%s' % (f.oshash, profile),
                     'url': request.build_absolute_uri('/%s' % f.item.public_id),
@@ -341,6 +348,12 @@ def direct_upload(request):
             file.uploading = True
             file.save()
             Task.start(file.item, request.user)
+            add_changelog({
+                'user': request.user,
+                'action': 'upload',
+            }, {
+                'item': file.item.public_id,
+            }, file.oshash)
             upload_url = '/api/upload/direct/?id=%s' % file.oshash
             return render_to_json_response({
                 'uploadUrl': upload_url,

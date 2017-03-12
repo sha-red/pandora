@@ -417,6 +417,13 @@ def upload(request):
             file.save()
         else:
             return render_to_json_response(response)
+        add_changelog({
+            'user': request.user,
+            'action': 'uploadDocument',
+        }, {
+            'name': name,
+            'extension': extension
+        }, file.get_id())
         upload_url = '/api/upload/document?id=%s' % file.get_id()
         return render_to_json_response({
             'uploadUrl': upload_url,
