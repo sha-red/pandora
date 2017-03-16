@@ -1,5 +1,10 @@
 #!/bin/bash
 PANDORA=${PANDORA-pandora}
+
+POSTGRES=${POSTGRES-local}
+RABBITMQ=${RABBITMQ-local}
+NGINX=${NGINX-local}
+
 echo Installing pandora with user: $PANDORA
 getent passwd $PANDORA > /dev/null 2>&1 || adduser --disabled-password --gecos "" $PANDORA
 
@@ -13,7 +18,7 @@ else
     SYSTEMD="no"
 fi
 if [ -z "$UBUNTU_CODENAME" ]; then
-    UBUNTU_CODENAME=trusty
+    UBUNTU_CODENAME=xenial
 fi
 export DEBIAN_FRONTEND=noninteractive
 echo "deb http://ppa.launchpad.net/j/pandora/ubuntu ${UBUNTU_CODENAME} main" > /etc/apt/sources.list.d/j-pandora.list
@@ -41,6 +46,16 @@ apt-get install -y \
     acpid \
     ntp
 fi
+EXTRA=""
+if [ "$POSTGRES" == "local" ]; then
+    EXTRA="$EXTRA postgresql postgresql-contrib"
+fi
+if [ "$RABBITMQ" == "local" ]; then
+    EXTRA="$EXTRA rabbitmq-server"
+fi
+if [ "$NGINX" == "local" ]; then
+    EXTRA="$EXTRA nginx"
+fi
 
 apt-get install -y \
     sudo \
@@ -48,8 +63,6 @@ apt-get install -y \
     vim \
     wget \
     pwgen \
-    nginx \
-    rabbitmq-server \
     git \
     python3-setuptools \
     python3-pip \
@@ -73,18 +86,24 @@ apt-get install -y \
     youtube-dl \
     ipython3 \
     postfix \
-    postgresql \
-    postgresql-contrib
+    postgresql-client $EXTRA
 
-sudo -u postgres createuser -S -D -R $PANDORA
-sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O $PANDORA pandora
-echo "CREATE EXTENSION pg_trgm;" | sudo -u postgres psql pandora
+if [ "$POSTGRES" == "local" ]; then
+    sudo -u postgres createuser -S -D -R $PANDORA
+    sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O $PANDORA pandora
+    echo "CREATE EXTENSION pg_trgm;" | sudo -u postgres psql pandora
+fi
 
 #rabbitmq
-RABBITPWD=$(pwgen -n 16 -1)
-rabbitmqctl add_user pandora $RABBITPWD
-rabbitmqctl add_vhost /pandora
-rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
+if [ "$RABBITMQ" == "local" ]; then
+    RABBITPWD=$(pwgen -n 16 -1)
+    rabbitmqctl add_user pandora $RABBITPWD
+    rabbitmqctl add_vhost /pandora
+    rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
+    BROKER_URL="amqp://pandora:$RABBITPWD@localhost:5672//pandora"
+else
+    BROKER_URL="$RABBITMQ"
+fi
 
 #pandora
 git clone https://git.0x2620.org/pandora.git /srv/pandora
@@ -106,7 +125,7 @@ DATABASES = {
         'PASSWORD': '',
     }
 }
-BROKER_URL = 'amqp://pandora:$RABBITPWD@localhost:5672//pandora'
+BROKER_URL = '$BROKER_URL'
 XACCELREDIRECT = True
 
 DEBUG = False
@@ -128,10 +147,12 @@ echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 
 /srv/pandora/ctl install
 if [ "$PANDORA" != "pandora" ]; then
     sed -i \
-        -e "s/USER=pandora/USER=$PANDORA/g" \
+        -e "s/User=pandora/User=$PANDORA/g" \
+        -e "s/Group=pandora/Group=$PANDORA/g" \
         -e "s/home\/pandora/home\/$PANDORA/g" \
         /etc/systemd/system/pandora*.service
-    sed -i "s/pandora pandora/$PANDORA $PANDORA/g"
+    sed -i "s/pandora pandora/$PANDORA $PANDORA/g" /etc/tmpfiles.d/pandora.conf
+    systemctl daemon-reload
 fi
 
 if [ "$LXC" == "yes" ]; then
@@ -144,8 +165,9 @@ fi
 #cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logrotate.d/pandora"
 
 #nginx
-cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
+if [ "$NGINX" == "local" ]; then
 
+cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
 read -r -d '' GZIP <<EOI
 gzip_static  on;\\
 \tgzip_http_version 1.1;\\
@@ -160,6 +182,8 @@ EOI
 sed -i -e "s#gzip_disable \"msie6\";#${GZIP}#g" /etc/nginx/nginx.conf
 
 service nginx restart
+
+fi
 
 if [ "$LXC" == "yes" ]; then
     test -e /etc/init/avahi-daemon.conf && sed -i "s/-D/--no-rlimits -D/g" /etc/init/avahi-daemon.conf
