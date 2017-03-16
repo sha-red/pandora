@@ -5,6 +5,12 @@ import sys
 root_dir = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
 os.chdir(root_dir)
 
+python3 = os.path.normpath(os.path.join(root_dir, '..', 'bin', 'python3'))
+if os.path.exists(python3) and sys.version_info[0] == 2 and sys.argv[0].endswith('manage.py'):
+    import subprocess
+    cmd = [python3] + sys.argv
+    sys.exit(subprocess.call(cmd))
+
 # using virtualenv's activate_this.py to reorder sys.path
 activate_this = os.path.join(root_dir, '..', 'bin', 'activate_this.py')
 with open(activate_this) as f:
