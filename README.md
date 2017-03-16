@@ -28,7 +28,8 @@
 2) install all required packages
 
     apt-get install git subversion mercurial \
-            python3-setuptools python3-pip python3-virtualenv ipython3 \
+            python3-setuptools python3-pip python3-virtualenv \
+            virtualenv ipython3 \
             python3-dev python3-pil python3-numpy python3-psycopg2 \
             python3-geoip python3-html5lib python3-lxml \
             postgresql postgresql-contrib rabbitmq-server \
