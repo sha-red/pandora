@@ -130,7 +130,8 @@ if [ "$PANDORA" != "pandora" ]; then
     sed -i \
         -e "s/USER=pandora/USER=$PANDORA/g" \
         -e "s/home\/pandora/home\/$PANDORA/g" \
-        /etc/init/pandora*.conf
+        /etc/systemd/system/pandora*.service
+    sed -i "s/pandora pandora/$PANDORA $PANDORA/g"
 fi
 
 if [ "$LXC" == "yes" ]; then
