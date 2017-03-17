@@ -1,6 +1,6 @@
 == Installing pan.do/ra inside LXC ==
 
-1) Install lxc on the host (Ubuntu 14.04 or later):
+1) Install lxc on the host (Ubuntu 16.04 or later):
 
     sudo apt-get install lxc
 

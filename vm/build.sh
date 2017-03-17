@@ -1,56 +1,28 @@
 #!/bin/bash
-cd "`dirname "$0"`"
+# apt-get install kvm cloud-utils qemu-utils curl
+
 BASE=`pwd`
 VERSION=`cd ..;git rev-list HEAD --count`
 TARGET=${BASE}/pandora-r${VERSION}.vdi
-SIZE=1T
-RELEASE=trusty
 
-if [ "$MIRROR" = "" ]; then
-    MIRROR="--mirror http://archive.ubuntu.com/ubuntu/"
-fi
+img=xenial-server-cloudimg-amd64-disk1.img
 
-if [ -e "$BASE/settings.sh" ]; then
-    . "$BASE/settings.sh"
-fi
+test -e $img || curl -O https://cloud-images.ubuntu.com/xenial/current/$img
+cp --reflink=always $img ${TARGET}.img
 
-if [ $(id -u) -ne 0 ]; then
-    echo "you need to run $0 as root"
-    exit 1
-fi
+cloud-localds seed.img cloud-config
+qemu-img resize ${TARGET}.img +998G
 
-# make sure ubuntu-archive-keyring is installed
-test -e /usr/share/keyrings/ubuntu-archive-keyring.gpg || apt-get install ubuntu-archive-keyring
+echo boot image and install pandora
+kvm -m 1024 \
+    -smp 4 \
+    -cdrom seed.img \
+    -device e1000,netdev=user.0 \
+    -netdev user,id=user.0,hostfwd=tcp::5555-:22,hostfwd=tcp::2620-:80 \
+    -drive file=${TARGET}.img,if=virtio,cache=writeback,index=0 \
+    -vnc :2
 
-vmdebootstrap=`vmdebootstrap --version`
-if [[ $vmdebootstrap == "1.4" ]]; then
-    EXTRA=--no-systemd-networkd
-fi
-
-vmdebootstrap \
-    --image ${TARGET}.img \
-    --size ${SIZE} \
-    --sparse \
-    --distribution=${RELEASE} \
-    $MIRROR \
-    $EXTRA \
-    --enable-dhcp \
-    --no-serial-console \
-    --no-kernel \
-    --package "linux-image-generic" \
-    --package "avahi-daemon" \
-    --package "ssh" \
-    --mbr \
-    --grub \
-    --sudo \
-    --lock-root-password \
-    --user pandora/pandora \
-    --hostname pandora \
-    --customize "${BASE}/prepare.sh" \
-    --log ${TARGET}.log --log-level debug --verbose
-
-echo "Installing pan.do/ra in VM"
-qemu-system-x86_64 -enable-kvm -name pandora -m 1024 -drive "format=raw,file=${TARGET}.img" -vnc :2
+echo convert qcow2 to vdi
 rm -rf "${TARGET}"
-/usr/bin/VBoxManage convertfromraw -format VDI "${TARGET}.img" "${TARGET}"
+qemu-img convert -f qcow2 -O vdi "${TARGET}.img" "${TARGET}"
 rm "${TARGET}.img"

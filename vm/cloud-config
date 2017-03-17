@@ -1,0 +1,22 @@
+#cloud-config
+hostname: pandora
+password: pandora
+chpasswd: { expire: False }
+ssh_pwauth: True
+
+growpart:
+    mode: auto
+    devices: ['/']
+    ignore_growroot_disabled: false
+
+runcmd:
+    - sed -i s/ubuntu/pandora/g /etc/passwd /etc/shadow /etc/group
+    - mv /home/ubuntu /home/pandora
+    - echo "pandora:pandora" | chpasswd
+    - apt-get update -qq
+    - apt-get install -y curl
+    - curl -sL https://pan.do/ra-install -o /root/pandora_install.sh
+    - chmod +x /root/pandora_install.sh
+    - /root/pandora_install.sh | tee /root/pandora_install.log
+    - sed -i s/console=ttyS0/quiet/g /etc/default/grub /boot/grub/grub.cfg /etc/default/grub.d/50-cloudimg-settings.cfg
+    - poweroff
