@@ -70,7 +70,7 @@
         "canSeeDebugMenu": {"staff": true, "admin": true},
         "canSeeExtraItemViews": {"staff": true, "admin": true},
         "canSeeMedia": {"staff": true, "admin": true},
-        "canSeeDocument": {"guest": 1, "member": 1, "firend": 4, "staff": 4, "admin": 4},
+        "canSeeDocument": {"guest": 1, "member": 1, "friend": 4, "staff": 4, "admin": 4},
         "canSeeItem": {"guest": 3, "member": 3, "friend": 4, "staff": 4, "admin": 4},
         "canSeeSize": {"friend": true, "staff": true, "admin": true},
         "canSeeSoftwareVersion": {"staff": true, "admin": true},
