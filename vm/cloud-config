@@ -9,14 +9,34 @@ growpart:
     devices: ['/']
     ignore_growroot_disabled: false
 
+write_files:
+  - path: /etc/systemd/network/eth.network
+    permissions: 0644
+    owner: root
+    content: |
+      [Match]
+      Name=e*
+
+      [Network]
+      DHCP=yes
+
 runcmd:
     - sed -i s/ubuntu/pandora/g /etc/passwd /etc/shadow /etc/group
     - mv /home/ubuntu /home/pandora
     - echo "pandora:pandora" | chpasswd
     - apt-get update -qq
     - apt-get install -y curl
+    - echo 127.0.0.1 pandora | tee -a /etc/hosts
+    - apt-get install -y avahi-daemon
     - curl -sL https://pan.do/ra-install -o /root/pandora_install.sh
     - chmod +x /root/pandora_install.sh
     - /root/pandora_install.sh | tee /root/pandora_install.log
     - sed -i s/console=ttyS0/quiet/g /etc/default/grub /boot/grub/grub.cfg /etc/default/grub.d/50-cloudimg-settings.cfg
+    - apt-get purge -y cloud-init
+    - systemctl enable systemd-networkd.service
+    - systemctl enable systemd-networkd-wait-online.service
+    - systemctl enable systemd-resolved.service
+    - apt-get purge -y resolvconf
+    - rm /etc/resolv.conf /etc/network/interfaces.d/*
+    - ln -s ../run/systemd/resolve/resolv.conf /etc/resolv.conf
     - poweroff
