@@ -9,8 +9,8 @@ from . import models
 
 class FileAdmin(admin.ModelAdmin):
     search_fields = ['path', 'oshash', 'video_codec']
-    list_display = ['available', 'wanted', 'selected', '__unicode__', 'public_id']
-    list_display_links = ('__unicode__', )
+    list_display = ['available', 'wanted', 'selected', '__str__', 'public_id']
+    list_display_links = ('__str__', )
 
     def public_id(self, obj):
         return '%s' % (obj.item.public_id)
