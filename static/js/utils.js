@@ -1197,6 +1197,9 @@ pandora.getClipVideos = function(clip, resolution) {
             if (clip.id) {
                 item.id = clip.id;
             }
+            if (Ox.isNumber(clip.volume)) {
+                item.volume = clip.volume;
+            }
             if (
                 currentTime <= start
                 && currentTime + clip.durations[i] > start

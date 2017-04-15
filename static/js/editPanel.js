@@ -213,6 +213,18 @@ pandora.ui.editPanel = function(isEmbed) {
                 }
                 pandora.api.get({id: clip.item, keys: ['duration']}, function(result) {
                     var clips;
+                    //fixme include in history...
+                    if (data.key == 'volume') {
+                        pandora.api.editClip({
+                            id: data.id,
+                            volume: data.value
+                        }, function(result) {
+                            edit.clips[Ox.getIndexById(edit.clips, data.id)] = result.data;
+                            Ox.Request.clearCache('sortClips');
+                            sortClips(updateClips);
+                        });
+                        return;
+                    }
                     if (data.key == 'out') {
                         data.value = Math.min(data.value, result.data.duration);
                     }

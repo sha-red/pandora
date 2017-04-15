@@ -94,6 +94,8 @@ class Edit(models.Model):
                     or round(c.start, 3) >= round(duration, 3) \
                     or round(c.end, 3) > round(duration, 3):
                 return False
+        if 'volume' in data:
+            c.volume = float(data['volume'])
         c.save()
         if index is not None:
             ids.insert(index, c.id)
@@ -427,11 +429,12 @@ class Clip(models.Model):
     start = models.FloatField(default=0)
     end = models.FloatField(default=0)
     duration = models.FloatField(default=0)
-    
+    volume = models.FloatField(default=1)
+
     hue = models.FloatField(default=0)
     saturation = models.FloatField(default=0)
     lightness = models.FloatField(default=0)
-    volume = models.FloatField(default=0)
+    sortvolume = models.FloatField(default=0)
     sortvalue = models.CharField(max_length=1000, null=True, db_index=True)
 
     objects = managers.ClipManager()
@@ -466,15 +469,16 @@ class Clip(models.Model):
         if int(end*25) - int(start*25) > 0:
             self.hue, self.saturation, self.lightness = extract.average_color(
                 self.item.timeline_prefix, self.start, self.end)
-            self.volume = extract.average_volume(self.item.timeline_prefix, self.start, self.end)
+            self.sortvolume = extract.average_volume(self.item.timeline_prefix, self.start, self.end)
         else:
             self.hue = self.saturation = self.lightness = 0
-            self.volume = 0
+            self.sortvolume = 0
 
     def json(self, user=None):
         data = {
             'id': self.get_id(),
-            'index': self.index
+            'index': self.index,
+            'volume': self.volume,
         }
         if self.annotation:
             data['annotation'] = self.annotation.public_id

@@ -102,6 +102,7 @@ def editClip(request, data):
         id: string, // clip id
         in: float, // in point in seconds
         out: float // out point in seconds
+        volume: float // per clip volume (0-1)
     }
     returns {}
     see: addClips, orderClips, removeClips, sortClips
@@ -118,6 +119,8 @@ def editClip(request, data):
                     clip.item = clip.annotation.item
                     clip.annotation = None
                 setattr(clip, {'in': 'start', 'out': 'end'}.get(key), float(data[key]))
+        if 'volume' in data:
+            clip.volume = float(data['volume'])
         if not clip.annotation:
             duration = clip.item.sort.duration
             if clip.start >= clip.end or clip.start >= duration or clip.end > duration:
@@ -183,6 +186,7 @@ def _order_clips(edit, sort):
             'in': 'start',
             'out': 'end',
             'text': 'sortvalue',
+            'volume': 'sortvolume',
             'item__sort__item': 'item__sort__public_id',
         }.get(key, key)
         order = '%s%s' % (operator, key)
