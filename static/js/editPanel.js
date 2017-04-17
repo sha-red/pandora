@@ -4,12 +4,6 @@ pandora.ui.editPanel = function(isEmbed) {
 
     var ui = pandora.user.ui,
         edit,
-        listSizes = [
-            144 + Ox.UI.SCROLLBAR_SIZE,
-            280 + Ox.UI.SCROLLBAR_SIZE,
-            416 + Ox.UI.SCROLLBAR_SIZE
-        ],
-        listSize = listSizes[ui.clipColumns],
         smallTimelineCanvas,
         smallTimelineContext,
         that = Ox.Element();
@@ -83,12 +77,11 @@ pandora.ui.editPanel = function(isEmbed) {
             annotationsCalendarSize: ui.annotationsCalendarSize,
             annotationsMapSize: ui.annotationsMapSize,
             annotationsRange: ui.annotationsRange,
-            annotationsSize: ui.annotationsSize,
             annotationsSort: ui.annotationsSort,
             clickLink: pandora.clickLink,
             clipRatio: pandora.site.video.previewRatio,
             clips: Ox.clone(edit.clips),
-            clipSize: listSize,
+            clipSize: ui.editSidebarSize + Ox.UI.SCROLLBAR_SIZE,
             clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.shift + 'C</span>',
             clipView: ui.edits[ui.edit].view,
             controlsTooltips: {
@@ -155,6 +148,9 @@ pandora.ui.editPanel = function(isEmbed) {
             width: Ox.$document.width() - pandora.$ui.mainPanel.size(0) - 1
         })
         .bindEvent({
+            clipSize: function(data) {
+                pandora.UI.set({editSidebarSize: data.size - Ox.UI.SCROLLBAR_SIZE});
+            },
             copy: function(data) {
                 var ids = Ox.sort(data.ids, function(id) {
                     return Ox.getObjectById(edit.clips, id).index;
@@ -333,9 +329,6 @@ pandora.ui.editPanel = function(isEmbed) {
             },
             select: function(data) {
                 pandora.UI.set({editSelection: data.ids});
-            },
-            size: function(data) {
-                pandora.UI.set({clipSize: data.size});
             },
             sort: function(data) {
                 pandora.UI.set({editSort: data});

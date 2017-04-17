@@ -1226,6 +1226,7 @@
             "edit": "",
             "edits": {},
             "editSelection": [],
+            "editSidebarSize": 416,
             "editSort": [
                 {"key": "index", "operator": "+"},
                 {"key": "year", "operator": "+"},

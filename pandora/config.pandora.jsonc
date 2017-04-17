@@ -1117,6 +1117,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "edit": "",
             "edits": {},
             "editSelection": [],
+            "editSidebarSize": 416,
             "editSort": [
                 {"key": "index", "operator": "+"},
                 {"key": "year", "operator": "+"},
