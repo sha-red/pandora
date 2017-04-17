@@ -1201,6 +1201,7 @@
             "calendarFind": "",
             "calendarSelection": "",
             "clipColumns": 2,
+            "clipSize": 416,
             "collectionColumns": ["title", "id", "extension", "dimensions", "size", "description", "matches", "user", "created", "modified"],
             "collectionColumnWidth": {},
             "collectionSelection": [],
@@ -1226,7 +1227,6 @@
             "edit": "",
             "edits": {},
             "editSelection": [],
-            "editSidebarSize": 416,
             "editSort": [
                 {"key": "index", "operator": "+"},
                 {"key": "year", "operator": "+"},

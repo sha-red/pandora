@@ -81,7 +81,7 @@ pandora.ui.editPanel = function(isEmbed) {
             clickLink: pandora.clickLink,
             clipRatio: pandora.site.video.previewRatio,
             clips: Ox.clone(edit.clips),
-            clipSize: ui.editSidebarSize + Ox.UI.SCROLLBAR_SIZE,
+            clipSize: ui.clipSize + Ox.UI.SCROLLBAR_SIZE,
             clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.shift + 'C</span>',
             clipView: ui.edits[ui.edit].view,
             controlsTooltips: {
