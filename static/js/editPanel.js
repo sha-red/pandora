@@ -149,7 +149,7 @@ pandora.ui.editPanel = function(isEmbed) {
         })
         .bindEvent({
             clipSize: function(data) {
-                pandora.UI.set({editSidebarSize: data.size - Ox.UI.SCROLLBAR_SIZE});
+                pandora.UI.set({clipSize: data.size - Ox.UI.SCROLLBAR_SIZE});
             },
             copy: function(data) {
                 var ids = Ox.sort(data.ids, function(id) {
