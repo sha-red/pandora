@@ -335,7 +335,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
                 os.unlink(enc_target)
             if os.path.exists(target):
                 os.unlink(target)
-            stdout = stdout.replace('\r\n', '\n').replace('\r', '\n')
+            stdout = stdout.decode('utf-8').replace('\r\n', '\n').replace('\r', '\n')
             return False, stdout
     if format == 'webm' and audio_only:
         cmd = ['mkvmerge', '-w', '-o', target, '--cues', '-1:all', enc_target]
