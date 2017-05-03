@@ -306,11 +306,15 @@ class Item(models.Model):
         return p
 
     def update_external(self):
+        poster_url = self.prefered_poster_url()
         if settings.DATA_SERVICE and not self.public_id.startswith('0x'):
             response = external_data('getData', {'id': self.public_id})
             if response['status']['code'] == 200:
                 self.external_data = response['data']
                 self.save(sync=True)
+                if poster_url != self.prefered_poster_url():
+                    self.remove_poster()
+                    self.make_poster()
                 return True
         return False
 
