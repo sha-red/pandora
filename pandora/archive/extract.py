@@ -65,7 +65,6 @@ def supported_formats():
         'h264': 'libx264' in stdout and 'DEA.L. aac' in stdout,
     }
 
-
 def stream(video, target, profile, info, audio_track=0, flags={}):
     if not os.path.exists(target):
         ox.makedirs(os.path.dirname(target))
