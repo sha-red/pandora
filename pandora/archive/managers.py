@@ -20,6 +20,7 @@ def parseCondition(condition, user):
     from item.managers import parseConditions as itemParseConditions
     from itemlist.models import List
     from item.models import Item
+    from .models import Volume
     k = condition.get('key', default_key)
     k = keymap.get(k, k)
     if not k:
