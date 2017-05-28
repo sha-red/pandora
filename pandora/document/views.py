@@ -388,6 +388,7 @@ def upload(request):
     else:
         file = None
         name, extension = request.POST['filename'].rsplit('.', 1)
+        extension = extension.lower()
     response = json_response(status=400, text='this request requires POST')
     if 'chunk' in request.FILES:
         if file.editable(request.user):
@@ -399,7 +400,7 @@ def upload(request):
     #init upload
     else:
         if not file:
-            file = models.Document(user=request.user, extension=extension)
+            file = models.Document(user=request.user)
             file.data['title'] = name
             file.extension = extension
             file.uploading = True
@@ -411,7 +412,7 @@ def upload(request):
                 file.file.delete()
             file.uploading = True
             name, extension = request.POST['filename'].rsplit('.', 1)
-            file.extension = extension.lower()
+            file.extension = extension
             file.width = -1
             file.pages = -1
             file.save()
