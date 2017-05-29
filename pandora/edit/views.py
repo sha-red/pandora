@@ -236,7 +236,7 @@ def getEdit(request, data):
         if edit.accessible(request.user):
             response['data'] = edit.json(keys=data.get('keys'), user=request.user)
         else:
-            response = json_response(status=403, text='not allowed')
+            response = json_response(status=404, text='not found')
     else:
         response = json_response(status=404, text='not found')
     return render_to_json_response(response)
