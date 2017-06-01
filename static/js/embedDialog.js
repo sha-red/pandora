@@ -900,6 +900,8 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                     options.view = 'info';
                 }
             }
+        } else if (ui.section == 'documents') {
+            options.view = 'document';
         } else if (ui.section == 'edits') {
             options.view = 'edit';
         } else {
@@ -907,9 +909,13 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         }
         options.mapMode = !ui.item ? 'find' : 'item';
         options.item = ui.item;
-        options.document = ui.documentsSelection[ui.item] && ui.documentsSelection[ui.item].length
-            ? ui.documentsSelection[ui.item][0]
-            : '';
+        if (ui.section == 'documents') {
+            options.document = ui.document;
+        } else {
+            options.document = ui.documentsSelection[ui.item] && ui.documentsSelection[ui.item].length
+                ? ui.documentsSelection[ui.item][0]
+                : '';
+        }
         options.list = ui._list;
         options.edit = ui.edit;
         options.text = ui.text;
