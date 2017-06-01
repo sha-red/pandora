@@ -484,10 +484,11 @@ def editMedia(request, data):
         models.Instance.objects.filter(file__oshash__in=dont_ignore).update(ignore=False)
     if ignore or dont_ignore:
         files = models.File.objects.filter(oshash__in=ignore+dont_ignore)
+        ids = []
         for i in Item.objects.filter(files__in=files).distinct():
             i.update_selected()
             i.update_wanted()
-        ids = []
+            ids.append(i.public_id)
         if ignore:
             qs = models.File.objects.filter(oshash__in=ignore, instances__id=None, selected=True)
             if qs.count():
