@@ -88,13 +88,14 @@ def join_tiles(source_paths, durations, target_path):
                         #print(image_file)
             if mode == full_tile_mode:
                 # render full tile
-                if data['full_tile_widths'][0]:
-                    resized = data['target_images']['large'].resize((
-                        data['full_tile_widths'][0], large_tile_h
-                    ), Image.ANTIALIAS)
-                    data['target_images']['full'].paste(resized, (data['full_tile_offset'], 0))
-                    data['full_tile_offset'] += data['full_tile_widths'][0]
-                data['full_tile_widths'] = data['full_tile_widths'][1:]
+                if data['full_tile_widths']:
+                    if data['full_tile_widths'][0]:
+                        resized = data['target_images']['large'].resize((
+                            data['full_tile_widths'][0], large_tile_h
+                        ), Image.ANTIALIAS)
+                        data['target_images']['full'].paste(resized, (data['full_tile_offset'], 0))
+                        data['full_tile_offset'] += data['full_tile_widths'][0]
+                    data['full_tile_widths'] = data['full_tile_widths'][1:]
             large_tile_i += 1
         # open next large tile
         if large_tile_i < large_tile_n:
@@ -114,6 +115,7 @@ def join_tiles(source_paths, durations, target_path):
     # read files
     frame_n = 0
     offset = 0
+    offsets = set()
     for i, path in enumerate(source_paths):
         file_info = map(get_file_info, os.listdir(path))
         file_info = list(filter(lambda x: x is not None, file_info))
@@ -127,8 +129,13 @@ def join_tiles(source_paths, durations, target_path):
             offset = int(sum(durations[:i]) * 25)
         for mode in files:
             source_files[mode][offset] = files[mode]
+        offsets.add(offset)
+        
     modes = [m for m in modes if source_files[m]]
-    offsets = sorted(source_files[modes[0]])
+    for offset in sorted(offsets):
+        for mode in modes:
+            if offset not in source_files[mode]:
+                source_files[mode][offset] = []
     last_offset = max(offsets)
     frame_n = last_offset
     for f in source_files[modes[0]][last_offset]:
@@ -176,6 +183,8 @@ def join_tiles(source_paths, durations, target_path):
                     save_and_open(data)
                     target_x -= large_tile_w
                     data['target_images']['large'].paste(source_image, (target_x, 0))
+            if not source_files[mode][offset]:
+                save_and_open(data)
         # save_and_open saves previous tile and opens tile at target_w
         # increase target_w to be in next tile
         target_w += large_tile_w
@@ -202,7 +211,6 @@ def join_tiles(source_paths, durations, target_path):
             with open(p, 'r') as f:
                 path_cuts = json.load(f)
         else:
-            print(p, 'missing')
             path_cuts = []
         if i > 0:
             cuts.append(offset)
@@ -222,7 +230,6 @@ def split_tiles(path, paths, durations):
     tiles = {}
     for file_name in file_names:
         mode = re.split('\d+', file_name[8:])[0]
-        print(file_name, mode)
         split = re.split('[a-z]+', file_name[8 + len(mode):-4])
         height, index = map(lambda x: int(x) if len(x) else -1, split)
         if mode not in tiles:
@@ -231,7 +238,6 @@ def split_tiles(path, paths, durations):
             tiles[mode][height] = 0
         if index + 1 > tiles[mode][height]:
             tiles[mode][height] = index + 1
-    print(tiles)
 
     # for each mode
     for mode in tiles:
@@ -279,5 +285,4 @@ def split_tiles(path, paths, durations):
                     paths[target_data[i]['item']], mode, height, target_data[i]['tile']
                 )
                 # target_image.save(file_name)
-                print(file_name, target_image.size)
 
