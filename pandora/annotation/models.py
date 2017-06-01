@@ -253,7 +253,7 @@ class Annotation(models.Model):
     def update_documents(self):
         from document.models import Document
         from document.utils import get_documents
-        old = [d.id for id in self.documents.all()]
+        old = [d.id for d in self.documents.all()]
         current = get_documents(self.value) if self.value else []
         removed = list(set(old) - set(current))
         added = list(set(current) - set(old))
