@@ -26,7 +26,7 @@ pandora.ui.player = function(data) {
             find: ui.itemFind,
             getLargeTimelineURL: function(type, i) {
                 return pandora.getMediaURL(
-                    '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg'
+                    '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg?' + data.modified
                 );
             },
             height: pandora.$ui.contentPanel.size(1),
@@ -48,7 +48,7 @@ pandora.ui.player = function(data) {
             showLayers: Ox.clone(ui.showLayers),
             showUsers: pandora.site.annotations.showUsers,
             showTimeline: ui.showTimeline,
-            smallTimelineURL: pandora.getMediaURL('/' + ui.item + '/timeline16p.jpg'),
+            smallTimelineURL: pandora.getMediaURL('/' + ui.item + '/timeline16p.jpg?' + data.modified),
             subtitlesDefaultTrack: Ox.getLanguageNameByCode(pandora.site.language),
             subtitlesLayer: data.subtitlesLayer,
             subtitlesOffset: ui.videoSubtitlesOffset,
