@@ -594,7 +594,6 @@ pandora.ui.mediaView = function(options) {
 
     function openVideo(data) {
         if (data.ids.length == 1) {
-            // fixme only selected videos!
             var stream = data.ids[0];
             pandora.api.get({id: pandora.user.ui.item, keys: ['streams', 'durations']}, function(result) {
                 var offset = result.data.streams.indexOf(stream),
@@ -602,11 +601,12 @@ pandora.ui.mediaView = function(options) {
                         itemView: pandora.user.ui.videoView
                     },
                     videoPoints = {};
-                Ox.print(offset, result.data.streams);
-                videoPoints['position'] = videoPoints['in'] = Ox.sum(result.data.durations.slice(0, offset));
-                videoPoints['out'] = videoPoints['in'] + result.data.durations[offset];
-                set['videoPoints.' + pandora.user.ui.item] = videoPoints;
-                pandora.UI.set(set);
+                if (offset > -1) {
+                    videoPoints['position'] = videoPoints['in'] = Ox.sum(result.data.durations.slice(0, offset));
+                    videoPoints['out'] = videoPoints['in'] + result.data.durations[offset];
+                    set['videoPoints.' + pandora.user.ui.item] = videoPoints;
+                    pandora.UI.set(set);
+                }
             });
         }
     }
