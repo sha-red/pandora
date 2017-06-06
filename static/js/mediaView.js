@@ -326,6 +326,7 @@ pandora.ui.mediaView = function(options) {
                 updateStatus();
             },
             select: selectFiles,
+            open: openVideo,
             submit: function(data) {
                 var value = self.$filesList.value(data.id, data.key);
                 if (data.value != value && !(data.value === '' && value === null)) {
@@ -571,6 +572,7 @@ pandora.ui.mediaView = function(options) {
         });
     }
 
+
     function openFiles(data) {
         data.ids.length == 1 && pandora.api.parsePath({
             path: self.$instancesList.value(data.ids[0], 'path')
@@ -588,6 +590,25 @@ pandora.ui.mediaView = function(options) {
             updateForm();
             self.$titleInput.triggerEvent('change', {value: result.data['title']});
         });
+    }
+
+    function openVideo(data) {
+        if (data.ids.length == 1) {
+            // fixme only selected videos!
+            var stream = data.ids[0];
+            pandora.api.get({id: pandora.user.ui.item, keys: ['streams', 'durations']}, function(result) {
+                var offset = result.data.streams.indexOf(stream),
+                    set = {
+                        itemView: pandora.user.ui.videoView
+                    },
+                    videoPoints = {};
+                Ox.print(offset, result.data.streams);
+                videoPoints['position'] = videoPoints['in'] = Ox.sum(result.data.durations.slice(0, offset));
+                videoPoints['out'] = videoPoints['in'] + result.data.durations[offset];
+                set['videoPoints.' + pandora.user.ui.item] = videoPoints;
+                pandora.UI.set(set);
+            });
+        }
     }
 
     function selectFiles(data) {
