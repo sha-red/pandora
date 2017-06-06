@@ -1362,7 +1362,7 @@
         "torrent": If true, video downloads are offered via BitTorrent
     */
     "video": {
-        "torrent": true,
+        "torrent": false,
         "formats": ["webm", "mp4"],
         // fixme: this should be named "ratio" or "defaultRatio",
         // as it also applies to clip lists (on load)
