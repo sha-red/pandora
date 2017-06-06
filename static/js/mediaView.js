@@ -113,7 +113,10 @@ pandora.ui.mediaView = function(options) {
                                 'encoding': 'Processing video on server',
                                 'failed': 'Encoding failed'
                             }[data.state])
-                            : data.instances.filter(function(i) {return i.ignore; }).length > 0
+                            : (
+                                data.instances.filter(function(i) {return i.ignore; }).length > 0 ||
+                                (data.instances.length == 0 && !data.selected)
+                            )
                             ? Ox._('Use this file')
                             : Ox._('Dont use this file');
                     },
@@ -294,8 +297,10 @@ pandora.ui.mediaView = function(options) {
                         })
                         .open();
                     } else {
-                        var ignored = self.$filesList.value(data.id, 'instances')
-                                .filter(function(i) {return i.ignore; }).length > 0;
+                        var instances = self.$filesList.value(data.id, 'instances'),
+                            selected = self.$filesList.value(data.id, 'selected'),
+                            ignored = (instances.length == 0 && ! selected) ||
+                                instances.filter(function(i) {return i.ignore; }).length > 0;
                         pandora.api.editMedia({
                             files: [{
                                 id: data.id,
