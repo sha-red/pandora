@@ -1080,7 +1080,7 @@ pandora.exitFullscreen = function() {
     }
 };
 
-pandora.formatDocumentKey = function(key, data) {
+pandora.formatDocumentKey = function(key, data, size) {
     var value;
     if (key.format) {
         value  = (

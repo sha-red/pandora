@@ -89,7 +89,7 @@ pandora.ui.collection = function() {
                 var sortKey = sort[0].key,
                     infoKey = sortKey == 'title' ? 'extension' : sortKey,
                     key = Ox.getObjectById(pandora.site.documentKeys, infoKey),
-                    info = pandora.formatDocumentKey(key, data),
+                    info = pandora.formatDocumentKey(key, data, size),
                     size = size || 128;
                 return {
                     height: Math.round(data.ratio > 1 ? size / data.ratio : size),
