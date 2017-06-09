@@ -70,6 +70,7 @@ STATICFILES_FINDERS = (
 )
 
 GEOIP_PATH = normpath(join(PROJECT_ROOT, '..', 'data', 'geo'))
+GOOGLE_API_KEY = None
 
 WEBSOCKET = False
 WEBSOCKET_PORT = 2622
