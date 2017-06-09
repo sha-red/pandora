@@ -21,12 +21,14 @@ pandora.ui.allItems = function(section) {
                 click: function() {
                     that.gainFocus();
                     if (section == 'items') {
-                        pandora.user.ui._list && pandora.UI.set({
-                            find: {conditions: [], operator: '&'}
+                        pandora.UI.set({
+                            find: {conditions: [], operator: '&'},
+                            item: ''
                         });
                     } else if (section == 'documents') {
-                        pandora.user.ui._collection && pandora.UI.set({
-                            findDocuments: {conditions: [], operator: '&'}
+                        pandora.UI.set({
+                            findDocuments: {conditions: [], operator: '&'},
+                            document: ''
                         });
                     } else {
                         pandora.UI.set(section.slice(0, -1), '');

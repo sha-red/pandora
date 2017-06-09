@@ -71,6 +71,7 @@ pandora.ui.folderList = function(id, section) {
             },
             {
                 align: 'right',
+                clickable: true,
                 id: 'items',
                 format: {type: 'number'},
                 operator: '-',
@@ -191,6 +192,7 @@ pandora.ui.folderList = function(id, section) {
             },
             {
                 align: 'right',
+                clickable: true,
                 id: 'items',
                 format: {type: 'number'},
                 operator: '-',
@@ -308,7 +310,9 @@ pandora.ui.folderList = function(id, section) {
         },
         click: function(data) {
             //var $list = pandora.$ui.folderList[id];
-            if (data.key == 'user') {
+            if (data.key == 'items') {
+                select(section, data.id);
+            } else if (data.key == 'user') {
                 pandora.$ui.listDialog = pandora.ui.listDialog('icon').open();
             } else if (data.key == 'type') {
                 if (that.value(data.id, 'type') == 'smart') {
@@ -399,37 +403,7 @@ pandora.ui.folderList = function(id, section) {
                     id != id_ && $list.options('selected', []);
                 });
             }
-            if (section == 'items') {
-                pandora.UI.set({
-                    find: {
-                        conditions: list ? [
-                            {key: 'list', value: list, operator: '=='}
-                        ] : [],
-                        operator: '&'
-                    },
-                    listView: list
-                        ? pandora.user.ui.lists[list]
-                            ? pandora.user.ui.lists[list].view
-                            : that.value(list).view
-                        : void 0
-                });
-            } else if (section == 'documents') {
-                pandora.UI.set({
-                    findDocuments: {
-                        conditions: list ? [
-                            {key: 'collection', value: list, operator: '=='}
-                        ] : [],
-                        operator: '&'
-                    },
-                    collectionView: list
-                        ? pandora.user.ui.collections[list]
-                            ? pandora.user.ui.collections[list].view
-                            : that.value(list).view
-                        : void 0
-                });
-            } else {
-                pandora.UI.set(section.slice(0, -1), list);
-            }
+            select(section, list);
         },
         submit: function(data) {
             var data_ = {id: data.id};
@@ -443,5 +417,40 @@ pandora.ui.folderList = function(id, section) {
             });
         }
     });
+
+    function select(section, list) {
+        if (section == 'items') {
+            pandora.UI.set({
+                find: {
+                    conditions: list ? [
+                        {key: 'list', value: list, operator: '=='}
+                    ] : [],
+                    operator: '&'
+                },
+                listView: list
+                    ? pandora.user.ui.lists[list]
+                        ? pandora.user.ui.lists[list].view
+                        : that.value(list).view
+                    : void 0
+            });
+        } else if (section == 'documents') {
+            pandora.UI.set({
+                findDocuments: {
+                    conditions: list ? [
+                        {key: 'collection', value: list, operator: '=='}
+                    ] : [],
+                    operator: '&'
+                },
+                collectionView: list
+                    ? pandora.user.ui.collections[list]
+                        ? pandora.user.ui.collections[list].view
+                        : that.value(list).view
+                    : void 0
+            });
+        } else {
+            pandora.UI.set(section.slice(0, -1), list);
+        }
+    }
+
     return that;
 };
