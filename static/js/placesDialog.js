@@ -13,6 +13,7 @@ pandora.ui.placesDialog = function(options) {
                     callback(result);
                 });
             },
+            apiKey: pandora.site.site.googleapikey,
             editPlace: function(place, callback) {
                 pandora.api.editPlace(place, function(result) {
                     Ox.Request.clearCache(); // fixme: remove

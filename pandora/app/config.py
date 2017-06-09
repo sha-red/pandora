@@ -76,6 +76,7 @@ def load_config(init=False):
         settings.SERVER_EMAIL = config['site']['email']['system']
         config['site']['videoprefix'] = settings.VIDEO_PREFIX
         config['site']['mediaprefix'] = settings.MEDIA_PREFIX
+        config['site']['googleapikey'] = getattr(settings, 'GOOGLE_API_KEY')
         config['site']['version'] = get_version()
         config['site']['dontValidateUser'] = not settings.AUTH_CHECK_USERNAME
         if not 'folderdepth' in config['site']:
