@@ -340,11 +340,11 @@
             "type": "enum",
             "columnWidth": 90,
             "format": {"type": "ColorLevel", "args": [
-                ["Public", "Out of Copyright", "Under Copyright", "Private"]
+                ["Public", "Restricted", "Private"]
             ]},
             "sort": true,
             "sortOperator": "+",
-            "values": ["Public", "Out of Copyright", "Under Copyright", "Private", "Unknown"]
+            "values": ["Public", "Restricted", "Private", "Unknown"]
         }
     ],
     /*
