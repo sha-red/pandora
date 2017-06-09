@@ -5,7 +5,8 @@
 pandora.ui.makeListPrivateDialog = function(name, subscribers, callback) {
 
     var ui = pandora.user.ui,
-        folderItem = ui.section == 'item' ? 'List' : 'Edit',
+        folderItems = pandora.getFolderItems(ui.section),
+        folderItem = folderItems.slice(0, -1),
         that = pandora.ui.iconDialog({
             buttons: [
                 Ox.Button({
