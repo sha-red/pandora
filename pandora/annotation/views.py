@@ -34,7 +34,7 @@ def get_annotation_or_404_json(id):
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'in', 'operator':'+'}]
+    query['sort'] = [{'key': 'in', 'operator': '+'}]
     for key in ('keys', 'group', 'range', 'sort', 'query'):
         if key in data:
             query[key] = data[key]
