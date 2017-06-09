@@ -1355,7 +1355,7 @@ pandora.ui.mainMenu = function() {
                 && ui.editView != 'annotations', // FIXME: focus
             listName = isVideoView || isClipView ? ''
                 : ui.section == 'items' ? (
-                    ui._? Ox._('from List') : Ox._('from Archive')
+                    ui._list ? Ox._('from List') : Ox._('from Archive')
                 )
                 : Ox._('from Edit'),
             listItemsName = Ox._(
@@ -1421,6 +1421,7 @@ pandora.ui.mainMenu = function() {
             historyItems = pandora.history.items(),
             undoText = pandora.history.undoText(),
             redoText = pandora.history.redoText();
+
         return { id: 'itemMenu', title: Ox._('Item'), items: [
             { id: 'add', title: Ox._('Add {0}...', [Ox._(pandora.site.itemName.singular)]), disabled: !pandora.hasCapability('canAddItems') },
             { id: 'edit', title: Ox._('Edit {0}...', [Ox._(pandora.site.itemName.singular)]), disabled: true /*fixme: !canEdit */ },
