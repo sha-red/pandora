@@ -206,7 +206,7 @@ class Annotation(models.Model):
 
             # remove undefined matches that only have this annotation
             for p in a_matches.filter(defined=False).exclude(name=self.value):
-                if p.annotations.exclude(id=id).count() == 0:
+                if p.annotations.exclude(id=self.id).count() == 0:
                     p.delete()
             if layer.get('type') == type and a_matches.count() == 0:
                 a_matches.add(Model.get_or_create(self.value))
