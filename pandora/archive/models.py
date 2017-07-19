@@ -307,6 +307,8 @@ class File(models.Model):
         else:
             load = ox.srt.load
         for s in load(self.data.path):
+            if s['value'].strip() == 'Subtitles downloaded from www.OpenSubtitles.org':
+                continue
             if s['in'] <= s['out'] and s['value'].strip():
                 key = '%s --> %s\n%s' % (s['in'], s['out'], s['value'])
                 if key not in subtitles:
