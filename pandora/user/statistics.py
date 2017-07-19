@@ -102,9 +102,16 @@ class Statistics(dict):
                 if item['location']:
                     split = ox.geo.split_geoname(item['location'])
                     if len(split) == 1:
-                        split.insert(0, None)
-                    if len(split) == 2:
-                        city, country = split
+                        country = split[0]
+                        city = None
+                    elif len(split) >= 2:
+                        city = ', '.join(split[:-1])
+                        country = split[-1]
+                    else:
+                        logger.error('unknown geo value: %s', item['location'])
+                        country = city = None
+
+                    if country:
                         country_data = ox.geo.get_country(country)
                         continent = country_data.get('continent', '')
                         region = ', '.join([continent, country_data.get('region', '')])
@@ -114,10 +121,8 @@ class Statistics(dict):
                         self._increment(self[mode]['continent'], continent)
                         self._increment(self[mode]['region'], region)
                         self._increment(self[mode]['country'], country)
-                        if city:
-                            self._increment(self[mode]['city'], city)
-                    else:
-                        logger.error('unknown geo value: %s', item['location'])
+                    if city:
+                        self._increment(self[mode]['city'], city)
 
                 name = {}
                 for key in ['system', 'browser']:
