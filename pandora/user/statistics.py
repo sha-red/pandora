@@ -2,6 +2,9 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import ox.geo
 
+import logging
+logger = logging.getLogger('pandora.statistics')
+
 colors = {
     'system': {
         'Android': [0, 255, 0],
@@ -100,19 +103,21 @@ class Statistics(dict):
                     split = ox.geo.split_geoname(item['location'])
                     if len(split) == 1:
                         split.insert(0, None)
-                    city, country = split
+                    if len(split) == 2:
+                        city, country = split
+                        country_data = ox.geo.get_country(country)
+                        continent = country_data.get('continent', '')
+                        region = ', '.join([continent, country_data.get('region', '')])
+                        country = ', '.join([region, country])
+                        city = ', '.join([country, city]) if city else ''
 
-                    country_data = ox.geo.get_country(country)
-                    continent = country_data.get('continent','')
-                    region = ', '.join([continent, country_data.get('region', '')])
-                    country = ', '.join([region, country])
-                    city = ', '.join([country, city]) if city else ''
-
-                    self._increment(self[mode]['continent'], continent)
-                    self._increment(self[mode]['region'], region)
-                    self._increment(self[mode]['country'], country)
-                    if city:
-                        self._increment(self[mode]['city'], city)
+                        self._increment(self[mode]['continent'], continent)
+                        self._increment(self[mode]['region'], region)
+                        self._increment(self[mode]['country'], country)
+                        if city:
+                            self._increment(self[mode]['city'], city)
+                    else:
+                        logger.error('unknown geo value: %s', item['location'])
 
                 name = {}
                 for key in ['system', 'browser']:
@@ -122,13 +127,13 @@ class Statistics(dict):
                         if name[key]:
                             self._increment(self[mode][key], name[key])
 
-                            key = key + 'version';
+                            key = key + 'version'
                             self._increment(self[mode][key], version)
 
                 if name.get('system') and name.get('browser'):
                     name = name['system'] + ' / ' + name['browser']
                     self._increment(self[mode]['systemandbrowser'], name)
-                    
+
                     name = item['system'] + ' / ' + item['browser']
                     self._increment(self[mode]['systemandbrowserversion'], name)
 
