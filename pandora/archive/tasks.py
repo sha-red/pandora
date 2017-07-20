@@ -10,7 +10,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from item.models import Item
-from item.tasks import update_poster
+from item.tasks import update_poster, update_timeline
 from taskqueue.models import Task
 
 from . import models
@@ -83,7 +83,7 @@ def update_files(user, volume, files):
            files__instances__in=removed.filter(file__selected=True)).distinct().values('public_id')]
     removed.delete()
     fix_path = []
-    update_timeline = set()
+    rebuild_timeline = set()
     for f in files:
         instance = update_or_create_instance(volume, f)
         if instance.path == f['oshash'] and f['path'] != f['oshash']:
@@ -94,14 +94,14 @@ def update_files(user, volume, files):
         instance.file.save()
         if instance.file.item:
             instance.file.item.update_wanted()
-            update_timeline.add(instance.file.item.public_id)
+            rebuild_timeline.add(instance.file.item.public_id)
     for i in ids:
         i = Item.objects.get(public_id=i)
         i.update_selected()
-    for i in update_timeline:
+    for i in rebuild_timeline:
         i = Item.objects.get(public_id=i)
         Tasks.start(i, user)
-        i.update_timeline()
+        update_timeline.delay(i.public_id)
 
 @task(ignore_results=True, queue='default')
 def update_info(user, info):
@@ -113,6 +113,9 @@ def update_info(user, info):
     for i in Item.objects.filter(files__in=files).distinct():
         i.update_selected()
         i.update_wanted()
+        if not i.rendered:
+            Tasks.start(i, user)
+            update_timeline.delay(i.public_id)
 
 @task(queue="encoding")
 def process_stream(fileId):
@@ -206,10 +209,11 @@ def download_media(item_id, url):
 
 @task(queue='default')
 def move_media(data, user):
-    user = models.User.objects.get(username=user)
     from changelog.models import add_changelog
     from item.models import get_item, Item
-    import item.tasks
+
+    user = models.User.objects.get(username=user)
+
     if Item.objects.filter(public_id=data['item']).count() == 1:
         i = Item.objects.get(public_id=data['item'])
     else:
@@ -238,8 +242,9 @@ def move_media(data, user):
         else:
             c.rendered = False
             c.save()
-            Task.start(c, user)
-            item.tasks.update_timeline.delay(public_id)
+            if c.files.count():
+                Task.start(c, user)
+                update_timeline.delay(public_id)
     add_changelog({
         'user': user,
         'action': 'moveMedia'
