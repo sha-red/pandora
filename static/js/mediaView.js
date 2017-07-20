@@ -6,6 +6,10 @@ pandora.ui.mediaView = function(options) {
 
     var canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level] || options.editable,
         self = {},
+        keys = ['title', 'director', 'year', 'id'],
+        listKeys = keys.filter(function(key) {
+            return Ox.isArray(Ox.getObjectById(pandora.site.itemKeys, key).type);
+        }),
         that = Ox.Element({}, self)
             .defaults({
                 id: ''
@@ -390,7 +394,7 @@ pandora.ui.mediaView = function(options) {
         })
         .css({margin: '8px'});
 
-    ['title', 'director', 'year', 'id'].forEach(function(key) {
+    keys.forEach(function(key) {
         var itemKey = Ox.getObjectById(pandora.site.itemKeys, key);
         self['$' + key + 'Input'] = Ox.Input({
             label: Ox._(key == 'id' ? 'ID'
@@ -412,10 +416,10 @@ pandora.ui.mediaView = function(options) {
                 }
                 if (data.value.length) {
                     conditions = {};
-                    ['id', 'title', 'director', 'year'].map(function(key) {
+                    keys.map(function(key) {
                         var value = self['$' + key + 'Input'].value();
                         if (value.length) {
-                            conditions[key] = key == 'director' ? value.split(', ') : value;
+                            conditions[key] = Ox.contains(listKeys, key) ? value.split(', ') : value;
                         }
                     });
                     pandora.api.findId(conditions, function(result) {
@@ -425,9 +429,9 @@ pandora.ui.mediaView = function(options) {
                                 self.$idInput.value('');
                             }
                         } else if (result.data.items.length == 1) {
-                            ['title', 'director', 'year', 'id'].forEach(function(key) {
+                            keys.forEach(function(key) {
                                 self['$' + key + 'Input'].value(
-                                    key == 'director'
+                                    Ox.contains(listKeys, key)
                                         ? result.data.items[0][key].join(', ')
                                         : result.data.items[0][key]
                                 );
@@ -449,13 +453,11 @@ pandora.ui.mediaView = function(options) {
     });
 
     self.$movieForm = Ox.Form({
-            items: [
-                self.$titleInput,
-                self.$directorInput,
-                self.$yearInput,
-                self.$idInput,
+            items: keys.map(function(key) {
+                return self['$' + key + 'Input'];
+            }).concat([
                 self.$switch
-            ],
+            ]),
             width: 240
         })
         .css({margin: '8px'});
@@ -467,7 +469,7 @@ pandora.ui.mediaView = function(options) {
         .css({margin: '0 4px 4px 8px'})
         .bindEvent({
             click: function() {
-                ['title', 'director', 'year', 'id'].forEach(function(key) {
+                keys.forEach(function(key) {
                     self['$' + key + 'Input'].value('');
                 });
             }
@@ -550,10 +552,9 @@ pandora.ui.mediaView = function(options) {
     function moveFiles(data) {
         var data = {
             ids: self.selected,
-            item: self.$idInput.value()
         };
-        ['title', 'director', 'year'].forEach(function(key) {
-            data[key] = self['$' + key + 'Input'].value();
+        keys.forEach(function(key) {
+            data[key == 'id' ? 'item' : key] = self['$' + key + 'Input'].value();
         });
         self.$moveButton.options(
             {disabled: true, title: Ox._('Moving Files...')}
@@ -583,10 +584,10 @@ pandora.ui.mediaView = function(options) {
             path: self.$instancesList.value(data.ids[0], 'path')
         }, function(result) {
             self.$idInput.value('');
-            ['title', 'director', 'year'].forEach(function(key) {
+            keys.forEach(function(key) {
                 if (result.data[key]) {
                     self['$' + key + 'Input'].value(
-                        key == 'director'
+                        Ox.contains(listKeys, key)
                             ? result.data[key].join(', ')
                             : result.data[key]
                     );
