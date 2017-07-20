@@ -48,9 +48,17 @@ pandora.ui.helpDialog = function() {
                     that.select(data.value == '' ? 'help' : data.value);
                 }
             }
-        });
+        }),
+        url = '/static/html/help.html';
 
-    Ox.get('/static/html/help.html', function(html) {
+    /*
+    // FIXME: should be updated at build time
+    if (Ox.contains(['ar'], pandora.user.ui.locale)) {
+        url = '/static/html/help.' + pandora.user.ui.locale + '.html';
+    }
+    */
+
+    Ox.get(url, function(html) {
 
         var $html = $('<div>'),
             strings = Ox.clone(pandora.site, true);
