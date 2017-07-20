@@ -100,7 +100,7 @@ def update_files(user, volume, files):
         i.update_selected()
     for i in rebuild_timeline:
         i = Item.objects.get(public_id=i)
-        Tasks.start(i, user)
+        Task.start(i, user)
         update_timeline.delay(i.public_id)
 
 @task(ignore_results=True, queue='default')
@@ -114,7 +114,7 @@ def update_info(user, info):
         i.update_selected()
         i.update_wanted()
         if not i.rendered:
-            Tasks.start(i, user)
+            Task.start(i, user)
             update_timeline.delay(i.public_id)
 
 @task(queue="encoding")
