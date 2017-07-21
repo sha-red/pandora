@@ -554,7 +554,7 @@ pandora.ui.mediaView = function(options) {
             ids: self.selected,
         };
         keys.forEach(function(key) {
-            data[key == 'id' ? 'item' : key] = self['$' + key + 'Input'].value();
+            data[key == 'id' ? 'item' : key] = Ox.encodeHTMLEntities(self['$' + key + 'Input'].value());
         });
         self.$moveButton.options(
             {disabled: true, title: Ox._('Moving Files...')}
@@ -587,10 +587,10 @@ pandora.ui.mediaView = function(options) {
             keys.forEach(function(key) {
                 if (result.data[key]) {
                     self['$' + key + 'Input'].value(
-                        Ox.contains(listKeys, key)
+                        Ox.decodeHTMLEntities(Ox.contains(listKeys, key)
                             ? result.data[key].join(', ')
                             : result.data[key]
-                    );
+                    ));
                 }
             });
             updateForm();
