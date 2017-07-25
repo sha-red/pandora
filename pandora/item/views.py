@@ -102,6 +102,150 @@ def parse_query(data, user):
     # group by only allows sorting by name or number of itmes
     return query
 
+def get_group(request, query, data):
+    group = {
+        'items': []
+    }
+    items = 'items'
+    item_qs = query['qs']
+    order_by = _order_by_group(query)
+    qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
+    qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
+
+    if 'positions' in query:
+        group['positions'] = {}
+        ids = [j['value'] for j in qs]
+        group['positions'] = utils.get_positions(ids, query['positions'])
+    elif 'range' in data:
+        qs = qs[query['range'][0]:query['range'][1]]
+        group['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
+    else:
+        group['items'] = qs.count()
+    return group
+
+def get_position(request, query, data):
+    response = {}
+    qs = _order_query(query['qs'], query['sort'])
+    ids = [j['public_id'] for j in qs.values('public_id')]
+    data['conditions'] = data['conditions'] + {
+        'value': query['position'],
+        'key': query['sort'][0]['key'],
+        'operator': '^'
+    }
+    query = parse_query(data, request.user)
+    qs = _order_query(query['qs'], query['sort'])
+    if qs.count() > 0:
+        response['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
+    return response
+
+def get_positions(request, query):
+    qs = _order_query(query['qs'], query['sort'])
+    ids = list(qs.values_list('public_id', flat=True))
+    return utils.get_positions(ids, query['positions'])
+
+def is_editable(request, item):
+    if request.user.is_anonymous():
+        return False
+    if not hasattr(request, 'user_group_names'):
+        request.user_group_names = {g.name for g in request.user.groups.all()}
+    if request.user.profile.capability('canEditMetadata') or \
+            request.user.is_staff or \
+            item.get('user') == request.user.username or \
+            set(item.get('groups', [])) & request.user_group_names:
+        return True
+    return False
+
+def get_clips(query, qs):
+    n = qs.count()
+    if n > query['clip_items']:
+        num = query['clip_items']
+        clips = []
+        step = int(n / (num + 1))
+        i = step
+        while i <= (n - step) and i < n and len(clips) < num:
+            clips.append(qs[i])
+            i += step
+    else:
+        clips = qs
+    return [c.json(query['clip_keys'], query['clip_filter']) for c in clips]
+
+def only_p_sums(request, query, m):
+    r = {}
+    for p in query['keys']:
+        if p == 'accessed':
+            r[p] = m.sort.accessed or ''
+        elif p == 'editable':
+            r[p] = is_editable(request, m.json)
+        elif p in item_sort_keys:
+            r[p] = getattr(m.sort, p)
+        else:
+            r[p] = m.json.get(p)
+    if 'clip_qs' in query:
+        r['clips'] = get_clips(query, query['clip_qs'].filter(item=m))
+    return r
+
+def only_p(request, query, m):
+    r = {}
+    if m:
+        if not isinstance(m, dict):
+            m = json.loads(m, object_hook=oxdjango.fields.from_json)
+        for p in query['keys']:
+            if p == 'editable':
+                r[p] = is_editable(request, m)
+            else:
+                r[p] = m.get(p)
+    if 'clip_qs' in query:
+        r['clips'] = get_clips(query['clip_qs'].filter(item__public_id=m['id']))
+    return r
+
+item_sort_keys = {
+    'accessed', 'modified', 'timesaccessed',
+    'numberofannotations', 'numberoffiles', 'numberofdocuments'
+}
+
+def get_items(request, query):
+    items = []
+    qs = _order_query(query['qs'], query['sort'])
+    qs = qs[query['range'][0]:query['range'][1]]
+    # items = [m.get_json(_p) for m in qs]
+    if any(p for p in query['keys'] if p in item_sort_keys):
+        qs = qs.select_related()
+        items = [only_p_sums(request, query, m) for m in qs]
+    else:
+        items = [only_p(request, query, m['json']) for m in qs.values('json')]
+    return items
+
+def get_stats(request, query):
+    stats = {}
+    items = query['qs']
+    files = File.objects.filter(item__in=items).filter(selected=True).filter(size__gt=0)
+    r = files.aggregate(
+        Sum('duration'),
+        Sum('pixels'),
+        Sum('size')
+    )
+    totals = [
+        i['id']
+        for i in settings.CONFIG['totals']
+        if 'capability' not in i or has_capability(request.user, i['capability'])
+    ]
+    if 'duration' in totals:
+        stats['duration'] = r['duration__sum']
+    if 'files' in totals:
+        stats['files'] = files.count()
+    if 'items' in totals:
+        stats['items'] = items.count()
+    if 'pixels' in totals:
+        stats['pixels'] = r['pixels__sum']
+    if 'runtime' in totals:
+        stats['runtime'] = items.aggregate(Sum('sort__runtime'))['sort__runtime__sum'] or 0
+    if 'size' in totals:
+        stats['size'] = r['size__sum']
+    for key in ('runtime', 'duration', 'pixels', 'size'):
+        if key in totals and stats[key] is None:
+            stats[key] = 0
+    return stats
+
 def find(request, data):
     '''
     Finds items for a given query
@@ -177,141 +321,17 @@ def find(request, data):
 
     response = json_response({})
     if 'group' in query:
-        response['data']['items'] = []
-        items = 'items'
-        item_qs = query['qs']
-        order_by = _order_by_group(query)
-        qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
-        qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
-
-        if 'positions' in query:
-            response['data']['positions'] = {}
-            ids = [j['value'] for j in qs]
-            response['data']['positions'] = utils.get_positions(ids, query['positions'])
-        elif 'range' in data:
-            qs = qs[query['range'][0]:query['range'][1]]
-            response['data']['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
-        else:
-            response['data']['items'] = qs.count()
+        response['data'] = get_group(request, query, data)
     elif 'position' in query:
-        qs = _order_query(query['qs'], query['sort'])
-        ids = [j['public_id'] for j in qs.values('public_id')]
-        data['conditions'] = data['conditions'] + {
-            'value': query['position'],
-            'key': query['sort'][0]['key'],
-            'operator': '^'
-        }
-        query = parse_query(data, request.user)
-        qs = _order_query(query['qs'], query['sort'])
-        if qs.count() > 0:
-            response['data']['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
+        response['data'] = get_position(request, query, data)
     elif 'positions' in query:
-        qs = _order_query(query['qs'], query['sort'])
-        ids = list(qs.values_list('public_id', flat=True))
-        response['data']['positions'] = utils.get_positions(ids, query['positions'])
+        response['data']['positions'] = get_positions(request, query)
     elif 'keys' in query:
-        response['data']['items'] = []
-        qs = _order_query(query['qs'], query['sort'])
-        _p = query['keys']
-
-        def get_clips(qs):
-            n = qs.count()
-            if n > query['clip_items']:
-                num = query['clip_items']
-                clips = []
-                step = int(n / (num + 1))
-                i = step
-                while i <= (n - step) and i < n and len(clips) < num:
-                    clips.append(qs[i])
-                    i += step
-            else:
-                clips = qs
-            return [c.json(query['clip_keys'], query['clip_filter']) for c in clips]
-
-        sort_keys = {
-            'accessed', 'modified', 'timesaccessed',
-            'numberofannotations', 'numberoffiles', 'numberofdocuments'
-        }
-
-        groups = {g.name for g in request.user.groups.all()}
-
-        def is_editable(item):
-            if request.user.is_anonymous():
-                return False
-            if request.user.profile.capability('canEditMetadata') or \
-                    request.user.is_staff or \
-                    item.get('user') == request.user.username or \
-                    set(item.get('groups', [])) & groups:
-                return True
-            return False
-
-        def only_p_sums(m):
-            r = {}
-            for p in _p:
-                if p == 'accessed':
-                    r[p] = m.sort.accessed or ''
-                elif p == 'editable':
-                    r[p] = is_editable(m.json)
-                elif p in sort_keys:
-                    r[p] = getattr(m.sort, p)
-                else:
-                    r[p] = m.json.get(p)
-            if 'clip_qs' in query:
-                r['clips'] = get_clips(query['clip_qs'].filter(item=m))
-            return r
-
-        def only_p(m):
-            r = {}
-            if m:
-                if not isinstance(m, dict):
-                    m = json.loads(m, object_hook=oxdjango.fields.from_json)
-                for p in _p:
-                    if p == 'editable':
-                        r[p] = is_editable(m)
-                    else:
-                        r[p] = m.get(p)
-            if 'clip_qs' in query:
-                r['clips'] = get_clips(query['clip_qs'].filter(item__public_id=m['id']))
-            return r
-        qs = qs[query['range'][0]:query['range'][1]]
-        # response['data']['items'] = [m.get_json(_p) for m in qs]
-        if any(p for p in _p if p in sort_keys):
-            qs = qs.select_related()
-            response['data']['items'] = [only_p_sums(m) for m in qs]
-        else:
-            response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
-
+        response['data']['items'] = get_items(request, query)
     else:  # otherwise stats
-        items = query['qs']
-        files = File.objects.filter(item__in=items).filter(selected=True).filter(size__gt=0)
-        r = files.aggregate(
-            Sum('duration'),
-            Sum('pixels'),
-            Sum('size')
-        )
-        totals = [
-            i['id']
-            for i in settings.CONFIG['totals']
-            if 'capability' not in i or has_capability(request.user, i['capability'])
-        ]
-        if 'duration' in totals:
-            response['data']['duration'] = r['duration__sum']
-        if 'files' in totals:
-            response['data']['files'] = files.count()
-        if 'items' in totals:
-            response['data']['items'] = items.count()
-        if 'pixels' in totals:
-            response['data']['pixels'] = r['pixels__sum']
-        if 'runtime' in totals:
-            response['data']['runtime'] = items.aggregate(Sum('sort__runtime'))['sort__runtime__sum'] or 0
-        if 'size' in totals:
-            response['data']['size'] = r['size__sum']
-        for key in ('runtime', 'duration', 'pixels', 'size'):
-            if key in totals and response['data'][key] is None:
-                response['data'][key] = 0
+        response['data'] = get_stats(request, query)
     return render_to_json_response(response)
 actions.register(find)
-
 
 def autocomplete(request, data):
     '''
