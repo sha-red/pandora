@@ -641,7 +641,7 @@ def findMedia(request, data):
         qs = qs.select_related()
         keys = query['keys']
         qs = qs[query['range'][0]:query['range'][1]]
-        response['data']['items'] = [f.json(keys) for f in qs]
+        response['data']['items'] = [f.json(keys, user=request.user) for f in qs]
     else:  # otherwise stats
         files = query['qs']
         response['data']['items'] = files.count()

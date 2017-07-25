@@ -434,6 +434,17 @@ class File(models.Model):
             for k in list(data):
                 if k not in keys:
                     del data[k]
+        can_see_media = False
+        if not user.is_anonymous():
+            can_see_media = user.profile.capability('canSeeMedia') or \
+                user.is_staff or \
+                self.item.user == user or \
+                self.item.groups.filter(id__in=user.groups.all()).count() > 0
+        if not can_see_media:
+            if 'instances' in data:
+                data['instances'] = []
+            if 'path' in data:
+                data['path'] = os.path.basename(data['path'])
         return data
 
     def all_paths(self):
