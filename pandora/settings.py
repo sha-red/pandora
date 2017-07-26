@@ -211,6 +211,7 @@ TRACKER_URL = "udp://tracker.openbittorrent.com:80"
 
 DATA_SERVICE = ''
 POSTER_PRECEDENCE = ()
+POSTER_ONLY_PORTRAIT = ()
 
 USE_IMDB = False
 

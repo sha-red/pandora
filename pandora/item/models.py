@@ -1398,7 +1398,10 @@ class Item(models.Model):
             if not service:
                 for service in settings.POSTER_PRECEDENCE:
                     if service in external_posters:
-                        return external_posters[service][0]['url']
+                        for p in external_posters[service]:
+                            if service in settings.POSTER_ONLY_PORTRAIT and p['width'] > p['height']:
+                                continue
+                            return p['url']
         return None
 
     def make_timeline(self):
