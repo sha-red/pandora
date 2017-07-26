@@ -330,24 +330,25 @@ class Annotation(models.Model):
         if self.languages:
             j['languages'] = self.languages.split(',')
         l = self.get_layer()
-        if l['type'] == 'entity':
-            try:
-                (j['entity'], j['value']) = self._get_entity_json(
-                    user=user, entity_cache=entity_cache)
-            except:
-                j['entity'] = {}
-        elif l['type'] == 'event':
-            qs = self.events.all()
-            if qs.count() > 0:
-                j['event'] = qs[0].json(user=user)
-            else:
-                j['event'] = {}
-        elif l['type'] == 'place':
-            qs = self.places.all()
-            if qs.count() > 0:
-                j['place'] = qs[0].json(user=user)
-            else:
-                j['place'] = {}
+        if l:
+            if l['type'] == 'entity':
+                try:
+                    (j['entity'], j['value']) = self._get_entity_json(
+                        user=user, entity_cache=entity_cache)
+                except:
+                    j['entity'] = {}
+            elif l['type'] == 'event':
+                qs = self.events.all()
+                if qs.count() > 0:
+                    j['event'] = qs[0].json(user=user)
+                else:
+                    j['event'] = {}
+            elif l['type'] == 'place':
+                qs = self.places.all()
+                if qs.count() > 0:
+                    j['place'] = qs[0].json(user=user)
+                else:
+                    j['place'] = {}
 
         if layer or (keys and 'layer' in keys):
             j['layer'] = self.layer
