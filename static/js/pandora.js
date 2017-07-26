@@ -364,20 +364,15 @@ appPanel
                     {id: 'featured', title: 'Featured Lists', showBrowser: false},
                     {id: 'volumes', title: 'Local Volumes'}
                 ],
-                documents: [
-                    {id: 'personal', title: 'Personal Collections'},
-                    {id: 'favorite', title: 'Favorite Collections', showBrowser: false},
-                    {id: 'featured', title: 'Featured Collections', showBrowser: false}
-                ],
                 edits: [
                     {id: 'personal', title: 'Personal Edits'},
                     {id: 'favorite', title: 'Favorite Edits', showBrowser: false},
                     {id: 'featured', title: 'Featured Edits', showBrowser: false}
                 ],
-                texts: [
-                    {id: 'personal', title: 'Personal Texts'},
-                    {id: 'favorite', title: 'Favorite Texts', showBrowser: false},
-                    {id: 'featured', title: 'Featured Texts', showBrowser: false}
+                documents: [
+                    {id: 'personal', title: 'Personal Collections'},
+                    {id: 'favorite', title: 'Favorite Collections', showBrowser: false},
+                    {id: 'featured', title: 'Featured Collections', showBrowser: false}
                 ]
             },
             sortKeys: pandora.getSortKeys(),
