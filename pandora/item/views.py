@@ -874,7 +874,7 @@ def poster(request, id, size=None):
                 icon=item.icon.name,
                 json=item.get_json()
             )
-    if item.poster:
+    if item.poster and os.path.exists(image.poster.path):
         return image_to_response(item.poster, size)
     else:
         poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
@@ -886,7 +886,7 @@ def icon(request, id, size=None):
     item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
-    if item.icon:
+    if item.icon and os.path.exists(item.icon.path):
         return image_to_response(item.icon, size)
     else:
         poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
