@@ -874,7 +874,7 @@ def poster(request, id, size=None):
                 icon=item.icon.name,
                 json=item.get_json()
             )
-    if item.poster and os.path.exists(image.poster.path):
+    if item.poster and os.path.exists(item.poster.path):
         return image_to_response(item.poster, size)
     else:
         poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
