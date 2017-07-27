@@ -435,7 +435,7 @@ class File(models.Model):
                 if k not in keys:
                     del data[k]
         can_see_media = False
-        if not user.is_anonymous():
+        if user and not user.is_anonymous():
             can_see_media = user.profile.capability('canSeeMedia') or \
                 user.is_staff or \
                 self.item.user == user or \

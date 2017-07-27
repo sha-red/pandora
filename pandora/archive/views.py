@@ -479,7 +479,7 @@ def editMedia(request, data):
                     update = True
             if update:
                 f.save()
-            response['data']['files'].append(f.json())
+            response['data']['files'].append(f.json(user=request.user))
         else:
             response['data']['files'].append({'id': info['id'], 'error': 'permission denied'})
     if ignore:
