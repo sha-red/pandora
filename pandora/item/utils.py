@@ -3,8 +3,11 @@
 #
 from decimal import Decimal
 import re
+import unicodedata
+
 import ox
 from ox import sort_string
+from six import PY2
 
 def safe_filename(filename):
     filename = filename.replace(': ', '_ ')
@@ -41,7 +44,7 @@ def parse_time(t):
     for i in range(len(p)):
         _p = p[i]
         if _p.endswith('.'):
-            _p =_p[:-1]
+            _p = _p[:-1]
         s = s * 60 + float(_p)
     return s
 
@@ -86,3 +89,17 @@ def get_by_key(objects, key, value):
 
 def get_by_id(objects, id):
     return get_by_key(objects, 'id', id)
+
+def normalize_dict(encoding, data):
+    if PY2:
+        string_type = unicode
+    else:
+        string_type = str
+    if isinstance(data, string_type):
+        data = unicodedata.normalize(encoding, data)
+    elif isinstance(data, dict):
+        for key in data:
+            data[key] = normalize_dict(encoding, data[key])
+    elif isinstance(data, list):
+        return [normalize_dict(encoding, value) for value in data]
+    return data

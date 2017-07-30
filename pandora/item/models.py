@@ -97,6 +97,7 @@ def get_item(info, user=None):
         if key in info and info[key]:
             item_data[key] = info[key]
 
+    item_data = utils.normalize_dict('NFC', item_data)
     if settings.USE_IMDB:
         if 'imdbId' in info and info['imdbId']:
             try:
@@ -1473,6 +1474,7 @@ class Item(models.Model):
         if os.path.exists(timeline):
             data['timeline'] = timeline
         data['oxdbId'] = self.oxdbId or self.oxdb_id() or self.public_id
+        data = utils.normalize_dict('NFC', data)
         ox.makedirs(os.path.join(settings.MEDIA_ROOT, self.path()))
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE, close_fds=True)
         p.communicate(json.dumps(data, default=fields.to_json).encode('utf-8'))
