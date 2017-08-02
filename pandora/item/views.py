@@ -880,6 +880,7 @@ def poster(request, id, size=None):
         poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
         response = HttpFileResponse(poster_path, content_type='image/jpeg')
         response['Cache-Control'] = 'no-cache'
+        response['Expires'] = datetime.strftime(datetime.utcnow() - timedelta(days=1), "%a, %d-%b-%Y %H:%M:%S GMT")
         return response
 
 def icon(request, id, size=None):
@@ -892,6 +893,7 @@ def icon(request, id, size=None):
         poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
         response = HttpFileResponse(poster_path, content_type='image/jpeg')
         response['Cache-Control'] = 'no-cache'
+        response['Expires'] = datetime.strftime(datetime.utcnow() - timedelta(days=1), "%a, %d-%b-%Y %H:%M:%S GMT")
         return response
 
 def timeline(request, id, size, position=-1, format='jpg', mode=None):
