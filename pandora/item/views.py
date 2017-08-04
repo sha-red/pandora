@@ -6,6 +6,7 @@ import os.path
 import mimetypes
 import random
 import time
+from datetime import datetime, timedelta
 
 from six import PY2
 from six.moves.urllib.parse import quote, urlparse
