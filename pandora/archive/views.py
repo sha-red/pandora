@@ -160,11 +160,11 @@ def upload(request, data=None):
             f.data.save('data.raw', request.FILES['file'])
             f.save()
             os.chmod(f.data.path, 0o644)
-            item.update_selected()
-            if not item.rendered:
-                item.tasks.update_timeline.delay(f.item.public_id)
+            f.item.update_selected()
+            if not f.item.rendered:
+                f.item.tasks.update_timeline.delay(f.item.public_id)
             else:
-                item.tasks.load_subtitles.delay(f.item.public_id)
+                f.item.tasks.load_subtitles.delay(f.item.public_id)
             response = json_response(text='file saved')
         else:
             response = json_response(status=403, text='permission denied')
