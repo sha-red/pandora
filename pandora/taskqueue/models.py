@@ -85,6 +85,12 @@ class Task(models.Model):
             task.save()
 
     def update(self, save=True):
+        from item.models import Item
+        try:
+            item = self.item.id
+        except Item.DoesNotExist:
+            return False
+
         if self.item.files.filter(wanted=True, available=False).count():
             status = 'pending'
         elif self.item.files.filter(uploading=True).count():
