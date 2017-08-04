@@ -36,7 +36,10 @@ def update_statistics():
 @task(ignore_results=True, queue='default')
 def parse_data(key):
     from . import models
-    session_data = models.SessionData.objects.get(session_key=key)
+    try:
+        session_data = models.SessionData.objects.get(session_key=key)
+    except models.SessionData.DoesNotExist:
+        return
     session_data.parse_data()
     session_data.save()
 
