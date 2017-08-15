@@ -15,8 +15,8 @@
 4) Attach to container and install pan.do/ra
 
     sudo lxc-attach -n pandora --clear-env
-    apt-get update -qq
-    apt-get -y install curl
+    apt-get update -qq && apt-get upgrade -y
+    apt-get -y install curl ca-certificates
     sed -i s/ubuntu/pandora/g /etc/passwd /etc/shadow /etc/group
     mv /home/ubuntu /home/pandora
     echo "pandora:pandora" | chpasswd
