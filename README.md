@@ -4,9 +4,10 @@
 
 ## SETUP
 
-  pan.do/ra is known to work with Ubuntu 14.04,
-  but other distributions should also work.
-  The instructions below are for Ubuntu 14.04.
+  pan.do/ra is known to work with Ubuntu 16.04,
+  but other distributions might also work.
+
+  The instructions below are for Ubuntu16.04.
   All commans given expect that you are root.
 
   To run pan.do/ra you need to install and setup:
@@ -27,14 +28,15 @@
 
 2) install all required packages
 
-    apt-get install git subversion mercurial \
+    apt-get install git \
             python3-setuptools python3-pip python3-virtualenv \
             virtualenv ipython3 \
             python3-dev python3-pil python3-numpy python3-psycopg2 \
+            python3-pyinotify python3-simplejson \
             python3-geoip python3-html5lib python3-lxml \
             postgresql postgresql-contrib rabbitmq-server \
             poppler-utils mkvtoolnix gpac imagemagick \
-            python3-ox oxframe ffmpeg
+            youtube-dl python3-ox oxframe ffmpeg
 
 
 ## Prepare Environment
@@ -145,11 +147,11 @@ b) apache2 (if you need it for other sites on the same server)
 
 ##  Updating
 
-  To update pandora to the latest version run this:
+  To update pandora to the latest development version run this:
 
     su pandora
     cd /srv/pandora
-    ./update.py
+    ./update.py dev
 
   this will update pandora/oxjs/python-ox and list possible upgrades to the db
 
