@@ -25,24 +25,31 @@ pandora.ui.siteDialog = function(section) {
                 } else if (id == 'news') {
                     pandora.$ui.news = pandora.ui.news(dialogWidth, dialogHeight).appendTo($content);
                 } else if (id == 'software') {
+                    var about = '<h1><b>pan.do/ra</b></h1>'
+                        + '<sub>open media archive</sub>'
+                        + '<p><b>{0}</b> is based on <b>pan.do/ra</b>, '
+                        + 'a free, open source platform for media archives.</p>'
+                        + '<b>pan.do/ra</b> includes <b>OxJS</b>, '
+                        + 'a new JavaScript library for web applications.</p>'
+                        + '<p>To learn more about <b>pan.do/ra</b> and <b>OxJS</b>, '
+                        + 'please visit <a href="https://pan.do/ra" target="_blank">pan.do/ra</a> '
+                        + 'and <a href="https://oxjs.org" target="_blank">oxjs.org</a>.</p>'
+                        + (
+                            canSeeVersion
+                            ? '<sub><b>{0}'
+                                + '</b> is running <b>pan.do/ra</b> revision '
+                                + '{1}.</sub>'
+                            : ''
+                        );
+                    if (pandora.site.site.name.toLocaleLowerCase() == 'pan.do/ra') {
+                        about = about
+                            .replace('<b>{0}</b> is based on <b>pan.do/ra</b>, ',
+                                     '<b>pan.do/ra</b> is ')
+                            .replace('<b>{0}</b> is running <b>pan.do/ra</b> ',
+                                     'This instances runs <b>pan.do/ra</b> ');
+                    }
                     Ox.Element()
-                        .html(Ox._(
-                            '<h1><b>pan.do/ra</b></h1>'
-                            + '<sub>open media archive</sub>'
-                            + '<p><b>{0}</b> is based on <b>pan.do/ra</b>, '
-                            + 'a free, open source platform for media archives.</p>'
-                            + '<b>pan.do/ra</b> includes <b>OxJS</b>, '
-                            + 'a new JavaScript library for web applications.</p>'
-                            + '<p>To learn more about <b>pan.do/ra</b> and <b>OxJS</b>, '
-                            + 'please visit <a href="https://pan.do/ra" target="_blank">pan.do/ra</a> '
-                            + 'and <a href="https://oxjs.org" target="_blank">oxjs.org</a>.</p>'
-                            + (
-                                canSeeVersion
-                                ? '<sub><b>{0}'
-                                    + '</b> is running <b>pan.do/ra</b> revision '
-                                    + '{1}.</sub>'
-                                : ''
-                            ),
+                        .html(Ox._(about,
                         [pandora.site.site.name, pandora.site.site.version]
                         ))
                         .appendTo($content);

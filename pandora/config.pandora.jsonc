@@ -1001,7 +1001,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         },
         "https": false,
         "id": "pandora",
-        "name": "Demo",
+        "name": "pan.do/ra",
         "sendReferrer": true,
         "url": "pandora.local"
     },
