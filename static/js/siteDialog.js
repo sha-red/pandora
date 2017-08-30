@@ -30,7 +30,7 @@ pandora.ui.siteDialog = function(section) {
                         + '<p><b>{0}</b> is based on <b>pan.do/ra</b>, '
                         + 'a free, open source platform for media archives.</p>'
                         + '<b>pan.do/ra</b> includes <b>OxJS</b>, '
-                        + 'a new JavaScript library for web applications.</p>'
+                        + 'a JavaScript library for web applications.</p>'
                         + '<p>To learn more about <b>pan.do/ra</b> and <b>OxJS</b>, '
                         + 'please visit <a href="https://pan.do/ra" target="_blank">pan.do/ra</a> '
                         + 'and <a href="https://oxjs.org" target="_blank">oxjs.org</a>.</p>'
