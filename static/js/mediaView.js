@@ -8,7 +8,8 @@ pandora.ui.mediaView = function(options) {
         self = {},
         keys = ['title', 'director', 'year', 'id'],
         listKeys = keys.filter(function(key) {
-            return Ox.isArray(Ox.getObjectById(pandora.site.itemKeys, key).type);
+            var itemKey = Ox.getObjectById(pandora.site.itemKeys, key)
+            return itemKey ? Ox.isArray(itemKey.type) : false;
         }),
         that = Ox.Element({}, self)
             .defaults({
