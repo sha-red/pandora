@@ -1241,8 +1241,10 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     "userLevels": ["guest", "member", "staff", "admin"],
     /*
     "video" contains the video settings.
-        "formats": Supported video formats. Should be ["webm", "mp4"], or
-            ["webm"] in case iDevices are not part of the audience
+        "formats": Supported video formats.
+            Should be ["webm", "mp4"] to support WebM and MP4,
+                      ["webm"] if only WebM is used or
+                      ["mp4"] for MP4 only.
         "previewRatio": Aspect ratio used in the info panel in the bottom left
             corner of the screen
         "resolutions": List of video resolutions. Supported values are 96, 144,

@@ -232,9 +232,8 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             video_settings += [
                 '-c:v', 'libx264',
                 '-preset:v', 'medium',
-                '-profile:v', 'baseline',
-                # does not work with avconv in Ubuntu 14.04 yet
-                # '-level', '3.0',
+                '-profile:v', 'high',
+                '-level', '4.0',
             ]
         video_settings += ['-map', '0:%s,0:0' % info['video'][0]['id']]
         audio_only = False
