@@ -17,13 +17,14 @@ class Command(BaseCommand):
     """
     help = 'run websocket daemon'
     args = ''
+
     def add_arguments(self, parser):
         parser.add_argument('--debug',
-            action='store_true',
-            dest='debug',
-            default=False,
-            help='enable debug'),
-        parser.add_argument("--pidfile", dest="pidfile",metavar="PIDFILE"),
+                            action='store_true',
+                            dest='debug',
+                            default=False,
+                            help='enable debug'),
+        parser.add_argument("--pidfile", dest="pidfile", metavar="PIDFILE"),
 
     def handle(self, **options):
         socket = daemon.Daemon(settings.WEBSOCKET_PORT, settings.WEBSOCKET_ADDRESS)
