@@ -1455,7 +1455,7 @@ class Item(models.Model):
                     data = f.read()
                     if data:
                         self.save_poster(data)
-                self.clear_poster_cache(poster)
+            self.clear_poster_cache(poster)
 
     def make_siteposter(self):
         poster = self.path('siteposter.jpg')
