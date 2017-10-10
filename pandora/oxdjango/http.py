@@ -40,7 +40,7 @@ def HttpFileResponse(path, content_type=None, filename=None):
             response['Content-Type'] = content_type
         response['Content-Length'] = os.stat(path).st_size
     else:
-        response = HttpResponse(open(path), content_type=content_type)
+        response = HttpResponse(open(path, 'rb'), content_type=content_type)
     if filename:
         if not isinstance(filename, bytes):
             filename = filename.encode('utf-8')
