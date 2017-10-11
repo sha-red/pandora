@@ -63,6 +63,10 @@ server {
     }
 
     error_page  400  /;
+    error_page  403  /403.html;
+    location  /403.html {
+        root   /srv/pandora/static/html;
+    }
     error_page  404  /404.html;
     location  /404.html {
         root   /srv/pandora/static/html;
