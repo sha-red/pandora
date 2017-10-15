@@ -19,7 +19,7 @@ class DelayedSignalHandler(object):
             self.old_handlers[managed_signal] = old_handler
 
     def __exit__(self, *_):
-        for managed_signal, old_handler in self.old_handlers.iteritems():
+        for managed_signal, old_handler in self.old_handlers.items():
             signal.signal(managed_signal, old_handler)
         '''
         for managed_signal, frame in self.managed_signals_queue:
