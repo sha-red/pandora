@@ -22,6 +22,9 @@ if [ -z "$UBUNTU_CODENAME" ]; then
 fi
 export DEBIAN_FRONTEND=noninteractive
 echo "deb http://ppa.launchpad.net/j/pandora/ubuntu ${UBUNTU_CODENAME} main" > /etc/apt/sources.list.d/j-pandora.list
+
+apt-get install -y gnupg
+
 apt-key add - <<EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1
