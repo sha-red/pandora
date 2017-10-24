@@ -107,6 +107,7 @@ if __name__ == "__main__":
         run('./manage.py', 'migrate', '--noinput')
         run('./manage.py', 'sqlfindindex')
         run('./manage.py', 'sync_itemsort')
+        run('./manage.py', 'sync_documentsort')
         reload_notice(base)
     elif len(sys.argv) == 2 and sys.argv[1] == 'static':
         os.chdir(join(base, 'pandora'))

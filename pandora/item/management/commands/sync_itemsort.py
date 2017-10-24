@@ -116,6 +116,3 @@ class Command(BaseCommand):
                     if options['debug']:
                         print(i)
                     i.update_sort()
-        # and udpate doucments
-        import document.sync_sort
-        document.sync_sort.update_tables(options['debug'])

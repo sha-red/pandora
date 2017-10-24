@@ -29,6 +29,7 @@ class Command(BaseCommand):
             [manage_py, 'migrate', '--noinput'],
             [manage_py, 'sqlfindindex'],
             [manage_py, 'sync_itemsort'],
+            [manage_py, 'sync_documentsort'],
             [manage_py, 'update_static'],
             [manage_py, 'compile_pyc', '-p', os.path.dirname(manage_py)],
         ]:
