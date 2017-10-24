@@ -25,7 +25,7 @@
     export LANG=en_US.UTF-8
 
     cd /root
-    curl -L https://pan.do/ra-install > pandora_install.sh
+    curl -sL https://pan.do/ra-install > pandora_install.sh
     chmod +x pandora_install.sh
-    ./pandora_install.sh | tee pandora_install.log
+    ./pandora_install.sh 2>&1 | tee pandora_install.log
 
