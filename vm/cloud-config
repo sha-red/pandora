@@ -20,17 +20,22 @@ write_files:
       [Network]
       DHCP=yes
 
+packages_update: true
+packages_upgrade: true
+
+packages:
+    - curl
+    - ca-certificates
+    - avahi-daemon
+
 runcmd:
     - sed -i s/ubuntu/pandora/g /etc/passwd /etc/shadow /etc/group
     - mv /home/ubuntu /home/pandora
     - echo "pandora:pandora" | chpasswd
-    - apt-get update -qq
-    - apt-get install -y curl
     - echo 127.0.0.1 pandora | tee -a /etc/hosts
-    - apt-get install -y avahi-daemon
     - curl -sL https://pan.do/ra-install -o /root/pandora_install.sh
     - chmod +x /root/pandora_install.sh
-    - /root/pandora_install.sh | tee /root/pandora_install.log
+    - /root/pandora_install.sh 2>&1 | tee /root/pandora_install.log
     - sed -i s/console=ttyS0/quiet/g /etc/default/grub /boot/grub/grub.cfg /etc/default/grub.d/50-cloudimg-settings.cfg
     - apt-get purge -y cloud-init
     - systemctl enable systemd-networkd.service
