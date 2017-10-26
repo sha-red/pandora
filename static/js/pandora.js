@@ -251,6 +251,7 @@ appPanel
                         }, function() {
                             pandora.site.site.videoprefix = url;
                         });
+                        Ox.Map.GoogleApiKey = pandora.site.site.googleapikey;
                     }
                 });
             }
