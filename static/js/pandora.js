@@ -251,7 +251,6 @@ appPanel
                         }, function() {
                             pandora.site.site.videoprefix = url;
                         });
-                        Ox.Map.GoogleApiKey = pandora.site.site.googleapikey;
                     }
                 });
             }
@@ -413,6 +412,8 @@ appPanel
             sectionElement: 'buttons',
             videoFormat: Ox.getVideoFormat(pandora.site.video.formats)
         });
+
+        Ox.Map.GoogleApiKey = pandora.site.site.googleapikey;
 
         // set locale and initialize url controller
         // data.locale is prefered language according to http header
