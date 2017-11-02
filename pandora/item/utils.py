@@ -9,6 +9,7 @@ import ox
 from ox import sort_string
 from six import PY2
 
+
 def safe_filename(filename):
     filename = filename.replace(': ', '_ ')
     filename = filename.replace('/', '_')

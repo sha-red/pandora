@@ -29,8 +29,7 @@
 2) install all required packages
 
     apt-get install git \
-            python3-setuptools python3-pip python3-virtualenv \
-            virtualenv ipython3 \
+            python3-setuptools python3-pip python3-venv ipython3 \
             python3-dev python3-pil python3-numpy python3-psycopg2 \
             python3-pyinotify python3-simplejson \
             python3-geoip python3-html5lib python3-lxml \

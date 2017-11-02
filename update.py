@@ -1,38 +1,73 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from __future__ import print_function
+import json
 import os
-
-base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
-os.chdir(base)
-
-# using virtualenv's activate_this.py to reorder sys.path
-activate_this = os.path.join(base, 'bin', 'activate_this.py')
-with open(activate_this) as f:
-    code = compile(f.read(), activate_this, 'exec')
-    exec(code, dict(__file__=activate_this))
-
-import sys
 import shutil
 import subprocess
+import sys
 try:
     from urllib.request import urlopen
 except:
     from urllib2 import urlopen
-import json
 from os.path import join, exists
+
+
+repos = {
+    "pandora": {
+        "url": "https://git.0x2620.org/pandora.git",
+        "path": ".",
+    },
+    "oxjs": {
+        "url": "https://git.0x2620.org/oxjs.git",
+        "path": "./static/oxjs",
+    },
+    "oxtimelines": {
+        "url": "https://git.0x2620.org/oxtimelines.git",
+        "path": "./src/oxtimelines",
+    },
+    "python-ox": {
+        "url": "https://git.0x2620.org/python-ox.git",
+        "path": "./src/python-ox",
+    }
+}
+
+
+def activate_venv(base):
+    if os.path.exists(base):
+        old_os_path = os.environ.get('PATH', '')
+        bin_path = os.path.join(base, 'bin')
+        if bin_path not in old_os_path:
+            os.environ['PATH'] = os.path.join(base, 'bin') + os.pathsep + old_os_path
+        site_packages = os.path.join(base, 'lib', 'python%s' % sys.version[:3], 'site-packages')
+        prev_sys_path = list(sys.path)
+        import site
+        site.addsitedir(site_packages)
+        sys.real_prefix = sys.prefix
+        sys.prefix = base
+        # Move the added items to the front of the path:
+        new_sys_path = []
+        for item in list(sys.path):
+            if item not in prev_sys_path:
+                new_sys_path.append(item)
+                sys.path.remove(item)
+        sys.path[:0] = new_sys_path
+
 
 def run(*cmd):
     p = subprocess.Popen(cmd)
     p.wait()
     return p.returncode
 
+
 def get(*cmd):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, error = p.communicate()
     return stdout.decode()
 
+
 def get_json(url):
     return json.loads(urlopen(url).read().decode())
+
 
 def get_release():
     if os.path.exists('.release'):
@@ -45,27 +80,10 @@ def get_release():
         print("Failed to load %s check your internet connection." % url)
         sys.exit(1)
 
-repos = {
-  "pandora": {
-    "url": "https://git.0x2620.org/pandora.git",
-    "path": ".",
-  }, 
-  "oxjs": {
-    "url": "https://git.0x2620.org/oxjs.git",
-    "path": "./static/oxjs",
-  }, 
-  "oxtimelines": {
-    "url": "https://git.0x2620.org/oxtimelines.git",
-    "path": "./src/oxtimelines",
-  }, 
-  "python-ox": {
-    "url": "https://git.0x2620.org/python-ox.git",
-    "path": "./src/python-ox",
-  }
-}
 
 def reload_notice(base):
     print('\nPlease restart pan.do/ra to finish the update:\n\tsudo %s/ctl reload\n' % base)
+
 
 def check_services(base):
     services = "pandora pandora-tasks pandora-encoding pandora-cron pandora-websocketd".split()
@@ -83,24 +101,32 @@ def check_services(base):
             print('\tsudo service %s start' % service)
             print('')
 
+
 def update_service(service):
     print('Please install new init script for "%s" service:' % service)
-    if os.path.exists('/etc/init/%s.conf'%service):
+    if os.path.exists('/etc/init/%s.conf' % service):
         print('\tsudo cp %s/etc/init/%s.conf /etc/init/' % (base, service))
     if os.path.exists('/bin/systemctl'):
         print('\tsudo cp %s/etc/systemd/system/%s.service /etc/systemd/system/' % (base, service))
         print('\tsudo systemctl daemon-reload')
     print('\tsudo service %s restart' % service)
 
+
 def run_git(path, *args):
     cmd = ['git'] + list(args)
     env = {'GIT_DIR': '%s/.git' % path}
     return subprocess.check_output(cmd, env=env).decode().strip()
 
+
 def get_version(path):
     return run_git(path, 'rev-list', 'HEAD', '--count')
 
+
 if __name__ == "__main__":
+    base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
+    os.chdir(base)
+    activate_venv(base)
+
     if len(sys.argv) == 2 and sys.argv[1] in ('database', 'db'):
         os.chdir(join(base, 'pandora'))
         print('\nRunning "./manage.py migrate"\n')
@@ -144,7 +170,7 @@ if __name__ == "__main__":
             import pandora.settings
             with open('pandora/local_settings.py', 'r') as f:
                 local_settings = f.read()
-            if not 'BROKER_URL' in local_settings:
+            if 'BROKER_URL' not in local_settings:
                 broker_url = 'amqp://%s:%s@%s:%s/%s' % (
                     getattr(pandora.settings, 'BROKER_USER', 'pandora'),
                     getattr(pandora.settings, 'BROKER_PASSWORD', 'box'),

@@ -11,6 +11,9 @@ import djcelery
 djcelery.setup_loader()
 
 BASE_DIR = PROJECT_ROOT = normpath(dirname(__file__))
+BIN_DIR = normpath(join(PROJECT_ROOT, '..', 'bin'))
+if BIN_DIR not in os.environ['PATH']:
+    os.environ['PATH'] = BIN_DIR + os.pathsep + os.environ['PATH']
 
 DEBUG = False
 JSON_DEBUG = False

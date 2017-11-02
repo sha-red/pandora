@@ -69,8 +69,7 @@ apt-get install -y \
     git \
     python3-setuptools \
     python3-pip \
-    virtualenv \
-    python3-virtualenv \
+    python3-venv \
     python3-dev \
     python3-pil \
     python3-numpy \
