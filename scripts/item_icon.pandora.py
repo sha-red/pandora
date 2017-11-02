@@ -60,11 +60,11 @@ def main():
     parser.add_option('-l', '--timeline', dest='timeline', help='Timeline (image file to be read)')
     parser.add_option('-i', '--icon', dest='icon', help='Icon (image file to be written)')
     (options, args) = parser.parse_args()
-    if options.icon == None:
+    if options.icon is None:
         parser.print_help()
         sys.exit()
     render_icon(options.frame, options.timeline, options.icon)
 
+
 if __name__ == "__main__":
     main()
-

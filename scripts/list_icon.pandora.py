@@ -52,7 +52,7 @@ def main():
     parser.add_option('-f', '--frames', dest='frames', help='Poster frames (image files to be read)', default='')
     parser.add_option('-o', '--icon', dest='icon', help='Icon (image file to be written)')
     (options, args) = parser.parse_args()
-    if options.icon == None:
+    if options.icon is None:
         parser.print_help()
         sys.exit()
 
@@ -60,6 +60,6 @@ def main():
 
     render_list_icon(frames, options.icon)
 
+
 if __name__ == "__main__":
     main()
-

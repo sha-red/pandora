@@ -67,6 +67,7 @@ def render_poster(data, poster):
     drawText(poster_image, ((poster_width - text_size[0]) / 2, text_top + (text_height - text_size[1]) / 2), text, font_file, font_size, poster_color)
     poster_image.save(poster)
 
+
 def main():
     parser = OptionParser()
     parser.add_option('-d', '--data', dest='data', help='json file with metadata', default=None)
@@ -84,6 +85,6 @@ def main():
             data = json.load(f)
     render_poster(data, options.poster)
 
+
 if __name__ == "__main__":
     main()
-

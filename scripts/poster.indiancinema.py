@@ -225,6 +225,6 @@ def main():
 
     render_poster(data, options.poster)
 
+
 if __name__ == "__main__":
     main()
-

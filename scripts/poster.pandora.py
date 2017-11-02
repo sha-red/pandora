@@ -158,6 +158,6 @@ def main():
             data = json.load(f)
     render_poster(data, options.poster)
 
+
 if __name__ == "__main__":
     main()
-
