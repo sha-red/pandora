@@ -7,15 +7,15 @@
   pan.do/ra is known to work with Ubuntu 16.04,
   but other distributions might also work.
 
-  The instructions below are for Ubuntu16.04.
-  All commans given expect that you are root.
+  The instructions below are for Ubuntu 16.04.
+  All command given expect that you are root.
 
   To run pan.do/ra you need to install and setup:
 
     python 3.5
     postgres
     nginx (or apache2)
-    additinal video packages
+    additional video packages
 
 
 ## Installing required packages
