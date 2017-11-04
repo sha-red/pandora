@@ -38,7 +38,7 @@ pandora.ui.errorDialog = function(data) {
         setTimeout(function() {
             if ($('.OxErrorDialog').length == 0 && !pandora.isUnloading) {
                 showLogsButton = error == 'error'
-                    && pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
+                    && pandora.hasCapability('canSeeDebugMenu')
                 that = pandora.ui.iconDialog({
                     buttons: (showLogsButton ? [
                         Ox.Button({

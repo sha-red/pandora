@@ -9,9 +9,7 @@ pandora.ui.uploadVideoDialog = function(data) {
             $.browser.version < '35' || Firefogg().version >= 334
         ),
         infoContent = Ox._('Please select the video file that you want to upload.'),
-        itemView = pandora.site.capabilities.canSeeExtraItemViews[
-            pandora.user.level
-        ] ? 'media' : 'info',
+        itemView = pandora.hasCapability('canSeeExtraItemViews') ? 'media' : 'info',
         selectFile,
         $actionButton,
         $closeButton,

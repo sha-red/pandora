@@ -190,8 +190,8 @@ Ox.load('UI', {
     });
 
     function getVideoOptions(data) {
-        var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
-            canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
+        var canPlayClips = data.editable || pandora.hasCapability('canPlayClips') >= data.rightslevel,
+            canPlayVideo = data.editable || pandora.hasCapability('canPlayVideo') >= data.rightslevel,
             options = {},
             subtitlesLayer = pandora.site.layers.filter(function(layer) {
                 return layer.isSubtitles;
@@ -226,7 +226,7 @@ Ox.load('UI', {
                     annotation.duration = Math.abs(annotation.out - annotation['in']);
                     annotation.editable = annotation.editable
                         || annotation.user == pandora.user.username
-                        || pandora.site.capabilities['canEditAnnotations'][pandora.user.level];
+                        || pandora.hasCapability('canEditAnnotations');
                     return annotation;
                 })
             });

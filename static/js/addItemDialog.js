@@ -45,7 +45,7 @@ pandora.ui.addItemDialog = function(options) {
             {
                 id: 'import',
                 title: Ox._('Import Video Files'),
-                disabled: !pandora.site.capabilities.canImportItems[pandora.user.level],
+                disabled: !pandora.hasCapability('canImportItems'),
                 selected: selected == 'import'
             }
         ]

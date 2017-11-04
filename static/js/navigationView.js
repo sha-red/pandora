@@ -122,7 +122,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
 
         that.replaceElement(0,
             $element = Ox.Map({
-                // clickable: pandora.site.capabilities.canClickMap[pandora.user.level],
+                // clickable: pandora.hasCapability('canClickMap'),
                 find: ui.mapFind,
                 // 20 px menu + 24 px toolbar + 1px resizbar + 16px statusbar (if !item)
                 height: isEmbed ? window.innerHeight - 40

@@ -4,10 +4,10 @@
 
 pandora.ui.siteDialog = function(section) {
 
-    var canSeeVersion = pandora.site.capabilities.canSeeSoftwareVersion[pandora.user.level],
+    var canSeeVersion = pandora.hasCapability('canSeeSoftwareVersion'),
         dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
         dialogWidth = Math.round(window.innerWidth * 0.75),
-        isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
+        isEditable = pandora.hasCapability('canEditSitePages'),
         tabs = Ox.clone(pandora.site.sitePages, true).map(function(page) {
             page.title = Ox._(page.title);
             return page;

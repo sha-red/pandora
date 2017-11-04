@@ -413,7 +413,7 @@ pandora.ui.editPanel = function(isEmbed) {
         var $content = Ox.Element()
                 .css({padding: '16px'})
                 .appendTo(that),
-            isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level];
+            isEditable = pandora.hasCapability('canEditSitePages');
         Ox.EditableContent({
                 editable: false,
                 value: Ox._('{0} Edits', [pandora.site.site.name]),

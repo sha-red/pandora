@@ -213,7 +213,7 @@ pandora.ui.clipList = function(videoRatio) {
                         pandora.api.get({id: item, keys: ['durations', 'rightslevel', 'streams']}, function(result) {
                             var points = [that.value(id, 'in'), that.value(id, 'out')],
                                 $player = Ox.VideoPlayer({
-                                    censored: pandora.site.capabilities.canPlayClips[pandora.user.level] < result.data.rightslevel
+                                    censored: pandora.hasCapability('canPlayClips') < result.data.rightslevel
                                         ? [{'in': 0, out: points[1] - points[0]}]
                                         : [],
                                     censoredIcon: pandora.site.cantPlay.icon,

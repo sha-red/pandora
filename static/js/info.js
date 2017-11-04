@@ -215,7 +215,7 @@ pandora.ui.listInfo = function() {
             : pandora.user.ui.section == 'documents'
             ? pandora.user.ui._collection
             : ui[folderItem.toLowerCase()],
-        canEditFeaturedLists = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
+        canEditFeaturedLists = pandora.hasCapability('canEditFeatured' + folderItems),
         that = Ox.Element().css({padding: '16px', textAlign: 'center'}),
         $icon = Ox.Element('<img>')
             .attr({

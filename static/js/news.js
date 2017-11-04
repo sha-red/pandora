@@ -12,7 +12,7 @@ pandora.ui.news = function(width, height) {
         backgroundColor = Ox.Theme() == 'oxlight' ? 'rgb(224, 224, 224)'
             : Ox.Theme() == 'oxmedium' ? 'rgb(128, 128, 128)'
             : 'rgb(32, 32, 32)',        
-        isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
+        isEditable = pandora.hasCapability('canEditSitePages'),
         items = [],
         $text;
 

@@ -21,7 +21,7 @@ pandora.ui.groupsDialog = function(options) {
             width: 584 + Ox.UI.SCROLLBAR_SIZE
         }),
 
-        canManageGroups = pandora.site.capabilities.canManageUsers[pandora.user.level],
+        canManageGroups = pandora.hasCapability('canManageUsers'),
         isItem = options.type == 'item',
 
         $content,

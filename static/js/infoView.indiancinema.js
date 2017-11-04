@@ -3,8 +3,8 @@
 pandora.ui.infoView = function(data) {
 
     var ui = pandora.user.ui,
-        canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
-        canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level],
+        canEdit = pandora.hasCapability('canEditMetadata'),
+        canRemove = pandora.hasCapability('canRemoveItems'),
         canSeeAllMetadata = pandora.user.level != 'guest',
         css = {
             marginTop: '4px',
@@ -65,7 +65,7 @@ pandora.ui.infoView = function(data) {
                     {
                         id: 'upload',
                         title: Ox._('Upload Video...'),
-                        disabled: !pandora.site.capabilities.canAddItems[pandora.user.level]
+                        disabled: !pandora.hasCapability('canAddItems')
                     },
                     {},
                     {
@@ -904,7 +904,7 @@ pandora.ui.infoView = function(data) {
                     .appendTo($line);
             }
             capabilities.forEach(function(capability) {
-                var hasCapability = pandora.site.capabilities[capability.name][userLevel] >= rightsLevel,
+                var hasCapability = pandora.hasCapability(capability.name, userLevel) >= rightsLevel,
                     $element = Ox.Theme.formatColorLevel(hasCapability, ['', '']);
                 Ox.Button({
                         tooltip: Ox._('{0} '

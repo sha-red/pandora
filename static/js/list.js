@@ -55,7 +55,7 @@ pandora.ui.list = function() {
                 width: 16
             }], pandora.site.sortKeys.filter(function(key) {
                 return !key.capability
-                    || pandora.site.capabilities[key.capability][pandora.user.level];
+                    || pandora.hasCapability(key.capability);
             }).map(function(key) {
                 var position = ui.listColumns.indexOf(key.id);
                 return {

@@ -13,7 +13,7 @@ pandora.ui.item = function() {
     pandora.api.get({
         id: pandora.user.ui.item,
         keys: isVideoView ? Ox.unique(pandora.VIDEO_OPTIONS_KEYS.concat(pandora.site.itemTitleKeys)) : []
-    }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
+    }, pandora.user.ui.itemView == 'info' && pandora.hasCapability('canEditMetadata') ? 0 : -1, function(result) {
 
         if (pandora.user.ui.item != item) {
             return;

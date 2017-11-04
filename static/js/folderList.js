@@ -7,7 +7,7 @@ pandora.ui.folderList = function(id, section) {
         i = Ox.getIndexById(pandora.site.sectionFolders[section], id),
         folderItems = pandora.getFolderItems(section),
         folderItem = folderItems.slice(0, -1),
-        canEditFeatured = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
+        canEditFeatured = pandora.hasCapability('canEditFeatured' + folderItems),
         $placeholder,
         that;
     var columns, items;

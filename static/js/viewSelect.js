@@ -14,7 +14,7 @@ pandora.ui.viewSelect = function() {
         that;
     if (
         viewKey == 'itemView'
-        && pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level]
+        && pandora.hasCapability('canSeeExtraItemViews')
     ) {
         items = items.concat([
             {},

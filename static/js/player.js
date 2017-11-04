@@ -21,7 +21,7 @@ pandora.ui.player = function(data) {
             clickLink: pandora.clickLink,
             cuts: data.cuts || [],
             duration: data.duration,
-            enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= data.rightslevel,
+            enableDownload: pandora.hasCapability('canDownloadVideo') >= data.rightslevel,
             enableSubtitles: ui.videoSubtitles,
             find: ui.itemFind,
             getLargeTimelineURL: function(type, i) {

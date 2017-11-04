@@ -4,7 +4,7 @@
 
 pandora.ui.mediaView = function(options) {
 
-    var canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level] || options.editable,
+    var canRemove = pandora.hasCapability('canRemoveItems') || options.editable,
         self = {},
         keys = ['title', 'director', 'year', 'id'],
         listKeys = keys.filter(function(key) {

@@ -100,7 +100,7 @@ pandora.ui.itemClips = function(options) {
                             result.data.durations, points
                         ),
                         $player = Ox.VideoPlayer({
-                            censored: pandora.site.capabilities.canPlayClips[pandora.user.level] < result.data.rightslevel
+                            censored: pandora.hasCapability('canPlayClips') < result.data.rightslevel
                                 ? [{'in': partsAndPoints.points[0], out: partsAndPoints.points[1]}]
                                 : [],
                             enableMouse: true,

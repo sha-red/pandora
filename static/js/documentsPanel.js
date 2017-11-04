@@ -576,7 +576,7 @@ pandora.ui.documentsPanel = function(options) {
         var $name, $description, $input,
             item = $list.value($list.options('selected')[0]),
             editable = item.user == pandora.user.username
-                || pandora.site.capabilities.canEditDocuments[pandora.user.level]
+                || pandora.hasCapability('canEditDocuments')
                 || options.editable,
             labelWidth = 80,
             width = ui.documentSize - 16 - Ox.UI.SCROLLBAR_SIZE;

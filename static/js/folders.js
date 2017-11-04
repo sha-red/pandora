@@ -18,7 +18,7 @@ pandora.ui.folders = function(section) {
         }[section]] || '').split(':')[0] == pandora.user.username,
         folderItems = pandora.getFolderItems(section),
         folderItem = folderItems.slice(0, -1),
-        canEditFeatured = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
+        canEditFeatured = pandora.hasCapability('canEditFeatured' + folderItems),
         initCounter = 0,
         loadCounter = 0;
     pandora.$ui.allItems = pandora.ui.allItems(section).appendTo(that);

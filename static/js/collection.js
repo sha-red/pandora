@@ -29,7 +29,7 @@ pandora.ui.collection = function() {
             unique: 'id',
             columns: pandora.site.documentSortKeys.filter(function(key) {
                 return !key.capability
-                    || pandora.site.capabilities[key.capability][pandora.user.level];
+                    || pandora.hasCapability(key.capability);
             }).map(function(key) {
                 var position = ui.collectionColumns.indexOf(key.id);
                 return {

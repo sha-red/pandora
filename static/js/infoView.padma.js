@@ -3,8 +3,8 @@
 pandora.ui.infoView = function(data) {
 
     var ui = pandora.user.ui,
-        canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level] || data.editable,
-        canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level] || data.editable,
+        canEdit = pandora.hasCapability('canEditMetadata') || data.editable,
+        canRemove = pandora.hasCapability('canRemoveItems') || data.editable,
         css = {
             marginTop: '4px',
             textAlign: 'justify'
@@ -665,7 +665,7 @@ pandora.ui.infoView = function(data) {
                     .appendTo($line);
             }
             capabilities.forEach(function(capability) {
-                var hasCapability = pandora.site.capabilities[capability.name][userLevel] >= rightsLevel,
+                var hasCapability = pandora.hasCapability(capability.name, userLevel) >= rightsLevel,
                     $element = Ox.Theme.formatColorLevel(hasCapability, ['', '']);
                 Ox.Button({
                         tooltip: Ox._('{0} '

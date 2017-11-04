@@ -149,9 +149,7 @@ pandora.ui.tasksDialog = function(options) {
             ],
             width: 128
         }).css({
-            display: pandora.site.capabilities.canSeeAllTasks[
-                pandora.user.level
-            ] ? 'block' : 'none',
+            display: pandora.hasCapability('canSeeAllTasks') ? 'block' : 'none',
             margin: '8px 4px 4px 4px'
         }).bindEvent({
             change: function(data) {
