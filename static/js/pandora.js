@@ -158,8 +158,11 @@ appPanel
     }
 
     function loadScreen(images) {
-        
-        var gradient, loadingScreen;
+        var gradient, loadingScreen,
+            gray = theme == 'oxlight' ? 224 : theme == 'oxmedium' ? 144 : 32,
+            color = window.backgroundColor ? window.backgroundColor : gray+', '+gray+', '+gray,
+            background = 'linear-gradient(top, rgba('+color+', 0.75), rgba('+color+', 1), rgba('+color+', 1))',
+            backgroundColor = 'rgb('+color+')';
         if (!isMSIE) {
             gradient = document.createElement('div');
             gradient.style.position = 'absolute';
@@ -172,9 +175,7 @@ appPanel
             gradient.style.height = logoHeight + 2 + 'px';
             gradient.style.margin = 'auto';
             ['-moz-', '-ms-', '-o-', '-webkit-', ''].forEach(function(prefix) {
-                gradient.style.background = theme == 'oxlight' ? prefix + 'linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
-                    : theme == 'oxmedium' ? prefix + 'linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
-                    : prefix + 'linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
+                gradient.style.background = prefix + background;
             });
         }
         loadingScreen = document.createElement('div');
@@ -183,8 +184,7 @@ appPanel
         loadingScreen.style.position = 'absolute';
         loadingScreen.style.width = '100%';
         loadingScreen.style.height = '100%';
-        loadingScreen.style.backgroundColor = theme == 'oxlight' ? 'rgb(224, 224, 224)'
-            : theme == 'oxmedium' ? 'rgb(144, 144, 144)' : 'rgb(32, 32, 32)';
+        loadingScreen.style.backgroundColor = backgroundColor;
         loadingScreen.style.zIndex = '1002';
         loadingScreen.appendChild(images.logo);
         images.reflection && loadingScreen.appendChild(images.reflection);

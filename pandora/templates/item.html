@@ -3,19 +3,8 @@
     <head>
         <meta charset="utf-8"/>
         <title>{{head_title}}</title>
-        <link rel="icon" type="image/png" href="/static/png/icon.png"/>
-        <meta name="application-name" content="{{settings.SITENAME}}"/>
-        <meta name="application-url" content="{{base_url}}"/>
         <link rel="alternate" type="application/json+oembed" href="{{base_url}}oembed?url={{current_url|urlencode}}" title="oEmbed Profile"/>
-        <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="{{settings.SITENAME}}"/>
-        <script>
-            try {
-                if (localStorage && !localStorage['Ox.theme']) {
-                    localStorage['Ox.theme'] = '"{{settings.CONFIG.user.ui.theme}}"';
-                }
-            } catch(e) {}
-        </script>
-        <script type="text/javascript" src="/static/js/pandora.js?{{settings.CONFIG.site.version}}"></script>
+        {% include "baseheader.html" %}
         <meta name="title" content="{{title}}"/>
         {%if description %}<meta name="description" content="{{description}}"/> {%endif%}
         {%if keywords %}<meta name="keywords" content="{{keywords|safe}}"/> {%endif%}
@@ -27,7 +16,6 @@
         <meta property="og:image" content="{{url}}/256p.jpg"/>
         <meta property="og:site_name" content="{{settings.SITENAME}}"/>
         {%if description %}<meta property="og:description" content="{{description}}"/>{%endif%}
-        <meta name="google" value="notranslate"/>
     </head>
     <body>
         <noscript>

@@ -1,0 +1,14 @@
+        <link rel="icon" type="image/png" href="/static/png/icon.png" />
+        <meta name="application-name" content="{{settings.SITENAME}}"/>
+        <meta name="application-url" content="{{base_url}}"/>
+        <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="{{settings.SITENAME}}" />
+        <script>
+            try {
+                if (localStorage && !localStorage['Ox.theme']) {
+                    localStorage['Ox.theme'] = '"{{settings.CONFIG.user.ui.theme}}"';
+                }
+            } catch(e) {}
+            {% if settings.LOADING_BACKGROUND %}var backgroundColor="{{settings.LOADING_BACKGROUND}}";{%endif%}
+        </script>
+        <script type="text/javascript" src="/static/js/pandora.js?{{settings.CONFIG.site.version}}"></script>
+        <meta name="google" value="notranslate"/>
