@@ -10,6 +10,11 @@ if [ "$action" = "init" ]; then
     cd "`dirname "$0"`"
     BASE=`pwd`
     python3 -m venv --system-site-packages .
+
+    # Work around broken venv module in Ubuntu 16.04 / Debian 9
+    if [ ! -e bin/pip ]; then
+        bin/python3 -m pip install -U pip
+    fi
     if [ ! -d static/oxjs ]; then
         git clone --depth 1 https://git.0x2620.org/oxjs.git static/oxjs
     fi
