@@ -210,7 +210,7 @@ echo
 if [ -n "\$HOST" ]; then
     echo "  http://\$HOST/"
 fi
-for ip in \$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print \$1 }'); do
+for ip in \$(ip -4 a | grep inet | grep -v peer | grep -v '127.0.0.1' | cut -f1 -d/ | sed s/inet//g | xargs); do
     echo "  http://\$ip/"
 done
 echo
