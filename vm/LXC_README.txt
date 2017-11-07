@@ -22,6 +22,7 @@
     echo "pandora:pandora" | chpasswd
     echo PasswordAuthentication no >> /etc/ssh/sshd_config
     locale-gen en_US.UTF-8
+    update-locale LANG=en_US.UTF-8
     export LANG=en_US.UTF-8
 
     cd /root
