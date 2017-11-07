@@ -5,7 +5,7 @@ Create virtual disk of pan.do/ra
 Pan.do/ra VM are based on cloud images.
 You also qemu to run the vm and virtualbox to convert the image
 
-  apt-get install vmdebootstrap virtualbox qemu qemu-utils
+  apt-get install virtualbox qemu qemu-utils
   apt-get install kvm cloud-utils
 
 

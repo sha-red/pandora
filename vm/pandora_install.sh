@@ -272,4 +272,10 @@ set showmode
 
 set lcs=tab:→·,trail:·,nbsp:˽
 set list
+if has('mouse')
+  set mouse=
+endif
 EOF
+if [ -e /usr/share/vim/vim80/defaults.vim ]; then
+    sed -i 's/ set mouse=a/" set mouse=a/g' /usr/share/vim/vim80/defaults.vim
+fi

@@ -7,8 +7,12 @@ TARGET=${BASE}/pandora-r${VERSION}.vdi
 
 img=xenial-server-cloudimg-amd64-disk1.img
 
-test -e $img || curl -O https://cloud-images.ubuntu.com/xenial/current/$img
-cp --reflink=always $img ${TARGET}.img
+if [ ! -e $img ]; then
+    echo downloading $img
+    curl -s -O https://cloud-images.ubuntu.com/xenial/current/$img
+fi
+echo preparing ${TARGET}.img
+cp -a $img ${TARGET}.img
 
 cloud-localds seed.img cloud-config
 qemu-img resize ${TARGET}.img +998G
