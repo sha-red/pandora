@@ -63,6 +63,7 @@ fi
 apt-get install -y \
     sudo \
     openssh-server \
+    iproute2 \
     vim \
     wget \
     pwgen \
