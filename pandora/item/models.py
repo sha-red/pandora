@@ -494,7 +494,7 @@ class Item(models.Model):
             if format == "webm":
                 cmd = ['mkvmerge', '-o', output]
                 cmd += [streams[0]] + ['+' + s for s in streams[1:]]
-                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+                p = subprocess.Popen(cmd, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'), close_fds=True)
                 p.wait()
                 return True
             elif format == "mp4":
@@ -502,7 +502,7 @@ class Item(models.Model):
                 shutil.copy(streams[0], tmp_output)
                 for s in streams[1:]:
                     cmd = ['MP4Box', '-cat', s, tmp_output]
-                    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+                    p = subprocess.Popen(cmd, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'), close_fds=True)
                     p.wait()
                 shutil.copy(tmp_output, output)
                 os.unlink(tmp_output)
