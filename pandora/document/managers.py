@@ -75,6 +75,11 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
         if exclude:
             q = ~Q(id__in=models.Document.objects.filter(q))
         return q
+    elif k == 'rightslevel':
+        q = Q(rightslevel=v)
+        if exclude:
+            q = ~Q(rightslevel=v)
+        return q
     elif k == 'groups':
         if op == '==' and v == '$my':
             if not owner:
