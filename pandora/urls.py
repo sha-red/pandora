@@ -69,14 +69,14 @@ urlpatterns = [
     url(r'^sitemap.xml$', item.views.sitemap_xml),
     url(r'', include(item.urls)),
 ]
-#if settings.DEBUG:
 #sould this not be enabled by default? nginx should handle those
-urlpatterns += [
-    url(r'^data/(?P<path>.*)$', django.views.static.serve,
-        {'document_root': settings.MEDIA_ROOT}),
-    url(r'^static/(?P<path>.*)$', django.views.static.serve,
-        {'document_root': settings.STATIC_ROOT}),
-]
+if settings.DEBUG:
+    urlpatterns += [
+        url(r'^data/(?P<path>.*)$', django.views.static.serve,
+            {'document_root': settings.MEDIA_ROOT}),
+        url(r'^static/(?P<path>.*)$', django.views.static.serve,
+            {'document_root': settings.STATIC_ROOT}),
+    ]
 
 urlpatterns += [
     url(r'^(V[a-z0-9]+)$', urlalias.views.padma_video),
