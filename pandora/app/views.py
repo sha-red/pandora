@@ -20,6 +20,7 @@ from ox.utils import json, ET
 from . import models
 
 from user.models import init_user
+from user.utils import get_location, get_ip
 from changelog.models import add_changelog
 
 from oxdjango.api import actions
