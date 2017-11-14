@@ -1301,7 +1301,11 @@ pandora.getDownloadLink = function(item, rightslevel) {
         pandora.hasCapability('canSeeItem', 'guest') < rightslevel) {
         torrent = false;
     }
-    return '/' + item + (torrent ? '/torrent/' : '/download/');
+    url = '/' + item + (torrent ? '/torrent/' : '/download/');
+    if (!torrent && pandora.site.video.downloadFormat) {
+        url += Ox.max(pandora.site.video.resolutions) + 'p.' + pandora.site.video.downloadFormat;
+    }
+    return url;
 };
 
 pandora.getEditTooltip = function(title) {

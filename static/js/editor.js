@@ -167,7 +167,8 @@ pandora.ui.editor = function(data) {
             downloadselection: function(data) {
                 document.location.href = '/' + ui.item
                     + '/' + Ox.max(pandora.site.video.resolutions)
-                    + 'p.webm?t=' + data['in'] + ',' + data.out;
+                    + 'p.' + pandora.site.video.downloadFormat
+                    + '?t=' + data['in'] + ',' + data.out;
             },
             editannotation: function(data) {
                 Ox.Log('', 'editAnnotation', data);

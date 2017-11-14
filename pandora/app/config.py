@@ -149,6 +149,9 @@ def load_config(init=False):
             key['autocompleteSort'] = get_by_id(default['itemKeys'], 'title')['autocompleteSort']
             sys.stderr.write("adding default value to itemKeys.title.autocompleteSort:\n\t\"autocompleteSort\": %s,\n\n" % json.dumps(key['autocompleteSort']))
 
+        if 'downloadFormat' not in config['video']:
+            config['video']['downloadFormat'] = default['video']['downloadFormat']
+
         old_formats = getattr(settings, 'CONFIG', {}).get('video', {}).get('formats', [])
         formats = config.get('video', {}).get('formats')
         if set(old_formats) != set(formats):

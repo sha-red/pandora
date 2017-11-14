@@ -1252,6 +1252,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "torrent": If true, video downloads are offered via BitTorrent
     */
     "video": {
+        "downloadFormat": "webm",
         "formats": ["webm", "mp4"],
         "previewRatio": 1.3333333333,
         "resolutions": [240, 480],
