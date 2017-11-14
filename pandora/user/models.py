@@ -9,7 +9,6 @@ from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
-from django.contrib.gis.geoip2 import GeoIP2
 from django.utils.encoding import python_2_unicode_compatible
 
 import ox
@@ -23,6 +22,7 @@ import documentcollection.models
 
 from . import managers
 from . import tasks
+from .utils import get_ip, get_location
 
 
 @python_2_unicode_compatible
@@ -71,24 +71,14 @@ class SessionData(models.Model):
     def parse_data(self):
         self.parse_useragent()
         if self.ip:
-            try:
-                g = GeoIP2()
-                location = g.city(self.ip)
-                if location:
-                    country = ox.get_country_name(location['country_code'])
-                    if location['city']:
-                        city = location['city']
-                        if isinstance(city, bytes):
-                            city = city.decode('latin-1')
-                        self.location = u'%s, %s' % (city, country)
-                        self.location_sort = u'%s, %s' % (country, city)
-                    else:
-                        self.location_sort = self.location = country
-                else:
-                    self.location_sort = self.location = None
-            except:
-                self.location_sort = self.location = None
-                pass
+            city, country = get_location(self.ip)
+            if city:
+                location = u'%s, %s' % (city, country)
+                location_sort = u'%s, %s' % (country, city)
+            else:
+                location = location_sort = country
+            self.location = location
+            self.location_sort = location_sort
 
     def save(self, *args, **kwargs):
         if self.user:
@@ -117,12 +107,7 @@ class SessionData(models.Model):
         data, created = cls.objects.get_or_create(session_key=session_key)
         if request.user.is_authenticated():
             data.user = request.user
-        if 'HTTP_X_FORWARDED_FOR' in request.META:
-            data.ip = request.META['HTTP_X_FORWARDED_FOR'].split(',')[0]
-        else:
-            data.ip = request.META['REMOTE_ADDR']
-        if data.ip.startswith('::ffff:'):
-            data.ip = data.ip[len('::ffff:'):]
+        data.ip = get_ip(request)
         data.useragent = request.META.get('HTTP_USER_AGENT', '')[:4096]
         info = json.loads(request.POST.get('data', '{}'))
         if info and isinstance(info, dict):
