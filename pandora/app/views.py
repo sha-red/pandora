@@ -14,6 +14,7 @@ from oxdjango.shortcuts import json_response, render_to_json_response
 from oxdjango.decorators import login_required_json
 
 import ox
+import ox.geo
 from ox.utils import json, ET
 
 from . import models
@@ -163,6 +164,22 @@ def init(request, data):
     if request.META.get('HTTP_X_PREFIX') == 'NO':
         config['site']['videoprefix'] = ''
         config['site']['mediaprefix'] = ''
+    elif settings.CDN_PREFIX:
+        try:
+            city, country = get_location(get_ip(request))
+            info = ox.geo.get_country(country)
+            prefix = None
+            for key in ('name', 'region', 'continent'):
+                location = info.get(key)
+                if location in settings.CDN_PREFIX:
+                    prefix = settings.CDN_PREFIX[location]
+                    break
+            if prefix:
+                config['site']['videoprefix'] = prefix['video']
+                config['site']['mediaprefix'] = prefix['media']
+        except:
+            pass
+
     response['data']['site'] = config
     response['data']['user'] = init_user(request.user, request)
     request.session['last_init'] = str(datetime.now())

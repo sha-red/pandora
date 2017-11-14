@@ -225,6 +225,14 @@ VIDEO_PREFIX = ''
 MEDIA_PREFIX = ''
 #VIDEO_PREFIX = '//media.example.com'
 #SESSION_COOKIE_DOMAIN = '.example.com'
+CDN_PREFIX = {}
+# set video prefix baesd on country/region/continent
+'''
+CDN_PREFIX = {
+    'India': {'media': 'https://media.in.example.com', 'video': 'https://{uid}.in.example.com'},
+    'Northern Africa': {'media': 'https://media.eg.example.com', 'video': 'https://{uid}.eg.example.com'},
+}
+'''
 
 SESSION_COOKIE_AGE = 60*24*60*60
 
