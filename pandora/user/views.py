@@ -29,6 +29,7 @@ from changelog.models import add_changelog
 
 from . import models
 from .decorators import capability_required_json
+from .utils import rename_user
 
 
 def get_user_or_404(data):
@@ -357,7 +358,7 @@ def editUser(request, data):
     if 'email' in data:
         if 'email' in data:
             data['email'] = ox.escape_html(data['email'])
-        if User.objects.filter(email__iexact=data['email']).exclude(id=user.id).count()>0:
+        if User.objects.filter(email__iexact=data['email']).exclude(id=user.id).count() > 0:
             response = json_response(status=403, text='email already in use')
             return render_to_json_response(response)
         user.email = data['email']
@@ -380,10 +381,12 @@ def editUser(request, data):
                 user.groups.add(group)
     if 'username' in data:
         if User.objects.filter(
-                username__iexact=data['username']).exclude(id=user.id).count()>0:
+                username__iexact=data['username']).exclude(id=user.id).count() > 0:
             response = json_response(status=403, text='username already in use')
             return render_to_json_response(response)
-        user.username = data['username']
+        else:
+            rename_user(user, data['username'])
+            profile = models.UserProfile.objects.get(pk=user.pk)
     user.save()
     profile.save()
     add_changelog(request, data, user.username)

@@ -27,3 +27,45 @@ def get_location(ip):
     except:
         country = city = None
     return city, country
+
+
+def rename_user(user, new):
+    import itemlist.models
+    import item.models
+    import user.models
+
+    old = user.username
+    old_prefix = old + ':'
+    new_prefix = new + ':'
+
+    # update list queries matching user
+    for l in itemlist.models.List.objects.filter(query__contains=old_prefix):
+        changed = False
+        for q in l.query['conditions']:
+            if old_prefix in q['value']:
+                q['value'] = q['value'].replace(old_prefix, new_prefix)
+                changed = True
+        if changed:
+            l.save()
+
+    # update profile settings matching user
+    for p in user.models.UserProfile.objects.all():
+        changed = False
+        lists = list(p.ui.get('lists', {}))
+        for name in lists:
+            if name.startswith(old_prefix):
+                nname = name.replace(old_prefix, new_prefix)
+                p.ui['lists'][nname] = p.ui['lists'].pop(name)
+                changed = True
+        collections = list(p.ui.get('collections', {}))
+        for name in collections:
+            if name.startswith(old_prefix):
+                nname = name.replace(old_prefix, new_prefix)
+                p.ui['collections'][nname] = p.ui['collections'].pop(name)
+                changed = True
+        if changed:
+            p.save()
+
+    # update user item find
+    item.models.ItemFind.objects.filter(key='user', value=old).update(value=new)
+    user.username = new
