@@ -1296,7 +1296,8 @@ pandora.getClipVideos = function(clip, resolution) {
 }());
 
 pandora.getDownloadLink = function(item, rightslevel) {
-    var torrent = pandora.site.video.torrent;
+    var torrent = pandora.site.video.torrent,
+        url;
     if (arguments.length == 2 && torrent &&
         pandora.hasCapability('canSeeItem', 'guest') < rightslevel) {
         torrent = false;
