@@ -1046,6 +1046,13 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
 
 };
 
+pandora.escapeQueryValue = function(value) {
+    return value.replace(/_/g, '%09')
+        .replace(/\s/g, '_')
+        .replace(/</g, '%0E')
+        .replace(/>/g, '%0F');
+};
+
 pandora.enterFullscreen = function() {
     pandora.$ui.appPanel.size(0, 0);
     if (pandora.user.ui.showSidebar) {

@@ -694,7 +694,7 @@ pandora.ui.infoView = function(data) {
             return key
                 ? '<a href="/' + (
                     key == 'alternativeTitles' ? 'title' : key
-                ) + '=' + value + '">' + value + '</a>'
+                ) + '=' + pandora.escapeQueryValue(value) + '">' + value + '</a>'
                 : value;
         }).join(Ox.contains(specialListKeys, key) ? '; ' : ', ');
     }

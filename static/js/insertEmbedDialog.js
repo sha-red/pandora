@@ -442,7 +442,7 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
             var data = Ox.map($input, function($element) {
                     return $element.options('value');
                 }),
-                options = Ox.serialize({
+                options = pandora.escapeQueryValue(Ox.serialize({
                     title: data.title || void 0,
                     showTimeline: data.showTimeline || void 0,
                     timeline: data.timeline && data.timeline != 'default'
@@ -451,8 +451,7 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                     showLayers: data.showAnnotations && data.showLayers
                         ? data.showLayers : void 0,
                     //matchRatio: true
-                }, true)
-                .replace(/_/g, '%09').replace(/\s/g, '_')
+                }, true))
                 .replace(/"/g, '&quot;');
             url = data.protocol + '://'
                 + data.site + '/'

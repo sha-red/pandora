@@ -290,10 +290,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 ? '%' + char.charCodeAt(0).toString(16).toUpperCase()
                 : char;
         });
-        return ret.replace(/_/g, '%09')
-            .replace(/\s/g, '_')
-            .replace(/</g, '%0E')
-            .replace(/>/g, '%0F');
+        return pandora.escapeQueryValue(ret);
     }
 
     function getForm() {

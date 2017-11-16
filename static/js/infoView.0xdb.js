@@ -781,7 +781,7 @@ pandora.ui.infoView = function(data) {
     function formatValue(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key ?
-                '<a href="/' + key + '=' + value + '">' + value + '</a>'
+                '<a href="/' + key + '=' + pandora.escapeQueryValue(value) + '">' + value + '</a>'
                 : value;
         }).join(', ');
     }
