@@ -498,14 +498,21 @@ class Item(models.Model):
                 p.wait()
                 return True
             elif format == "mp4":
-                fd, tmp_output = tempfile.mkstemp('.mp4')
-                shutil.copy(streams[0], tmp_output)
-                for s in streams[1:]:
-                    cmd = ['MP4Box', '-cat', s, tmp_output]
-                    p = subprocess.Popen(cmd, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'), close_fds=True)
-                    p.wait()
-                shutil.copy(tmp_output, output)
-                os.unlink(tmp_output)
+                fd, tmp_output_txt = tempfile.mkstemp('.txt')
+                with open(tmp_output_txt, 'w') as f:
+                    f.write('\n'.join(["file '{}'".format(path) for path in streams]))
+                cmd = [
+                    settings.FFMPEG,
+                    '-nostats', '-loglevel', 'error',
+                    '-y',
+                    '-f', 'concat', '-safe', '0', '-i', tmp_output_txt,
+                    '-c', 'copy',
+                    output
+                ]
+                p = subprocess.Popen(
+                    cmd, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'), close_fds=True)
+                p.wait()
+                os.unlink(tmp_output_txt)
                 return True
             else:
                 return None
