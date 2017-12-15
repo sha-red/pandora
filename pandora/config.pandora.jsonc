@@ -1002,6 +1002,8 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "https": false,
         "id": "pandora",
         "name": "pan.do/ra",
+        // Set to true to allow search engines to index the site
+        "public": false,
         "sendReferrer": true,
         "url": "pandora.local"
     },

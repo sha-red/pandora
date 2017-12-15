@@ -89,11 +89,17 @@ def opensearch_xml(request):
         'application/xml'
     )
 
-def robots_txt(request, url):
-    return HttpResponse(
-        'User-agent: *\nDisallow:\nSitemap: %s\n' % request.build_absolute_uri('/sitemap.xml'),
-        'text/plain'
-    )
+def robots_txt(request):
+    if settings.CONFIG['site'].get('public'):
+        robots_txt = '''User-agent: *
+Disallow:
+Sitemap: {}
+'''.format(request.build_absolute_uri('/sitemap.xml'))
+    else:
+        robots_txt = '''User-agent: *
+Disallow: /
+'''
+    return HttpResponse(robots_txt, 'text/plain')
 
 def getPage(request, data):
     '''
@@ -113,7 +119,7 @@ def getPage(request, data):
         name = data['name']
     page, created = models.Page.objects.get_or_create(name=name)
     if created:
-        page.text= ''
+        page.text = ''
         page.save()
     response = json_response({'name': page.name, 'text': page.text})
     return render_to_json_response(response)

@@ -1110,6 +1110,7 @@
         "https": true,
         "id": "0xdb",
         "name": "0xDB",
+        "public": true,
         "sendReferrer": false,
         "url": "0xDB.org"
     },
