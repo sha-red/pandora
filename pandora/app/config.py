@@ -107,7 +107,7 @@ def load_config(init=False):
         # add missing defaults
         for section in sorted((
             'capabilities', 'cantPlay',
-            'documentKeys', 'documentRightsLevels', 'documentRightsLevel',
+            'documentKeys', 'documentRightsLevels',
             'entities', 'itemName', 'itemTitleKeys', 'itemKeys', 'media', 'posters',
             'site', 'tv', 'user.ui', 'user.ui.part', 'user.ui.showFolder',
             'menuExtras', 'languages'
@@ -139,6 +139,14 @@ def load_config(init=False):
                 if added:
                     sys.stderr.write("adding default %s:\n\t" % section)
                     sys.stderr.write("\n\t".join(added) + '\n\n')
+
+        key = 'documentRightsLevel'
+        if key not in config:
+            config[key] = {}
+        for level in config['userLevels']:
+            if level not in config[key]:
+                config[key] = default.get(key, 0)
+
         for key in ('language', 'importMetadata'):
             if key not in config:
                 sys.stderr.write("adding default value:\n\t\"%s\": %s,\n\n" % (key, json.dumps(default[key])))
