@@ -65,7 +65,7 @@ pandora.ui.helpDialog = function() {
             return '<tr><td>' + (index + 1) + '</td><td>' + Ox._('Add {0}', [layer.item.toLowerCase()]) + '</td></tr>';
         }).join('\n');
         strings.itemName = Ox.map(strings.itemName, function(v) {
-            return v.toLowerCase();
+            return Ox._(v).toLowerCase();
         });
         strings.signup = pandora.user.level == 'guest'
             ? '<a href="/signup">' + Ox._('sign up') + '</a>' : Ox._('sign up');
