@@ -51,12 +51,10 @@ pandora.ui.helpDialog = function() {
         }),
         url = '/static/html/help.html';
 
-    /*
     // FIXME: should be updated at build time
     if (Ox.contains(['ar'], pandora.user.ui.locale)) {
         url = '/static/html/help.' + pandora.user.ui.locale + '.html';
     }
-    */
 
     Ox.get(url, function(html) {
 
