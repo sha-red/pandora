@@ -1063,7 +1063,7 @@
         "https": true,
         "id": "padma",
         "name": "Pad.ma",
-        "public": false,
+        "public": true,
         "sendReferrer": true,
         "url": "pad.ma"
     },
