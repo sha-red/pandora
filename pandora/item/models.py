@@ -41,6 +41,7 @@ from clip.models import Clip, get_layers
 from person.models import get_name_sort
 from sequence.tasks import get_sequences
 from title.models import get_title_sort
+from user.utils import update_groups
 import archive.models
 
 
@@ -247,15 +248,7 @@ class Item(models.Model):
             del data['id']
         if 'groups' in data:
             groups = data.pop('groups')
-            if isinstance(groups, list):
-                groups = list(filter(lambda g: g.strip(), groups))
-                groups = [ox.escape_html(g) for g in groups]
-                for g in self.groups.exclude(name__in=groups):
-                    self.groups.remove(g)
-                current_groups = [g.name for g in self.groups.all()]
-                for g in list(filter(lambda g: g not in current_groups, groups)):
-                    group, created = Group.objects.get_or_create(name=g)
-                    self.groups.add(group)
+            update_groups(self, groups)
         keys = [k['id'] for k in
                 list(filter(lambda i: i.get('description'), settings.CONFIG['itemKeys']))]
         for k in keys:

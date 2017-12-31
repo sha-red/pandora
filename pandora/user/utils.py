@@ -1,4 +1,5 @@
 from django.contrib.gis.geoip2 import GeoIP2
+from django.contrib.auth.models import Group
 
 import ox
 
@@ -69,3 +70,14 @@ def rename_user(user, new):
     # update user item find
     item.models.ItemFind.objects.filter(key='user', value=old).update(value=new)
     user.username = new
+
+def update_groups(model, groups):
+    if isinstance(groups, list):
+        groups = list(filter(lambda g: g.strip(), groups))
+        groups = [ox.escape_html(g) for g in groups]
+        for g in model.groups.exclude(name__in=groups):
+            model.groups.remove(g)
+        current_groups = [g.name for g in model.groups.all()]
+        for g in list(filter(lambda g: g not in current_groups, groups)):
+            group, created = Group.objects.get_or_create(name=g)
+            model.groups.add(group)

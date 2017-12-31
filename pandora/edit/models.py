@@ -15,7 +15,7 @@ from oxdjango.fields import DictField, TupleField
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Max
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.utils.encoding import python_2_unicode_compatible
 
 from annotation.models import Annotation
@@ -24,6 +24,7 @@ from item.utils import get_by_id
 import clip.models
 
 from archive import extract
+from user.utils import update_groups
 
 from . import managers
 
@@ -41,6 +42,7 @@ class Edit(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, related_name='edits')
+    groups = models.ManyToManyField(Group, blank=True, related_name='edits')
     name = models.CharField(max_length=255)
 
     status = models.CharField(max_length=20, default='private')
@@ -134,12 +136,16 @@ class Edit(models.Model):
         if not user or user.is_anonymous():
             return False
         if self.user == user or \
+           self.groups.filter(id__in=user.groups.all()).count() > 0 or \
            user.is_staff or \
            user.profile.capability('canEditFeaturedEdits'):
             return True
         return False
 
     def edit(self, data, user):
+        if 'groups' in data:
+            groups = data.pop('groups')
+            update_groups(self, groups)
         for key in data:
             if key == 'status':
                 value = data[key]
@@ -344,6 +350,8 @@ class Edit(models.Model):
                 'description',
                 'duration',
                 'editable',
+                'editable',
+                'groups',
                 'id',
                 'items',
                 'name',
@@ -387,6 +395,8 @@ class Edit(models.Model):
                 response[key] = self.editable(user)
             elif key == 'user':
                 response[key] = self.user.username
+            elif key == 'groups':
+                response[key] = [g.name for g in self.groups.all()]
             elif key == 'subscribers':
                 response[key] = self.subscribed_users.all().count()
             elif key == 'subscribed':

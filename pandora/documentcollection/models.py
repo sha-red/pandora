@@ -9,7 +9,7 @@ from glob import glob
 
 from django.db import models
 from django.db.models import Max
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -18,6 +18,7 @@ import ox
 from oxdjango.fields import DictField, TupleField
 
 from archive import extract
+from user.utils import update_groups
 
 from . import managers
 
@@ -43,6 +44,7 @@ class Collection(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, related_name='collections')
+    groups = models.ManyToManyField(Group, blank=True, related_name='collections')
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, default='private')
     _status = ['private', 'public', 'featured']
@@ -123,12 +125,16 @@ class Collection(models.Model):
         if user.is_anonymous():
             return False
         if self.user == user or \
+           self.groups.filter(id__in=user.groups.all()).count() > 0 or \
            user.is_staff or \
-           user.profile.capability('canEditFeaturedCollections') is True:
+           user.profile.capability('canEditFeaturedCollections'):
             return True
         return False
 
     def edit(self, data, user):
+        if 'groups' in data:
+            groups = data.pop('groups')
+            update_groups(self, groups)
         for key in data:
             if key == 'query' and not data['query']:
                 setattr(self, key, {"static": True})
@@ -212,7 +218,20 @@ class Collection(models.Model):
 
     def json(self, keys=None, user=None):
         if not keys:
-            keys = ['id', 'name', 'user', 'type', 'query', 'status', 'subscribed', 'posterFrames', 'description', 'view']
+            keys = [
+                'description',
+                'editable',
+                'groups',
+                'id',
+                'name',
+                'posterFrames',
+                'query',
+                'status',
+                'subscribed',
+                'type',
+                'user',
+                'view',
+            ]
         response = {}
         for key in keys:
             if key in ('items', 'documents'):
@@ -221,6 +240,10 @@ class Collection(models.Model):
                 response[key] = self.get_id()
             elif key == 'user':
                 response[key] = self.user.username
+            elif key == 'groups':
+                response[key] = [g.name for g in self.groups.all()]
+            elif key == 'editable':
+                response[key] = self.editable(user)
             elif key == 'query':
                 if not self.query.get('static', False):
                     response[key] = self.query
