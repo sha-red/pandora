@@ -1047,6 +1047,9 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
 };
 
 pandora.escapeQueryValue = function(value) {
+    if (!Ox.isString(value)) {
+        value = value.toString();
+    }
     return value.replace(/_/g, '%09')
         .replace(/\s/g, '_')
         .replace(/</g, '%0E')
