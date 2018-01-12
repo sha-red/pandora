@@ -37,7 +37,7 @@ def api(request):
         response['Access-Control-Allow-Origin'] = '*'
         return response
     if request.META.get('CONTENT_TYPE') == 'application/json':
-        r = json.loads(request.body)
+        r = json.loads(request.body.decode('utf-8'))
         action = r['action']
         data = r.get('data', {})
     else:
