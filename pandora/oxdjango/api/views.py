@@ -17,6 +17,8 @@ def api(request):
         response = render_to_json_response({'status': {'code': 200,
                                                        'text': 'use POST'}})
         response['Access-Control-Allow-Origin'] = '*'
+        response['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
+        response['Access-Control-Allow-Headers'] = 'Content-Type'
         return response
     if request.META['REQUEST_METHOD'] != "POST" or (
         not 'action' in request.POST and request.META.get('CONTENT_TYPE') != 'application/json'
