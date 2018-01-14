@@ -879,7 +879,7 @@ def poster(request, id, size=None):
         return image_to_response(item.poster, size)
     else:
         poster_url = os.path.join(settings.STATIC_URL, 'jpg/poster.jpg')
-        return redirect(stream.media.url)
+        return redirect(poster_url)
 
 def icon(request, id, size=None):
     item = get_object_or_404(models.Item, public_id=id)
@@ -889,7 +889,7 @@ def icon(request, id, size=None):
         return image_to_response(item.icon, size)
     else:
         poster_url = os.path.join(settings.STATIC_URL, 'jpg/poster.jpg')
-        return redirect(stream.media.url)
+        return redirect(poster_url)
 
 def timeline(request, id, size, position=-1, format='jpg', mode=None):
     item = get_object_or_404(models.Item, public_id=id)
