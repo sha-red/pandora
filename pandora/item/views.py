@@ -858,6 +858,15 @@ def siteposter(request, id, size=None):
             poster = path
     return HttpFileResponse(poster, content_type='image/jpeg')
 
+
+def temp_poster():
+    poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
+    with open(poster_path, 'rb') as fd:
+        response = HttpResponse(fd.read(), content_type='image/jpeg')
+    response['Cache-Control'] = 'no-store'
+    response['Expires'] = datetime.strftime(datetime.utcnow() + timedelta(seconds=10), "%a, %d-%b-%Y %H:%M:%S GMT")
+    return response
+
 def poster(request, id, size=None):
     item = get_object_or_404(models.Item, public_id=id)
     if not item.access(request.user):
@@ -878,8 +887,7 @@ def poster(request, id, size=None):
     if item.poster and os.path.exists(item.poster.path):
         return image_to_response(item.poster, size)
     else:
-        poster_url = os.path.join(settings.STATIC_URL, 'jpg/poster.jpg')
-        return redirect(poster_url)
+        return temp_poster()
 
 def icon(request, id, size=None):
     item = get_object_or_404(models.Item, public_id=id)
@@ -888,8 +896,7 @@ def icon(request, id, size=None):
     if item.icon and os.path.exists(item.icon.path):
         return image_to_response(item.icon, size)
     else:
-        poster_url = os.path.join(settings.STATIC_URL, 'jpg/poster.jpg')
-        return redirect(poster_url)
+        return temp_poster()
 
 def timeline(request, id, size, position=-1, format='jpg', mode=None):
     item = get_object_or_404(models.Item, public_id=id)
