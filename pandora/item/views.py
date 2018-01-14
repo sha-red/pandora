@@ -878,11 +878,8 @@ def poster(request, id, size=None):
     if item.poster and os.path.exists(item.poster.path):
         return image_to_response(item.poster, size)
     else:
-        poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
-        response = HttpFileResponse(poster_path, content_type='image/jpeg')
-        response['Cache-Control'] = 'no-cache'
-        response['Expires'] = datetime.strftime(datetime.utcnow() - timedelta(days=1), "%a, %d-%b-%Y %H:%M:%S GMT")
-        return response
+        poster_url = os.path.join(settings.STATIC_URL, 'jpg/poster.jpg')
+        return redirect(stream.media.url)
 
 def icon(request, id, size=None):
     item = get_object_or_404(models.Item, public_id=id)
@@ -891,11 +888,8 @@ def icon(request, id, size=None):
     if item.icon and os.path.exists(item.icon.path):
         return image_to_response(item.icon, size)
     else:
-        poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
-        response = HttpFileResponse(poster_path, content_type='image/jpeg')
-        response['Cache-Control'] = 'no-cache'
-        response['Expires'] = datetime.strftime(datetime.utcnow() - timedelta(days=1), "%a, %d-%b-%Y %H:%M:%S GMT")
-        return response
+        poster_url = os.path.join(settings.STATIC_URL, 'jpg/poster.jpg')
+        return redirect(stream.media.url)
 
 def timeline(request, id, size, position=-1, format='jpg', mode=None):
     item = get_object_or_404(models.Item, public_id=id)
