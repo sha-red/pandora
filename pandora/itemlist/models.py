@@ -115,7 +115,7 @@ class List(models.Model):
         return self.user == user or self.status in ('public', 'featured')
 
     def editable(self, user):
-        if user.is_anonymous():
+        if not user or user.is_anonymous():
             return False
         if self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0 or \
