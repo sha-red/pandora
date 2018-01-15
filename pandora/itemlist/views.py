@@ -269,7 +269,7 @@ def addList(request, data):
     pos.position = qs.aggregate(Max('position'))['position__max'] + 1
     pos.save()
     response = json_response(status=200, text='created')
-    response['data'] = list.json()
+    response['data'] = list.json(user=request.user)
     add_changelog(request, data, list.get_id())
     return render_to_json_response(response)
 actions.register(addList, cache=False)

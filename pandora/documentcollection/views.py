@@ -274,7 +274,7 @@ def addCollection(request, data):
     pos.position = qs.aggregate(Max('position'))['position__max'] + 1
     pos.save()
     response = json_response(status=200, text='created')
-    response['data'] = collection.json()
+    response['data'] = collection.json(user=request.user)
     add_changelog(request, data, collection.get_id())
     return render_to_json_response(response)
 actions.register(addCollection, cache=False)
