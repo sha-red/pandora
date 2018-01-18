@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
 import os
+import sys
 
 from PIL import Image
 from PIL import ImageDraw
 from optparse import OptionParser
 from ox.image import drawText, wrapText
-import sys
-
 
 root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 static_root = os.path.join(os.path.dirname(__file__), 'data')
@@ -39,6 +37,8 @@ def render_list_icon(frames, icon):
     mask_image = Image.open(os.path.join(static_root, 'iconMask.png'))
     mask_image = mask_image.resize((icon_width, icon_height))
     icon_image.putalpha(mask_image)
+    if icon.endswith('.jpg'):
+        icon_image = icon_image.convert('RGB')
     icon_image.save(icon)
 
 def main():

@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
 import os
+import sys
 
 from PIL import Image
 from optparse import OptionParser
-import sys
 
 root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 static_root = os.path.join(os.path.dirname(__file__), 'data')
@@ -44,6 +43,8 @@ def render_icon(frame, timeline, icon):
     # we're using jpegs with border-radius
     # mask_image = Image.open(os.path.join(static_root, 'iconMask.png'))
     # icon_image.putalpha(mask_image)
+    if icon.endswith('.jpg'):
+        icon_image = icon_image.convert('RGB')
     icon_image.save(icon)
 
 def main():
