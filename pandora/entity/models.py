@@ -174,7 +174,7 @@ class Entity(models.Model):
                 response[key] = self.name_sort
             elif key == 'documents':
                 response[key] = [ox.toAZ(id_)
-                    for id_, in self.documentproperties.order_by('index').values_list('document_id')]
+                    for id_, in self.documentproperties.order_by('document__name_sort').values_list('document_id')]
             elif key in self.data:
                 response[key] = self.data[key]
         return response
