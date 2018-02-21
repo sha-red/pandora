@@ -173,8 +173,13 @@ class Entity(models.Model):
             elif key == 'sortName':
                 response[key] = self.name_sort
             elif key == 'documents':
+                title = get_by_id(settings.CONFIG['documentKeys'], 'title')
+                if title:
+                    sort_key = 'document__sort__title'
+                else:
+                    sort_key = 'document__created'
                 response[key] = [ox.toAZ(id_)
-                    for id_, in self.documentproperties.order_by('document__name_sort').values_list('document_id')]
+                    for id_, in self.documentproperties.order_by(sort_key).values_list('document_id')]
             elif key in self.data:
                 response[key] = self.data[key]
         return response
