@@ -54,7 +54,7 @@ class Entity(models.Model):
     def save(self, *args, **kwargs):
         entity = get_by_id(settings.CONFIG['entities'], self.type)
         if entity.get('sortType') == 'person' and self.name:
-            if isinstance(self.name, str):
+            if isinstance(self.name, bytes):
                 self.name = self.name.decode('utf-8')
             self.name_sort = get_name_sort(self.name)[:255].lower()
         else:
