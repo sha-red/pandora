@@ -1140,6 +1140,7 @@
             "id": "keywords",
             "title": "Keywords",
             "type": "layer",
+            "filter": true,
             "find": true
         },
         {
