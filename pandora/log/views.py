@@ -34,15 +34,16 @@ def logError(request, data):
     if 'text' in data:
         if len(url) > 1000:
             url = url[:997] + '...'
-        text = data['text'] + '\n\n' + request.META.get('HTTP_USER_AGENT', '')[:4096]
-        l = models.Log(
+        text = data.get('url', '') + '\n\n' + \
+            data['text'] + '\n\n' + request.META.get('HTTP_USER_AGENT', '')[:4096]
+        log = models.Log(
             text=text,
             line=int(data.get('line', 0)),
             url=url
         )
         if user:
-            l.user = user
-        l.save()
+            log.user = user
+        log.save()
     response = json_response()
     return render_to_json_response(response)
 actions.register(logError, cache=False)
