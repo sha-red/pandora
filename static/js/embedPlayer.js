@@ -154,7 +154,7 @@ pandora.ui.embedPlayer = function() {
                 }
             })
             .bindEvent(function(data, event) {
-                if (Ox.contains(['close', 'paused'], event)) {
+                if (Ox.contains(['close', 'paused', 'position'], event)) {
                     Ox.$parent.postMessage(event, data);
                 }
             });
