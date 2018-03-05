@@ -40,7 +40,7 @@ pandora.ui.document = function() {
         item = result.data;
         var documentTitle = pandora.getWindowTitle(item);
         document.title = pandora.getPageTitle(document.location.pathname) || documentTitle;
-        pandora.$ui.itemTitle
+        pandora.$ui.itemTitle && pandora.$ui.itemTitle
             .options({title: '<b>' + (pandora.getDocumentTitle(item)) + '</b>'})
             .show();
 

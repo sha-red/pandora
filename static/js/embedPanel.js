@@ -31,14 +31,19 @@ pandora.ui.embedPanel = function() {
                     that = pandora.ui.embedNavigation(view);
                 }
             }
+        } else if (ui.section == 'documents') {
+            that = pandora.ui.embedDocument()
         } else if (ui.section == 'edits') {
             // FIXME: this is non-standard, see above!
             that = pandora.ui.editPanel(true);
         } else {
             that = pandora.ui.embedError(true)
         }
-    } else if (ui.page == 'documents' && ui.document) {
-        that = pandora.ui.embedError(true);
+    } else if (ui.page == 'document' && ui.part.document) {
+        ui.document = ui.part.document
+        ui.section = 'documents'
+        ui.page = ''
+        that = pandora.ui.embedDocument()
     }
     if (!that) {
         that = pandora.ui.embedError();
