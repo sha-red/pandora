@@ -27,7 +27,7 @@
 */
 pandora.chunkupload = function(options) {
     var aborted = false,
-        chunkSize = options.size || 1024 * 1024,
+        chunkSize = options.size || 1024 * 1024 * 5,
         chunkURL,
         file = options.file,
         bytesAvailable = file.size,
