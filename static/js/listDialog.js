@@ -266,6 +266,67 @@ pandora.ui.listGeneralPanel = function(listData) {
                 )
                 .css({position: 'absolute', left: '160px', top: '64px'})
                 .appendTo(that),
+            $groupsInput = Ox.Input({
+                disabled: false,
+                label: Ox._('Groups'),
+                labelWidth: 80,
+                value: listData.groups.join(', '),
+                width: 320
+            })
+            .bindEvent({
+                change: editGroups
+            })
+            .css({position: 'absolute', left: '160px', top: '88px'})
+            .appendTo(that),
+            /*
+            $groupsLabel,
+            $groupsInput = Ox.FormElementGroup({
+                elements: [
+                    Ox.Label({
+                        overlap: 'right',
+                        textAlign: 'right',
+                        title: Ox._('Groups'),
+                        width: 80
+                    }),
+                    Ox.FormElementGroup({
+                        elements: [
+                            $groupsLabel = Ox.Label({
+                                title: listData.groups ? listData.groups.join(', ') : '',
+                                width: 224
+                            }),
+                            Ox.Button({
+                                overlap: 'left',
+                                title: 'edit',
+                                tooltip: Ox._('Edit Groups'),
+                                type: 'image'
+                            })
+                            .bindEvent({
+                                click: function() {
+                                    console.log(listData)
+                                    pandora.$ui.groupsDialog = pandora.ui.groupsDialog({
+                                            id: listData.id,
+                                            name: listData.id,
+                                            groups: listData.groups,
+                                            type: 'list'
+                                        })
+                                        .bindEvent({
+                                            groups: function(data) {
+                                                var groups = data.groups.join(', ');
+                                                //fixme edit groups
+                                                $groupsLabel.options({title: groups});
+                                            }
+                                        })
+                                        .open();
+                                }
+                            })
+                        ],
+                        float: 'right'
+                    })
+                ],
+                float: 'left'
+            }).css({position: 'absolute', left: '160px', top: '88px'})
+            .appendTo(that),
+            */
             $subscribersInput = Ox.Input({
                     disabled: true,
                     label: Ox._('Subscribers'),
@@ -273,7 +334,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                     value: subscribers,
                     width: 320
                 })
-                .css({position: 'absolute', left: '160px', top: '88px'})
+                .css({position: 'absolute', left: '160px', top: '112px'})
                 [getSubscribersAction()]()
                 .appendTo(that),
             $descriptionInput = Ox.Input({
@@ -320,6 +381,19 @@ pandora.ui.listGeneralPanel = function(listData) {
                     }
                 });
             }
+        }
+        function editGroups(data) {
+            var groups = data.value.split(', ');
+            console.log(groups);
+            pandora.api['edit' + folderItem]({
+                id: listData.id,
+                groups: groups
+            }, function(result) {
+                listData.groups = result.data.groups;
+                pandora.$ui.folderList[listData.folder].value(
+                    result.data.id, 'groups', listData.groups
+                );
+            });
         }
         function editStatus(data) {
             var status = data.value;
@@ -368,10 +442,10 @@ pandora.ui.listGeneralPanel = function(listData) {
             });
         }
         function getDescriptionHeight() {
-            return listData.status == 'private' ? 184 : 160;
+            return (listData.status == 'private' ? 184 : 160) - 24;
         }
         function getDescriptionTop() {
-            return listData.status == 'private' ? 88 : 112;
+            return (listData.status == 'private' ? 88 : 112) + 24;
         }
         function getSubscribersAction() {
             return listData.status == 'private' ? 'hide' : 'show';

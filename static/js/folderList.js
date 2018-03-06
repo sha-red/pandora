@@ -15,7 +15,7 @@ pandora.ui.folderList = function(id, section) {
         columns = [
             {
                 clickable: function(data) {
-                    return data.user == pandora.user.username
+                    return data.editable
                         || (id == 'featured' && canEditFeatured);
                 },
                 format: function(value, data) {
@@ -31,7 +31,7 @@ pandora.ui.folderList = function(id, section) {
                 id: 'user',
                 operator: '+',
                 tooltip: function(data) {
-                    return data.user == pandora.user.username
+                    return data.editable
                         || (id == 'featured' && canEditFeatured)
                         ? Ox._('Edit Icon')
                         : '';
@@ -52,7 +52,7 @@ pandora.ui.folderList = function(id, section) {
             },
             {
                 editable: function(data) {
-                    return data.user == pandora.user.username;
+                    return data.editable;
                 },
                 format: function(value) {
                     return Ox.encodeHTMLEntities(value);
@@ -81,7 +81,7 @@ pandora.ui.folderList = function(id, section) {
             {
                 clickable: function(data) {
                     return section != 'texts' && (
-                        data.type == 'smart' || data.user == pandora.user.username
+                        data.type == 'smart' || data.editable
                     );
                 },
                 format: function(value, data) {
@@ -98,16 +98,16 @@ pandora.ui.folderList = function(id, section) {
                             width: '10px',
                             height: '10px',
                             padding: '3px',
-                            opacity: section == 'texts' || data.user == pandora.user.username ? 1 : 0.25
+                            opacity: section == 'texts' || data.editable ? 1 : 0.25
                         });
                 },
                 id: 'type',
                 operator: '+',
                 tooltip: function(data) {
                     return data.type == 'static'
-                        ? (data.user == pandora.user.username ? Ox._('Edit {0}', [Ox._(folderItem)]) : '')
+                        ? (data.editable ? Ox._('Edit {0}', [Ox._(folderItem)]) : '')
                         : data.type == 'smart'
-                        ? (data.user == pandora.user.username ? Ox._('Edit Query') : Ox._('Show Query'))
+                        ? (data.editable ? Ox._('Edit Query') : Ox._('Show Query'))
                         : data.type.toUpperCase();
                 },
                 visible: true,
@@ -264,7 +264,7 @@ pandora.ui.folderList = function(id, section) {
         columns: columns,
         droppable: id != 'volumes',
         items: items,
-        keys: ['modified'].concat(section != 'texts'
+        keys: ['modified', 'editable', 'groups'].concat(section != 'texts'
             ? ['query', 'name', 'view'] : ['rightslevel']),
         max: 1,
         min: 0,

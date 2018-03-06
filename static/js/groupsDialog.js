@@ -36,13 +36,18 @@ pandora.ui.groupsDialog = function(options) {
         groups,
         selectedGroups;
 
-    pandora.api[isItem ? 'get' : 'getUser']({
-        id: options.id,
-        keys: ['groups']
-    }, function(result) {
-        selectedGroups = result.data.groups;
+    if (options.groups) {
+        selectedGroups = options.groups;
         renderGroups();
-    });
+    } else {
+        pandora.api[isItem ? 'get' : 'getUser']({
+            id: options.id,
+            keys: ['groups']
+        }, function(result) {
+            selectedGroups = result.data.groups;
+            renderGroups();
+        });
+    }
 
     function addGroup() {
         // disableElements();

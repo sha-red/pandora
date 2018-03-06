@@ -350,7 +350,6 @@ class Edit(models.Model):
                 'description',
                 'duration',
                 'editable',
-                'editable',
                 'groups',
                 'id',
                 'items',

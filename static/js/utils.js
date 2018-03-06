@@ -714,7 +714,7 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                             data = $list.value(id);
                         if (drag.targets) {
                             drag.targets[id] = Ox.extend({
-                                editable: data.user == pandora.user.username
+                                editable: data.editable
                                     && data.type == 'static',
                                 selected: $item.is('.OxSelected')
                             }, data);
@@ -828,8 +828,10 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                                     operator: '&'
                                 }
                             }, function(result) {
-                                var folder = drag.target.status != 'featured'
-                                    ? 'personal' : 'featured';
+                                var folder = drag.target.status == 'featured' ? 'featured' : (
+                                    drag.target.user == pandora.user.username
+                                    ? 'personal' : 'favorite'
+                                );
                                 pandora.$ui.folderList[folder].value(
                                     drag.target.id, 'items', result.data.items
                                 );
@@ -938,7 +940,7 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
             );
         } else if (
             drag.action == 'move'
-            && drag.source.user != pandora.user.username
+            && !drag.source.editable
         ) {
             image = 'symbolClose';
             text = Ox._(
@@ -951,7 +953,7 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                 'You can\'t remove {0}<br>from smart {1}.',
                 [itemName.plural, targetName.plural]
             );
-        } else if (drag.target && drag.target.user != pandora.user.username) {
+        } else if (drag.target && !drag.target.editable) {
             image = 'symbolClose';
             text = Ox._(
                 'You can only {0} {1}<br>to your own {2}',
@@ -1726,9 +1728,10 @@ pandora.getListData = function(list) {
         if (folder) {
             data = pandora.$ui.folderList[folder].value(list);
             if (pandora.user.ui.section == 'item') {
-                data.editable = data.user == pandora.user.username && data.type == 'static';
+                data.editable = data.editable && data.type == 'static';
             } else {
-                data.editable = data.user == pandora.user.username;
+                data.editable = data.editable || data.user == pandora.user.username;
+
             }
             data.folder = folder;
         }
