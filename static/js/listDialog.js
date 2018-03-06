@@ -225,7 +225,6 @@ pandora.ui.listGeneralPanel = function(listData) {
                         })
                     : Ox.Select({
                             items: pandora.site.textRightsLevels.map(function(rightsLevel, i) {
-                                console.log(listData);
                                 return {
                                     id: i,
                                     title: rightsLevel.name,
@@ -302,7 +301,6 @@ pandora.ui.listGeneralPanel = function(listData) {
                             })
                             .bindEvent({
                                 click: function() {
-                                    console.log(listData)
                                     pandora.$ui.groupsDialog = pandora.ui.groupsDialog({
                                             id: listData.id,
                                             name: listData.id,
@@ -312,7 +310,9 @@ pandora.ui.listGeneralPanel = function(listData) {
                                         .bindEvent({
                                             groups: function(data) {
                                                 var groups = data.groups.join(', ');
-                                                //fixme edit groups
+                                                editGroups({
+                                                    value: data.groups
+                                                })
                                                 $groupsLabel.options({title: groups});
                                             }
                                         })
@@ -384,7 +384,6 @@ pandora.ui.listGeneralPanel = function(listData) {
         }
         function editGroups(data) {
             var groups = data.value.split(', ');
-            console.log(groups);
             pandora.api['edit' + folderItem]({
                 id: listData.id,
                 groups: groups
@@ -442,10 +441,10 @@ pandora.ui.listGeneralPanel = function(listData) {
             });
         }
         function getDescriptionHeight() {
-            return (listData.status == 'private' ? 184 : 160) - 24;
+            return listData.status == 'private' ? 160 : 136;
         }
         function getDescriptionTop() {
-            return (listData.status == 'private' ? 88 : 112) + 24;
+            return listData.status == 'private' ? 64 : 88;
         }
         function getSubscribersAction() {
             return listData.status == 'private' ? 'hide' : 'show';
