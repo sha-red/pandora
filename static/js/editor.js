@@ -3,7 +3,9 @@
 'use strict';
 
 pandora.ui.editor = function(data) {
+
     var ui = pandora.user.ui,
+        rightsLevel = data.rightslevel,
 
         that = Ox.VideoAnnotationPanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
@@ -162,13 +164,20 @@ pandora.ui.editor = function(data) {
                 pandora.$ui[dialog] = pandora.ui[dialog](data).open();
             },
             downloadvideo: function() {
-                document.location.href = pandora.getDownloadLink(ui.item, data.rightslevel);
+                pandora.ui.downloadVideoDialog({
+                    item: ui.item,
+                    rightsLevel: rightsLevel,
+                    title: data.title
+                }).open();
             },
-            downloadselection: function(data) {
-                document.location.href = '/' + ui.item
-                    + '/' + Ox.max(pandora.site.video.resolutions)
-                    + 'p.' + pandora.site.video.downloadFormat
-                    + '?t=' + data['in'] + ',' + data.out;
+            downloadselection: function(selection) {
+                pandora.ui.downloadVideoDialog({
+                    item: ui.item,
+                    'in': selection['in'],
+                    out: selection.out,
+                    rightsLevel: rightsLevel,
+                    title: data.title
+                }).open();
             },
             editannotation: function(data) {
                 Ox.Log('', 'editAnnotation', data);
