@@ -515,7 +515,9 @@ pandora.ui.editPanel = function(isEmbed) {
             },
         });
         pandora.$ui.embedPanel.replaceWith(that);
+        pandora.$ui.embedPanel = that;
         updateSmallTimelineURL();
+        Ox.$parent.postMessage('loaded');
     }
 
     function orderClips(ids) {

@@ -3,7 +3,6 @@
 'use strict';
 
 pandora.ui.embedDocument = function() {
-    var that = Ox.Element();
-    pandora.ui.document().appendTo(that)
+    var that = pandora.ui.document();
     return that;
 };

@@ -24,6 +24,12 @@ pandora.ui.document = function() {
             ],
             orientation: 'vertical'
         })
+        .update(function(key, value) {
+            console.log('got update', key, value)
+            if (Ox.contains(['area', 'zoom', 'page'], key)) {
+                $content.options(key, value)
+            }
+        })
         .bindEvent({
             pandora_showbrowser: function(data) {
                 that.update();

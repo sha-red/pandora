@@ -442,6 +442,9 @@ appPanel
                             if (pandora.isEmbedURL(data.url)) {
                                 pandora.URL.push(data.url);
                             }
+                        },
+                        options: function(data) {
+                            pandora.$ui.embedPanel.options(data);
                         }
                     });
                 } else if (isPrint) {

@@ -1,8 +1,11 @@
 'use strict';
 
 pandora.ui.embedPlayer = function() {
-
-    var that = Ox.Element(),
+    var self = {};
+    var that = Ox.Element({}, self)
+        .update(function(key, value) {
+            $player.options(key, value);
+        }),
         ui = pandora.user.ui,
         defaults = {
             annotationsRange: ui.annotationsRange,
@@ -139,6 +142,9 @@ pandora.ui.embedPlayer = function() {
                 playing: function(data) {
                     setPosition(data.position, true);
                 },
+                paused: function(data) {
+                    self.options.position = data.paused
+                },
                 position: function(data) {
                     setPosition(data.position);
                 },
@@ -154,7 +160,7 @@ pandora.ui.embedPlayer = function() {
                 }
             })
             .bindEvent(function(data, event) {
-                if (Ox.contains(['close', 'paused', 'position'], event)) {
+                if (Ox.contains(['close', 'paused', 'position', 'playing'], event)) {
                     Ox.$parent.postMessage(event, data);
                 }
             });
@@ -343,6 +349,7 @@ pandora.ui.embedPlayer = function() {
     }
 
     function setPosition(position, playing) {
+        self.options.position = position
         !playing && $player.options({position: position});
         options.showTimeline && $timeline.options({position: position});
         options.showAnnotations && $annotations.options({position: position});
