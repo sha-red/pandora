@@ -699,6 +699,13 @@
             "sort": true
         },
         {
+            "id": "publicnotes",
+            "title": "Public Notes",
+            "type": "layer",
+            "advanced": true,
+            "find": true
+        },
+        {
             "id": "subtitles",
             "title": "Subtitles",
             "type": "layer",
