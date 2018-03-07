@@ -2,7 +2,7 @@
 'use strict';
 
 pandora.ui.folderList = function(id, section) {
-    section = section || pandora.user.section;
+    section = section || pandora.user.ui.section;
     var ui = pandora.user.ui,
         i = Ox.getIndexById(pandora.site.sectionFolders[section], id),
         folderItems = pandora.getFolderItems(section),
