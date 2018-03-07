@@ -101,7 +101,7 @@ pandora.ui.textPanel = function(text, $toolbar) {
     }
 
     function getEmbedURLs(text) {
-        var matches = text.match(/<a [^<>]*?href="(.+?)".*?>/gi),
+        var matches = text ? text.match(/<a [^<>]*?href="(.+?)".*?>/gi) : [],
             urls = [];
         if (matches) {
             matches.forEach(function(match) {
