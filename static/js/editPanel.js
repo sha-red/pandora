@@ -403,6 +403,7 @@ pandora.ui.editPanel = function(isEmbed) {
         pandora.$ui.mainPanel.replaceElement(1, that);
         updateSmallTimelineURL();
         ui.edits[ui.edit].view == 'grid' && enableDragAndDrop();
+        that.gainFocus();
     }
 
     function renderEdits() {
