@@ -38,7 +38,7 @@ pandora.ui.leftPanel = function(section) {
                 pandora.$ui.leftPanel.size(2, infoHeight);
                 !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoHeight + 'px'});
                 pandora.resizeFolders();
-                pandora.$ui.info.resizeInfo();                
+                pandora.$ui.info.resizeInfo();
             },
             resizeend: function(data) {
                 // set to 0 so that UI.set registers a change of the value
