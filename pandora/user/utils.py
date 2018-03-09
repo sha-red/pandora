@@ -30,12 +30,12 @@ def get_location(ip):
     return city, country
 
 
-def rename_user(user, new):
+def rename_user(u, new):
     import itemlist.models
     import item.models
     import user.models
 
-    old = user.username
+    old = u.username
     old_prefix = old + ':'
     new_prefix = new + ':'
 
@@ -69,7 +69,8 @@ def rename_user(user, new):
 
     # update user item find
     item.models.ItemFind.objects.filter(key='user', value=old).update(value=new)
-    user.username = new
+    u.username = new
+    u.save()
 
 def update_groups(model, groups):
     if isinstance(groups, list):
