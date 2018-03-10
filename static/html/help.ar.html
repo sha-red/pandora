@@ -22,19 +22,19 @@
             <tr><td>الأوامر+ اسحب وأترك</td><td>نقل كل العناصر المختارة لقائمة أخرى</td></tr>
             <tr><td></td></tr>
             <tr><td>أعلى/أسفل/يمين/يسار</td><td>اختيار العنصر التالي</td></tr>
-            <tr><td>Shift Up/Down/Left/Right</td><td>Add next item to the current selection</td></tr>
-            <tr><td>Control A</td><td>Select all items</td></tr>
-            <tr><td>Shift Control A</td><td>Deselect all items</td></tr>
-            <tr><td>Alt Control A</td><td>Toggle all items (select all deselected and deselect all selected items)</td></tr>
-            <tr><td>Page Up</td><td>Scroll one page up</td></tr>
-            <tr><td>Page Down</td><td>Scroll one page down</td></tr>
-            <tr><td>Home</td><td>Scroll to first item</td></tr>
-            <tr><td>End</td><td>Scroll to last item</td></tr>
-            <tr><td>Control X</td><td>Cut all selected items from a list</td></tr>
-            <tr><td>Control C</td><td>Copy all selected items from a list</td></tr>
-            <tr><td>Control V</td><td>Paste previously cut or copied items into a list</td></tr>
-            <tr><td>Delete</td><td>Delete all selected items from a list</td></tr>
-            <tr><td>Space</td><td>Show preview (list of {itemName.plural}) or play/pause video (list of clips)</td></tr>
+            <tr><td>  العالي +  أعلى/أسفل/يمين/يسار</td><td>إضافة العنصر التالي للقائمة الحالية </td></tr>
+            <tr><td>تحكم + A</td><td>اختيار كل العناصر</td></tr>
+            <tr><td>العالي + تحكم + A </td><td>ابطال اختيار كل العناصر</td></tr>
+            <tr><td> تبديل + تحكم + A</td><td>لإعادة اختيار كل العناصر أو إبطال اختيار كل العناصر</td></tr>
+            <tr><td>Page Up</td><td>الانتقال لصفحة أعلى</td></tr>
+            <tr><td>Page Down</td><td>الانتقال لصفحة أسفل </td></tr>
+            <tr><td>Home</td><td>الانتقال للعنصر الأول</td></tr>
+            <tr><td>End</td><td>الانتقال للعنصر الأخير</td></tr>
+            <tr><td>تحكم + X</td><td>قطع كل العناصر المختارة من القائمة</td></tr>
+            <tr><td> تحكم + C</td><td>نسخ كل العناصر في القائمة </td></tr>
+            <tr><td>تحكم + V</td><td>لصق كل العناصر المقطوعة أو المنسوخة في قائمة </td></tr>
+            <tr><td> حذف</td><td>حذف كل العناصر المختارة من القائمة</td></tr>
+            <tr><td>مسطرة المسافة</td><td>معاينة (قائمة الفيديوهات) أو تشغيل/إيقاف (قائمة المقاطع) </td></tr>
             <tr><td>Control M</td><td>Open main menu</td></tr>
         </table>
     </p>
@@ -69,69 +69,76 @@
     <img src="/static/jpg/help.views.jpg">
 </div>
 <div id="timelines">
-    <p>A timeline is a visual signature of a {itemName.singular}. It provides an instant overview of its structure over time, and can be used for navigation. You can switch between different types of timelines: anti-alias (average colors), slit-scan (see below), keyframes (full frames) and waveform (audio).</p>
+    <p>الخط الزمني هو التوقيع البصري للفيديو، وهو يعطي نظرة عامة فورية لتركيب الفيديو في سياق زمني، ويمكن استخدامه للإبحار. 
+يمكن الاختيار بين أنواع مختلفة من الخطوط الزمنية:
+تنعيم الحواف (ألوان متوسطة)، مسح الشقوق (انظر بالأسفل)، إطارات مفتاحية (ملأ الشاشة)، والرسم الموجي (صوت)
+</p>
     <img src="/static/jpg/help.timelines.jpg">
 </div>
 <div id="clips">
-    <p>Some views don't show lists of {itemName.plural}, but lists of video clips &mdash; for example clips matching your query, or related to a specific location on a map. These clips can be sorted by various properties (like saturation, see below), and each clip is a video player. The video will load once you've selected it, and you can then simply click to play. If you doubleclick, you'll get to the {itemName.singular} itself, and its video player will be at the very position of the clip.</p>
+    <p>بعض المطالعات لا تظهر قوائم للفيديوهات بل قوائم للمقاطع - مثلاً، المقاطع المطابقة لبحثك، أو المتعلقة بموقع محدد على الخريطة. هذه المقاطع يمكن فرزها بخصائص متنوعة (مثل التشبع، انظر بالأسفل)، وكل مقطع له مشغل فيديو. يجري تحميل الفيديو فور اختياره، ويمكن بعدها النقر والتشغيل ببساطة. إذا قمت بالنقر مرتين ستصل إلى الفيديو نفسه وسيكون المشغل في وضعية المقطع.
+</p>
     <img src="/static/jpg/help.clips.jpg">
 </div>
 <div id="maps">
-    <p>Any list of {itemName.plural}, just like every individual {itemName.singular}, can be displayed as a map. This map shows all places that appear in annotations, and selecting a place will display a list of all matching clips.</p>
+    <p>أي قائمة فيديو أو فيديو منفرد يمكن عرضها كخريطة. هذه الخريطة تظهر كل الأماكن المذكورة في الهوامش، وعند اختيار مكان ستظهر قائمة بكل المقاطع المطابقة.</p>
     <img src="/static/jpg/help.maps.jpg">
 </div>
 <div id="calendars">
-    <p>Calendars work just like maps (you can pan or zoom in and out), but they don't show places on a world map, but historic events on a timeline. Selecting an event will display a list of matching clips.</p>
+    <p>الرزمانات تعمل مثل الخرائط تماماً (يمكن التحريك والتكبير والتصغير) ولكنا لا تظهر أماكن على خريطة العالم، بل تظهر أحداث تاريخية على خط زمني. اختيار حدث سيظهر قائمة بالمقاطع المطابقة.
+</p>
     <img src="/static/jpg/help.calendars.jpg">
 </div>
 <div id="find">
-    <p>To search <b>{site.name}</b>, just type something in the find box in the upper right corner of the screen, and press enter. The site returns all exact matches, so there is no need to enclose multiple words in quotes.</p>
-    <p>The find box also includes a menu that lets you specify what exactly you're searching for &mdash; for example the title of a {itemName.singular}, a particular person, or a specific type of annotation.<p>
-    <p>From that menu, you can also access the advanced find options. Below, you can see how to search for "All {itemName.plural} from 1968 that were made in France, Italy, East Germany or West Germany". You can also save any search as a smart list that you can access at any time, and that will update dynamically.</p>
+    <p>للبحث في Pan.do/ra ، اكتب شيئ في صندوق البحث في الركن بأعلى الشاشة على اليمين ثم اضغط "الرجوع" . سيظهر البحث كل النتائج المطابقة تماماً، لذا فلا حاجة لكتابة كلمات كثيرة. </p>
+    <p>صندوق البحث يحتوي على قائمة تمكنك من تحديد موضوع بحثك بدقة، على سبيل المثال: عنوان الفيديو، أو شخصية معينة، أو نوع معين من الهوامش.
+<p>
+    <p>من خلال هذه القائمة يمكنك كذلك الوصول لخاصية البحث المتقدم. بالأسفل نموذج لكيفية البحث عن "كل الفيديوهات التي صنعت في ١٩٦٨ في فرنسا وإيطاليا وألمانيا الشرقية والغربية". يمكنك أيضاً حفظ نتائج البحث في قائمة ذكية يمكنك الوصول إليها في أي وقت وسيتم تحديثها تلقائياً.</p>
     <img src="/static/jpg/help.find.jpg">
 </div>
 <div id="filters">
-    <p>Often, the easiest way to instantly find what you're looking for is to use filters. Below, you can see how to find, with just three clicks, all German-language {itemName.plural} from either East Germany or West Germany. You can then narrow down you search even further, for example by picking a specific year.</p>
+    <p>كثيراً ما يكون استخدام المرشحات هو أسهل طريقة للعثور عن ما  تبحث عنه.  في النموذج المبين بالأسفل ترى كيف يمكنك العثور على كل الفيديوهات الناطقة بالألمانية من ألمانيا الغربية والشرقية عن طريق ثلاث نقرات فقط. يمكنك تحديد البحث بشكل أدق عن طريق تحديد سنة معينة.</p>
     <img src="/static/jpg/help.filters.jpg">
 </div>
 <div id="lists">
-    <p>A list is simply a list of {itemName.plural}, and you can create as many lists as you want. These lists behave like folders &mdash; you can add {itemName.plural} to them, either via drag &amp; drop or via copy &amp; paste, and you can also remove any item from a list.</p>
-    <p>Smart lists, on the other hand, are saved searches (like "all {itemName.plural} longer than one hour" or "all French {itemName.plural} from the 1960s"), and they will update dynamically.</p>
-    <p>All personal lists you create are initially private, but you can share them by making them public, so that other users can find and browse them, and add them to their favorites. Your own favorite lists are initially empty, but if you click on "Manage Favorite Lists", you will see all public lists, and you can add the ones you like to your favorites.</p>
-    <p>Finally, there are featured lists, which are selected public lists, picked by <b>{site.name}</b>.</p>
+    <p>القائمة هي ببساطة قائمة تحتوي على عدد من الفيديوهات، ويمكنك إنشاء أي عدد تريده من الفيديوهات. هذه القوائم تعمل مثل الحوافظ - يمكنك إضافة الفيديوهات إليها عن طريق السحب والترك أو عن طريق النسخ واللصق، ويمكنك كذلك إزالة أي عنصر من القائمة.
+</p>
+    <p>أما القوائم الذكية، فهي فهي نتائج بحث محفوظة (على سبيل المثال: "كل الفيديوهات التي يتعدى زمنها الساعة"، أو "كل الفيديوهات الفرنسية لعام ١٩٦٨") وستقوم القائمة بتحديث نفسها بشكل تلقائي.</p>
+    <p>كل القوائم الشخصية التي تنشئها هي خاصة بالأساس، ولكن يمكنك مشاركتها بجعلها علنية حتى يتمكن المستخدمون الآخرون من العثور عليها وتصفحها وإضافتها إلى مفضلاتهم. . قوائمك المفضلة فارغة في البداية ولكن إذا نقرت "نظم القوائم المفضلة" سترى كل القوائم العامة ويمكنك إضافة القوائم التي تعجبك إلى مفضلاتك. </p>
+    <p>توجد كذلك قوائم مبرزة، وهي قوائم منتقاة عن طريق Pan.do/ra </p>
     <img src="/static/jpg/help.lists.jpg">
 </div>
 <div id="player">
-    <p>In the player view, you'll get a video player, including a fullscreen mode, and various controls to set the video's volume, position or resolution. You can also search right in the player, and the results will be highlighted on the timeline. You don't even have to move your mouse &mdash; for what you see below, you can just type F road ENTER G G G SHIFT+G and so on.</p>
+    <p>مظهر المشغل سيظهر لك مشغل فيديو يتضمن خاصية ملأ الشاشة، وأدوات تحكم متنوعة للتحكم في الصوت والموضع وجودة الصورة. يمكنك كذلك البحث داخل المشغل مباشرة وستظهر النتائج مضاءة على الخط الزمني. لست حتى بحاجة لاستخدام الفأرة - يمكنك فقط كتابة F ثم كلمة البحث (مثلاً "F طريق"), إذا أردت المزيد من النتائج اكتب G, وإذا أردت الرجوع للنتيجة السابقة انقر العالي + G</p>
     <img src="/static/jpg/help.player.jpg">
 </div>
 <div id="editor">
-    <p>In the editor view, you can add and edit time-based annotations. Just set an in point and an out point, and pick one of the different types of annotations to add.</p>
+    <p>مظهر المحرر يمكنك من إضافة وتحرير الهوامش على الخط الزمني. فقط عليك تحديد نقطة بداية ونهاية واختيار أحد أنواع الهوامش لإضافته.</p>
     <p>
-        <h2>Keyboard Shortcuts</h2>
+        <h2>مختصرات لوحة المفاتيح</h2>
         <br>
         <table>
-            <tr><td>Space</td><td>Play/Pause</td></tr>
-            <tr><td>P</td><td>Play from in point to out point</td></tr>
-            <tr><td>L</td><td>Loop/Don't Loop</td></tr>
-            <tr><td>0</td><td>Mute/Unmute</td></tr>
-            <tr><td>-</td><td>Turn volume down</td></tr>
-            <tr><td>+</td><td>Turn volume up</td></tr>
-            <tr><td>Shift -</td><td>Small video player</td></tr>
-            <tr><td>Shift +</td><td>Large video player</td></tr>
-            <tr><td>â†</td><td>Go one frame back</td></tr>
-            <tr><td>â†’</td><td>Go one frame forward</td></tr>
-            <tr><td>Shift â†</td><td>Go one second back</td></tr>
-            <tr><td>Shift â†’</td><td>Go one second forward</td></tr>
-            <tr><td>â†‘</td><td>Go one line up on the timeline</td></tr>
-            <tr><td>â†“</td><td>Go one line down on the timeline</td></tr>
-            <tr><td>Shift â†‘</td><td>Go to first frame</td></tr>
-            <tr><td>Shift â†“</td><td>Go to last frame</td></tr>
-            <tr><td>Shift P</td><td>Go to poster frame</td></tr>
-            <tr><td>I</td><td>Set in point</td></tr>
-            <tr><td>O</td><td>Set out point</td></tr>
-            <tr><td>Shift I</td><td>Go to in point</td></tr>
-            <tr><td>Shift O</td><td>Go to out point</td></tr>
+            <tr><td> مسطرة المسافة</td><td>تشغيل/إيقاف</td></tr>
+            <tr><td>P</td><td>تشغيل من نقطة الدخول لنقطة الخروج</td></tr>
+            <tr><td>L</td><td>حلقة تكرار/إلغاء حلقة تكرار</td></tr>
+            <tr><td>0</td><td>كتم الصوت/تفعيل الصوت</td></tr>
+            <tr><td>-</td><td>Tخفض الصوت</td></tr>
+            <tr><td>+</td><td>رفع الصوت </td></tr>
+            <tr><td>Shift -</td><td>مشغل فيديو صغير</td></tr>
+            <tr><td>Shift +</td><td>مشغل فيديو كبير </td></tr>
+            <tr><td>←</td><td>إطار واحد للخلف </td></tr>
+            <tr><td>→</td><td>إطار واحد للأمام </td></tr>
+            <tr><td>Shift ←</td><td>ثانية واحدة إلى الخلف</td></tr>
+            <tr><td>Shift →</td><td>ثانية واحدة إلى الأمام </td></tr>
+            <tr><td>↑</td><td>إصعد إلى خط أعلى في الخط الزمني</td></tr>
+            <tr><td>↓</td><td>إنزل إلى خط أسفل في الخط الزمني</td></tr>
+            <tr><td>Shift ↑</td><td>إذهب إلى الإطار الأول</td></tr>
+            <tr><td>Shift ↓</td><td>إذهب إلى الإطار الأخير</td></tr>
+            <tr><td>Shift P</td><td>اذهب إلى إطار الملصق</td></tr>
+            <tr><td>I</td><td>حدد نقطة الدخول</td></tr>
+            <tr><td>O</td><td>حدد نقطة الخروج</td></tr>
+            <tr><td>Shift I</td><td>اذهب إلى نقطة الدخول</td></tr>
+            <tr><td>Shift O</td><td>اذهب إلى نقطة الخروج </td></tr>
             <tr><td>[</td><td>Go to previous annotation</td></tr>
             <tr><td>]</td><td>Go to next annotation</td></tr>
             <tr><td>\</td><td>Select current annotation</td></tr>
