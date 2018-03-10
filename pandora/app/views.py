@@ -30,6 +30,8 @@ def intro(request):
 
 def index(request):
     title = settings.SITENAME
+    if 'tagline' in settings.CONFIG['site']:
+        title = settings.CONFIG['site']['tagline']
     text = settings.CONFIG['site']['description']
     page = request.path.split('/')
     if len(page) == 2:
