@@ -400,7 +400,11 @@ pandora.ui.editPanel = function(isEmbed) {
                 callback && callback();
             });
         };
+        // FIXME: replaceElement resets inner collapsed state
+        var right = that.css('right');
         pandora.$ui.mainPanel.replaceElement(1, that);
+        that.css('right', right);
+
         updateSmallTimelineURL();
         ui.edits[ui.edit].view == 'grid' && enableDragAndDrop();
         that.gainFocus();
