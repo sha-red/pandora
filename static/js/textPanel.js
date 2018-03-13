@@ -382,7 +382,7 @@ pandora.ui.textHTML = function(text) {
     }
 
     function scrollToPosition() {
-        var settings = (pandora.user.ui.part.document
+        var settings = (pandora.user.ui.page == 'document' && pandora.user.ui.part.document
                 ? pandora.user.ui.documents[pandora.user.ui.part.document]
                 : pandora.user.ui.section == 'documents'
                 ? pandora.user.ui.documents[pandora.user.ui.document]
