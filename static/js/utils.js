@@ -1994,9 +1994,11 @@ pandora.getSpan = function(state, val, callback) {
                 if (Ox.contains(['epub', 'pdf', 'txt'], extension)) {
                     state.span = Ox.limit(parseInt(val), 1, dimensions);
                 } else if (Ox.contains(['html'], extension)) {
-                    //fixme: allow numbers or check names?
-                    //state.span = Ox.limit(parseInt(val), 0, 100);
-                    state.span = val
+                    if (pandora.isNumericalSpan(val)) {
+                        state.span = Ox.limit(parseInt(val), 0, 100);
+                    } else {
+                        state.span = val;
+                    }
                 } else if (Ox.contains(['gif', 'jpg', 'png'], extension)) {
                     values = val.split(',');
                     if (values.length == 4) {
@@ -2442,6 +2444,12 @@ pandora.isEmbedURL = function(url) {
 pandora.isLicensed = function() {
     return !pandora.site.license || pandora.site.license > +new Date();
 };
+
+pandora.isNumericalSpan = function(str) {
+    return str.split(',').every(function(str) {
+        return /^[0-9-\.:]+$/.test(str);
+    });
+}
 
 pandora.isPrintURL = function(url) {
     url = url || document.location.href;

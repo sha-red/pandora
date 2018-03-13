@@ -393,8 +393,17 @@ pandora.ui.textHTML = function(text) {
         if (settings.name) {
             element = that.find('*[data-name="' + settings.name + '"]');
             if (element.length) {
-                scrollTop = Math.max(that[0].scrollTop + element.offset().top - 48, 0);
-                position = 100 * scrollTop / that[0].scrollHeight;
+                scrollTop = that[0].scrollTop + element.offset().top;
+                if (pandora.user.ui.page == 'document') {
+                    scrollTop -= 48;
+                } else {
+                    scrollTop -= 80;
+                    if (pandora.user.ui.showBrowser) {
+                        scrollTop -= (112 + Ox.UI.SCROLLBAR_SIZE);
+                    }
+                }
+
+                position = 100 * Math.max(scrollTop, 0) / that[0].scrollHeight;
             }
         }
         scrollTo(position);

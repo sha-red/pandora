@@ -254,7 +254,7 @@ pandora.URL = (function() {
                         set[!state.item ? 'collectionView' : 'documentView'] = state.view;
                     }
                     if (state.span) {
-                        if (Ox.isNumber(state.pan)) {
+                        if (Ox.isNumber(state.span)) {
                             set['documents.' + state.item] = {position: state.span};
                         } else {
                             set['documents.' + state.item] = {name: state.span};
