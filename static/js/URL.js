@@ -23,9 +23,13 @@ pandora.URL = (function() {
                 if (
                     state.page == 'document'
                     && pandora.user.ui.documents[state.part]
-                    && pandora.user.ui.documents[state.part].position
+                    && (
+                        pandora.user.ui.documents[state.part].position ||
+                        pandora.user.ui.documents[state.part].name
+                    )
                 ) {
-                    state.span = pandora.user.ui.documents[state.part].position;
+                    state.span = pandora.user.ui.documents[state.part].position ||
+                        pandora.user.ui.documents[state.part].name;
                 }
             }
 
@@ -107,7 +111,6 @@ pandora.URL = (function() {
                     state.span = [position];
                 }
             }
-            
         }
 
         if (
@@ -251,7 +254,11 @@ pandora.URL = (function() {
                         set[!state.item ? 'collectionView' : 'documentView'] = state.view;
                     }
                     if (state.span) {
-                        set['documents.' + state.item] = {position: state.span};
+                        if (Ox.isNumber(state.pan)) {
+                            set['documents.' + state.item] = {position: state.span};
+                        } else {
+                            set['documents.' + state.item] = {name: state.span};
+                        }
                     }
                     if (!state.item && state.find) {
                         set.findDocuments = state.find;

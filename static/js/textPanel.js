@@ -7,7 +7,7 @@ pandora.ui.textPanel = function(text, $toolbar) {
         that = Ox.SplitPanel({
             elements: [
                 {
-                    element: textElement = pandora.ui.textHTML(text)
+                    element: textElement = pandora.$ui.textElement = pandora.ui.textHTML(text)
                 },
                 {
                     element: textEmbed = pandora.ui.textEmbed(textElement),
@@ -195,7 +195,7 @@ pandora.ui.textHTML = function(text) {
                     that.update();
                 },
             })
-            .bindEvent('pandora_documents.' + text.id.toLowerCase(), function(data) {
+            .bindEvent('pandora_documents.' + pandora.user.ui.document.toLowerCase(), function(data) {
                 data.value && data.value.name && scrollToPosition();
             })
             .bindEvent('pandora_texts.' + text.id.toLowerCase(), function(data) {

@@ -1994,7 +1994,9 @@ pandora.getSpan = function(state, val, callback) {
                 if (Ox.contains(['epub', 'pdf', 'txt'], extension)) {
                     state.span = Ox.limit(parseInt(val), 1, dimensions);
                 } else if (Ox.contains(['html'], extension)) {
-                    state.span = Ox.limit(parseInt(val), 0, 100);
+                    //fixme: allow numbers or check names?
+                    //state.span = Ox.limit(parseInt(val), 0, 100);
+                    state.span = val
                 } else if (Ox.contains(['gif', 'jpg', 'png'], extension)) {
                     values = val.split(',');
                     if (values.length == 4) {
