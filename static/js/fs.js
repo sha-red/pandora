@@ -277,7 +277,7 @@ pandora.fs = (function() {
         //fixme: would be nice to download videos from subdomains,
         //       currently throws a cross domain error
         var name = that.getVideoName(id, resolution, part, track),
-            url = '/' + pandora.getVideoURLName(id, resolution, part, track),
+            url = pandora.getMediaURL('/' + pandora.getVideoURLName(id, resolution, part, track)),
             blobSize = 5*1024*1024, total;
         Ox.Log('FS', 'start downloading', url);
         getSize(url, function(size) {
