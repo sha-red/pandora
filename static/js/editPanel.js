@@ -330,6 +330,9 @@ pandora.ui.editPanel = function(isEmbed) {
             select: function(data) {
                 pandora.UI.set({editSelection: data.ids});
             },
+            selectannotation: function(data) {
+                that.options({position: data['in']})
+            },
             sort: function(data) {
                 pandora.UI.set({editSort: data});
                 sortClips(updateClips);
@@ -542,6 +545,7 @@ pandora.ui.editPanel = function(isEmbed) {
                 items: Ox.flatten(clips.map(function(clip) {
                     return clip.layers[layer.id].map(function(annotation) {
                         var a = Ox.clone(annotation);
+                        a['id'] = clip['id'] + '/' + a['id'];
                         a['in'] = Math.max(
                             clip['position'],
                             a['in'] - clip['in'] + clip['position']
