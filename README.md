@@ -173,4 +173,4 @@ b) apache2 (if you need it for other sites on the same server)
   now you can access your local pandora instace at http://127.0.0.1:8000/
 
   we use virtual machines/lxc for development and deployment,
-  more info on that in vm/LXC_README.txt
+  more info on that in vm/LXC_README.md
