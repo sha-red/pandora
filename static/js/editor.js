@@ -194,6 +194,7 @@ pandora.ui.editor = function(data) {
                         });
                     }
                     that.updateAnnotation(data.id, result.data);
+                    pandora.UI.set('videoPoints.' + ui.item + '.annotation', result.data.id.split('/')[1] || '');
                     Ox.Request.clearCache();
                 };
                 if (data.id[0] == '_') {
