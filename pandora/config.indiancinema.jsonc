@@ -1597,7 +1597,7 @@
         {"id": "about", "title": "About"},
         {"id": "news", "title": "News"},
         {"id": "faq", "title": "Frequently Asked Questions"},
-        {"id": "terms", "title": "Terms of Service"},
+        //{"id": "terms", "title": "Terms of Service"},
         {"id": "copyrights", "title": "Copyrights"},
         {"id": "contact", "title": "Contact"}
     ],
