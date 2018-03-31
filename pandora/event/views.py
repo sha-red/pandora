@@ -8,16 +8,17 @@ from django.conf import settings
 from six import string_types
 import ox
 from ox.utils import json
+
+from changelog.models import add_changelog
+from item import utils
+from oxdjango.api import actions
 from oxdjango.decorators import login_required_json
 from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
-
-from oxdjango.api import actions
-from item import utils
-from changelog.models import add_changelog
+from user.decorators import capability_required_json
 
 from . import models
 
-@login_required_json
+@capability_required_json('canEditEvents')
 def addEvent(request, data):
     '''
     Adds a new event to the calendar
