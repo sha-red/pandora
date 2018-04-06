@@ -1052,7 +1052,8 @@ pandora.escapeQueryValue = function(value) {
     if (!Ox.isString(value)) {
         value = value.toString();
     }
-    return value.replace(/_/g, '%09')
+    return value.replace(/%/, '%25')
+        .replace(/_/g, '%09')
         .replace(/\s/g, '_')
         .replace(/</g, '%0E')
         .replace(/>/g, '%0F');
