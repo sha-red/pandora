@@ -92,6 +92,7 @@ pandora.ui.embedPlayer = function() {
                 invertHighlight: options.invertHighlight,
                 muted: ui.videoMuted,
                 paused: options.paused,
+                loop: options.loop,
                 playInToOut: options.playInToOut,
                 position: options.position,
                 poster: pandora.getMediaURL('/' + options.item + '/' + '96p' + (
