@@ -1373,12 +1373,13 @@ pandora.getFoldersWidth = function(section) {
 };
 
 pandora.getHash = function(state, callback) {
+    // FIXME: remove this
     var embedKeys = [
             'annotationsRange', 'annotationsSort',
             'embed',
             'ignoreRights', 'invertHighlight',
             'matchRatio',
-            'paused', 'playInToOut',
+            'paused', 'playInToOut', 'loop', 'volume',
             'showAnnotations', 'showCloseButton', 'showLayers', 'showTimeline',
             'timeline', 'title'
         ],

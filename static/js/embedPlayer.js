@@ -11,6 +11,7 @@ pandora.ui.embedPlayer = function() {
             annotationsRange: ui.annotationsRange,
             annotationsSort: ui.annotationsSort,
             invertHighlight: true,
+            loop: false,
             matchRatio: false,
             paused: true,
             playInToOut: true,
@@ -21,6 +22,7 @@ pandora.ui.embedPlayer = function() {
             }),
             showTimeline: false,
             timeline: ui.videoTimeline,
+            volume: ui.videoVolume,
             width: window.innerWidth
         },
         options = getOptions(),
@@ -28,6 +30,7 @@ pandora.ui.embedPlayer = function() {
         video,
         $innerPanel, $outerPanel,
         $title, $player, $controls, $timeline, $annotations;
+
 
     pandora.api.get({id: ui.item, keys: pandora.VIDEO_OPTIONS_KEYS}, function(result) {
         if (removed) {
@@ -120,7 +123,7 @@ pandora.ui.embedPlayer = function() {
                     ? pandora.site.timelines : [],
                 title: video.title,
                 video: video.video,
-                volume: ui.videoVolume,
+                volume: options.volume,
                 width: options.width
             }, options['in'] ? {
                 'in': options['in']
