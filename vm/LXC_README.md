@@ -1,12 +1,25 @@
+# Preparations
+
+    you will need at least 2GB of free disk space to install pan.do/ra
+
 # Installing pan.do/ra inside LXC
 
 1) Install lxc on the host (Ubuntu 16.04 or later):
 
     sudo apt-get install lxc
 
+1.1) On Debian you have to configure the a network for LXC before creating a container
+
+    Simplest setup is this one here:
+        https://wiki.debian.org/LXC/SimpleBridge#Using_lxc-net
+
 2) Create a new container, use different names if installing multiple instances:
 
     sudo lxc-create -n pandora -t ubuntu -- -r xenial
+
+    or
+
+    sudo lxc-create -n pandora -t debian -- -r stretch
 
 3) Install pan.do/ra in container:
 
