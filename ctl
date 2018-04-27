@@ -13,7 +13,7 @@ if [ "$action" = "init" ]; then
 
     # Work around broken venv module in Ubuntu 16.04 / Debian 9
     if [ ! -e bin/pip ]; then
-        bin/python3 -m pip install -U --ignore-installed pip
+        bin/python3 -m pip install -U --ignore-installed "pip<9"
     fi
     if [ ! -d static/oxjs ]; then
         git clone --depth 1 https://git.0x2620.org/oxjs.git static/oxjs
