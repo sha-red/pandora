@@ -875,6 +875,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "title": "Keywords",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Keyword",
+            "autocomplete": true,
             "overlap": true,
             "type": "string"
         },
