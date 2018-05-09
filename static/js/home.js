@@ -261,20 +261,21 @@ pandora.ui.home = function() {
         var height = $logo.height();
         if (width == 0 || height == 0) {
             setTimeout(adjustRatio, 50);
-        }
-        var aspect = width / height;
-        if (aspect != 2) {
-            var top = 320 / aspect;
-            $reflectionImage.css({
-                top: top + 'px',
-            })
-            $reflectionGradient.css({
-                top: top + 'px',
-                height: (top + 2) + 'px',
-            })
-            $logo.css({
-                bottom: top + 'px',
-            })
+        } else {
+            var aspect = width / height;
+            if (aspect != 2) {
+                var top = 320 / aspect;
+                $reflectionImage.css({
+                    top: top + 'px',
+                })
+                $reflectionGradient.css({
+                    top: top + 'px',
+                    height: (top + 2) + 'px',
+                })
+                $logo.css({
+                    bottom: top + 'px',
+                })
+            }
         }
     }
 
