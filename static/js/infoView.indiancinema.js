@@ -623,6 +623,8 @@ pandora.ui.infoView = function(data) {
                 edit[key] = value
                     ? Ox.decodeHTMLEntities(value).split('; ').map(Ox.encodeHTMLEntities)
                     : [];
+            } else if (key == 'imdbId') {
+                edit[key] = value.match(/\d{7}/)[0];
             } else {
                 edit[key] = value;
             }
