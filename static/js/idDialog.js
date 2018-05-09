@@ -189,7 +189,7 @@ pandora.ui.idDialog = function(data) {
         if (item.originalTitle == data.title) {
             item.originalTitle = highlightTitle(item.originalTitle);
         }
-        if (item.director) {
+        if (item.director && data.director) {
             item.director.forEach(function(director, i) {
                 if (Ox.contains(data.director, director)) {
                     item.director[i] = highlightTitle(director);

@@ -27,6 +27,10 @@ pandora.ui.metadataDialog = function(data) {
 
         that = data.imdbId ? updateDialog() : idDialog();
 
+    keys = keys.filter(function(key) {
+        return getItemKey(key);
+    });
+
     data.imdbId && getMetadata();
 
     function idDialog() {
