@@ -247,11 +247,35 @@ pandora.ui.home = function() {
             })
             .appendTo(that);
 
+    adjustRatio();
+
     if (pandora.user.level == 'guest') {
         $signupButton.appendTo(that);
         $signinButton.appendTo(that);
     } else {
         $preferencesButton.appendTo(that);
+    }
+
+    function adjustRatio() {
+        var width = $logo.width();
+        var height = $logo.height();
+        if (width == 0 || height == 0) {
+            setTimeout(adjustRatio, 50);
+        }
+        var aspect = width / height;
+        if (aspect != 2) {
+            var top = 320 / aspect;
+            $reflectionImage.css({
+                top: top + 'px',
+            })
+            $reflectionGradient.css({
+                top: top + 'px',
+                height: (top + 2) + 'px',
+            })
+            $logo.css({
+                bottom: top + 'px',
+            })
+        }
     }
 
     that.fadeInScreen = function() {
