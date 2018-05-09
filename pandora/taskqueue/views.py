@@ -44,7 +44,10 @@ def cancelTask(request, data):
     if not isinstance(ids, list):
         ids = [ids]
     for id in ids:
-        task = models.Task.get(id)
+        try:
+            task = models.Task.get(id)
+        except models.Task.DoesNotExist:
+            continue
         if task.user != request.user and not request.user.profile.capability('canSeeAllTasks'):
             response = json_response(status=403, text='permission denied')
             return render_to_json_response(response)
