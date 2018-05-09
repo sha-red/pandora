@@ -936,9 +936,10 @@ def download_source(request, id, part=None):
         part = int(part) - 1
     else:
         part = 0
-    if not item.files.all().count() > part:
+    streams = item.streams()
+    if parts > len(streams):
         raise Http404
-    f = item.files.all()[part]
+    f = streams[part].file
     if not f.data:
         raise Http404
 
