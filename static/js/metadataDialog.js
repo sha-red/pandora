@@ -65,7 +65,7 @@ pandora.ui.metadataDialog = function(data) {
             title: Ox._('Update Metadata')
         });
     }
-    
+
     function updateDialog() {
         return Ox.Dialog({
             buttons: [
@@ -222,11 +222,11 @@ pandora.ui.metadataDialog = function(data) {
                     imdb.title = imdb.originalTitle;
                 }
                 keys.forEach(function(key, index) {
-                    var isEqual = Ox.isEqual(data[key], imdb[key]) || (
-                            isEmpty(data[key]) && isEmpty(imdb[key])
+                    var isEqual = Ox.isEqual(data[getKey(key)], imdb[key]) || (
+                            isEmpty(data[getKey(key)]) && isEmpty(imdb[key])
                         ),
                         checked = isEqual ? [true, true]
-                            : isEmpty(data[key]) && !isEmpty(imdb[key]) ? [false, true]
+                            : isEmpty(data[getKey(key)]) && !isEmpty(imdb[key]) ? [false, true]
                             : [true, false];
                     if (index > 0) {
                         $('<div>')
@@ -242,7 +242,7 @@ pandora.ui.metadataDialog = function(data) {
                             margin: '3px 3px 5px 3px'
                         })
                         .appendTo($data);
-                    $input[key] = [data[key], imdb[key]].map(function(v, i) {
+                    $input[key] = [data[getKey(key)], imdb[key]].map(function(v, i) {
                         return Ox.InputGroup({
                                 inputs: [
                                     Ox.Checkbox({
