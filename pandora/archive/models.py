@@ -524,7 +524,7 @@ class File(models.Model):
                     tinfo = ox.avinfo(target)
                     del tinfo['path']
                     f = File(oshash=tinfo['oshash'], item=self.item)
-                    f.path = self.path.rsplit('.', 1)[0] + config['formats'][0]
+                    f.path = self.path.rsplit('.', 1)[0] + '.' + config['formats'][0]
                     f.info = tinfo
                     f.info['language'] = language
                     f.info['extension'] = config['formats'][0]
