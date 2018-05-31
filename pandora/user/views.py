@@ -362,7 +362,7 @@ def editUser(request, data):
             response = json_response(status=403, text='email already in use')
             return render_to_json_response(response)
         user.email = data['email']
-    if 'level' in data:
+    if 'level' in data and request.user.profile.get_level() == 'admin':
         profile.set_level(data['level'])
     if 'notes' in data:
         profile.notes = data['notes']

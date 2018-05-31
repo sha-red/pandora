@@ -680,19 +680,27 @@ pandora.ui.usersDialog = function() {
 
                         }
                     }),
-                Ox.Select({
-                    id: 'level',
-                    items: pandora.site.userLevels.slice(1).map(function(level) {
-                        return {
-                            id: level,
-                            title: Ox.toTitleCase(level)
-                        };
+                pandora.user.level == 'admin'
+                    ? Ox.Select({
+                        id: 'level',
+                        items: pandora.site.userLevels.slice(1).map(function(level) {
+                            return {
+                                id: level,
+                                title: Ox.toTitleCase(level)
+                            };
+                        }),
+                        label: Ox._('Level'),
+                        labelWidth: 80,
+                        value: user.level,
+                        width: formWidth - 16
+                    }) : Ox.Input({
+                        disabled: true,
+                        id: 'level',
+                        label: Ox._('Level'),
+                        labelWidth: 80,
+                        value: Ox.toTitleCase(user.level),
+                        width: formWidth - 16
                     }),
-                    label: Ox._('Level'),
-                    labelWidth: 80,
-                    value: user.level,
-                    width: formWidth - 16
-                }),
                 Ox.Checkbox({
                         id: 'newsletter',
                         label: Ox._('Newsletter'),
