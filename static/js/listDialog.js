@@ -444,7 +444,7 @@ pandora.ui.listGeneralPanel = function(listData) {
             return listData.status == 'private' ? 160 : 136;
         }
         function getDescriptionTop() {
-            return listData.status == 'private' ? 64 : 88;
+            return listData.status == 'private' ? 112 : 136;
         }
         function getSubscribersAction() {
             return listData.status == 'private' ? 'hide' : 'show';
