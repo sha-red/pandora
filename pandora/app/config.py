@@ -95,15 +95,6 @@ def load_config(init=False):
         for key in config['itemKeys']:
             config['keys'][key['id']] = key
 
-        # add entities if needed
-        if len(config.get('entities', [])) and not [k for k in config['documentKeys'] if k['id'] == 'entites']:
-            config['documentKeys'].append({
-                'id': 'entity',
-                'title': 'Entity',
-                'type': 'string',
-                'find': True
-            })
-
         # add missing defaults
         for section in sorted((
             'capabilities', 'cantPlay',
@@ -139,6 +130,15 @@ def load_config(init=False):
                 if added:
                     sys.stderr.write("adding default %s:\n\t" % section)
                     sys.stderr.write("\n\t".join(added) + '\n\n')
+
+        # add entities if needed
+        if len(config.get('entities', [])) and not [k for k in config['documentKeys'] if k['id'] == 'entites']:
+            config['documentKeys'].append({
+                'id': 'entity',
+                'title': 'Entity',
+                'type': 'string',
+                'find': True
+            })
 
         key = 'documentRightsLevel'
         if key not in config:
