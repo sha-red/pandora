@@ -1375,6 +1375,10 @@ class Item(models.Model):
                 get_sequences(self.public_id)
             tasks.load_subtitles.delay(self.public_id)
 
+    def update_cache(self, **kwargs):
+        self.cache = self.get_json()
+        Item.objects.filter(id=self.id).update(cache=self.cache, **kwargs)
+
     def save_poster(self, data):
         self.poster.name = self.path('poster.jpg')
         poster = self.poster.path
@@ -1384,10 +1388,8 @@ class Item(models.Model):
         self.poster_width = self.poster.width
         self.clear_poster_cache(self.poster.path)
         if self.cache.get('posterRatio') != self.poster_width / self.poster_height:
-            self.cache = self.get_json()
-            Item.objects.filter(id=self.id).update(cache=self.cache,
-                                                   poster_width=self.poster_width,
-                                                   poster_height=self.poster_height)
+            self.update_cache(poster_width=self.poster_width,
+                              poster_height=self.poster_height)
 
     def prefered_poster_url(self):
         if settings.DATA_SERVICE:
