@@ -5,10 +5,19 @@ import copy
 
 from django.db import models
 from django.utils import datetime_safe
+import django.contrib.postgres.fields
+from django.core.serializers.json import DjangoJSONEncoder
+
 from six import string_types
 
 from ox.utils import json
 
+class JSONField(django.contrib.postgres.fields.JSONField):
+
+    def __init__(self, *args, **kwargs):
+        if 'encoder' not in kwargs:
+            kwargs['encoder'] = DjangoJSONEncoder
+        super().__init__(*args, **kwargs)
 
 def to_json(python_object):
     if isinstance(python_object, datetime.datetime):

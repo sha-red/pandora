@@ -11,9 +11,9 @@ from django.db.models import Max
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
-import ox
+from oxdjango.fields import JSONField
 
-from oxdjango.fields import DictField, TupleField
+import ox
 
 from archive import extract
 from user.utils import update_groups
@@ -39,16 +39,16 @@ class List(models.Model):
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, default='private')
     _status = ['private', 'public', 'featured']
-    query = DictField(default={"static": True})
+    query = JSONField(default=lambda: {"static": True}, editable=False)
     type = models.CharField(max_length=255, default='static')
     description = models.TextField(default='')
 
     icon = models.ImageField(default=None, blank=True, upload_to=get_icon_path)
 
     view = models.TextField(default=get_listview)
-    sort = TupleField(default=get_listsort, editable=False)
+    sort = JSONField(default=get_listsort, editable=False)
 
-    poster_frames = TupleField(default=[], editable=False)
+    poster_frames = JSONField(default=[], editable=False)
 
     #is through table still required?
     items = models.ManyToManyField('item.Item', related_name='lists',

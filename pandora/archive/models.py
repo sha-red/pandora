@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.utils.encoding import python_2_unicode_compatible
+from oxdjango.fields import JSONField
 
 from oxdjango import fields
 import ox
@@ -69,7 +70,7 @@ class File(models.Model):
     size = models.BigIntegerField(default=0)
     duration = models.FloatField(null=True)
 
-    info = fields.DictField(default={})
+    info = JSONField(default=dict, editable=False)
 
     video_codec = models.CharField(max_length=255)
     pixel_format = models.CharField(max_length=255)
@@ -687,7 +688,7 @@ class Stream(models.Model):
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
     oshash = models.CharField(max_length=16, null=True, db_index=True)
-    info = fields.DictField(default={})
+    info = JSONField(default=dict, editable=False)
     duration = models.FloatField(default=0)
     aspect_ratio = models.FloatField(default=0)
 

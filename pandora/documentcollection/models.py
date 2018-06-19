@@ -11,10 +11,9 @@ from django.db.models import Max
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
+from oxdjango.fields import JSONField
 
 import ox
-
-from oxdjango.fields import DictField, TupleField
 
 from archive import extract
 from user.utils import update_groups
@@ -47,16 +46,16 @@ class Collection(models.Model):
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, default='private')
     _status = ['private', 'public', 'featured']
-    query = DictField(default={"static": True})
+    query = JSONField(default=lambda: {"static": True}, editable=False)
     type = models.CharField(max_length=255, default='static')
     description = models.TextField(default='')
 
     icon = models.ImageField(default=None, blank=True, upload_to=get_icon_path)
 
     view = models.TextField(default=get_collectionview)
-    sort = TupleField(default=get_collectionsort, editable=False)
+    sort = JSONField(default=get_collectionsort, editable=False)
 
-    poster_frames = TupleField(default=[], editable=False)
+    poster_frames = JSONField(default=[], editable=False)
 
     #is through table still required?
     documents = models.ManyToManyField('document.Document', related_name='collections',

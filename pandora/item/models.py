@@ -23,7 +23,7 @@ from django.utils import datetime_safe
 from django.utils.encoding import python_2_unicode_compatible
 
 import ox
-from oxdjango import fields
+from oxdjango.fields import JSONField, to_json
 from oxdjango.sortmodel import get_sort_field
 import ox.web.imdb
 import ox.image
@@ -175,9 +175,9 @@ class Item(models.Model):
 
     public_id = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True, null=True)
-    external_data = fields.DictField(default={}, editable=False)
-    data = fields.DictField(default={}, editable=False)
-    json = fields.DictField(default={}, editable=False)
+    external_data = JSONField(default=dict, editable=False)
+    data = JSONField(default=dict, editable=False)
+    json = JSONField(default=dict, editable=False)
     poster = models.ImageField(default=None, blank=True, upload_to=get_poster_path)
     poster_source = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
@@ -187,7 +187,7 @@ class Item(models.Model):
     icon = models.ImageField(default=None, blank=True, upload_to=get_icon_path)
 
     torrent = models.FileField(default=None, blank=True, max_length=1000, upload_to=get_torrent_path)
-    stream_info = fields.DictField(default={}, editable=False)
+    stream_info = JSONField(default=dict, editable=False)
 
     # stream related fields
     stream_aspect = models.FloatField(default=4/3)
@@ -1476,7 +1476,7 @@ class Item(models.Model):
         data = utils.normalize_dict('NFC', data)
         ox.makedirs(os.path.join(settings.MEDIA_ROOT, self.path()))
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(json.dumps(data, default=fields.to_json).encode('utf-8'))
+        p.communicate(json.dumps(data, default=to_json).encode('utf-8'))
         self.clear_poster_cache(poster)
         return poster
 

@@ -4,7 +4,6 @@ from django.db.models import Q, Manager
 
 from oxdjango.managers import get_operator
 from oxdjango.query import QuerySet
-from oxdjango.fields import DictField
 
 
 keymap = {
@@ -36,8 +35,7 @@ def parseCondition(condition, user):
     if isinstance(v, bool):
         key = k
     elif k == 'url':
-        key = 'info' + get_operator('=', 'istr')
-        v = DictField.dumps({'url': v})[1:-1]
+        key = 'info__url' + get_operator('=', 'istr')
     elif k == 'list':
         q = Q(id=0)
         l = v.split(":")

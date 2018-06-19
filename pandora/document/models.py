@@ -14,12 +14,12 @@ from django.contrib.auth.models import User, Group
 from django.db.models.signals import pre_delete
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
+from oxdjango.fields import JSONField
 
 from PIL import Image
 import ox
 
 
-from oxdjango import fields
 from oxdjango.sortmodel import get_sort_field
 from person.models import get_name_sort
 from item.models import Item
@@ -65,7 +65,7 @@ class Document(models.Model):
     linked_documents = models.ManyToManyField('Document', related_name='linking_documents')
 
     rightslevel = models.IntegerField(db_index=True, default=0)
-    data = fields.DictField(default={})
+    data = JSONField(default=dict, editable=False)
 
     def update_access(self, user):
         if not user.is_authenticated():

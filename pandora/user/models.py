@@ -9,9 +9,9 @@ from django.db import models
 from django.db.models import Max
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
+from oxdjango.fields import JSONField
 
 import ox
-from oxdjango.fields import DictField
 from ox.utils import json
 
 from itemlist.models import List, Position
@@ -38,7 +38,7 @@ class SessionData(models.Model):
     useragent = models.CharField(max_length=4096, null=True)
     windowsize = models.CharField(max_length=255, null=True)
     screensize = models.CharField(max_length=255, null=True)
-    info = DictField(default={})
+    info = JSONField(default=dict, editable=False)
 
     location = models.CharField(max_length=255, null=True)
     location_sort = models.CharField(max_length=255, null=True)
@@ -178,8 +178,8 @@ class UserProfile(models.Model):
     level = models.IntegerField(default=1)
     files_updated = models.DateTimeField(default=datetime.now)
     newsletter = models.BooleanField(default=True)
-    ui = DictField(default={})
-    preferences = DictField(default={})
+    ui = JSONField(default=dict, editable=False)
+    preferences = JSONField(default=dict, editable=False)
 
     notes = models.TextField(default='')
 

@@ -10,12 +10,12 @@ import tempfile
 
 from six.moves.urllib.parse import quote
 import ox
-from oxdjango.fields import DictField, TupleField
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth.models import User, Group
 from django.utils.encoding import python_2_unicode_compatible
+from oxdjango.fields import JSONField
 
 from annotation.models import Annotation
 from item.models import Item
@@ -49,12 +49,12 @@ class Edit(models.Model):
     description = models.TextField(default='')
     rightslevel = models.IntegerField(db_index=True, default=0)
 
-    query = DictField(default={"static": True})
+    query = JSONField(default=lambda: {"static": True}, editable=False)
     type = models.CharField(max_length=255, default='static')
 
     icon = models.ImageField(default=None, blank=True, null=True, upload_to=get_icon_path)
 
-    poster_frames = TupleField(default=[], editable=False)
+    poster_frames = JSONField(default=[], editable=False)
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_edits')
 
     def __str__(self):

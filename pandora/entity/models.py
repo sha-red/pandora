@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete, post_init
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
+from oxdjango.fields import JSONField
 
 import ox
 from oxdjango import fields
@@ -40,7 +41,7 @@ class Entity(models.Model):
     name = models.CharField(max_length=255)
     alternativeNames = fields.TupleField(default=())
 
-    data = fields.DictField(default={}, editable=False)
+    data = JSONField(default=dict, editable=False)
     matches = models.IntegerField(default=0)
 
     objects = managers.EntityManager()
@@ -271,7 +272,7 @@ class DocumentProperties(models.Model):
     document = models.ForeignKey(Document, related_name='documentproperties')
     entity = models.ForeignKey(Entity, related_name='documentproperties')
     index = models.IntegerField(default=0)
-    data = fields.DictField(default={})
+    data = JSONField(default=dict, editable=False)
 
     def __str__(self):
         return u"%r-%r" % (self.document, self.entity)

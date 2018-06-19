@@ -6,8 +6,8 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from oxdjango.fields import JSONField
 
-from oxdjango import fields
 import ox
 
 import websocket
@@ -21,7 +21,7 @@ FIXME: remove this table more migrate to new ChangeLog
 class Changelog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=255, db_index=True)
-    value = fields.DictField(default={})
+    value = JSONField(default=dict, editable=False)
 
     def __str__(self):
         return u'%s %s' % (self.type, self.created)
@@ -52,7 +52,7 @@ def add_changelog(request, data, id=None):
 class Log(models.Model):
 
     action = models.CharField(max_length=255, db_index=True)
-    data = fields.DictField(default={})
+    data = JSONField(default=dict, editable=False)
     created = models.DateTimeField(db_index=True)
     user = models.ForeignKey(User, null=True, related_name='changelog')
     changeid = models.TextField()

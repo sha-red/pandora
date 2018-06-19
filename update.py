@@ -247,6 +247,8 @@ if __name__ == "__main__":
             run('./bin/pip', 'install', '-r', 'requirements.txt')
             update_service('pandora-encoding')
             update_service('pandora-tasks')
+        if old < 5972:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
         if len(sys.argv) == 1:
             release = get_release()

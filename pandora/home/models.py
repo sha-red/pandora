@@ -8,10 +8,10 @@ from django.db import models
 from django.db.models import Max
 from django.db.models.signals import pre_delete
 from django.utils.encoding import python_2_unicode_compatible
+from oxdjango.fields import JSONField
 
 import ox
 
-from oxdjango import fields
 from itemlist.models import List
 from edit.models import Edit
 from documentcollection.models import Collection
@@ -24,7 +24,7 @@ class Item(models.Model):
 
     active = models.BooleanField(default=True)
     index = models.IntegerField(default=-1)
-    data = fields.DictField(default={}, editable=False)
+    data = JSONField(default=dict, editable=False)
 
     def editable(self, user):
         return user.is_authenticated() and user.profile.capability("canManageHome")
