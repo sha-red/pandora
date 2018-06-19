@@ -177,7 +177,7 @@ class Item(models.Model):
     oxdbId = models.CharField(max_length=42, unique=True, blank=True, null=True)
     external_data = JSONField(default=dict, editable=False)
     data = JSONField(default=dict, editable=False)
-    json = JSONField(default=dict, editable=False)
+    cache = JSONField(default=dict, editable=False)
     poster = models.ImageField(default=None, blank=True, upload_to=get_poster_path)
     poster_source = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
@@ -425,8 +425,8 @@ class Item(models.Model):
             self.poster_width = 80
         self.update_sort()
         self.update_languages()
-        self.json = self.get_json()
-        self.json['modified'] = datetime.now()
+        self.cache = self.get_json()
+        self.cache['modified'] = datetime.now()
         super(Item, self).save(*args, **kwargs)
         self.update_find()
         self.update_sort()
@@ -1360,7 +1360,7 @@ class Item(models.Model):
             if offset:
                 self.data['volume'] /= offset
         # extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
-        self.json = self.get_json()
+        self.cache = self.get_json()
         self.update_sort()
         self.select_frame()
         self.make_poster()
@@ -1383,9 +1383,9 @@ class Item(models.Model):
         self.poster_height = self.poster.height
         self.poster_width = self.poster.width
         self.clear_poster_cache(self.poster.path)
-        if self.json.get('posterRatio') != self.poster_width / self.poster_height:
-            self.json = self.get_json()
-            Item.objects.filter(id=self.id).update(json=self.json,
+        if self.cache.get('posterRatio') != self.poster_width / self.poster_height:
+            self.cache = self.get_json()
+            Item.objects.filter(id=self.id).update(cache=self.cache,
                                                    poster_width=self.poster_width,
                                                    poster_height=self.poster_height)
 
@@ -1467,7 +1467,7 @@ class Item(models.Model):
             timeline = audio_timeline
 
         cmd = [settings.ITEM_POSTER, '-d', '-', '-p', poster]
-        data = self.json.copy()
+        data = self.cache.copy()
         if frame:
             data['frame'] = frame
         if os.path.exists(timeline):
@@ -1495,8 +1495,8 @@ class Item(models.Model):
                         })
                 offset += f.duration
         else:
-            if 'videoRatio' in self.json and self.sort.duration and self.streams():
-                width, height = self.json['resolution']
+            if 'videoRatio' in self.cache and self.sort.duration and self.streams():
+                width, height = self.cache['resolution']
                 if width and height:
                     pos = self.sort.duration / 2
                     for p in [pos/2, pos, pos+pos/2]:
@@ -1636,9 +1636,9 @@ class Item(models.Model):
                     for data in s.srt(offset):
                         subtitles_added = True
                         value = data['value'].replace('\n', '<br>\n').replace('<br><br>\n', '<br>\n')
-                        if data['in'] < self.json['duration'] and data['out'] > self.json['duration']:
-                            data['out'] = self.json['duration']
-                        if data['in'] < self.json['duration']:
+                        if data['in'] < self.cache['duration'] and data['out'] > self.cache['duration']:
+                            data['out'] = self.cache['duration']
+                        if data['in'] < self.cache['duration']:
                             new.append((float('%0.03f' % data['in']), float('%0.03f' % data['out']), value))
                 # otherwise add empty 5 seconds annotation every minute
                 if not subtitles_added:

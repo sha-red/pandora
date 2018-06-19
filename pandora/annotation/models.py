@@ -368,7 +368,7 @@ class Annotation(models.Model):
                     if key in self._clip_keys:
                         j[key] = getattr(self.clip, key)
                     elif key not in self.annotation_keys:
-                        value = self.item.get(key) or self.item.json.get(key)
+                        value = self.item.get(key) or self.item.cache.get(key)
                         if not value and hasattr(self.item.sort, key):
                             value = getattr(self.item.sort, key)
                         if value != None:

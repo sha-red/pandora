@@ -493,16 +493,16 @@ class Clip(models.Model):
             data['item'] = self.item.public_id
             data['in'] = self.annotation.start
             data['out'] = self.annotation.end
-            data['parts'] = self.annotation.item.json['parts']
-            data['durations'] = self.annotation.item.json['durations']
+            data['parts'] = self.annotation.item.cache['parts']
+            data['durations'] = self.annotation.item.cache['durations']
         else:
             data['item'] = self.item.public_id
             data['in'] = self.start
             data['out'] = self.end
-            data['parts'] = self.item.json['parts']
-            data['durations'] = self.item.json['durations']
+            data['parts'] = self.item.cache['parts']
+            data['durations'] = self.item.cache['durations']
         for key in ('title', 'director', 'year', 'videoRatio'):
-            value = self.item.json.get(key)
+            value = self.item.cache.get(key)
             if value:
                 data[key] = value
         data['duration'] = data['out'] - data['in']

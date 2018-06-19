@@ -131,7 +131,7 @@ class MetaClip(object):
                     if key == 'streams':
                         value = [s.file.oshash for s in self.item.streams()]
                     else:
-                        value = self.item.get(key) or self.item.json.get(key)
+                        value = self.item.get(key) or self.item.cache.get(key)
                     if not value and hasattr(self.item.sort, key):
                         value = getattr(self.item.sort, key)
                     if value is not None:
@@ -148,10 +148,10 @@ class MetaClip(object):
         qs = self.annotations.all()
         if qs.count():
             data['annotation'] = qs[0].public_id
-        data['parts'] = self.item.json['parts']
-        data['durations'] = self.item.json['durations']
+        data['parts'] = self.item.cache['parts']
+        data['durations'] = self.item.cache['durations']
         for key in ('title', 'director', 'year', 'videoRatio'):
-            value = self.item.json.get(key)
+            value = self.item.cache.get(key)
             if value:
                 data[key] = value
         data['duration'] = data['out'] - data['in']

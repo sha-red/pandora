@@ -55,5 +55,5 @@ class Sequence(models.Model):
         if keys:
             for key in keys:
                 if key not in j:
-                    j[key] = self.sort.item.json.get(key)
+                    j[key] = self.sort.item.cache.get(key)
         return j

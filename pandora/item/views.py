@@ -175,11 +175,11 @@ def only_p_sums(request, query, m):
         if p == 'accessed':
             r[p] = m.sort.accessed or ''
         elif p == 'editable':
-            r[p] = is_editable(request, m.json)
+            r[p] = is_editable(request, m.cache)
         elif p in item_sort_keys:
             r[p] = getattr(m.sort, p)
         else:
-            r[p] = m.json.get(p)
+            r[p] = m.cache.get(p)
     if 'clip_qs' in query:
         r['clips'] = get_clips(query, query['clip_qs'].filter(item=m))
     return r
@@ -212,7 +212,7 @@ def get_items(request, query):
         qs = qs.select_related()
         items = [only_p_sums(request, query, m) for m in qs]
     else:
-        items = [only_p(request, query, m['json']) for m in qs.values('json')]
+        items = [only_p(request, query, m['cache']) for m in qs.values('cache')]
     return items
 
 def get_stats(request, query):
@@ -1040,7 +1040,7 @@ def video(request, id, resolution, format, index=None, track=None):
             if not r:
                 return HttpResponseForbidden()
             path = video.name
-            duration = sum(item.json['durations'])
+            duration = sum(item.cache['durations'])
 
         content_type = mimetypes.guess_type(path)[0]
         if len(t) == 2 and t[1] > t[0] and duration >= t[1]:
