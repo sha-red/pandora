@@ -20,14 +20,19 @@ class Command(BaseCommand):
     """
     help = 'import annotations from srt or vtt'
     args = 'username item layername filename.srt'
-    option_list = BaseCommand.option_list + (
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('username', help='username')
+        parser.add_argument('item', help='item')
+        parser.add_argument('layername', help='layer')
+        parser.add_argument('filename', help='filename.srt')
 
     def handle(self, *args, **options):
-        if len(args) != 4:
-            print(self.usage('import_srt'))
-            return 
-        username, public_id, layer_id, filename = args
+        username = options['username']
+        public_id = options['item']
+        layer_id = options['layer']
+        filename = options['filename']
+
         user = User.objects.get(username=username)
         item = Item.objects.get(public_id=public_id)
         layer = list(filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers']))[0]
