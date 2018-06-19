@@ -87,7 +87,7 @@ class Program(models.Model):
         return u"%s %s" % (self.item, self.start)
 
     def json(self, user, current=False):
-        item_json = self.item.get_json()
+        item_json = self.item.json()
         r = {
             'item': self.item.public_id,
         }

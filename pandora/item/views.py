@@ -207,7 +207,7 @@ def get_items(request, query):
     items = []
     qs = _order_query(query['qs'], query['sort'])
     qs = qs[query['range'][0]:query['range'][1]]
-    # items = [m.get_json(_p) for m in qs]
+    # items = [m.json(_p) for m in qs]
     if any(p for p in query['keys'] if p in item_sort_keys):
         qs = qs.select_related()
         items = [only_p_sums(request, query, m) for m in qs]
@@ -415,7 +415,7 @@ def findId(request, data):
         qs = models.Item.objects.filter(public_id=data['id'])
         if qs.count() == 1:
             response['data']['items'] = [
-                i.get_json(['title', 'director', 'year', 'id']) for i in qs
+                i.json(['title', 'director', 'year', 'id']) for i in qs
             ]
 
     if not response['data']['items'] \
@@ -509,7 +509,7 @@ def get(request, data):
     data['keys'] = data.get('keys', [])
     item = get_object_or_404_json(models.Item, public_id=data['id'])
     if item.access(request.user):
-        info = item.get_json(data['keys'])
+        info = item.json(data['keys'])
         if not data['keys'] or 'stream' in data['keys']:
             info['stream'] = item.get_stream()
         if not data['keys'] or 'streams' in data['keys']:
@@ -602,7 +602,7 @@ def add(request, data):
         del data['title']
         if data:
             response = edit_item(request, item, data)
-        response['data'] = item.get_json()
+        response['data'] = item.json()
         add_changelog(request, request_data, item.public_id)
     return render_to_json_response(response)
 actions.register(add, cache=False)
@@ -626,7 +626,7 @@ def edit(request, data):
     if item.editable(request.user):
         request_data = data.copy()
         response = edit_item(request, item, data)
-        response['data'] = item.get_json()
+        response['data'] = item.json()
         add_changelog(request, request_data)
     else:
         response = json_response(status=403, text='permission denied')
@@ -881,7 +881,7 @@ def poster(request, id, size=None):
                 poster_height=item.poster_height,
                 poster_width=item.poster_width,
                 icon=item.icon.name,
-                json=item.get_json()
+                json=item.json()
             )
     if item.poster and os.path.exists(item.poster.path):
         return image_to_response(item.poster, size)
@@ -1304,7 +1304,7 @@ def item_json(request, id):
         response = json_response(status=404, text='not found')
     else:
         item = qs[0]
-        response = item.get_json()
+        response = item.json()
         response['layers'] = item.get_layers(request.user)
     return render_to_json_response(response)
 
@@ -1318,7 +1318,7 @@ def item_xml(request, id):
         response = render_to_json_response(response)
     else:
         item = qs[0]
-        j = item.get_json()
+        j = item.json()
         j['layers'] = item.get_layers(request.user)
         if 'resolution' in j:
             j['resolution'] = {'width': j['resolution'][0], 'height': j['resolution'][1]}

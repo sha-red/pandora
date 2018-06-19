@@ -584,7 +584,7 @@ class Document(models.Model):
     def referenced(self):
         result = {}
         result['items'] = [
-            i.get_json(keys=['id', 'title'])
+            i.json(keys=['id', 'title'])
             for i in self.items.all().order_by('sort__title')
         ]
         result['annotations'] = [

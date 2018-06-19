@@ -425,7 +425,7 @@ class Item(models.Model):
             self.poster_width = 80
         self.update_sort()
         self.update_languages()
-        self.cache = self.get_json()
+        self.cache = self.json()
         self.cache['modified'] = datetime.now()
         super(Item, self).save(*args, **kwargs)
         self.update_find()
@@ -582,7 +582,7 @@ class Item(models.Model):
         documents = [d.json(item=self) for d in qs]
         return sorted(documents, key=lambda d: d['index'])
 
-    def get_json(self, keys=None):
+    def json(self, keys=None):
         i = {
             'id': self.public_id,
             'rendered': self.rendered,
@@ -700,7 +700,7 @@ class Item(models.Model):
 
     def get_item_description_html(self):
         description = ''
-        data = self.get_json()
+        data = self.json()
         info = []
         for key in [
             'director', 'writer', 'producer',
@@ -1360,7 +1360,7 @@ class Item(models.Model):
             if offset:
                 self.data['volume'] /= offset
         # extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
-        self.cache = self.get_json()
+        self.cache = self.json()
         self.update_sort()
         self.select_frame()
         self.make_poster()
@@ -1376,7 +1376,7 @@ class Item(models.Model):
             tasks.load_subtitles.delay(self.public_id)
 
     def update_cache(self, **kwargs):
-        self.cache = self.get_json()
+        self.cache = self.json()
         Item.objects.filter(id=self.id).update(cache=self.cache, **kwargs)
 
     def save_poster(self, data):
