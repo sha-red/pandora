@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# vi:si:et:sw=4:sts=4:ts=4
 from __future__ import print_function
 from django.core.management.base import BaseCommand
 from django.conf import settings

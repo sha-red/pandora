@@ -1,4 +1,3 @@
-// vi:si:et:sw=4:sts=4:ts=4
 // GPL2+/MIT 2012
 'use strict';
 /*

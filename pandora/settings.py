@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# vi:si:et:sw=4:sts=4:ts=4
 # Django settings for pan.do/ra project defaults,
 # create local_settings.py to overwrite
 # check pan.do/ra section below for relevant settings

@@ -1,5 +1,3 @@
-// vim: et:ts=4:sw=4:sts=4:ft=javascript
-
 'use strict';
 
 // fixme: this is a very uncommon pattern

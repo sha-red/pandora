@@ -1,5 +1,5 @@
-// vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
+
 pandora.ui.sectionbar = function(mode, isDragAndDrop) {
     var that = Ox.Bar({
             size: 24

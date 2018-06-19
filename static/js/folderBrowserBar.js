@@ -1,5 +1,5 @@
-// vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
+
 pandora.ui.folderBrowserBar = function(id, section) {
     section = section || pandora.user.ui.section;
     var ui = pandora.user.ui,

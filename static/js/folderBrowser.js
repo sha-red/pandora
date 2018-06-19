@@ -1,5 +1,5 @@
-// vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
+
 pandora.ui.folderBrowser = function(id, section) {
     // Yes, we have to wait for the lists init event to decide if it is shown.
     // This run-once init handler runs *after* the list's own init handler.

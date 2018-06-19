@@ -1,5 +1,5 @@
-// vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
+
 pandora.ui.folderPlaceholder = function(id, section) {
     var that = Ox.Element()
             .addClass('OxLight')

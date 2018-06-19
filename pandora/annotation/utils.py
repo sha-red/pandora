@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# ci:si:et:sw=4:sts=4:ts=4
 import ox
 
 def cleanup_value(value, layer_type):

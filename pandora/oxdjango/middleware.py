@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# vi:si:et:sw=4:sts=4:ts=4
 
 from .shortcuts import HttpErrorJson, render_to_json_response
 

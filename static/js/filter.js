@@ -1,5 +1,5 @@
-// vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
+
 pandora.ui.filter = function(id) {
     var i = Ox.getIndexById(pandora.user.ui.filters, id),
         filter = Ox.getObjectById(pandora.site.filters, id),
