@@ -9,3 +9,4 @@ html5lib
 requests==2.9.1
 tornado==4.1
 geoip2==2.2.0
+youtube-dl
