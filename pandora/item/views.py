@@ -881,7 +881,7 @@ def poster(request, id, size=None):
                 poster_height=item.poster_height,
                 poster_width=item.poster_width,
                 icon=item.icon.name,
-                json=item.json()
+                cache=item.json()
             )
     if item.poster and os.path.exists(item.poster.path):
         return image_to_response(item.poster, size)
