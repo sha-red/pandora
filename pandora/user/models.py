@@ -111,6 +111,11 @@ class SessionData(models.Model):
         info = json.loads(request.POST.get('data', '{}'))
         if info and isinstance(info, dict):
             data.info = info
+            if data.info.get('navigator', {}).get('plugins'):
+                data.info['navigator']['plugins'] = [
+                    p for p in data.info['navigator']['plugins']
+                    if p and '\x00' not in p
+                ]
         screen = data.info.get('screen', {})
         if screen and 'height' in screen and 'width' in screen:
             data.screensize = u'%s\xd7%s' % (screen['width'], screen['height'])
