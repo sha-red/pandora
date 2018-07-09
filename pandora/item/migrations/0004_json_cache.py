@@ -19,4 +19,13 @@ class Migration(migrations.Migration):
             old_name='json',
             new_name='cache',
         ),
+        migrations.RunSQL(
+            """UPDATE item_item SET cache = jsonb_set(cache, '{created}', cache->'created'->'__value__', true) WHERE cache @> '{"created": {"__class__": "datetime.datetime"}}'"""
+        ),
+        migrations.RunSQL(
+            """UPDATE item_item SET cache = jsonb_set(cache, '{accessed}', cache->'accessed'->'__value__', true) WHERE cache @> '{"accessed": {"__class__": "datetime.datetime"}}'"""
+        ),
+        migrations.RunSQL(
+            """UPDATE item_item SET cache = jsonb_set(cache, '{modified}', cache->'modified'->'__value__', true) WHERE cache @> '{"modified": {"__class__": "datetime.datetime"}}'"""
+        ),
     ]
