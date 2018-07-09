@@ -7,6 +7,7 @@ pandora.ui.metadataDialog = function(data) {
             'country', 'year', 'language', 'runtime', 'color', 'sound',
             'productionCompany',
             'producer', 'writer', 'cinematographer', 'editor', 'composer', 'actor',
+            'lyricist', 'singer',
             'genre', 'keyword', 'summary'
         ],
         mapKeys = {
