@@ -30,7 +30,7 @@ def api(request):
             'api': api,
             'settings': settings,
             'sitename': settings.SITENAME
-        })
+        }
         response = render_to_response('api.html', context)
         response['Access-Control-Allow-Origin'] = '*'
         return response
