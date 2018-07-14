@@ -247,7 +247,7 @@ def getEmbedDefaults(request, data):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     qs = Item.objects.filter(level__lte=level, rendered=True).order_by('sort__public_id')
     if qs.exists():
-        i = qs[0].json
+        i = qs[0].cache
         response['data']['item'] = i['id']
         response['data']['itemDuration'] = i['duration']
         response['data']['itemRatio'] = i['videoRatio']
