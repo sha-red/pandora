@@ -4,7 +4,6 @@ from __future__ import division, absolute_import
 import json
 
 from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.conf import settings
 
 from ..shortcuts import render_to_json_response, json_response, HttpErrorJson
@@ -27,7 +26,7 @@ def api(request):
         for f in sorted(methods):
             api.append({'name': f,
                         'doc': actions.doc(f).replace('\n', '<br>\n')})
-        context = RequestContext(request, {
+        context = {
             'api': api,
             'settings': settings,
             'sitename': settings.SITENAME
