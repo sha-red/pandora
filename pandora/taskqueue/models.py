@@ -6,7 +6,7 @@ from time import time
 
 from celery.backends import default_backend
 from celery.utils import get_full_cls_name
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -15,6 +15,7 @@ import celery.task.control
 import kombu.five
 import ox
 
+User = get_user_model()
 
 def get_tasks(username):
     from item.models import Item

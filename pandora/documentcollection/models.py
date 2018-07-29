@@ -8,7 +8,8 @@ from glob import glob
 
 from django.db import models
 from django.db.models import Max
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
@@ -19,6 +20,8 @@ from archive import extract
 from user.utils import update_groups
 
 from . import managers
+
+User = get_user_model()
 
 
 def get_path(f, x):

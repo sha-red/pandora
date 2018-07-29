@@ -17,7 +17,9 @@ from six.moves.urllib.parse import quote
 from django.db import models, transaction, connection
 from django.db.models import Q, Sum, Max
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
+
 from django.db.models.signals import pre_delete
 from django.utils import datetime_safe
 from django.utils.encoding import python_2_unicode_compatible
@@ -43,6 +45,7 @@ from title.models import get_title_sort
 from user.utils import update_groups
 import archive.models
 
+User = get_user_model()
 
 if not PY2:
     unicode = str

@@ -9,7 +9,7 @@ from glob import glob
 from six.moves.urllib.parse import quote
 from django.db import models
 from django.db.models import Max
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db.models.signals import pre_delete
 from django.utils.encoding import python_2_unicode_compatible
@@ -21,6 +21,7 @@ from archive.chunk import save_chunk
 
 from . import managers
 
+User = get_user_model()
 
 def get_path(i, x): return i.path(x)
 def get_icon_path(i, x): return get_path(i, 'icon.jpg')

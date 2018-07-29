@@ -7,7 +7,7 @@ import unicodedata
 from django.utils.encoding import python_2_unicode_compatible
 from django.db import models, transaction
 from django.db.models import Q
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db.models.signals import pre_delete
 
@@ -19,6 +19,8 @@ from item.utils import sort_string, get_by_key
 
 from . import managers
 from . import utils
+
+User = get_user_model()
 
 def get_super_matches(obj, model):
     super_matches = []

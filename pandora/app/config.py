@@ -12,7 +12,7 @@ from glob import glob
 
 from six.moves import _thread as thread
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 import ox.jsonc
 from ox.utils import json
@@ -20,6 +20,7 @@ from ox.utils import json
 from archive.extract import supported_formats
 from item.utils import get_by_id
 
+User = get_user_model()
 
 _win = (sys.platform == "win32")
 

@@ -10,7 +10,8 @@ from six import string_types
 from six.moves.urllib.parse import quote, unquote
 from django.db import models, transaction
 from django.db.models import Max
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
 from django.db.models.signals import pre_delete, post_init
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
@@ -25,6 +26,7 @@ from document.models import Document
 
 from . import managers
 
+User = get_user_model()
 
 @python_2_unicode_compatible
 class Entity(models.Model):

@@ -10,7 +10,8 @@ from six import PY2, string_types
 from six.moves.urllib.parse import quote, unquote
 from django.db import models, transaction
 from django.db.models import Q, Sum, Max
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 from django.db.models.signals import pre_delete
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
@@ -29,6 +30,8 @@ from archive.chunk import save_chunk
 
 from . import managers
 from . import utils
+
+User = get_user_model()
 
 if not PY2:
     unicode = str

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, absolute_import
 
-import ox
-
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import transaction
+
+import ox
 from celery.task import task
 
 from .models import Annotation
@@ -14,7 +15,8 @@ from .models import Annotation
 def add_annotations(data):
     from item.models import Item
     from entity.models import Entity
-    from user.models import User
+    User = get_user_model()
+
     item = Item.objects.get(public_id=data['item'])
     layer_id = data['layer']
     layer = list(filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers']))

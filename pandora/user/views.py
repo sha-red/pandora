@@ -13,7 +13,8 @@ from django.core.mail import send_mail, BadHeaderError, EmailMessage
 from django.shortcuts import redirect
 from django.db import transaction
 from django.db.models import Max
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 
 from oxdjango.shortcuts import render_to_json_response, json_response, get_object_or_404_json
@@ -30,6 +31,7 @@ from . import models
 from .decorators import capability_required_json
 from .utils import rename_user
 
+User = get_user_model()
 
 def get_user_or_404(data):
     if 'id' in data:

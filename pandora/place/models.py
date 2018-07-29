@@ -2,7 +2,8 @@
 from __future__ import division, print_function, absolute_import
 
 from django.db import models, transaction
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
 from django.utils.encoding import python_2_unicode_compatible
 import ox
 from oxdjango import fields
@@ -12,6 +13,7 @@ from item.models import Item
 
 from . import managers
 
+User = get_user_model()
 
 @python_2_unicode_compatible
 class Place(models.Model):

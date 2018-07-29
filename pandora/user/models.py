@@ -4,7 +4,8 @@ from __future__ import division, print_function, absolute_import
 import copy
 from datetime import datetime
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
@@ -23,6 +24,7 @@ from . import managers
 from . import tasks
 from .utils import get_ip, get_location
 
+User = get_user_model()
 
 @python_2_unicode_compatible
 class SessionData(models.Model):

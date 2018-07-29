@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.conf import settings
 
 import ox
 
 import app.monkey_patch
 
 from item.models import Item
-from user.models import User
 
 from ... import models
+
+User = get_user_model()
+
 
 class Command(BaseCommand):
     """

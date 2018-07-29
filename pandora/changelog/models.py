@@ -3,7 +3,7 @@ from __future__ import division, print_function, absolute_import
 
 from datetime import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
@@ -13,6 +13,8 @@ import ox
 import websocket
 
 from . import managers
+
+User = get_user_model()
 
 '''
 FIXME: remove this table more migrate to new ChangeLog
