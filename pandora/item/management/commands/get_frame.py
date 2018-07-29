@@ -11,13 +11,18 @@ from ... import models
 
 class Command(BaseCommand):
     help = 'extract frame and print path'
-    args = '<id> <height> <position>'
 
-    def handle(self, id, height, position, **options):
+    def add_arguments(self, parser):
+        parser.add_argument('args', metavar='args', type=str, nargs='*', help='<id> <height> <position>')
+
+    def handle(self, id, height, position, **kwargs):
         position = float(position)
         height = int(height)
         with transaction.atomic():
-            i = models.Item.objects.get(public_id=id)
-            path = i.frame(position, height)
+            try:
+                i = models.Item.objects.get(public_id=id)
+                path = i.frame(position, height)
+            except models.Item.DoesNotExist:
+                path = None
         if path:
             print(path)
