@@ -15,11 +15,6 @@ from oxdjango.fields import JSONField
 import ox
 from ox.utils import json
 
-from itemlist.models import List, Position
-import text
-import edit
-import documentcollection.models
-
 from . import managers
 from . import tasks
 from .utils import get_ip, get_location
@@ -233,6 +228,11 @@ def profile_post_save(sender, instance, **kwargs):
 models.signals.post_save.connect(profile_post_save, sender=UserProfile)
 
 def get_ui(user_ui, user=None):
+    from itemlist.models import List, Position
+    import documentcollection.models
+    import edit.models
+    import text.models
+
     ui = {}
     config = copy.deepcopy(settings.CONFIG)
     ui.update(config['user']['ui'])

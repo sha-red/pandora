@@ -1,5 +1,4 @@
 from django.contrib.gis.geoip2 import GeoIP2
-from django.contrib.auth.models import Group
 
 import ox
 
@@ -73,6 +72,7 @@ def rename_user(u, new):
     u.save()
 
 def update_groups(model, groups):
+    from .models import Group
     if isinstance(groups, list):
         groups = list(filter(lambda g: g.strip(), groups))
         groups = [ox.escape_html(g) for g in groups]

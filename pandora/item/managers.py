@@ -10,7 +10,7 @@ from django.conf import settings
 
 from archive.models import Volume
 from itemlist.models import List
-from django.contrib.auth.models import Group
+from user.models import Group
 from . import utils
 
 from oxdjango.query import QuerySet

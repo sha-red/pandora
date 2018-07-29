@@ -13,6 +13,7 @@ from oxdjango.managers import get_operator
 
 from documentcollection.models import Collection
 from item import utils
+from user.models import Group
 
 
 keymap = {

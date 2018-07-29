@@ -10,7 +10,6 @@ from six import PY2, string_types
 from six.moves.urllib.parse import quote, unquote
 from django.db import models, transaction
 from django.db.models import Q, Sum, Max
-from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.db.models.signals import pre_delete
 from django.conf import settings
@@ -27,6 +26,7 @@ from item.models import Item
 from annotation.models import Annotation
 from archive.extract import resize_image
 from archive.chunk import save_chunk
+from user.models import Group
 
 from . import managers
 from . import utils
