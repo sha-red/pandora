@@ -521,7 +521,7 @@ class File(models.Model):
                     n += 1
                 profile = '%sp.%s' % (resolution, config['formats'][0])
                 target = os.path.join(tmp, language + '_' + profile)
-                ok, error = extract.stream(media, target, profile, info, audio_track=i+1)
+                ok, error = extract.stream(media, target, profile, info, audio_track=i+1, flags=self.flags)
                 if ok:
                     tinfo = ox.avinfo(target)
                     del tinfo['path']
@@ -691,6 +691,7 @@ class Stream(models.Model):
     available = models.BooleanField(default=False)
     oshash = models.CharField(max_length=16, null=True, db_index=True)
     info = JSONField(default=dict, editable=False)
+    flags = JSONField(default=dict, editable=False)
     duration = models.FloatField(default=0)
     aspect_ratio = models.FloatField(default=0)
 
@@ -750,7 +751,7 @@ class Stream(models.Model):
             self.media.name = self.path(self.name())
         target = self.media.path
         info = ox.avinfo(media)
-        ok, error = extract.stream(media, target, self.name(), info)
+        ok, error = extract.stream(media, target, self.name(), info, flags=self.flags)
         # file could have been moved while encoding
         # get current version from db and update
         _self = Stream.objects.get(id=self.id)
