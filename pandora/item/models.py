@@ -1032,9 +1032,16 @@ class Item(models.Model):
                 elif sort_type == 'date':
                     value = self.get(source)
                     if isinstance(value, string_types):
-                        value = datetime_safe.datetime.strptime(value, '%Y-%m-%d')
-                    set_value(s, name, value)
-
+                        value_ = None
+                        for fmt in ('%Y-%m-%d', '%Y-%m', '%Y'):
+                            try:
+                                value_ = datetime_safe.datetime.strptime(value, fmt)
+                            except ValueError:
+                                pass
+                            else:
+                                continue
+                    if value_ is not None:
+                        set_value(s, name, value_)
         s.save()
 
     def update_facet(self, key):
