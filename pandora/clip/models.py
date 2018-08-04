@@ -91,7 +91,7 @@ class MetaClip(object):
 
             self.findvalue = '\n'.join(list(filter(None, [a.findvalue for a in anns])))
             for l in [k['id'] for k in settings.CONFIG['layers']]:
-                setattr(self, l, l in anns_by_layer and len(anns_by_layer[l]))
+                setattr(self, l, l in anns_by_layer and bool(len(anns_by_layer[l])))
         models.Model.save(self, *args, **kwargs)
 
     clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
