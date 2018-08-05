@@ -412,11 +412,8 @@ pandora.ui.documentInfoView = function(data) {
 
     function formatValue(key, value) {
         var ret;
-        if (key == 'date') {
-            ret = value ? Ox.formatDate(value,
-                ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length],
-                true
-            ) : '';
+        if (key == 'date' && (!value || value.split('-').length < 4)) {
+            ret = pandora.formatDate(value);
         } else if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), key);
         } else if (listKeys.indexOf(key) > -1) {

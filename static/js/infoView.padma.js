@@ -594,19 +594,7 @@ pandora.ui.infoView = function(data) {
     function formatValue(key, value) {
         var ret;
         if (key == 'date' && (!value || value.split('-').length < 4)) {
-            if (!value) {
-                ret = ''
-            } else if (Ox.contains(value, ':') && value.split('-').length == 3) {
-                ret = Ox.formatDate(value,
-                    ['', '', '%B %e, %Y %H:%M', '%B %e, %Y %H:%M:%S'][value.split(':').length],
-                    false
-                );
-            } else {
-                ret = Ox.formatDate(value,
-                    ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length],
-                    true
-                );
-            }
+            ret = pandora.formatDate(value);
         } else if (listKeys.indexOf(key) > -1) {
             ret = value.split(', ');
         } else {

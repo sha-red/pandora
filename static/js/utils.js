@@ -1115,6 +1115,27 @@ pandora.formatDocumentKey = function(key, data, size) {
     return value;
 }
 
+pandora.formatDate = function(value) {
+    var ret;
+    if (!value) {
+        ret = ''
+    } else if (Ox.contains(value, ':') && value.split('-').length == 3) {
+        ret = Ox.formatDate(value,
+            ['', '', '%B %e, %Y %H:%M', '%B %e, %Y %H:%M:%S'][value.split(':').length],
+            false
+        );
+    } else {
+        ret = Ox.formatDate(value,
+            ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length],
+            true
+        );
+    }
+    if (ret.trim() == 'NaN') {
+        ret = value;
+    }
+    return ret;
+}
+
 pandora.getAllItemsTitle = function(section) {
     section = section || pandora.user.ui.section;
     return {
