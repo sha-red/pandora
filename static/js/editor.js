@@ -26,7 +26,7 @@ pandora.ui.editor = function(data) {
             enableSetPosterFrame: !pandora.site.media.importFrames && data.editable,
             enableSubtitles: ui.videoSubtitles,
             find: ui.itemFind,
-            findLayer: pandora.user.ui._findState.key,
+            findLayer: ui._findState.key,
             getFrameURL: function(position) {
                 return pandora.getMediaURL('/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg?' + data.modified);
             },
@@ -237,6 +237,9 @@ pandora.ui.editor = function(data) {
                     },
                     listView: 'clip'
                 });
+            },
+            findlayer: function(data) {
+                ui._findState.key = data;
             },
             gainfocus: function() {
                 pandora.$ui.mainMenu.replaceItemMenu();
