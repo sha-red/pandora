@@ -257,14 +257,21 @@ def update_static():
     pandora_json = os.path.join(settings.STATIC_ROOT, 'json/pandora.json')
     for root, folders, files in os.walk(os.path.join(settings.STATIC_ROOT, 'js')):
         for f in files:
-            if not f in (
-                'pandora.js', 'pandora.min.js'
-            ) and f.endswith('.js') and len(f.split('.'))  == 2:
-                f = os.path.join(root, f)
-                #ignore old embed js file
-                if 'js/embed/' in f:
-                    continue
+            f = os.path.join(root, f)
+            #ignore old embed js file
+            if 'js/embed/' in f:
+                continue
+            if len(f.split('.')) == 2:
                 fsite = f.replace('.js', '.%s.js' % settings.CONFIG['site']['id'])
+            else:
+                fsite = f
+            basefile = f.split('.')[0] + '.js'
+            if f not in (
+                'pandora.js', 'pandora.min.js'
+            ) and f.endswith('.js') and (
+                len(f.split('.')) == 2 or
+                not os.path.exists(basefile) and fsite == f
+            ):
                 if os.path.exists(fsite):
                     f = fsite
                 js.append(f[len(settings.STATIC_ROOT)+1:])
