@@ -60,6 +60,7 @@
         "canManageHome": {},
         "canManagePlacesAndEvents": {"staff": true, "admin": true},
         "canManageTitlesAndNames": {"staff": true, "admin": true},
+        "canManageTranslations": {"admin": true},
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 2, "member": 2, "friend": 4, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "friend": 4, "staff": 4, "admin": 4},

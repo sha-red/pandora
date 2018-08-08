@@ -187,6 +187,7 @@ class Annotation(models.Model):
             if not delay_matches:
                 self.update_matches()
             self.update_documents()
+            self.update_translations()
 
     def update_matches(self):
         from place.models import Place
@@ -264,6 +265,15 @@ class Annotation(models.Model):
         if added:
             for document in Document.objects.filter(id__in=added):
                 self.documents.add(document)
+
+    def update_translations(self):
+        from translation.models import Translation
+        layer = self.get_layer()
+        if layer.get('translate'):
+            t, created = Translation.objects.get_or_create(lang=lang, key=self.value)
+            if created:
+                t.type = Translation.CONTENT
+                t.save()
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():

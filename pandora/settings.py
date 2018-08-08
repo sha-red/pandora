@@ -141,6 +141,7 @@ INSTALLED_APPS = (
     'news',
     'user',
     'urlalias',
+    'translation',
     'tv',
     'documentcollection',
     'document',

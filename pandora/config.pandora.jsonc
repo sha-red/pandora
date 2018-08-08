@@ -67,6 +67,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "canManageHome": {"staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "staff": true, "admin": true},
         "canManageTitlesAndNames": {"member": true, "staff": true, "admin": true},
+        "canManageTranslations": {"admin": true},
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},

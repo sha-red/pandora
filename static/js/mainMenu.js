@@ -232,6 +232,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.hasCapability('canManagePlacesAndEvents') },
                         {},
                         { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.hasCapability('canManageUsers') },
+                        { id: 'translations', title: Ox._('Manage Translations...'), disabled: !pandora.hasCapability('canManageTranslations') },
                         { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.hasCapability('canManageUsers') },
                         {},
                         { id: 'changelog', title: Ox._('Changelog...'), disabled: !pandora.hasCapability('canManageUsers') }
@@ -652,6 +653,8 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.usersDialog = pandora.ui.usersDialog().open();
                 } else if (data.id == 'statistics') {
                     pandora.$ui.statisticsDialog = pandora.ui.statisticsDialog().open();
+                } else if (data.id == 'translations') {
+                    pandora.$ui.translationsDialog = pandora.ui.translationsDialog().open();
                 } else if (data.id == 'changelog') {
                     pandora.$ui.changelogDialog = pandora.ui.changelogDialog().open();
                 } else if (data.id == 'clearcache') {

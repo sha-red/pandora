@@ -3062,9 +3062,13 @@ pandora.setLocale = function(locale, callback) {
             url = [
                 '/static/json/locale.pandora.' + locale + '.json',
                 '/static/json/locale.' + pandora.site.site.id + '.' + locale + '.json',
+                '/api/locale.' + locale + '.json'
             ];
         } else {
-            url = '/static/json/locale.' + locale + '.json';
+            url = [
+                '/static/json/locale.' + locale + '.json',
+                '/api/locale.' + locale + '.json'
+            ];
         }
     }
     Ox.setLocale(locale, url, callback);

@@ -15,6 +15,10 @@ pandora.ui.filter = function(id) {
                     align: 'left',
                     id: 'name',
                     format: function(value) {
+                        var layer = Ox.getObjectById(pandora.site.layers, filter.id);
+                        if (layer && layer.translate) {
+                            value = Ox._(value)
+                        }
                         return filter.flag
                             ? $('<div>')
                                 .append(

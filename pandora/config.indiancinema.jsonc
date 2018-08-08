@@ -62,6 +62,7 @@
         "canManageHome": {"staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "researcher": true, "staff": true, "admin": true},
         "canManageTitlesAndNames": {"member": true, "researcher": true, "staff": true, "admin": true},
+        "canManageTranslations": {"admin": true},
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 3, "member": 3, "researcher": 3, "staff": 3, "admin": 3},
         "canPlayVideo": {"guest": 1, "member": 1, "researcher": 3, "staff": 3, "admin": 3},

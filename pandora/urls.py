@@ -25,6 +25,7 @@ import edit.views
 import itemlist.views
 import item.views
 import item.urls
+import translation.views
 import urlalias.views
 
 def serve_static_file(path, location, content_type):
@@ -34,6 +35,7 @@ urlpatterns = [
     # Uncomment the admin/doc line below to enable admin documentation:
     # urlurl(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/locale.(?P<lang>.*).json$', translation.views.locale_json),
     url(r'^api/upload/text/?$', text.views.upload),
     url(r'^api/upload/document/?$', document.views.upload),
     url(r'^api/upload/direct/?$', archive.views.direct_upload),
