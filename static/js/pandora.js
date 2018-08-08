@@ -475,6 +475,7 @@ appPanel
         // allow site scripts to run after pandora is loaded
         pandora.triggerEvent('loaded');
         !pandora.isLicensed() && pandora.openLicenseDialog();
+        pandora.localInitInit && pandora.localInitInit();
         loadUserScript && pandora.loadUserScript();
         document.removeEventListener && document.removeEventListener(
             'keydown', onKeydown
