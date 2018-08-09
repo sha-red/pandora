@@ -266,7 +266,7 @@ def update_static():
             else:
                 fsite = f
             basefile = f.split('.')[0] + '.js'
-            if f not in (
+            if f.split('/')[-1] not in (
                 'pandora.js', 'pandora.min.js'
             ) and f.endswith('.js') and (
                 len(f.split('.')) == 2 or
