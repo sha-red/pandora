@@ -251,7 +251,7 @@ class Edit(models.Model):
                 items = [i['id'] for i in self.get_items(user).values('id')]
                 clips = clips.filter(item__in=items)
             else:
-                clips = None
+                clips = clip.models.Clip.objects.filter(id=None)
         return clips
 
     def get_clips_json(self, user=None):
