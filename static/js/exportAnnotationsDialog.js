@@ -125,7 +125,7 @@ pandora.ui.exportAnnotationsDialog = function(options) {
                 format == 'json'
                 ? JSON.stringify(items, null, '    ')
                 : Ox.formatSRT(items)
-            )], {type: 'text/plain'}),
+            )], {type: 'text/plain; charset=utf-8'}),
             url = window.URL.createObjectURL(blob);
 
         $link.attr({
