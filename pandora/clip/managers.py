@@ -116,13 +116,13 @@ def parseConditions(conditions, operator, user):
         else:
             conn.append(parseCondition(condition, user))
     if conn:
-        q = conn[0]
-        for c in conn[1:]:
-            if operator == '|':
+        if operator == '|':
+            q = conn[0]
+            for c in conn[1:]:
                 q = q | c
-            else:
-                q = q & c
-        return q
+            return [q]
+        else:
+            return conn
     return None
 
 class ClipManager(Manager):
@@ -149,12 +149,15 @@ class ClipManager(Manager):
 
         conditions = [parse(c) for c in conditions]
         if conditions:
-            q = conditions[0]
-            for c in conditions[1:]:
-                if operator == '|':
+            # always make an any query,
+            # since & is for intersection in clip not intersection in annotation
+            if operator == '|' or operator == '&':
+                q = conditions[0]
+                for c in conditions[1:]:
                     q = q | c
-                else:
-                    q = q & c
+                return [q]
+            else:
+                return conditions
             return q
         return None
 
@@ -187,7 +190,8 @@ class ClipManager(Manager):
                                      data.get('query', {}).get('operator', '&'),
                                      user)
         if conditions:
-            qs = qs.filter(conditions)
+            for condition in conditions:
+                qs = qs.filter(condition)
 
         qs = qs.distinct()
 

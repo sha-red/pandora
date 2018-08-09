@@ -117,7 +117,8 @@ def findClips(request, data):
         def add_annotations(key, qs, add_layer=False):
             values = ['public_id', 'layer', 'value', 'clip_id']
             if query['filter']:
-                qs = qs.filter(query['filter'])
+                for limit in query['filter']:
+                    qs = qs.filter(limit)
             for i in response['data']['items']:
                 if not key in i:
                     i[key] = []
