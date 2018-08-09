@@ -105,6 +105,17 @@ pandora.ui.exportAnnotationsDialog = function(options) {
         updateLink();
     }
 
+    function textBlob(data) {
+        data = Ox.encodeUTF8(data);
+        var byteNumbers = new Array(data.length);
+        for (var i = 0; i < data.length; i++) {
+            byteNumbers[i] = data.charCodeAt(i);
+        }
+        var byteArray = new Uint8Array(byteNumbers);
+        var blob = new Blob([byteArray], {type: 'text/plain; charset=utf-8'});
+        return blob;
+    }
+
     function updateLink() {
         var layer = $layerSelect.value(),
             format = $formatSelect.value(),
@@ -121,11 +132,11 @@ pandora.ui.exportAnnotationsDialog = function(options) {
                     text: text
                 };
             }),
-            blob = new Blob([Ox.encodeUTF8(
+            blob = textBlob(
                 format == 'json'
                 ? JSON.stringify(items, null, '    ')
                 : Ox.formatSRT(items)
-            )], {type: 'text/plain; charset=utf-8'}),
+            ),
             url = window.URL.createObjectURL(blob);
 
         $link.attr({
