@@ -117,7 +117,8 @@ class MetaClip(object):
                 #annotations = self.annotations.filter(layer__in=settings.CONFIG['clipLayers'])
                 annotations = self.annotations.all()
                 if qs:
-                    annotations = annotations.filter(qs)
+                    for q in qs:
+                        annotations = annotations.filter(q)
                 entity_cache = {}
                 j['annotations'] = [
                     a.json(keys=['value', 'id', 'layer'], entity_cache=entity_cache) for a in annotations
