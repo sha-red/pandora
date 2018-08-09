@@ -1044,7 +1044,15 @@ def video(request, id, resolution, format, index=None, track=None):
 
         content_type = mimetypes.guess_type(path)[0]
         if len(t) == 2 and t[1] > t[0] and duration >= t[1]:
-            response = HttpResponse(extract.chop(path, t[0], t[1]), content_type=content_type)
+            # FIXME: could be multilingual here
+            subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
+            if subtitles:
+                srt = item.srt(subtitles['id'], encoder=ox.srt)
+                if len(srt) < 4:
+                    srt = None
+            else:
+                srt = None
+            response = HttpResponse(extract.chop(path, t[0], t[1], subtitles=srt), content_type=content_type)
             filename = u"Clip of %s - %s-%s - %s %s%s" % (
                 item.get('title'),
                 ox.format_duration(t[0] * 1000).replace(':', '.')[:-4],

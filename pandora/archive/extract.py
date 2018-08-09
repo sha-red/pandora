@@ -602,27 +602,39 @@ def timeline_strip(item, cuts, info, prefix):
             timeline_image.save(timeline_file)
 
 
-def chop(video, start, end):
+def chop(video, start, end, subtitles=None):
     t = end - start
     tmp = tempfile.mkdtemp()
     ext = os.path.splitext(video)[1]
     choped_video = '%s/tmp%s' % (tmp, ext)
-    cmd = [
-        settings.FFMPEG,
-        '-y',
-        '-i', video,
-        '-ss', '%.3f' % start,
-        '-t', '%.3f' % t,
-        '-c:v', 'copy',
-        '-c:a', 'copy',
-        '-f', ext[1:],
-        choped_video
-    ]
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-                         stdout=open('/dev/null', 'w'),
-                         stderr=open('/dev/null', 'w'),
-                         close_fds=True)
-    p.wait()
+    if subtitles and ext == '.mp4':
+        subtitles_f = choped_video + '.full.srt'
+        with open(subtitles_f, 'wb') as fd:
+            fd.write(subtitles)
+    else:
+        subtitles_f = None
+    if ext == '.mp4':
+        from .chop import Chop
+        Chop(video, choped_video, start, end, subtitles_f)
+        if subtitles_f:
+            os.unlink(subtitles_f)
+    else:
+        cmd = [
+            settings.FFMPEG,
+            '-y',
+            '-i', video,
+            '-ss', '%.3f' % start,
+            '-t', '%.3f' % t,
+            '-c:v', 'copy',
+            '-c:a', 'copy',
+            '-f', ext[1:],
+            choped_video
+        ]
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                             stdout=open('/dev/null', 'w'),
+                             stderr=open('/dev/null', 'w'),
+                             close_fds=True)
+        p.wait()
     f = open(choped_video, 'rb')
     os.unlink(choped_video)
     os.rmdir(tmp)
