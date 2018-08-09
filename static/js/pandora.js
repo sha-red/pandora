@@ -169,7 +169,7 @@ appPanel
             gradient.style.right = 0;
             gradient.style.bottom = 0;
             // + 2 is a temporary fix for Chrome 26
-            gradient.style.width = logoWidth + 2 + 'px' 
+            gradient.style.width = logoWidth + 2 + 'px';
             gradient.style.height = logoHeight + 2 + 'px';
             gradient.style.margin = 'auto';
             ['-moz-', '-ms-', '-o-', '-webkit-', ''].forEach(function(prefix) {
