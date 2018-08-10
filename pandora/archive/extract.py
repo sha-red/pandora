@@ -21,6 +21,8 @@ from ox.utils import json
 from django.conf import settings
 from PIL import Image
 
+from .chop import Chop, make_keyframe_index
+
 img_extension = 'jpg'
 
 MAX_DISTANCE = math.sqrt(3 * pow(255, 2))
@@ -347,6 +349,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         shutil.move(enc_target, target)
     for f in glob('%s.log*' % target):
         os.unlink(f)
+    make_keyframe_index(target)
     return True, None
 
 
@@ -614,7 +617,6 @@ def chop(video, start, end, subtitles=None):
     else:
         subtitles_f = None
     if ext == '.mp4':
-        from .chop import Chop
         Chop(video, choped_video, start, end, subtitles_f)
         if subtitles_f:
             os.unlink(subtitles_f)

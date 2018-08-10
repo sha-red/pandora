@@ -5,10 +5,39 @@ from bisect import bisect_left
 
 import ox
 
+def make_keyframe_index(video):
+    cmd = [
+        'ffprobe',
+        '-v', 'error',
+        '-show_packets', '-select_streams', 'v',
+        '-show_entries', 'packet=pts_time,flags',
+        '-of', 'csv',
+        '-i', video
+    ]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+    result = stdout.decode().strip()
+    keyframe_times = []
+    timecode = 0
+    for line in result.split('\n'):
+        if line.split(',')[1] != 'N/A':
+            timecode = line.split(',')[1]
+        if ',K' in line:
+            keyframe_times.append(float(timecode))
+
+    last_keyframe = ox.avinfo(video)['duration']
+    if keyframe_times[-1] != last_keyframe:
+        keyframe_times.append(last_keyframe)
+
+    keyframes_cache = video + '.keyframes'
+    with open(keyframes_cache, 'w') as fd:
+        json.dump(keyframe_times, fd, indent=0)
+    return keyframe_times
+
+
 class Chop(object):
     keyframes = []
     subtitles = None
-    info = {}
     ffmpeg = [
         'ffmpeg',
         '-nostats', '-loglevel', 'error',
@@ -77,12 +106,6 @@ class Chop(object):
         for segment in segments:
             os.unlink(segment)
 
-    def get_info(self):
-        if self.info:
-            return self.info
-        self.info = ox.avinfo(self.video)
-        return self.info
-
     def get_keyframes(self):
         video = self.video
         if self.keyframes:
@@ -93,35 +116,8 @@ class Chop(object):
             with open(keyframes_cache, 'r') as fd:
                 self.keyframes = json.load(fd)
             return self.keyframes
-
-        cmd = [
-            'ffprobe',
-            '-v', 'error',
-            '-show_packets', '-select_streams', 'v',
-            '-show_entries', 'packet=pts_time,flags',
-            '-of', 'csv',
-            '-i', video
-        ]
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        stdout, stderr = p.communicate()
-        result = stdout.decode().strip()
-        keyframe_times = []
-        timecode = 0
-        for line in result.split('\n'):
-            if line.split(',')[1] != 'N/A':
-                timecode = line.split(',')[1]
-            if ',K' in line:
-                keyframe_times.append(float(timecode))
-
-        last_keyframe = self.get_info()['duration']
-        if keyframe_times[-1] != last_keyframe:
-            keyframe_times.append(last_keyframe)
-
-        self.keyframes = keyframe_times
-        if not os.path.exists(keyframes_cache):
-            with open(keyframes_cache, 'w') as fd:
-                json.dump(keyframe_times, fd)
-        return keyframe_times
+        self.keyframes = make_keyframe_index(video)
+        return self.keyframes
 
     def get_gop_sections(self, start: float, end: float) -> dict:
         keyframes = self.get_keyframes()
@@ -141,17 +137,17 @@ class Chop(object):
         }
 
     def encode(self, source, target, start, duration):
-        info = self.get_info()
-        if self.info['audio']:
+        info = ox.avinfo(self.video)
+        if info['audio']:
             acodec = [
                 '-c:a',
-                self.info['audio'][0]['codec']
+                info['audio'][0]['codec']
             ]
         else:
             acodec = []
         vcodec = [
             '-c:v',
-            self.info['video'][0]['codec']
+            info['video'][0]['codec']
         ]
 
         cmd = self.ffmpeg + [
