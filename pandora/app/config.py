@@ -165,6 +165,10 @@ def load_config(init=False):
         if set(old_formats) != set(formats):
             sformats = supported_formats()
             settings.FFMPEG_SUPPORTS_VP9 = 'vp9' in sformats
+            try:
+                settings.CHOP_SUPPORT = int(sformats.get('version', ['0'])[0]) > 2
+            except:
+                settings.CHOP_SUPPORT = False
             if sformats:
                 for f in formats:
                     if f not in sformats or not sformats[f]:

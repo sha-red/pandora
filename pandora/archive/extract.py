@@ -57,7 +57,10 @@ def supported_formats():
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     stdout = stdout.decode('utf-8')
+    stderr = stderr.decode('utf-8')
+    version = stderr.split('\n')[0].split(' ')[2]
     return {
+        'version': version.split('.'),
         'ogg': 'libtheora' in stdout and 'libvorbis' in stdout,
         'webm': 'libvpx' in stdout and 'libvorbis' in stdout,
         'vp8': 'libvpx' in stdout and 'libvorbis' in stdout,
@@ -616,7 +619,7 @@ def chop(video, start, end, subtitles=None):
             fd.write(subtitles)
     else:
         subtitles_f = None
-    if ext == '.mp4':
+    if ext == '.mp4' and settings.CHOP_SUPPORT:
         Chop(video, choped_video, start, end, subtitles_f)
         if subtitles_f:
             os.unlink(subtitles_f)
