@@ -619,7 +619,7 @@ def chop(video, start, end, subtitles=None):
             fd.write(subtitles)
     else:
         subtitles_f = None
-    if ext == '.mp4' and settings.CHOP_SUPPORT:
+    if False and ext == '.mp4' and settings.CHOP_SUPPORT:
         Chop(video, choped_video, start, end, subtitles_f)
         if subtitles_f:
             os.unlink(subtitles_f)
