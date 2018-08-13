@@ -274,7 +274,7 @@ except NameError:
             secret.write(SECRET_KEY)
             secret.close()
         except IOError:
-            Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
+            raise Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
 
 INSTALLED_APPS = tuple(list(INSTALLED_APPS) + LOCAL_APPS)
 
