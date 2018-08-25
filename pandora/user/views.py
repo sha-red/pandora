@@ -154,6 +154,7 @@ def signup(request, data):
     }
     see: signin, signout
     '''
+    from itemlist.models import List, Position
     if 'username' in data and 'password' in data and 'email' in data:
         data['username'] = data['username'].strip()
         data['email'] = ox.escape_html(data['email'])
@@ -186,7 +187,7 @@ def signup(request, data):
             user.save()
             #create default user lists:
             for l in settings.CONFIG['personalLists']:
-                list = models.List(name=l['title'], user=user)
+                list = List(name=l['title'], user=user)
                 for key in ('query', 'public', 'featured'):
                     if key in l:
                         setattr(list, key, l[key])
@@ -195,8 +196,8 @@ def signup(request, data):
                                 if c['key'] == 'user':
                                     c['value'] = c['value'].format(username=user.username)
                 list.save()
-                pos = models.Position(list=list, section='personal', user=user)
-                qs = models.Position.objects.filter(user=user, section='personal')
+                pos = Position(list=list, section='personal', user=user)
+                qs = Position.objects.filter(user=user, section='personal')
                 pos.position = (qs.aggregate(Max('position'))['position__max'] or 0) + 1
                 pos.save()
             if request.session.session_key:
