@@ -827,6 +827,20 @@ def poster_frame(request, id, position):
     raise Http404
 
 
+def image_path_to_response(image, size=None):
+    if size:
+        size = int(size)
+        path = image.replace('.jpg', '.%d.jpg' % size)
+        if not os.path.exists(path):
+            image_size = max(Image.open(image).size)
+            if size > image_size:
+                path = image
+            else:
+                extract.resize_image(image, path, size=size)
+    else:
+        path = image
+    return HttpFileResponse(path, content_type='image/jpeg')
+
 def image_to_response(image, size=None):
     if size:
         size = int(size)
@@ -883,8 +897,12 @@ def poster(request, id, size=None):
                 icon=item.icon.name,
                 cache=item.json()
             )
+    siteposter = item.path('siteposter.jpg')
+    siteposter = os.path.abspath(os.path.join(settings.MEDIA_ROOT, siteposter))
     if item.poster and os.path.exists(item.poster.path):
         return image_to_response(item.poster, size)
+    elif os.path.exists(siteposter):
+        return image_path_to_response(siteposter, size)
     else:
         return temp_poster()
 

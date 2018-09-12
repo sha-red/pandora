@@ -1455,7 +1455,7 @@ class Item(models.Model):
             self.clear_poster_cache(self.poster.path)
             self.poster.delete()
 
-        if not self.poster:
+        if not self.poster or not os.path.exists(self.poster.path):
             poster = self.make_siteposter()
             url = self.prefered_poster_url()
             if url:
