@@ -10,10 +10,14 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
 {
     /*
     "annotations" configures the annotation panel.
+        "separator" is the character, string or HTML tag that separates
+            annotations of type "string"
         "showUsers": If true, include list of users in menu, so that
             annotations by specific users can be turned on and off
+
     */
     "annotations": {
+        "separator": ";",
         "showUsers": false
     },
     /*
@@ -102,7 +106,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     "clipLayers": ["publicnotes", "keywords", "subtitles"],
     /*
     "documentKeys" defines the metadata associated with each document. Required keys
-    are "*", "id" and "title". 
+    are "*", "id" and "title".
     A documentKey must have the following properties:
         "id": The unique id of the key (as used by the server)
         "title": The title of the key (as displayed by the client)
@@ -936,7 +940,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     */
     "media": {
         "importPosters": false,
-        "importFrames": false 
+        "importFrames": false
     },
     /*
     "menuExtras" can be used to add extra functionality to the main menu bar.

@@ -9,6 +9,7 @@ pandora.ui.editor = function(data) {
             annotationsCalendarSize: ui.annotationsCalendarSize,
             annotationsMapSize: ui.annotationsMapSize,
             annotationsRange: ui.annotationsRange,
+            annotationsSeparator: pandora.site.annotations.separator,
             annotationsSize: ui.annotationsSize,
             annotationsSort: ui.annotationsSort,
             annotationsTooltip: Ox._('annotations')
