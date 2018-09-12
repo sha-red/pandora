@@ -29,7 +29,7 @@ pandora.ui.metadataDialog = function(data) {
         that = data.imdbId ? updateDialog() : idDialog();
 
     keys = keys.filter(function(key) {
-        return key == 'alternativeTitles' || getItemKey(key);
+        return Ox.contains(['alternativeTitles', 'filmingLocations'], key) || getItemKey(key);
     });
 
     data.imdbId && getMetadata();
@@ -184,7 +184,7 @@ pandora.ui.metadataDialog = function(data) {
     function getMetadata() {
         pandora.api.getMetadata({
             id: data.imdbId,
-            keys: keys.concat(['originalTitle'])
+            keys: Ox.unique(keys.concat(['originalTitle']))
         }, function(result) {
             var $bar = Ox.Bar({size: 24}),
                 $data = Ox.Element()
@@ -218,9 +218,11 @@ pandora.ui.metadataDialog = function(data) {
                 .appendTo($bar);
             if (result.data) {
                 imdb = Ox.clone(result.data, true);
-                if (imdb.originalTitle) {
-                    imdb.alternativeTitles = [[imdb.title, []]].concat(imdb.alternativeTitles || []);
-                    imdb.title = imdb.originalTitle;
+                if (!Ox.contains(keys, 'originalTitle')) {
+                    if (imdb.originalTitle) {
+                        imdb.alternativeTitles = [[imdb.title, []]].concat(imdb.alternativeTitles || []);
+                        imdb.title = imdb.originalTitle;
+                    }
                 }
                 keys.forEach(function(key, index) {
                     var isEqual = Ox.isEqual(data[getKey(key)], imdb[key]) || (
