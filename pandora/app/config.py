@@ -101,7 +101,8 @@ def load_config(init=False):
             'documentKeys', 'documentRightsLevels',
             'entities', 'itemName', 'itemTitleKeys', 'itemKeys', 'media', 'posters',
             'site', 'tv', 'user.ui', 'user.ui.part', 'user.ui.showFolder',
-            'menuExtras', 'languages'
+            'menuExtras', 'languages',
+            'annotations',
         )):
             parts = [p.replace('\0', '\\.') for p in section.replace('\\.', '\0').split('.')]
             # print('checking', section)
