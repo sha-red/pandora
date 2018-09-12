@@ -163,6 +163,11 @@ pandora.ui.editor = function(data) {
                 pandora.$ui[dialog] && pandora.$ui[dialog].remove();
                 pandora.$ui[dialog] = pandora.ui[dialog](data).open();
             },
+            downloadframe: function(data_) {
+                var url = '/' + ui.item + '/' + Ox.max(pandora.site.video.resolutions) + 'p' + data_.position + '.jpg',
+                    name = data.title + ' - ' + Ox.formatDuration(data_.position) + '.jpg';
+                pandora.saveURL(url, name)
+            },
             downloadvideo: function() {
                 pandora.ui.downloadVideoDialog({
                     item: ui.item,

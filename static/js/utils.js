@@ -2577,6 +2577,25 @@ pandora.openURL = function(url) {
     }
 };
 
+pandora.saveURL = function(url, name) {
+    var link = document.createElement('a');
+    if (typeof link.download === 'string') {
+        link.href = url;
+        link.setAttribute('download', name ? name : true);
+        //Firefox requires the link to be in the body
+        document.body.appendChild(link);
+
+        //simulate click
+        link.click();
+
+        //remove the link when done
+        document.body.removeChild(link);
+    } else {
+        window.open(url);
+    }
+}
+
+
 pandora.signin = function(data) {
     // fixme: this is still voodoo
     pandora.user = Ox.extend(data.user, {
