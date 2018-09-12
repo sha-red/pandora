@@ -3,7 +3,7 @@
 pandora.ui.metadataDialog = function(data) {
 
     var keys = [
-            'title', 'alternativeTitles', 'director',
+            'title', 'originalTitle', 'alternativeTitles', 'director',
             'country', 'year', 'language', 'runtime', 'color', 'sound',
             'productionCompany', 'filmingLocations',
             'producer', 'writer', 'cinematographer', 'editor', 'composer', 'actor',
@@ -29,7 +29,10 @@ pandora.ui.metadataDialog = function(data) {
         that = data.imdbId ? updateDialog() : idDialog();
 
     keys = keys.filter(function(key) {
-        return Ox.contains(['alternativeTitles', 'filmingLocations'], key) || getItemKey(key);
+        return Ox.contains([
+            'alternativeTitles',
+            'filmingLocations'
+        ], key) || getItemKey(key);
     });
 
     data.imdbId && getMetadata();
