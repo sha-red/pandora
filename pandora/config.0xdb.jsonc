@@ -10,6 +10,7 @@
             annotations by specific users can be turned on and off
     */
     "annotations": {
+        "separator": ";",
         "showUsers": false
     },
     /*
