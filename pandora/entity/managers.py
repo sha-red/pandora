@@ -61,6 +61,31 @@ def buildCondition(k, op, v):
     key = str(key)
     if find_key:
         return Q(**{'find__key': find_key, key: v})
+        q = Q(**{'find__key': find_key, key: v})
+
+        # TODO: support more elaborate predicates on link targets?
+        # Straw man syntax:
+        #   // entities with 'ABC' in friends:
+        #   {key: 'link:friends', operator: '==', value: 'ABC'}
+        #   // entities whose friends have 'science' in their description
+        #   {key: 'link:friends', operator: '~', value: {
+        #       key: 'description',
+        #       operator: '=',
+        #       value: 'science'
+        #   }}
+        #   // entities listed in PQR's friends
+        #   {key: 'backlink:friends', operator: '==', value: 'PQR'}
+        # It's a bit tricky without special syntax because at this point we
+        # don't know what the matching entity type is.
+        if op == '==':
+            try:
+                v_ = ox.fromAZ(v)
+            except:
+                pass
+            else:
+                q |= Q(links__key=find_key, links__target=v_)
+
+        return q
     else:
         return Q(**{key: v})
 
@@ -118,7 +143,7 @@ class EntityManager(Manager):
                                      query.get('operator', '&'),
                                      user, item)
         if conditions:
-            qs = qs.filter(conditions)
+            qs = qs.filter(conditions).distinct()
 
         return qs
 

@@ -30,6 +30,10 @@ User = get_user_model()
 
 @python_2_unicode_compatible
 class Entity(models.Model):
+    class ValueError(ValueError):
+        '''Raised if a field name or value is invalid (based on the "entities"
+        key in config.jsonc)'''
+        pass
 
     class Meta:
         unique_together = ("type", "name")
@@ -54,7 +58,7 @@ class Entity(models.Model):
     documents = models.ManyToManyField(Document, through='DocumentProperties', related_name='entities')
 
     def save(self, *args, **kwargs):
-        entity = get_by_id(settings.CONFIG['entities'], self.type)
+        entity = self.get_entity(self.type)
         if entity.get('sortType') == 'person' and self.name:
             if isinstance(self.name, bytes):
                 self.name = self.name.decode('utf-8')
@@ -74,6 +78,13 @@ class Entity(models.Model):
     @classmethod
     def get(cls, id):
         return cls.objects.get(pk=ox.fromAZ(id))
+
+    @classmethod
+    def get_entity(cls, type_):
+        e = get_by_id(settings.CONFIG['entities'], type_)
+        if e is None:
+            raise cls.ValueError('Unknown entity type {!r}'.format(type_))
+        return e
 
     @classmethod
     def get_by_name(cls, name, type):
@@ -115,7 +126,14 @@ class Entity(models.Model):
         return False
 
     def edit(self, data):
-        for key in data:
+        if 'type' in data:
+            entity = self.get_entity(data['type'])
+            self.type = data['type']
+        else:
+            entity = self.get_entity(self.type)
+
+        config_keys = {k['id']: k for k in entity['keys']}
+        for key, value in data.items():
             if key == 'name':
                 data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
                 if not data['name']:
@@ -127,7 +145,7 @@ class Entity(models.Model):
                     name = data['name'] + ' [%d]' % n
                 self.name = name
             elif key == 'type':
-                self.type = data[key]
+                pass
             elif key == 'alternativeNames':
                 used_names = [self.name.lower()]
                 names = []
@@ -143,6 +161,34 @@ class Entity(models.Model):
                     names.append(name)
                     used_names.append(name.lower())
                 self.alternativeNames = tuple(ox.escape_html(n) for n in names)
+            elif key not in config_keys:
+                raise self.ValueError('Unknown key "{}" for entity type "{}"'.format(key, self.type))
+            elif config_keys[key]['type'] == ["entity"]:
+                n = config_keys[key].get('max')
+                if n is not None:
+                    value = value[:n]
+
+                es = []
+                for d in value:
+                    if not isinstance(d, dict):
+                        raise self.ValueError('"{}" should be [object]'.format(key))
+
+                    try:
+                        if 'id' in d:
+                            es.append(Entity.get(d['id']))
+                        elif 'name' in d and 'type' in d:
+                            es.append(Entity.get_by_name(d['name'], d['type']))
+                        else:
+                            raise self.ValueError('"{}" elements should have either "id" or both "name" and "type"'.format(key))
+                    except Entity.DoesNotExist:
+                        pass  # consistent with addDocument when "entity" is a list of IDs
+
+                for e in es:
+                    Link.objects.get_or_create(source=self, key=key, target=e)
+
+                Link.objects.filter(source=self, key=key) \
+                    .exclude(target__in=es) \
+                    .delete()
             else:
                 #FIXME: more data validation
                 if isinstance(data[key], string_types):
@@ -150,7 +196,29 @@ class Entity(models.Model):
                 else:
                     self.data[key] = data[key]
 
+    def _expand_links(self, keys, back=False):
+        response = {}
+
+        # Not applying any filters here to allow .prefetch_related()
+        # on sets of entities.
+        qs = (self.backlinks if back else self.links).all()
+        for link in qs:
+            if link.key in keys:
+                other = link.source if back else link.target
+                j = other.json(keys=['id', 'type', 'name', 'sortName'])
+                key = '-' + link.key if back else link.key
+                response.setdefault(key, []).append(j)
+
+        for k in response:
+            response[k].sort(key=lambda j: j['sortName'])
+
+        return response
+
+
     def json(self, keys=None, user=None):
+        entity = self.get_entity(self.type)
+        config_keys = {k['id']: k for k in entity['keys']}
+
         if not keys:
             keys = [
                 'alternativeNames',
@@ -161,8 +229,19 @@ class Entity(models.Model):
                 'type',
                 'user',
                 'documents',
-            ] + list(self.data)
+            ] + list(config_keys)
+
         response = {}
+
+        link_keys = {
+            id
+            for id, k in config_keys.items()
+            if id in keys and k['type'] in ('entity', ['entity'])
+        }
+        if link_keys:
+            response.update(self._expand_links(link_keys))
+            response.update(self._expand_links(link_keys, back=True))
+
         for key in keys:
             if key == 'id':
                 response[key] = self.get_id()
@@ -182,6 +261,8 @@ class Entity(models.Model):
                     sort_key = 'document__created'
                 response[key] = [ox.toAZ(id_)
                     for id_, in self.documentproperties.order_by(sort_key).values_list('document_id')]
+            elif key in link_keys:
+                pass # expanded above
             elif key in self.data:
                 response[key] = self.data[key]
         return response
@@ -205,9 +286,7 @@ class Entity(models.Model):
             else:
                 Find.objects.filter(entity=self, key=key).delete()
 
-        entity = get_by_id(settings.CONFIG['entities'], self.type)
-        if not entity:
-            return
+        entity = self.get_entity(self.type)
         with transaction.atomic():
             ids = ['name']
             for key in entity['keys']:
@@ -232,6 +311,9 @@ class Entity(models.Model):
             matches = annotation.models.Annotation.objects.filter(layer__in=entity_layers, value=self.get_id()).count()
         else:
             matches = 0
+
+        matches += Link.objects.filter(target=self).count()
+
         for url in urls:
             matches += annotation.models.Annotation.objects.filter(value__contains=url).count()
             matches += item.models.Item.objects.filter(data__contains=url).count()
@@ -295,3 +377,18 @@ class Find(models.Model):
 
     def __str__(self):
         return u"%s=%s" % (self.key, self.value)
+
+@python_2_unicode_compatible
+class Link(models.Model):
+    '''Models entity fields of type "entity".'''
+
+    class Meta:
+        unique_together = ("source", "key", "target")
+
+    source = models.ForeignKey(Entity, related_name='links')
+    key = models.CharField(max_length=200)
+    target = models.ForeignKey(Entity, related_name='backlinks')
+
+    def __str__(self):
+        return u"%s-[%s]->%s" % (self.source, self.key, self.target)
+

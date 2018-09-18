@@ -29,6 +29,14 @@ def get_entity_or_404_json(id):
                                'text': 'Entity not found'}}
         raise HttpErrorJson(response)
 
+def get_type_or_400_json(type_):
+    try:
+        return models.Entity.get_entity(type_)
+    except models.Entity.ValueError as e:
+        raise HttpErrorJson(json_response(
+            status=400,
+            text=e.message))
+
 @login_required_json
 def addEntity(request, data):
     '''
@@ -45,9 +53,7 @@ def addEntity(request, data):
     existing_names = []
     exists = False
 
-    if not utils.get_by_id(settings.CONFIG['entities'], data['type']):
-        response = json_response(status=500, text='unknown entity type')
-        return render_to_json_response(response)
+    get_type_or_400_json(data.get('type'))
 
     if 'name' in data:
         names = [data['name']] + data.get('alternativeNames', [])
@@ -113,7 +119,7 @@ def autocompleteEntities(request, data):
         data['range'] = [0, 10]
     op = data.get('operator', '=')
 
-    entity = utils.get_by_id(settings.CONFIG['entities'], data['key'])
+    entity = get_type_or_400_json(data['key'])
     order_by = entity.get('autocompleteSort', False)
     if order_by:
         for o in order_by:
@@ -157,6 +163,17 @@ def editEntity(request, data):
         id: string, // entity id
         name: string, // entity name
         description: string, // entity description
+        friends: [ // key with type "entity"
+            {
+                // either:
+                id: string, // related entity ID
+
+                // or:
+                type: string, // related entity type, and
+                name: string // related entity name
+            }
+            ... // more entities
+        ]
         ... // more properties, as defined in config
     }
     returns {
@@ -168,8 +185,11 @@ def editEntity(request, data):
     response = json_response()
     entity = get_entity_or_404_json(data['id'])
     if entity.editable(request.user):
-        entity.edit(data)
-        entity.save()
+        try:
+            entity.edit(data)
+            entity.save()
+        except models.Entity.ValueError as e:
+            raise HttpErrorJson(json_response(status=400, text=e.message))
         response['data'] = entity.json(user=request.user)
         add_changelog(request, data)
     else:
@@ -228,6 +248,8 @@ def findEntities(request, data):
     response = json_response()
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
+        qs = qs.prefetch_related('links', 'links__target')
+        qs = qs.prefetch_related('backlinks', 'backlinks__source')
 
         response['data']['items'] = [l.json(data['keys'], request.user) for l in qs]
     elif 'position' in data:
