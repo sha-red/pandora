@@ -292,6 +292,13 @@ class Annotation(models.Model):
     def _get_entity_json(self, user=None, entity_cache=None):
         """When serializing many annotations pointing to the same entity, it is expensive to
         repeatedly look up and serialize the same entity.
+
+        TODO: if Entity were a (nullable) foreign key of Annotation, we could just:
+
+            prefetch_related('entity', 'entity__user', 'entity__documents')
+
+        before serializing the annotations, which would make self.entity.json(user=user) cheap and
+        all this unnecessary.
         """
         from entity.models import Entity
 
