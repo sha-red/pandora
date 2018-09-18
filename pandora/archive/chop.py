@@ -119,7 +119,7 @@ class Chop(object):
         self.keyframes = make_keyframe_index(video)
         return self.keyframes
 
-    def get_gop_sections(self, start: float, end: float) -> dict:
+    def get_gop_sections(self, start, end):
         keyframes = self.get_keyframes()
         start_pos = bisect_left(keyframes, start)
         end_pos = bisect_left(keyframes, end)

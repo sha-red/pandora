@@ -17,7 +17,7 @@ class JSONField(django.contrib.postgres.fields.JSONField):
     def __init__(self, *args, **kwargs):
         if 'encoder' not in kwargs:
             kwargs['encoder'] = DjangoJSONEncoder
-        super().__init__(*args, **kwargs)
+        super(JSONField, self).__init__(*args, **kwargs)
 
 def to_json(python_object):
     if isinstance(python_object, datetime.datetime):
@@ -74,6 +74,8 @@ class DictField(models.TextField):
         except:
             raise Exception('failed to parse value: %s' % value)
         if value is not None:
+            if isinstance(value, string_types):
+                value = json.loads(value)
             assert isinstance(value, self._type)
         return value
 
