@@ -679,6 +679,19 @@ pandora.createLinks = function($element) {
 
 }());
 
+pandora.enableBatchEdit = function(section) {
+    var ui = pandora.user.ui;
+    if (section == 'documents') {
+        return !ui.document && ui.collectionSelection.length > 1 && ui.collectionSelection.every(function(item) {
+            return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
+        })
+    } else {
+        return !ui.item && ui.listSelection.length > 1 && ui.listSelection.every(function(item) {
+            return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
+        })
+    }
+};
+
 pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
 
     section = section || pandora.user.ui.section;

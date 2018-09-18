@@ -1,9 +1,11 @@
 'use strict';
 
-pandora.ui.infoView = function(data) {
+pandora.ui.infoView = function(data, isMixed) {
+    isMixed = isMixed || {};
 
     var ui = pandora.user.ui,
-        canEdit = pandora.hasCapability('canEditMetadata'),
+        isMultiple = arguments.length == 2,
+        canEdit = pandora.hasCapability('canEditMetadata') || isMultiple || data.editable,
         canRemove = pandora.hasCapability('canRemoveItems'),
         canSeeAllMetadata = pandora.user.level != 'guest',
         css = {
@@ -13,8 +15,8 @@ pandora.ui.infoView = function(data) {
         iconRatio = ui.icons == 'posters' ? (
             ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio
         ) : 1,
-        iconSize = ui.infoIconSize,
-        iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
+        iconSize = isMultiple ? 0 : ui.infoIconSize,
+        iconWidth = isMultiple ? 0 : iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
@@ -133,71 +135,73 @@ pandora.ui.infoView = function(data) {
 
         that = Ox.SplitPanel({
             elements: [
-                {element: $bar, size: 16},
+                {element: $bar, size: isMultiple ? 0 : 16},
                 {element: $info}
             ],
             orientation: 'vertical'
-        }),
+        });
 
-        $icon = Ox.Element({
-                element: '<img>'
-            })
-            .attr({
-                src: pandora.getMediaURL('/' + data.id + '/' + (
-                    ui.icons == 'posters' ? 'poster' : 'icon'
-                ) + '512.jpg?' + data.modified)
-            })
-            .css({
-                position: 'absolute',
-                left: margin + iconLeft + 'px',
-                top: margin + 'px',
-                width: iconWidth + 'px',
-                height: iconHeight + 'px',
-                borderRadius: borderRadius + 'px',
-                cursor: 'pointer'
-            })
-            .bindEvent({
-                singleclick: toggleIconSize
-            })
-            .appendTo($info),
+        if (!isMultiple) {
+            var $icon = Ox.Element({
+                    element: '<img>'
+                })
+                .attr({
+                    src: pandora.getMediaURL('/' + data.id + '/' + (
+                        ui.icons == 'posters' ? 'poster' : 'icon'
+                    ) + '512.jpg?' + data.modified)
+                })
+                .css({
+                    position: 'absolute',
+                    left: margin + iconLeft + 'px',
+                    top: margin + 'px',
+                    width: iconWidth + 'px',
+                    height: iconHeight + 'px',
+                    borderRadius: borderRadius + 'px',
+                    cursor: 'pointer'
+                })
+                .bindEvent({
+                    singleclick: toggleIconSize
+                })
+                .appendTo($info),
 
-        $reflection = $('<div>')
-            .addClass('OxReflection')
-            .css({
-                position: 'absolute',
-                left: margin + 'px',
-                top: margin + iconHeight + 'px',
-                width: iconSize + 'px',
-                height: Math.round(iconSize / 2) + 'px',
-                overflow: 'hidden'
-            })
-            .appendTo($info),
+            $reflection = $('<div>')
+                .addClass('OxReflection')
+                .css({
+                    position: 'absolute',
+                    left: margin + 'px',
+                    top: margin + iconHeight + 'px',
+                    width: iconSize + 'px',
+                    height: Math.round(iconSize / 2) + 'px',
+                    overflow: 'hidden'
+                })
+                .appendTo($info),
 
-        $reflectionIcon = $('<img>')
-            .attr({
-                src: pandora.getMediaURL('/' + data.id + '/' + (
-                    ui.icons == 'posters'
-                    ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                ) + '512.jpg?' + data.modified)
-            })
-            .css({
-                position: 'absolute',
-                left: iconLeft + 'px',
-                width: iconWidth + 'px',
-                height: iconHeight + 'px',
-                borderRadius: borderRadius + 'px'
-            })
-            .appendTo($reflection),
+            $reflectionIcon = $('<img>')
+                .attr({
+                    src: pandora.getMediaURL('/' + data.id + '/' + (
+                        ui.icons == 'posters'
+                        ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
+                    ) + '512.jpg?' + data.modified)
+                })
+                .css({
+                    position: 'absolute',
+                    left: iconLeft + 'px',
+                    width: iconWidth + 'px',
+                    height: iconHeight + 'px',
+                    borderRadius: borderRadius + 'px'
+                })
+                .appendTo($reflection),
 
-        $reflectionGradient = $('<div>')
-            .css({
-                position: 'absolute',
-                width: iconSize + 'px',
-                height: Math.round(iconSize / 2) + 'px'
-            })
-            .appendTo($reflection),
+            $reflectionGradient = $('<div>')
+                .css({
+                    position: 'absolute',
+                    width: iconSize + 'px',
+                    height: Math.round(iconSize / 2) + 'px'
+                })
+                .appendTo($reflection);
+        }
 
-        $text = Ox.Element()
+        var $text = Ox.Element()
             .addClass('OxTextPage')
             .css({
                 position: 'absolute',
@@ -243,6 +247,7 @@ pandora.ui.infoView = function(data) {
     });
 
     // Title -------------------------------------------------------------------
+    if (!isMultiple) {
 
     $('<div>')
         .css({
@@ -270,6 +275,7 @@ pandora.ui.infoView = function(data) {
                 })
         )
         .appendTo($text);
+    }
 
     // Director ----------------------------------------------------------------
 
@@ -285,7 +291,7 @@ pandora.ui.infoView = function(data) {
                         format: function(value) {
                             return formatLink(value.split(', '), 'name');
                         },
-                        placeholder: formatLight(Ox._('Unknown Director')),
+                        placeholder: formatLight(Ox._(isMixed.director ? 'Mixed Director' : 'Unknown Director')),
                         tooltip: canEdit ? pandora.getEditTooltip() : '',
                         value: data.director ? data.director.join(', ') : ''
                     })
@@ -355,7 +361,7 @@ pandora.ui.infoView = function(data) {
                         '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
                     );
                 },
-                placeholder: formatLight(Ox._('No Summary')),
+                placeholder: formatLight(Ox._(isMixed.summary ? 'Mixed Summary' : 'No Summary')),
                 tooltip: canEdit ? pandora.getEditTooltip() : '',
                 type: 'textarea',
                 value: data.summary || ''
@@ -435,7 +441,7 @@ pandora.ui.infoView = function(data) {
                         '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
                     );
                 },
-                placeholder: formatLight(Ox._('No Songs')),
+                placeholder: formatLight(Ox._(isMixed.songs ? 'Mixed Songs' : 'No Songs')),
                 tooltip: canEdit ? pandora.getEditTooltip() : '',
                 type: 'textarea',
                 value: data.songs || ''
@@ -455,6 +461,7 @@ pandora.ui.infoView = function(data) {
     }
 
     // Descriptions ------------------------------------------------------------
+    if (!isMultiple) {
 
     $descriptions = $('<div>').attr({id: 'descriptions'}).appendTo($text);
 
@@ -550,6 +557,8 @@ pandora.ui.infoView = function(data) {
         // no video placeholder
     }
 
+    }
+
     // Rights Level ------------------------------------------------------------
 
     var $rightsLevel = $('<div>');
@@ -581,7 +590,7 @@ pandora.ui.infoView = function(data) {
             .append(
                 Ox.EditableContent({
                         clickLink: pandora.clickLink,
-                        placeholder: formatLight(Ox._('No comments')),
+                        placeholder: formatLight(Ox._(isMixed.comments ? 'Mixed comments' : 'No comments')),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
                         value: data.comments || '',
@@ -589,12 +598,7 @@ pandora.ui.infoView = function(data) {
                     })
                     .bindEvent({
                         submit: function(event) {
-                            pandora.api.edit({
-                                id: data.id,
-                                comments: event.value
-                            }, function(result) {
-                                // ...
-                            });
+                            editMetadata('comments', event.value);
                         }
                     })
             )
@@ -605,7 +609,7 @@ pandora.ui.infoView = function(data) {
 
     function editMetadata(key, value) {
         if (value != data[key]) {
-            var edit = {id: data.id};
+            var edit = {id: isMultiple ? ui.listSelection : data.id};
             if (key == 'alternativeTitles') {
                 edit[key] = value ? Ox.decodeHTMLEntities(value).split('; ').map(function(value) {
                     return [Ox.encodeHTMLEntities(value), []];
@@ -629,33 +633,36 @@ pandora.ui.infoView = function(data) {
                 edit[key] = value;
             }
             pandora.api.edit(edit, function(result) {
-                var src;
-                data[key] = result.data[key];
-                if (result.data.id != data.id) {
-                    Ox.Request.clearCache(); // fixme: too much
-                    pandora.UI.set({item: result.data.id});
-                    pandora.$ui.browser.value(data.id, 'id', result.data.id);
-                } else {
-                    Ox.Request.clearCache('autocomplete');
+                if (!isMultiple) {
+                    var src;
+                    data[key] = result.data[key];
+                    if (result.data.id != data.id) {
+                        Ox.Request.clearCache(); // fixme: too much
+                        pandora.UI.set({item: result.data.id});
+                        pandora.$ui.browser.value(data.id, 'id', result.data.id);
+                    } else {
+                        Ox.Request.clearCache('autocomplete');
+                    }
+                    pandora.updateItemContext();
+                    pandora.$ui.browser.value(result.data.id, key, result.data[key]);
+                    if (Ox.contains(posterKeys, key) && ui.icons == 'posters') {
+                        src = pandora.getMediaURL('/' + data.id + '/poster512.jpg?' + Ox.uid());
+                        $icon.attr({src: src});
+                        $reflectionIcon.attr({src: src});
+                    }
+                    if (Ox.contains(nameKeys, key)) {
+                        data['namedescription'] = result.data['namedescription'];
+                        descriptions.names = getNames();
+                        renderDescriptions();
+                    } else if (key == 'productionCompany') {
+                        data['productionCompanydescription'] = result.data['productionCompanydescription'];
+                        descriptions.studios = getStudios();
+                        renderDescriptions();
+                    } else if (key == 'imdbId') {
+                        updateIMDb();
+                    }
                 }
-                pandora.updateItemContext();
-                pandora.$ui.browser.value(result.data.id, key, result.data[key]);
-                if (Ox.contains(posterKeys, key) && ui.icons == 'posters') {
-                    src = pandora.getMediaURL('/' + data.id + '/poster512.jpg?' + Ox.uid());
-                    $icon.attr({src: src});
-                    $reflectionIcon.attr({src: src});
-                }
-                if (Ox.contains(nameKeys, key)) {
-                    data['namedescription'] = result.data['namedescription'];
-                    descriptions.names = getNames();
-                    renderDescriptions();
-                } else if (key == 'productionCompany') {
-                    data['productionCompanydescription'] = result.data['productionCompanydescription'];
-                    descriptions.studios = getStudios();
-                    renderDescriptions();
-                } else if (key == 'imdbId') {
-                    updateIMDb();
-                }
+                that.triggerEvent('change', Ox.extend({}, key, value));
             });
         }
     }
@@ -1060,7 +1067,7 @@ pandora.ui.infoView = function(data) {
                             format: function(value) {
                                 return formatValue(key, value);
                             },
-                            placeholder: formatLight(Ox._('unknown')),
+                            placeholder: formatLight(Ox._(isMixed[key] ? 'mixed': 'unknown')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: getValue(key, data[key])
                         })
@@ -1130,8 +1137,12 @@ pandora.ui.infoView = function(data) {
                             .css({background: $rightsLevelElement.css('background')})
                             .data({OxColor: $rightsLevelElement.data('OxColor')})
                         // renderCapabilities(rightsLevel);
-                        pandora.api.edit({id: data.id, rightslevel: rightsLevel}, function(result) {
-                            // ...
+                        var edit = {
+                            id: isMultiple ? ui.listSelection : data.id,
+                            rightslevel: rightsLevel
+                        };
+                        pandora.api.edit(edit, function(result) {
+                            that.triggerEvent('change', Ox.extend({}, 'rightslevel', rightsLevel));
                         });
                     }
                 })

@@ -1,14 +1,16 @@
 'use strict';
 
-pandora.ui.infoView = function(data) {
+pandora.ui.infoView = function(data, isMixed) {
+    isMixed = isMixed || {};
 
     // fixme: given that currently, the info view doesn't scroll into view nicely
     // when collapsing the movies browser, the info view should become a split panel
 
     var ui = pandora.user.ui,
-        canEdit = pandora.hasCapability('canEditMetadata'),
+        isMultiple = arguments.length == 2,
+        canEdit = pandora.hasCapability('canEditMetadata') || isMultiple || data.editable,
         canRemove = pandora.hasCapability('canRemoveItems'),
-        canSeeAllMetadata = pandora.user.level != 'guest',
+        canSeeAllMetadata = pandora.user.level != 'guest' && !isMultiple,
         css = {
             marginTop: '4px',
             textAlign: 'justify'
@@ -16,12 +18,15 @@ pandora.ui.infoView = function(data) {
         iconRatio = ui.icons == 'posters' ? (
             ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio
         ) : 1,
-        iconSize = ui.infoIconSize,
-        iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
+        iconSize = isMultiple ? 0 : ui.infoIconSize,
+        iconWidth = isMultiple ? 0 : iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
-        isEditable = canEdit && data.id.slice(0, 2) == '0x',
+        isEditable = canEdit && (isMultiple
+            ? !ui.listSelection.some(function(id) { return id.slice(0, 2) != '0x' })
+            : data.id.slice(0, 2) == '0x'
+        ),
         listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
         margin = 16,
         statisticsWidth = 128,
@@ -101,7 +106,7 @@ pandora.ui.infoView = function(data) {
 
         that = Ox.SplitPanel({
             elements: [
-                {element: $bar, size: 16},
+                {element: $bar, size: isMultiple ? 0 : 16},
                 {element: $main}
             ],
             orientation: 'vertical'
@@ -126,73 +131,75 @@ pandora.ui.infoView = function(data) {
                 right: 0,
                 height: getHeight() + 'px'
             })
-            .appendTo($info),
+            .appendTo($info);
 
-        $icon = Ox.Element({
-                element: '<img>',
-                tooltip: canEdit ? (
-                    !ui.showIconBrowser
-                        ? Ox._('Doubleclick to edit icon')
-                        : Ox._('Doubleclick to hide icons')
-                ) : ''
-            })
-            .attr({
-                src: pandora.getMediaURL('/' + data.id + '/' + (
-                    ui.icons == 'posters'
-                    ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                ) + '512.jpg?' + data.modified)
-            })
-            .css({
-                position: 'absolute',
-                left: margin + iconLeft + 'px',
-                top: margin + 'px',
-                width: iconWidth + 'px',
-                height: iconHeight + 'px',
-                borderRadius: borderRadius + 'px',
-                cursor: 'pointer'
-            })
-            .bindEvent({
-                singleclick: toggleIconSize
-            })
-            .appendTo($data.$element),
+        if (!isMultiple) {
+            var $icon = Ox.Element({
+                    element: '<img>',
+                    tooltip: canEdit ? (
+                        !ui.showIconBrowser
+                            ? Ox._('Doubleclick to edit icon')
+                            : Ox._('Doubleclick to hide icons')
+                    ) : ''
+                })
+                .attr({
+                    src: pandora.getMediaURL('/' + data.id + '/' + (
+                        ui.icons == 'posters'
+                        ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
+                    ) + '512.jpg?' + data.modified)
+                })
+                .css({
+                    position: 'absolute',
+                    left: margin + iconLeft + 'px',
+                    top: margin + 'px',
+                    width: iconWidth + 'px',
+                    height: iconHeight + 'px',
+                    borderRadius: borderRadius + 'px',
+                    cursor: 'pointer'
+                })
+                .bindEvent({
+                    singleclick: toggleIconSize
+                })
+                .appendTo($data.$element),
 
-        $reflection = $('<div>')
-            .addClass('OxReflection')
-            .css({
-                position: 'absolute',
-                left: margin + 'px',
-                top: margin + iconHeight + 'px',
-                width: iconSize + 'px',
-                height: Math.round(iconSize / 2) + 'px',
-                overflow: 'hidden'
-            })
-            .appendTo($data.$element),
+            $reflection = $('<div>')
+                .addClass('OxReflection')
+                .css({
+                    position: 'absolute',
+                    left: margin + 'px',
+                    top: margin + iconHeight + 'px',
+                    width: iconSize + 'px',
+                    height: Math.round(iconSize / 2) + 'px',
+                    overflow: 'hidden'
+                })
+                .appendTo($data.$element),
 
-        $reflectionIcon = $('<img>')
-            .attr({
-                src: pandora.getMediaURL('/' + data.id + '/' + (
-                    ui.icons == 'posters'
-                    ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                ) + '512.jpg?' + data.modified)
-            })
-            .css({
-                position: 'absolute',
-                left: iconLeft + 'px',
-                width: iconWidth + 'px',
-                height: iconHeight + 'px',
-                borderRadius: borderRadius + 'px'
-            })
-            .appendTo($reflection),
+            $reflectionIcon = $('<img>')
+                .attr({
+                    src: pandora.getMediaURL('/' + data.id + '/' + (
+                        ui.icons == 'posters'
+                        ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
+                    ) + '512.jpg?' + data.modified)
+                })
+                .css({
+                    position: 'absolute',
+                    left: iconLeft + 'px',
+                    width: iconWidth + 'px',
+                    height: iconHeight + 'px',
+                    borderRadius: borderRadius + 'px'
+                })
+                .appendTo($reflection),
 
-        $reflectionGradient = $('<div>')
-            .css({
-                position: 'absolute',
-                width: iconSize + 'px',
-                height: Math.round(iconSize / 2) + 'px'
-            })
-            .appendTo($reflection),
+            $reflectionGradient = $('<div>')
+                .css({
+                    position: 'absolute',
+                    width: iconSize + 'px',
+                    height: Math.round(iconSize / 2) + 'px'
+                })
+                .appendTo($reflection);
+        }
 
-        $text = Ox.Element()
+        var $text = Ox.Element()
             .addClass('OxTextPage')
             .css({
                 position: 'absolute',
@@ -228,7 +235,7 @@ pandora.ui.infoView = function(data) {
     pandora.createLinks($text);
 
     // Title -------------------------------------------------------------------
-
+    if (!isMultiple) {
     $('<div>')
         .css({
             marginTop: '-2px'
@@ -255,6 +262,7 @@ pandora.ui.infoView = function(data) {
                 })
         )
         .appendTo($text);
+    }
 
     // Director ----------------------------------------------------------------
 
@@ -270,7 +278,7 @@ pandora.ui.infoView = function(data) {
                         format: function(value) {
                             return formatValue(value.split(', '), 'name');
                         },
-                        placeholder: formatLight(Ox._('Unknown Director')),
+                        placeholder: formatLight(Ox._(isMixed.director ? 'Mixed Director' : 'Unknown Director')),
                         tooltip: isEditable ? pandora.getEditTooltip() : '',
                         value: data.director ? data.director.join(', ') : ''
                     })
@@ -306,7 +314,7 @@ pandora.ui.infoView = function(data) {
                     format: function(value) {
                         return formatValue(value.split(', '), key)
                     },
-                    placeholder: formatLight('unknown'),
+                    placeholder: formatLight(isMixed[key] ? 'mixed' : 'unknown'),
                     tooltip: pandora.getEditTooltip(),
                     value: key == 'country'
                         ? (data[key] ? data[key].join(', ') : [''])
@@ -320,7 +328,7 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($div);
         });
-    } else if (data.country || data.year || data.language || data.runtime || data.color || data.sound) {
+    } else if (!isMultiple && (data.country || data.year || data.language || data.runtime || data.color || data.sound)) {
         var html = [];
         ['country', 'year', 'language', 'runtime', 'color', 'sound'].forEach(function(key) {
             if (data[key]) {
@@ -379,7 +387,7 @@ pandora.ui.infoView = function(data) {
                             key == 'episodeDirector' ? 'name' : 'year'
                         );
                     },
-                    placeholder: formatLight('unknown'),
+                    placeholder: formatLight(Ox._(isMixed[key] ? 'mixed' : 'unknown')),
                     tooltip: pandora.getEditTooltip(),
                     value: key == 'episodeDirector'
                         ? (data[key] ? data[key].join(', ') : [''])
@@ -393,7 +401,7 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($div);
         });
-    } else if (data.episodeDirector || data.writer || data.producer || data.cinematographer || data.editor) {
+    } else if (!isMultiple && (data.episodeDirector || data.writer || data.producer || data.cinematographer || data.editor)) {
         $div = $('<div>')
             .addClass('OxSelectable')
             .css(css)
@@ -435,7 +443,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($text);
     }
 
-    if (data.genre || (data.keyword && canSeeAllMetadata)) {
+    if (!isMultiple && (data.genre || (data.keyword && canSeeAllMetadata))) {
         $div = $('<div>')
             .addClass('OxSelectable')
             .css(css)
@@ -456,8 +464,7 @@ pandora.ui.infoView = function(data) {
         .html(formatKey('summary') + data.summary)
         .appendTo($text);
 
-    if (canSeeAllMetadata) {
-        
+    if (!isMultiple && canSeeAllMetadata) {
         data.trivia && data.trivia.forEach(function(value) {
             $('<div>')
                 .css({
@@ -570,7 +577,7 @@ pandora.ui.infoView = function(data) {
     $('<div>').css({height: '16px'}).appendTo($text);
 
     // Mainstream Score, Arthouse Score ----------------------------------------
-
+    if (!isMultiple) {
     ['votes', 'likes'].forEach(function(key) {
         var value = data[key] || 0;
         $('<div>')
@@ -597,7 +604,6 @@ pandora.ui.infoView = function(data) {
     });
 
     // Duration, Aspect Ratio --------------------------------------------------
-
     ['duration', 'aspectratio'].forEach(function(key) {
         var itemKey = Ox.getObjectById(pandora.site.itemKeys, key),
             value = data[key] || 0;
@@ -669,6 +675,7 @@ pandora.ui.infoView = function(data) {
             )
             .appendTo($statistics);
     });
+    }
 
     // Rights Level ------------------------------------------------------------
 
@@ -689,7 +696,7 @@ pandora.ui.infoView = function(data) {
             .append(
                 Ox.EditableContent({
                         clickLink: pandora.clickLink,
-                        placeholder: formatLight(Ox._('No notes')),
+                        placeholder: formatLight(Ox._(isMixed.notes ? 'Mixed notes' : 'No notes')),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
                         value: data.notes || '',
@@ -697,12 +704,7 @@ pandora.ui.infoView = function(data) {
                     })
                     .bindEvent({
                         submit: function(event) {
-                            pandora.api.edit({
-                                id: data.id,
-                                notes: event.value
-                            }, function(result) {
-                                // ...
-                            });
+                            editMetadata('notes', event.value);
                         }
                     })
             )
@@ -711,7 +713,7 @@ pandora.ui.infoView = function(data) {
 
     $('<div>').css({height: '16px'}).appendTo($statistics);
 
-    if (canEdit) {
+    if (canEdit && !isMultiple) {
         $icon.bindEvent({
             doubleclick: function() {
                 pandora.UI.set({showIconBrowser: !ui.showIconBrowser});
@@ -730,7 +732,7 @@ pandora.ui.infoView = function(data) {
 
     function editMetadata(key, value) {
         if (value != data[key]) {
-            var edit = {id: data.id};
+            var edit = {id: isMultiple ? ui.listSelection : data.id};
             if (key == 'title') {
                 Ox.extend(edit, parseTitle(value));
             } else if (['director', 'country'].indexOf(key) > -1) {
@@ -739,14 +741,17 @@ pandora.ui.infoView = function(data) {
                 edit[key] = value;
             }
             pandora.api.edit(edit, function(result) {
-                if (result.data.id != data.id) {
-                    Ox.Request.clearCache(); // fixme: too much
-                    pandora.UI.set({item: result.data.id});
-                    pandora.$ui.browser.value(data.id, 'id', result.data.id);
-                    // FIXME: does this update selected?
+                if (!isMultiple) {
+                    if (result.data.id != data.id) {
+                        Ox.Request.clearCache(); // fixme: too much
+                        pandora.UI.set({item: result.data.id});
+                        pandora.$ui.browser.value(data.id, 'id', result.data.id);
+                        // FIXME: does this update selected?
+                    }
+                    pandora.updateItemContext();
+                    pandora.$ui.browser.value(result.data.id, key, result.data[key]);
                 }
-                pandora.updateItemContext();
-                pandora.$ui.browser.value(result.data.id, key, result.data[key]);
+                that.triggerEvent('change', Ox.extend({}, key, value));
             });
         }
     }
@@ -1059,8 +1064,12 @@ pandora.ui.infoView = function(data) {
                             .css({background: $rightsLevelElement.css('background')})
                             .data({OxColor: $rightsLevelElement.data('OxColor')})
                         renderCapabilities(rightsLevel);
-                        pandora.api.edit({id: data.id, rightslevel: rightsLevel}, function(result) {
-                            // ...
+                        var edit = {
+                            id: isMultiple ? ui.listSelection : data.id,
+                            rightslevel: rightsLevel
+                        };
+                        pandora.api.edit(edit, function(result) {
+                            that.triggerEvent('change', Ox.extend({}, 'rightslevel', rightsLevel));
                         });
                     }
                 })

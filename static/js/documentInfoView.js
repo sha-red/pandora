@@ -1,9 +1,11 @@
 'use strict';
 
-pandora.ui.documentInfoView = function(data) {
+pandora.ui.documentInfoView = function(data, isMixed) {
+    isMixed = isMixed || {};
 
     var ui = pandora.user.ui,
-        canEdit = pandora.hasCapability('canEditMetadata') || data.editable,
+        isMultiple = arguments.length == 2,
+        canEdit = pandora.hasCapability('canEditMetadata') || isMultiple || data.editable,
         canRemove = pandora.hasCapability('canRemoveItems'),
         css = {
             marginTop: '4px',
@@ -11,8 +13,8 @@ pandora.ui.documentInfoView = function(data) {
         },
         html,
         iconRatio = data.ratio,
-        iconSize = ui.infoIconSize,
-        iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
+        iconSize = isMultiple ? 0 : ui.infoIconSize,
+        iconWidth = isMultiple ? 0 : iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         margin = 16,
@@ -103,63 +105,65 @@ pandora.ui.documentInfoView = function(data) {
 
         that = Ox.SplitPanel({
             elements: [
-                {element: $bar, size: 16},
+                {element: $bar, size: isMultiple ? 0 : 16},
                 {element: $info}
             ],
             orientation: 'vertical'
-        }),
+        });
 
-        $icon = Ox.Element({
-                element: '<img>',
-            })
-            .attr({
-                src: '/documents/' + data.id + '/512p.jpg?' + data.modified
-            })
-            .css({
-                position: 'absolute',
-                left: margin + iconLeft + 'px',
-                top: margin + 'px',
-                width: iconWidth + 'px',
-                height: iconHeight + 'px'
-            })
-            .bindEvent({
-                // singleclick: toggleIconSize
-            })
-            .appendTo($info),
+        if (!isMultiple) {
+            var $icon = Ox.Element({
+                    element: '<img>',
+                })
+                .attr({
+                    src: '/documents/' + data.id + '/512p.jpg?' + data.modified
+                })
+                .css({
+                    position: 'absolute',
+                    left: margin + iconLeft + 'px',
+                    top: margin + 'px',
+                    width: iconWidth + 'px',
+                    height: iconHeight + 'px'
+                })
+                .bindEvent({
+                    // singleclick: toggleIconSize
+                })
+                .appendTo($info),
 
-        $reflection = $('<div>')
-            .addClass('OxReflection')
-            .css({
-                position: 'absolute',
-                left: margin + 'px',
-                top: margin + iconHeight + 'px',
-                width: iconSize + 'px',
-                height: iconSize / 2 + 'px',
-                overflow: 'hidden'
-            })
-            .appendTo($info),
+            $reflection = $('<div>')
+                .addClass('OxReflection')
+                .css({
+                    position: 'absolute',
+                    left: margin + 'px',
+                    top: margin + iconHeight + 'px',
+                    width: iconSize + 'px',
+                    height: iconSize / 2 + 'px',
+                    overflow: 'hidden'
+                })
+                .appendTo($info),
 
-        $reflectionIcon = $('<img>')
-            .attr({
-                src: '/documents/' + data.id + '/512p.jpg?' + data.modified
-            })
-            .css({
-                position: 'absolute',
-                left: iconLeft + 'px',
-                width: iconWidth + 'px',
-                height: iconHeight + 'px',
-            })
-            .appendTo($reflection),
+            $reflectionIcon = $('<img>')
+                .attr({
+                    src: '/documents/' + data.id + '/512p.jpg?' + data.modified
+                })
+                .css({
+                    position: 'absolute',
+                    left: iconLeft + 'px',
+                    width: iconWidth + 'px',
+                    height: iconHeight + 'px',
+                })
+                .appendTo($reflection),
 
-        $reflectionGradient = $('<div>')
-            .css({
-                position: 'absolute',
-                width: iconSize + 'px',
-                height: iconSize / 2 + 'px'
-            })
-            .appendTo($reflection),
+            $reflectionGradient = $('<div>')
+                .css({
+                    position: 'absolute',
+                    width: iconSize + 'px',
+                    height: iconSize / 2 + 'px'
+                })
+                .appendTo($reflection);
+        }
 
-        $text = Ox.Element()
+        var $text = Ox.Element()
             .addClass('OxTextPage')
             .css({
                 position: 'absolute',
@@ -263,13 +267,13 @@ pandora.ui.documentInfoView = function(data) {
     }
 
     // Referenced --------------------------------------------------------------
-
     if (
+        !isMultiple && (
         data.referenced.items.length
         || data.referenced.annotations.length
         || data.referenced.documents.length
         || data.referenced.entities.length  
-    ) {
+    )) {
     
         var itemsById = {}
         data.referenced.items.forEach(function(item) {
@@ -287,7 +291,6 @@ pandora.ui.documentInfoView = function(data) {
             itemsById[itemId].annotations = itemsById[itemId].annotations.concat(annotation);
         });
         var html = Ox.sortBy(Object.values(itemsById), 'title').map(function(item) {
-            console.log('item', item)
             return (item.referenced ? '<a href="/' + item.id + '/documents">' : '')
                 + item.title //Ox.encodeHTMLEntities(item.title)
                 + (item.referenced ? '</a>' : '')
@@ -360,7 +363,9 @@ pandora.ui.documentInfoView = function(data) {
 
     function editMetadata(key, value) {
         if (value != data[key]) {
-            var edit = {id: data.id};
+            var edit = {
+                id: isMultiple ? ui.collectionSelection : data.id,
+            };
             if (key == 'title') {
                 edit[key] = value;
             } else if (listKeys.indexOf(key) >= 0) {
@@ -369,17 +374,20 @@ pandora.ui.documentInfoView = function(data) {
                 edit[key] = value ? value : null;
             }
             pandora.api.editDocument(edit, function(result) {
-                var src;
-                data[key] = result.data[key];
-                Ox.Request.clearCache(); // fixme: too much? can change filter/list etc
-                if (result.data.id != data.id) {
-                    pandora.UI.set({document: result.data.id});
-                    pandora.$ui.browser.value(data.id, 'id', result.data.id);
+                if (!isMultiple) {
+                    var src;
+                    data[key] = result.data[key];
+                    Ox.Request.clearCache(); // fixme: too much? can change filter/list etc
+                    if (result.data.id != data.id) {
+                        pandora.UI.set({document: result.data.id});
+                        pandora.$ui.browser.value(data.id, 'id', result.data.id);
+                    }
+                    //pandora.updateItemContext();
+                    //pandora.$ui.browser.value(result.data.id, key, result.data[key]);
+                    pandora.$ui.itemTitle
+                        .options({title: '<b>' + (pandora.getDocumentTitle(result.data)) + '</b>'});
                 }
-                //pandora.updateItemContext();
-                //pandora.$ui.browser.value(result.data.id, key, result.data[key]);
-                pandora.$ui.itemTitle
-                    .options({title: '<b>' + (pandora.getDocumentTitle(result.data)) + '</b>'});
+                that.triggerEvent('change', Ox.extend({}, key, value));
             });
         }
     }
@@ -421,7 +429,11 @@ pandora.ui.documentInfoView = function(data) {
         } else if (['type', 'publisher'].indexOf(key) > -1) {
             ret = formatLink(value, key);
         } else {
-            ret = pandora.formatDocumentKey(Ox.getObjectById(pandora.site.documentKeys, key), data);
+            if (isMixed[key]) {
+                ret = 'Mixed'
+            } else {
+                ret = pandora.formatDocumentKey(Ox.getObjectById(pandora.site.documentKeys, key), data);
+            }
         }
         return ret;
     }
@@ -533,7 +545,7 @@ pandora.ui.documentInfoView = function(data) {
                             format: function(value) {
                                 return formatValue(key, value);
                             },
-                            placeholder: formatLight(Ox._('unknown')),
+                            placeholder: formatLight(Ox._(isMixed[key] ? 'mixed' : 'unknown')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: getValue(key, data[key])
                         })
@@ -576,8 +588,12 @@ pandora.ui.documentInfoView = function(data) {
                             .css({background: $rightsLevelElement.css('background')})
                             .data({OxColor: $rightsLevelElement.data('OxColor')})
                         //renderCapabilities(rightsLevel);
-                        pandora.api.editDocument({id: data.id, rightslevel: rightsLevel}, function(result) {
-                            // ...
+                        var edit = {
+                            id: isMultiple ? ui.collectionSelection : data.id,
+                            rightslevel: rightsLevel
+                        };
+                        pandora.api.editDocument(edit, function(result) {
+                            that.triggerEvent('change', Ox.extend({}, 'rightslevel', rightsLevel));
                         });
                     }
                 })

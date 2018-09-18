@@ -132,14 +132,19 @@ def editDocument(request, data):
     response = json_response()
     item = 'item' in data and Item.objects.get(public_id=data['item']) or None
     if data['id']:
-        document = models.Document.get(data['id'])
-        if document.editable(request.user, item):
-            add_changelog(request, data)
-            document.edit(data, request.user, item)
-            document.save()
-            response['data'] = document.json(user=request.user, item=item)
+        if isinstance(data['id'], list):
+            documents = models.Document.objects.filter(pk__in=map(ox.fromAZ, data['id']))
         else:
-            response = json_response(status=403, text='permission denied')
+            documents = [models.Document.get(data['id'])]
+        for document in documents:
+            if document.editable(request.user, item):
+                if document == documents[0]:
+                    add_changelog(request, data)
+                document.edit(data, request.user, item)
+                document.save()
+                response['data'] = document.json(user=request.user, item=item)
+            else:
+                response = json_response(status=403, text='permission denied')
     else:
         response = json_response(status=500, text='invalid request')
     return render_to_json_response(response)

@@ -622,14 +622,19 @@ def edit(request, data):
     }
     see: add, find, get, lookup, remove, upload
     '''
-    item = get_object_or_404_json(models.Item, public_id=data['id'])
-    if item.editable(request.user):
-        request_data = data.copy()
-        response = edit_item(request, item, data)
-        response['data'] = item.json()
-        add_changelog(request, request_data)
+    if isinstance(data['id'], list):
+        items = models.Item.objects.filter(public_id__in=data['id'])
     else:
-        response = json_response(status=403, text='permission denied')
+        items = [get_object_or_404_json(models.Item, public_id=data['id'])]
+    for item in items:
+        if item.editable(request.user):
+            request_data = data.copy()
+            response = edit_item(request, item, data)
+            response['data'] = item.json()
+            if item == items[0]:
+                add_changelog(request, request_data)
+        else:
+            response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(edit, cache=False)
 

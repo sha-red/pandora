@@ -262,6 +262,8 @@ def update_static():
     pandora_json = os.path.join(settings.STATIC_ROOT, 'json/pandora.json')
     for root, folders, files in os.walk(os.path.join(settings.STATIC_ROOT, 'js')):
         for f in files:
+            if f.startswith('._'):
+                continue
             f = os.path.join(root, f)
             #ignore old embed js file
             if 'js/embed/' in f:
