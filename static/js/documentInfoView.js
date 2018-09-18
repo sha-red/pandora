@@ -385,7 +385,7 @@ pandora.ui.documentInfoView = function(data) {
     }
 
     function formatKey(key, mode) {
-        var item = Ox.getObjectById(pandora.site.itemKeys, key);
+        var item = Ox.getObjectById(pandora.site.documentKeys, key);
         key = Ox._(item ? item.title : key);
         mode = mode || 'text';
         return mode == 'text'
