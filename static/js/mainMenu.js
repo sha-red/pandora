@@ -939,12 +939,10 @@ pandora.ui.mainMenu = function() {
             window.open(document.location.href + '#?print=true', '_blank');
         },
         key_control_shift_e: function() {
-            console.log('!!', ui.section, pandora.enableBatchEdit(ui.section))
             if (
                 !pandora.hasDialogOrScreen() &&
                 pandora.enableBatchEdit(ui.section)
             ) {
-                console.log('!!>>', ui.section)
                 if (ui.section == 'documents') {
                     pandora.ui.editDocumentsDialog().open();
                 } else {

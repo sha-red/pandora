@@ -103,7 +103,6 @@ pandora.ui.editDocumentsDialog = function() {
                 if (Ox.unique(values).length > 1) {
                     isMixed[key] = true;
                 }
-                console.log(key, values)
                 data[key] = isMixed[key] ? null
                     : isArray && values.length ? values[0].split(separator)
                     : values[0];
