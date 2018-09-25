@@ -1030,7 +1030,7 @@ class Item(models.Model):
                     value = self.get(source)
                     set_value(s, name, value)
                 elif sort_type == 'date':
-                    value = self.get(source)
+                    value = value_ = self.get(source)
                     if isinstance(value, string_types):
                         value_ = None
                         for fmt in ('%Y-%m-%d', '%Y-%m', '%Y'):
