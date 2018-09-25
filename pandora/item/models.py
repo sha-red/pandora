@@ -622,7 +622,8 @@ class Item(models.Model):
             i['connections'] = self.expand_connections()
 
         if not keys or 'posterRatio' in keys:
-            i['posterRatio'] = self.poster_width / self.poster_height
+            if self.poster_height:
+                i['posterRatio'] = self.poster_width / self.poster_height
 
         streams = self.streams()
         i['durations'] = [s.duration for s in streams]
@@ -1479,7 +1480,7 @@ class Item(models.Model):
             timeline = audio_timeline
 
         cmd = [settings.ITEM_POSTER, '-d', '-', '-p', poster]
-        data = self.cache.copy()
+        data = self.json()
         if frame:
             data['frame'] = frame
         if os.path.exists(timeline):
