@@ -145,7 +145,7 @@ pandora.ui.list = function() {
                             info.css({width: size * 0.75 + 'px'});
                         }
                     } else {
-                        info = data[sortKey];
+                        info = data[sortKey] || '';
                     }
                 }
                 size = size || 128;
@@ -192,7 +192,9 @@ pandora.ui.list = function() {
                     info = data['year'] || data['date'] || '';
                 } else {
                     format = pandora.getSortKeyData(sortKey).format;
-                    if (format) {
+                    if (Ox.isUndefined(data[sortKey]) || Ox.isNull(data[sortKey])) {
+                        info = '';
+                    } else if (format) {
                         info = (
                             /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
                         )['format' + Ox.toTitleCase(format.type)].apply(
@@ -202,7 +204,7 @@ pandora.ui.list = function() {
                             info.css({width: size * 0.75 + 'px'});
                         }
                     } else {
-                        info = data[sortKey];
+                        info = data[sortKey] || '';
                     }
                 }
                 return {
@@ -279,7 +281,9 @@ pandora.ui.list = function() {
                     info = data['year'] || data['date'] || '';
                 } else {
                     format = pandora.getSortKeyData(sortKey).format;
-                    if (format) {
+                    if (Ox.isUndefined(data[sortKey]) || Ox.isNull(data[sortKey])) {
+                        info = '';
+                    } else if (format) {
                         info = (
                             /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
                         )['format' + Ox.toTitleCase(format.type)].apply(
@@ -289,7 +293,7 @@ pandora.ui.list = function() {
                             info.css({width: size * 0.75 + 'px'});
                         }
                     } else {
-                        info = data[sortKey];
+                        info = data[sortKey] || '';
                     }
                 }
                 return {
