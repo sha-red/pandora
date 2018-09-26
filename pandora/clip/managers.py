@@ -111,7 +111,8 @@ def parseConditions(conditions, operator, user):
             q = parseConditions(condition['conditions'],
                              condition.get('operator', '&'), user)
             if q:
-                conn.append(q)
+                for conn_ in q:
+                    conn.append(conn_)
             pass
         else:
             conn.append(parseCondition(condition, user))
