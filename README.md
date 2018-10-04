@@ -164,10 +164,12 @@ b) apache2 (if you need it for other sites on the same server)
 
   in one terminal:
 
+    cd /srv/pandora/pandora
     ./manage.py runserver 2620
 
   and background task in another:
 
+    cd /srv/pandora/pandora
     ./manage.py celeryd -B -Q celery,default,encoding -l INFO
 
   now you can access your local pandora instace at http://127.0.0.1:8000/
