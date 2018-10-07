@@ -217,6 +217,11 @@ POSTER_PRECEDENCE = ()
 POSTER_ONLY_PORTRAIT = ()
 
 USE_IMDB = False
+ADDITIONAL_IMDB_KEYS = [
+    'cast',
+    'links', 'reviews', 'posters',
+    'alternativeTitles', 'originalTitle',
+]
 
 #If you set VIDEO_PREFIX make sure cookies work accros subsomains
 #by setting SESSION_COOKIE_DOMAIN to ".domain.tld"

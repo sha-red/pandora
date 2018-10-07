@@ -307,6 +307,11 @@ class Item(models.Model):
             response = external_data('getData', {'id': self.public_id})
             if response['status']['code'] == 200:
                 self.external_data = response['data']
+                keys = [
+                    k['id'] for k in settings.CONFIG['itemKeys']
+                ] + settings.ADDITIONAL_IMDB_KEYS
+                for key in set(self.external_data) - set(keys):
+                    del self.external_data[key]
                 self.save(sync=True)
                 if poster_url != self.prefered_poster_url():
                     self.remove_poster()
