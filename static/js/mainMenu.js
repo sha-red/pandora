@@ -227,12 +227,12 @@ pandora.ui.mainMenu = function() {
                             ? [{}] : [],
                         { id: 'titles', title: Ox._('Manage Titles...'), disabled: !pandora.hasCapability('canManageTitlesAndNames') },
                         { id: 'names', title: Ox._('Manage Names...'), disabled: !pandora.hasCapability('canManageTitlesAndNames') },
+                        { id: 'translations', title: Ox._('Manage Translations...'), disabled: !pandora.hasCapability('canManageTranslations') },
                         {},
                         { id: 'places', title: Ox._('Manage Places...'), disabled: !pandora.hasCapability('canManagePlacesAndEvents') },
                         { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.hasCapability('canManagePlacesAndEvents') },
                         {},
                         { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.hasCapability('canManageUsers') },
-                        { id: 'translations', title: Ox._('Manage Translations...'), disabled: !pandora.hasCapability('canManageTranslations') },
                         { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.hasCapability('canManageUsers') },
                         {},
                         { id: 'changelog', title: Ox._('Changelog...'), disabled: !pandora.hasCapability('canManageUsers') }

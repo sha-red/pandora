@@ -67,7 +67,7 @@ pandora.ui.translationsDialog = function() {
                             return Ox.encodeHTMLEntities(data)
                         },
                         visible: true,
-                        width: 256
+                        width: 240
                     },
                     {
                         editable: true,
@@ -79,18 +79,17 @@ pandora.ui.translationsDialog = function() {
                         },
                         tooltip: Ox._('Edit Translation'),
                         visible: true,
-                        width: 256
+                        width: 240
                     },
                     {
                         id: 'lang',
-                        align: 'right',
                         operator: '-',
                         title: Ox._('Language'),
                         format: function(lang) {
                             return Ox.LOCALE_NAMES[lang]
                         },
                         visible: true,
-                        width: 64
+                        width: 96
                     },
                 ],
                 columnsVisible: true,
@@ -166,10 +165,10 @@ pandora.ui.translationsDialog = function() {
             })
             .bindEvent({
                 resizeend: function(data) {
-                    var width = (data.width - 64 - Ox.UI.SCROLLBAR_SIZE) / 2;
+                    var width = (data.width - 96 - Ox.UI.SCROLLBAR_SIZE) / 2;
                     [
-                        {id: 'name', width: Math.ceil(width)},
-                        {id: 'sortname', width: Math.floor(width)}
+                        {id: 'key', width: Math.ceil(width)},
+                        {id: 'value', width: Math.floor(width)},
                     ].forEach(function(column) {
                         $list.resizeColumn(column.id, column.width);
                     });
@@ -180,8 +179,8 @@ pandora.ui.translationsDialog = function() {
             .css({
                 position: 'absolute',
                 top: '4px',
-                left: '128px',
-                right: '32px',
+                left: '40px',
+                right: '40px',
                 bottom: '4px',
                 paddingTop: '2px',
                 fontSize: '9px',
