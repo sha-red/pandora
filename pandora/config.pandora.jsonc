@@ -864,6 +864,8 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "canPlayClips": If true, clips from this layer will play for users
             with canPlayClips access
         "entity": ID of the referenced entity (if type is "entity")
+        "getDefaults": function in pandora namespace that gets called
+            to populate defaults for new annotations. i.e. getCurrentFrameAnnotation
         "hasEvents": If true, the calendar will be populated with matches from
             this layer
         "hasPlaces": If true, the map will be populated with matches from this

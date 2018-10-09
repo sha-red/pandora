@@ -1274,6 +1274,15 @@ pandora.getClipVideos = function(clip, resolution) {
     }));
 };
 
+pandora.getCurrentFrameAnnotation = function(data) {
+    var ui = pandora.user.ui,
+        position = ui.videoPoints[ui.item].position,
+        resolution = Ox.max(pandora.site.video.resolutions);
+    return {
+        value: '<img src="/' + ui.item + '/' + resolution + 'p' + position + '.jpg">\n\n'
+    };
+};
+
 (function() {
     var itemTitles = {}, documentTitles = {};
     pandora.getWindowTitle = function(itemData) {

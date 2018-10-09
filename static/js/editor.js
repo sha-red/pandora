@@ -114,7 +114,8 @@ pandora.ui.editor = function(data) {
                 // async to not capture keyboard input
                 setTimeout(function() {
                     var created = Ox.formatDate(new Date(), '%Y-%m-%dT%H:%M:%SZ'),
-                        type = Ox.getObjectById(pandora.site.layers, data.layer).type;
+                        layer = Ox.getObjectById(pandora.site.layers, data.layer),
+                        type = layer.type;
                     that.addAnnotation(data.layer, Ox.extend(
                         {
                             created: created,
@@ -131,7 +132,8 @@ pandora.ui.editor = function(data) {
                             place: {lat: null, lng: null}
                         } : type == 'event' ? {
                             event: {start: '', end: ''}
-                        } : {}
+                        } : {},
+                        layer.getDefaults ? pandora[layer.getDefaults](data) : {}
                     ));
                     Ox.Request.clearCache();
                 });
