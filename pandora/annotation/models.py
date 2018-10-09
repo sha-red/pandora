@@ -339,6 +339,7 @@ class Annotation(models.Model):
             'in': self.start,
             'out': self.end,
             'value': self.value,
+            'layer': self.layer,
             'created': self.created,
             'modified': self.modified,
         }
