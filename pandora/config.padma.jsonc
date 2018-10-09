@@ -100,7 +100,7 @@
     "clipLayers": ["transcripts", "keywords", "places", "events", "descriptions"],
     /*
     "documentKeys" defines the metadata associated with each document. Required keys
-    are "*", "id" and "title". 
+    are "*", "id" and "title".
     A documentKey must have the following properties:
         "id": The unique id of the key (as used by the server)
         "title": The title of the key (as displayed by the client)
@@ -1003,7 +1003,7 @@
     */
     "media": {
         "importPosters": false,
-        "importFrames": false 
+        "importFrames": false
     },
     /*
     "menuExtras" can be used to add extra functionality to the main menu bar.
@@ -1148,6 +1148,7 @@
         "level": "guest",
         "ui": {
             "annotationsCalendarSize": 128,
+            "annotationsHighlight": false,
             "annotationsMapSize": 128,
             "annotationsRange": "position",
             "annotationsSize": 256,

@@ -7,6 +7,7 @@ pandora.ui.editor = function(data) {
 
         that = Ox.VideoAnnotationPanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
+            annotationsHighlight: ui.annotationsHighlight,
             annotationsMapSize: ui.annotationsMapSize,
             annotationsRange: ui.annotationsRange,
             annotationsSeparator: pandora.site.annotations.separator,
@@ -137,6 +138,9 @@ pandora.ui.editor = function(data) {
                     ));
                     Ox.Request.clearCache();
                 });
+            },
+            annotationshighlight: function(data) {
+                pandora.UI.set({annotationsHighlight: data});
             },
             annotationsrange: function(data) {
                 pandora.UI.set({annotationsRange: data.range});
