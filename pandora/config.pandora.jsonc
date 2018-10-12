@@ -1095,7 +1095,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "level": "guest",
         "ui": {
             "annotationsCalendarSize": 128,
-            "annotationsHighlight": false,
+            "annotationsHighlight": "none",
             "annotationsMapSize": 128,
             "annotationsRange": "all",
             "annotationsSize": 256,
