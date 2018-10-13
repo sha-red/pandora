@@ -11,7 +11,7 @@ pandora.ui.news = function(width, height) {
             .appendTo(that),
         backgroundColor = Ox.Theme() == 'oxlight' ? 'rgb(224, 224, 224)'
             : Ox.Theme() == 'oxmedium' ? 'rgb(128, 128, 128)'
-            : 'rgb(32, 32, 32)',        
+            : 'rgb(32, 32, 32)',
         isEditable = pandora.hasCapability('canEditSitePages'),
         items = [],
         $text;
@@ -127,30 +127,35 @@ pandora.ui.news = function(width, height) {
     }
 
     function renderList() {
+        var $addButton = Ox.Button({
+                title: Ox._('Add'),
+                width: 92
+            })
+            .css({float: 'left', margin: '0 4px 0 0'})
+            .bindEvent({
+                click: function() {
+                    $removeButton.options({disabled: false});
+                    addItem();
+                }
+            });
+        var $removeButton = Ox.Button({
+                disabled: items.length == 0,
+                title: Ox._('Remove'),
+                width: 92
+            })
+            .css({float: 'left', margin: '0 0 0 4px'})
+            .bindEvent({
+                click: function() {
+                    $removeButton.options({disabled: items.length == 1});
+                    removeItem();
+                }
+            })
         $right.empty();
         if (isEditable) {
             $('<div>')
                 .css({height: '16px', marginBottom: '8px'})
-                .append(
-                    Ox.Button({
-                            title: Ox._('Add'),
-                            width: 92
-                        })
-                        .css({float: 'left', margin: '0 4px 0 0'})
-                        .bindEvent({
-                            click: addItem
-                        })
-                )
-                .append(
-                    Ox.Button({
-                            title: Ox._('Remove'),
-                            width: 92
-                        })
-                        .css({float: 'left', margin: '0 0 0 4px'})
-                        .bindEvent({
-                            click: removeItem
-                        })
-                )
+                .append($addButton)
+                .append($removeButton)
                 .appendTo($right);
         }
         items.sort(function(a, b) {
