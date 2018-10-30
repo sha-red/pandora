@@ -642,5 +642,7 @@ def chop(video, start, end, subtitles=None):
         p.wait()
     f = open(choped_video, 'rb')
     os.unlink(choped_video)
+    if subtitles_f and os.path.exists(subtitles_f):
+        os.unlink(subtitles_f)
     os.rmdir(tmp)
     return f
