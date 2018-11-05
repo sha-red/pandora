@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import re
 import subprocess
 
@@ -22,11 +23,17 @@ def pdfinfo(pdf):
     return data
 
 def extract_pdfpage(pdf, image, page):
-    page -= 1
-    cmd = ['convert', '%s[%d]' % (pdf, page),
-        '-background', 'white', '-flatten', '-resize', '1024x1024', image]
-    p = subprocess.Popen(cmd, close_fds=True)
-    p.wait()
+    page = str(page)
+    cmd = [
+        'pdftocairo',
+        '-jpeg',
+        '-f', page, '-l', page,
+        '-singlefile',
+        '-scale-to', '2048',
+        pdf,
+        os.path.splitext(image)[0]
+    ]
+    subprocess.call(cmd, stdout=open('/dev/null', 'wb'))
     return image
 
 def get_documents(text):
