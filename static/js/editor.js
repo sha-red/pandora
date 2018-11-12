@@ -51,7 +51,7 @@ pandora.ui.editor = function(data) {
                             pandora.api.autocompleteEntities({
                                 key: layer.entity,
                                 operator: '=',
-                                range: [0, 20],
+                                range: [0, 100],
                                 value: value
                             }, function(result) {
                                 callback(result.data.items);
@@ -68,7 +68,7 @@ pandora.ui.editor = function(data) {
                                 pandora.api.autocomplete({
                                     key: key,
                                     operator: '=',
-                                    range: [0, 20],
+                                    range: [0, 100],
                                     value: value
                                 }, function(result) {
                                     n--;
