@@ -191,12 +191,12 @@ pandora.ui.filter = function(id) {
                 ],
                 type: 'image',
             })
-            .css(Ox.UI.SCROLLBAR_SIZE == 16 ? {
-                right: 0,
-                width: '14px'
-            } : {
+            .css(Ox.UI.SCROLLBAR_SIZE == 8 ? {
                 right: '-1px',
                 width: '8px',
+            } : {
+                right: '2px',
+                width: (Ox.UI.SCROLLBAR_SIZE - 2) + 'px'
             })
             .bindEvent({
                 change: function(data) {
