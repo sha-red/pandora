@@ -594,6 +594,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "id": "keywords",
             "title": "Keywords",
             "type": "layer",
+            "autocomplete": true,
             "filter": true,
             "find": true
         },
