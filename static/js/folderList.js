@@ -167,7 +167,11 @@ pandora.ui.folderList = function(id, section) {
                     pandora.$ui.mainMenu.updateLists(id, result.data.items);
                 }
                 callback(result);
-                if (result.data.items.length && _updateItemsCount) {
+                if (
+                    _updateItemsCount
+                    && Ox.isArray(result.data.items)
+                    && result.data.items.length
+                ) {
                     setTimeout(function() {
                         updateItemsCount(result.data.items.map(function(item) {
                             return item.id;
