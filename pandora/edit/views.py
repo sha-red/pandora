@@ -118,6 +118,12 @@ def editClip(request, data):
                     clip.item = clip.annotation.item
                     clip.annotation = None
                 setattr(clip, {'in': 'start', 'out': 'end'}.get(key), float(data[key]))
+        if 'annotation' in data and not data['annotation']:
+            if clip.annotation:
+                clip.start = clip.annotation.start
+                clip.end = clip.annotation.end
+                clip.item = clip.annotation.item
+                clip.annotation = None
         if 'volume' in data:
             clip.volume = float(data['volume'])
         if not clip.annotation:
