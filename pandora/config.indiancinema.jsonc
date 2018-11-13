@@ -1670,6 +1670,7 @@
         "newsletter": true,
         "ui": {
             "annotationsCalendarSize": 128,
+            "annotationsHighlight": "none",
             "annotationsMapSize": 128,
             "annotationsRange": "all",
             "annotationsSize": 256,

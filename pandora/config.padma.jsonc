@@ -1148,6 +1148,7 @@
         "level": "guest",
         "ui": {
             "annotationsCalendarSize": 128,
+            "annotationsHighlight": "none",
             "annotationsHighlight": false,
             "annotationsMapSize": 128,
             "annotationsRange": "position",
