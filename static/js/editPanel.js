@@ -532,8 +532,7 @@ pandora.ui.editPanel = function(isEmbed) {
         edit.clips.forEach(function(clip) {
             clip.index = ids.indexOf(clip.id);
         });
-        edit.clips = Ox.sortBy(edit.clips, 'index');
-        updateVideos();
+        updateClips(Ox.sortBy(edit.clips, 'index'));
     }
 
     function getLayers(clips) {
@@ -692,17 +691,6 @@ pandora.ui.editPanel = function(isEmbed) {
             });
         });
     }
-
-    function updateVideos() {
-        updateDuration();
-        that.options({
-            duration: edit.duration,
-            smallTimelineURL: getSmallTimelineURL(),
-            video: getVideos()
-        });
-        updateSmallTimelineURL();
-    }
-
     return that;
 
 };
