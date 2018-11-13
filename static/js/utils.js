@@ -1279,7 +1279,7 @@ pandora.getCurrentFrameAnnotation = function(data) {
         position = ui.videoPoints[ui.item].position,
         resolution = Ox.max(pandora.site.video.resolutions);
     return {
-        value: '<img src="/' + ui.item + '/' + resolution + 'p' + position + '.jpg">\n'
+        value: '<a href="/' + item + '/' + position + '"><img src="/' + ui.item + '/' + resolution + 'p' + position + '.jpg"></a>\n'
     };
 };
 
