@@ -155,6 +155,11 @@ pandora.ui.folderList = function(id, section) {
                     {key: 'status', value: 'featured', operator: '='}
                 ], operator: '&'};
             }
+            var _updateItemsCount = false;
+            if (data.keys && Ox.contains(data.keys, 'items')) {
+                data.keys = data.keys.filter(function(key)  { return key != 'items' })
+                _updateItemsCount = true;
+            }
             return pandora.api['find' + folderItems](Ox.extend(data, {
                 query: query
             }), function(result) {
@@ -162,6 +167,13 @@ pandora.ui.folderList = function(id, section) {
                     pandora.$ui.mainMenu.updateLists(id, result.data.items);
                 }
                 callback(result);
+                if (result.data.items.length && _updateItemsCount) {
+                    setTimeout(function() {
+                        updateItemsCount(result.data.items.map(function(item) {
+                            return item.id;
+                        }));
+                    }, 500)
+                }
             });
         };
     } else {
@@ -449,6 +461,22 @@ pandora.ui.folderList = function(id, section) {
         } else {
             pandora.UI.set(section.slice(0, -1), list);
         }
+    }
+
+    function updateItemsCount(ids) {
+        Ox.serialForEach(ids, function(item, index, items, callback) {
+            pandora.api['find' + folderItems]({
+                keys: ['items'],
+                query: {
+                    conditions: [{key: 'id', value: item, operator: '=='}]
+                },
+                range: [0, 1]
+            }, function(result) {
+                that.value(item, 'items', result.data.items[0].items);
+                callback();
+            })
+        })
+
     }
 
     return that;
