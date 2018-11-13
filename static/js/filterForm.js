@@ -29,6 +29,7 @@ pandora.ui.filterForm = function(options) {
                     if (key.format && key.format.type == 'ColorPercent') {
                         key.format.type = 'percent';
                     }
+                    key.autocomplete = autocompleteFunction(key)
                     return key;
                 }).concat([{
                     id: 'list',
@@ -70,6 +71,24 @@ pandora.ui.filterForm = function(options) {
         that.getList = that.$filter.getList;
         that.value = that.$filter.value;
     });
+    function autocompleteFunction(key) {
+        return key.autocomplete ? function(value, callback) {
+            pandora.api.autocomplete({
+                key: key.id,
+                query: {
+                    conditions: [],
+                    operator: '&'
+                },
+                range: [0, 100],
+                sort: key.autocompleteSort,
+                value: value
+            }, function(result) {
+                callback(result.data.items.map(function(item) {
+                    return Ox.decodeHTMLEntities(item);
+                }));
+            });
+        } : null;
+    }
     that.updateResults = function() {
         if (mode == 'list') {
             Ox.Request.clearCache(list.id);
