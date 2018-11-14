@@ -126,6 +126,15 @@ def parseConditions(conditions, operator, user):
             return conn
     return None
 
+def flatten_conditions(conditions):
+    conditions_ = []
+    for c in conditions:
+        if 'conditions' in c:
+            conditions_ += flatten_conditions(c['conditions'])
+        else:
+            conditions_.append(c)
+    return conditions_
+
 class ClipManager(Manager):
 
     def get_query_set(self):
@@ -135,7 +144,8 @@ class ClipManager(Manager):
         layer_ids = [k['id'] for k in settings.CONFIG['layers']]
         keys = layer_ids + ['annotations', 'text', '*']
         conditions = data.get('query', {}).get('conditions', [])
-        conditions = list(filter(lambda c: c['key'] in keys, conditions))
+        conditions = flatten_conditions(conditions)
+        conditions = list(filter(lambda c: c.get('key') in keys, conditions))
         operator = data.get('query', {}).get('operator', '&')
 
         def parse(condition):
