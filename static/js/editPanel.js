@@ -331,7 +331,9 @@ pandora.ui.editPanel = function(isEmbed) {
                 pandora.UI.set({editSelection: data.ids});
             },
             selectannotation: function(data) {
-                that.options({position: data['in']})
+                if ('in' in data) {
+                    that.options({position: data['in']})
+                }
             },
             sort: function(data) {
                 pandora.UI.set({editSort: data});
