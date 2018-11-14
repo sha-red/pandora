@@ -412,7 +412,9 @@ pandora.ui.editPanel = function(isEmbed) {
 
         updateSmallTimelineURL();
         ui.edits[ui.edit].view == 'grid' && enableDragAndDrop();
-        that.gainFocus();
+        if (!Ox.Focus.focusedElementIsInput()) {
+            that.gainFocus();
+        }
     }
 
     function renderEdits() {
