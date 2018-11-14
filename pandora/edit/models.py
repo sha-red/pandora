@@ -257,7 +257,7 @@ class Edit(models.Model):
     def get_clips_json(self, user=None):
         qs = self.get_clips(user)
         if self.type == 'static':
-            clips = [c.json(user) for c in qs.order_by('index')]
+            clips = [c.json(user=user) for c in qs.order_by('index')]
         else:
             if qs is None:
                 clips = []

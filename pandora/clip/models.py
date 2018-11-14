@@ -96,7 +96,7 @@ class MetaClip(object):
 
     clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
                  'hue', 'saturation', 'lightness', 'volume', 'videoRatio')
-    def json(self, keys=None, qs=None):
+    def json(self, keys=None, qs=None, user=None):
         j = {}
         for key in self.clip_keys:
             j[key] = getattr(self, {
