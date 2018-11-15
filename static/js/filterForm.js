@@ -100,7 +100,7 @@ pandora.ui.filterForm = function(options) {
                     id: list.id,
                     query: that.$filter.options('value')
                 }, function(result) {
-                    editPanel.updatePanel && pandora.$ui.editPanel.updatePanel();
+                    pandora.$ui.editPanel && pandora.$ui.editPanel.updatePanel();
                 });
             } else {
                 pandora.$ui.list && pandora.$ui.list
