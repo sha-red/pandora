@@ -10,3 +10,4 @@ requests==2.19.1
 tornado<5
 geoip2==2.9.0
 youtube-dl
+python-memcached
