@@ -249,9 +249,6 @@ if __name__ == "__main__":
             update_service('pandora-tasks')
         if old < 5975:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
-        if old <= 6064:
-            run('./bin/pip', 'install', '-r', 'requirements.txt')
-            run('./pandora/manage.py', 'createcachetable')
     else:
         if len(sys.argv) == 1:
             release = get_release()

@@ -145,11 +145,7 @@ class ClipManager(Manager):
         keys = layer_ids + ['annotations', 'text', '*']
         conditions = data.get('query', {}).get('conditions', [])
         conditions = flatten_conditions(conditions)
-        conditions_ = []
-        for c in conditions:
-            if c.get('key') in keys and c not in conditions_:
-                conditions_.append(c)
-        conditions = conditions_
+        conditions = list(filter(lambda c: c.get('key') in keys, conditions))
         operator = data.get('query', {}).get('operator', '&')
 
         def parse(condition):
