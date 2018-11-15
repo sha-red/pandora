@@ -95,7 +95,7 @@ def findClips(request, data):
     if 'keys' in data:
         qs = order_query(qs, query['sort'])
         qs = qs[query['range'][0]:query['range'][1]]
-        qs = qs.select_related('item')
+        #qs = qs.select_related('item')
 
         layers = settings.CONFIG['layers']
         entity_layer_ids = [k['id'] for k in layers if k['type'] == 'entity']
