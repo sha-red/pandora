@@ -56,6 +56,7 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
+            'id': 'public_id',
             'duration': 'clip__duration',
             'in': 'start',
             'lightness': 'clip__lightness',
