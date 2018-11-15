@@ -785,7 +785,7 @@ def setUI(request, data):
             if isinstance(p, list):
                 p = p[getPositionById(p, key)]
             else:
-                if key not in p:
+                if key not in p or not isinstance(p[key], dict):
                     p[key] = {}
                 p = p[key]
         if value == None and keys[0] in p:
