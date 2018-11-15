@@ -11,10 +11,9 @@ import tempfile
 from six.moves.urllib.parse import quote
 import ox
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.core.cache import cache
 from django.db import models, transaction
 from django.db.models import Max
+from django.contrib.auth import get_user_model
 
 from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
@@ -119,7 +118,7 @@ class Edit(models.Model):
                 c = self.add_clip(data)
                 if c:
                     ids.insert(index, c.id)
-                    added.append(c.json(user=user))
+                    added.append(c.json(user))
                     added[-1]['index'] = index
                     index += 1
                 else:
@@ -489,38 +488,32 @@ class Clip(models.Model):
             self.sortvolume = 0
 
     def json(self, user=None):
-        cache_key = 'edit:clip:' + str(self.get_id())
-        if user:
-            cache_key += ':' + user.username
-        data = cache.get(cache_key)
-        if not data:
-            data = {
-                'id': self.get_id(),
-                'index': self.index,
-                'volume': self.volume,
-            }
-            if self.annotation:
-                data['annotation'] = self.annotation.public_id
-                data['item'] = self.item.public_id
-                data['in'] = self.annotation.start
-                data['out'] = self.annotation.end
-                data['parts'] = self.annotation.item.cache['parts']
-                data['durations'] = self.annotation.item.cache['durations']
-            else:
-                data['item'] = self.item.public_id
-                data['in'] = self.start
-                data['out'] = self.end
-                data['parts'] = self.item.cache['parts']
-                data['durations'] = self.item.cache['durations']
-            for key in ('title', 'director', 'year', 'videoRatio'):
-                value = self.item.cache.get(key)
-                if value:
-                    data[key] = value
-            data['duration'] = data['out'] - data['in']
-            data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
-            data['layers'] = self.get_layers(user)
-            data['streams'] = [s.file.oshash for s in self.item.streams()]
-            cache.set(cache_key, data, 180)
+        data = {
+            'id': self.get_id(),
+            'index': self.index,
+            'volume': self.volume,
+        }
+        if self.annotation:
+            data['annotation'] = self.annotation.public_id
+            data['item'] = self.item.public_id
+            data['in'] = self.annotation.start
+            data['out'] = self.annotation.end
+            data['parts'] = self.annotation.item.cache['parts']
+            data['durations'] = self.annotation.item.cache['durations']
+        else:
+            data['item'] = self.item.public_id
+            data['in'] = self.start
+            data['out'] = self.end
+            data['parts'] = self.item.cache['parts']
+            data['durations'] = self.item.cache['durations']
+        for key in ('title', 'director', 'year', 'videoRatio'):
+            value = self.item.cache.get(key)
+            if value:
+                data[key] = value
+        data['duration'] = data['out'] - data['in']
+        data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
+        data['layers'] = self.get_layers(user)
+        data['streams'] = [s.file.oshash for s in self.item.streams()]
         return data
 
     def get_annotations(self):
