@@ -938,6 +938,18 @@ pandora.ui.mainMenu = function() {
         key_control_p: function() {
             window.open(document.location.href + '#?print=true', '_blank');
         },
+        key_control_e: function() {
+            if (
+                !pandora.hasDialogOrScreen() &&
+                pandora.enableBatchEdit(ui.section)
+            ) {
+                if (ui.section == 'documents') {
+                    pandora.ui.editDocumentsDialog().open();
+                } else {
+                    pandora.ui.editDialog().open();
+                }
+            }
+        },
         key_control_shift_e: function() {
             if (
                 !pandora.hasDialogOrScreen() &&
@@ -1167,7 +1179,7 @@ pandora.ui.mainMenu = function() {
         return { id: 'itemMenu', title: Ox._('Item'), items: [
             { id: 'add', title: Ox._('Add {0}...', [Ox._('Document')]), disabled: !pandora.hasCapability('canAddItems') },
             { id: 'edit', title: Ox._('Edit {0}...', [Ox._('Document')]), disabled: true /*fixme: !canEdit */ },
-            { id: 'batchedit', title: Ox._('Batch Edit {0}...', [Ox._('Documents')]), disabled: !pandora.enableBatchEdit(ui.section), keyboard: 'shift control e' },
+            { id: 'batchedit', title: Ox._('Batch Edit {0}...', [Ox._('Documents')]), disabled: !pandora.enableBatchEdit(ui.section), keyboard: 'control e' },
             {},
             { id: 'selectall', title: Ox._('Select All {0}', [listItemsName]), disabled: !canSelect, keyboard: 'control a' },
             { id: 'selectnone', title: Ox._('Select None'), disabled: !canSelect, keyboard: 'shift control a' },
