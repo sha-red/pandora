@@ -212,11 +212,40 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         }).join(find.operator);
     }
 
+    function getData() {
+        var type = $input.type.value(),
+            view = $list.options('selected')[0];
+        return Ox.map($input, function($element, key) {
+            return Ox.contains(Ox.getObjectById(views, view).inputs, key)
+                && (
+                    !Ox.contains(['map', 'calendar'], view)
+                    || ($input.mapMode.value() == 'item' && key != 'find')
+                    || ($input.mapMode.value() == 'find' && key != 'item')
+                )
+                && $element.value ? $element.value() : void 0;
+        })
+    }
+
     function formatHTML() {
-        var type = $input.type.value();
+        var type = $input.type.value(),
+            view = $list.options('selected')[0],
+            value = $input.link.value(),
+            data = getData();
+        if (view == 'document') {
+            var prefix = type == 'iframe'
+                ? (pandora.site.site.https ? 'https' : 'http')
+                    + '://' + pandora.site.site.url + '/'
+                : '/',
+                page = type == 'iframe' ? 'documents' : 'document',
+                resolution = 480;
+            if (value == '...' || !value.length) {
+                value = '<img src="' + prefix + 'documents/' + data.document + '/' + resolution + 'p.jpg">';
+            }
+            return '<a href="' + prefix + page + '/' + data.document + '">' + value + '</a>';
+        }
         return type == 'link'
             ? '<a href="' + formatURL()
-                + '">' + $input.link.value()
+                + '">' + value
                 + '</a>'
             : '<iframe src="' + formatURL()
                 + '" width="' + $input.width.value()
@@ -227,15 +256,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
     function formatURL() {
         var type = $input.type.value(),
             view = $list.options('selected')[0],
-            data = Ox.map($input, function($element, key) {
-                return Ox.contains(Ox.getObjectById(views, view).inputs, key)
-                    && (
-                        !Ox.contains(['map', 'calendar'], view)
-                        || ($input.mapMode.value() == 'item' && key != 'find')
-                        || ($input.mapMode.value() == 'find' && key != 'item')
-                    )
-                    && $element.value ? $element.value() : void 0;
-            }),
+            data = getData(),
             options = Ox.serialize({
                 title: data.title || void 0,
                 showTimeline: data.showTimeline || void 0,
