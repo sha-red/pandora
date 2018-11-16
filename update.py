@@ -312,7 +312,10 @@ if __name__ == "__main__":
             run('./manage.py', 'compile_pyc', '-p', '.')
         os.chdir(join(base, 'pandora'))
         diff = get('./manage.py', 'sqldiff', '-a').strip()
-        if diff != '-- No differences':
+        if diff not in [
+            '-- No differences',
+            'BEGIN;\n-- Model missing for table: cache\nCOMMIT;'
+        ]:
             print('Database has changed, please make a backup and run %s db' % sys.argv[0])
         elif not development:
             print('pan.do/ra is at the latest release,\nyou can run "%s dev" to update to the development version' % sys.argv[0])
