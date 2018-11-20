@@ -118,10 +118,7 @@ def getPage(request, data):
         name = data
     else:
         name = data['name']
-    page, created = models.Page.objects.get_or_create(name=name)
-    if created:
-        page.text = ''
-        page.save()
+    page, created = models.Page.objects.get_or_create(name=name, defaults={'text': ''})
     response = json_response({'name': page.name, 'text': page.text})
     return render_to_json_response(response)
 actions.register(getPage)
