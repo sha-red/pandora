@@ -235,6 +235,8 @@ class Document(models.Model):
                     value = self.get_value(source, u'')
                     if isinstance(value, list):
                         value = u','.join(value)
+                    if not isinstance(value, str):
+                        value = str(value)
                     value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'words':
