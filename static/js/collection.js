@@ -137,8 +137,10 @@ pandora.ui.collection = function() {
 
         that.bindEvent({
             closepreview: function(data) {
-                pandora.$ui.previewDialog.close();
-                delete pandora.$ui.previewDialog;
+                if (pandora.$ui.documentDialog) {
+                    pandora.$ui.documentDialog.close();
+                    delete pandora.$ui.documentDialog;
+                }
             },
             copy: function(data) {
                 pandora.clipboard.copy(data.ids, 'document');
@@ -227,20 +229,25 @@ pandora.ui.collection = function() {
                 pandora.UI.set(set);
             },
             openpreview: function(data) {
-                /*
-                if (!pandora.$ui.previewDialog) {
-                    pandora.$ui.previewDialog = pandora.ui.previewDialog()
-                        .open()
-                        .bindEvent({
-                            close: function() {
-                                that.closePreview();
-                                delete pandora.$ui.previewDialog;
-                            }
-                        });
+                if (!pandora.$ui.documentDialog) {
+                    pandora.$ui.documentDialog = pandora.openDocumentDialog({
+                        documents: that.options('selected').map(function(id) {
+                            return that.value(id);
+                        })
+                    }).bindEvent({
+                        close: function() {
+                            that.closePreview();
+                            delete pandora.$ui.documentDialog;
+                        }
+                    });
                 } else {
-                    pandora.$ui.previewDialog.update();
+                    pandora.$ui.documentDialog.update({
+                        index: 0,
+                        items: that.options('selected').map(function(id) {
+                            return that.value(id);
+                        })
+                    });
                 }
-                */
             },
             paste: function(data) {
                 var items = pandora.clipboard.paste();
