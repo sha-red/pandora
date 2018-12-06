@@ -26,13 +26,15 @@ pandora.ui.metadataDialog = function(data) {
         $label = {},
         $input = {},
 
+        extraKeyTitles = {
+            'alternativeTitles': 'Alternative Titles',
+            'filmingLocations': 'Filming Locations'
+        },
+
         that = data.imdbId ? updateDialog() : idDialog();
 
     keys = keys.filter(function(key) {
-        return Ox.contains([
-            'alternativeTitles',
-            'filmingLocations'
-        ], key) || getItemKey(key);
+        return key in extraKeyTitles || getItemKey(key);
     });
 
     data.imdbId && getMetadata();
@@ -298,10 +300,7 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function getTitle(key) {
-        return Ox._(
-            key == 'alternativeTitles' ? 'Alternative Titles'
-            : getItemKey(key).title
-        );
+        return Ox._(extraKeyTitles[key] || getItemKey(key).title);
     }
 
     function getUpdateKeys() {
