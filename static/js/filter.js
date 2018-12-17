@@ -17,7 +17,6 @@ pandora.ui.filter = function(id) {
                     format: function(value) {
                         var layer = Ox.getObjectById(pandora.site.layers, filter.id),
                             key = Ox.getObjectById(pandora.site.itemKeys, filter.id);
-                        console.log('filter', filter, key, layer)
                         if ((layer && layer.translate) || (key && key.translate)) {
                             value = Ox._(value)
                         }
