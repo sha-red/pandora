@@ -17,8 +17,9 @@ def get_cache_key(key, lang):
 
 def load_itemkey_translations():
     from annotation.models import Annotation
+    from item.models import Item
     from django.db.models import QuerySet
-    used_keys = []
+    used_keys = set()
     for layer in settings.CONFIG['layers']:
         if layer.get('translate'):
             qs = Annotation.objects.filter(layer=layer['id'])
@@ -28,11 +29,31 @@ def load_itemkey_translations():
                 for lang in settings.CONFIG['languages']:
                     if lang == settings.CONFIG['language']:
                         continue
-                    used_keys.append(value)
-                    t, created = Translation.objects.get_or_create(lang=lang, key=value)
-                    if created:
-                        t.type = Translation.CONTENT
-                        t.save()
+                    used_keys.add(value)
+                    t, _ = Translation.objects.get_or_create(lang=lang, key=value, defaults={
+                        'type': Translation.CONTENT
+                    })
+
+    translated_keys = []
+    for key in settings.CONFIG['itemKeys']:
+        if key.get('translate'):
+            translated_keys.append(key['id'])
+
+    if translated_keys:
+        for item in Item.objects.all():
+            for key in translated_keys:
+                values = item.get(key)
+                if isinstance(values, str):
+                    values = [values]
+                if values:
+                    for value in values:
+                        for lang in settings.CONFIG['languages']:
+                            if lang == settings.CONFIG['language']:
+                                continue
+                            used_keys.add(value)
+                            t, _ = Translation.objects.get_or_create(lang=lang, key=value, defaults={
+                                'type': Translation.CONTENT
+                            })
 
     Translation.objects.filter(type=Translation.CONTENT).exclude(key__in=used_keys).delete()
 
