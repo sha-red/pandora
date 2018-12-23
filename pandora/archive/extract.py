@@ -352,7 +352,8 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         shutil.move(enc_target, target)
     for f in glob('%s.log*' % target):
         os.unlink(f)
-    make_keyframe_index(target)
+    if info['video']:
+        make_keyframe_index(target)
     return True, None
 
 

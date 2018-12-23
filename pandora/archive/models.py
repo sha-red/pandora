@@ -370,7 +370,8 @@ class File(models.Model):
                         self.info.update(stream.info)
                         self.parse_info()
                         self.save()
-                    extract.make_keyframe_index(stream.media.path)
+                    if stream.info.get('video'):
+                        extract.make_keyframe_index(stream.media.path)
                 return True, stream.media.size
             return save_chunk(stream, stream.media, chunk, offset, name, done_cb)
         return False, 0
