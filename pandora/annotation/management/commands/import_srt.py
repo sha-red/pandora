@@ -12,7 +12,7 @@ import app.monkey_patch
 
 from item.models import Item
 
-from ... import models
+from ... import models, tasks
 
 User = get_user_model()
 
@@ -22,12 +22,12 @@ class Command(BaseCommand):
     import annotations
     """
     help = 'import annotations from srt or vtt'
-    args = 'username item layername filename.srt'
+    args = 'username item layer filename.srt'
 
     def add_arguments(self, parser):
         parser.add_argument('username', help='username')
         parser.add_argument('item', help='item')
-        parser.add_argument('layername', help='layer')
+        parser.add_argument('layer', help='layer')
         parser.add_argument('filename', help='filename.srt')
 
     def handle(self, *args, **options):
@@ -48,22 +48,9 @@ class Command(BaseCommand):
         for i in range(len(annotations)-1):
             if annotations[i]['out'] == annotations[i+1]['in']:
                 annotations[i]['out'] = annotations[i]['out'] - 0.001
-        with transaction.atomic():
-            for a in annotations:
-                if a['value']:
-                    annotation = models.Annotation(
-                        item=item,
-                        layer=layer_id,
-                        user=user,
-                        start=float(a['in']),
-                        end=float(a['out']),
-                        value=a['value'])
-                    annotation.save()
-            #update facets if needed
-            if list(filter(lambda f: f['id'] == layer_id, settings.CONFIG['filters'])):
-                item.update_layer_facet(layer_id)
-            Item.objects.filter(id=item.id).update(modified=annotation.modified)
-            annotation.item.modified = annotation.modified
-            annotation.item.update_find()
-            annotation.item.update_sort()
-            annotation.item.update_facets()
+        tasks.add_annotations.delay({
+            'item': item.public_id,
+            'layer': layer_id,
+            'user': username,
+            'annotations': annotations
+        })
