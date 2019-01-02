@@ -162,16 +162,14 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function formatValue(key, value) {
+        var item = getItemKey(key)
         return !value ? ''
             : key == 'alternativeTitles' ? value.map(function(v) {
                 return v[0];
             }).join('; ')
             : key == 'runtime' ? Math.round(value / 60) + ' min'
             : key == 'productionCompany' ? value.join('; ')
-            : Ox.isArray(
-                getItemKey(key).type
-            ) ? value.join(', ')
-            : value;
+            : item && Ox.isArray(item.type) ? value.join(', ') : value;
     }
 
     function getFormWidth() {
