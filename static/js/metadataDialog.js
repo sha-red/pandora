@@ -27,8 +27,7 @@ pandora.ui.metadataDialog = function(data) {
         $input = {},
 
         extraKeyTitles = {
-            'alternativeTitles': 'Alternative Titles',
-            'filmingLocations': 'Filming Locations'
+            'alternativeTitles': 'Alternative Titles'
         },
 
         that = data.imdbId ? updateDialog() : idDialog();
@@ -365,10 +364,11 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function updateMetadata() {
-        var edit = {id: data.id}, type;
+        var item, edit = {id: data.id}, type;
         updateKeys.forEach(function(key) {
+            item = getItemKey(key);
             type = key == 'alternativeTitles' ? []
-                : getItemKey(key).type;
+                : item ? item.type : 'string';
             edit[getKey(key)] = imdb[key] || (
                 Ox.isArray(type) ? [] : ''
             );

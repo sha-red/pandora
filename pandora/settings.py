@@ -228,6 +228,7 @@ ADDITIONAL_IMDB_KEYS = [
     'cast',
     'links', 'reviews', 'posters',
     'alternativeTitles', 'originalTitle',
+    'filmingLocations'
 ]
 
 #If you set VIDEO_PREFIX make sure cookies work accros subsomains
