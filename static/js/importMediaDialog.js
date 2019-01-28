@@ -82,7 +82,7 @@ pandora.ui.importMediaDialog = function(options) {
             width: 544
         });
 
-    function addMedia(url, callback) {
+    function getMediaUrlInfo(url, callback) {
         pandora.api.getMediaUrlInfo({url: url}, function(result) {
             // FIXME: support playlists / multiple items
             var info = result.data.items[0];
@@ -116,6 +116,12 @@ pandora.ui.importMediaDialog = function(options) {
                 }
                 return value;
             });
+            callback(values, info)
+        });
+    }
+
+    function addMedia(url, callback) {
+        getMediaUrlInfo(url, function(values, info) {
             pandora.api.add({title: values.title || info.title}, function(result) {
                 var edit = Ox.extend(
                     Ox.filter(values, function(value, key) {
