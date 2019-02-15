@@ -145,6 +145,7 @@ chown -R $PANDORA:$PANDORA /srv/pandora
 echo "Initialize database..."
 cd /srv/pandora/pandora
 $MANAGE init_db
+$MANAGE createcachetable
 echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
 
 /srv/pandora/ctl install
