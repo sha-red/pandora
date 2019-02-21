@@ -329,6 +329,7 @@ pandora.ui.infoView = function(data, isMixed) {
     renderGroup([
         'censorshipcertificatenumber',
         'dateofcensorcertificate',
+        'censorshipcertificatecentre',
         'ratingcertificate',
         'length',
         'numberofreels',
@@ -422,6 +423,7 @@ pandora.ui.infoView = function(data, isMixed) {
         'stuntdirector',
         'continuity',
         'publicity'
+        'laboratory'
     ]);
     renderGroup([
         'courtesy',
@@ -629,6 +631,11 @@ pandora.ui.infoView = function(data, isMixed) {
                     : [];
             } else if (key == 'imdbId') {
                 edit[key] = value.match(/\d{7}/)[0];
+            } else if (key == 'dateofcensorcertificate') {
+                if (/\d{2}-\d{2}-\d{4}/.test(value)) {
+                    value = Ox.reverse(value.split('-')).join('-')
+                }
+                edit[key] = value;
             } else {
                 edit[key] = value;
             }

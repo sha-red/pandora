@@ -8,7 +8,8 @@ pandora.ui.metadataDialog = function(data) {
             'productionCompany', 'filmingLocations',
             'producer', 'writer', 'cinematographer', 'editor', 'composer', 'actor',
             'lyricist', 'singer',
-            'genre', 'keyword', 'summary'
+            'genre', 'keyword', 'summary',
+            'laboratory'
         ],
         mapKeys = {
             'keyword': 'topic'

@@ -716,6 +716,11 @@
             "type": "date"
         },
         {
+            "id": "certificationcentre",
+            "title": "Certification centre",
+            "type": "string"
+        },
+        {
             "id": "ratingcertificate",
             "title": "Rating/Certificate",
             "type": "string"
@@ -1058,6 +1063,14 @@
             "columnWidth": 180,
             "find": true,
             "sortType": "person"
+        },
+        {
+            "id": "laboratory",
+            "title": "Laboratory",
+            "type": ["string"],
+            "advanced": true,
+            "columnWidth": 180,
+            "find": true
         },
         {
             "id": "courtesy",
