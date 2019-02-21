@@ -329,7 +329,7 @@ pandora.ui.infoView = function(data, isMixed) {
     renderGroup([
         'censorshipcertificatenumber',
         'dateofcensorcertificate',
-        'censorshipcertificatecentre',
+        'certificationcentre',
         'ratingcertificate',
         'length',
         'numberofreels',
