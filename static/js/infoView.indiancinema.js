@@ -422,7 +422,7 @@ pandora.ui.infoView = function(data, isMixed) {
         'productioncontroller',
         'stuntdirector',
         'continuity',
-        'publicity'
+        'publicity',
         'laboratory'
     ]);
     renderGroup([
