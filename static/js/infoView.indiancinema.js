@@ -733,6 +733,9 @@ pandora.ui.infoView = function(data, isMixed) {
         if (key == 'year') {
             ret = formatLink(value, 'year');
         } else if (['releasedate', 'dateofcensorcertificate'].indexOf(key) > -1) {
+            if (/\d{2}-\d{2}-\d{4}/.test(value)) {
+                value = Ox.reverse(value.split('-')).join('-')
+            }
             ret = value ? Ox.formatDate(value,
                 ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length],
                 true
