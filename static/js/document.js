@@ -66,7 +66,7 @@ pandora.ui.document = function() {
                         ? pandora.user.ui.documents[item.id].position
                         : 1,
                     url: '/documents/' + item.id + '/'
-                        + item.title + '.' + item.extension,
+                        + item.title.replace('?', '_') + '.' + item.extension,
                     width: that.width(),
                     zoom: 'fit'
                 })
