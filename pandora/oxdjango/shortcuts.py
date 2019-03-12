@@ -25,14 +25,20 @@ def _to_json(python_object):
         return python_object.strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError(u'%s %s is not JSON serializable' % (repr(python_object), type(python_object)))
 
+def json_dump(data, fp, indent=4):
+    return json.dump(data, fp, indent=indent, default=_to_json, ensure_ascii=False)
+
+def json_dumps(data, indent=4):
+    return json.dumps(data, indent=indent, default=_to_json, ensure_ascii=False)
+
 def render_to_json_response(dictionary, content_type="application/json", status=200):
     indent = None
     if settings.DEBUG:
         content_type = "text/javascript"
         indent = 2
     if getattr(settings, 'JSON_DEBUG', False):
-        print(json.dumps(dictionary, indent=2, default=_to_json, ensure_ascii=False).encode('utf-8'))
-    response = json.dumps(dictionary, indent=indent, default=_to_json, ensure_ascii=False)
+        print(json_dumps(dictionary, indent=2).encode('utf-8'))
+    response = json_dumps(dictionary, indent=indent)
     if not isinstance(response, bytes):
         response = response.encode('utf-8')
     return HttpResponse(response, content_type=content_type, status=status)
