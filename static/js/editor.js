@@ -117,25 +117,36 @@ pandora.ui.editor = function(data) {
                     var created = Ox.formatDate(new Date(), '%Y-%m-%dT%H:%M:%SZ'),
                         layer = Ox.getObjectById(pandora.site.layers, data.layer),
                         type = layer.type;
-                    that.addAnnotation(data.layer, Ox.extend(
-                        {
-                            created: created,
-                            duration: data.out - data['in'],
-                            editable: true,
-                            id: '_' + Ox.uid(),
-                            'in': data['in'],
-                            modified: created,
-                            out: data.out,
-                            user: pandora.user.username,
-                            value: ''
-                        },
-                        type == 'place' ? {
-                            place: {lat: null, lng: null}
-                        } : type == 'event' ? {
-                            event: {start: '', end: ''}
-                        } : {},
-                        layer.getDefaults ? pandora[layer.getDefaults](data) : {}
-                    ));
+                    if (layer.getDefaults) {
+                        pandora.api.addAnnotation(Ox.extend({
+                                'in': data['in'],
+                                item: ui.item,
+                                layer: data.layer,
+                                out: data.out
+                            },
+                            pandora[layer.getDefaults](data)
+                        ), function(result) {
+                            that.addAnnotation(data.layer, result.data)
+                        })
+                    } else {
+                        that.addAnnotation(data.layer, Ox.extend({
+                                created: created,
+                                duration: data.out - data['in'],
+                                editable: true,
+                                id: '_' + Ox.uid(),
+                                'in': data['in'],
+                                modified: created,
+                                out: data.out,
+                                user: pandora.user.username,
+                                value: ''
+                            },
+                            type == 'place' ? {
+                                place: {lat: null, lng: null}
+                            } : type == 'event' ? {
+                                event: {start: '', end: ''}
+                            } : {},
+                        ));
+                    }
                     Ox.Request.clearCache();
                 });
             },
