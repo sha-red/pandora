@@ -45,12 +45,16 @@ class Command(BaseCommand):
                 indexes = connection.introspection.get_indexes(cursor, table)
                 drop = []
                 if column in indexes:
-                    sql = "SELECT indexname, indexdef FROM pg_catalog.pg_indexes " + \
-                          "WHERE indexdef LIKE '%ON {table}%' AND indexdef LIKE '%{column}%'".format(table=table, column=column)
-                    cursor.execute(sql)
-                    for r in cursor:
-                        if 'USING gin' not in r[1]:
-                            drop.append(r[0])
+                    for sql in (
+                        "SELECT indexname, indexdef FROM pg_catalog.pg_indexes " + \
+                              "WHERE indexdef LIKE '%ON {table}%' AND indexdef LIKE '%{column}%'".format(table=table, column=column),
+                        "SELECT indexname, indexdef FROM pg_catalog.pg_indexes " + \
+                              "WHERE indexdef LIKE '%ON public.{table}%' AND indexdef LIKE '%{column}%'".format(table=table, column=column),
+                    ):
+                        cursor.execute(sql)
+                        for r in cursor:
+                            if 'USING gin' not in r[1]:
+                                drop.append(r[0])
                 if drop:
                     for idx in drop:
                         sql = 'DROP INDEX ' + idx
