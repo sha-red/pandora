@@ -229,7 +229,8 @@ ADDITIONAL_IMDB_KEYS = [
     'links', 'reviews', 'posters',
     'alternativeTitles', 'originalTitle',
     'filmingLocations',
-    'seriesTitle', 'episodeDirector',
+    'isSeries', 'seriesTitle', 'seriesYear', 'series',
+    'episodeTitle', 'episodeDirector', 'episodeYear', 'season', 'episode'
     'connections',
 ]
 
