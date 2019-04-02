@@ -609,6 +609,20 @@ pandora.ui.infoView = function(data, isMixed) {
 
     $('<div>').css({height: '16px'}).appendTo($statistics);
 
+
+    function cleanupDate(value) {
+        if (/\d{2}-\d{2}-\d{4}/.test(value)) {
+            value = Ox.reverse(value.split('-')).join('-')
+        }
+        if (/\d{4}/\d{2}/\d{d}/.test(value)) {
+            value = value.split('/').join('-')
+        }
+        if (/\d{2}/\d{2}/\d{4}/.test(value)) {
+            value = Ox.reverse(value.split('/')).join('-')
+        }
+        return value
+    }
+
     function editMetadata(key, value) {
         if (value != data[key]) {
             var edit = {id: isMultiple ? ui.listSelection : data.id};
@@ -632,9 +646,7 @@ pandora.ui.infoView = function(data, isMixed) {
             } else if (key == 'imdbId') {
                 edit[key] = value.match(/\d{7}/)[0];
             } else if (key == 'dateofcensorcertificate') {
-                if (/\d{2}-\d{2}-\d{4}/.test(value)) {
-                    value = Ox.reverse(value.split('-')).join('-')
-                }
+                value = cleanupDate(value);
                 edit[key] = value;
             } else {
                 edit[key] = value;
@@ -733,9 +745,7 @@ pandora.ui.infoView = function(data, isMixed) {
         if (key == 'year') {
             ret = formatLink(value, 'year');
         } else if (['releasedate', 'dateofcensorcertificate'].indexOf(key) > -1) {
-            if (/\d{2}-\d{2}-\d{4}/.test(value)) {
-                value = Ox.reverse(value.split('-')).join('-')
-            }
+            value = cleanupDate(value);
             ret = value ? Ox.formatDate(value,
                 ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length],
                 true
