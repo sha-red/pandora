@@ -10,6 +10,7 @@ def get_operator(op, type='str'):
             '<=': '__lte',
             '^': '__startswith',
             '$': '__endswith',
+            '&': '__in',
         },
         'istr': {
             '==': '__iexact',
@@ -20,6 +21,7 @@ def get_operator(op, type='str'):
             '<=': '__lte',
             '^': '__istartswith',
             '$': '__iendswith',
+            '&': '__in',
         },
         'int': {
             '==': '',
@@ -27,6 +29,7 @@ def get_operator(op, type='str'):
             '>=': '__gte',
             '<': '__lt',
             '<=': '__lte',
+            '&': '__in',
         }
     }[type].get(op, {
         'str': '__contains',

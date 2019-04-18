@@ -78,14 +78,14 @@ pandora.ui.editDialog = function() {
         pandora.api.find({
             keys: keys,
             query: {
-                conditions: ids.map(function(id) {
-                    return {
+                conditions: [
+                    {
                         key: 'id',
-                        operator: '==',
-                        value: id
-                    };
-                }),
-                operator: '|'
+                        operator: '&',
+                        value: ids
+                    }
+                ],
+                operator: '&'
             }
         }, function(result) {
             var data = {},

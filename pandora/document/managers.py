@@ -70,7 +70,11 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
     key_type = get_key_type(k)
     facet_keys = models.Document.facet_keys
     if k == 'id':
-        v = ox.fromAZ(v)
+        if op == '&' and isinstance(v, list):
+            v = [ox.fromAZ(id_) for id_ in v]
+            k += get_operator(op)
+        else:
+            v = ox.fromAZ(v)
         q = Q(**{k: v})
         if exclude:
             q = ~Q(id__in=models.Document.objects.filter(q))
