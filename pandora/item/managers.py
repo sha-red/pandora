@@ -49,6 +49,9 @@ def parseCondition(condition, user, owner=None):
     key_type = (utils.get_by_id(settings.CONFIG['itemKeys'], k) or {'type': 'string'}).get('type')
     if isinstance(key_type, list):
         key_type = key_type[0]
+        type_is_list = True
+    else:
+        type_is_list = False
     key_type = {
         'title': 'string',
         'person': 'string',
@@ -114,7 +117,7 @@ def parseCondition(condition, user, owner=None):
         if exclude:
             q = ~Q(id__in=models.Item.objects.filter(q))
         return q
-    elif key_type == "string":
+    elif key_type == "string" or (key_type == 'date' and type_is_list):
         in_find = not k.startswith('public_id')
         if in_find:
             value_key = 'find__value'
@@ -166,7 +169,7 @@ def parseCondition(condition, user, owner=None):
             else:
                 q = Q(id=0)
         return q
-    elif key_type == 'date':
+    elif key_type == 'date' and not type_is_list:
         def parse_date(d):
             while len(d) < 3:
                 d.append(1)

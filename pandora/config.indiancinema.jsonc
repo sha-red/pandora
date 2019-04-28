@@ -713,7 +713,8 @@
         {
             "id": "dateofcensorcertificate",
             "title": "Date of Censor Certificate",
-            "type": "date"
+            "find": true,
+            "type": ["date"]
         },
         {
             "id": "certificationcentre",

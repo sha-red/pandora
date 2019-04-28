@@ -30,6 +30,13 @@ pandora.ui.infoView = function(data, isMixed) {
         }).map(function(key){
             return key.id;
         }),
+        specialListKeys = [].concat(
+            pandora.site.itemKeys.filter(function(key) {
+                return key.type[0] == 'date'
+            }).map(function(key) {
+                return key.id;
+            })
+        ),
         posterKeys = nameKeys.concat(['title', 'year']),
         statisticsWidth = 128,
 
@@ -364,15 +371,36 @@ pandora.ui.infoView = function(data, isMixed) {
 
     $('<div>').css({height: '16px'}).appendTo($statistics);
 
+    function cleanupDate(value) {
+        if (/\d{2}-\d{2}-\d{4}/.test(value)) {
+            value = Ox.reverse(value.split('-')).join('-')
+        }
+        if (/\d{4}i\/\d{2}\/\d{d}/.test(value)) {
+            value = value.split('/').join('-')
+        }
+        if (/\d{2}\/\d{2}\/\d{4}/.test(value)) {
+            value = Ox.reverse(value.split('/')).join('-')
+        }
+        return value
+    }
+
     function editMetadata(key, value) {
         if (value != data[key]) {
+            var itemKey = Ox.getObjectById(pandora.site.itemKeys, key);
             var edit = {id: isMultiple ? ui.listSelection : data.id};
             if (key == 'title') {
                 edit[key] = value;
             } else if (listKeys.indexOf(key) >= 0) {
                 edit[key] = value ? value.split(', ') : [];
+            } else if (specialListKeys.indexOf(key) > -1) {
+                edit[key] = value
+                    ? Ox.decodeHTMLEntities(value).split('; ').map(Ox.encodeHTMLEntities)
+                    : [];
             } else {
                 edit[key] = value ? value : null;
+            }
+            if (itemKey && itemKey.type && itemKey.type[0] == 'date') {
+                edit[key] = edit[key].map(cleanupDate);
             }
             pandora.api.edit(edit, function(result) {
                 if (!isMultiple) {
@@ -425,20 +453,40 @@ pandora.ui.infoView = function(data, isMixed) {
         return '<span class="OxLight">' + str + '</span>';
     }
 
-    function formatLink(value, key) {
-        return (Ox.isArray(value) ? value : [value]).map(function(value) {
+
+    function formatLink(value, key, linkValue) {
+        linkValue = linkValue || value
+        linkValue = Ox.isArray(linkValue) ? linkValue: [linkValue]
+        return (Ox.isArray(value) ? value : [value]).map(function(value, idx) {
             return key
-                ? '<a href="/' + key + '=' + value + '">' + value + '</a>'
+                ? '<a href="/' + (
+                    key == 'alternativeTitles' ? 'title' : key
+                ) + '=' + pandora.escapeQueryValue(linkValue[idx]) + '">' + value + '</a>'
                 : value;
-        }).join(', ');
+        }).join(Ox.contains(specialListKeys, key) ? '; ' : ', ');
     }
 
     function formatValue(key, value) {
         var ret;
         if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), 'name');
+        } else if (
+            listKeys.indexOf(key) > -1 && Ox.getObjectById(pandora.site.itemKeys, key).type[0] == 'date'
+        ) {
+            ret = value.split('; ').map(function(date) {
+                date = cleanupDate(date)
+                return date ? formatLink(Ox.formatDate(date,
+                    ['', '%Y', '%B %Y', '%B %e, %Y'][date.split('-').length],
+                    true
+                ), key, date) : '';
+            }).join('; ');
         } else if (listKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), key);
+        } else if (specialListKeys.indexOf(key) > -1) {
+            ret = formatLink(
+                Ox.decodeHTMLEntities(value).split('; ').map(Ox.encodeHTMLEntities),
+                key
+            );
         } else if (['year', 'country'].indexOf(key) > -1) {
             ret = formatLink(value, key);
         } else {
@@ -458,6 +506,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     function getValue(key, value) {
         return !value ? ''
+            : Ox.contains(specialListKeys, key) ? value.join('; ')
             : Ox.contains(listKeys, key) ? value.join(', ')
             : value;
     }

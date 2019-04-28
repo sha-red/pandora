@@ -24,7 +24,13 @@ pandora.ui.infoView = function(data, isMixed) {
         listWidth = 0,
         margin = 16,
         // these may contain commas, and are thus separated by semicolons
-        specialListKeys = ['alternativeTitles', 'productionCompany'],
+        specialListKeys = ['alternativeTitles', 'productionCompany'].concat(
+            pandora.site.itemKeys.filter(function(key) {
+                return key.type[0] == 'date'
+            }).map(function(key) {
+                return key.id;
+            })
+        ),
         nameKeys = pandora.site.itemKeys.filter(function(key) {
             return key.sortType == 'person';
         }).map(function(key) {
@@ -625,6 +631,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     function editMetadata(key, value) {
         if (value != data[key]) {
+            var itemKey = Ox.getObjectById(pandora.site.itemKeys, key);
             var edit = {id: isMultiple ? ui.listSelection : data.id};
             if (key == 'alternativeTitles') {
                 edit[key] = value ? Ox.decodeHTMLEntities(value).split('; ').map(function(value) {
@@ -645,11 +652,11 @@ pandora.ui.infoView = function(data, isMixed) {
                     : [];
             } else if (key == 'imdbId') {
                 edit[key] = value.match(/\d{7}/)[0];
-            } else if (key == 'dateofcensorcertificate') {
-                value = cleanupDate(value);
-                edit[key] = value;
             } else {
                 edit[key] = value;
+            }
+            if (itemKey && itemKey.type && itemKey.type[0] == 'date') {
+                edit[key] = edit[key].map(cleanupDate);
             }
             pandora.api.edit(edit, function(result) {
                 if (!isMultiple) {
@@ -717,12 +724,14 @@ pandora.ui.infoView = function(data, isMixed) {
         return '<span class="OxLight">' + str + '</span>';
     }
 
-    function formatLink(value, key) {
-        return (Ox.isArray(value) ? value : [value]).map(function(value) {
+    function formatLink(value, key, linkValue) {
+        linkValue = linkValue || value
+        linkValue = Ox.isArray(linkValue) ? linkValue: [linkValue]
+        return (Ox.isArray(value) ? value : [value]).map(function(value, idx) {
             return key
                 ? '<a href="/' + (
                     key == 'alternativeTitles' ? 'title' : key
-                ) + '=' + pandora.escapeQueryValue(value) + '">' + value + '</a>'
+                ) + '=' + pandora.escapeQueryValue(linkValue[idx]) + '">' + value + '</a>'
                 : value;
         }).join(Ox.contains(specialListKeys, key) ? '; ' : ', ');
     }
@@ -744,7 +753,17 @@ pandora.ui.infoView = function(data, isMixed) {
         var ret;
         if (key == 'year') {
             ret = formatLink(value, 'year');
-        } else if (['releasedate', 'dateofcensorcertificate'].indexOf(key) > -1) {
+        } else if (
+            listKeys.indexOf(key) > -1 && Ox.getObjectById(pandora.site.itemKeys, key).type[0] == 'date'
+        ) {
+            ret = value.split('; ').map(function(date) {
+                date = cleanupDate(date)
+                return date ? formatLink(Ox.formatDate(date,
+                    ['', '%Y', '%B %Y', '%B %e, %Y'][date.split('-').length],
+                    true
+                ), key, date) : '';
+            }).join('; ');
+        } else if (['releasedate'].indexOf(key) > -1) {
             value = cleanupDate(value);
             ret = value ? Ox.formatDate(value,
                 ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length],
