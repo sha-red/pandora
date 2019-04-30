@@ -66,7 +66,7 @@
 1) Get code from git
 
     cd /srv/
-    git clone https://git.0x2620.org/pandora.git pandora
+    git clone -b stable https://git.0x2620.org/pandora.git pandora
     cd pandora
     ./ctl init
 
@@ -146,11 +146,11 @@ b) apache2 (if you need it for other sites on the same server)
 
 ##  Updating
 
-  To update pandora to the latest development version run this:
+  To update pandora to the latest version run this:
 
     su pandora
     cd /srv/pandora
-    ./update.py dev
+    ./update.py
 
   this will update pandora/oxjs/python-ox and list possible upgrades to the db
 
