@@ -107,7 +107,32 @@ pandora.ui.addItemDialog = function(options) {
                     pandora.api.getMediaUrlInfo({
                         url: input
                     }, function(result) {
-                        onInfo(result.data.items.map(getVideoInfo));
+                        if (requslt.data.items.length) {
+                            onInfo(result.data.items.map(getVideoInfo));
+                        } else {
+                            $screen.stop();
+                            that.close();
+                            var error = Ox.Dialog({
+                                buttons: [
+                                    {},
+                                    Ox.Button({
+                                        id: 'close',
+                                        title: Ox._('Close')
+                                    }).bindEvent({
+                                        click: function() {
+                                            error.close();
+                                        }
+                                    })
+                                ],
+                                closeButton: true,
+                                content: Ox.Element().css({padding: '32px'}).html('Import failed'),
+                                height: 96,
+                                keys: {escape: 'close'},
+                                removeOnClose: true,
+                                title: Ox._('Import Error'),
+                                width: 192
+                            }).open()
+                        }
                     });
                 }
             }
