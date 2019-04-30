@@ -257,6 +257,8 @@ if __name__ == "__main__":
         if old <= 6064:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
             run('./pandora/manage.py', 'createcachetable')
+        if old <= 6108:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
         if len(sys.argv) == 1:
             branch = get_branch()

@@ -9,5 +9,5 @@ html5lib
 requests==2.19.1
 tornado<5
 geoip2==2.9.0
-youtube-dl
+youtube-dl>=2019.4.30
 python-memcached
