@@ -121,6 +121,11 @@ def run_git(path, *args):
 def get_version(path):
     return run_git(path, 'rev-list', 'HEAD', '--count')
 
+def get_branch(path=None):
+    if not path:
+        path = '.'
+    return get('cat', os.path.join(path, '.git/HEAD')).strip().split('/')[-1]
+
 
 if __name__ == "__main__":
     base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
@@ -254,49 +259,38 @@ if __name__ == "__main__":
             run('./pandora/manage.py', 'createcachetable')
     else:
         if len(sys.argv) == 1:
-            release = get_release()
-            repos = release['repositories']
+            branch = get_branch()
+            development = branch == 'master'
+        elif len(sys.argv) == 3 and sys.argv[1] == 'switch':
+            branch = sys.argv[2]
             development = False
         else:
-            release = {
-                'date': 'development'
-            }
+            branch = 'master'
             development = True
         os.chdir(base)
         current = ''
         new = ''
-        if development:
-            if get('git', 'symbolic-ref', 'HEAD').strip().split('/')[-1] != 'master':
-                print('update only possible if you are on master branch')
-                sys.exit(1)
         for repo in sorted(repos, key=lambda r: repos[r]['path']):
             path = os.path.join(base, repos[repo]['path'])
             if exists(path):
                 os.chdir(path)
+                current_branch = get_branch(path)
+                if current_branch != branch:
+                        run('git', 'checkout', branch)
                 revno = get_version(path)
                 if repo == 'pandora':
                     pandora_old_revno = revno
                 current += revno
                 url = repos[repo]['url']
-                if 'revision' in repos[repo]:
-                    if revno != repos[repo]['revision']:
-                        run('git', 'fetch')
-                        run('git', 'checkout', repos[repo]['commit'])
-                else:
-                    print('Checking', repo)
-                    #run('git', 'checkout', 'master', '-q')
-                    run('git', 'pull')
+                print('Checking', repo)
+                run('git', 'pull')
                 revno = get_version(path)
                 new += revno
                 if repo == 'pandora':
                     pandora_new_revno = revno
             else:
                 os.chdir(os.path.dirname(path))
-                if 'revision' in repos[repo]:
-                    run('git', 'clone', repos[repo]['url'])
-                    run_git(path, 'checkout', repos[repo]['commit'])
-                else:
-                    run('git', 'clone', '--depth', '1', repos[repo]['url'])
+                run('git', 'clone', '--depth', '1', repos[repo]['url'])
                 setup = os.path.join(base, repos[repo]['path'], 'setup.py')
                 if repo in ('python-ox', 'oxtimelines') and os.path.exists(setup):
                     os.chdir(os.path.dirname(setup))
@@ -317,7 +311,7 @@ if __name__ == "__main__":
             'BEGIN;\n-- Model missing for table: cache\nCOMMIT;'
         ]:
             print('Database has changed, please make a backup and run %s db' % sys.argv[0])
-        elif not development:
-            print('pan.do/ra is at the latest release,\nyou can run "%s dev" to update to the development version' % sys.argv[0])
+        elif branch != 'master':
+            print('pan.do/ra is at the latest release,\nyou can run "%s switch master" to switch to the development version' % sys.argv[0])
         elif current != new:
             reload_notice(base)

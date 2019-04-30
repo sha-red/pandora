@@ -11,21 +11,23 @@ if [ "$action" = "init" ]; then
     BASE=`pwd`
     python3 -m venv --system-site-packages .
 
+    branch=`cat .git/HEAD  | sed 's@/@\n@g' | tail -n1`
+
     # Work around broken venv module in Ubuntu 16.04 / Debian 9
     if [ ! -e bin/pip ]; then
         bin/python3 -m pip install -U --ignore-installed "pip<9"
     fi
     if [ ! -d static/oxjs ]; then
-        git clone --depth 1 https://git.0x2620.org/oxjs.git static/oxjs
+        git clone --depth 1 -b $branch https://git.0x2620.org/oxjs.git static/oxjs
     fi
     mkdir -p src
     if [ ! -d src/oxtimelines ]; then
-        git clone --depth 1 https://git.0x2620.org/oxtimelines.git src/oxtimelines
+        git clone --depth 1 -b $branch https://git.0x2620.org/oxtimelines.git src/oxtimelines
     fi
     for package in oxtimelines python-ox; do
         cd ${BASE}
         if [ ! -d src/${package} ]; then
-            git clone --depth 1 https://git.0x2620.org/${package}.git src/${package}
+            git clone --depth 1 -b $branch https://git.0x2620.org/${package}.git src/${package}
         fi
         cd ${BASE}/src/${package}
         ${BASE}/bin/python setup.py develop

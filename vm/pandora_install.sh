@@ -4,6 +4,7 @@ PANDORA=${PANDORA-pandora}
 POSTGRES=${POSTGRES-local}
 RABBITMQ=${RABBITMQ-local}
 NGINX=${NGINX-local}
+BRANCH=${BRANCH-stable}
 
 echo Installing pandora with user: $PANDORA
 getent passwd $PANDORA > /dev/null 2>&1 || adduser --disabled-password --gecos "" $PANDORA
@@ -111,6 +112,7 @@ fi
 #pandora
 git clone https://git.0x2620.org/pandora.git /srv/pandora
 cd /srv/pandora
+git checkout $BRANCH
 ./ctl init
 
 HOST=$(hostname -s)
