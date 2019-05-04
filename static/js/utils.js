@@ -860,7 +860,7 @@ pandora.enableDragAndDrop = function($list, canMove, section, getItems) {
                             items: drag.ids
 
                         }, function() {
-                            Ox.Request.clearCache('find');
+                            Ox.Request.clearCache('findDocuments');
                             pandora.api.findDocuments({
                                 query: {
                                     conditions: [{

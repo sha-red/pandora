@@ -235,7 +235,7 @@ pandora.ui.folderBrowserList = function(id, section) {
                     pandora.UI.set({
                         findDocuments: {
                             conditions: list ? [
-                                {key: 'list', value: data.ids[0], operator: '=='}
+                                {key: 'collection', value: data.ids[0], operator: '=='}
                             ] : [],
                             operator: '&'
                         }
