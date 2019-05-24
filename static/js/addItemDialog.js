@@ -107,7 +107,7 @@ pandora.ui.addItemDialog = function(options) {
                     pandora.api.getMediaUrlInfo({
                         url: input
                     }, function(result) {
-                        if (requslt.data.items.length) {
+                        if (result.data.items.length) {
                             onInfo(result.data.items.map(getVideoInfo));
                         } else {
                             $screen.stop();
