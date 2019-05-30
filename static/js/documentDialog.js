@@ -196,7 +196,7 @@ pandora.ui.documentDialog = function(options) {
                         ? pandora.user.ui.documents[item.id].position
                         : 1,
                     url: '/documents/' + item.id + '/'
-                        + item.title + '.' + item.extension,
+                        + item.title.replace('?', '_') + '.' + item.extension,
                     width: dialogWidth,
                     zoom: 'fit'
                 })
