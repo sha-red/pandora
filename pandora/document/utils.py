@@ -26,6 +26,7 @@ def extract_pdfpage(pdf, image, page):
     page = str(page)
     cmd = [
         'pdftocairo',
+        '-cropbox',
         '-jpeg',
         '-f', page, '-l', page,
         '-singlefile',
