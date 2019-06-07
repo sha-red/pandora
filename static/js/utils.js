@@ -2827,10 +2827,27 @@ pandora.resizeFilters = function(width) {
     pandora.$ui.browser && pandora.$ui.browser
         .size(0, pandora.user.ui.filterSizes[0])
         .size(2, pandora.user.ui.filterSizes[4]);
+    pandora.$ui.documentBrowser && pandora.$ui.documentBrowser
+        .size(0, pandora.user.ui.filterSizes[0])
+        .size(2, pandora.user.ui.filterSizes[4]);
     pandora.$ui.filtersInnerPanel && pandora.$ui.filtersInnerPanel
         .size(0, pandora.user.ui.filterSizes[1])
         .size(2, pandora.user.ui.filterSizes[3]);
+    pandora.$ui.documentFiltersInnerPanel && pandora.$ui.documentFiltersInnerPanel
+        .size(0, pandora.user.ui.filterSizes[1])
+        .size(2, pandora.user.ui.filterSizes[3]);
     pandora.$ui.filters && pandora.$ui.filters.forEach(function($list, i) {
+        $list.resizeColumn(
+            'name',
+            pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE
+        );
+        if (pandora.site.flags) {
+            $list.find('.flagname').css({
+                width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE
+            });
+        }
+    });
+    pandora.$ui.documentFilters && pandora.$ui.documentFilters.forEach(function($list, i) {
         $list.resizeColumn(
             'name',
             pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE

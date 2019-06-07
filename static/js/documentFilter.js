@@ -244,7 +244,7 @@ pandora.ui.documentFilter = function(id) {
                     }
                     function replaceFilter(i, id) {
                         var isOuter = i % 4 == 0;
-                        pandora.$ui[isOuter ? 'browser' : 'filtersInnerPanel'].replaceElement(
+                        pandora.$ui[isOuter ? 'browser' : 'documentFiltersInnerPanel'].replaceElement(
                             isOuter ? i / 2 : i - 1,
                             pandora.$ui.documentFilters[i] = pandora.ui.documentFilter(id)
                         );
