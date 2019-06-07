@@ -4,16 +4,14 @@ pandora.ui.documentContentPanel = function() {
     var that = Ox.SplitPanel({
             elements: !pandora.user.ui.document ? [
                 {
-                    collapsed: true,
-                    collapsible: false, //fixme
+                    collapsed: !pandora.user.ui.showDocumentFilters,
+                    collapsible: true,
                     element: pandora.$ui.documentBrowser = pandora.ui.documentBrowser(),
-                    resizable: false, //fixme
+                    resizable: true,
                     resize: [96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256],
-                    size: 96,
-                    tooltip: '' /* fixme:
-                        Ox._('filters') + ' <span class="OxBright">'
-                            + Ox.SYMBOLS.shift + 'F</span>'
-                    */
+                    size: pandora.user.ui.documentFiltersSize,
+                    tooltip: Ox._('filters') + ' <span class="OxBright">'
+                        + Ox.SYMBOLS.shift + 'F</span>'
                 },
                 {
                     element: pandora.$ui.list = pandora.ui.collection()

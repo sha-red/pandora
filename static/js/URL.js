@@ -144,6 +144,7 @@ pandora.URL = (function() {
 
         pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
         pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
+        pandora.user.ui._documentFilterState = pandora.getDocumentFilterState(pandora.user.ui.findDocuments);
         pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
         pandora.user.ui._collection = pandora.getCollectionState(pandora.user.ui.findDocuments);
         pandora.user.ui._findDocumentsState = pandora.getFindDocumentsState(pandora.user.ui.findDocuments);

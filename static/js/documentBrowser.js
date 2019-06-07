@@ -3,7 +3,69 @@
 pandora.ui.documentBrowser = function() {
     var that;
     if (!pandora.user.ui.document) {
-        that = Ox.Element().html('fixme');
+        pandora.user.ui.filterSizes = pandora.getFilterSizes();
+        pandora.$ui.documentFilters = pandora.ui.documentFilters();
+        that = Ox.SplitPanel({
+            elements: [
+                {
+                    element: pandora.$ui.documentFilters[0],
+                    size: pandora.user.ui.filterSizes[0]
+                },
+                {
+                    element: pandora.$ui.documentFiltersInnerPanel = pandora.ui.documentFiltersInnerPanel()
+                },
+                {
+                    element: pandora.$ui.documentFilters[4],
+                    size: pandora.user.ui.filterSizes[4]
+                },
+            ],
+            id: 'browser',
+            orientation: 'horizontal'
+        })
+        .bindEvent({
+            resize: function(data) {
+                pandora.$ui.documentFilters.forEach(function(list) {
+                    list.size();
+                });
+                if (pandora.user.ui.listView == 'map') {
+                    pandora.$ui.map.resizeMap();
+                } else if (pandora.user.ui.listView == 'calendar') {
+                    pandora.$ui.calendar.resizeCalendar();
+                } else if (pandora.user.ui.listView == 'video') {
+                    pandora.$ui.list.size();
+                }
+            },
+            resizeend: function(data) {
+                pandora.UI.set({documentFiltersSize: data.size});
+            },
+            toggle: function(data) {
+                data.collapsed && pandora.$ui.list.gainFocus();
+                pandora.UI.set({showDocumentFilters: !data.collapsed});
+                if (!data.collapsed) {
+                    pandora.$ui.documentFilters.forEach(function($documentFilter) {
+                        var selected = $documentFilter.options('_selected');
+                        if (selected) {
+                            $documentFilter.bindEventOnce({
+                                load: function() {
+                                    $documentFilter.options({
+                                        _selected: false,
+                                        selected: selected
+                                    });
+                                }
+                            }).reloadList();
+                        }
+                    });
+                    pandora.$ui.documentFilters.updateMenus();
+                }
+                if (pandora.user.ui.listView == 'map') {
+                    pandora.$ui.map.resizeMap();
+                } else if (pandora.user.ui.listView == 'calendar') {
+                    pandora.$ui.calendar.resizeCalendar();
+                } else if (pandora.user.ui.listView == 'video') {
+                    pandora.$ui.list.size();
+                }
+            }
+        });
     } else {
         var that = Ox.IconList({
             borderRadius: 0,

@@ -217,6 +217,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "type": "string",
             "columnWidth": 120,
             //"format": {"type": "date", "args": ["%a, %b %e, %Y"]},
+            "filter": true,
             "sort": true
         },
         {
@@ -1122,11 +1123,19 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             },
             "document": "",
             "documents": {},
+            "documentFiltersSize": 176,
             "documentSize": 256,
             "documentView": "view",
             "documentsSelection": {},
             "documentsSort": [{"key": "title", "operator": "+"}],
             "documentsView": "grid",
+            "documentFilters": [
+                {"id": "author", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "place", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "date", "sort": [{"key": "name", "operator": "-"}]},
+                {"id": "publisher", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "language", "sort": [{"key": "items", "operator": "-"}]}
+            ],
             "edit": "",
             "edits": {},
             "editSelection": [],
@@ -1191,6 +1200,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "showCalendarControls": false,
             "showClips": true,
             "showDocument": true,
+            "showDocumentFilters": false,
             "showFilters": true,
             "showIconBrowser": false,
             "showInfo": true,

@@ -52,7 +52,7 @@ pandora.ui.browser = function() {
                                         selected: selected
                                     });
                                 }
-                            }).reloadList();                            
+                            }).reloadList();
                         }
                     });
                     pandora.$ui.filters.updateMenus();

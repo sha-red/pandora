@@ -2626,6 +2626,7 @@ pandora.signin = function(data) {
     });
     pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
     pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
+    pandora.user.ui._documentFilterState = pandora.getDocumentFilterState(pandora.user.ui.findDocuments);
     pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     pandora.user.ui._collection = pandora.getCollectionState(pandora.user.ui.findDocuments);
     pandora.user.ui._findDocumentsState = pandora.getFindDocumentsState(pandora.user.ui.findDocuments);
@@ -2642,6 +2643,7 @@ pandora.signout = function(data) {
     pandora.user = data.user;
     pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
     pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
+    pandora.user.ui._documentFilterState = pandora.getDocumentFilterState(pandora.user.ui.findDocuments);
     pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     pandora.user.ui._collection = pandora.getCollectionState(pandora.user.ui.findDocuments);
     pandora.user.ui._findDocumentsState = pandora.getFindDocumentsState(pandora.user.ui.findDocuments);
@@ -3396,6 +3398,7 @@ pandora.wait = function(id, callback, timeout) {
         }
         return state;
     };
+
     function getState(find, key) {
         var index, state = '';
         if (find.operator == '&') {
@@ -3429,12 +3432,10 @@ pandora.wait = function(id, callback, timeout) {
         if (find.operator == '&') {
             // number of conditions that are not list or filters
             conditions = find.conditions.length
-                - !!pandora.user.ui._collection;
-            /*
-                - pandora.user.ui._filterState.filter(function(filter) {
+                - !!pandora.user.ui._collection
+                - pandora.user.ui._documentFilterState.filter(function(filter) {
                     return filter.index > -1;
                 }).length;
-            */
             // indices of non-advanced find queries
             indices = pandora.site.documentKeys.map(function(findKey) {
                 return oneCondition(find.conditions, findKey.id, '=');
@@ -3456,16 +3457,62 @@ pandora.wait = function(id, callback, timeout) {
                 key: 'advanced',
                 value: ''
             };
-            /*
             Ox.forEach(pandora.user.ui.documentFilters, function(key) {
                 if (everyCondition(find.conditions, key, '==')) {
                     state.key = '*';
                     return false;
                 }
             });
-            */
         }
         return state;
+    };
+
+    pandora.getDocumentFilterState = function(find) {
+        // A filter is selected if exactly one condition in an & query or every
+        // condition in an | query has the filter id as key and "==" as operator
+        return pandora.user.ui.documentFilters.map(function(filter) {
+            // FIXME: cant index be an empty array, instead of -1?
+            var key = filter.id,
+                state = {index: -1, find: Ox.clone(find, true), selected: []};
+            if (find.operator == '&') {
+                // include conditions where all subconditions match
+                state.index = oneCondition(find.conditions, key, '==', true);
+                if (state.index > -1) {
+                    state.selected = find.conditions[state.index].conditions
+                        ? find.conditions[state.index].conditions.map(function(condition) {
+                            return condition.value;
+                        })
+                        : [find.conditions[state.index].value];
+                }
+            } else {
+                if (everyCondition(find.conditions, key, '==')) {
+                    state.index = Ox.range(find.conditions.length);
+                    state.selected = find.conditions.map(function(condition) {
+                        return condition.value;
+                    });
+                }
+            }
+            if (state.selected.length) {
+                if (Ox.isArray(state.index)) {
+                    // every condition in an | query matches this filter
+                    state.find = {conditions: [], operator: ''};
+                } else {
+                    // one condition in an & query matches this filter
+                    state.find.conditions.splice(state.index, 1);
+                    if (
+                        state.find.conditions.length == 1
+                        && state.find.conditions[0].conditions
+                    ) {
+                        // unwrap single remaining bracketed query
+                        state.find = {
+                            conditions: state.find.conditions[0].conditions,
+                            operator: state.find.conditions[0].operator
+                        };
+                    }
+                }
+            }
+            return state;
+        });
     };
 
 }());

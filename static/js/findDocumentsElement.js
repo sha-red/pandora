@@ -35,26 +35,39 @@ pandora.ui.findDocumentsElement = function() {
                 ] : [], [
                     $findSelect = Ox.Select({
                             id: 'select',
-                            items: pandora.site.documentKeys.filter(function(key) {
-                                return key.find;
-                            }).map(function(key) {
+                            items: [].concat(
+                                pandora.site.documentKeys.filter(function(key) {
+                                    return key.find;
+                                }).map(function(key) {
                                     return {
                                         id: key.id,
                                         title: Ox._('Find: {0}', [Ox._(key.title)])
                                     };
                                 }),
+                                [{}, {
+                                    id: 'advanced',
+                                    title: Ox._('Find: Advanced...')
+                                }]
+                            ),
+
                             overlap: 'right',
                             value: findKey,
                             width: 128
                         })
                         .bindEvent({
                             change: function(data) {
-                                //pandora.$ui.mainMenu.checkItem('findMenu_find_' + data.value);
-                                $findInput.options({
-                                    autocomplete: autocompleteFunction(),
-                                    placeholder: ''
-                                }).focusInput(true);
-                                previousFindKey = data.value;
+                                if (data.value == 'advanced') {
+                                    that.updateElement();
+                                    pandora.$ui.mainMenu.checkItem('findMenu_find_' + previousFindKey);
+                                    pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
+                                } else {
+                                    //pandora.$ui.mainMenu.checkItem('findMenu_find_' + data.value);
+                                    $findInput.options({
+                                        autocomplete: autocompleteFunction(),
+                                        placeholder: ''
+                                    }).focusInput(true);
+                                    previousFindKey = data.value;
+                                }
                             }
                         }),
                     $findInput = Ox.Input({
@@ -77,7 +90,7 @@ pandora.ui.findDocumentsElement = function() {
                         focus: function(data) {
                             if ($findSelect.value() == 'advanced') {
                                 if (hasPressedClear) {
-                                    pandora.UI.set({find: pandora.site.user.ui.find});
+                                    pandora.UI.set({findDocuments: pandora.site.user.ui.findDocuments});
                                     that.updateElement();
                                     hasPressedClear = false;
                                 }

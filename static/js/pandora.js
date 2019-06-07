@@ -342,6 +342,15 @@ appPanel
                     type: Ox.isArray(key.type) ? key.type[0] : key.type
                 };
             }),
+            documentFilters: data.site.documentKeys.filter(function(key) {
+                return key.filter;
+            }).map(function(key) {
+                return {
+                    id: key.id,
+                    title: key.title,
+                    type: Ox.isArray(key.type) ? key.type[0] : key.type
+                };
+            }),
             findKeys: data.site.itemKeys.filter(function(key) {
                 return key.find;
             }),

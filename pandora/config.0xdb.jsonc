@@ -165,6 +165,7 @@
             "type": "string",
             "columnWidth": 120,
             //"format": {"type": "date", "args": ["%a, %b %e, %Y"]},
+            "filter": true,
             "sort": true
         },
         {
@@ -220,6 +221,7 @@
         },
         {
             "id": "size",
+            "filter": true,
             "operator": "-",
             "title": "Size",
             "type": "integer",
@@ -1230,11 +1232,19 @@
             },
             "document": "",
             "documents": {},
-            "documentView": "view",
+            "documentFiltersSize": 176,
             "documentSize": 256,
             "documentsSelection": {},
             "documentsSort": [{"key": "name", "operator": "+"}],
             "documentsView": "grid",
+            "documentView": "view",
+            "documentFilters": [
+                {"id": "author", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "place", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "date", "sort": [{"key": "name", "operator": "-"}]},
+                {"id": "publisher", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "language", "sort": [{"key": "items", "operator": "-"}]}
+            ],
             "edit": "",
             "edits": {},
             "editSelection": [],
@@ -1303,6 +1313,7 @@
             "showCalendarControls": true, // fixme: should be false
             "showClips": true,
             "showDocument": true,
+            "showDocumentFilters": false,
             "showFilters": true,
             "showIconBrowser": false,
             "showInfo": true,

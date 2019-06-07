@@ -24,6 +24,9 @@ pandora.UI = (function() {
             pandora.user.ui._filterState = pandora.getFilterState(
                 pandora.user.ui.find
             );
+            pandora.user.ui._documentFilterState = pandora.getDocumentFilterState(
+                pandora.user.ui.findDocuments
+            );
             pandora.user.ui._findState = pandora.getFindState(
                 pandora.user.ui.find
             );
@@ -85,6 +88,7 @@ pandora.UI = (function() {
                 // (values we put in add will be changed, but won't trigger)
                 collection = pandora.getCollectionState(args.findDocuments);
                 pandora.user.ui._collection = collection;
+                pandora.user.ui._documentFilterState = pandora.getDocumentFilterState(args.findDocuments);
                 pandora.user.ui._findDocumentsState = pandora.getFindDocumentsState(args.findDocuments);
                 if (pandora.$ui.appPanel && !pandora.stayInItemView) {
                     // if we're not on page load, and if find isn't a context change

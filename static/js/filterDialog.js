@@ -42,7 +42,12 @@ pandora.ui.filterDialog = function() {
                         }
                     })
             ],
-            content: pandora.$ui.filterForm = pandora.ui.filterForm({mode: 'find'}),
+            content: pandora.$ui.filterForm = (pandora.user.ui.section == 'documents'
+                ? pandora.ui.documentFilterForm
+                : pandora.ui.filterForm
+            )({
+                mode: 'find'
+            }),
             maxWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
             minHeight: 264,
             minWidth: 648 + Ox.UI.SCROLLBAR_SIZE,

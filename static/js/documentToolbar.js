@@ -64,7 +64,7 @@ pandora.ui.documentToolbar = function() {
         }
     })
     that.append(
-        pandora.$ui.findDocumentsElement = pandora.ui.findDocumentsElement(function(data) {
+        pandora.$ui.findElement= pandora.ui.findDocumentsElement(function(data) {
             var key = data.key,
                 value = data.value,
                 conditions;

@@ -42,7 +42,7 @@ pandora.ui.documentFilterForm = function(options) {
                     view: pandora.user.ui.collectionView
                 } : null,
                 sortKeys: pandora.site.documentSortKeys,
-                value: Ox.clone(mode == 'collection' ? collection.query : pandora.user.ui.documentFind, true),
+                value: Ox.clone(mode == 'collection' ? collection.query : pandora.user.ui.findDocuments, true),
                 viewKeys: pandora.site.collectionViews
             })
             .css(mode == 'embed' ? {} : {padding: '16px'})
@@ -87,7 +87,7 @@ pandora.ui.documentFilterForm = function(options) {
             });
             */
         } else {
-            pandora.UI.set({find: Ox.clone(that.$filter.options('value'), true)});
+            pandora.UI.set({findDocuments: Ox.clone(that.$filter.options('value'), true)});
             pandora.$ui.findElement.updateElement();
         }
     };
