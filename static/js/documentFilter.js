@@ -178,7 +178,7 @@ pandora.ui.documentFilter = function(id) {
                 pandora.$ui.mainMenu.checkItem('sortMenu_sortfilters_sortfilter' + id + '_' + data.key);
                 pandora.$ui.mainMenu.checkItem('sortMenu_orderfilters_orderfilter' + id + '_' + (data.operator == '+' ? 'ascending' : 'descending'));
                 filters[i].sort = [{key: data.key, operator: data.operator}];
-                pandora.UI.set({filters: filters});
+                pandora.UI.set({documentFilters: filters});
             }
         }),
         $menu = Ox.MenuButton({
@@ -214,7 +214,7 @@ pandora.ui.documentFilter = function(id) {
                         }
                         filters[i] = makeFilter(id_);
                         pandora.UI.set(Ox.extend({
-                            filters: filters
+                            documentFilters: filters
                         }, find ? {
                             findDocuments: find
                         } : {}));
@@ -229,7 +229,7 @@ pandora.ui.documentFilter = function(id) {
                         pandora.user.ui._documentFilterState[i_] = filterData;
                         filters[i] = makeFilter(id_, pandora.user.ui.documentFilters[i_].sort);
                         filters[i_] = makeFilter(id, pandora.user.ui.documentFilters[i].sort);
-                        pandora.UI.set({filters: filters});
+                        pandora.UI.set({documentFilters: filters});
                         replaceFilter(i, id_);
                         replaceFilter(i_, id);
                     }
