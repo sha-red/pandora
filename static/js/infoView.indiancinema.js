@@ -754,7 +754,7 @@ pandora.ui.infoView = function(data, isMixed) {
         if (key == 'year') {
             ret = formatLink(value, 'year');
         } else if (
-            listKeys.indexOf(key) > -1 && Ox.getObjectById(pandora.site.itemKeys, key).type[0] == 'date'
+            specialListKeys.indexOf(key) > -1 && Ox.getObjectById(pandora.site.itemKeys, key).type[0] == 'date'
         ) {
             ret = value.split('; ').map(function(date) {
                 date = cleanupDate(date)
