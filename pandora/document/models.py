@@ -403,6 +403,13 @@ class Document(models.Model):
             'rightslevel',
         ):
             return getattr(self, key)
+        document_key = utils.get_by_id(settings.CONFIG['documentKeys'], key)
+        if document_key and 'value' in document_key \
+                and isinstance(document_key['value'], dict) \
+                and document_key['value'].get('type') == 'map' \
+                and self.get(document_key['value']['key']):
+            value = re.compile(document_key['value']['map']).findall(self.get_value(document_key['value']['key']))
+            return value[0] if value else default
         elif key == 'user':
             return self.user.username
         else:
