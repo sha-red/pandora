@@ -906,8 +906,8 @@ pandora.ui.infoView = function(data, isMixed) {
                 return value[0];
             }).join('; ')
             : key == 'runtime' ? Math.round(value / 60)
-            : Ox.contains(listKeys, key) ? value.join(', ')
-            : Ox.contains(specialListKeys, key) ? value.join('; ')
+            : Ox.contains(listKeys, key) && value.join ? value.join(', ')
+            : Ox.contains(specialListKeys, key) && value.join ? value.join('; ')
             : value;
     }
 
