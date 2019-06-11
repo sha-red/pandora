@@ -651,7 +651,7 @@ pandora.ui.infoView = function(data, isMixed) {
                     ? Ox.decodeHTMLEntities(value).split('; ').map(Ox.encodeHTMLEntities)
                     : [];
             } else if (key == 'imdbId') {
-                edit[key] = value.match(/\d{7}/)[0];
+                edit[key] = value ? value.match(/\d{7}/)[0] : value;
             } else {
                 edit[key] = value;
             }
