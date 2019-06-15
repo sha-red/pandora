@@ -439,6 +439,12 @@ pandora.ui.infoView = function(data, isMixed) {
 
     // Songs
     if (data.songs || canEdit) {
+        $('<div>')
+            .css({
+                marginTop: '12px',
+            })
+            .html(formatKey('songs'))
+            .appendTo($text);
         Ox.EditableContent({
                 clickLink: pandora.clickLink,
                 collapseToEnd: false,
@@ -449,7 +455,7 @@ pandora.ui.infoView = function(data, isMixed) {
                         '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
                     );
                 },
-                placeholder: formatLight(Ox._(isMixed.songs ? 'Mixed Songs' : 'No Songs')),
+                placeholder: formatLight(Ox._(isMixed.songs ? 'Mixed Songs' : 'unknown')),
                 tooltip: canEdit ? pandora.getEditTooltip() : '',
                 type: 'textarea',
                 value: data.songs || ''
@@ -457,7 +463,6 @@ pandora.ui.infoView = function(data, isMixed) {
             })
             .css(css)
             .css({
-                marginTop: '12px',
                 overflow: 'hidden'
             })
             .bindEvent({
