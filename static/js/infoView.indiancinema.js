@@ -24,7 +24,7 @@ pandora.ui.infoView = function(data, isMixed) {
         listWidth = 0,
         margin = 16,
         // these may contain commas, and are thus separated by semicolons
-        specialListKeys = ['alternativeTitles', 'productionCompany'].concat(
+        specialListKeys = ['alternativeTitles', 'productionCompany', 'laboratory'].concat(
             pandora.site.itemKeys.filter(function(key) {
                 return key.type[0] == 'date'
             }).map(function(key) {
