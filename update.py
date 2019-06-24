@@ -58,7 +58,6 @@ def run(*cmd):
     p.wait()
     return p.returncode
 
-
 def get(*cmd):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, error = p.communicate()
@@ -135,7 +134,10 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ('database', 'db'):
         os.chdir(join(base, 'pandora'))
         print('\nRunning "./manage.py migrate"\n')
-        run('./manage.py', 'migrate', '--noinput')
+        r = get('./manage.py', 'migrate', '--noinput')
+        r = r.replace("Your models have changes that are not yet reflected in a migration, and so won't be applied.", '')
+        r = r.replace("Run 'manage.py makemigrations' to make new migrations, and then re-run 'manage.py migrate' to apply them.", '')
+        print(r)
         run('./manage.py', 'sqlfindindex')
         run('./manage.py', 'sync_itemsort')
         run('./manage.py', 'sync_documentsort')
