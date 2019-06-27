@@ -27,13 +27,6 @@ pandora.ui.documentBrowser = function() {
                 pandora.$ui.documentFilters.forEach(function(list) {
                     list.size();
                 });
-                if (pandora.user.ui.listView == 'map') {
-                    pandora.$ui.map.resizeMap();
-                } else if (pandora.user.ui.listView == 'calendar') {
-                    pandora.$ui.calendar.resizeCalendar();
-                } else if (pandora.user.ui.listView == 'video') {
-                    pandora.$ui.list.size();
-                }
             },
             resizeend: function(data) {
                 pandora.UI.set({documentFiltersSize: data.size});
@@ -56,13 +49,6 @@ pandora.ui.documentBrowser = function() {
                         }
                     });
                     pandora.$ui.documentFilters.updateMenus();
-                }
-                if (pandora.user.ui.listView == 'map') {
-                    pandora.$ui.map.resizeMap();
-                } else if (pandora.user.ui.listView == 'calendar') {
-                    pandora.$ui.calendar.resizeCalendar();
-                } else if (pandora.user.ui.listView == 'video') {
-                    pandora.$ui.list.size();
                 }
             }
         });
