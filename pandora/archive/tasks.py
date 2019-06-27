@@ -210,6 +210,7 @@ def download_media(item_id, url):
 def move_media(data, user):
     from changelog.models import add_changelog
     from item.models import get_item, Item
+    from annotation.models import Annotation
 
     user = models.User.objects.get(username=user)
 
@@ -228,12 +229,26 @@ def move_media(data, user):
         else:
             i = get_item({'imdbId': data['public_id']}, user=user)
     changed = [i.public_id]
+    old_item = None
     for f in models.File.objects.filter(oshash__in=data['ids']):
-        if f.item.id != i.public_id and f.editable(user):
+        if f.item.public_id != i.public_id and f.editable(user):
             if f.item.public_id not in changed:
                 changed.append(f.item.public_id)
+            old_item = f.item
             f.item = i
             f.save()
+
+    if old_item:
+        data['from'] = old_item.public_id
+
+    # If all files are moved to a new item, keep annotations
+    if old_item and old_item.files.count() == 0 and i.files.count() == len(data['ids']):
+        for a in old_item.annotations.all().order_by('id'):
+            a.item = i
+            a.set_public_id()
+            Annotation.objects.filter(id=a.id).update(item=i, public_id=a.public_id)
+        old_item.clips.all().update(item=i, sort=i.sort)
+
     for public_id in changed:
         c = Item.objects.get(public_id=public_id)
         if c.files.count() == 0 and settings.CONFIG['itemRequiresVideo']:

@@ -478,6 +478,7 @@ class Item(models.Model):
             a.item = other
             a.set_public_id()
             Annotation.objects.filter(id=a.id).update(item=other, public_id=a.public_id)
+        self.clips.all().update(item=other, sort=other.sort)
 
         if hasattr(self, 'files'):
             for f in self.files.all():
