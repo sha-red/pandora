@@ -174,7 +174,7 @@ pandora.ui.filter = function(id) {
             },
             sort: function(data) {
                 Ox.Log('', 'SORT', data)
-                var filters = Ox.clone(pandora.user.ui.filters);
+                var filters = Ox.clone(pandora.user.ui.filters, true);
                 pandora.$ui.mainMenu.checkItem('sortMenu_sortfilters_sortfilter' + id + '_' + data.key);
                 pandora.$ui.mainMenu.checkItem('sortMenu_orderfilters_orderfilter' + id + '_' + (data.operator == '+' ? 'ascending' : 'descending'));
                 filters[i].sort = [{key: data.key, operator: data.operator}];
@@ -201,7 +201,7 @@ pandora.ui.filter = function(id) {
             })
             .bindEvent({
                 change: function(data) {
-                    var filters = Ox.clone(pandora.user.ui.filters),
+                    var filters = Ox.clone(pandora.user.ui.filters, true),
                         find,
                         id_ = data.checked[0].id,
                         i_ = Ox.getIndexById(pandora.user.ui.filters, id_);
