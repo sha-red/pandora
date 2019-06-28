@@ -22,7 +22,7 @@ def get_name_sort(name, sortname=None):
             if sortname:
                 person.sortname = sortname
             person.save()
-        sortname = unicodedata.normalize('NFKD', person.sortname)
+        sortname = unicodedata.normalize('NFKD', person.sortname).lower()
     else:
         sortname = u''
     return sortname
@@ -50,18 +50,19 @@ class Person(models.Model):
         if not self.sortname:
             self.sortname = ox.get_sort_name(self.name)
             self.sortname = unicodedata.normalize('NFKD', self.sortname)
-        self.sortsortname = utils.sort_string(self.sortname)
+        self.sortsortname = utils.sort_string(self.sortname).lower()
         self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)
 
     def update_itemsort(self):
+        sortname = self.sortname.lower()
         item.models.Facet.objects.filter(
             key__in=item.models.Item.person_keys + ['name'],
             value=self.name
         ).exclude(
-            sortvalue=self.sortname
+            sortvalue=sortname
         ).update(
-            sortvalue=self.sortname
+            sortvalue=sortname
         )
         for i in item.models.Item.objects.filter(facets__in=item.models.Facet.objects.filter(
             key__in=item.models.Item.person_keys + ['name'],
