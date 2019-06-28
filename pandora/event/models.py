@@ -129,7 +129,7 @@ class Event(models.Model):
                 value = get_name_sort(value)
             else:
                 value = get_title_sort(value)
-        self.name_sort = utils.sort_string(value)
+        self.name_sort = utils.sort_string(value).lower()
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
