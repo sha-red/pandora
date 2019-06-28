@@ -903,7 +903,7 @@ class Item(models.Model):
                 sort_value = u'; '.join([get_name_sort(name) for name in values])
             if not sort_value:
                 sort_value = u''
-            return sort_value
+            return sort_value.lower()
 
         def set_value(s, name, value):
             if isinstance(value, string_types):

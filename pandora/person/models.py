@@ -22,7 +22,7 @@ def get_name_sort(name, sortname=None):
             if sortname:
                 person.sortname = sortname
             person.save()
-        sortname = unicodedata.normalize('NFKD', person.sortname).lower()
+        sortname = unicodedata.normalize('NFKD', person.sortname)
     else:
         sortname = u''
     return sortname
