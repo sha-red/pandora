@@ -478,7 +478,11 @@ class Item(models.Model):
             a.item = other
             a.set_public_id()
             Annotation.objects.filter(id=a.id).update(item=other, public_id=a.public_id)
-        self.clips.all().update(item=other, sort=other.sort)
+        try:
+            other_sort = other.sort
+        except:
+            other_sort = None
+        self.clips.all().update(item=other, sort=other_sort)
 
         if hasattr(self, 'files'):
             for f in self.files.all():
@@ -488,6 +492,8 @@ class Item(models.Model):
         if save:
             other.save()
             # FIXME: update poster, stills and streams after this
+            if other_sort is None:
+                other.clips.all().update(sort=other.sort)
 
     def merge_streams(self, output, resolution=None, format="webm"):
         streams = [s.get(resolution, format).media.path for s in self.streams()]
