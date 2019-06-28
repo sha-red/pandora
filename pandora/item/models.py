@@ -1047,8 +1047,7 @@ class Item(models.Model):
                                 pass
                             else:
                                 continue
-                    if value_ is not None:
-                        set_value(s, name, value_)
+                    set_value(s, name, value_)
         s.save()
 
     def update_facet(self, key):
