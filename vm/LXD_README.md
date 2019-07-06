@@ -2,7 +2,7 @@
 
     you will need at least 2GB of free disk space to install pan.do/ra
 
-# Installing pan.do/ra inside LXC
+# Installing pan.do/ra inside LXD
 
 1) Install lxd on the host (Ubuntu 16.04 or later):
 
