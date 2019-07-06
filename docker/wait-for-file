@@ -1,0 +1,12 @@
+#!/bin/sh
+TIMEOUT=60
+TARGET="$1"
+
+for i in `seq $TIMEOUT` ; do
+    if [ -e "$TARGET" ]; then
+        exit 0
+    fi
+    sleep 1
+done
+echo "Giving up waiting for file $TARGET" >&2
+exit 1

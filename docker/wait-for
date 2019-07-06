@@ -1,0 +1,17 @@
+#!/bin/sh
+
+TIMEOUT=15
+
+HOST="$1"
+PORT="$2"
+
+for i in `seq $TIMEOUT` ; do
+    nc -z "$HOST" "$PORT" > /dev/null 2>&1
+    result=$?
+    if [ $result -eq 0 ] ; then
+      exit 0
+    fi
+    sleep 1
+done
+echo "Failed to connect to database at $HOST:$PORT" >&2
+exit 1

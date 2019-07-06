@@ -29,3 +29,5 @@ static/django_extensions
 *.swp
 pandora/gunicorn_config.py
 .DS_Store
+.env
+overlay/

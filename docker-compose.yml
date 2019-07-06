@@ -1,0 +1,91 @@
+version: '3'
+
+volumes:
+    pandora:
+    postgres:
+    rabbitmq:
+
+networks:
+    backend:
+
+services:
+    proxy:
+        build: docker/nginx
+        ports:
+            - "127.0.0.1:2620:80"
+        networks:
+            - backend
+            - default
+        links:
+            - pandora
+            - websocketd
+        depends_on:
+            - pandora
+            - websocketd
+        volumes:
+            - pandora:/pandora
+            - ./overlay:/overlay
+        restart: unless-stopped
+
+    db:
+        image: postgres:latest
+        networks:
+            - backend
+        env_file: .env
+        volumes:
+            - postgres:/var/lib/postgresql/data/
+        restart: unless-stopped
+
+    rabbitmq:
+        hostname: rabbitmq
+        image: rabbitmq:latest
+        env_file: .env
+        networks:
+            - backend
+        volumes:
+            - rabbitmq:/var/lib/rabbitmq
+        restart: unless-stopped
+
+    pandora:
+        hostname: pandora
+        build: .
+        command: pandora
+        volumes:
+            - pandora:/pandora
+            - ./overlay:/overlay
+        networks:
+            - backend
+        env_file: .env
+        links:
+            - db
+            - rabbitmq
+        depends_on:
+            - db
+            - rabbitmq
+        restart: unless-stopped
+
+    encoding: &app_base
+        build: .
+        command: encoding
+        env_file: .env
+        networks:
+            - backend
+        volumes:
+            - pandora:/pandora
+            - ./overlay:/overlay
+        restart: unless-stopped
+
+    tasks:
+        <<: *app_base
+        command: tasks
+
+    cron:
+        <<: *app_base
+        command: cron
+
+    websocketd:
+        <<: *app_base
+        command: websocketd
+        networks:
+            - backend
+
