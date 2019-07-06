@@ -16,7 +16,7 @@
 
     or
 
-    sudo lxc launch images:debian/stretch pandora
+    sudo lxc launch images:debian/10 pandora
 
 3) Attach to container and install pan.do/ra
 
