@@ -210,6 +210,7 @@
             "type": "string",
             "columnWidth": 120,
             //"format": {"type": "date", "args": ["%a, %b %e, %Y"]},
+            "filter": true,
             "sort": true
         },
         {
