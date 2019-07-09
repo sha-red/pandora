@@ -232,6 +232,9 @@ pandora.ui.documentInfoView = function(data, isMixed) {
     renderGroup(['author', 'date', 'type']);
     renderGroup(['publisher', 'place', 'series', 'edition', 'language']);
 
+    Ox.getObjectById(pandora.site.documentKeys, 'keywords') && renderGroup(['keywords'])
+
+
     // Description -------------------------------------------------------------
 
     if (canEdit || data.description) {

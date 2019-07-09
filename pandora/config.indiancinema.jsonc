@@ -240,6 +240,14 @@
             "sort": true
         },
         {
+            "id": "keywords",
+            "title": "Keywords",
+            "type": ["string"],
+            "columnWidth": 128,
+            "filter": true,
+            "find": true
+        },
+        {
             "id": "id",
             "operator": "+",
             "title": "ID",
