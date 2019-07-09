@@ -97,7 +97,8 @@ pandora.ui.editDocumentsDialog = function() {
                     });
                 if (isArray) {
                     values = values.map(function(value) {
-                        return (value || []).join(separator);
+                        value = value || []
+                        return value.join ? value.join(separator) : value;
                     });
                 }
                 if (Ox.unique(values).length > 1) {
