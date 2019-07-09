@@ -1183,11 +1183,19 @@
             },
             "document": "",
             "documents": {},
+            "documentFiltersSize": 176,
             "documentSize": 256,
             "documentView": "view",
             "documentsSelection": {},
             "documentsSort": [{"key": "title", "operator": "+"}],
             "documentsView": "grid",
+            "documentFilters": [
+                {"id": "author", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "place", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "date", "sort": [{"key": "name", "operator": "-"}]},
+                {"id": "publisher", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "language", "sort": [{"key": "items", "operator": "-"}]}
+            ],
             "edit": "",
             "edits": {},
             "editSelection": [],
@@ -1252,6 +1260,7 @@
             "showCalendarControls": true, // fixme: should be false
             "showClips": true,
             "showDocument": true,
+            "showDocumentFilters": false,
             "showFilters": true,
             "showIconBrowser": false,
             "showInfo": true,
