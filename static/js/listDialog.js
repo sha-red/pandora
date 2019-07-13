@@ -22,7 +22,12 @@ pandora.ui.listDialog = function(section) {
                 if (id == 'general') {
                     return pandora.ui.listGeneralPanel(listData);
                 } else if (id == 'icon') {
-                    return pandora.$ui.listIconPanel = pandora.ui.listIconPanel(listData);
+                    if (pandora.user.ui.section == 'documents') {
+                        pandora.$ui.listIconPanel = pandora.ui.collectionIconPanel(listData);
+                    } else {
+                        pandora.$ui.listIconPanel = pandora.ui.listIconPanel(listData);
+                    }
+                    return pandora.$ui.listIconPanel
                 } else if (id == 'query') {
                     return pandora.$ui.filterForm = (pandora.user.ui.section == 'documents'
                         ? pandora.ui.documentFilterForm

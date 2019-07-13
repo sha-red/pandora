@@ -265,38 +265,23 @@ class Collection(models.Model):
 
     def update_icon(self):
         frames = []
-        #fixme
-        '''
         if not self.poster_frames:
-            documents = self.get_documents(self.user)
+            documents = self.get_documents(self.user).all()
             if documents.count():
                 poster_frames = []
                 for i in range(0, documents.count(), max(1, int(documents.count()/4))):
                     poster_frames.append({
-                        'document': documents[int(i)].id,
-                        'position': documents[int(i)].poster_frame
+                        'document': documents[int(i)].get_id(),
+                        #'page': documents[int(i)]
                     })
                 self.poster_frames = tuple(poster_frames)
                 self.save()
         for i in self.poster_frames:
             from document.models import Document
-            qs = Document.objects.filter(id=i['document'])
+            qs = Document.objects.filter(id=ox.fromAZ(i['document']))
             if qs.count() > 0:
-                if i.get('position'):
-                    frame = qs[0].frame(i['position'])
-                    if frame:
-                        frames.append(frame)
-        '''
-        from item.models import Item
-        for i in self.poster_frames:
-            try:
-                qs = Item.objects.filter(public_id=i['item'])
-                if qs.count() > 0:
-                    frame = qs[0].frame(i['position'])
-                    if frame:
-                        frames.append(frame)
-            except:
-                pass
+                frame = qs[0].thumbnail(size=1024, page=i.get('page'))
+                frames.append(frame)
         self.icon.name = self.path('icon.jpg')
         icon = self.icon.path
         if frames:
