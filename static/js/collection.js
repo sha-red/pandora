@@ -13,6 +13,7 @@ pandora.ui.collection = function() {
 
     if (view == 'list') {
         that = Ox.TableList({
+            draggable: true,
             keys: keys,
             items: function(data, callback) {
                 pandora.api.findDocuments(Ox.extend(data, {
