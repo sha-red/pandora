@@ -230,7 +230,7 @@ pandora.ui.collectionIconPanel = function(listData) {
     that.updateQuery = function(key, value) {
         $list.options({
             items: function(data, callback) {
-                pandora.api.find(Ox.extend(data, {
+                pandora.api.findDocuments(Ox.extend(data, {
                     query: {
                         conditions: [{key: 'collection', value: listData.id, operator: '=='}].concat(
                         value !== ''

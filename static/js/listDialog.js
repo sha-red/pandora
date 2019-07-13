@@ -69,7 +69,11 @@ pandora.ui.listDialog = function(section) {
     var $findElement = Ox.FormElementGroup({
             elements: [
                 pandora.$ui.findIconItemSelect = Ox.Select({
-                    items: pandora.site.findKeys.map(function(findKey) {
+                    items: (
+                        pandora.user.ui.section == 'items'
+                        ? pandora.site.findKeys
+                        : pandora.site.documentKeys
+                    ).map(function(findKey) {
                         return {id: findKey.id, title: Ox._('Find: {0}', [Ox._(findKey.title)])};
                     }),
                     overlap: 'right',
