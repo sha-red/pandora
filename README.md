@@ -2,177 +2,51 @@
 
   for more information on pan.do/ra visit our website at https://pan.do/ra
 
-## SETUP
+## Installing pan.do/ra
 
-  pan.do/ra is known to work with Ubuntu 16.04,
-  but other distributions might also work.
+  we recommend to run pan.do/ra inside of LXD or LXC or dedicated VM or server.
+  You will need at least 2GB of free disk space
 
-  The instructions below are for Ubuntu 16.04.
-  All command given expect that you are root.
+  pan.do/ra is known to work with Ubuntu 18.04 and Debian/10 (buster),
+  other distributions might also work, let us know if it works for you.
 
-  To run pan.do/ra you need to install and setup:
+  Use the following commands to install pan.do/ra and all dependencies:
 
-    python 3.5
-    postgres
-    nginx (or apache2)
-    additional video packages
+```
+    cd /root
+    curl -sL https://pan.do/ra-install > pandora_install.sh
+    chmod +x pandora_install.sh
+    ./pandora_install.sh 2>&1 | tee pandora_install.log
+```
 
-
-## Installing required packages
-
-1) add pandora ppa to get all packages in the required version
-
-    apt-get install software-properties-common
-    add-apt-repository ppa:j/pandora
-    apt-get update
-
-2) install all required packages
-
-    apt-get install git \
-            python3-setuptools python3-pip python3-venv ipython3 \
-            python3-dev python3-pil python3-numpy python3-psycopg2 \
-            python3-pyinotify python3-simplejson \
-            python3-geoip python3-html5lib python3-lxml \
-            postgresql postgresql-contrib rabbitmq-server \
-            poppler-utils mkvtoolnix gpac imagemagick \
-            youtube-dl python3-ox oxframe ffmpeg
+ For step by step installation, look at [pandora_install.sh](src/branch/master/vm/pandora_install.sh)
 
 
-## Prepare Environment
+## Configuration
 
-1) add pandora user and set permissions
+  pan.do/ra is mostly configured in two places:
 
-    adduser pandora --disabled-login --disabled-password
+### /srv/pandora/pandora/local_settings.py
 
-2) Setup Database
-
-    su postgres
-    createuser pandora
-    createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
-    echo "CREATE EXTENSION pg_trgm;" | psql pandora
-    exit
-
-3) Setup RabbitMQ
-
-  You have to use the same password here and in BROKER_URL in local_settings.py
-
-    rabbitmqctl add_user pandora PASSWORD
-    rabbitmqctl add_vhost /pandora
-    rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
+  this file contains local Django configuration overwrites,
+  like database configuration, email backend and more.
 
 
-## Install Pan.do/ra
+### /srv/pandora/pandora/config.jsonc
 
-1) Get code from git
+  config.jsonc can be used in configure the pan.do/ra related
+  settings. From title to item keys to video resolutions.
 
-    cd /srv/
-    git clone -b stable https://git.0x2620.org/pandora.git pandora
-    cd pandora
-    ./ctl init
+  More info at
+  https://code.0x2620.org/0x2620/pandora/wiki/Configuration
 
-    cd /srv
-    chown -R pandora.pandora pandora
 
-2) create local_settings.py and config.jsonc
+## Customization
 
-2.1) create file /srv/pandora/pandora/local_settings.py with the following content:
+  pan.do/ra can be customized, this is mostly done by adding
+  JavaScript files that replace or enhance parts of pan.do/ra
 
-    DATABASES = {
-        'default': {
-            'NAME': 'pandora',
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'USER': 'pandora',
-            'PASSWORD': '',
-        }
-    }
-    DB_GIN_TRGM = True
-    BROKER_URL = 'amqp://pandora:PASSWORD@localhost:5672//pandora'
+  More info at
+  https://code.0x2620.org/0x2620/pandora/wiki/Customization
 
-    #with apache x-sendfile or lighttpd set this to True
-    XSENDFILE = False
 
-    #with nginx X-Accel-Redirect set this to True
-    XACCELREDIRECT = True
-
-2.2) create config.jsonc
-
-  config.jsonc holds the configuration for your site.
-  To start you can copy /srv/pandora/pandora/config.pandora.jsonc
-  to /srv/pandora/pandora/config.jsonc but have a look at 
-  https://wiki.0x2620.org/wiki/pandora/configuration and
-  config.0xdb.jsonc config.padma.jsonc for configuration options.
-
-3) initialize database
-
-    su pandora
-    cd /srv/pandora/pandora
-    ./manage.py init_db
-
-4) install init scripts and start daemons
-
-    /srv/pandora/ctl install
-    /srv/pandora/ctl start
-
-5) Setup Webserver
-a) nginx (recommended)
-
-    apt-get install nginx
-    cp /srv/pandora/etc/nginx/pandora /etc/nginx/sites-available/pandora
-    cd /etc/nginx/sites-enabled
-    ln -s ../sites-available/pandora
-
-    #read comments in /etc/nginx/sites-available/pandora for setting
-    #your hostname and other required settings
-    #make sure XACCELREDIRECT = True in /srv/pandora/pandora/local_settings.py
-    
-    service nginx reload
-
-b) apache2 (if you need it for other sites on the same server)
-
-    apt-get install apache2-mpm-prefork libapache2-mod-xsendfile
-    a2enmod xsendfile
-    a2enmod proxy_http
-    a2enmod proxy_wstunnel
-    cp /srv/pandora/etc/apache2/pandora.conf /etc/apache2/sites-available/pandora.conf
-    a2ensite pandora
-
-    #read comments in /etc/apache2/sites-available/pandora.conf for setting
-    #your hostname and other required settings
-    #make sure XSENDFILE = True in /srv/pandora/pandora/local_settings.py
-    
-    service apache2 reload
-
-  Now you can open pandora in your browser, the first user to sign up will become admin.
-
-##  Updating
-
-  To update pandora to the latest version run this:
-
-    su pandora
-    cd /srv/pandora
-    ./update.py
-
-  this will update pandora/oxjs/python-ox and list possible upgrades to the db
-
-  to update your database run:
-
-    su pandora
-    cd /srv/pandora
-    ./update.py db
-
-## Development
-
-  in one terminal:
-
-    cd /srv/pandora/pandora
-    ./manage.py runserver 2620
-
-  and background task in another:
-
-    cd /srv/pandora/pandora
-    ./manage.py celeryd -B -Q celery,default,encoding -l INFO
-
-  now you can access your local pandora instace at http://127.0.0.1:8000/
-
-  we use virtual machines/lxc for development and deployment,
-  more info on that in vm/LXC_README.md
