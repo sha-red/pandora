@@ -1,4 +1,4 @@
-Django==1.11.13
+Django==1.11.22
 simplejson
 chardet
 celery==3.1.26.post2
@@ -6,7 +6,7 @@ django-celery==3.2.2
 django-extensions==2.0.7
 gunicorn==19.8.1
 html5lib
-requests==2.19.1
+requests==2.22.0
 tornado<5
 geoip2==2.9.0
 youtube-dl>=2019.4.30
