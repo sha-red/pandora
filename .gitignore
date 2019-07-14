@@ -1,12 +1,17 @@
 secret.txt
 local_settings.py
 lib
+lib64
 include
 share
 src
 bin
 static/json/pandora.json
 static/js/pandora.min.js
+static/djcelery
+etc/bash_completion.d
+etc/fish
+pyvenv.cfg
 config.jsonc
 local
 static/js/pandora.min.js.gz

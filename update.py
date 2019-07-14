@@ -280,6 +280,8 @@ if __name__ == "__main__":
                 os.chdir(path)
                 current_branch = get_branch(path)
                 if current_branch != branch:
+                        run('git', 'remote', 'set-branches', 'origin', '*')
+                        run('git', 'fetch', 'origin')
                         run('git', 'checkout', branch)
                 revno = get_version(path)
                 if repo == 'pandora':
