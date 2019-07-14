@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# pan.do/ra installer
+# ===================
+#
+
 PANDORA=${PANDORA-pandora}
 
 POSTGRES=${POSTGRES-local}
@@ -6,18 +11,21 @@ RABBITMQ=${RABBITMQ-local}
 NGINX=${NGINX-local}
 BRANCH=${BRANCH-stable}
 
+# add a pandora user
 echo Installing pandora with user: $PANDORA
 getent passwd $PANDORA > /dev/null 2>&1 || adduser --disabled-password --gecos "" $PANDORA
 
+#
+# install pan.do/ra ppa
+# 
+# apt-get install software-properties-common
+# add-apt-repository ppa:j/pandora
+#
 LXC=`grep -q lxc /proc/1/environ && echo 'yes' || echo 'no'`
 if [ -e /etc/os-release ]; then
     . /etc/os-release
 fi
-if [ -d "/run/systemd/system/" ]; then
-    SYSTEMD="yes"
-else
-    SYSTEMD="no"
-fi
+SYSTEMD="yes"
 if [ -z "$UBUNTU_CODENAME" ]; then
     UBUNTU_CODENAME=zesty
 fi
@@ -46,10 +54,12 @@ echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99languages
 apt-get update -qq
 
 if [ "$LXC" == "no" ]; then
-apt-get install -y \
-    acpid \
-    ntp
+apt-get install -y acpid
+systemctl enable systemd-timesyncd.service
 fi
+
+# add postgres, rabbitmq and nginx
+# unless they are running on another host
 EXTRA=""
 if [ "$POSTGRES" == "local" ]; then
     EXTRA="$EXTRA postgresql postgresql-contrib"
@@ -61,6 +71,7 @@ if [ "$NGINX" == "local" ]; then
     EXTRA="$EXTRA nginx"
 fi
 
+# install all required packages
 apt-get install -y \
     sudo \
     openssh-server \
@@ -92,13 +103,15 @@ apt-get install -y \
     postfix \
     postgresql-client $EXTRA
 
+# setup database
+
 if [ "$POSTGRES" == "local" ]; then
     sudo -u postgres createuser -S -D -R $PANDORA
     sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O $PANDORA pandora
     echo "CREATE EXTENSION pg_trgm;" | sudo -u postgres psql pandora
 fi
 
-#rabbitmq
+# setup rabbitmq
 if [ "$RABBITMQ" == "local" ]; then
     RABBITPWD=$(pwgen -n 16 -1)
     rabbitmqctl add_user pandora $RABBITPWD
@@ -109,18 +122,20 @@ else
     BROKER_URL="$RABBITMQ"
 fi
 
-#pandora
+# checkout pandora from git
 git clone https://git.0x2620.org/pandora.git /srv/pandora
 cd /srv/pandora
 git checkout $BRANCH
 ./ctl init
 
+# create config.jsonc from templates in git
 HOST=$(hostname -s)
 HOST_CONFIG="/srv/pandora/pandora/config.$HOST.jsonc"
 SITE_CONFIG="/srv/pandora/pandora/config.jsonc"
 test -e $HOST_CONFIG && cp $HOST_CONFIG $SITE_CONFIG
 test -e $SITE_CONFIG || cp /srv/pandora/pandora/config.pandora.jsonc $SITE_CONFIG
 
+# create local_settings.py
 cat > /srv/pandora/pandora/local_settings.py <<EOF
 DATABASES = {
     'default': {
@@ -141,15 +156,18 @@ EOF
 
 MANAGE="sudo -H -u $PANDORA /srv/pandora/pandora/manage.py"
 
+# more sure all files are owned by the pandora user
 mkdir /srv/pandora/data
 chown -R $PANDORA:$PANDORA /srv/pandora
 
+# initialize the database
 echo "Initialize database..."
 cd /srv/pandora/pandora
 $MANAGE init_db
 $MANAGE createcachetable
 echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
 
+# install pandora systemd services
 /srv/pandora/ctl install
 if [ "$PANDORA" != "pandora" ]; then
     sed -i \
@@ -161,6 +179,7 @@ if [ "$PANDORA" != "pandora" ]; then
     systemctl daemon-reload
 fi
 
+# if pandora is running inside a container, expose backend at port 2620
 if [ "$LXC" == "yes" ]; then
     sed -i s/127.0.0.1/0.0.0.0/g /srv/pandora/pandora/gunicorn_config.py
     echo "WEBSOCKET_ADDRESS = \"0.0.0.0\"" >> /srv/pandora/pandora/local_settings.py
@@ -170,7 +189,7 @@ fi
 #logrotate
 #cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logrotate.d/pandora"
 
-#nginx
+# configure nginx
 if [ "$NGINX" == "local" ]; then
 
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
@@ -191,21 +210,9 @@ service nginx restart
 
 fi
 
-if [ "$LXC" == "yes" ]; then
-    test -e /etc/init/avahi-daemon.conf && sed -i "s/-D/--no-rlimits -D/g" /etc/init/avahi-daemon.conf
-fi
-
+# additional configurations if installed outside of LXD/LXC
 if [ "$LXC" == "no" ]; then
-    if [ "$SYSTEMD" == "yes" ]; then
-        echo Servers=pool.ntp.org >> /etc/systemd/timesyncd.conf
-    else
-cat > /etc/cron.d/ntp_fixtime <<EOF
-# /etc/cron.d/ntp_fixtime: vms can go out of sync, run ntpdate to sync time
-
-*/10 * * * *   root /usr/sbin/ntpdate pool.ntp.org >/dev/null
-EOF
-    fi
-
+echo Servers=pool.ntp.org >> /etc/systemd/timesyncd.conf
 cat > /usr/local/bin/genissue <<EOF
 #!/bin/sh
 HOST=\$(ps ax | grep avahi-daemon | grep local | sed "s/.*\[\(.*\)\].*/\1/g" | sed 's/\.$//')
@@ -224,7 +231,7 @@ chmod +x /usr/local/bin/genissue
 
 cat > /etc/rc.local <<EOF
 #!/bin/sh -e
-#vm has one network interface and that might change, make sure its not persistent
+# vm has one network interface and that might change, make sure its not persistent
 rm -f /etc/udev/rules.d/70-persistent-net.rules
 
 #update issue
@@ -279,6 +286,10 @@ if has('mouse')
   set mouse=
 endif
 EOF
-if [ -e /usr/share/vim/vim80/defaults.vim ]; then
-    sed -i 's/ set mouse=a/" set mouse=a/g' /usr/share/vim/vim80/defaults.vim
-fi
+
+cat > /etc/vim/vimrc.local <<EOF
+runtime! defaults.vim
+let g:skip_defaults_vim = 1
+
+set mouse=
+EOF
