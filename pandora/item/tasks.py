@@ -102,7 +102,7 @@ def update_timeline(public_id):
         item = models.Item.objects.get(public_id=public_id)
     except models.Item.DoesNotExist:
         return
-    item.update_timeline(async=False)
+    item.update_timeline(async_=False)
     Task.finish(item)
 
 @task(queue="encoding")
@@ -111,7 +111,7 @@ def rebuild_timeline(public_id):
     i = models.Item.objects.get(public_id=public_id)
     for s in i.streams():
         s.make_timeline()
-    i.update_timeline(async=False)
+    i.update_timeline(async_=False)
 
 @task(queue="encoding")
 def load_subtitles(public_id):

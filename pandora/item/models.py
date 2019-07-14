@@ -1361,7 +1361,7 @@ class Item(models.Model):
         qs = qs.order_by('file__part', 'file__sort_path')
         return qs
 
-    def update_timeline(self, async=True):
+    def update_timeline(self, async_=True):
         streams = self.streams()
         self.make_timeline()
         if streams.count() == 1:
@@ -1391,7 +1391,7 @@ class Item(models.Model):
         self.rendered = streams.count() > 0
         self.save()
         if self.rendered:
-            if async:
+            if async_:
                 get_sequences.delay(self.public_id)
             else:
                 get_sequences(self.public_id)
