@@ -272,16 +272,16 @@ class Collection(models.Model):
                 for i in range(0, documents.count(), max(1, int(documents.count()/4))):
                     poster_frames.append({
                         'document': documents[int(i)].get_id(),
-                        #'page': documents[int(i)]
                     })
                 self.poster_frames = tuple(poster_frames)
                 self.save()
         for i in self.poster_frames:
             from document.models import Document
-            qs = Document.objects.filter(id=ox.fromAZ(i['document']))
-            if qs.count() > 0:
-                frame = qs[0].thumbnail(size=1024, page=i.get('page'))
-                frames.append(frame)
+            if 'document' in i:
+                qs = Document.objects.filter(id=ox.fromAZ(i['document']))
+                if qs.count() > 0:
+                    frame = qs[0].thumbnail(size=1024, page=i.get('page'))
+                    frames.append(frame)
         self.icon.name = self.path('icon.jpg')
         icon = self.icon.path
         if frames:

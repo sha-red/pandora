@@ -192,7 +192,9 @@ pandora.addFolderItem = function(section) {
                 }, function(result) {
                     var posterFrames = result
                         ? result.data.items.map(function(item) {
-                            return {item: item.id, position: item.posterFrame};
+                            return section == 'documents'
+                                ? {document: item.id}
+                                : {item: item.id, position: item.posterFrame};
                         }) : [];
                     posterFrames = posterFrames.length == 1
                         ? Ox.repeat([posterFrames[0]], 4)

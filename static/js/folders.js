@@ -46,7 +46,15 @@ pandora.ui.folders = function(section) {
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
                                 { id: 'newlist', title: Ox._('New {0}', [Ox._(folderItem)]), keyboard: 'control n' },
-                                { id: 'newlistfromselection', title: Ox._('New {0} from Selection', [Ox._(folderItem)]), keyboard: 'shift control n', disabled: ui.listSelection.length == 0 },
+                                {
+                                    id: 'newlistfromselection',
+                                    title: Ox._('New {0} from Selection',
+                                    [Ox._(folderItem)]),
+                                    keyboard: 'shift control n',
+                                    disabled:  ui.section == 'documents'
+                                        ? ui.collectionSelection == 0
+                                        : ui.listSelection.length == 0
+                                },
                                 { id: 'newsmartlist', title: Ox._('New Smart {0}', [Ox._(folderItem)]), keyboard: 'alt control n' },
                                 { id: 'newsmartlistfromresults', title: Ox._('New Smart {0} from Results', [Ox._(folderItem)]), keyboard: 'shift alt control n' },
                                 {},
