@@ -10,13 +10,13 @@
   pan.do/ra is known to work with Ubuntu 18.04 and Debian/10 (buster),
   other distributions might also work, let us know if it works for you.
 
-  Use the following commands to install pan.do/ra and all dependencies:
+  Use the following commands as root to install pan.do/ra and all dependencies:
 
 ```
-    cd /root
-    curl -sL https://pan.do/ra-install > pandora_install.sh
-    chmod +x pandora_install.sh
-    ./pandora_install.sh 2>&1 | tee pandora_install.log
+cd /root
+curl -sL https://pan.do/ra-install > pandora_install.sh
+chmod +x pandora_install.sh
+./pandora_install.sh 2>&1 | tee pandora_install.log
 ```
 
  For step by step installation, look at [pandora_install.sh](vm/pandora_install.sh)

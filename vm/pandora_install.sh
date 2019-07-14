@@ -25,7 +25,6 @@ LXC=`grep -q lxc /proc/1/environ && echo 'yes' || echo 'no'`
 if [ -e /etc/os-release ]; then
     . /etc/os-release
 fi
-SYSTEMD="yes"
 if [ -z "$UBUNTU_CODENAME" ]; then
     UBUNTU_CODENAME=bionic
 fi
@@ -98,10 +97,11 @@ apt-get install -y \
     gpac \
     imagemagick \
     poppler-utils \
-    youtube-dl \
     ipython3 \
     postfix \
     postgresql-client $EXTRA
+
+apt-get install -y --no-install-recommends youtube-dl rtmpdump
 
 # setup database
 
