@@ -19,7 +19,7 @@
     ./pandora_install.sh 2>&1 | tee pandora_install.log
 ```
 
- For step by step installation, look at [pandora_install.sh](src/branch/master/vm/pandora_install.sh)
+ For step by step installation, look at [pandora_install.sh](vm/pandora_install.sh)
 
 
 ## Configuration
