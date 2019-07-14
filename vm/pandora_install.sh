@@ -27,7 +27,7 @@ if [ -e /etc/os-release ]; then
 fi
 SYSTEMD="yes"
 if [ -z "$UBUNTU_CODENAME" ]; then
-    UBUNTU_CODENAME=zesty
+    UBUNTU_CODENAME=bionic
 fi
 export DEBIAN_FRONTEND=noninteractive
 echo "deb http://ppa.launchpad.net/j/pandora/ubuntu ${UBUNTU_CODENAME} main" > /etc/apt/sources.list.d/j-pandora.list
