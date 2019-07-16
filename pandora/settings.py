@@ -6,8 +6,6 @@ from __future__ import absolute_import
 
 import os
 from os.path import join, normpath, dirname
-import djcelery
-djcelery.setup_loader()
 
 BASE_DIR = PROJECT_ROOT = normpath(dirname(__file__))
 BIN_DIR = normpath(join(PROJECT_ROOT, '..', 'bin'))
@@ -122,7 +120,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
 
     'django_extensions',
-    'djcelery',
+    'django_celery_results',
     'app',
     'log',
     'annotation',

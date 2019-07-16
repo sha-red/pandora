@@ -4,7 +4,6 @@ from __future__ import division, print_function, absolute_import
 from datetime import datetime, timedelta
 from time import time
 
-from celery.backends import default_backend
 from celery.utils import get_full_cls_name
 from django.contrib.auth import get_user_model
 from django.conf import settings

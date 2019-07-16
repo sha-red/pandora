@@ -1,8 +1,8 @@
 Django==1.11.22
 simplejson
 chardet
-celery==3.1.26.post2
-django-celery==3.2.2
+celery>4
+django-celery-results
 django-extensions==2.0.7
 gunicorn==19.8.1
 html5lib

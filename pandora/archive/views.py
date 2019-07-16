@@ -10,7 +10,7 @@ from django.db.models import Count, Q
 
 from six import string_types
 from celery.utils import get_full_cls_name
-from celery.backends import default_backend
+from celery._state import current_app
 import ox
 from oxdjango.decorators import login_required_json
 from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
@@ -390,8 +390,11 @@ def getTaskStatus(request, data):
     else:
         task_id = data['task_id']
     response = json_response(status=200, text='ok')
-    status = default_backend.get_status(task_id)
-    res = default_backend.get_result(task_id)
+
+    backend = current_app.backend
+    status = backend.get_status(task_id)
+    res = backend.get_result(task_id)
+
     response['data'] = {
         'id': task_id,
         'status': status
