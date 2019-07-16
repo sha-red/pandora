@@ -312,9 +312,22 @@ if __name__ == "__main__":
             run('./manage.py', 'compile_pyc', '-p', '.')
         os.chdir(join(base, 'pandora'))
         diff = get('./manage.py', 'sqldiff', '-a').strip()
+        for row in [
+            '-- Model missing for table: djcelery_periodictasks\n',
+            '-- Model missing for table: celery_taskmeta\n',
+            '-- Model missing for table: celery_tasksetmeta\n',
+            '-- Model missing for table: djcelery_crontabschedule\n',
+            '-- Model missing for table: djcelery_periodictask\n',
+            '-- Model missing for table: djcelery_intervalschedule\n',
+            '-- Model missing for table: djcelery_workerstate\n',
+            '-- Model missing for table: djcelery_taskstate\n',
+            '-- Model missing for table: cache\n',
+        ]:
+            if row in diff:
+                diff = diff.replace(row, '')
         if diff not in [
             '-- No differences',
-            'BEGIN;\n-- Model missing for table: cache\nCOMMIT;'
+            'BEGIN;\nCOMMIT;'
         ]:
             print('Database has changed, please make a backup and run %s db' % sys.argv[0])
         elif branch != 'master':
