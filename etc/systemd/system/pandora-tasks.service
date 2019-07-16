@@ -9,8 +9,8 @@ User=pandora
 Group=pandora
 PIDFile=/run/pandora/tasks.pid
 WorkingDirectory=/srv/pandora/pandora
-ExecStart=/srv/pandora/bin/python /srv/pandora/pandora/manage.py \
-    celery worker \
+ExecStart=/srv/pandora/bin/celery \
+    -A pandora worker \
     -Q default,celery -n pandora-default \
     --pidfile /run/pandora/tasks.pid \
     --maxtasksperchild 1000 \
