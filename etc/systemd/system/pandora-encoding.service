@@ -8,9 +8,9 @@ Restart=always
 User=pandora
 Group=pandora
 PIDFile=/run/pandora/encoding.pid
-WorkingDirectory=/srv/pandora
+WorkingDirectory=/srv/pandora/pandora
 ExecStart=/srv/pandora/bin/celery \
-    -A pandora worker \
+    -A app worker \
     -Q encoding -n pandora-encoding \
     --pidfile /run/pandora/encoding.pid \
     --maxtasksperchild 500 \
