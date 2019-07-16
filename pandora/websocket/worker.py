@@ -27,7 +27,7 @@ class Worker(ConsumerMixin):
         message.ack()
 
 def run():
-    with Connection(settings.BROKER_URL) as conn:
+    with Connection(settings.CELERY_BROKER_URL) as conn:
         try:
             worker = Worker(conn)
             worker.run()

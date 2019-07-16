@@ -261,6 +261,17 @@ if __name__ == "__main__":
             run('./pandora/manage.py', 'createcachetable')
         if old <= 6108:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
+        if old <= 6160:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
+            with open('pandora/local_settings.py', 'r') as f:
+                local_settings = f.read()
+            if 'BROKER_URL' in local_settings and 'CELERY_BROKER_URL' not in local_settings:
+                local_settings = [
+                    'CELERY_' + l if l.startswith('BROKER_URL') else l
+                    for l in local_settings.split('\n')
+                ]
+                with open('pandora/local_settings.py', 'w') as f:
+                    f.write('\n'.join(local_settings))
     else:
         if len(sys.argv) == 1:
             branch = get_branch()

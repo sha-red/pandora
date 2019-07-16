@@ -117,9 +117,9 @@ if [ "$RABBITMQ" == "local" ]; then
     rabbitmqctl add_user pandora $RABBITPWD
     rabbitmqctl add_vhost /pandora
     rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
-    BROKER_URL="amqp://pandora:$RABBITPWD@localhost:5672//pandora"
+    CELERY_BROKER_URL="amqp://pandora:$RABBITPWD@localhost:5672//pandora"
 else
-    BROKER_URL="$RABBITMQ"
+    CELERY_BROKER_URL="$RABBITMQ"
 fi
 
 # checkout pandora from git
@@ -145,7 +145,7 @@ DATABASES = {
         'PASSWORD': '',
     }
 }
-BROKER_URL = '$BROKER_URL'
+CELERY_BROKER_URL = '$CELERY_BROKER_URL'
 XACCELREDIRECT = True
 
 DEBUG = False

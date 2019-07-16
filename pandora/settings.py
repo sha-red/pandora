@@ -200,7 +200,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 
-BROKER_URL = 'amqp://pandora:box@localhost:5672//pandora'
+CELERY_BROKER_URL = 'amqp://pandora:box@localhost:5672//pandora'
 
 SEND_CELERY_ERROR_EMAILS = False
 
@@ -262,6 +262,10 @@ COLLECTION_ICON = join(SCRIPT_ROOT, 'list_icon.py')
 
 DB_GIN_TRGM = False
 
+ALLOWED_HOSTS = ['*']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 32 * 1024 * 1024
 
 RELOADER_RUNNING = False
 #you can ignore things below this line
@@ -293,12 +297,4 @@ except NameError:
 
 INSTALLED_APPS = tuple(list(INSTALLED_APPS) + LOCAL_APPS)
 
-ALLOWED_HOSTS = ['*']
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-DATA_UPLOAD_MAX_MEMORY_SIZE = 32 * 1024 * 1024
-try:
-    CELERY_BROKER_URL
-except NameError:
-    CELERY_BROKER_URL = BROKER_URL
 

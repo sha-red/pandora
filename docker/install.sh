@@ -24,7 +24,7 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-BROKER_URL = "amqp://{0}:{1}@rabbitmq:5672//".format(os.environ.get('RABBITMQ_DEFAULT_USER'), os.environ.get('RABBITMQ_DEFAULT_PASS'))
+CELERY_BROKER_URL = "amqp://{0}:{1}@rabbitmq:5672//".format(os.environ.get('RABBITMQ_DEFAULT_USER'), os.environ.get('RABBITMQ_DEFAULT_PASS'))
 XACCELREDIRECT = True
 
 DEBUG = False
