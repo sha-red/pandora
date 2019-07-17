@@ -403,8 +403,8 @@ def getTaskStatus(request, data):
         response['data'].update(res)
     else:
         response['data']['result'] = res
-    if status in default_backend.EXCEPTION_STATES:
-        traceback = default_backend.get_traceback(task_id)
+    if status in backend.EXCEPTION_STATES:
+        traceback = backend.get_traceback(task_id)
         response['data'].update({
             'result': str(res),
             'exc': get_full_cls_name(res.__class__),
