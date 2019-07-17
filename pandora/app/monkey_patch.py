@@ -32,4 +32,19 @@ def monkey_patch_username():
         if isinstance(v, MaxLengthValidator):
             v.limit_value = 255
 
+def apply_patch():
+    from django.db import connection, transaction
+    cursor = connection.cursor()
+    table = connection.introspection.get_table_description(cursor, User._meta.db_table)
+    sql = []
+    for row in table:
+        if row.name in NEW_LENGTH and row.internal_size != NEW_LENGTH[row.name]:
+            sql.append('ALTER TABLE "%s" ALTER "%s" TYPE varchar(%d)' % (User._meta.db_table, row.name, NEW_LENGTH[row.name]))
+
+    for q in sql:
+        cursor.execute(q)
+    if sql:
+        transaction.commit()
+
+
 monkey_patch_username()
