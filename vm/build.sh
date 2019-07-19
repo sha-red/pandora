@@ -5,11 +5,11 @@ BASE=`pwd`
 VERSION=`cd ..;git rev-list HEAD --count`
 TARGET=${BASE}/pandora-r${VERSION}.vdi
 
-img=xenial-server-cloudimg-amd64-disk1.img
+img=bionic-server-cloudimg-amd64.img
 
 if [ ! -e $img ]; then
     echo downloading $img
-    curl -s -O https://cloud-images.ubuntu.com/xenial/current/$img
+    curl -s -O https://cloud-images.ubuntu.com/bionic/current/$img
 fi
 echo preparing ${TARGET}.img
 cp -a $img ${TARGET}.img
