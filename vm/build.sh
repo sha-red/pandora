@@ -19,7 +19,7 @@ qemu-img resize ${TARGET}.img +998G
 
 echo boot image and install pandora
 kvm -m 1024 \
-    -smp 4 \
+    -smp 2 \
     -cdrom seed.img \
     -device e1000,netdev=user.0 \
     -netdev user,id=user.0,hostfwd=tcp::5555-:22,hostfwd=tcp::2620-:80 \
