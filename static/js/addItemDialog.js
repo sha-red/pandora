@@ -69,6 +69,15 @@ pandora.ui.addItemDialog = function(options) {
         title: Ox._('Add {0}', [pandora.site.itemName.singular]),
         width: 544
     });
+    if (options.files) {
+        that.options({content: $screen.start()});
+        $button.options({disabled: true});
+        Ox.serialMap(options.files, function(file, index, files, callback) {
+            getFileInfo(file, function(info) {
+                callback(Ox.extend(info, {file: file}));
+            });
+        }, onInfo);
+    }
 
     function createButton() {
         $button = Ox[selected == 'upload' ? 'FileButton' : 'Button']({

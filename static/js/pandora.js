@@ -281,6 +281,37 @@ appPanel
             resize: pandora.resizeWindow,
             unload: pandora.unloadWindow
         })
+        Ox.$document.on({
+            dragenter: function(event) {
+                if (Ox.contains(event.originalEvent.dataTransfer.types, 'Files')) {
+                    event.originalEvent.preventDefault();
+                    event.originalEvent.stopPropagation();
+                    if (!$('#importScreen').length) {
+                        pandora.ui.importScreen().appendTo(Ox.$body);
+                    }
+                } else {
+                    console.log(event.originalEvent.dataTransfer);
+                }
+            },
+            dragover: function(event) {
+                event.originalEvent.preventDefault();
+                event.originalEvent.stopPropagation();
+            },
+            dragstart: function(event) {
+                event.originalEvent.preventDefault();
+                event.originalEvent.stopPropagation();
+            },
+            drop: function(event) {
+                $('#importScreen').remove();
+                if (pandora.hasCapability('canAddItems')) {
+                    if (event.originalEvent.dataTransfer.files.length) {
+                        event.originalEvent.preventDefault();
+                        event.originalEvent.stopPropagation();
+                        pandora.uploadDroppedFiles(event.originalEvent.dataTransfer.files)
+                    }
+                }
+            }
+        });
         Ox.extend(pandora, {
             $ui: {},
             site: data.site,

@@ -404,6 +404,31 @@ pandora.createLinks = function($element) {
     });
 };
 
+pandora.uploadDroppedFiles = function(files) {
+    var documentExtensions = ['pdf', /* 'epub', 'txt', */ 'png', 'gif', 'jpg'];
+    files = Ox.map(files, function(file) { return file});
+
+    if (files.every(function(file) {
+        var extension = file.name.split('.').pop().toLowerCase()
+        return Ox.contains(documentExtensions, extension)
+    })) {
+        pandora.ui.uploadDocumentDialog({
+            files: files
+        }, function(files) {
+            if (files) {
+                Ox.Request.clearCache('findDocuments');
+                if (pandora.user.ui.document || pandora.user.ui.section != 'documents') {
+                    pandora.UI.set({section: 'documents', document: ''});
+                } else {
+                    pandora.$ui.list && pandora.$ui.list.reloadList();
+                }
+            }
+        }).open();
+    } else {
+        pandora.ui.addItemDialog({files: files}).open()
+    }
+};
+
 (function() {
 
     pandora.doHistory = function(action, items, targets, index, callback) {
