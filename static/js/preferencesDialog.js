@@ -47,6 +47,9 @@ pandora.ui.preferencesDialog = function() {
                                         validate: pandora.validateNewPassword,
                                         width: 320
                                     })
+                                    .attr({
+                                        autocomplete: 'new-password'
+                                    })
                                     .bindEvent({
                                         validate: function(data) {
                                             data.valid && pandora.api.editPreferences({password: data.value});
