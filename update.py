@@ -332,6 +332,7 @@ if __name__ == "__main__":
             '-- Model missing for table: djcelery_intervalschedule\n',
             '-- Model missing for table: djcelery_workerstate\n',
             '-- Model missing for table: djcelery_taskstate\n',
+            '-- Model missing for table: south_migrationhistory\n',
             '-- Model missing for table: cache\n',
         ]:
             if row in diff:
