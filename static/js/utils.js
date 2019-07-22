@@ -406,7 +406,7 @@ pandora.createLinks = function($element) {
 
 pandora.uploadDroppedFiles = function(files) {
     var documentExtensions = ['pdf', /* 'epub', 'txt', */ 'png', 'gif', 'jpg'];
-    files = Ox.map(files, function(file) { return file});
+    files = Ox.map(files, function(file) { return file });
 
     if (files.every(function(file) {
         var extension = file.name.split('.').pop().toLowerCase()
