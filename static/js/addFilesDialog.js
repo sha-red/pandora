@@ -117,20 +117,20 @@ pandora.ui.addFilesDialog = function(options) {
             )
         });
     } else {
+        if (options.items.length > 1) {
+            selectItems.push({
+                id: 'multiple',
+                title: Ox._(
+                    'Create multiple {0}',
+                    [pandora.site.itemName.plural.toLowerCase()]
+                )
+            });
+        }
         selectItems.push({
             id: 'one',
             title: Ox._(
                 'Create one {0} with multiple parts',
                 [pandora.site.itemName.singular.toLowerCase()]
-            )
-        });
-    }
-    if (options.items.length > 1) {
-        selectItems.push({
-            id: 'multiple',
-            title: Ox._(
-                'Create multiple {0}',
-                [pandora.site.itemName.plural.toLowerCase()]
             )
         });
     }
