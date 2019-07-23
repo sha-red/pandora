@@ -389,6 +389,7 @@ class Item(models.Model):
                 if q.count() != 0:
                     if utils.is_imdb_id(self.public_id):
                         self.oxdbId = None
+                        self.update_sort()
                         q[0].merge_with(self, save=False)
                     else:
                         n = 1
