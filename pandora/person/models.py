@@ -38,7 +38,7 @@ class Person(models.Model):
     #FIXME: how to deal with aliases
     aliases = fields.TupleField(default=[])
 
-    imdbId = models.CharField(max_length=7, blank=True)
+    imdbId = models.CharField(max_length=16, blank=True)
     wikipediaId = models.CharField(max_length=1000, blank=True)
 
     objects = managers.PersonManager()

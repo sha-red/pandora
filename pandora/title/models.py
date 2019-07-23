@@ -32,7 +32,7 @@ class Title(models.Model):
     sortsorttitle = models.CharField(max_length=1000)
     edited = models.BooleanField(default=False)
 
-    imdbId = models.CharField(max_length=7, blank=True)
+    imdbId = models.CharField(max_length=16, blank=True)
 
     objects = managers.TitleManager()
 
