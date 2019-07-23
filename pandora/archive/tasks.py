@@ -209,7 +209,7 @@ def download_media(item_id, url):
 @task(queue='default')
 def move_media(data, user):
     from changelog.models import add_changelog
-    from item.models import get_item, Item
+    from item.models import get_item, Item, ItemSort
     from item.utils import is_imdb_id
     from annotation.models import Annotation
 
@@ -229,6 +229,11 @@ def move_media(data, user):
             i = get_item(data, user=user)
         else:
             i = get_item({'imdbId': data['public_id']}, user=user)
+    try:
+        i.sort
+    except ItemSort.DoesNotExist:
+        i.update_sort()
+
     changed = [i.public_id]
     old_item = None
     for f in models.File.objects.filter(oshash__in=data['ids']):
