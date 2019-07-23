@@ -103,3 +103,7 @@ def normalize_dict(encoding, data):
     elif isinstance(data, list):
         return [normalize_dict(encoding, value) for value in data]
     return data
+
+
+def is_imdb_id(id):
+    return bool(len(id) >= 7 and str(id).isdigit())

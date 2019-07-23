@@ -387,7 +387,7 @@ class Item(models.Model):
             if self.oxdbId != oxdbId:
                 q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
                 if q.count() != 0:
-                    if len(self.public_id) == 7:
+                    if utils.is_imdb_id(self.public_id):
                         self.oxdbId = None
                         q[0].merge_with(self, save=False)
                     else:
@@ -401,14 +401,14 @@ class Item(models.Model):
                             q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
                 self.oxdbId = oxdbId
                 update_poster = True
-                if len(self.public_id) != 7:
+                if not utils.is_imdb_id(self.public_id):
                     update_ids = True
 
         # id changed, what about existing item with new id?
-        if settings.USE_IMDB and len(self.public_id) != 7 and self.oxdbId != self.public_id:
+        if settings.USE_IMDB and not utils.is_imdb_id(self.public_id) and self.oxdbId != self.public_id:
             self.public_id = self.oxdbId
             # FIXME: move files to new id here
-        if settings.USE_IMDB and len(self.public_id) == 7:
+        if settings.USE_IMDB and utils.is_imdb_id(self.public_id):
             for key in ('title', 'year', 'director', 'season', 'episode',
                         'seriesTitle', 'episodeTitle'):
                 if key in self.data:
@@ -418,7 +418,7 @@ class Item(models.Model):
         if settings.USE_IMDB:
             defaults = list(filter(lambda k: 'default' in k, settings.CONFIG['itemKeys']))
             for k in defaults:
-                if len(self.public_id) == 7:
+                if utils.is_imdb_id(self.public_id):
                     if k['id'] in self.data and self.data[k['id']] == k['default']:
                         del self.data[k['id']]
                 else:
