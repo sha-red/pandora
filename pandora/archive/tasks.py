@@ -210,6 +210,7 @@ def download_media(item_id, url):
 def move_media(data, user):
     from changelog.models import add_changelog
     from item.models import get_item, Item
+    from item.utils import is_imdb_id
     from annotation.models import Annotation
 
     user = models.User.objects.get(username=user)
@@ -218,7 +219,7 @@ def move_media(data, user):
         i = Item.objects.get(public_id=data['item'])
     else:
         data['public_id'] = data.pop('item').strip()
-        if len(data['public_id']) != 7:
+        if not is_imdb_id(data['public_id']):
             del data['public_id']
             if 'director' in data and isinstance(data['director'], string_types):
                 if data['director'] == '':
