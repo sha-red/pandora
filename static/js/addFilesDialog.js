@@ -8,6 +8,11 @@ pandora.ui.addFilesDialog = function(options) {
     }).bindEvent({
         click: function() {
             $button.options({disabled: true});
+            that.disableCloseButton()
+            var $screen = Ox.LoadingScreen({
+                size: 16
+            });
+            that.options({content: $screen.start()});
             (options.action == 'upload' ? uploadVideos : importVideos)(function() {
                 that.close();
                 pandora.ui.tasksDialog({
