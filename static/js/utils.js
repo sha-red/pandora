@@ -3218,9 +3218,8 @@ pandora.updateStatus = function(item) {
         return ui.item == item && [
             'info', 'player', 'editor', 'timeline'
         ].indexOf(ui.itemView) > -1 && !(
-            // fixme: still wrong
-            pandora.$ui.uploadVideoDialog
-            && pandora.$ui.uploadVideoDialog.is('::visible')
+            pandora.$ui.addItemDialog
+            && pandora.$ui.addItemDialog.is('::visible')
         );
     }
 };
