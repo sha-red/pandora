@@ -406,7 +406,7 @@ pandora.ui.mediaView = function(options) {
                 var conditions, matches;
                 if (key == 'id' && data.value.substr(0, 2) != '0x') {
                     if (pandora.site.site.id == '0xdb') {
-                        matches = data.value.match(/\d{7}/);
+                        matches = data.value.match(/\d+?/);
                     } else {
                         matches = data.value.match(/[A-Z]+/);
                     }
