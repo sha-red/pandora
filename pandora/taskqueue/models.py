@@ -183,13 +183,17 @@ class Task(models.Model):
     def json(self):
         if self.status != 'canceled':
             self.update()
-        return {
+        data = {
             'started': self.started,
             'ended': self.ended,
             'status': self.status,
-            'title': self.item.get('title'),
-            'item': self.item.public_id,
-            'user': self.user and self.user.username or '',
             'id': self.public_id,
+            'user': self.user and self.user.username or '',
         }
+        try:
+            data['title'] = self.item.get('title')
+            data['item'] = self.item.public_id
+        except:
+            pass
+        return data
 
