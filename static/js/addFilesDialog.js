@@ -149,6 +149,49 @@ pandora.ui.addFilesDialog = function(options) {
     $($select.find('.OxButton')[0]).css({margin: '-1px'});
     $button.parent().parent().append($select);
 
+    function getNewOrEmptyItem(data, callback) {
+        pandora.api.find({
+            query: {
+                conditions: [
+                    {key: 'title', value: data.title, operator: '=='}
+                ]
+            },
+            keys: ['id']
+        }, function(result) {
+            if (!result.data.items.length) {
+                pandora.api.add(data, callback)
+            } else {
+                var isNew = true
+                Ox.serialForEach(result.data.items, function(item, index, items, next) {
+                    isNew && pandora.api.findMedia({
+                        query: {
+                            conditions: [
+                                {key: 'id', value: item.id, operator: '=='}
+                            ]
+                        },
+                        keys: ['id']
+                    }, function(result) {
+                        if (!result.data.items.length) {
+                            isNew = false
+                            callback({
+                                data: {
+                                    title: data.title,
+                                    id: item.id
+                                }
+                            })
+                        }
+                        next()
+                    })
+                }, function() {
+                    if (isNew) {
+                        pandora.api.add(data, callback)
+                    }
+                })
+
+            }
+        })
+    }
+
     function importVideos(callback) {
         var id, title;
         ($select.value() == 'add' ? pandora.api.get : Ox.noop)({
@@ -166,7 +209,7 @@ pandora.ui.addFilesDialog = function(options) {
                 } else {
                     title = items[$select.value() == 'one' ? 0 : index].title;
                 }
-                (isNewItem ? pandora.api.add : Ox.noop)({
+                (isNewItem ? getNewOrEmptyItem : Ox.noop)({
                     title: title
                 }, function(result) {
                     if (isNewItem) {
@@ -206,7 +249,7 @@ pandora.ui.addFilesDialog = function(options) {
                 } else {
                     title = items[$select.value() == 'one' ? 0 : index].title;
                 }
-                (isNewItem ? pandora.api.add : Ox.noop)({
+                (isNewItem ? getNewOrEmptyItem : Ox.noop)({
                     title: title
                 }, function(result) {
                     if (isNewItem) {
