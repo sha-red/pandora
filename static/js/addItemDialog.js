@@ -230,6 +230,7 @@ pandora.ui.addItemDialog = function(options) {
         // FIXME: what about pending/aborted uploads
         pandora.api.findMedia({
             keys: ['id', 'item', 'url'],
+            range: [0, items.length],
             query: {
                 conditions: selected == 'upload' ? items.map(function(item) {
                     return {key: 'oshash', operator: '==', value: item.oshash};
