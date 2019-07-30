@@ -43,7 +43,7 @@ pandora.ui.preferencesDialog = function() {
                                         id: 'password',
                                         label: Ox._('New Password'),
                                         labelWidth: 120,
-                                        type: 'password',
+                                        type: 'text',
                                         validate: pandora.validateNewPassword,
                                         width: 320
                                     })
@@ -51,6 +51,11 @@ pandora.ui.preferencesDialog = function() {
                                         autocomplete: 'new-password'
                                     })
                                     .bindEvent({
+                                        focus: function(data) {
+                                            this.options({
+                                                type: 'password'
+                                            })
+                                        },
                                         validate: function(data) {
                                             data.valid && pandora.api.editPreferences({password: data.value});
                                         }
