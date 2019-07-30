@@ -6,7 +6,7 @@ random.seed()
 import re
 import json
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.template import loader
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
@@ -719,7 +719,9 @@ def editPreferences(request, data):
         profile.save()
     if 'password' in data:
         change = True
-        request.user.set_password(data['password'])
+        user = request.user
+        user.set_password(data['password'])
+        update_session_auth_hash(request, user)
     if 'script' in data:
         profile = request.user.profile
         profile.preferences['script'] = data['script']
