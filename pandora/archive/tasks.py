@@ -128,7 +128,7 @@ def process_stream(fileId):
         stream = streams[0]
         stream.make_timeline()
         stream.extract_derivatives()
-        file = models.File.objects.get(id=fileId)
+        file.refresh_from_db()
         file.encoding = False
         file.save()
     file.item.update_selected()
@@ -158,13 +158,12 @@ def extract_stream(fileId):
         if created:
             file.extract_frames()
             stream.media.name = stream.path(stream.name())
-            stream = stream.encode()
+            stream.encode()
             if stream.available:
                 stream.make_timeline()
                 stream.extract_derivatives()
                 file.extract_tracks()
-                # get current version from db
-                file = models.File.objects.get(id=fileId)
+                file.refresh_from_db()
                 if not file.item.rendered \
                         and not file.item.files.exclude(id=fileId).filter(Q(queued=True) | Q(encoding=True)).count():
                     file.item.update_timeline()

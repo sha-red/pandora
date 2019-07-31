@@ -756,9 +756,8 @@ class Stream(models.Model):
         ok, error = extract.stream(media, target, self.name(), info, flags=self.flags)
         # file could have been moved while encoding
         # get current version from db and update
-        _self = Stream.objects.get(id=self.id)
-        _self.update_status(ok, error)
-        return _self
+        self.refresh_from_db()
+        self.update_status(ok, error)
 
     def get_index(self):
         index = 1
