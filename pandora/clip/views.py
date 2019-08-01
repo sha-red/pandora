@@ -102,8 +102,6 @@ def findClips(request, data):
         subtitles = utils.get_by_key(layers, 'isSubtitles', True)
         layer_ids = [k['id'] for k in layers]
         keys = list(filter(lambda k: k not in layer_ids + ['annotations'], data['keys']))
-        if list(filter(lambda k: k not in models.Clip.clip_keys, keys)):
-            qs = qs.select_related('item__sort')
 
         clips = {}
         response['data']['items'] = clip_jsons = []
