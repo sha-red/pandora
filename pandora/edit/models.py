@@ -248,7 +248,7 @@ class Edit(models.Model):
             clips_query = self.clip_query()
             if clips_query['conditions']:
                 clips = clip.models.Clip.objects.find({'query': clips_query}, user)
-                items = [i['id'] for i in self.get_items(user).values('id')]
+                items = self.get_items(user).values('id')
                 clips = clips.filter(item__in=items)
             else:
                 clips = clip.models.Clip.objects.filter(id=None)
