@@ -141,4 +141,5 @@ class PlaceManager(Manager):
                                      user)
         if conditions:
             qs = qs.filter(conditions)
+        qs = qs.distinct()
         return qs
