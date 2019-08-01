@@ -240,6 +240,7 @@ def findPlaces(request, data):
     qs = qs.distinct()
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
+        qs = qs.select_related()
         response['data']['items'] = [p.json(data['keys'], request.user) for p in qs]
     elif 'position' in query:
         ids = [i.get_id() for i in qs]
