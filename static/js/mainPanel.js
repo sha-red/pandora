@@ -23,8 +23,39 @@ pandora.ui.mainPanel = function() {
         .bindEvent({
             pandora_finddocuments: function() {
                 var previousUI = pandora.UI.getPrevious();
-                if (!previousUI.document && ui._list == previousUI._list) {
-                    that.replaceElement(1, pandora.$ui.documentPanel = pandora.ui.documentPanel());
+                Ox.Log('FIND', 'handled in mainPanel', previousUI.item, previousUI._list)
+                if (!previousUI.document && ui._collection == previousUI._collection) {
+                    pandora.$ui.list.reloadList();
+
+                    // FIXME: why is this being handled _here_?
+                    ui._documentFilterState.forEach(function(data, i) {
+                        if (!Ox.isEqual(data.selected, previousUI._documentFilterState[i].selected)) {
+                            pandora.$ui.documentFilters[i].options(
+                                ui.showFilters ? {
+                                    selected: data.selected
+                                } : {
+                                    _selected: data.selected,
+                                    selected: []
+                                }
+                            );
+                        }
+                        if (!Ox.isEqual(data.find, previousUI._documentFilterState[i].find)) {
+                            if (!ui.showFilters) {
+                                pandora.$ui.documentFilters[i].options({
+                                    _selected: data.selected
+                                });
+                            }
+                            // we can call reloadList here, since the items function
+                            // handles the hidden filters case without making requests
+                            pandora.$ui.documentFilters[i].reloadList();
+                        }
+                    });
+                } else {
+                    if (pandora.stayInItemView) {
+                        pandora.stayInItemView = false;
+                    } else {
+                        that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                    }
                 }
             },
             pandora_document: function(data) {
