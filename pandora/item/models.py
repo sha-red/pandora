@@ -939,6 +939,8 @@ class Item(models.Model):
         s.oxdbId = self.oxdbId
         if not settings.USE_IMDB and s.public_id.isupper() and s.public_id.isalpha():
             s.public_id = ox.sort_string(str(ox.fromAZ(s.public_id)))
+        else:
+            s.public_id = ox.sort_string(str(ox.fromAZ(s.public_id)))
         s.modified = self.modified or datetime.now()
         s.created = self.created or datetime.now()
         s.rightslevel = self.level
