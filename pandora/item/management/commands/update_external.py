@@ -17,9 +17,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--all', action='store_true', dest='all',
-            default=False, help='update all items, otherwise oldes N'),
+            default=False, help='update all items, otherwise oldes N')
         parser.add_argument('-n', '--items', action='store', dest='items', type=int,
-            default=30, help='number of items ot update'),
+            default=30, help='number of items ot update')
 
     def handle(self, **options):
         offset = 0
