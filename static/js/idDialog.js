@@ -201,7 +201,7 @@ pandora.ui.idDialog = function(data) {
         }
         return Ox.filter([
             item.id,
-            item.title + (item.originalTitle ? ' (' + item.originalTitle + ')' : ''),
+            item.title + ((item.originalTitle && item.title != item.originalTitle) ? ' (' + item.originalTitle + ')' : ''),
             item.director ? item.director.join(', ') : '',
             item.year
         ]).join(' &mdash; ');
