@@ -39,7 +39,6 @@ pandora.addFolderItem = function(section) {
                 if (isItems) {
                     data.items = ui.listSelection;
                 } else if (section == 'documents') {
-                    //fixme
                     data.items = ui.collectionSelection;
                 } else {
                     data.clips = pandora.getClipData(
@@ -49,7 +48,7 @@ pandora.addFolderItem = function(section) {
                     );
                 }
             } else {
-                data.query = ui.find;
+                data.query = isItems ? ui.find : ui.findDocuments;
             }
         }
         if (ui.section == 'items' && section == 'edits') {
@@ -140,7 +139,7 @@ pandora.addFolderItem = function(section) {
             documents: 'addCollection',
             edits: 'addEdit'
         }[section]](data, function(result) {
-            getPosterFrames(result.data.id);
+            section == 'documents' ? reloadFolder(newList) : getPosterFrames(result.data.id);
         });
     }
     function getPosterFrames(newList) {
