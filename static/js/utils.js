@@ -139,7 +139,7 @@ pandora.addFolderItem = function(section) {
             documents: 'addCollection',
             edits: 'addEdit'
         }[section]](data, function(result) {
-            section == 'documents' ? reloadFolder(newList) : getPosterFrames(result.data.id);
+            section == 'documents' ? reloadFolder(result.data.id) : getPosterFrames(result.data.id);
         });
     }
     function getPosterFrames(newList) {
