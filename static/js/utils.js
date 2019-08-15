@@ -145,7 +145,7 @@ pandora.addFolderItem = function(section) {
     }
     function getPosterFrames(newList) {
         var query,
-            sortKey = Ox.getObjectById(pandora.site.itemKeys, 'votes')
+            sortKey = section == 'items' && Ox.getObjectById(pandora.site.itemKeys, 'votes')
                 ? 'votes' : 'timesaccessed';
         if (!isDuplicate) {
             ({
