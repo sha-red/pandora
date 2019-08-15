@@ -287,7 +287,9 @@ pandora.ui.folderList = function(id, section) {
         // works when switching back from browser, but won't work on load, since
         // getListData relies on $folderList, so selectList is called in init handler
         selected: pandora.getListData().folder == id
-            ? [ui[ui.section == 'items' ? '_list' : ui.section.slice(0, -1)]]
+            ? [ui[ui.section == 'items' ? '_list'
+                  : ui.section == 'documents' ? '_collection'
+                  : ui.section.slice(0, -1)]]
             : [],
         sort: [{key: 'position', operator: '+'}],
         sortable: id != 'featured' || canEditFeatured,

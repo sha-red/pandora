@@ -23,7 +23,7 @@ pandora.ui.mainPanel = function() {
         .bindEvent({
             pandora_finddocuments: function() {
                 var previousUI = pandora.UI.getPrevious();
-                Ox.Log('FIND', 'handled in mainPanel', previousUI.item, previousUI._list)
+                Ox.Log('FIND', 'finddocuments handled in mainPanel', previousUI.document, previousUI._collection)
                 if (!previousUI.document && ui._collection == previousUI._collection) {
                     pandora.$ui.list.reloadList();
 
@@ -54,7 +54,7 @@ pandora.ui.mainPanel = function() {
                     if (pandora.stayInItemView) {
                         pandora.stayInItemView = false;
                     } else {
-                        that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                        that.replaceElement(1, pandora.$ui.documentPanel = pandora.ui.documentPanel());
                     }
                 }
             },
@@ -68,7 +68,7 @@ pandora.ui.mainPanel = function() {
             },
             pandora_find: function() {
                 var previousUI = pandora.UI.getPrevious();
-                Ox.Log('FIND', 'handled in mainPanel', previousUI.item, previousUI._list)
+                Ox.Log('FIND', 'find handled in mainPanel', previousUI.item, previousUI._list)
                 if (!previousUI.item && ui._list == previousUI._list) {
                     if (['map', 'calendar'].indexOf(ui.listView) > -1) {
                         pandora.$ui.contentPanel.replaceElement(1,
