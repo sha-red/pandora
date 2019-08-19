@@ -2625,6 +2625,11 @@ pandora.openURL = function(url) {
     }
 };
 
+pandora.safePDFName = function(name) {
+    name = name.replace('?', '_').replace('#', '_');
+    return name;
+};
+
 pandora.saveURL = function(url, name) {
     var link = document.createElement('a');
     if (typeof link.download === 'string') {
