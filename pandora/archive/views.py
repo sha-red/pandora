@@ -368,7 +368,7 @@ def direct_upload(request):
     return render_to_json_response(response)
 
 
-@login_required_json
+#@login_required_json
 def getTaskStatus(request, data):
     '''
     Gets the status for a given task

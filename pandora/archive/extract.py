@@ -609,11 +609,14 @@ def timeline_strip(item, cuts, info, prefix):
             timeline_image.save(timeline_file)
 
 
-def chop(video, start, end, subtitles=None):
+def chop(video, start, end, subtitles=None, dest=None, encode=False):
     t = end - start
-    tmp = tempfile.mkdtemp()
     ext = os.path.splitext(video)[1]
-    choped_video = '%s/tmp%s' % (tmp, ext)
+    if dest is None:
+        tmp = tempfile.mkdtemp()
+        choped_video = '%s/tmp%s' % (tmp, ext)
+    else:
+        choped_video = dest
     if subtitles and ext == '.mp4':
         subtitles_f = choped_video + '.full.srt'
         with open(subtitles_f, 'wb') as fd:
@@ -625,25 +628,71 @@ def chop(video, start, end, subtitles=None):
         if subtitles_f:
             os.unlink(subtitles_f)
     else:
+        if encode:
+            bpp = 0.17
+            if ext == '.mp4':
+                vcodec = [
+                    '-c:v', 'libx264',
+                    '-preset:v', 'medium',
+                    '-profile:v', 'high',
+                    '-level', '4.0',
+                ]
+                acodec = [
+                    '-c:a', 'aac',
+                    '-aq', '6',
+                    '-strict', '-2'
+                ]
+            else:
+                vcodec = [
+                    '-c:v', 'libvpx',
+                    '-deadline', 'good',
+                    '-cpu-used', '0',
+                    '-lag-in-frames', '25',
+                    '-auto-alt-ref', '1',
+                ]
+                acodec = [
+                    '-c:a', 'libvorbis',
+                    '-aq', '6',
+                ]
+            info = ox.avinfo(video)
+            if not info['audio']:
+                acodec = []
+            if not info['video']:
+                vcodec = []
+            else:
+                height = info['video'][0]['height']
+                width = info['video'][0]['width']
+                fps = 30
+                bitrate = height*width*fps*bpp/1000
+                vcodec += ['-vb', '%dk' % bitrate]
+            encoding = vcodec + acodec
+        else:
+            encoding = [
+                '-c:v', 'copy',
+                '-c:a', 'copy',
+            ]
         cmd = [
             settings.FFMPEG,
             '-y',
             '-i', video,
             '-ss', '%.3f' % start,
             '-t', '%.3f' % t,
-            '-c:v', 'copy',
-            '-c:a', 'copy',
+        ] + encoding + [
             '-f', ext[1:],
             choped_video
         ]
+        print(cmd)
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                              stdout=open('/dev/null', 'w'),
                              stderr=open('/dev/null', 'w'),
                              close_fds=True)
         p.wait()
-    f = open(choped_video, 'rb')
-    os.unlink(choped_video)
     if subtitles_f and os.path.exists(subtitles_f):
         os.unlink(subtitles_f)
-    os.rmdir(tmp)
-    return f
+    if dest is None:
+        f = open(choped_video, 'rb')
+        os.unlink(choped_video)
+        os.rmdir(tmp)
+        return f
+    else:
+        return None

@@ -638,6 +638,32 @@ def edit(request, data):
     return render_to_json_response(response)
 actions.register(edit, cache=False)
 
+
+def extractClip(request, data):
+    '''
+    Extract and cache clip
+
+    takes {
+        item: string
+        resolution: int
+        format: string
+        in: float
+        out: float
+    }
+    returns {
+        taskId: string, // taskId
+    }
+    '''
+    item = get_object_or_404_json(models.Item, public_id=data['item'])
+    if not item.access(request.user):
+        return HttpResponseForbidden()
+
+    response = json_response()
+    t = tasks.extract_clip.delay(data['item'], data['in'], data['out'], data['resolution'], data['format'])
+    response['data']['taskId'] = t.task_id
+    return render_to_json_response(response)
+actions.register(extractClip, cache=False)
+
 @login_required_json
 def remove(request, data):
     '''
@@ -1056,6 +1082,23 @@ def video(request, id, resolution, format, index=None, track=None):
         ext = '.%s' % format
         duration = stream.info['duration']
 
+        filename = u"Clip of %s - %s-%s - %s %s%s" % (
+            item.get('title'),
+            ox.format_duration(t[0] * 1000).replace(':', '.')[:-4],
+            ox.format_duration(t[1] * 1000).replace(':', '.')[:-4],
+            settings.SITENAME.replace('/', '-'),
+            item.public_id,
+            ext
+        )
+        content_type = mimetypes.guess_type(path)[0]
+
+        cache_name = '%s_%sp_%s.%s' % (item.public_id, resolution, '%s,%s' % (t[0], t[1]), format)
+        cache_path = os.path.join(settings.MEDIA_ROOT, item.path('cache/%s' % cache_name))
+        if os.path.exists(cache_path):
+            response = HttpFileResponse(cache_path, content_type=content_type)
+            response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
+            return response
+
         # multipart request beyond first part, merge parts and chop that
         if not index and streams.count() > 1 and stream.info['duration'] < t[1]:
             video = NamedTemporaryFile(suffix=ext)
@@ -1065,7 +1108,6 @@ def video(request, id, resolution, format, index=None, track=None):
             path = video.name
             duration = sum(item.cache['durations'])
 
-        content_type = mimetypes.guess_type(path)[0]
         if len(t) == 2 and t[1] > t[0] and duration >= t[1]:
             # FIXME: could be multilingual here
             subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
@@ -1076,20 +1118,12 @@ def video(request, id, resolution, format, index=None, track=None):
             else:
                 srt = None
             response = HttpResponse(extract.chop(path, t[0], t[1], subtitles=srt), content_type=content_type)
-            filename = u"Clip of %s - %s-%s - %s %s%s" % (
-                item.get('title'),
-                ox.format_duration(t[0] * 1000).replace(':', '.')[:-4],
-                ox.format_duration(t[1] * 1000).replace(':', '.')[:-4],
-                settings.SITENAME,
-                item.public_id,
-                ext
-            )
             response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
             return response
         else:
             filename = "%s - %s %s%s" % (
                 item.get('title'),
-                settings.SITENAME,
+                settings.SITENAME.replace('/', '-'),
                 item.public_id,
                 ext
             )

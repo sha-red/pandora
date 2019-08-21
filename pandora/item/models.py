@@ -14,14 +14,15 @@ from glob import glob
 
 from six import PY2, string_types
 from six.moves.urllib.parse import quote
-from django.db import models, transaction, connection
-from django.db.models import Q, Sum, Max
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
-
+from django.core.files.temp import NamedTemporaryFile
+from django.db import models, transaction, connection
+from django.db.models import Q, Sum, Max
 from django.db.models.signals import pre_delete
-from django.utils import datetime_safe
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils import datetime_safe
 
 import ox
 from oxdjango.fields import JSONField, to_json
@@ -1181,6 +1182,37 @@ class Item(models.Model):
                 if not os.path.exists(path):
                     return None
                 return path
+
+    def extract_clip(self, in_, out, resolution, format, track=None, force=False):
+        streams = self.streams(track)
+        stream = streams[0].get(resolution, format)
+        if streams.count() > 1 and stream.info['duration'] < out:
+            video = NamedTemporaryFile(suffix='.%s' % format)
+            r = self.merge_streams(video.name, resolution, format)
+            if not r:
+                return False
+            path = video.name
+            duration = sum(item.cache['durations'])
+        else:
+            path = stream.media.path
+            duration = stream.info['duration']
+
+        cache_name = '%s_%sp_%s.%s' % (self.public_id, resolution, '%s,%s' % (in_, out), format)
+        cache_path = os.path.join(settings.MEDIA_ROOT, self.path('cache/%s' % cache_name))
+        if os.path.exists(cache_path) and not force:
+            return cache_path
+        if duration >= out:
+            subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
+            if subtitles:
+                srt = self.srt(subtitles['id'], encoder=ox.srt)
+                if len(srt) < 4:
+                    srt = None
+            else:
+                srt = None
+            ox.makedirs(os.path.dirname(cache_path))
+            extract.chop(path, in_, out, subtitles=srt, dest=cache_path, encode=True)
+            return cache_path
+        return False
 
     @property
     def timeline_prefix(self):

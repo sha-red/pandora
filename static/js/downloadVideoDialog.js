@@ -66,6 +66,8 @@ pandora.ui.downloadVideoDialog = function(options) {
             ]
         }).appendTo($content),
 
+        failed = false,
+
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
@@ -73,20 +75,55 @@ pandora.ui.downloadVideoDialog = function(options) {
                     title: Ox._('Download')
                 }).bindEvent({
                     click: function() {
-                        that.close();
+                        if (failed) {
+                            that.close();
+                            return
+                        }
                         var values = $form.values(),
                             url
                         if (options.out) {
-                            url = '/' + options.item
-                                + '/' + values.resolution
-                                + 'p.' + values.format
-                                + '?t=' + options['in'] + ',' + options.out;
+                            var $screen = Ox.LoadingScreen({
+                                size: 16
+                            })
+                            that.options({content: $screen.start()});
+                            pandora.api.extractClip({
+                                item: options.item,
+                                resolution: values.resolution,
+                                format: values.format,
+                                'in': options['in'],
+                                out: options.out
+                            }, function(result) {
+                                if (result.data.taskId) {
+                                    pandora.wait(result.data.taskId, function(result) {
+                                        console.log('wait -> ', result)
+                                        if (result.data.result) {
+                                            url = '/' + options.item
+                                                + '/' + values.resolution
+                                                + 'p.' + values.format
+                                                + '?t=' + options['in'] + ',' + options.out;
+                                            that.close();
+                                            document.location.href = url
+                                        } else {
+                                        }
+                                    }, 1000)
+                                } else {
+                                    that.options({content: 'Failed to extract clip.'});
+                                    that.options('buttons')[0].options({
+                                        title: Ox._('Close')
+                                    });
+                                    failed = true;
+                                }
+                            })
+
                         } else {
                             url = '/' + options.item
                                 + '/download/' + values.resolution
                                 + 'p.' + values.format
                         }
-                        document.location.href = url
+                        if (url) {
+                            that.close();
+                            document.location.href = url
+                        }
                     }
                 })
             ],

@@ -22,6 +22,7 @@ def cronjob(**kwargs):
     if limit_rate('item.tasks.cronjob', 8 * 60 * 60):
         update_random_sort()
         update_random_clip_sort()
+        clear_cache.delay()
 
 def update_random_sort():
     from . import models
@@ -124,6 +125,33 @@ def load_subtitles(public_id):
         item.update_find()
         item.update_sort()
         item.update_facets()
+
+
+@task(queue="encoding")
+def extract_clip(public_id, in_, out, resolution, format, track=None):
+    from . import models
+    try:
+        item = models.Item.objects.get(public_id=public_id)
+    except models.Item.DoesNotExist:
+        return False
+    if item.extract_clip(in_, out, resolution, format, track):
+        return True
+    return False
+
+
+@task(queue="encoding")
+def clear_cache(days=60):
+    import subprocess
+    path = os.path.join(settings.MEDIA_ROOT, 'media')
+    cmd = ['find', path, '-iregex', '.*/frames/.*', '-atime', '+%s' % days, '-type', 'f', '-exec', 'rm', '{}', ';']
+    subprocess.check_output(cmd)
+    path = os.path.join(settings.MEDIA_ROOT, 'items')
+    cmd = ['find', path, '-iregex', '.*/cache/.*', '-atime', '+%s' % days, '-type', 'f', '-exec', 'rm', '{}', ';']
+    subprocess.check_output(cmd)
+    path = settings.MEDIA_ROOT
+    cmd = ['find', path, '-type', 'd', '-size', '0', '-prune', '-exec', 'rmdir', '{}', ';']
+    subprocess.check_output(cmd)
+
 
 @task(ignore_results=True, queue='default')
 def update_sitemap(base_url):
