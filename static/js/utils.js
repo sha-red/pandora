@@ -404,7 +404,7 @@ pandora.createLinks = function($element) {
 };
 
 pandora.uploadDroppedFiles = function(files) {
-    var documentExtensions = ['pdf', /* 'epub', 'txt', */ 'png', 'gif', 'jpg'];
+    var documentExtensions = ['pdf', /* 'epub', 'txt', */ 'png', 'gif', 'jpg', 'jpeg'];
     files = Ox.map(files, function(file) { return file });
 
     if (files.every(function(file) {
