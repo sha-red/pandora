@@ -1695,7 +1695,7 @@
             "annotationsCalendarSize": 128,
             "annotationsHighlight": "none",
             "annotationsMapSize": 128,
-            "annotationsRange": "all",
+            "annotationsRange": "position",
             "annotationsSize": 256,
             "annotationsSort": "position",
             "calendarFind": "",
