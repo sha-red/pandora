@@ -210,7 +210,7 @@ def parse_query(data, user):
     for key in ('keys', 'group', 'file', 'range', 'position', 'positions', 'sort'):
         if key in data:
             query[key] = data[key]
-    print(query.get('sort'), data.get('sort'))
+    #print(query.get('sort'), data.get('sort'))
     query['qs'] = models.Document.objects.find(data, user)
     query['item'] = get_item(data.get('query', {}))
     return query
