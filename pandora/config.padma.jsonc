@@ -1160,7 +1160,7 @@
             "annotationsHighlight": "none",
             "annotationsHighlight": false,
             "annotationsMapSize": 128,
-            "annotationsRange": "position",
+            "annotationsRange": "selection",
             "annotationsSize": 256,
             "annotationsSort": "position",
             "calendarFind": "",
@@ -1310,7 +1310,7 @@
             "videoSize": "large",
             "videoSubtitles": false,
             "videoSubtitlesOffset": 0,
-            "videoTimeline": "antialias",
+            "videoTimeline": "keyframes",
             "videoView": "player",
             "videoVolume": 1
         },
