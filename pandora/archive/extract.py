@@ -216,6 +216,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             '-vb', '%dk' % bitrate,
             '-aspect', aspect,
             # '-vf', 'yadif',
+            '-max_muxing_queue_size', '512',
             '-vf', 'hqdn3d%s,scale=%s:%s' % (crop, width, height),
             '-g', '%d' % int(fps*5),
         ]
