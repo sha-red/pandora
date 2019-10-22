@@ -990,11 +990,6 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         {"name": "Private", "color": [255, 128, 128]}
     ],
     /*
-    "sendReferrer", if set to false, will cause all outgoing links to originate
-    from one single URL
-    */
-    "sendReferrer": false,
-    /*
     "site" contains various settings for this instance. In "email", "contact"
     if the address in the contact form (to), "system" is the address used by
     the system (from).
