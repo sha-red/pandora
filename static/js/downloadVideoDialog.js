@@ -9,6 +9,10 @@ pandora.ui.downloadVideoDialog = function(options) {
             'mp4': 'MP4',
         },
 
+        parts = Ox.max(options.video.map(function(video) {
+            return video.index
+        })),
+
         $content = Ox.Element()
             .css({margin: '16px'}),
 
@@ -27,6 +31,9 @@ pandora.ui.downloadVideoDialog = function(options) {
             .css({marginBottom: '16px'})
             .appendTo($content),
 
+        $format,
+        $resolution,
+
         $form = window.$form = Ox.Form({
             items: [
                 Ox.Select({
@@ -36,7 +43,10 @@ pandora.ui.downloadVideoDialog = function(options) {
                                 id: format,
                                 title: formats[format]
                             };
-                        }),
+                        }).concat(!options.out && options.source ? [{
+                            id: 'source',
+                            title: Ox._('Source')
+                        }] : []),
                         label: Ox._('Format'),
                         labelWidth: 120,
                         value: pandora.site.video.downloadFormat,
@@ -44,9 +54,14 @@ pandora.ui.downloadVideoDialog = function(options) {
                     })
                     .bindEvent({
                         change: function(data) {
+                            if (data.value == 'source') {
+                                $resolution.hide()
+                            } else {
+                                $resolution.show()
+                            }
                         }
                     }),
-                Ox.Select({
+                $resolution = Ox.Select({
                         id: 'resolution',
                         items: pandora.site.video.resolutions.map(function(resolution) {
                             return {
@@ -63,7 +78,25 @@ pandora.ui.downloadVideoDialog = function(options) {
                         change: function(data) {
                         }
                     })
-            ]
+            ].concat(parts ? [
+                Ox.Select({
+                        id: 'part',
+                        items: Ox.range(parts + 1).map(function(resolution, idx) {
+                            return {
+                                id: idx + 1,
+                                title: 'Part ' + (idx+1)
+                            };
+                        }),
+                        label: Ox._('Part'),
+                        labelWidth: 120,
+                        value: 1,
+                        width: 240
+                    })
+                    .bindEvent({
+                        change: function(data) {
+                        }
+                    })
+            ] : [])
         }).appendTo($content),
 
         failed = false,
@@ -116,9 +149,17 @@ pandora.ui.downloadVideoDialog = function(options) {
                             })
 
                         } else {
-                            url = '/' + options.item
-                                + '/download/' + values.resolution
-                                + 'p.' + values.format
+                            if (values.format == 'source') {
+                                url = '/' + options.item
+                                    + '/download/source/'
+                                    + (values.part ? values.part : '')
+                            } else {
+                                url = '/' + options.item
+                                    + '/download/' + values.resolution
+                                    + 'p'
+                                    + (values.part ? values.part : '')
+                                    + '.' + values.format
+                            }
                         }
                         if (url) {
                             that.close();

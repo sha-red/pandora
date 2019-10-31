@@ -189,7 +189,9 @@ pandora.ui.editor = function(data) {
                 pandora.ui.downloadVideoDialog({
                     item: ui.item,
                     rightsLevel: rightsLevel,
-                    title: data.title
+                    source: data.source && pandora.hasCapability('canDownloadSource'),
+                    title: data.title,
+                    video: data.video
                 }).open();
             },
             downloadselection: function(selection) {

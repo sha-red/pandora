@@ -992,6 +992,8 @@ def download_source(request, id, part=None):
         raise Http404
 
     parts = ['%s - %s ' % (item.get('title'), settings.SITENAME), item.public_id]
+    if len(streams) > 1:
+        parts.append('.Part %d' % (part + 1))
     parts.append('.')
     parts.append(f.extension)
     filename = ''.join(parts)
@@ -1002,7 +1004,7 @@ def download_source(request, id, part=None):
     response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
     return response
 
-def download(request, id, resolution=None, format='webm'):
+def download(request, id, resolution=None, format='webm', part=None):
     item = get_object_or_404(models.Item, public_id=id)
     if not resolution or int(resolution) not in settings.CONFIG['video']['resolutions']:
         resolution = max(settings.CONFIG['video']['resolutions'])
@@ -1010,22 +1012,35 @@ def download(request, id, resolution=None, format='webm'):
         resolution = int(resolution)
     if not item.access(request.user) or not item.rendered:
         return HttpResponseForbidden()
+    if part is not None:
+        part = int(part) - 1
+        streams = item.streams()
+        if part > len(streams):
+            raise Http404
     ext = '.%s' % format
     parts = ['%s - %s ' % (item.get('title'), settings.SITENAME), item.public_id]
     if resolution != max(settings.CONFIG['video']['resolutions']):
         parts.append('.%dp' % resolution)
+    if part is not None:
+        parts.append('.Part %d' % (part + 1))
     parts.append(ext)
     filename = ''.join(parts)
     video = NamedTemporaryFile(suffix=ext)
     content_type = mimetypes.guess_type(video.name)[0]
-    r = item.merge_streams(video.name, resolution, format)
-    if not r:
-        return HttpResponseForbidden()
-    elif r is True:
-        response = HttpResponse(FileWrapper(video), content_type=content_type)
-        response['Content-Length'] = os.path.getsize(video.name)
+    if part is None:
+        r = item.merge_streams(video.name, resolution, format)
+        if not r:
+            return HttpResponseForbidden()
+        elif r is True:
+            response = HttpResponse(FileWrapper(video), content_type=content_type)
+            response['Content-Length'] = os.path.getsize(video.name)
+        else:
+            response = HttpFileResponse(r, content_type=content_type)
     else:
-        response = HttpFileResponse(r, content_type=content_type)
+        stream = streams[part].get(resolution, format)
+        path = stream.media.path
+        content_type = mimetypes.guess_type(path)[0]
+        response = HttpFileResponse(path, content_type=content_type)
     response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
     return response
 

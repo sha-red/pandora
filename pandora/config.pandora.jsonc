@@ -45,6 +45,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "canAddItems": {"member": true, "staff": true, "admin": true},
         "canAddDocuments": {"member": true, "staff": true, "admin": true},
         "canDownloadVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
+        "canDownloadSource": {"member": 1, "staff": 4, "admin": 4},
         "canEditAnnotations": {"staff": true, "admin": true},
         "canEditDocuments": {"staff": true, "admin": true},
         "canEditEntities": {"staff": true, "admin": true},

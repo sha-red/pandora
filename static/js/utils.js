@@ -2359,6 +2359,7 @@ pandora.VIDEO_OPTIONS_KEYS = [
     'rendered',
     'rightslevel',
     'size',
+    'source',
     'streams',
     'title',
     'videoRatio'
