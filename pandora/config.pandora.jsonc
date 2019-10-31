@@ -550,7 +550,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         {
             "id": "country",
             "title": "Country",
-            "type": "string",
+            "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
             "filter": true,
