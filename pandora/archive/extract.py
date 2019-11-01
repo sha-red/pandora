@@ -239,6 +239,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
                 '-preset:v', 'medium',
                 '-profile:v', 'high',
                 '-level', '4.0',
+                '-pix_fmt', 'yuv420p',
             ]
         video_settings += ['-map', '0:%s,0:0' % info['video'][0]['id']]
         audio_only = False
