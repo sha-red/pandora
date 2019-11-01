@@ -1442,7 +1442,7 @@ pandora.getFoldersWidth = function(section) {
 pandora.getFindLayer = function() {
     var key = pandora.user.ui._findState.key
     if (!Ox.getObjectById(pandora.site.layers, key)) {
-        key = 'all'
+        key = '*'
     }
     return key
 };
