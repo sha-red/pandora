@@ -1439,6 +1439,14 @@ pandora.getFoldersWidth = function(section) {
     return width;
 };
 
+pandora.getFindLayer = function() {
+    var key = pandora.user.ui._findState.key
+    if (!!Ox.getObjectById(pandora.site.layers, key)) {
+        key = 'all'
+    }
+    return key
+};
+
 pandora.getHash = function(state, callback) {
     // FIXME: remove this
     var embedKeys = [

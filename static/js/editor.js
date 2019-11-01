@@ -28,7 +28,7 @@ pandora.ui.editor = function(data) {
             enableSetPosterFrame: !pandora.site.media.importFrames && data.editable,
             enableSubtitles: ui.videoSubtitles,
             find: ui.itemFind,
-            findLayer: ui._findState.key,
+            findLayer: pandora.getFindLayer(),
             getFrameURL: function(position) {
                 return pandora.getMediaURL('/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg?' + data.modified);
             },
