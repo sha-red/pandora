@@ -640,7 +640,7 @@ class Item(models.Model):
                 i['posterRatio'] = self.poster_width / self.poster_height
 
         if keys and 'source' in keys:
-            i['source'] = self.files.filter(selected=True).exclude(data='').exists()
+            i['source'] = self.streams().exclude(file__data='').exists()
 
         streams = self.streams()
         i['durations'] = [s.duration for s in streams]
