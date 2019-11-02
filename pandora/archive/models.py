@@ -523,7 +523,7 @@ class File(models.Model):
                     n += 1
                 profile = '%sp.%s' % (resolution, config['formats'][0])
                 target = os.path.join(tmp, language + '_' + profile)
-                ok, error = extract.stream(media, target, profile, info, audio_track=i+1, flags=self.flags)
+                ok, error = extract.stream(media, target, profile, info, audio_track=i+1, flags={})
                 if ok:
                     tinfo = ox.avinfo(target)
                     del tinfo['path']
