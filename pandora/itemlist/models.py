@@ -271,12 +271,13 @@ class List(models.Model):
                 self.save()
         for i in self.poster_frames:
             from item.models import Item
-            qs = Item.objects.filter(public_id=i['item'])
-            if qs.count() > 0:
-                if i.get('position'):
-                    frame = qs[0].frame(i['position'])
-                    if frame:
-                        frames.append(frame)
+            if 'item' in i:
+                qs = Item.objects.filter(public_id=i['item'])
+                if qs.count() > 0:
+                    if i.get('position'):
+                        frame = qs[0].frame(i['position'])
+                        if frame:
+                            frames.append(frame)
         self.icon.name = self.path('icon.jpg')
         icon = self.icon.path
         if frames:
