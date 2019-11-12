@@ -371,19 +371,6 @@ pandora.ui.infoView = function(data, isMixed) {
 
     $('<div>').css({height: '16px'}).appendTo($statistics);
 
-    function cleanupDate(value) {
-        if (/\d{2}-\d{2}-\d{4}/.test(value)) {
-            value = Ox.reverse(value.split('-')).join('-')
-        }
-        if (/\d{4}i\/\d{2}\/\d{d}/.test(value)) {
-            value = value.split('/').join('-')
-        }
-        if (/\d{2}\/\d{2}\/\d{4}/.test(value)) {
-            value = Ox.reverse(value.split('/')).join('-')
-        }
-        return value
-    }
-
     function editMetadata(key, value) {
         if (value != data[key]) {
             var itemKey = Ox.getObjectById(pandora.site.itemKeys, key);
@@ -400,7 +387,7 @@ pandora.ui.infoView = function(data, isMixed) {
                 edit[key] = value ? value : null;
             }
             if (itemKey && itemKey.type && itemKey.type[0] == 'date') {
-                edit[key] = edit[key].map(cleanupDate);
+                edit[key] = edit[key].map(pandora.cleanupDate);
             }
             pandora.api.edit(edit, function(result) {
                 if (!isMultiple) {
@@ -474,7 +461,7 @@ pandora.ui.infoView = function(data, isMixed) {
             listKeys.indexOf(key) > -1 && Ox.getObjectById(pandora.site.itemKeys, key).type[0] == 'date'
         ) {
             ret = value.split('; ').map(function(date) {
-                date = cleanupDate(date)
+                date = pandora.cleanupDate(date)
                 return date ? formatLink(Ox.formatDate(date,
                     ['', '%Y', '%B %Y', '%B %e, %Y'][date.split('-').length],
                     true
