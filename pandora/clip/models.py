@@ -121,7 +121,9 @@ class MetaClip(object):
                         annotations = annotations.filter(q)
                 entity_cache = {}
                 j['annotations'] = [
-                    a.json(keys=['value', 'id', 'layer'], entity_cache=entity_cache) for a in annotations
+                    a.json(keys=['value', 'id', 'layer'], entity_cache=entity_cache)
+                    for a in annotations
+                    if a.value
                 ]
             if 'layers' in keys:
                 j['layers'] = self.get_layers()
