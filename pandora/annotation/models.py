@@ -378,6 +378,8 @@ class Annotation(models.Model):
                 streams = self.item.streams()
                 if streams:
                     j['videoRatio'] = streams[0].aspect_ratio
+            if 'clip' in keys:
+                j[key] = self.clip.public_id
             for key in keys:
                 if key not in j:
                     if key in self._clip_keys:

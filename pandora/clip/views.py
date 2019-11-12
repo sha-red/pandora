@@ -78,7 +78,7 @@ def findClips(request, data):
     takes {
         query: object, // find clips, query object, see `find`
         itemsQuery: object, // limit to matching items, query object, see `find`
-        keys: [string], // list of properties to return
+        keys: [string], // list of properties to return, include 'annotations' to get all annotations for a clip
         positions: [int], // list of positions
         range: [int, int], // range of results to return
         sort: [object] // list of sort objects, see `find`
