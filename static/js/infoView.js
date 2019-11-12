@@ -38,6 +38,15 @@ pandora.ui.infoView = function(data, isMixed) {
             })
         ),
         posterKeys = nameKeys.concat(['title', 'year']),
+        displayedKeys = [ // FIXME: can tis be a flag in the config?
+            'title', 'notes', 'name', 'summary', 'id',
+            'hue', 'saturation', 'lightness', 'cutsperminute', 'volume',
+            'user', 'rightslevel', 'bitrate', 'timesaccessed',
+            'numberoffiles', 'numberofannotations', 'numberofcuts', 'words', 'wordsperminute',
+            'duration', 'aspectratio', 'pixels', 'size', 'resolution',
+            'created', 'modified', 'accessed',
+            'random'
+        ],
         statisticsWidth = 128,
 
         $bar = Ox.Bar({size: 16})
@@ -236,13 +245,17 @@ pandora.ui.infoView = function(data, isMixed) {
         )
         .appendTo($text);
 
-    // Director, Year and Country ----------------------------------------------
+    // Director, Year and Country, Language --------------------------------
 
-    renderGroup(['director', 'year', 'country']);
+    renderGroup(['director', 'year', 'country', 'language']);
 
     // Featuring ----------------------------------------------
 
     renderGroup(['featuring']);
+
+    // Render any remaing keys defined in config
+
+    renderRemainingKeys();
 
     // Summary -----------------------------------------------------------------
 
@@ -277,6 +290,7 @@ pandora.ui.infoView = function(data, isMixed) {
             )
             .appendTo($text);
     }
+
 
     // Duration, Aspect Ratio --------------------------------------------------
     if (!isMultiple) {
@@ -575,6 +589,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     function renderGroup(keys) {
         var $element;
+        keys.forEach(function(key) { displayedKeys.push(key) });
         if (canEdit || keys.filter(function(key) {
             return data[key];
         }).length) {
@@ -603,6 +618,17 @@ pandora.ui.infoView = function(data, isMixed) {
                 }
             });
             $element.appendTo($text);
+        }
+    }
+
+    function renderRemainingKeys() {
+        var keys = pandora.site.itemKeys.filter(function(item) {
+            return item.id != '*' && item.type != 'layer' && !Ox.contains(displayedKeys, item.id);
+        }).map(function(item) {
+            return item.id;
+        });
+        if (keys.length) {
+            renderGroup(keys)
         }
     }
 
