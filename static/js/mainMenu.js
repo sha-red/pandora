@@ -229,8 +229,10 @@ pandora.ui.mainMenu = function() {
                         { id: 'names', title: Ox._('Manage Names...'), disabled: !pandora.hasCapability('canManageTitlesAndNames') },
                         { id: 'translations', title: Ox._('Manage Translations...'), disabled: !pandora.hasCapability('canManageTranslations') },
                         {},
-                        { id: 'places', title: Ox._('Manage Places...'), disabled: !pandora.hasCapability('canManagePlacesAndEvents') },
-                        { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.hasCapability('canManagePlacesAndEvents') },
+                        pandora.hasView('map')
+                        ? [{ id: 'places', title: Ox._('Manage Places...'), disabled: !pandora.hasCapability('canManagePlacesAndEvents') }] : [],
+                        pandora.hasView('calendar')
+                        ? [{ id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.hasCapability('canManagePlacesAndEvents') }] : [],
                         {},
                         { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.hasCapability('canManageUsers') },
                         { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.hasCapability('canManageUsers') },

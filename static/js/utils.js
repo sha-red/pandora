@@ -2489,6 +2489,9 @@ pandora.hasPlacesLayer = function() {
     });
 };
 
+pandora.hasView = function(id) {
+    return !!(Ox.getObjectById(pandora.site.itemViews, id) || Ox.getObjectById(pandora.site.listViews, id))
+};
 
 pandora.isClipView = function(view, item) {
     if (pandora.user.ui.section == 'items') {
