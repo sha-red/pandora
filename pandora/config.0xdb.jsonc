@@ -98,7 +98,7 @@
     text of clips (in grid view, below the icon). Excluding a layer from this
     list means it will not be included in find annotations.
     */
-    "clipLayers": ["subtitles"],
+    "clipLayers": ["subtitles", "keywords"],
     "documentKeys": [
         {
             "id": "*",
@@ -711,6 +711,14 @@
             "find": true
         },
         {
+            "id": "keywords",
+            "title": "Keywords",
+            "type": "layer",
+            "autocomplete": true,
+            "filter": true,
+            "find": true
+        },
+        {
             "id": "subtitles",
             "title": "Subtitles",
             "type": "layer",
@@ -998,6 +1006,15 @@
             tooltip that appears on mouseover.
     */
     "layers": [
+        {
+            "id": "keywords",
+            "title": "Keywords",
+            "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "item": "Keyword",
+            "autocomplete": true,
+            "overlap": true,
+            "type": "string"
+        },
         {
             "id": "privatenotes",
             "title": "Private Notes",
