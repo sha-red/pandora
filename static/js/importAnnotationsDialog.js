@@ -68,7 +68,14 @@ pandora.ui.importAnnotationsDialog = function(options) {
         .bindEvent({
             change: function(data) {
                 $status.empty();
-                data.value.length && $formatSelect.options({value: Ox.last(data.value[0].name.split('.'))});
+                if (data.value.length) {
+                    var format = Ox.last(data.value[0].name.split('.'));
+                    $formatSelect.options({value: format});
+                    var subtitlesLayer = pandora.getSubtitlesLayer()
+                    if (subtitlesLayer && format == 'srt' && Ox.getObjectById(layers, subtitlesLayer))  {
+                        $layerSelect.options({value: subtitlesLayer})
+                    }
+                }
                 that[
                     data.value.length ? 'enableButton' : 'disableButton'
                 ]('import');
