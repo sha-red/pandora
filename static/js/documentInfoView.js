@@ -28,6 +28,13 @@ pandora.ui.documentInfoView = function(data, isMixed) {
         }).map(function(key){
             return key.id;
         }),
+        displayedKeys = [ // FIXME: can tis be a flag in the config?
+            'title', 'notes', 'name', 'description', 'id',
+            'user', 'rightslevel', 'timesaccessed',
+            'extension', 'dimensions', 'size', 'matches',
+            'created', 'modified', 'accessed',
+            'random', 'entity'
+        ],
         statisticsWidth = 128,
 
         $bar = Ox.Bar({size: 16})
@@ -234,6 +241,10 @@ pandora.ui.documentInfoView = function(data, isMixed) {
 
     Ox.getObjectById(pandora.site.documentKeys, 'keywords') && renderGroup(['keywords'])
 
+    // Render any remaing keys defined in config
+
+    renderRemainingKeys();
+
 
     // Description -------------------------------------------------------------
 
@@ -320,6 +331,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
         pandora.createLinks($div);
 
     }
+
 
     // Extension, Dimensions, Size ---------------------------------------------
 
@@ -533,6 +545,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
 
     function renderGroup(keys) {
         var $element;
+        keys.forEach(function(key) { displayedKeys.push(key) });
         if (canEdit || keys.filter(function(key) {
             return data[key];
         }).length) {
@@ -563,6 +576,17 @@ pandora.ui.documentInfoView = function(data, isMixed) {
             $element.appendTo($text);
         }
         return $element;
+    }
+
+    function renderRemainingKeys() {
+        var keys = pandora.site.documentKeys.filter(function(item) {
+            return item.id != '*' && !Ox.contains(displayedKeys, item.id);
+        }).map(function(item) {
+            return item.id;
+        });
+        if (keys.length) {
+            renderGroup(keys)
+        }
     }
 
     function renderRightsLevel() {
