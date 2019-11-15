@@ -71,7 +71,7 @@ def load_config(init=False):
         if getattr(settings, 'SITEURL', False):
             config['site']['url'] = settings.SITEURL
         settings.URL = config['site']['url']
-        settings.EMAIL_SUBJECT_PREFIX = '[%s]'%settings.SITENAME
+        settings.EMAIL_SUBJECT_PREFIX = '[%s]' % settings.SITENAME
         settings.DEFAULT_FROM_EMAIL = config['site']['email']['system']
         settings.SERVER_EMAIL = config['site']['email']['system']
         config['site']['videoprefix'] = settings.VIDEO_PREFIX
@@ -79,9 +79,9 @@ def load_config(init=False):
         config['site']['googleapikey'] = getattr(settings, 'GOOGLE_API_KEY')
         config['site']['version'] = get_version()
         config['site']['dontValidateUser'] = not settings.AUTH_CHECK_USERNAME
-        if not 'folderdepth' in config['site']:
+        if 'folderdepth' not in config['site']:
             config['site']['folderdepth'] = settings.USE_IMDB and 4 or 3
-        if 'sendReferrer' in config and not 'sendReferrer' in config['site']:
+        if 'sendReferrer' in config and 'sendReferrer' not in config['site']:
             config['site']['sendReferrer'] = config.pop('sendReferrer')
 
         # enable default filters if needed
@@ -90,6 +90,13 @@ def load_config(init=False):
             if key['id'] in default_filters and not key.get('filter'):
                 key['filter'] = True
                 sys.stderr.write('enabled filter for "%s" since its used as default filter.\n' % (key['id']))
+
+        # enable default document filters if needed
+        default_filters = [f['id'] for f in config['user']['ui']['documentFilters']]
+        for key in config['documentKeys']:
+            if key['id'] in default_filters and not key.get('filter'):
+                key['filter'] = True
+                sys.stderr.write('enabled filter for documeny key "%s" since its used as default filter.\n' % (key['id']))
 
         config['keys'] = {}
         for key in config['itemKeys']:
