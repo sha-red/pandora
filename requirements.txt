@@ -11,3 +11,4 @@ tornado<5
 geoip2==2.9.0
 youtube-dl>=2019.4.30
 python-memcached
+elasticsearch

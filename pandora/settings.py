@@ -204,6 +204,9 @@ CELERY_BROKER_URL = 'amqp://pandora:box@localhost:5672//pandora'
 
 SEND_CELERY_ERROR_EMAILS = False
 
+# Elasticsearch
+ELASTICSEARCH_HOST = None
+
 #with apache x-sendfile or lighttpd set this to True
 XSENDFILE = False
 

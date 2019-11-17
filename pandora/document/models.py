@@ -30,6 +30,7 @@ from user.models import Group
 
 from . import managers
 from . import utils
+from .fulltext import FulltextMixin
 
 User = get_user_model()
 
@@ -40,7 +41,7 @@ def get_path(f, x):
     return f.path(x)
 
 @python_2_unicode_compatible
-class Document(models.Model):
+class Document(models.Model, FulltextMixin):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -153,7 +154,7 @@ class Document(models.Model):
                 i = key['id']
                 if i == 'rightslevel':
                     save(i, self.rightslevel)
-                elif i not in ('*', 'dimensions') and i not in self.facet_keys:
+                elif i not in ('*', 'dimensions', 'fulltext') and i not in self.facet_keys:
                     value = data.get(i)
                     if isinstance(value, list):
                         value = u'\n'.join(value)
@@ -277,6 +278,7 @@ class Document(models.Model):
                 self.update_sort()
                 self.update_find()
                 self.update_facets()
+                self.update_fulltext()
             new = False
         else:
             new = True

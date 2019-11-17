@@ -91,6 +91,7 @@ apt-get install -y \
     python3-lxml \
     python3-html5lib \
     python3-ox \
+    python3-elasticsearch \
     oxframe \
     ffmpeg \
     mkvtoolnix \
@@ -98,6 +99,8 @@ apt-get install -y \
     imagemagick \
     poppler-utils \
     ipython3 \
+    tesseract-ocr \
+    tesseract-ocr-eng \
     postfix \
     postgresql-client $EXTRA
 

@@ -128,6 +128,12 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
             else:
                 q = Q(id=0)
         return q
+    elif key_type == 'fulltext':
+        qs = models.Document.find_fulltext_ids(v)
+        q = Q(id__in=qs)
+        if exclude:
+            q = ~Q(id__in=qs)
+        return q
     elif key_type == 'boolean':
         q = Q(**{'find__key': k, 'find__value': v})
         if exclude:
