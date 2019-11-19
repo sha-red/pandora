@@ -181,6 +181,9 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function getKey(key) {
+        if (Ox.getObjectById(pandora.site.itemKeys, key) && mapKeys[key]) {
+            return key
+        }
         return mapKeys[key] || key;
     }
 
