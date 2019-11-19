@@ -251,7 +251,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     // Featuring ----------------------------------------------
 
-    renderGroup(['featuring']);
+    Ox.getObjectById(pandora.site.itemKeys, 'featuring') && renderGroup(['featuring']);
 
     // Render any remaing keys defined in config
 
