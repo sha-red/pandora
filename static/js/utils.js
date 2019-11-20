@@ -424,7 +424,10 @@ pandora.uploadDroppedFiles = function(files) {
             }
         }).open();
     } else {
-        pandora.ui.addItemDialog({files: files}).open()
+        pandora.ui.addItemDialog({
+            files: files,
+            selected: 'upload'
+        }).open()
     }
 };
 
