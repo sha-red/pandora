@@ -75,6 +75,7 @@ pandora.ui.importAnnotationsDialog = function(options) {
                     if (subtitlesLayer && format == 'srt' && Ox.getObjectById(layers, subtitlesLayer))  {
                         $layerSelect.options({value: subtitlesLayer})
                     }
+                    updateLanguageSelect();
                 }
                 that[
                     data.value.length ? 'enableButton' : 'disableButton'
