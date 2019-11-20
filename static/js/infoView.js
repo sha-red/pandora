@@ -368,7 +368,7 @@ pandora.ui.infoView = function(data, isMixed) {
             .append(
                 Ox.EditableContent({
                         height: 128,
-                        placeholder: formatLight(Ox._(isMixed ? 'Mixed notes' : 'No notes')),
+                        placeholder: formatLight(Ox._(isMixed.notes ? 'Mixed notes' : 'No notes')),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
                         value: data.notes || '',
