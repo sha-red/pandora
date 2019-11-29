@@ -80,7 +80,7 @@ pandora.ui.document = function() {
                     imageHeight: item.dimensions[1],
                     imagePreviewURL: pandora.getMediaURL('/documents/' + item.id + '/256p.jpg?' + item.modified),
                     imageURL: pandora.getMediaURL('/documents/' + item.id + '/'
-                        + item.title + '.' + item.extension + '?' + item.modified),
+                        + pandora.safePDFName(item.title) + '.' + item.extension + '?' + item.modified),
                     imageWidth: item.dimensions[0],
                     width: that.width()
                 }).css({
