@@ -2640,7 +2640,7 @@ pandora.openURL = function(url) {
     }
 };
 
-pandora.safePDFName = function(name) {
+pandora.safeDocumentName = function(name) {
     name = name.replace('?', '_').replace('#', '_');
     return name;
 };
