@@ -71,7 +71,7 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
 
     key_type = get_key_type(k)
 
-    key_config = (utils.get_by_id(settings.CONFIG['documentKeys'], k) or {'type': 'string'}).get('type')
+    key_config = (utils.get_by_id(settings.CONFIG['documentKeys'], k) or {'type': 'string'})
 
     facet_keys = models.Document.facet_keys
     if k == 'id':
