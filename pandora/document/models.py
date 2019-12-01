@@ -154,7 +154,9 @@ class Document(models.Model, FulltextMixin):
                 i = key['id']
                 if i == 'rightslevel':
                     save(i, self.rightslevel)
-                elif i not in ('*', 'dimensions', 'fulltext') and i not in self.facet_keys:
+                if key.get('fulltext'):
+                    continue
+                elif i not in ('*', 'dimensions') and i not in self.facet_keys:
                     value = data.get(i)
                     if isinstance(value, list):
                         value = u'\n'.join(value)

@@ -36,6 +36,8 @@ def get_key_type(k):
     }.get(key_type, key_type)
     return key_type
 
+
+
 def parseCondition(condition, user, item=None, owner=None):
     '''
     '''
@@ -68,6 +70,9 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
         k = 'collection'
 
     key_type = get_key_type(k)
+
+    key_config = (utils.get_by_id(settings.CONFIG['documentKeys'], k) or {'type': 'string'}).get('type')
+
     facet_keys = models.Document.facet_keys
     if k == 'id':
         if op == '&' and isinstance(v, list):
@@ -128,7 +133,7 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
             else:
                 q = Q(id=0)
         return q
-    elif key_type == 'fulltext':
+    elif key_config.fulltext:
         qs = models.Document.find_fulltext_ids(v)
         q = Q(id__in=qs)
         if exclude:
