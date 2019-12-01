@@ -133,7 +133,7 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
             else:
                 q = Q(id=0)
         return q
-    elif key_config.fulltext:
+    elif key_config.get('fulltext'):
         qs = models.Document.find_fulltext_ids(v)
         q = Q(id__in=qs)
         if exclude:
