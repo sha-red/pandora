@@ -36,11 +36,12 @@ class FulltextMixin:
             return self.data.get('text', '')
         return ''
 
-    def delete_fulltext(self):
-        res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type='document', id=self.id)
-
     def has_fulltext_key():
         return bool([k for k in settings.CONFIG['documentKeys'] if k.get('fulltext')])
+
+    def delete_fulltext(self):
+        if self.has_fulltext_key():
+            res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type='document', id=self.id)
 
     def update_fulltext(self):
         if self.has_fulltext_key():

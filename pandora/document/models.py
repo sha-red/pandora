@@ -653,6 +653,7 @@ def delete_document(sender, **kwargs):
     if t.file:
         t.delete_cache()
         t.file.delete(save=False)
+    t.delete_fulltext()
 pre_delete.connect(delete_document, sender=Document)
 
 class ItemProperties(models.Model):
