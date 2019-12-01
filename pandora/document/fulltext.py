@@ -27,10 +27,11 @@ class FulltextMixin:
         return es
 
     def extract_fulltext(self):
-        if self.extension == 'pdf':
-            return extract_text(self.file.path)
-        elif self.extension in ('png', 'jpg'):
-            return ocr_image(self.file.path)
+        if self.file:
+            if self.extension == 'pdf':
+                return extract_text(self.file.path)
+            elif self.extension in ('png', 'jpg'):
+                return ocr_image(self.file.path)
         elif self.extension == 'html':
             return self.data.get('text', '')
         return ''
@@ -38,13 +39,17 @@ class FulltextMixin:
     def delete_fulltext(self):
         res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type='document', id=self.id)
 
+    def has_fulltext_key():
+        return bool([k for k in settings.CONFIG['documentKeys'] if k.get('fulltext')])
+
     def update_fulltext(self):
-        text = self.extract_fulltext()
-        if text:
-            doc = {
-                'text': text.lower()
-            }
-            res = self.elasticsearch().index(index=self._ES_INDEX, doc_type='document', id=self.id, body=doc)
+        if self.has_fulltext_key():
+            text = self.extract_fulltext()
+            if text:
+                doc = {
+                    'text': text.lower()
+                }
+                res = self.elasticsearch().index(index=self._ES_INDEX, doc_type='document', id=self.id, body=doc)
 
     @classmethod
     def find_fulltext(cls, query):
