@@ -33,7 +33,7 @@ pandora.ui.findDocumentsElement = function() {
                             }
                         }),
                 ] : [], [
-                    $findSelect = Ox.Select({
+                    pandora.$ui.findDocumentsSelect = $findSelect = Ox.Select({
                             id: 'select',
                             items: [].concat(
                                 pandora.site.documentKeys.filter(function(key) {
@@ -70,7 +70,7 @@ pandora.ui.findDocumentsElement = function() {
                                 }
                             }
                         }),
-                    $findInput = Ox.Input({
+                    pandora.$ui.findDocumentsInput = $findInput = Ox.Input({
                         autocomplete: autocompleteFunction(),
                         autocompleteSelect: true,
                         autocompleteSelectHighlight: true,
