@@ -196,7 +196,7 @@ pandora.ui.documentDialog = function(options) {
                         ? pandora.user.ui.documents[item.id].position
                         : 1,
                     url: '/documents/' + item.id + '/'
-                        + pandora.safePDFName(item.title + '.' + item.extension),
+                        + pandora.safeDocumentName(item.title) + '.' + item.extension,
                     width: dialogWidth,
                     zoom: 'fit'
                 })
@@ -211,7 +211,7 @@ pandora.ui.documentDialog = function(options) {
                     imageHeight: item.dimensions[1],
                     imagePreviewURL: pandora.getMediaURL('/documents/' + item.id + '/256p.jpg?' + item.modified),
                     imageURL: pandora.getMediaURL('/documents/' + item.id + '/'
-                        + item.title + '.' + item.extension + '?' + item.modified),
+                        + pandora.safeDocumentName(item.title) + '.' + item.extension + '?' + item.modified),
                     imageWidth: item.dimensions[0],
                     width: dialogWidth
                 })
