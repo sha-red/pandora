@@ -698,3 +698,99 @@ def chop(video, start, end, subtitles=None, dest=None, encode=False):
         return f
     else:
         return None
+
+def has_faststart(path):
+    cmd = [settings.FFPROBE, '-v', 'trace', '-i', path]
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT,
+                         close_fds=True)
+    stdout, stderr = p.communicate()
+    moov = "type:'moov'"
+    mdat = "type:'mdat'"
+    blocks = [b for b in stdout.decode().split('\n') if moov in b or mdat in b]
+    if blocks and moov in blocks[0]:
+        return True
+    return False
+
+def remux_stream(src, dst):
+    info = ox.avinfo(src)
+    if info.get('audio'):
+        audio = ['-c:a', 'copy']
+    else:
+        audio = []
+    if info.get('video'):
+        video = ['-c:v', 'copy']
+    else:
+        video = []
+    cmd = [
+        settings.FFMPEG,
+        '-nostats', '-loglevel', 'error',
+        '-map_metadata', '-1', '-sn',
+        '-i', src,
+    ] + video + [
+    ] + audio + [
+        '-movflags', '+faststart',
+        dst
+    ]
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                         stdout=open('/dev/null', 'w'),
+                         stderr=open('/dev/null', 'w'),
+                         close_fds=True)
+    p.wait()
+    return True, None
+
+
+def ffprobe(path, *args):
+    cmd = [settings.FFPROBE, '-loglevel', 'error', '-print_format', 'json', '-i', path] + list(args)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+    stdout, stderr = p.communicate()
+    return json.loads(stdout.decode())
+
+
+def get_chapters(path):
+    info = ffprobe(path, '-show_chapters')
+    chapters = []
+    n = 0
+    for chapter in info.get('chapters', []):
+        n += 1
+        chapters.append({
+            'in': chapter['start_time'],
+            'out': chapter['end_time'],
+            'value': chapter.get('tags', {}).get('title', 'Chapter %s' % n)
+        })
+    return chapters
+
+def get_text_subtitles(path):
+    subtitles = []
+    for stream in ffprobe(path, '-show_streams')['streams']:
+        if stream.get('codec_name') in ('subrip', 'aas', 'text'):
+            subtitles.append({
+                'index': stream['index'],
+                'language': stream['tags']['language'],
+            })
+    return subtitles
+
+def has_img_subtitles(path):
+    subtitles = []
+    for stream in ffprobe(path, '-show_streams')['streams']:
+        if stream.get('codec_type') == 'subtitle' and stream.get('codec_name') in ('dvbsub', 'pgssub'):
+            subtitles.append({
+                'index': stream['index'],
+                'language': stream['tags']['language'],
+            })
+    return subtitles
+
+def extract_subtitles(path, language=None):
+    extra = []
+    if language:
+        tracks = get_text_subtitles(path)
+        track = [t for t in tracks if t['language'] == language]
+        if track:
+            extra = ['-map', '0:%s' % track[0]['index']]
+        else:
+            raise Exception("unknown language: %s" % language)
+    cmd = ['ffmpeg', '-loglevel', 'error', '-i', path] + extra + ['-f', 'srt', '-']
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+    stdout, stderr = p.communicate()
+    return ox.srt.loads(stdout.decode())

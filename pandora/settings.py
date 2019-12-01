@@ -178,6 +178,7 @@ CACHES = {
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 AUTH_CHECK_USERNAME = True
 FFMPEG = 'ffmpeg'
+FFPROBE = 'ffprobe'
 FFMPEG_SUPPORTS_VP9 = True
 FFMPEG_DEBUG = False
 

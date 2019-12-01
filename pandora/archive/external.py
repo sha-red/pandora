@@ -97,6 +97,17 @@ def download(item_id, url):
         tmp = tmp.decode('utf-8')
     os.chdir(tmp)
     cmd = ['youtube-dl', '-q', media['url']]
+    if settings.CONFIG['video'].get('reuseUload', False):
+        max_resolution = max(settings.CONFIG['video']['resolutions'])
+        format = settings.CONFIG['video']['formats'][0]
+        if format == 'mp4':
+            cmd += [
+                '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio',
+                '--merge-output-format', 'mp4'
+            ]
+        elif format == 'webm':
+            cmd += ['--merge-output-format', 'webm']
+
     p = subprocess.Popen(cmd,
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, close_fds=True)

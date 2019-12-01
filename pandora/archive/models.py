@@ -376,6 +376,50 @@ class File(models.Model):
             return save_chunk(stream, stream.media, chunk, offset, name, done_cb)
         return False, 0
 
+    def extract_text_data(self):
+        if self.data:
+            for sub in extract.get_text_subtitles(self.data.path):
+                srt = extract.extract_subtitles(self.data.path, sub['language'])
+                # fixme add subtitles, possibly with language!
+            chapters = extract.get_chapters(self.data.path)
+            if chapters:
+                # fixme add chapters as notes
+                pass
+
+    def get_codec(self, type):
+        track = self.info.get(type)
+        if track:
+            return track[0].get('codec')
+
+    MP4_VCODECS = ['h264']
+    MP4_ACODECS = ['aac', None]
+    WEBM_VCODECS = ['vp8', 'vp9']
+    WEBM_ACODECS = ['vorbis', 'opus', None]
+
+    def can_remux(self):
+        config = settings.CONFIG['video']
+        height = self.info['video'][0]['height'] if self.info.get('video') else None
+        max_resolution = max(config['resolutions'])
+        if height <= max_resolution and self.extension in ('mov', 'mkv', 'mp4', 'm4v'):
+            vcodec = self.get_codec('video')
+            acodec = self.get_codec('audio')
+            if vcodec in self.MP4_VCODECS and acodec in self.MP4_ACODECS:
+                return True
+        return False
+
+    def can_stream(self):
+        config = settings.CONFIG['video']
+        height = self.info['video'][0]['height'] if self.info.get('video') else None
+        max_resolution = max(config['resolutions'])
+        if height <= max_resolution and config['formats'][0] == self.extension:
+            vcodec = self.get_codec('video')
+            acodec = self.get_codec('audio')
+            if self.extension in ['mp4', 'm4v'] and vcodec in self.MP4_VCODECS and acodec in self.MP4_ACODECS:
+                return extract.has_faststart(self.data.path)
+            elif self.extension == 'webm' and vcodec in self.WEBM_VCODECS and acodec in self.WEBM_ACODECS:
+                return True
+        return False
+
     def stream_resolution(self):
         config = settings.CONFIG['video']
         height = self.info['video'][0]['height'] if self.info.get('video') else None
@@ -747,13 +791,27 @@ class Stream(models.Model):
                         derivative.encode()
 
     def encode(self):
+        reuse = settings.CONFIG['video'].get('reuseUpload', False)
         media = self.source.media.path if self.source else self.file.data.path
-
         if not self.media:
             self.media.name = self.path(self.name())
         target = self.media.path
         info = ox.avinfo(media)
-        ok, error = extract.stream(media, target, self.name(), info, flags=self.flags)
+
+        done = False
+        if reuse and not self.source:
+            if self.file.can_stream():
+                ok, error = True, None
+                ox.makedirs(os.path.dirname(target))
+                shutil.move(self.file.data.path, target)
+                self.file.data.name = ''
+                self.file.save()
+            elif self.file.can_remux():
+                ok, error = extract.remux_stream(media, target)
+                done = True
+        if not done:
+            ok, error = extract.stream(media, target, self.name(), info, flags=self.flags)
+
         # file could have been moved while encoding
         # get current version from db and update
         self.refresh_from_db()
