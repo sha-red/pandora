@@ -36,7 +36,7 @@ class FulltextMixin:
             return self.data.get('text', '')
         return ''
 
-    def has_fulltext_key():
+    def has_fulltext_key(self):
         return bool([k for k in settings.CONFIG['documentKeys'] if k.get('fulltext')])
 
     def delete_fulltext(self):
