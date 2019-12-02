@@ -41,7 +41,11 @@ class FulltextMixin:
 
     def delete_fulltext(self):
         if self.has_fulltext_key():
-            res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type='document', id=self.id)
+            from elasticsearch.exceptions import NotFoundError
+            try:
+                res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type='document', id=self.id)
+            except NotFoundError:
+                pass
 
     def update_fulltext(self):
         if self.has_fulltext_key():
