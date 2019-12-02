@@ -540,7 +540,7 @@ class Document(models.Model, FulltextMixin):
             if size:
                 path = os.path.join(folder, '%dp%d.jpg' % (size, page))
             if len(crop) == 4:
-                path = os.path.join(folder, '%dp%d,%s.jpg' % (1024, page, ','.join(map(str, crop)))
+                path = os.path.join(folder, '%dp%d,%s.jpg' % (1024, page, ','.join(map(str, crop))))
                 if not os.path.exists(path):
                     img = Image.open(src).crop(crop)
                     img.save(path)
@@ -548,7 +548,7 @@ class Document(models.Model, FulltextMixin):
                     img = Image.open(path)
                 src = path
                 if size < max(img.size):
-                    path = os.path.join(folder, '%dp%d,%s.jpg' % (size, page, ','.join(map(str, crop)))
+                    path = os.path.join(folder, '%dp%d,%s.jpg' % (size, page, ','.join(map(str, crop))))
                     if not os.path.exists(path):
                         resize_image(src, path, size=size)
         elif self.extension in ('jpg', 'png', 'gif'):
