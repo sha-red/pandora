@@ -522,8 +522,14 @@ class Document(models.Model, FulltextMixin):
         else:
             path = src
         if self.extension == 'pdf':
+            crop = []
             if page:
-                page = int(page)
+                if ',' in page:
+                    crop = list(map(int, page.split(',')))
+                    page = crop[0]
+                    crop = crop[1:]
+                else:
+                    page = int(page)
             if page and page > 1 and page <= self.pages:
                 src = os.path.join(folder, '1024p%d.jpg' % page)
             else:
@@ -533,6 +539,18 @@ class Document(models.Model, FulltextMixin):
                 self.extract_page(page)
             if size:
                 path = os.path.join(folder, '%dp%d.jpg' % (size, page))
+            if len(crop) == 4:
+                path = os.path.join(folder, '%dp%d,%s.jpg' % (1024, page, ','.join(map(str, crop)))
+                if not os.path.exists(path):
+                    img = Image.open(src).crop(crop)
+                    img.save(path)
+                else:
+                    img = Image.open(path)
+                src = path
+                if size < max(img.size):
+                    path = os.path.join(folder, '%dp%d,%s.jpg' % (size, page, ','.join(map(str, crop)))
+                    if not os.path.exists(path):
+                        resize_image(src, path, size=size)
         elif self.extension in ('jpg', 'png', 'gif'):
             if os.path.exists(src):
                 if size and page:
