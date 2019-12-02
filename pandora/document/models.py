@@ -280,7 +280,6 @@ class Document(models.Model, FulltextMixin):
                 self.update_sort()
                 self.update_find()
                 self.update_facets()
-                self.update_fulltext()
             new = False
         else:
             new = True
@@ -506,6 +505,7 @@ class Document(models.Model, FulltextMixin):
                     self.oshash = ox.oshash(self.file.path)
                     self.save()
                     self.delete_cache()
+                    self.update_fulltext()
                 return True, self.file.size
 
             return save_chunk(self, self.file, chunk, offset, name, done_cb)
