@@ -1410,7 +1410,6 @@ pandora.ui.mainMenu = function() {
 
     function getSectionViews() {
         if (ui.section == 'documents') {
-            console.log('now documents')
             return [
                 { id: 'documents', title: Ox._('View Documents'), items: [
                     { group: 'collectionview', min: 1, max: 1, items: pandora.site.listViews.filter(function(view) {
