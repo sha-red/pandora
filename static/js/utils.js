@@ -2706,7 +2706,11 @@ pandora.reloadList = function() {
     Ox.Log('', 'reloadList')
     var listData = pandora.getListData();
     Ox.Request.clearCache(); // fixme: remove
-    if (pandora.$ui.filters) {
+    if (pandora.user.ui.section == 'documents' && pandora.$ui.documentFilters) {
+        pandora.$ui.documentFilters.forEach(function($filter) {
+            $filter.reloadList();
+        });
+    } else if (pandora.$ui.filters) {
         pandora.$ui.filters.forEach(function($filter) {
             $filter.reloadList();
         });
