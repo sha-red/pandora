@@ -27,7 +27,7 @@ pandora.ui.documentFilterForm = function(options) {
                     if (key.format && key.format.type == 'ColorPercent') {
                         key.format.type = 'percent';
                     }
-                    Ox.print(key);
+                    key.autocomplete = autocompleteFunction(key)
                     return key;
                 }).concat([{
                     id: 'collection',
@@ -69,6 +69,24 @@ pandora.ui.documentFilterForm = function(options) {
         that.getList = that.$filter.getList;
         that.value = that.$filter.value;
     });
+    function autocompleteFunction(key) {
+        return key.autocomplete ? function(value, callback) {
+            pandora.api.autocomplete({
+                key: key.id,
+                query: {
+                    conditions: [],
+                    operator: '&'
+                },
+                range: [0, 100],
+                sort: key.autocompleteSort,
+                value: value
+            }, function(result) {
+                callback(result.data.items.map(function(item) {
+                    return Ox.decodeHTMLEntities(item);
+                }));
+            });
+        } : null;
+    }
     that.updateResults = function() {
         if (mode == 'collection') {
             Ox.Request.clearCache(collection.id);
@@ -81,11 +99,9 @@ pandora.ui.documentFilterForm = function(options) {
                     }
                 })
                 .reloadList();
-            /*
-            pandora.$ui.filters && pandora.$ui.filters.forEach(function($filter) {
+            pandora.$ui.documentFilters && pandora.$ui.documentFilters.forEach(function($filter) {
                 $filter.reloadList();
             });
-            */
         } else {
             pandora.UI.set({findDocuments: Ox.clone(that.$filter.options('value'), true)});
             pandora.$ui.findElement.updateElement();
