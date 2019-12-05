@@ -215,6 +215,8 @@ class Item(models.Model):
                 and item_key['value'].get('type') == 'map' \
                 and self.get(item_key['value']['key']):
             value = re.compile(item_key['value']['map']).findall(self.get(item_key['value']['key']))
+            if value and item_key['value'].get('format'):
+                value = [item_key['value']['format'].format(value[0])]
             return value[0] if value else default
         return default
 

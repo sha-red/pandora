@@ -412,6 +412,8 @@ class Document(models.Model, FulltextMixin):
                 and document_key['value'].get('type') == 'map' \
                 and self.get_value(document_key['value']['key']):
             value = re.compile(document_key['value']['map']).findall(self.get_value(document_key['value']['key']))
+            if value and document_key['value'].get('format'):
+                value = [document_key['value']['format'].format(value[0])]
             return value[0] if value else default
         elif key == 'user':
             return self.user.username
