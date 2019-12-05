@@ -3026,6 +3026,7 @@ pandora.resizeWindow = function() {
             }
         }
     } else if (pandora.user.ui.section == 'documents') {
+        pandora.resizeFilters(pandora.$ui.documentPanel.width());
         if (pandora.user.ui.document) {
             pandora.$ui.document && pandora.$ui.document.update();
         } else {
