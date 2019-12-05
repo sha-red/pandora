@@ -133,7 +133,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
                     height: iconHeight + 'px'
                 })
                 .bindEvent({
-                    // singleclick: toggleIconSize
+                    singleclick: toggleIconSize
                 })
                 .appendTo($info),
 
@@ -634,6 +634,36 @@ pandora.ui.documentInfoView = function(data, isMixed) {
         }
         $capabilities = $('<div>').appendTo($rightsLevel);
         //renderCapabilities(data.rightslevel);
+    }
+
+    function toggleIconSize() {
+        iconSize = iconSize == 256 ? 512 : 256;
+        iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio);
+        iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio);
+        iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
+        $icon.animate({
+            left: margin + iconLeft + 'px',
+            width: iconWidth + 'px',
+            height: iconHeight + 'px',
+        }, 250);
+        $reflection.animate({
+            top: margin + iconHeight + 'px',
+            width: iconSize + 'px',
+            height: iconSize / 2 + 'px'
+        }, 250);
+        $reflectionIcon.animate({
+            left: iconLeft + 'px',
+            width: iconWidth + 'px',
+            height: iconHeight + 'px',
+        }, 250);
+        $reflectionGradient.animate({
+            width: iconSize + 'px',
+            height: iconSize / 2 + 'px'
+        }, 250);
+        $text.animate({
+            left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px'
+        }, 250);
+        pandora.UI.set({infoIconSize: iconSize});
     }
 
     that.reload = function() {
