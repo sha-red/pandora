@@ -5,6 +5,8 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
         extensions = files.map(function(file) {
             return file.name.split('.').pop().toLowerCase()
         }),
+        existingFiles = [],
+        uploadFiles = [],
 
         supportedExtensions = ['gif', 'jpg', 'jpeg', 'pdf', 'png'],
 
@@ -56,9 +58,9 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
                 height: 112,
                 keys: {escape: 'close'},
                 width: 288,
-                title: files.length == 1
+                title: uploadFiles.length == 1
                     ? Ox._('Upload Document')
-                    : Ox._('Upload {0} Documents', [files.length])
+                    : Ox._('Upload {0} Documents', [uploadFiles.length])
             })
             .bindEvent({
                 open: function() {
@@ -73,46 +75,63 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
             Ox._('Supported file types are GIF, JPG, PNG and PDF.')
         );
     } else {
-        var valid = true;
+        var oshashes = [];
         Ox.parallelForEach(files, function(file, index, array, callback) {
             var extension = file.name.split('.').pop().toLowerCase(),
                 filename = file.name.split('.').slice(0, -1).join('.') + '.'
                     + (extension == 'jpeg' ? 'jpg' : extension);
-            valid && Ox.oshash(file, function(oshash) {
-                pandora.api.findDocuments({
-                    keys: ['id', 'user', 'title', 'extension'],
-                    query: {
-                        conditions: [{
-                            key: 'oshash',
-                            operator: '==',
-                            value: oshash
-                        }],
-                        operator: '&'
-                    },
-                    range: [0, 1],
-                    sort: [{key: 'title', operator: '+'}]
-                }, function(result) {
-                    if (result.data.items.length) {
-                        var id = result.data.items[0].title + '.'
-                            + result.data.items[0].extension;
-                        valid && errorDialog(
-                            filename == id
-                            ? Ox._(
-                                'The file "{0}" already exists.',
-                                [filename]
-                            )
-                            : Ox._(
-                                'The file "{0}" already exists as "{1}".',
-                                [filename, id]
-                            )
-                        ).open();
-                        valid = false;
-                    }
+            Ox.oshash(file, function(oshash) {
+                // skip duplicate files
+                if (Ox.contains(oshashes, oshash)) {
                     callback();
-                })
+                } else {
+                    oshashes.push(oshash)
+                    pandora.api.findDocuments({
+                        keys: ['id', 'user', 'title', 'extension'],
+                        query: {
+                            conditions: [{
+                                key: 'oshash',
+                                operator: '==',
+                                value: oshash
+                            }],
+                            operator: '&'
+                        },
+                        range: [0, 1],
+                        sort: [{key: 'title', operator: '+'}]
+                    }, function(result) {
+                        if (result.data.items.length) {
+                            var id = result.data.items[0].title + '.'
+                                + result.data.items[0].extension;
+                            existingFiles.push({
+                                id: id,
+                                filename: filename
+
+                            })
+                        } else {
+                            uploadFiles.push(file)
+                        }
+                        callback();
+                    })
+                }
             });
         } ,function() {
-            valid && $uploadDialog.open();
+            if (uploadFiles.length) {
+                $uploadDialog.open();
+            } else if (existingFiles.length) {
+                var filename = existingFiles[0].filename
+                var id = existingFiles[0].id
+                errorDialog(
+                    filename == id
+                    ? Ox._(
+                        'The file "{0}" already exists.',
+                        [filename]
+                    )
+                    : Ox._(
+                        'The file "{0}" already exists as "{1}".',
+                        [filename, id]
+                    )
+                ).open();
+            }
         });
         return {open: Ox.noop};
     }
@@ -138,7 +157,7 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
     function uploadFile(part) {
         var data = {
             },
-            file = files[part],
+            file = uploadFiles[part],
             extension = file.name.split('.').pop().toLowerCase(),
             filename = file.name.split('.').slice(0, -1).join('.') + '.'
                 + (extension == 'jpeg' ? 'jpg' : extension);
@@ -158,7 +177,7 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
                     if (data.progress == 1) {
                         part++;
                         ids.push(data.response.id);
-                        if (part == files.length) {
+                        if (part == uploadFiles.length) {
                             $progress.options({progress: data.progress});
                             callback && callback({ids: ids});
                             $uploadDialog.close();
@@ -174,7 +193,7 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
                 },
                 progress: function(data) {
                     var progress = data.progress || 0;
-                    progress = part / files.length + 1 / files.length * progress;
+                    progress = part / uploadFiles.length + 1 / uploadFiles.length * progress;
                     $progress.options({progress: progress});
                 }
             });
