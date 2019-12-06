@@ -15,7 +15,7 @@ def pdfinfo(pdf):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     data = {}
-    for line in stdout.decode('utf-8').strip().split('\n'):
+    for line in stdout.decode('utf-8', 'replace').strip().split('\n'):
         parts = line.split(':')
         key = parts[0].lower().strip()
         if key:
