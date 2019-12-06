@@ -402,6 +402,47 @@ pandora.ui.mainMenu = function() {
                             });
                         }
                     } else if (ui.section == 'documents') {
+                        var files, ids = [];
+                        if (ui.document) {
+                            files = [pandora.$ui.document.info()];
+                            ids = [files[0].id];
+                        } else {
+                            files = pandora.$ui.list.options('selected').map(function(id) {
+                                ids.push(id)
+                                return pandora.$ui.list.value(id);
+                            });
+                        }
+                        if (ui._collection) {
+                            //fixme use history
+                            //pandora.doHistory('delete', files, ui._collection, function() {
+                            pandora.api.removeCollectionItems({
+                                collection: ui._collection,
+                                items: ids
+                            }, function() {
+                                pandora.UI.set({collectionSelection: []});
+                                pandora.reloadList();
+                            });
+                        } else {
+                            pandora.ui.deleteDocumentDialog(
+                                files,
+                                function() {
+                                    Ox.Request.clearCache();
+                                    if (ui.document) {
+                                        pandora.UI.set({document: ''});
+                                    } else {
+                                        pandora.$ui.list.reloadList()
+                                    }
+                                }
+                            ).open();
+                        }
+                    } else if (ui.section == 'edits') {
+                        var clips = pandora.$ui.editPanel.getSelectedClips();
+                        pandora.doHistory('delete', clips, ui.edit, function(result) {
+                            pandora.$ui.editPanel.updatePanel(function() {});
+                        });
+                    }
+                } else if (data.id == 'deletefromarchive') {
+                    if (ui.section == 'documents') {
                         var files;
                         if (ui.document) {
                             files = [pandora.$ui.document.info()];
@@ -421,11 +462,6 @@ pandora.ui.mainMenu = function() {
                                 }
                             }
                         ).open();
-                    } else if (ui.section == 'edits') {
-                        var clips = pandora.$ui.editPanel.getSelectedClips();
-                        pandora.doHistory('delete', clips, ui.edit, function(result) {
-                            pandora.$ui.editPanel.updatePanel(function() {});
-                        });
                     }
                 } else if (data.id == 'undo') {
                     fromMenu = true;
@@ -1045,7 +1081,11 @@ pandora.ui.mainMenu = function() {
             { id: 'paste', title: clipboardItems == 0 ? Ox._('Paste') : Ox._('Paste {0}', [clipboardItemName]), disabled: !canPaste, keyboard: 'control v' },
             { id: 'clearclipboard', title: Ox._('Clear Clipboard'), disabled: !clipboardItems},
             {},
-            { id: 'delete', title: Ox._('{0} {1} {2}', [deleteVerb, selectionItemName, listName]), disabled: !canDelete, keyboard: 'delete' },
+            [
+                { id: 'delete', title: Ox._('{0} {1} {2}', [deleteVerb, selectionItemName, listName]), disabled: !canDelete, keyboard: 'delete' }
+            ].concat(ui._collection ? [
+                { id: 'deletefromarchive', title: Ox._('{0} {1} {2}', [Ox._('Delete'), selectionItemName, Ox._('from Archive')]), disabled: !canDelete }
+            ] : []),
             {},
             { id: 'undo', title: undoText ? Ox._('Undo {0}', [undoText]) : Ox._('Undo'), disabled: !undoText, keyboard: 'control z' },
             { id: 'redo', title: redoText ? Ox._('Redo {0}', [redoText]) : Ox._('Redo'), disabled: !redoText, keyboard: 'shift control z' },
