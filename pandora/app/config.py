@@ -96,7 +96,7 @@ def load_config(init=False):
         for key in config['documentKeys']:
             if key['id'] in default_filters and not key.get('filter'):
                 key['filter'] = True
-                sys.stderr.write('enabled filter for documeny key "%s" since its used as default filter.\n' % (key['id']))
+                sys.stderr.write('enabled filter for document key "%s" since its used as default filter.\n' % (key['id']))
 
         config['keys'] = {}
         for key in config['itemKeys']:

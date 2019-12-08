@@ -439,7 +439,7 @@ def upload(request):
 
 def autocompleteDocuments(request, data):
     '''
-    Returns autocomplete strings for a given documeny key and search string
+    Returns autocomplete strings for a given document key and search string
     takes {
         key: string, // document key
         value: string, // search string
