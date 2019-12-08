@@ -30,6 +30,7 @@ from user.models import Group
 
 from . import managers
 from . import utils
+from . import tasks
 from .fulltext import FulltextMixin
 
 User = get_user_model()
@@ -507,7 +508,7 @@ class Document(models.Model, FulltextMixin):
                     self.oshash = ox.oshash(self.file.path)
                     self.save()
                     self.delete_cache()
-                    self.update_fulltext()
+                    tasks.extract_fulltext.delay(self.id)
                 return True, self.file.size
 
             return save_chunk(self, self.file, chunk, offset, name, done_cb)
