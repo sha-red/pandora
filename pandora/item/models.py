@@ -1049,7 +1049,9 @@ class Item(models.Model):
                         value = len(value)
                     set_value(s, name, value)
                 elif sort_type == 'year':
-                    value = self.get(source)[:4]
+                    value = self.get(source)
+                    if isinstance(value, str):
+                        value = value[:4]
                     set_value(s, name, value)
                 elif sort_type == 'date':
                     value = value_ = self.get(source)
