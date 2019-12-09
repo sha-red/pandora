@@ -1647,12 +1647,10 @@ pandora.ui.mainMenu = function() {
     function getViewMenu() {
         return { id: 'viewMenu', title: Ox._('View'), items: [
             { id: 'section', title: Ox._('Section'), items: [
-                { group: 'viewsection', min: 1, max: 1, items: Object.keys(pandora.site.sectionFolders).map(function(section) {
-                    return {
-                        id: section,
-                        title: section == 'items' ? Ox._(pandora.site.itemName.plural) : Ox._(Ox.toTitleCase(section)),
-                        checked: ui.section == section
-                    };
+                { group: 'viewsection', min: 1, max: 1, items: pandora.site.sections.map(function(section) {
+                    section = Ox.extend({}, section)
+                    section.checked = section.id == ui.section;
+                    return section;
                 }) }
             ] },
             {},

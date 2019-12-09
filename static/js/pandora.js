@@ -395,6 +395,11 @@ appPanel
             }) ? 'manual' : data.site.layers.some(function(layer) {
                 return layer.hasPlaces;
             }) ? 'auto' : 'none',
+            sections: [
+                {id: 'items', title: Ox._(pandora.site.itemName.plural)},
+                {id: 'edits', title: Ox._('Edits')},
+                {id: 'documents', title: Ox._('Documents')}
+            ],
             sectionFolders: {
                 items: [
                     {id: 'personal', title: 'Personal Lists'},
