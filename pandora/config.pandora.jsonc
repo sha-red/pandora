@@ -1274,6 +1274,6 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "formats": ["webm", "mp4"],
         "previewRatio": 1.3333333333,
         "resolutions": [240, 480],
-        "torrent": true
+        "torrent": false
     }
 }
