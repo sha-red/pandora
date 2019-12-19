@@ -107,6 +107,8 @@ class Command(BaseCommand):
                     print(sql)
                 cursor.execute(sql)
             transaction.commit()
+            for i in models.Item.objects.filter(sort=None):
+                i.save()
             if rebuild:
                 print("Updating sort values...")
                 ids = [i['id'] for i in models.Item.objects.all().values('id')]
@@ -115,3 +117,5 @@ class Command(BaseCommand):
                     if options['debug']:
                         print(i)
                     i.update_sort()
+        for i in models.Item.objects.filter(sort=None):
+            i.save()
