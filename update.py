@@ -127,6 +127,9 @@ def get_branch(path=None):
 
 
 if __name__ == "__main__":
+    if os.stat(__file__).st_uid != os.getuid() or os.getuid() == 0:
+        print('you must run update.py as the pandora user')
+        sys.exit(1)
     base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
     os.chdir(base)
     activate_venv(base)
