@@ -1375,6 +1375,15 @@ def sitemap_xml(request):
     response['Content-Type'] = 'application/xml'
     return response
 
+def sitemap_part_xml(request, part):
+    part = int(part)
+    sitemap = os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'sitemap%06d.xml' % part))
+    if not os.path.exists(sitemap):
+        raise Http404
+    response = HttpFileResponse(sitemap)
+    response['Content-Type'] = 'application/xml'
+    return response
+
 def item_json(request, id):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     if not request.user.is_anonymous():

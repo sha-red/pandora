@@ -64,6 +64,7 @@ urlpatterns = [
     url(r'^atom.xml$', item.views.atom_xml),
     url(r'^robots.txt$', app.views.robots_txt),
     url(r'^sitemap.xml$', item.views.sitemap_xml),
+    url(r'^sitemap(?P<part>\d+).xml$', item.views.sitemap_part_xml),
     url(r'', include(item.urls)),
 ]
 #sould this not be enabled by default? nginx should handle those

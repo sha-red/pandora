@@ -161,13 +161,47 @@ def update_sitemap(base_url):
     def absolute_url(url):
         return base_url + url
 
-    urlset = ET.Element('urlset')
-    urlset.attrib['xmlns'] = "http://www.sitemaps.org/schemas/sitemap/0.9"
-    urlset.attrib['xmlns:xsi'] = "http://www.w3.org/2001/XMLSchema-instance"
-    urlset.attrib['xsi:schemaLocation'] = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
-    urlset.attrib['xmlns:video'] = "http://www.google.com/schemas/sitemap-video/1.1"
+    state = {}
+    state['part'] = 1
+    state['count'] = 0
 
-    url = ET.SubElement(urlset, "url")
+    def new_urlset():
+        urlset = ET.Element('urlset')
+        urlset.attrib['xmlns'] = "http://www.sitemaps.org/schemas/sitemap/0.9"
+        urlset.attrib['xmlns:xsi'] = "http://www.w3.org/2001/XMLSchema-instance"
+        urlset.attrib['xsi:schemaLocation'] = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+        urlset.attrib['xmlns:video'] = "http://www.google.com/schemas/sitemap-video/1.1"
+        return urlset
+
+    def save_urlset():
+        s = ET.SubElement(sitemap_index, "sitemap")
+        loc = ET.SubElement(s, "loc")
+        loc.text = absolute_url("sitemap%06d.xml" % state['part'])
+        lastmod = ET.SubElement(s, "lastmod")
+        lastmod.text = datetime.now().strftime("%Y-%m-%d")
+        data = b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(state['urlset'])
+        path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'sitemap%06d.xml.gz' % state['part']))
+        with open(path[:-3], 'wb') as f:
+            f.write(data)
+        with gzip.open(path, 'wb') as f:
+            f.write(data)
+        state['part'] += 1
+        state['count'] = 0
+        state['urlset'] = new_urlset()
+
+    def tick():
+        state['count'] += 1
+        if state['count'] > 40000:
+            save_urlset()
+
+    sitemap_index = ET.Element('sitemapindex')
+    sitemap_index.attrib['xmlns'] = "http://www.sitemaps.org/schemas/sitemap/0.9"
+    sitemap_index.attrib['xmlns:xsi'] = "http://www.w3.org/2001/XMLSchema-instance"
+    sitemap_index.attrib['xsi:schemaLocation'] = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+
+    state['urlset'] = new_urlset()
+
+    url = ET.SubElement(state['urlset'], "url")
     loc = ET.SubElement(url, "loc")
     loc.text = absolute_url('') 
     # always, hourly, daily, weekly, monthly, yearly, never
@@ -179,9 +213,10 @@ def update_sitemap(base_url):
     # priority of page on site values 0.1 - 1.0
     priority = ET.SubElement(url, "priority")
     priority.text = '1.0'
+    tick()
 
     for page in [s['id'] for s in settings.CONFIG['sitePages']]:
-        url = ET.SubElement(urlset, "url")
+        url = ET.SubElement(state['urlset'], "url")
         loc = ET.SubElement(url, "loc")
         loc.text = absolute_url(page)
         # always, hourly, daily, weekly, monthly, yearly, never
@@ -190,11 +225,12 @@ def update_sitemap(base_url):
         # priority of page on site values 0.1 - 1.0
         priority = ET.SubElement(url, "priority")
         priority.text = '1.0'
+        tick()
 
     allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
     can_play = settings.CONFIG['capabilities']['canPlayVideo']['guest']
     for i in models.Item.objects.filter(level__lte=allowed_level):
-        url = ET.SubElement(urlset, "url")
+        url = ET.SubElement(state['urlset'], "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")
         loc.text = absolute_url("%s/info" % i.public_id)
@@ -230,11 +266,12 @@ def update_sitemap(base_url):
                 el.text = "%s" % int(duration)
             el = ET.SubElement(video, "video:live")
             el.text = "no"
+        tick()
 
     # Featured Lists
     from itemlist.models import List
     for l in List.objects.filter(Q(status='featured') | Q(status='public')):
-        url = ET.SubElement(urlset, "url")
+        url = ET.SubElement(state['urlset'], "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")
         loc.text = absolute_url("list==%s" % quote(l.get_id()))
@@ -248,10 +285,12 @@ def update_sitemap(base_url):
         # priority of page on site values 0.1 - 1.0
         priority = ET.SubElement(url, "priority")
         priority.text = '1.0' if l.status == 'featured' else '0.75'
+        tick()
+
     # Featured Edits
     from edit.models import Edit
     for l in Edit.objects.filter(Q(status='featured') | Q(status='public')):
-        url = ET.SubElement(urlset, "url")
+        url = ET.SubElement(state['urlset'], "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")
         loc.text = absolute_url(l.get_absolute_url()[1:])
@@ -265,10 +304,12 @@ def update_sitemap(base_url):
         # priority of page on site values 0.1 - 1.0
         priority = ET.SubElement(url, "priority")
         priority.text = '1.0' if l.status == 'featured' else '0.75'
+        tick()
+
     # Featured Collections
     from documentcollection.models import Collection
     for l in Collection.objects.filter(Q(status='featured') | Q(status='public')):
-        url = ET.SubElement(urlset, "url")
+        url = ET.SubElement(state['urlset'], "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")
         loc.text = absolute_url("documents/collection==%s" % quote(l.get_id()))
@@ -282,10 +323,11 @@ def update_sitemap(base_url):
         # priority of page on site values 0.1 - 1.0
         priority = ET.SubElement(url, "priority")
         priority.text = '1.0' if l.status == 'featured' else '0.75'
+        tick()
 
     from document.models import Document
     for d in Document.objects.filter(rightslevel=0).filter(Q(extension='html') | Q(extension='pdf')):
-        url = ET.SubElement(urlset, "url")
+        url = ET.SubElement(state['urlset'], "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")
         loc.text = absolute_url(d.get_id())
@@ -301,8 +343,10 @@ def update_sitemap(base_url):
         priority.text = '0.75'
         if d.collections.filter(Q(status='featured') | Q(status='public')).count():
             priority.text = '1.0'
-
-    data = b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset)
+        tick()
+    if state['count']:
+        save_urlset()
+    data = b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(sitemap_index)
     with open(sitemap[:-3], 'wb') as f:
         f.write(data)
     with gzip.open(sitemap, 'wb') as f:
