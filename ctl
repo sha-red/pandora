@@ -9,33 +9,37 @@ fi
 if [ "$action" = "init" ]; then
     cd "`dirname "$0"`"
     BASE=`pwd`
-    python3 -m venv --system-site-packages .
-
+    SUDO=""
+    PANDORA_USER=`ls -l update.py | cut -f3 -d" "`
+    if [ `whoami` != $PANDORA_USER ]; then
+        SUDO="sudo -H -u $PANDORA_USER"
+    fi
+    $SUDO python3 -m venv --system-site-packages .
     branch=`cat .git/HEAD  | sed 's@/@\n@g' | tail -n1`
 
     # Work around broken venv module in Ubuntu 16.04 / Debian 9
     if [ ! -e bin/pip ]; then
-        bin/python3 -m pip install -U --ignore-installed "pip<9"
+        $SUDO bin/python3 -m pip install -U --ignore-installed "pip<9"
     fi
     if [ ! -d static/oxjs ]; then
-        git clone --depth 1 -b $branch https://git.0x2620.org/oxjs.git static/oxjs
+        $SUDO git clone --depth 1 -b $branch https://git.0x2620.org/oxjs.git static/oxjs
     fi
-    mkdir -p src
+    $SUDO mkdir -p src
     if [ ! -d src/oxtimelines ]; then
-        git clone --depth 1 -b $branch https://git.0x2620.org/oxtimelines.git src/oxtimelines
+        $SUDO git clone --depth 1 -b $branch https://git.0x2620.org/oxtimelines.git src/oxtimelines
     fi
     for package in oxtimelines python-ox; do
         cd ${BASE}
         if [ ! -d src/${package} ]; then
-            git clone --depth 1 -b $branch https://git.0x2620.org/${package}.git src/${package}
+            $SUDO git clone --depth 1 -b $branch https://git.0x2620.org/${package}.git src/${package}
         fi
         cd ${BASE}/src/${package}
-        ${BASE}/bin/python setup.py develop
+        $SUDO ${BASE}/bin/python setup.py develop
     done
     cd ${BASE}
-    ./bin/pip install -r requirements.txt
+    $SUDO ./bin/pip install -r requirements.txt
     if [ ! -e pandora/gunicorn_config.py ]; then
-        cp pandora/gunicorn_config.py.in pandora/gunicorn_config.py
+        $SUDO cp pandora/gunicorn_config.py.in pandora/gunicorn_config.py
     fi
     exit 0
 fi
