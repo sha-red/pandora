@@ -129,6 +129,7 @@ fi
 git clone https://git.0x2620.org/pandora.git /srv/pandora
 cd /srv/pandora
 git checkout $BRANCH
+chown -R $PANDORA:$PANDORA /srv/pandora
 ./ctl init
 
 # create config.jsonc from templates in git
