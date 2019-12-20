@@ -86,6 +86,21 @@ def load_config(init=False):
 
         # enable default filters if needed
         default_filters = [f['id'] for f in config['user']['ui']['filters']]
+        available_filters = [key['id'] for key in config['itemKeys'] if key.get('filter')]
+        unknown_ids = set(default_filters) - set(available_filters)
+        if unknown_ids:
+            sys.stderr.write('WARNING: unknown item keys in default filters: %s.\n' % list(unknown_ids))
+            unused_filters = [key for key in available_filters if key not in default_filters]
+            if len(unused_filters) < len(unknown_ids):
+                sys.stderr.write('you need at least 5 item filters')
+            else:
+                auto_filters = unused_filters[:len(unknown_ids)]
+                default_filters += auto_filters
+                for key in auto_filters:
+                    config['user']['ui']['filters'].append({
+                        "id": key, "sort": [{"key": "items", "operator": "-"}]
+                    })
+                sys.stderr.write('         using the following document filters instead: %s.\n' % auto_filters)
         for key in config['itemKeys']:
             if key['id'] in default_filters and not key.get('filter'):
                 key['filter'] = True
@@ -93,6 +108,22 @@ def load_config(init=False):
 
         # enable default document filters if needed
         default_filters = [f['id'] for f in config['user']['ui']['documentFilters']]
+        available_filters = [key['id'] for key in config['documentKeys'] if key.get('filter')]
+        unknown_ids = set(default_filters) - set(available_filters)
+        if unknown_ids:
+            sys.stderr.write('WARNING: unknown document keys in default filters: %s.\n' % list(unknown_ids))
+            unused_filters = [key for key in available_filters if key not in default_filters]
+            if len(unused_filters) < len(unknown_ids):
+                sys.stderr.write('you need at least 5 item filters')
+            else:
+                auto_filters = unused_filters[:len(unknown_ids)]
+                default_filters += auto_filters
+                for key in auto_filters:
+                    config['user']['ui']['documentFilters'].append({
+                        "id": key, "sort": [{"key": "items", "operator": "-"}]
+                    })
+                sys.stderr.write('         using the following document filters instead: %s.\n' % auto_filters)
+
         for key in config['documentKeys']:
             if key['id'] in default_filters and not key.get('filter'):
                 key['filter'] = True
