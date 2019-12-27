@@ -919,12 +919,12 @@ pandora.ui.infoView = function(data, isMixed) {
         });
     }
 
-    function renderList() {
+    function renderFrames() {
         pandora.api.get({
             id: data.id,
-            keys: [ui.icons == 'posters' ? 'posters' : 'frames']
+            keys: ['frames']
         }, 0, function(result) {
-            var images = result.data[ui.icons == 'posters' ? 'posters' : 'frames'].map(function(image) {
+            var images = result.data.frames.map(function(image) {
                     return Ox.extend(image, {index: image.index.toString()});
                 }),
                 selectedImage = images.filter(function(image) {
@@ -932,8 +932,8 @@ pandora.ui.infoView = function(data, isMixed) {
                 })[0],
                 modified = data.modified;
             $list = Ox.IconList({
-                    defaultRatio: ui.icons == 'posters' || !data.stream ? pandora.site.posters.ratio : data.stream.aspectratio,
-                    fixedRatio: ui.icons == 'posters' || !data.stream ? false : data.stream.aspectratio,
+                    defaultRatio: !data.stream ? pandora.site.posters.ratio : data.stream.aspectratio,
+                    fixedRatio: !data.stream ? false : data.stream.aspectratio,
                     item: function(data, sort, size) {
                         var ratio = data.width / data.height;
                         size = size || 128;
@@ -941,17 +941,124 @@ pandora.ui.infoView = function(data, isMixed) {
                             height: ratio <= 1 ? size : size / ratio,
                             id: data.id,
                             info: data.width + ' × ' + data.height + ' px',
-                            title: ui.icons == 'posters' ? data.source : Ox.formatDuration(data.position),
+                            title: Ox.formatDuration(data.position),
+                            url: data.url,
+                            width: ratio >= 1 ? size : size * ratio
+                        }
+                    },
+                    items: images,
+                    keys: ['index', 'position', 'width', 'height', 'url'],
+                    max: 1,
+                    min: 1,
+                    orientation: 'both',
+                    // fixme: should never be undefined
+                    selected: selectedImage ? [selectedImage['index']] : [],
+                    size: 128,
+                    sort: [{key: 'index', operator: '+'}],
+                    unique: 'index'
+                })
+                .addClass('OxMedia')
+                .css({
+                    display: 'block',
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    width: listWidth + 'px',
+                    height: getHeight() + 'px'
+                })
+                .bindEvent({
+                    select: function(event) {
+                        var index = event.ids[0];
+                        selectedImage = images.filter(function(image) {
+                            return image.index == index;
+                        })[0];
+                        var imageRatio = selectedImage.width / selectedImage.height,
+                            src = selectedImage.url
+                        if ($browserImages.length == 0) {
+                            $browserImages = pandora.$ui.browser.find('img[src*="/' + data.id + '/"]');
+                        }
+                        pandora.api.setPosterFrame({
+                            id: data.id,
+                            // fixme: api slightly inconsistent, this shouldn't be "position"
+                            position: selectedImage.index
+                        }, function() {
+                            var src;
+                            Ox.Request.clearCache();
+                            if (ui.icons == 'frames') {
+                                src = pandora.getMediaURL('/' + data.id + '/icon512.jpg?' + Ox.uid());
+                                $icon.attr({src: src});
+                                $reflectionIcon.attr({src: src});
+                                if (pandora.$ui.videoPreview) {
+                                    pandora.$ui.videoPreview.options({
+                                        position: $list.value(selectedImage.index, 'position')
+                                    });
+                                }
+                            } else if (ui.icons == 'posters' && ui.showSitePosters) {
+                                src = pandora.getMediaURL('/' + data.id + '/siteposter512.jpg?' + Ox.uid());
+                                $icon.attr({src: src});
+                                $reflectionIcon.attr({src: src});
+                            }
+                            $browserImages.each(function() {
+                                $(this).attr({src: pandora.getMediaURL('/' + data.id + '/' + (
+                                    ui.icons == 'posters'
+                                        ? ui.showSitePosters ? 'siteposter' : 'poster'
+                                        : 'icon'
+                                ) + '128.jpg?' + Ox.uid())});
+                            });
+                            if (ui.listSort[0].key == 'modified') {
+                                pandora.$ui.browser.reloadList();
+                            }
+                        });
+                    }
+                })
+                .appendTo($info);
+            $list.size();
+        });
+    }
+
+    function renderList() {
+        if (ui.icons == 'posters' && !ui.showSitePosters) {
+            renderPosters()
+        } else {
+            renderFrames()
+        }
+    }
+
+    function renderPosters() {
+        pandora.api.get({
+            id: data.id,
+            keys: ['posters']
+        }, 0, function(result) {
+            var images = result.data.posters.map(function(image) {
+                    return Ox.extend(image, {index: image.index.toString()});
+                }),
+                selectedImage = images.filter(function(image) {
+                    return image.selected;
+                })[0],
+                modified = data.modified;
+            if (images.length == 1) {
+                renderFrames()
+                return
+            }
+            $list = Ox.IconList({
+                    defaultRatio: pandora.site.posters.ratio,
+                    fixedRatio: false,
+                    item: function(data, sort, size) {
+                        var ratio = data.width / data.height;
+                        size = size || 128;
+                        return {
+                            height: ratio <= 1 ? size : size / ratio,
+                            id: data.id,
+                            info: data.width + ' × ' + data.height + ' px',
+                            title: data.source,
                             url: data.url.replace('http://', '//') + (
-                                ui.icons == 'posters' && data.source == pandora.site.site.url ? '?' + modified : ''
+                                data.source == pandora.site.site.url ? '?' + modified : ''
                             ),
                             width: ratio >= 1 ? size : size * ratio
                         }
                     },
                     items: images,
-                    keys: ui.icons == 'posters'
-                        ? ['index', 'source', 'width', 'height', 'url']
-                        : ['index', 'position', 'width', 'height', 'url'],
+                    keys: ['index', 'source', 'width', 'height', 'url'],
                     max: 1,
                     min: 1,
                     orientation: 'both',
@@ -981,12 +1088,12 @@ pandora.ui.infoView = function(data, isMixed) {
                         if ($browserImages.length == 0) {
                             $browserImages = pandora.$ui.browser.find('img[src*="/' + data.id + '/"]');
                         }
-                        if (ui.icons == 'posters' && !ui.showSitePosters) {
+                        if (!ui.showSitePosters) {
                             $browserImages.each(function() {
                                 var $this = $(this),
                                     size = Math.max($this.width(), $this.height());
                                 $this.attr({src: src});
-                                ui.icons == 'posters' && $this.css(imageRatio < 1 ? {
+                                $this.css(imageRatio < 1 ? {
                                     width: Math.round(size * imageRatio) + 'px',
                                     height: size + 'px'
                                 } : {
@@ -1000,31 +1107,17 @@ pandora.ui.infoView = function(data, isMixed) {
                             iconSize = iconSize == 256 ? 512 : 256;
                             toggleIconSize();
                         }
-                        pandora.api[ui.icons == 'posters' ? 'setPoster' : 'setPosterFrame'](Ox.extend({
-                            id: data.id
-                        }, ui.icons == 'posters' ? {
+                        pandora.api.setPoster({
+                            id: data.id,
                             source: selectedImage.source
-                        } : {
-                             // fixme: api slightly inconsistent, this shouldn't be "position"
-                            position: selectedImage.index
-                        }), function() {
+                        }, function() {
                             var src;
                             Ox.Request.clearCache();
-                            if (ui.icons == 'frames') {
-                                src = pandora.getMediaURL('/' + data.id + '/icon512.jpg?' + Ox.uid());
-                                $icon.attr({src: src});
-                                $reflectionIcon.attr({src: src});
-                                if (pandora.$ui.videoPreview) {
-                                    pandora.$ui.videoPreview.options({
-                                        position: $list.value(selectedImage.index, 'position')
-                                    });
-                                }
-                            }
                             if (!ui.showSitePosters) {
                                 $browserImages.each(function() {
-                                    $(this).attr({src: pandora.getMediaURL('/' + data.id + '/' + (
-                                        ui.icons == 'posters' ? 'poster' : 'icon'
-                                    ) + '128.jpg?' + Ox.uid())});
+                                    $(this).attr({
+                                        src: pandora.getMediaURL('/' + data.id + '/poster128.jpg?' + Ox.uid())
+                                    });
                                 });
                             }
                             if (ui.listSort[0].key == 'modified') {
@@ -1037,6 +1130,7 @@ pandora.ui.infoView = function(data, isMixed) {
             $list.size();
         });
     }
+
 
     function renderRightsLevel() {
         var $rightsLevelElement = getRightsLevelElement(data.rightslevel),
