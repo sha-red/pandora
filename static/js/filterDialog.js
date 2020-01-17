@@ -12,7 +12,9 @@ pandora.ui.filterDialog = function() {
                         click: function() {
                             var list = pandora.$ui.filterForm.getList();
                             if (list.save) {
-                                pandora.api.addList({
+                                pandora.api[
+                                    pandora.user.ui.section == 'documents' ? 'addCollection' : 'addList'
+                                ]({
                                     name: list.name,
                                     query: list.query,
                                     status: 'private',
@@ -20,12 +22,21 @@ pandora.ui.filterDialog = function() {
                                 }, function(result) {
                                     var $list = pandora.$ui.folderList.personal,
                                         id = result.data.id;
-                                    pandora.UI.set({
-                                        find: {
-                                            conditions: [{key: 'list', value: id, operator: '=='}],
-                                            operator: '&'
-                                        }
-                                    });
+                                    if (pandora.user.ui.section) {
+                                        pandora.UI.set({
+                                            findDocuments: {
+                                                conditions: [{key: 'collection', value: id, operator: '=='}],
+                                                operator: '&'
+                                            }
+                                        });
+                                    } else {
+                                        pandora.UI.set({
+                                            find: {
+                                                conditions: [{key: 'list', value: id, operator: '=='}],
+                                                operator: '&'
+                                            }
+                                        });
+                                    }
                                     Ox.Request.clearCache(); // fixme: remove
                                     $list.bindEventOnce({
                                             load: function(data) {

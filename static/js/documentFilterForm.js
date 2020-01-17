@@ -37,6 +37,7 @@ pandora.ui.documentFilterForm = function(options) {
                         return item.id;
                     })
                 }]),
+                listName: Ox._('Collection'),
                 list: mode == 'find' ? {
                     sort: pandora.user.ui.collectionSort,
                     view: pandora.user.ui.collectionView
