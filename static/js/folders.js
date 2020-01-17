@@ -52,13 +52,13 @@ pandora.ui.folders = function(section) {
                                     [Ox._(folderItem)]),
                                     keyboard: 'shift control n',
                                     disabled:  ui.section == 'documents'
-                                        ? ui.collectionSelection == 0
+                                        ? ui.collectionSelection.length == 0
                                         : ui.listSelection.length == 0
                                 },
                                 { id: 'newsmartlist', title: Ox._('New Smart {0}', [Ox._(folderItem)]), keyboard: 'alt control n' },
                                 { id: 'newsmartlistfromresults', title: Ox._('New Smart {0} from Results', [Ox._(folderItem)]), keyboard: 'shift alt control n' },
                                 {},
-                                { id: 'duplicatelist', title: Ox._('Duplicate Selected {0}', [Ox._(folderItem)]), keyboard: 'control d', disabled: !ui._list },
+                                { id: 'duplicatelist', title: Ox._('Duplicate Selected {0}', [Ox._(folderItem)]), keyboard: 'control d', disabled: ui.section == 'documents' ? !ui._collection : !ui._list },
                                 { id: 'editlist', title: Ox._('Edit Selected {0}...', [Ox._(folderItem)]), keyboard: 'control e', disabled: !editable },
                                 { id: 'deletelist', title: Ox._('Delete Selected {0}...', [Ox._(folderItem)]), keyboard: 'delete', disabled: !editable }
                             ],
@@ -75,12 +75,17 @@ pandora.ui.folders = function(section) {
                                 ], data.id)) {
                                     pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
                                 } else if (data.id == 'duplicatelist') {
-                                    pandora.addList(ui._list);
+                                    pandora.addList(ui.section == 'documents' ? ui._collection : ui._list);
                                 } else if (data.id == 'editlist') {
                                     pandora.ui.listDialog().open();
                                 } else if (data.id == 'deletelist') {
                                     pandora.ui.deleteListDialog().open();
                                 }
+                            },
+                            pandora_collectionselection: function(data) {
+                                pandora.$ui.personalListsMenu[
+                                    data.value.length ? 'enableItem' : 'disableItem'
+                                ]('newlistfromselection');
                             },
                             pandora_find: function() {
                                 // fixme: duplicated
@@ -94,6 +99,20 @@ pandora.ui.folders = function(section) {
                                 pandora.$ui.personalListsMenu[action]('deletelist');
                                 pandora.$ui.personalListsMenu[
                                     ui.listSelection.length ? 'enableItem' : 'disableItem'
+                                ]('newlistfromselection');
+                            },
+                            pandora_finddocuments: function() {
+                                // fixme: duplicated
+                                var action = ui._collection
+                                    && pandora.getListData(ui._collection).user == pandora.user.username
+                                    ? 'enableItem' : 'disableItem'
+                                pandora.$ui.personalListsMenu[
+                                    ui._collection ? 'enableItem' : 'disableItem'
+                                ]('duplicatelist');
+                                pandora.$ui.personalListsMenu[action]('editlist');
+                                pandora.$ui.personalListsMenu[action]('deletelist');
+                                pandora.$ui.personalListsMenu[
+                                    ui.collectionSelection.length ? 'enableItem' : 'disableItem'
                                 ]('newlistfromselection');
                             },
                             pandora_listselection: function(data) {

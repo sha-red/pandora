@@ -391,7 +391,7 @@ pandora.ui.folderList = function(id, section) {
         },
         key_control_d: function() {
             if (that.options('selected').length) {
-                pandora.addFolderItem(ui.section, ui._list);
+                pandora.addFolderItem(ui.section, ui.section == 'documents' ? ui._collection : ui._list);
             }
         },
         key_control_e: function() {

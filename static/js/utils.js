@@ -81,18 +81,28 @@ pandora.addFolderItem = function(section) {
             data.description = result.data.items[0].description;
             if (data.type == 'static') {
                 var query;
-                if (isItems) {
+                if (Ox.contains(['items', 'documents'], section)) {
                     query = {
                         conditions: [{
-                            key: 'list',
+                            key: {
+                                items: 'list',
+                                documents: 'collection'
+                            }[section],
                             operator: '==',
                             value: list
                         }],
                         operator: '&'
                     };
-                    pandora.api.find({query: query}, function(result) {
+
+                    pandora.api[{
+                        items: 'find',
+                        documents: 'findDocuments'
+                    }[section]]({query: query}, function(result) {
                         if (result.data.items) {
-                            pandora.api.find({
+                            pandora.api[{
+                                items: 'find',
+                                documents: 'findDocuments'
+                            }[section]]({
                                 query: query,
                                 keys: ['id'],
                                 sort: [{key: 'id', operator: ''}],
@@ -107,9 +117,6 @@ pandora.addFolderItem = function(section) {
                             addList();
                         }
                     });
-                } else if(section == 'documents') {
-                    //fixme
-                    addList();
                 } else {
                     pandora.api.getEdit({
                         id: list,
