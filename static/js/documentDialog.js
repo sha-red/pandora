@@ -201,8 +201,7 @@ pandora.ui.documentDialog = function(options) {
                     zoom: 'fit'
                 })
                 : item.extension == 'html'
-                ? pandora.ui.textPanel(item).css({
-                })
+                ? pandora.$ui.textPanel = pandora.ui.textPanel(item)
                 : Ox.ImageViewer({
                     area: pandora.user.ui.documents[item.id]
                         ? pandora.user.ui.documents[item.id].position
@@ -243,7 +242,7 @@ pandora.ui.documentDialog = function(options) {
     }
 
     function setTitle() {
-        that.options({title: item.title + '.' + item.extension});
+        that.options({title: item.title + (item.extension == 'html' ? '' : '.' + item.extension)});
     }
 
     that.getItems = function() {

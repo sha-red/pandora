@@ -1,16 +1,30 @@
 'use strict';
 
 pandora.ui.textPanel = function(text, $toolbar) {
+    if (Ox.isUndefined(text.text)) {
+        var that = Ox.Element().append(Ox.LoadingScreen().start())
+        pandora.api.getDocument({
+            id: text.id,
+            keys: ['text']
+        }, function(result) {
+            text.text = result.data.text
+            if (text.text) {
+                pandora.$ui.textPanel.replaceWith(pandora.$ui.textPanel = pandora.ui.textPanel(text, $toolbar))
+            }
+        })
+        return that;
+    }
+
     var textElement,
         textEmbed,
         embedURLs = getEmbedURLs(text.text),
         that = Ox.SplitPanel({
             elements: [
                 {
-                    element: textElement = pandora.$ui.textElement = pandora.ui.textHTML(text)
+                    element: textElement = pandora.ui.textHTML(text)
                 },
                 {
-                    element: textEmbed = pandora.ui.textEmbed(textElement),
+                    element: textEmbed = pandora.ui.textEmbed(),
                     collapsed: !embedURLs.length,
                     size: pandora.user.ui.embedSize,
                     resizable: true,
@@ -124,7 +138,6 @@ pandora.ui.textPanel = function(text, $toolbar) {
             0),
             position = 100 * scrollTop / Math.max(1, textElement[0].scrollHeight);
         textElement.scrollTo(position);
-        window.text = textElement;
     }
 
     that.selectEmbed = function(index, scroll) {
@@ -431,7 +444,7 @@ pandora.ui.textHTML = function(text) {
 
 };
 
-pandora.ui.textEmbed = function(textElement) {
+pandora.ui.textEmbed = function(textEmbed) {
 
     var that = Ox.Element()
             .bindEvent({
