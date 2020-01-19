@@ -186,6 +186,17 @@ def load_config(init=False):
             if level not in config[key]:
                 config[key] = default.get(key, 0)
 
+        config['user']['ui']['documentsSort'] = [
+            s for s in config['user']['ui']['documentsSort']
+            if get_by_id(config['documentKeys'], s['key'])
+        ]
+        if not config['user']['ui']['documentsSort']:
+            sort_key = [k for k in config['documentKeys'] if k['id'] != '*'][0]
+            config['user']['ui']['documentsSort'] = [{
+                "key": sort_key['id'],
+                "operator": sort_key.get('operator', '+')
+            }]
+
         for key in ('language', 'importMetadata'):
             if key not in config:
                 sys.stderr.write("adding default value:\n\t\"%s\": %s,\n\n" % (key, json.dumps(default[key])))
