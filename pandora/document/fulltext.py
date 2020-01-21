@@ -63,7 +63,9 @@ class FulltextMixin:
 
     @classmethod
     def find_fulltext_ids(cls, query):
-        if query and query[0] == '"' and query[-1] == '"':
+        if not query:
+            return []
+        elif query[0] == '"' and query[-1] == '"':
             query = {
                 "match_phrase": {
                     "text": query.lower()[1:-1]
