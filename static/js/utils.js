@@ -48,7 +48,7 @@ pandora.addFolderItem = function(section) {
                     );
                 }
             } else {
-                data.query = isItems ? ui.find : ui.findDocuments;
+                data.query = section == 'documents' ? ui.findDocuments : ui.find;
             }
         }
         if (ui.section == 'items' && section == 'edits') {
