@@ -9,7 +9,7 @@ pandora.ui.downloadVideoDialog = function(options) {
             'mp4': 'MP4',
         },
 
-        parts = Ox.max(options.video.map(function(video) {
+        parts = options.out ? null : Ox.max(options.video.map(function(video) {
             return video.index
         })),
 
