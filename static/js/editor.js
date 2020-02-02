@@ -200,7 +200,8 @@ pandora.ui.editor = function(data) {
                     'in': selection['in'],
                     out: selection.out,
                     rightsLevel: rightsLevel,
-                    title: data.title
+                    title: data.title,
+                    video: data.video
                 }).open();
             },
             editannotation: function(data) {
