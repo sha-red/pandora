@@ -397,8 +397,9 @@ def update_geoip(force=False):
     path = os.path.join(settings.GEOIP_PATH, 'GeoLite2-City.mmdb')
     if not os.path.exists(path) or force:
         url = 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz'
+        url = 'https://download.db-ip.com/free/dbip-city-lite-2020-01.mmdb.gz'
         print('download', url)
-        ox.net.save_url(url, "%s.gz"%path)
+        ox.net.save_url(url, "%s.gz" % path)
         if os.path.exists(path):
             os.unlink(path)
         os.system('gunzip "%s.gz"' % path)
