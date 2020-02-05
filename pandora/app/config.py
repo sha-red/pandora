@@ -105,30 +105,6 @@ def load_config(init=False):
             if key['id'] in default_filters and not key.get('filter'):
                 key['filter'] = True
                 sys.stderr.write('enabled filter for "%s" since its used as default filter.\n' % (key['id']))
-
-        # enable default document filters if needed
-        default_filters = [f['id'] for f in config['user']['ui']['documentFilters']]
-        available_filters = [key['id'] for key in config['documentKeys'] if key.get('filter')]
-        unknown_ids = set(default_filters) - set(available_filters)
-        if unknown_ids:
-            sys.stderr.write('WARNING: unknown document keys in default filters: %s.\n' % list(unknown_ids))
-            unused_filters = [key for key in available_filters if key not in default_filters]
-            if len(unused_filters) < len(unknown_ids):
-                sys.stderr.write('you need at least 5 item filters')
-            else:
-                auto_filters = unused_filters[:len(unknown_ids)]
-                default_filters += auto_filters
-                for key in auto_filters:
-                    config['user']['ui']['documentFilters'].append({
-                        "id": key, "sort": [{"key": "items", "operator": "-"}]
-                    })
-                sys.stderr.write('         using the following document filters instead: %s.\n' % auto_filters)
-
-        for key in config['documentKeys']:
-            if key['id'] in default_filters and not key.get('filter'):
-                key['filter'] = True
-                sys.stderr.write('enabled filter for document key "%s" since its used as default filter.\n' % (key['id']))
-
         config['keys'] = {}
         for key in config['itemKeys']:
             config['keys'][key['id']] = key
@@ -209,6 +185,32 @@ def load_config(init=False):
 
         if 'downloadFormat' not in config['video']:
             config['video']['downloadFormat'] = default['video']['downloadFormat']
+
+
+        # enable default document filters if needed
+        default_filters = [f['id'] for f in config['user']['ui']['documentFilters']]
+        available_filters = [key['id'] for key in config['documentKeys'] if key.get('filter')]
+        unknown_ids = set(default_filters) - set(available_filters)
+        if unknown_ids:
+            sys.stderr.write('WARNING: unknown document keys in default filters: %s.\n' % list(unknown_ids))
+            unused_filters = [key for key in available_filters if key not in default_filters]
+            if len(unused_filters) < len(unknown_ids):
+                sys.stderr.write('you need at least 5 item filters')
+            else:
+                auto_filters = unused_filters[:len(unknown_ids)]
+                default_filters += auto_filters
+                for key in auto_filters:
+                    config['user']['ui']['documentFilters'].append({
+                        "id": key, "sort": [{"key": "items", "operator": "-"}]
+                    })
+                sys.stderr.write('         using the following document filters instead: %s.\n' % auto_filters)
+
+        for key in config['documentKeys']:
+            if key['id'] in default_filters and not key.get('filter'):
+                key['filter'] = True
+                sys.stderr.write('enabled filter for document key "%s" since its used as default filter.\n' % (key['id']))
+
+
 
         old_formats = getattr(settings, 'CONFIG', {}).get('video', {}).get('formats', [])
         formats = config.get('video', {}).get('formats')
