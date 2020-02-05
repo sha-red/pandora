@@ -225,7 +225,7 @@ pandora.ui.metadataDialog = function(data) {
             if (result.data) {
                 imdb = Ox.clone(result.data, true);
                 if (!Ox.contains(keys, 'originalTitle')) {
-                    if (imdb.originalTitle) {
+                    if (imdb.originalTitle && imdb.originalTitle != imdb.title) {
                         imdb.alternativeTitles = [[imdb.title, []]].concat(imdb.alternativeTitles || []);
                         imdb.title = imdb.originalTitle;
                     }
