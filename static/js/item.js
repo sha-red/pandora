@@ -45,12 +45,12 @@ pandora.ui.item = function() {
             var note = Ox.Element()
                 .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
             pandora.$ui.contentPanel.replaceElement(1, note);
-            if (pandora.user.username == item.user || pandora.hasCapability('canSeeAllTasks')) {
+            if (pandora.user.username == result.data.user || pandora.hasCapability('canSeeAllTasks')) {
                 pandora.api.getTasks({
                     user: pandora.hasCapability('canSeeAllTasks') ? '' : pandora.user.username
                 }, function(result_) {
                     var tasks = result_.data.items.filter(function(task) { return task.item == item})
-                    if (tasks.length == 0) {
+                    if (tasks.length > 0) {
                         html = Ox._(
                             '<i>{0}</i> is currently processed. '
                             + '{1} view will be available in a moment.',
