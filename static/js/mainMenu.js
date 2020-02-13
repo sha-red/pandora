@@ -1669,7 +1669,11 @@ pandora.ui.mainMenu = function() {
             {
                 id: 'showfilters',
                 title: Ox._((ui.showFilters ? 'Hide' : 'Show') + ' Filters'),
-                disabled: ui.section != 'items' || !!ui.item, keyboard: 'shift f'
+                disabled: (
+                    !Ox.contains(['items', 'documents'], ui.section) ||
+                    (ui.section == 'items' && !!ui.item) ||
+                    (ui.section == 'documents' && !!ui.document)
+                ), keyboard: 'shift f'
             },
             {
                 id: 'showbrowser',
