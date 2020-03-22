@@ -404,7 +404,6 @@ def update_geoip(force=False):
         match = re.compile('href=[\'"](http.*.mmdb.gz)').findall(index)
         if match:
             url = match[0]
-            print(url)
             print('download', url)
             ox.net.save_url(url, "%s.gz" % path)
             if os.path.exists(path):
