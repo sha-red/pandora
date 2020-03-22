@@ -191,7 +191,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             w = info['video'][0]['width'] - flags['crop']['left'] - flags['crop']['right']
             x = flags['crop']['left']
             y = flags['crop']['top']
-            crop = ',crop=w=%s:h=%s:x=%s:y=%s' (w, h, x, y)
+            crop = ',crop=w=%s:h=%s:x=%s:y=%s' % (w, h, x, y)
             aspect = dar * (info['video'][0]['width'] / info['video'][0]['height']) * (w/h)
             if abs(w/h - aspect) < 0.02:
                 aspect = '%s:%s' % (w, h)
