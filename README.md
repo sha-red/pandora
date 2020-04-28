@@ -16,6 +16,7 @@
 cd /root
 curl -sL https://pan.do/ra-install > pandora_install.sh
 chmod +x pandora_install.sh
+BRANCH=stable # change to 'master' to get current developement version
 ./pandora_install.sh 2>&1 | tee pandora_install.log
 ```
 

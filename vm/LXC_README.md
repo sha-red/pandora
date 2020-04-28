@@ -4,7 +4,7 @@
 
 # Installing pan.do/ra inside LXC
 
-1) Install lxc on the host (Ubuntu 18.04 or later):
+1) Install lxc on the host (Ubuntu 18.04):
 
     sudo apt-get install lxc
 
@@ -41,5 +41,6 @@
     cd /root
     curl -sL https://pan.do/ra-install > pandora_install.sh
     chmod +x pandora_install.sh
+    BRANCH=stable # or master
     ./pandora_install.sh 2>&1 | tee pandora_install.log
 
