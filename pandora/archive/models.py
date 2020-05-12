@@ -814,8 +814,12 @@ class Stream(models.Model):
 
         # file could have been moved while encoding
         # get current version from db and update
-        self.refresh_from_db()
-        self.update_status(ok, error)
+        try:
+            self.refresh_from_db()
+        except archive.models.DoesNotExist:
+            pass
+        else:
+            self.update_status(ok, error)
 
     def get_index(self):
         index = 1
