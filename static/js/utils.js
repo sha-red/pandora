@@ -425,6 +425,13 @@ pandora.uploadDroppedFiles = function(files) {
                 Ox.Request.clearCache('findDocuments');
                 if (pandora.user.ui.document || pandora.user.ui.section != 'documents') {
                     pandora.UI.set({section: 'documents', document: ''});
+                } else if (pandora.user.ui._collection && pandora.getListData().editable) {
+                    pandora.api.addCollectionItems({
+                        items: files.ids,
+                        collection: pandora.user.ui._collection
+                    }, function(results) {
+                        pandora.$ui.list && pandora.$ui.list.reloadList();
+                    })
                 } else {
                     pandora.$ui.list && pandora.$ui.list.reloadList();
                 }
