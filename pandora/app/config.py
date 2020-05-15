@@ -29,18 +29,14 @@ RUN_RELOADER = True
 NOTIFIER = None
 
 def get_version():
-    info = join(dirname(dirname(dirname(__file__))), '.bzr', 'branch', 'last-revision')
     git_dir = join(dirname(dirname(dirname(__file__))), '.git')
     if exists(git_dir):
         env = {'GIT_DIR': git_dir}
         cmd = ['git', 'rev-list', 'HEAD', '--count']
-        return subprocess.check_output(cmd, env=env).strip().decode('utf-8')
-    elif exists(info):
-        f = open(info)
-        rev = int(f.read().split()[0])
-        f.close()
-        if rev:
-            return u'%s' % rev
+        version = subprocess.check_output(cmd, env=env).strip().decode('utf-8')
+        if settings.VERSION_EPOCH:
+            version = settings.VERSION_EPOCH + version
+        return version
     else:
         return u'unknown'
 
