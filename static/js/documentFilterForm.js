@@ -72,7 +72,7 @@ pandora.ui.documentFilterForm = function(options) {
     });
     function autocompleteFunction(key) {
         return key.autocomplete ? function(value, callback) {
-            pandora.api.autocomplete({
+            pandora.api.autocompleteDocuments({
                 key: key.id,
                 query: {
                     conditions: [],
