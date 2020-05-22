@@ -58,6 +58,7 @@ def sort_title(title):
     title = title.replace(u'Æ', 'Ae')
     if isinstance(title, bytes):
         title = title.decode('utf-8')
+    title = ox.decode_html(title)
     title = sort_string(title)
 
     #title
