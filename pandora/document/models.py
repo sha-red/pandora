@@ -27,6 +27,7 @@ from annotation.models import Annotation
 from archive.extract import resize_image
 from archive.chunk import save_chunk
 from user.models import Group
+from user.utils import update_groups
 
 from . import managers
 from . import utils
@@ -334,6 +335,7 @@ class Document(models.Model, FulltextMixin):
         if not user or user.is_anonymous():
             return False
         if self.user == user or \
+           self.groups.filter(id__in=user.groups.all()).count() > 0 or \
            user.is_staff or \
            user.profile.capability('canEditDocuments') is True or \
            (item and item.editable(user)):
@@ -347,6 +349,9 @@ class Document(models.Model, FulltextMixin):
                 p.description = ox.sanitize_html(data['description'])
                 p.save()
         else:
+            if 'groups' in data:
+                groups = data.pop('groups')
+                update_groups(self, groups)
             for key in data:
                 k = list(filter(lambda i: i['id'] == key, settings.CONFIG['documentKeys']))
                 ktype = k and k[0].get('type') or ''
@@ -436,6 +441,7 @@ class Document(models.Model, FulltextMixin):
                 'matches',
                 'size',
                 'user',
+                'groups',
                 'referenced',
             ]
             if self.extension in ('html', 'txt'):
@@ -455,6 +461,8 @@ class Document(models.Model, FulltextMixin):
                 response[key] = self.editable(user)
             elif key == 'user':
                 response[key] = self.user.username
+            elif key == 'groups':
+                response[key] = [g.name for g in self.groups.all()]
             elif key == 'accessed':
                 response[key] = self.accessed.aggregate(Max('access'))['access__max']
             elif key == 'timesaccessed':
