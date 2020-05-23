@@ -23,6 +23,7 @@ pandora.ui.groupsDialog = function(options) {
 
         canManageGroups = pandora.hasCapability('canManageUsers'),
         isItem = options.type == 'item',
+        isDocument = options.type == 'document',
 
         $content,
         $label,
@@ -40,7 +41,11 @@ pandora.ui.groupsDialog = function(options) {
         selectedGroups = options.groups;
         renderGroups();
     } else {
-        pandora.api[isItem ? 'get' : 'getUser']({
+        pandora.api[
+            isItem ? 'get'
+            : isDocument ? 'getDocument'
+            : 'getUser'
+        ]({
             id: options.id,
             keys: ['groups']
         }, function(result) {
@@ -70,8 +75,16 @@ pandora.ui.groupsDialog = function(options) {
             return group.name;
         });
         // disableElements();
-        Ox.Request.clearCache(isItem ? 'get' : 'getUser');
-        pandora.api[isItem ? 'edit' : 'editUser']({
+        Ox.Request.clearCache(
+            isItem ? 'get'
+            : isDocument ? 'getDocument'
+            : 'getUser'
+        );
+        pandora.api[
+            isItem ? 'edit'
+            : isDocument ? 'editDocument'
+            : 'editUser'
+        ]({
             id: options.id,
             groups: selectedGroups
         }, function(result) {
@@ -198,7 +211,9 @@ pandora.ui.groupsDialog = function(options) {
             $label = Ox.Label({
                     textAlign: 'center',
                     title: Ox._(
-                        isItem ? pandora.site.itemName.singular : 'User'
+                        isItem ? pandora.site.itemName.singular
+                        : isDocument ? 'Document'
+                        : 'User'
                     ) + ': ' + options.name,
                     width: 552
                 })
