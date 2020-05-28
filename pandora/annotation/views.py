@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.conf import settings
 from django.db.models import Count, Sum, F, Value

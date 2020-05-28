@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from datetime import datetime, timedelta
 from time import time
@@ -9,7 +8,6 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
-from django.utils.encoding import python_2_unicode_compatible
 import celery.task.control
 import kombu.five
 import ox
@@ -40,7 +38,6 @@ def get_tasks(username):
         tasks.append(task.json())
     return tasks
 
-@python_2_unicode_compatible
 class Task(models.Model):
     DONE = ['finished', 'failed', 'canceled']
 
@@ -51,8 +48,8 @@ class Task(models.Model):
     status = models.CharField(default='unknown', max_length=32)
     started = models.DateTimeField(null=True)
     ended = models.DateTimeField(null=True)
-    item = models.ForeignKey("item.Item", related_name='tasks')
-    user = models.ForeignKey(User, related_name='tasks', null=True)
+    item = models.ForeignKey("item.Item", related_name='tasks', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='tasks', null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return "%s [%s]" % (self.item.public_id, self.status)

@@ -283,7 +283,7 @@ class DocumentManager(Manager):
         qs = qs.distinct()
 
         #anonymous can only see public items
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             level = 'guest'
             allowed_level = settings.CONFIG['capabilities']['canSeeDocument'][level]
             qs = qs.filter(rightslevel__lte=allowed_level)

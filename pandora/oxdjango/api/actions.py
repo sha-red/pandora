@@ -111,10 +111,10 @@ class ApiActions(dict):
             f = fc[len(fc)-1].cell_contents
         if PY2:
             info = f.func_code.co_filename[len(settings.PROJECT_ROOT)+1:]
-            info = u'%s:%s' % (info, f.func_code.co_firstlineno)
+            info = '%s:%s' % (info, f.func_code.co_firstlineno)
         else:
             info = f.__code__.co_filename[len(settings.PROJECT_ROOT)+1:]
-            info = u'%s:%s' % (info, f.__code__.co_firstlineno)
+            info = '%s:%s' % (info, f.__code__.co_firstlineno)
         return info, trim(inspect.getsource(f))
 
     def register(self, method, action=None, cache=True, version=None):

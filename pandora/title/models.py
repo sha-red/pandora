@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import unicodedata
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 import ox
 
@@ -22,10 +20,9 @@ def get_title_sort(title):
             title.save()
         sorttitle = unicodedata.normalize('NFKD', title.sorttitle)
     else:
-        sorttitle = u''
+        sorttitle = ''
     return sorttitle
 
-@python_2_unicode_compatible
 class Title(models.Model):
     title = models.CharField(max_length=1000, unique=True)
     sorttitle = models.CharField(max_length=1000)

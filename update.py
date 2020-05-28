@@ -275,6 +275,9 @@ if __name__ == "__main__":
                 ]
                 with open('pandora/local_settings.py', 'w') as f:
                     f.write('\n'.join(local_settings))
+        if old <= 6313:
+            run('./bin/pip', 'uninstall', 'django-celery', '-y')
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
         if len(sys.argv) == 1:
             branch = get_branch()

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import json
 import os.path
@@ -12,7 +11,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import pre_delete
-from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
 
 from oxdjango import fields
@@ -36,7 +34,6 @@ if not PY2:
 def data_path(f, x):
     return f.get_path('data.bin')
 
-@python_2_unicode_compatible
 class File(models.Model):
     AV_INFO = (
         'duration', 'video', 'audio', 'oshash', 'size',
@@ -55,7 +52,7 @@ class File(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     oshash = models.CharField(max_length=16, unique=True)
-    item = models.ForeignKey("item.Item", related_name='files', null=True)
+    item = models.ForeignKey("item.Item", related_name='files', null=True, on_delete=models.CASCADE)
 
     path = models.CharField(max_length=2048, default="")  # canoncial path/file
     sort_path = models.CharField(max_length=2048, default="")  # sort name
@@ -483,7 +480,7 @@ class File(models.Model):
                 if k not in keys:
                     del data[k]
         can_see_media = False
-        if user and not user.is_anonymous():
+        if user and not user.is_anonymous:
             can_see_media = user.profile.capability('canSeeMedia') or \
                 user.is_staff or \
                 self.item.user == user or \
@@ -598,15 +595,15 @@ class File(models.Model):
         status = {}
         if self.encoding:
             for s in self.streams.all():
-                status[s.name()] = u'done' if s.available else u'encoding'
+                status[s.name()] = 'done' if s.available else 'encoding'
             config = settings.CONFIG['video']
             max_resolution = self.streams.get(source=None).resolution
             for resolution in sorted(config['resolutions'], reverse=True):
                 if resolution <= max_resolution:
                     for f in config['formats']:
-                        name = u'%sp.%s' % (resolution, f)
+                        name = '%sp.%s' % (resolution, f)
                         if name not in status:
-                            status[name] = u'queued'
+                            status[name] = 'queued'
         return status
 
     def delete_frames(self):
@@ -627,7 +624,6 @@ def delete_file(sender, **kwargs):
     f.delete_files()
 pre_delete.connect(delete_file, sender=File)
 
-@python_2_unicode_compatible
 class Volume(models.Model):
 
     class Meta:
@@ -636,11 +632,11 @@ class Volume(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    user = models.ForeignKey(User, related_name='volumes')
+    user = models.ForeignKey(User, related_name='volumes', on_delete=models.CASCADE)
     name = models.CharField(max_length=1024)
 
     def __str__(self):
-        return u"%s's %s" % (self.user, self.name)
+        return "%s's %s" % (self.user, self.name)
 
     def json(self):
         return {
@@ -652,7 +648,6 @@ class Volume(models.Model):
 def inttime():
     return int(time.time())
 
-@python_2_unicode_compatible
 class Instance(models.Model):
 
     class Meta:
@@ -668,11 +663,11 @@ class Instance(models.Model):
     path = models.CharField(max_length=2048)
     ignore = models.BooleanField(default=False)
 
-    file = models.ForeignKey(File, related_name='instances')
-    volume = models.ForeignKey(Volume, related_name='files')
+    file = models.ForeignKey(File, related_name='instances', on_delete=models.CASCADE)
+    volume = models.ForeignKey(Volume, related_name='files', on_delete=models.CASCADE)
 
     def __str__(self):
-        return u"%s's %s <%s>" % (self.volume.user, self.path, self.file.oshash)
+        return "%s's %s <%s>" % (self.volume.user, self.path, self.file.oshash)
 
     @property
     def public_id(self):
@@ -691,14 +686,13 @@ def frame_path(frame, name):
     name = "%s%s" % (frame.position, ext)
     return frame.file.get_path(name)
 
-@python_2_unicode_compatible
 class Frame(models.Model):
 
     class Meta:
         unique_together = ("file", "position")
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    file = models.ForeignKey(File, related_name="frames")
+    file = models.ForeignKey(File, related_name="frames", on_delete=models.CASCADE)
     position = models.FloatField()
     frame = models.ImageField(default=None, null=True, upload_to=frame_path)
     width = models.IntegerField(default=0)
@@ -711,7 +705,7 @@ class Frame(models.Model):
         super(Frame, self).save(*args, **kwargs)
 
     def __str__(self):
-        return u'%s/%s' % (self.file, self.position)
+        return '%s/%s' % (self.file, self.position)
 
 def delete_frame(sender, **kwargs):
     f = kwargs['instance']
@@ -722,18 +716,17 @@ pre_delete.connect(delete_frame, sender=Frame)
 def stream_path(f, x):
     return f.path(x)
 
-@python_2_unicode_compatible
 class Stream(models.Model):
 
     class Meta:
         unique_together = ("file", "resolution", "format")
 
-    file = models.ForeignKey(File, related_name='streams')
+    file = models.ForeignKey(File, related_name='streams', on_delete=models.CASCADE)
     resolution = models.IntegerField(default=96)
     format = models.CharField(max_length=255, default='webm')
 
     media = models.FileField(default=None, blank=True, upload_to=stream_path)
-    source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
+    source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True, on_delete=models.CASCADE)
     available = models.BooleanField(default=False)
     oshash = models.CharField(max_length=16, null=True, db_index=True)
     info = JSONField(default=dict, editable=False)
@@ -753,10 +746,10 @@ class Stream(models.Model):
         return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
 
     def name(self):
-        return u"%sp.%s" % (self.resolution, self.format)
+        return "%sp.%s" % (self.resolution, self.format)
 
     def __str__(self):
-        return u"%s/%s" % (self.file, self.name())
+        return "%s/%s" % (self.file, self.name())
 
     def get(self, resolution, format):
         streams = []

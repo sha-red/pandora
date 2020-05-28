@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.db.models import Max, Min, Count
 from django.conf import settings
@@ -50,7 +49,7 @@ def addPlace(request, data):
         n = 0
         while _exists:
             _exists = models.Place.objects.filter(defined=True,
-                                name_find__contains=u'|%s|' % name.lower()).count() > 0
+                                name_find__contains='|%s|' % name.lower()).count() > 0
             if _exists:
                 name = 'Untitled [%s]' %n
             n += 1
@@ -61,7 +60,7 @@ def addPlace(request, data):
     for n in names:
         n = ox.decode_html(name)
         if models.Place.objects.filter(defined=True,
-                                       name_find__contains=u'|%s|' % n.lower()).count() != 0:
+                                       name_find__contains='|%s|' % n.lower()).count() != 0:
             exists = True
             existing_names.append(n)
     '''
@@ -130,7 +129,7 @@ def editPlace(request, data):
         for name in names + alternative_names:
             name = ox.decode_html(name)
             if models.Place.objects.filter(defined=True,
-                    name_find__contains=u'|%s|' % name.lower()).exclude(id=place.id).count() != 0:
+                    name_find__contains='|%s|' % name.lower()).exclude(id=place.id).count() != 0:
                 conflict = True
                 conflict_names.append(name)
         '''

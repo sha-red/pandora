@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import os
 import re
@@ -12,7 +11,6 @@ from django.db.models import Max
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db.models.signals import pre_delete
-from django.utils.encoding import python_2_unicode_compatible
 import ox
 from oxdjango.fields import TupleField
 
@@ -26,7 +24,6 @@ User = get_user_model()
 def get_path(i, x): return i.path(x)
 def get_icon_path(i, x): return get_path(i, 'icon.jpg')
 
-@python_2_unicode_compatible
 class Text(models.Model):
 
     class Meta:
@@ -34,7 +31,7 @@ class Text(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, related_name='texts')
+    user = models.ForeignKey(User, related_name='texts', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, default='private')
     _status = ['private', 'public', 'featured']
@@ -77,13 +74,13 @@ class Text(models.Model):
         return '%s/text.pdf' % self.get_absolute_url()
 
     def get_id(self):
-        return u'%s:%s' % (self.user.username, self.name)
+        return '%s:%s' % (self.user.username, self.name)
 
     def accessible(self, user):
         return self.user == user or self.status in ('public', 'featured')
 
     def editable(self, user):
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return False
         if self.user == user or \
            user.is_staff or \
@@ -209,7 +206,7 @@ class Text(models.Model):
             elif key == 'subscribers':
                 response[key] = self.subscribed_users.all().count()
             elif key == 'subscribed':
-                if user and not user.is_anonymous():
+                if user and not user.is_anonymous:
                     response[key] = self.subscribed_users.filter(id=user.id).exists()
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key,key))
@@ -304,17 +301,16 @@ def delete_file(sender, **kwargs):
         t.file.delete(save=False)
 pre_delete.connect(delete_file, sender=Text)
 
-@python_2_unicode_compatible
 class Position(models.Model):
 
     class Meta:
         unique_together = ("user", "text", "section")
 
-    text = models.ForeignKey(Text, related_name='position')
-    user = models.ForeignKey(User, related_name='text_position')
+    text = models.ForeignKey(Text, related_name='position', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='text_position', on_delete=models.CASCADE)
     section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
     def __str__(self):
-        return u'%s/%s/%s' % (self.section, self.position, self.text)
+        return '%s/%s/%s' % (self.section, self.position, self.text)
 

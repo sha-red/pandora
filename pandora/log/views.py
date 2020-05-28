@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import ox
 from ox.utils import json
@@ -25,7 +24,7 @@ def logError(request, data):
     returns {}
     see: findErrorLogs, removeErrorLogs
     '''
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         user = request.user
     else:
         user = None

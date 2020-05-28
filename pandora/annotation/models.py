@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import re
 import unicodedata
 
-from django.utils.encoding import python_2_unicode_compatible
 from django.db import models, transaction
 from django.db.models import Q
 from django.contrib.auth import get_user_model
@@ -83,16 +81,15 @@ def get_matches(obj, model, layer_type, qs=None):
         matches = [-1]
     return Annotation.objects.filter(id__in=matches)
 
-@python_2_unicode_compatible
 class Annotation(models.Model):
     objects = managers.AnnotationManager()
 
     #FIXME: here having a item,start index would be good
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, related_name='annotations')
-    item = models.ForeignKey('item.Item', related_name='annotations')
-    clip = models.ForeignKey('clip.Clip', null=True, related_name='annotations')
+    user = models.ForeignKey(User, related_name='annotations', on_delete=models.CASCADE)
+    item = models.ForeignKey('item.Item', related_name='annotations', on_delete=models.CASCADE)
+    clip = models.ForeignKey('clip.Clip', null=True, related_name='annotations', on_delete=models.CASCADE)
 
     public_id = models.CharField(max_length=128, unique=True)
     #seconds
@@ -107,7 +104,7 @@ class Annotation(models.Model):
     languages = models.CharField(max_length=255, null=True, blank=True)
 
     def editable(self, user):
-        if user.is_authenticated():
+        if user.is_authenticated:
             if user.profile.capability('canEditAnnotations') or \
                self.user == user or \
                user.groups.filter(id__in=self.item.groups.all()).count() > 0:
@@ -400,7 +397,7 @@ class Annotation(models.Model):
         return j
 
     def __str__(self):
-        return u"%s %s-%s" % (self.public_id, self.start, self.end)
+        return "%s %s-%s" % (self.public_id, self.start, self.end)
 
 def cleanup_related(sender, **kwargs):
     kwargs['instance'].cleanup_undefined_relations()

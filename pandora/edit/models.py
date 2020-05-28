@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import re
 import os
@@ -15,7 +14,6 @@ from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth import get_user_model
 
-from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
 
 from annotation.models import Annotation
@@ -35,7 +33,6 @@ User = get_user_model()
 def get_path(f, x): return f.path(x)
 def get_icon_path(f, x): return get_path(f, 'icon.jpg')
 
-@python_2_unicode_compatible
 class Edit(models.Model):
 
     class Meta:
@@ -45,7 +42,7 @@ class Edit(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, related_name='edits')
+    user = models.ForeignKey(User, related_name='edits', on_delete=models.CASCADE)
     groups = models.ManyToManyField(Group, blank=True, related_name='edits')
     name = models.CharField(max_length=255)
 
@@ -59,11 +56,11 @@ class Edit(models.Model):
 
     icon = models.ImageField(default=None, blank=True, null=True, upload_to=get_icon_path)
 
-    poster_frames = JSONField(default=[], editable=False)
+    poster_frames = JSONField(default=list, editable=False)
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_edits')
 
     def __str__(self):
-        return u'%s (%s)' % (self.name, self.user)
+        return '%s (%s)' % (self.name, self.user)
 
     @classmethod
     def get(cls, id):
@@ -73,7 +70,7 @@ class Edit(models.Model):
         return cls.objects.get(user__username=username, name=name)
     
     def get_id(self):
-        return u'%s:%s' % (self.user.username, self.name)
+        return '%s:%s' % (self.user.username, self.name)
     
     def get_absolute_url(self):
         return ('/edits/%s' % quote(self.get_id())).replace('%3A', ':')
@@ -137,7 +134,7 @@ class Edit(models.Model):
         return self.user == user or self.status in ('public', 'featured')
 
     def editable(self, user):
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return False
         if self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0 or \
@@ -403,7 +400,7 @@ class Edit(models.Model):
             elif key == 'subscribers':
                 response[key] = self.subscribed_users.all().count()
             elif key == 'subscribed':
-                if user and not user.is_anonymous():
+                if user and not user.is_anonymous:
                     response[key] = self.subscribed_users.filter(id=user.id).exists()
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key, key))
@@ -430,15 +427,14 @@ class Edit(models.Model):
         #p.wait()
         shutil.rmtree(tmp)
 
-@python_2_unicode_compatible
 class Clip(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    edit = models.ForeignKey(Edit, related_name='clips')
+    edit = models.ForeignKey(Edit, related_name='clips', on_delete=models.CASCADE)
     index = models.IntegerField(default=0)
-    item = models.ForeignKey(Item, null=True, default=None, related_name='editclip')
-    annotation = models.ForeignKey(Annotation, null=True, default=None, related_name='editclip')
+    item = models.ForeignKey(Item, null=True, default=None, related_name='editclip', on_delete=models.CASCADE)
+    annotation = models.ForeignKey(Annotation, null=True, default=None, related_name='editclip', on_delete=models.CASCADE)
     start = models.FloatField(default=0)
     end = models.FloatField(default=0)
     duration = models.FloatField(default=0)
@@ -454,8 +450,8 @@ class Clip(models.Model):
 
     def __str__(self):
         if self.annotation:
-            return u'%s' % self.annotation.public_id
-        return u'%s/%0.3f-%0.3f' % (self.item.public_id, self.start, self.end)
+            return '%s' % self.annotation.public_id
+        return '%s/%0.3f-%0.3f' % (self.item.public_id, self.start, self.end)
     
     def get_id(self):
         return ox.toAZ(self.id)
@@ -541,17 +537,16 @@ class Clip(models.Model):
 
         return clip.models.get_layers(item=item, interval=(start, end), user=user)
 
-@python_2_unicode_compatible
 class Position(models.Model):
 
     class Meta:
         unique_together = ("user", "edit", "section")
 
-    edit = models.ForeignKey(Edit, related_name='position')
-    user = models.ForeignKey(User, related_name='edit_position')
+    edit = models.ForeignKey(Edit, related_name='position', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='edit_position', on_delete=models.CASCADE)
     section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
     def __str__(self):
-        return u'%s/%s/%s' % (self.section, self.position, self.edit)
+        return '%s/%s/%s' % (self.section, self.position, self.edit)
 

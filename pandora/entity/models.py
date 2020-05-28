@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import os
 import re
@@ -14,7 +13,6 @@ from django.contrib.auth import get_user_model
 
 from django.db.models.signals import pre_delete, post_init
 from django.conf import settings
-from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
 
 import ox
@@ -28,7 +26,6 @@ from . import managers
 
 User = get_user_model()
 
-@python_2_unicode_compatible
 class Entity(models.Model):
     class ValueError(ValueError):
         '''Raised if a field name or value is invalid (based on the "entities"
@@ -38,7 +35,7 @@ class Entity(models.Model):
     class Meta:
         unique_together = ("type", "name")
 
-    user = models.ForeignKey(User, related_name='entities', null=True, default=None)
+    user = models.ForeignKey(User, related_name='entities', null=True, default=None, on_delete=models.CASCADE)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -64,7 +61,7 @@ class Entity(models.Model):
                 self.name = self.name.decode('utf-8')
             self.name_sort = get_name_sort(self.name)[:255].lower()
         else:
-            self.name_sort = ox.sort_string(self.name or u'')[:255].lower() or None
+            self.name_sort = ox.sort_string(self.name or '')[:255].lower() or None
         self.name_find = '||' + '||'.join((self.name,) + self.alternativeNames) + '||'
         self.name_find = self.name_find.lower()
         super(Entity, self).save(*args, **kwargs)
@@ -88,11 +85,11 @@ class Entity(models.Model):
 
     @classmethod
     def get_by_name(cls, name, type):
-        return cls.objects.get(name_find__contains=u'|%s|' % name.lower(), type=type)
+        return cls.objects.get(name_find__contains='|%s|' % name.lower(), type=type)
 
     @classmethod
     def get_or_create(model, name):
-        qs = model.objects.filter(name_find__contains=u'|%s|' % name.lower())
+        qs = model.objects.filter(name_find__contains='|%s|' % name.lower())
         if qs.count() == 0:
             instance = model(name=name)
             instance.save()
@@ -117,7 +114,7 @@ class Entity(models.Model):
         DocumentProperties.objects.filter(document=document, entity=self).delete()
 
     def editable(self, user, item=None):
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return False
         if user.is_staff or \
            user.profile.capability('canEditEntities') == True or \
@@ -140,7 +137,7 @@ class Entity(models.Model):
                     data['name'] = "Unnamed"
                 name = data['name']
                 n = 1
-                while Entity.objects.filter(name_find__contains=u'|%s|' % name.lower()).exclude(id=self.id).count() > 0:
+                while Entity.objects.filter(name_find__contains='|%s|' % name.lower()).exclude(id=self.id).count() > 0:
                     n += 1
                     name = data['name'] + ' [%d]' % n
                 self.name = name
@@ -155,7 +152,7 @@ class Entity(models.Model):
                     name_ = name
                     n = 1
                     while name in used_names or \
-                        Entity.objects.filter(name_find__contains=u'|%s|' % name.lower()).exclude(id=self.id).count() > 0:
+                        Entity.objects.filter(name_find__contains='|%s|' % name.lower()).exclude(id=self.id).count() > 0:
                         n += 1
                         name = name_ + ' [%d]' % n
                     names.append(name)
@@ -268,7 +265,7 @@ class Entity(models.Model):
         return response
 
     def annotation_value(self):
-        #return u'<a href="/entities/%s">%s</a>' % (self.get_id(), ox.escape_html(self.name))
+        #return '<a href="/entities/%s">%s</a>' % (self.get_id(), ox.escape_html(self.name))
         return ox.escape_html(self.name)
 
     def update_find(self):
@@ -292,10 +289,10 @@ class Entity(models.Model):
             for key in entity['keys']:
                 value = self.data.get(key['id'])
                 if isinstance(value, list):
-                    value = u'\n'.join(value)
+                    value = '\n'.join(value)
                 save(key['id'], value)
                 ids.append(key['id'])
-            save('name', u'\n'.join([self.name] + list(self.alternativeNames)))
+            save('name', '\n'.join([self.name] + list(self.alternativeNames)))
             self.find.exclude(key__in=ids).delete()
 
     def update_matches(self):
@@ -344,7 +341,6 @@ post_init.connect(
 )
 
 
-@python_2_unicode_compatible
 class DocumentProperties(models.Model):
 
     class Meta:
@@ -353,42 +349,40 @@ class DocumentProperties(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    document = models.ForeignKey(Document, related_name='documentproperties')
-    entity = models.ForeignKey(Entity, related_name='documentproperties')
+    document = models.ForeignKey(Document, related_name='documentproperties', on_delete=models.CASCADE)
+    entity = models.ForeignKey(Entity, related_name='documentproperties', on_delete=models.CASCADE)
     index = models.IntegerField(default=0)
     data = JSONField(default=dict, editable=False)
 
     def __str__(self):
-        return u"%r-%r" % (self.document, self.entity)
+        return "%r-%r" % (self.document, self.entity)
 
     def save(self, *args, **kwargs):
 
         super(DocumentProperties, self).save(*args, **kwargs)
 
-@python_2_unicode_compatible
 class Find(models.Model):
 
     class Meta:
         unique_together = ("entity", "key")
 
-    entity = models.ForeignKey('Entity', related_name='find', db_index=True)
+    entity = models.ForeignKey('Entity', related_name='find', db_index=True, on_delete=models.CASCADE)
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True, db_index=settings.DB_GIN_TRGM)
 
     def __str__(self):
-        return u"%s=%s" % (self.key, self.value)
+        return "%s=%s" % (self.key, self.value)
 
-@python_2_unicode_compatible
 class Link(models.Model):
     '''Models entity fields of type "entity".'''
 
     class Meta:
         unique_together = ("source", "key", "target")
 
-    source = models.ForeignKey(Entity, related_name='links')
+    source = models.ForeignKey(Entity, related_name='links', on_delete=models.CASCADE)
     key = models.CharField(max_length=200)
-    target = models.ForeignKey(Entity, related_name='backlinks')
+    target = models.ForeignKey(Entity, related_name='backlinks', on_delete=models.CASCADE)
 
     def __str__(self):
-        return u"%s-[%s]->%s" % (self.source, self.key, self.target)
+        return "%s-[%s]->%s" % (self.source, self.key, self.target)
 

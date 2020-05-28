@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 import datetime
 from django.utils import datetime_safe
 from django.http import HttpResponse, Http404
@@ -23,7 +22,7 @@ def _to_json(python_object):
         return python_object.strftime('%Y-%m-%dT%H:%M:%SZ')
     if isinstance(python_object, datetime_safe.datetime):
         return python_object.strftime('%Y-%m-%dT%H:%M:%SZ')
-    raise TypeError(u'%s %s is not JSON serializable' % (repr(python_object), type(python_object)))
+    raise TypeError('%s %s is not JSON serializable' % (repr(python_object), type(python_object)))
 
 def json_dump(data, fp, indent=4):
     return json.dump(data, fp, indent=indent, default=_to_json, ensure_ascii=False)

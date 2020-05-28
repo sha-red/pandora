@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import random
 random.seed()
@@ -118,7 +117,7 @@ def signout(request, data):
     see: signin, signup
     '''
     response = json_response(text='ok')
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         uid = request.user.id
         profile = request.user.profile
         if profile.ui.get('page') == 'signout':
@@ -608,7 +607,7 @@ def mail(request, data):
                 'url': request.build_absolute_uri('/'),
             }
             message = template.render(context, request)
-            subject = u'Fwd: %s' % subject
+            subject = 'Fwd: %s' % subject
             email_to = '"%s" <%s>' % (request.user.username, request.user.email)
             receipt = EmailMessage(subject,
                                    message,
@@ -634,7 +633,7 @@ def contact(request, data):
     '''
     name = data.get('name', '')
     email = data.get('email', '')
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         if not name:
             name = request.user.username
         if not email:
@@ -657,10 +656,10 @@ def contact(request, data):
         message = ox.decode_html(template.render(context, request))
         response = json_response(text='message sent')
         try:
-            send_mail(u'%s Contact - %s' % (settings.SITENAME, subject), message, email_from, email_to)
+            send_mail('%s Contact - %s' % (settings.SITENAME, subject), message, email_from, email_to)
         except BadHeaderError:
             response = json_response(status=400, text='invalid data')
-        if request.user.is_authenticated() \
+        if request.user.is_authenticated \
             and 'receipt' in data \
             and data['receipt']:
             template = loader.get_template('contact_receipt.txt')
@@ -735,7 +734,7 @@ actions.register(editPreferences, cache=False)
 
 
 def reset_ui(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         profile = request.user.profile
         profile.ui = {}
         profile.save()
@@ -752,7 +751,7 @@ def resetUI(request, data):
     see: setUI
     '''
     response = json_response()
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         profile = request.user.profile
         profile.ui = {}
         profile.save()
@@ -773,7 +772,7 @@ def setUI(request, data):
     notes: To set nested keys, use {'foo.bar.baz': value}
     see: resetUI
     '''
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         profile = request.user.profile
         ui = profile.ui
     else:
@@ -794,7 +793,7 @@ def setUI(request, data):
             del p[keys[0]]
         else:
             p[keys[0]] = value
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         profile.save()
     else:
         request.session['ui'] = json.dumps(ui)
@@ -802,7 +801,7 @@ def setUI(request, data):
     if data.get('item'):
         item = get_object_or_404_json(Item, public_id=data['item'])
         with transaction.atomic():
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 access, created = Access.objects.get_or_create(item=item, user=request.user)
             else:
                 access, created = Access.objects.get_or_create(item=item, user=None)
@@ -919,7 +918,7 @@ def addGroup(request, data):
     while not created:
         g, created = Group.objects.get_or_create(name=name)
         n += 1
-        name = u'%s [%d]' % (_name, n) 
+        name = '%s [%d]' % (_name, n) 
     response['data'] = group_json(g)
     add_changelog(request, data, g.name)
     return render_to_json_response(response)
@@ -950,7 +949,7 @@ def editGroup(request, data):
     _name = re.sub(' \[\d+\]$', '', name).strip()
     while Group.objects.filter(name=name).count():
         n += 1
-        name = u'%s [%d]' % (_name, n)
+        name = '%s [%d]' % (_name, n)
     g.name = name
     g.save()
     add_changelog(request, data, g.name)

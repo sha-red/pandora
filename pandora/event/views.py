@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.db.models import Count
 from django.conf import settings
@@ -37,7 +36,7 @@ def addEvent(request, data):
     for name in names:
         name = ox.decode_html(name)
         if models.Event.objects.filter(defined=True,
-                name_find__icontains=u'|%s|'%name).count() != 0:
+                name_find__icontains='|%s|'%name).count() != 0:
             exists = True
             existing_names.append(name)
     if not exists:
@@ -93,7 +92,7 @@ def editEvent(request, data):
         names = [data.get('name', event.name)] + data.get('alternativeNames', [])
         for name in names:
             if models.Event.objects.filter(defined=True,
-                    name_find__icontains=u'|%s|'%name).exclude(id=event.id).count() != 0:
+                    name_find__icontains='|%s|'%name).exclude(id=event.id).count() != 0:
                 conflict = True
                 conflict_names.append(name)
         if not conflict:

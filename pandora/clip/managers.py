@@ -215,7 +215,7 @@ class ClipManager(Manager):
             for l in list(filter(lambda k: k in layer_ids, data['keys'])):
                 qs = qs.filter(**{l: True})
         #anonymous can only see public clips
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
             qs = qs.filter(sort__rightslevel__lte=allowed_level)
         #users can see public clips, there own clips and clips of there groups

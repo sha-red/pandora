@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
 
 import ox
@@ -19,14 +17,13 @@ User = get_user_model()
 '''
 FIXME: remove this table more migrate to new ChangeLog
 '''
-@python_2_unicode_compatible
 class Changelog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=255, db_index=True)
     value = JSONField(default=dict, editable=False)
 
     def __str__(self):
-        return u'%s %s' % (self.type, self.created)
+        return '%s %s' % (self.type, self.created)
 
     def json(self):
         return self.value
@@ -50,19 +47,18 @@ def add_changelog(request, data, id=None):
         'user': c.user.username,
     })
 
-@python_2_unicode_compatible
 class Log(models.Model):
 
     action = models.CharField(max_length=255, db_index=True)
     data = JSONField(default=dict, editable=False)
     created = models.DateTimeField(db_index=True)
-    user = models.ForeignKey(User, null=True, related_name='changelog')
+    user = models.ForeignKey(User, null=True, related_name='changelog', on_delete=models.CASCADE)
     changeid = models.TextField()
 
     objects = managers.LogManager()
 
     def __str__(self):
-        return u'%s %s %s' % (self.created, self.action, self.changeid)
+        return '%s %s %s' % (self.created, self.action, self.changeid)
 
     def get_id(self):
         return ox.toAZ(self.id)

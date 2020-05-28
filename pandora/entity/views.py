@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from six import string_types
 import ox
@@ -60,7 +59,7 @@ def addEntity(request, data):
         for name in names:
             name = ox.decode_html(name)
             if models.Entity.objects.filter(type=data['type'],
-                    name_find__icontains=u'|%s|'%name).count() != 0:
+                    name_find__icontains='|%s|'%name).count() != 0:
                 exists = True
                 existing_names.append(name)
         if not exists:
@@ -87,7 +86,7 @@ def addEntity(request, data):
         type = data['type']
         name = 'Unnamed'
         num = 1
-        while models.Entity.objects.filter(name_find__icontains=u'|%s|'%name).count() > 0:
+        while models.Entity.objects.filter(name_find__icontains='|%s|'%name).count() > 0:
             num += 1
             name = 'Unnamed [%d]' % num
         entity = models.Entity(name=name, type=type)

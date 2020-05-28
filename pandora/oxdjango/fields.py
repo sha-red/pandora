@@ -64,7 +64,7 @@ class DictField(models.TextField):
     def dumps(cls, obj):
         return json.dumps(obj, default=to_json, ensure_ascii=False)
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection, context=None):
         if value is None:
             return value
         if isinstance(value, self._type):

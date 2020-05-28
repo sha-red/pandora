@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.conf import settings
 import ox
@@ -154,7 +153,7 @@ def findClips(request, data):
                 add_annotations(layer, aqs)
     elif 'position' in query:
         qs = order_query(qs, query['sort'])
-        ids = [u'%s/%0.03f-%0.03f' % (c['item__public_id'], c['start'], c['end'])
+        ids = ['%s/%0.03f-%0.03f' % (c['item__public_id'], c['start'], c['end'])
             for c in qs.values('item__public_id', 'start', 'end')]
         data['conditions'] = data['conditions'] + {
             'value': data['position'],
@@ -167,7 +166,7 @@ def findClips(request, data):
             response['data']['position'] = utils.get_positions(ids, [qs[0].public_id])[0]
     elif 'positions' in data:
         qs = order_query(qs, query['sort'])
-        ids = [u'%s/%0.03f-%0.03f' % (c['item__public_id'], c['start'], c['end'])
+        ids = ['%s/%0.03f-%0.03f' % (c['item__public_id'], c['start'], c['end'])
             for c in qs.values('item__public_id', 'start', 'end')]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:

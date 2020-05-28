@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import codecs
 import os
@@ -38,7 +37,7 @@ def get_version():
             version = settings.VERSION_EPOCH + version
         return version
     else:
-        return u'unknown'
+        return 'unknown'
 
 def load_config(init=False):
     with open(settings.SITE_CONFIG) as f:

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 from item.models import ItemSort
 
@@ -15,7 +13,6 @@ def parse_hash(value):
 def format_hash(value):
     return hex(value + 9223372036854775808)[2:-1].upper()
 
-@python_2_unicode_compatible
 class Sequence(models.Model):
     class Meta:
         unique_together = ("sort", "start", "end", "mode")
@@ -25,7 +22,7 @@ class Sequence(models.Model):
         'color': 1
     }
     mode = models.IntegerField(choices=sorted(zip(MODE.values(), list(MODE)), key=lambda k: k[0]), default=0)
-    sort = models.ForeignKey(ItemSort, null=True, related_name='sequences')
+    sort = models.ForeignKey(ItemSort, null=True, related_name='sequences', on_delete=models.CASCADE)
 
     hash = models.BigIntegerField(db_index=True, default=-9223372036854775808)
     start = models.FloatField(default=-1)
@@ -40,7 +37,7 @@ class Sequence(models.Model):
 
     @property
     def public_id(self):
-        return u"%s/%0.03f-%0.03f" % (self.sort.item.public_id, float(self.start), float(self.end))
+        return "%s/%0.03f-%0.03f" % (self.sort.item.public_id, float(self.start), float(self.end))
 
     def __str__(self):
         return self.public_id

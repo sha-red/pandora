@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.db import models
 from django.conf import settings
-from django.utils.encoding import python_2_unicode_compatible
 
 import ox
 
@@ -15,7 +13,7 @@ from . import managers
 def get_layers(item, interval=None, user=None):
     from annotation.models import Annotation
 
-    if user and user.is_anonymous():
+    if user and user.is_anonymous:
         user = None
 
     layers = {}
@@ -45,7 +43,6 @@ def get_layers(item, interval=None, user=None):
     return layers
 
 
-@python_2_unicode_compatible
 class MetaClip(object):
     def update_calculated_values(self):
         start = self.start
@@ -184,7 +181,7 @@ class MetaClip(object):
 
     @property
     def public_id(self):
-        return u"%s/%0.03f-%0.03f" % (self.item.public_id, float(self.start), float(self.end))
+        return "%s/%0.03f-%0.03f" % (self.item.public_id, float(self.start), float(self.end))
 
     def __str__(self):
         return self.public_id
@@ -200,8 +197,8 @@ attrs = {
     'modified': models.DateTimeField(auto_now=True),
     'aspect_ratio': models.FloatField(default=0),
 
-    'item': models.ForeignKey('item.Item', related_name='clips'),
-    'sort': models.ForeignKey('item.ItemSort', related_name='matching_clips'),
+    'item': models.ForeignKey('item.Item', related_name='clips', on_delete=models.CASCADE),
+    'sort': models.ForeignKey('item.ItemSort', related_name='matching_clips', on_delete=models.CASCADE),
     'user': models.IntegerField(db_index=True, null=True),
 
     #seconds
@@ -226,4 +223,4 @@ Clip = type('Clip', (MetaClip, models.Model), attrs)
 
 class ClipRandom(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    clip = models.OneToOneField(Clip)
+    clip = models.OneToOneField(Clip, on_delete=models.CASCADE)

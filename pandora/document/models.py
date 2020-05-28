@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import os
 import re
@@ -13,7 +12,6 @@ from django.db.models import Q, Sum, Max
 from django.contrib.auth import get_user_model
 from django.db.models.signals import pre_delete
 from django.conf import settings
-from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
 
 from PIL import Image
@@ -42,13 +40,12 @@ if not PY2:
 def get_path(f, x):
     return f.path(x)
 
-@python_2_unicode_compatible
 class Document(models.Model, FulltextMixin):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    user = models.ForeignKey(User, related_name='documents')
+    user = models.ForeignKey(User, related_name='documents', on_delete=models.CASCADE)
     groups = models.ManyToManyField(Group, blank=True, related_name='documents')
 
     extension = models.CharField(max_length=255)
@@ -74,7 +71,7 @@ class Document(models.Model, FulltextMixin):
     data = JSONField(default=dict, editable=False)
 
     def update_access(self, user):
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             user = None
         access, created = Access.objects.get_or_create(document=self, user=user)
         if not created:
@@ -161,7 +158,7 @@ class Document(models.Model, FulltextMixin):
                 elif i not in ('*', 'dimensions') and i not in self.facet_keys:
                     value = data.get(i)
                     if isinstance(value, list):
-                        value = u'\n'.join(value)
+                        value = '\n'.join(value)
                     save(i, value)
 
     base_keys = ('id', 'size', 'dimensions', 'extension', 'matches')
@@ -192,11 +189,11 @@ class Document(models.Model, FulltextMixin):
         s.dimensions = ox.sort_string('%d' % prefix) + ox.sort_string('%d' % value)
 
         def sortNames(values):
-            sort_value = u''
+            sort_value = ''
             if values:
-                sort_value = u'; '.join([get_name_sort(name) for name in values])
+                sort_value = '; '.join([get_name_sort(name) for name in values])
             if not sort_value:
-                sort_value = u''
+                sort_value = ''
             return sort_value.lower()
 
         def set_value(s, name, value):
@@ -229,7 +226,7 @@ class Document(models.Model, FulltextMixin):
                 if isinstance(sort_type, list):
                     sort_type = sort_type[0]
                 if sort_type == 'title':
-                    value = self.get_value(source, u'Untitled')
+                    value = self.get_value(source, 'Untitled')
                     value = utils.sort_title(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'person':
@@ -237,9 +234,9 @@ class Document(models.Model, FulltextMixin):
                     value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'string':
-                    value = self.get_value(source, u'')
+                    value = self.get_value(source, '')
                     if isinstance(value, list):
-                        value = u','.join(value)
+                        value = ','.join(value)
                     if not isinstance(value, str):
                         value = str(value)
                     value = utils.sort_string(value)[:955]
@@ -319,7 +316,7 @@ class Document(models.Model, FulltextMixin):
         return ox.toAZ(self.id)
 
     def access(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             level = 'guest'
         else:
             level = user.profile.get_level()
@@ -332,7 +329,7 @@ class Document(models.Model, FulltextMixin):
         return False
 
     def editable(self, user, item=None):
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return False
         if self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0 or \
@@ -693,8 +690,8 @@ class ItemProperties(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    item = models.ForeignKey(Item)
-    document = models.ForeignKey(Document, related_name='descriptions')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    document = models.ForeignKey(Document, related_name='descriptions', on_delete=models.CASCADE)
     description = models.TextField(default="")
     index = models.IntegerField(default=0)
 
@@ -709,14 +706,13 @@ class ItemProperties(models.Model):
         super(ItemProperties, self).save(*args, **kwargs)
 
 
-@python_2_unicode_compatible
 class Access(models.Model):
     class Meta:
         unique_together = ("document", "user")
 
     access = models.DateTimeField(auto_now=True)
-    document = models.ForeignKey(Document, related_name='accessed')
-    user = models.ForeignKey(User, null=True, related_name='accessed_documents')
+    document = models.ForeignKey(Document, related_name='accessed', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, related_name='accessed_documents', on_delete=models.CASCADE)
     accessed = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
@@ -729,10 +725,9 @@ class Access(models.Model):
 
     def __str__(self):
         if self.user:
-            return u"%s/%s/%s" % (self.user, self.document, self.access)
-        return u"%s/%s" % (self.item, self.access)
+            return "%s/%s/%s" % (self.user, self.document, self.access)
+        return "%s/%s" % (self.item, self.access)
 
-@python_2_unicode_compatible
 class Facet(models.Model):
     '''
         used for keys that can have multiple values like people, languages etc.
@@ -743,13 +738,13 @@ class Facet(models.Model):
     class Meta:
         unique_together = ("document", "key", "value")
 
-    document = models.ForeignKey('Document', related_name='facets')
+    document = models.ForeignKey('Document', related_name='facets', on_delete=models.CASCADE)
     key = models.CharField(max_length=200, db_index=True)
     value = models.CharField(max_length=1000, db_index=True)
     sortvalue = models.CharField(max_length=1000, db_index=True)
 
     def __str__(self):
-        return u"%s=%s" % (self.key, self.value)
+        return "%s=%s" % (self.key, self.value)
 
     def save(self, *args, **kwargs):
         if not self.sortvalue:
@@ -768,18 +763,17 @@ for key in settings.CONFIG['itemKeys']:
     if key.get('sortType') == 'person':
         Document.person_keys.append(key['id'])
 
-@python_2_unicode_compatible
 class Find(models.Model):
 
     class Meta:
         unique_together = ('document', 'key')
 
-    document = models.ForeignKey('Document', related_name='find', db_index=True)
+    document = models.ForeignKey('Document', related_name='find', db_index=True, on_delete=models.CASCADE)
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True, db_index=settings.DB_GIN_TRGM)
 
     def __str__(self):
-        return u'%s=%s' % (self.key, self.value)
+        return '%s=%s' % (self.key, self.value)
 
 '''
 Sort
@@ -787,7 +781,7 @@ table constructed based on info in settings.CONFIG['documentKeys']
 '''
 attrs = {
     '__module__': 'document.models',
-    'document': models.OneToOneField('Document', related_name='sort', primary_key=True),
+    'document': models.OneToOneField('Document', related_name='sort', primary_key=True, on_delete=models.CASCADE),
     'created': models.DateTimeField(null=True, blank=True, db_index=True),
 }
 for key in list(filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['documentKeys'])):

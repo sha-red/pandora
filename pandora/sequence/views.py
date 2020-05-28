@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from ox.utils import json
 from oxdjango.shortcuts import render_to_json_response, json_response

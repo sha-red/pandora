@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import os
 import re
@@ -10,7 +9,6 @@ from django.db import models
 from django.db.models import Max
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
 
 import ox
@@ -36,7 +34,6 @@ def get_collectionview():
 def get_collectionsort():
     return tuple(settings.CONFIG['user']['ui']['collectionSort'])
 
-@python_2_unicode_compatible
 class Collection(models.Model):
 
     class Meta:
@@ -44,7 +41,7 @@ class Collection(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, related_name='collections')
+    user = models.ForeignKey(User, related_name='collections', on_delete=models.CASCADE)
     groups = models.ManyToManyField(Group, blank=True, related_name='collections')
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, default='private')
@@ -58,7 +55,7 @@ class Collection(models.Model):
     view = models.TextField(default=get_collectionview)
     sort = JSONField(default=get_collectionsort, editable=False)
 
-    poster_frames = JSONField(default=[], editable=False)
+    poster_frames = JSONField(default=list, editable=False)
 
     #is through table still required?
     documents = models.ManyToManyField('document.Document', related_name='collections',
@@ -117,13 +114,13 @@ class Collection(models.Model):
         return self.get_id()
 
     def get_id(self):
-        return u'%s:%s' % (self.user.username, self.name)
+        return '%s:%s' % (self.user.username, self.name)
 
     def accessible(self, user):
         return self.user == user or self.status in ('public', 'featured')
 
     def editable(self, user):
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return False
         if self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0 or \
@@ -251,7 +248,7 @@ class Collection(models.Model):
             elif key == 'subscribers':
                 response[key] = self.subscribed_users.all().count()
             elif key == 'subscribed':
-                if user and not user.is_anonymous():
+                if user and not user.is_anonymous:
                     response[key] = self.subscribed_users.filter(id=user.id).exists()
             else:
                 response[key] = getattr(self, {
@@ -318,28 +315,26 @@ class Collection(models.Model):
                 path = source
         return path
 
-@python_2_unicode_compatible
 class CollectionDocument(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    collection = models.ForeignKey(Collection)
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     index = models.IntegerField(default=0)
-    document = models.ForeignKey('document.Document')
+    document = models.ForeignKey('document.Document', on_delete=models.CASCADE)
 
     def __str__(self):
-        return u'%s in %s' % (self.document, self.collection)
+        return '%s in %s' % (self.document, self.collection)
 
-@python_2_unicode_compatible
 class Position(models.Model):
 
     class Meta:
         unique_together = ("user", "collection", "section")
 
-    collection = models.ForeignKey(Collection, related_name='position')
-    user = models.ForeignKey(User, related_name='collection_positions')
+    collection = models.ForeignKey(Collection, related_name='position', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='collection_positions', on_delete=models.CASCADE)
     section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
     def __str__(self):
-        return u'%s/%s/%s' % (self.section, self.position, self.collection)
+        return '%s/%s/%s' % (self.section, self.position, self.collection)
 

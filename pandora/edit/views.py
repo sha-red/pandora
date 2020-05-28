@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import os
 import re
@@ -404,7 +403,8 @@ def findEdits(request, data):
     query = parse_query(data, request.user)
 
     #order
-    is_section_request = query['sort'] == [{u'operator': u'+', u'key': u'position'}]
+    is_section_request = query['sort'] == [{'operator': '+', 'key': 'position'}]
+
     def is_featured_condition(x):
         return x['key'] == 'status' and \
                x['value'] == 'featured' and \
@@ -414,7 +414,7 @@ def findEdits(request, data):
 
     if is_section_request:
         qs = query['qs']
-        if not is_featured and not request.user.is_anonymous():
+        if not is_featured and not request.user.is_anonymous:
             qs = qs.filter(position__in=models.Position.objects.filter(user=request.user))
         qs = qs.order_by('position__position')
     else:

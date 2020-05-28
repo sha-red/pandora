@@ -158,7 +158,7 @@ class AnnotationManager(Manager):
         #anonymous can only see public items
         public_layers = self.model.public_layers()
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             qs = qs.filter(layer__in=public_layers)
         #users can see public and own
         else:

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.utils.encoding import python_2_unicode_compatible
 
 import ox
 
@@ -12,11 +10,10 @@ from . import managers
 User = get_user_model()
 
 
-@python_2_unicode_compatible
 class Log(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, default=None, blank=True, null=True)
+    user = models.ForeignKey(User, default=None, blank=True, null=True, on_delete=models.CASCADE)
     url = models.CharField(max_length=1000, default='')
     line = models.IntegerField(default=0)
     text = models.TextField(blank=True)
@@ -24,7 +21,7 @@ class Log(models.Model):
     objects = managers.LogManager()
 
     def __str__(self):
-        return u"%s" % self.id
+        return "%s" % self.id
 
     def json(self, keys=None):
         j = {

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from datetime import datetime
 import unicodedata
@@ -81,7 +80,7 @@ def parseCondition(condition, user, owner=None):
 
     if (not exclude and op == '=' or op in ('$', '^')) and v == '':
         return Q()
-    elif k == 'filename' and (user.is_anonymous() or not user.profile.capability('canSeeMedia')):
+    elif k == 'filename' and (user.is_anonymous or not user.profile.capability('canSeeMedia')):
         return Q(id=0)
     elif k == 'oshash':
         return Q(files__oshash=v)
@@ -100,7 +99,7 @@ def parseCondition(condition, user, owner=None):
             q = ~q
         return q
     elif k in ('canplayvideo', 'canplayclips'):
-        level = user.is_anonymous() and 'guest' or user.profile.get_level()
+        level = user.is_anonymous and 'guest' or user.profile.get_level()
         allowed_level = settings.CONFIG['capabilities'][{
             'canplayvideo': 'canPlayVideo',
             'canplayclips': 'canPlayClips'
@@ -249,7 +248,7 @@ class ItemManager(Manager):
         if l != "*":
             l = l.split(":")
             only_public = True
-            if not user.is_anonymous():
+            if not user.is_anonymous:
                 if len(l) == 1:
                     l = [user.username] + l
                 if user.username == l[0]:
@@ -305,7 +304,7 @@ class ItemManager(Manager):
         qs = qs.distinct()
         
         #anonymous can only see public items
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             level = 'guest'
             allowed_level = settings.CONFIG['capabilities']['canSeeItem'][level]
             qs = qs.filter(level__lte=allowed_level)

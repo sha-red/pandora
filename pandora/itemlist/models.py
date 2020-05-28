@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import os
 import re
@@ -10,7 +9,6 @@ from django.db import models
 from django.db.models import Max
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
 
 import ox
@@ -28,7 +26,6 @@ def get_icon_path(f, x): return get_path(f, 'icon.jpg')
 def get_listview(): return settings.CONFIG['user']['ui']['listView']
 def get_listsort(): return tuple(settings.CONFIG['user']['ui']['listSort'])
 
-@python_2_unicode_compatible
 class List(models.Model):
 
     class Meta:
@@ -36,7 +33,7 @@ class List(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, related_name='lists')
+    user = models.ForeignKey(User, related_name='lists', on_delete=models.CASCADE)
     groups = models.ManyToManyField(Group, blank=True, related_name='lists')
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, default='private')
@@ -50,7 +47,7 @@ class List(models.Model):
     view = models.TextField(default=get_listview)
     sort = JSONField(default=get_listsort, editable=False)
 
-    poster_frames = JSONField(default=[], editable=False)
+    poster_frames = JSONField(default=list, editable=False)
 
     #is through table still required?
     items = models.ManyToManyField('item.Item', related_name='lists',
@@ -110,13 +107,13 @@ class List(models.Model):
         return self.get_id()
 
     def get_id(self):
-        return u'%s:%s' % (self.user.username, self.name)
+        return '%s:%s' % (self.user.username, self.name)
 
     def accessible(self, user):
         return self.user == user or self.status in ('public', 'featured')
 
     def editable(self, user):
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return False
         if self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0 or \
@@ -244,7 +241,7 @@ class List(models.Model):
             elif key == 'subscribers':
                 response[key] = self.subscribed_users.all().count()
             elif key == 'subscribed':
-                if user and not user.is_anonymous():
+                if user and not user.is_anonymous:
                     response[key] = self.subscribed_users.filter(id=user.id).exists()
             else:
                 response[key] = getattr(self, {
@@ -314,29 +311,27 @@ class List(models.Model):
                 path = source
         return path
 
-@python_2_unicode_compatible
 class ListItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    list = models.ForeignKey(List)
+    list = models.ForeignKey(List, on_delete=models.CASCADE)
     index = models.IntegerField(default=0)
-    item = models.ForeignKey('item.Item')
+    item = models.ForeignKey('item.Item', on_delete=models.CASCADE)
 
     def __str__(self):
-        return u'%s in %s' % (self.item, self.list)
+        return '%s in %s' % (self.item, self.list)
 
 
-@python_2_unicode_compatible
 class Position(models.Model):
 
     class Meta:
         unique_together = ("user", "list", "section")
 
-    list = models.ForeignKey(List, related_name='position')
-    user = models.ForeignKey(User)
+    list = models.ForeignKey(List, related_name='position', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     section = models.CharField(max_length=255)
     position = models.IntegerField(default=0)
 
     def __str__(self):
-        return u'%s/%s/%s' % (self.section, self.position, self.list)
+        return '%s/%s/%s' % (self.section, self.position, self.list)
 

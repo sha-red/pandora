@@ -12,7 +12,7 @@ def login_required_json(function=None):
     """
 
     def _wrapped_view(request, *args, **kwargs):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return function(request, *args, **kwargs)
         return render_to_json_response({'status': {'code': 401, 'text': 'login required'}})
     return wraps(function)(_wrapped_view)
@@ -24,7 +24,7 @@ def admin_required_json(function=None):
     """
 
     def _wrapped_view(request, *args, **kwargs):
-        if request.user.is_authenticated() and request.user.profile.get_level() == 'admin':
+        if request.user.is_authenticated and request.user.profile.get_level() == 'admin':
             return function(request, *args, **kwargs)
         return render_to_json_response({'status': {'code': 403, 'text': 'permission denied'}})
     return wraps(function)(_wrapped_view)

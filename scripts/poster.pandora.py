@@ -17,7 +17,7 @@ static_root = os.path.join(os.path.dirname(__file__), 'data')
 def render_poster(data, poster):
 
     title = ox.decode_html(data.get('title', ''))
-    director = ox.decode_html(u', '.join(data.get('director', [])))
+    director = ox.decode_html(', '.join(data.get('director', [])))
     year = str(data.get('year', ''))
     series = data.get('isSeries', False)
     oxdb_id = data['oxdbId']

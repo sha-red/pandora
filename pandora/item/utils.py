@@ -55,14 +55,14 @@ def plural_key(term):
 
 def sort_title(title):
 
-    title = title.replace(u'Æ', 'Ae')
+    title = title.replace('Æ', 'Ae')
     if isinstance(title, bytes):
         title = title.decode('utf-8')
     title = ox.decode_html(title)
     title = sort_string(title)
 
     #title
-    title = re.sub(u'[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
+    title = re.sub('[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
     return title.strip()
 
 def get_positions(ids, pos, decode_id=False):

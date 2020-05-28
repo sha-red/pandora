@@ -3,7 +3,7 @@ from __future__ import division, absolute_import
 
 import json
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.conf import settings
 
 from ..shortcuts import render_to_json_response, json_response, HttpErrorJson
@@ -31,7 +31,7 @@ def api(request):
             'settings': settings,
             'sitename': settings.SITENAME
         }
-        response = render_to_response('api.html', context)
+        response = render(request, 'api.html', context)
         response['Access-Control-Allow-Origin'] = '*'
         return response
     if request.META.get('CONTENT_TYPE') == 'application/json':

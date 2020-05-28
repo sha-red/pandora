@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import os.path
 import mimetypes
@@ -144,7 +143,7 @@ def get_positions(request, query):
     return utils.get_positions(ids, query['positions'])
 
 def is_editable(request, item):
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         return False
     if not hasattr(request, 'user_group_names'):
         request.user_group_names = {g.name for g in request.user.groups.all()}
@@ -1097,7 +1096,7 @@ def video(request, id, resolution, format, index=None, track=None):
         ext = '.%s' % format
         duration = stream.info['duration']
 
-        filename = u"Clip of %s - %s-%s - %s %s%s" % (
+        filename = "Clip of %s - %s-%s - %s %s%s" % (
             item.get('title'),
             ox.format_duration(t[0] * 1000).replace(':', '.')[:-4],
             ox.format_duration(t[1] * 1000).replace(':', '.')[:-4],
@@ -1166,9 +1165,9 @@ def srt(request, id, layer, language=None, index=None, ext='srt'):
         content_type, encoder = _subtitle_formats[ext]
         response = HttpResponse()
         if language:
-            filename = u"%s.%s.%s" % (item.get('title'), language, ext)
+            filename = "%s.%s.%s" % (item.get('title'), language, ext)
         else:
-            filename = u"%s.%s" % (item.get('title'), ext)
+            filename = "%s.%s" % (item.get('title'), ext)
         response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
         response['Content-Type'] = content_type
         response.write(item.srt(layer, language, encoder=encoder))
@@ -1206,7 +1205,7 @@ def atom_xml(request):
     el.text = atom_link
 
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
-    if not request.user.is_anonymous():
+    if not request.user.is_anonymous:
         level = request.user.profile.level
     for item in models.Item.objects.filter(level__lte=level, rendered=True).order_by('-created')[:7]:
         if add_updated:
@@ -1232,7 +1231,7 @@ def atom_xml(request):
         if item.get('director'):
             el = ET.SubElement(entry, "author")
             name = ET.SubElement(el, "name")
-            name.text = ox.decode_html(u', '.join(item.get('director')))
+            name.text = ox.decode_html(', '.join(item.get('director')))
         elif item.user:
             el = ET.SubElement(entry, "author")
             name = ET.SubElement(el, "name")
@@ -1283,7 +1282,7 @@ def atom_xml(request):
                     el = ET.SubElement(format, key)
                     el.text = unicode(value)
         el = ET.SubElement(format, 'pixel_aspect_ratio')
-        el.text = u"1:1"
+        el.text = "1:1"
 
         if has_capability(request.user, 'canDownloadVideo'):
             if item.torrent:
@@ -1386,7 +1385,7 @@ def sitemap_part_xml(request, part):
 
 def item_json(request, id):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
-    if not request.user.is_anonymous():
+    if not request.user.is_anonymous:
         level = request.user.profile.level
     qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
@@ -1399,7 +1398,7 @@ def item_json(request, id):
 
 def item_xml(request, id):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
-    if not request.user.is_anonymous():
+    if not request.user.is_anonymous:
         level = request.user.profile.level
     qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
@@ -1439,7 +1438,7 @@ def item(request, id):
     view = None
     template = 'index.html'
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
-    if not request.user.is_anonymous():
+    if not request.user.is_anonymous:
         level = request.user.profile.level
     qs = models.Item.objects.filter(public_id=id, level__lte=level)
     if qs.count() == 0:
@@ -1484,7 +1483,7 @@ def item(request, id):
                 else:
                     title = key['title'] if key else k.capitalize()
                 if isinstance(value, list):
-                    value = value = u', '.join([unicode(v) for v in value])
+                    value = value = ', '.join([unicode(v) for v in value])
                 elif key and key.get('type') == 'float':
                     value = '%0.3f' % value
                 elif key and key.get('type') == 'time':
@@ -1493,7 +1492,7 @@ def item(request, id):
         clips = []
         clip = {'in': 0, 'annotations': []}
         # logged in users should have javascript. not adding annotations makes load faster
-        if not settings.USE_IMDB and request.user.is_anonymous():
+        if not settings.USE_IMDB and request.user.is_anonymous:
             for a in item.annotations.exclude(
                 layer='subtitles'
             ).exclude(
@@ -1513,13 +1512,13 @@ def item(request, id):
         head_title = item.get('title', '')
         title = item.get('title', '')
         if item.get('director'):
-            head_title += u' (%s)' % u', '.join(item.get('director', []))
+            head_title += ' (%s)' % ', '.join(item.get('director', []))
         if item.get('year'):
-            head_title += u' %s' % item.get('year')
-            title += u' (%s)' % item.get('year')
+            head_title += ' %s' % item.get('year')
+            title += ' (%s)' % item.get('year')
         if view:
-            head_title += u' – %s' % view
-        head_title += u' – %s' % settings.SITENAME
+            head_title += ' – %s' % view
+        head_title += ' – %s' % settings.SITENAME
         head_title = ox.decode_html(head_title)
         title = ox.decode_html(title)
         ctx = {

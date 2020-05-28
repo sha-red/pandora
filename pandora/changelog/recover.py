@@ -1,4 +1,3 @@
-from __future__ import print_function
 
 import models
 import item.models
@@ -18,33 +17,33 @@ def recover_item(id):
     created = old.value['created']
     i.user = user.models.User.objects.get(username=i.data['user'])
     for key in [
-         u'rendered',
-         u'random',
-         u'cuts',
-         u'duration',
-         u'id',  
-         u'size',
-         u'posterFrame',
-         u'parts',
-         u'cutsperminute',
-         u'hue', 
-         u'numberofcuts',
-         u'durations',
-         u'volume',
-         u'user',
-         u'words',
-         u'videoRatio',
-         u'aspectratio',
-         u'bitrate',
-         u'pixels',
-         u'created',
-         u'numberoffiles',
-         u'modified',
-         u'timesaccessed',
-         u'accessed',
-         u'resolution',
-         u'wordsperminute',
-         u'posterRatio'
+        'rendered',
+        'random',
+        'cuts',
+        'duration',
+        'id',
+        'size',
+        'posterFrame',
+        'parts',
+        'cutsperminute',
+        'hue', 
+        'numberofcuts',
+        'durations',
+        'volume',
+        'user',
+        'words',
+        'videoRatio',
+        'aspectratio',
+        'bitrate',
+        'pixels',
+        'created',
+        'numberoffiles',
+        'modified',
+        'timesaccessed',
+        'accessed',
+        'resolution',
+        'wordsperminute',
+        'posterRatio'
     ]:
         if key in i.data:
             del i.data[key]

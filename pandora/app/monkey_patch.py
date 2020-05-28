@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group

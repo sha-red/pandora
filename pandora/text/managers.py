@@ -126,7 +126,7 @@ class TextManager(Manager):
         if conditions:
             qs = qs.filter(conditions)
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             qs = qs.filter(Q(status='public') | Q(status='featured'))
         else:
             qs = qs.filter(Q(status='public') | Q(status='featured') | Q(user=user))

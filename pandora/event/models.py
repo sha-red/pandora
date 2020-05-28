@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.db import models, transaction
 from django.contrib.auth import get_user_model
 
-from django.utils.encoding import python_2_unicode_compatible
 
 import ox
 from oxdjango import fields
@@ -19,7 +17,6 @@ from . import managers
 
 User = get_user_model()
 
-@python_2_unicode_compatible
 class Event(models.Model):
     '''
         Events are events in time that can be once or recurring,
@@ -33,7 +30,7 @@ class Event(models.Model):
     modified = models.DateTimeField(auto_now=True)
     defined = models.BooleanField(default=False)
 
-    user = models.ForeignKey(User, null=True, related_name='events')
+    user = models.ForeignKey(User, null=True, related_name='events', on_delete=models.CASCADE)
 
     name = models.CharField(null=True, max_length=255, unique=True)
     name_sort = models.CharField(null=True, max_length=255, db_index=True)
@@ -66,7 +63,7 @@ class Event(models.Model):
 
     @classmethod
     def get_or_create(model, name):
-        qs = model.objects.filter(name_find__contains=u'|%s|' % name.lower())
+        qs = model.objects.filter(name_find__contains='|%s|' % name.lower())
         if qs.count() == 0:
             instance = model(name=name)
             instance.save()
@@ -75,7 +72,7 @@ class Event(models.Model):
         return instance
 
     def editable(self, user):
-        if user and not user.is_anonymous() \
+        if user and not user.is_anonymous \
             and (not self.user or \
                  self.user == user or \
                  user.profile.capability('canEditEvents')):

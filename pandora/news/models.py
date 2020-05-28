@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 import ox
 
 from . import managers
 
 
-@python_2_unicode_compatible
 class News(models.Model):
     objects = managers.NewsManager()
 
@@ -20,7 +17,7 @@ class News(models.Model):
     text = models.TextField()
 
     def editable(self, user):
-        return user.is_authenticated() and user.profile.capability("canEditSitePages")
+        return user.is_authenticated and user.profile.capability("canEditSitePages")
 
     def save(self, *args, **kwargs):
         super(News, self).save(*args, **kwargs)
@@ -42,5 +39,5 @@ class News(models.Model):
         return j
 
     def __str__(self):
-        return u"%s/%s" % (self.date, self.title)
+        return "%s/%s" % (self.date, self.title)
 

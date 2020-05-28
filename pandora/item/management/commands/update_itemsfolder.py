@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 
 import os
 
@@ -38,10 +37,10 @@ class Command(BaseCommand):
                     versions = os.path.join(prefix, os.path.dirname(path), 'Versions')
                     s = f.streams.filter(source=None)[0]
                     basename = os.path.basename(path).rsplit('.', 1)[0]
-                    target = os.path.join(versions, u'%s.%s' % (basename, s.format))
+                    target = os.path.join(versions, '%s.%s' % (basename, s.format))
                     link(s.media.path, target)
                 else:
                     s = f.streams.filter(source=None)[0]
                     basename = path.rsplit('.', 1)[0]
-                    target = os.path.join(prefix, u'%s.%s' % (basename, s.format))
+                    target = os.path.join(prefix, '%s.%s' % (basename, s.format))
                     link(s.media.path, target)

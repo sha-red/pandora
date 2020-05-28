@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import json
 import os
@@ -21,7 +20,6 @@ from django.core.files.temp import NamedTemporaryFile
 from django.db import models, transaction, connection
 from django.db.models import Q, Sum, Max
 from django.db.models.signals import pre_delete
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils import datetime_safe
 
 import ox
@@ -164,12 +162,11 @@ def get_poster_path(f, x):
 def get_torrent_path(f, x):
     return get_path(f, 'torrent.torrent')
 
-@python_2_unicode_compatible
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    user = models.ForeignKey(User, null=True, related_name='items')
+    user = models.ForeignKey(User, null=True, related_name='items', on_delete=models.CASCADE)
     groups = models.ManyToManyField(Group, blank=True, related_name='items')
 
     # while metadata is updated, files are set to rendered=False
@@ -221,7 +218,7 @@ class Item(models.Model):
         return default
 
     def access(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             level = 'guest'
         else:
             level = user.profile.get_level()
@@ -236,7 +233,7 @@ class Item(models.Model):
         return False
 
     def editable(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.profile.capability('canEditMetadata') or \
            user.is_staff or \
@@ -350,10 +347,10 @@ class Item(models.Model):
     def __str__(self):
         year = self.get('year')
         if year:
-            string = u'%s (%s)' % (ox.decode_html(self.get('title', 'Untitled')), self.get('year'))
+            string = '%s (%s)' % (ox.decode_html(self.get('title', 'Untitled')), self.get('year'))
         else:
-            string = self.get('title', u'Untitled')
-        return u'[%s] %s' % (self.public_id, string)
+            string = self.get('title', 'Untitled')
+        return '[%s] %s' % (self.public_id, string)
 
     def get_absolute_url(self):
         return '/%s' % self.public_id
@@ -400,7 +397,7 @@ class Item(models.Model):
                         title = self.get(key, 'Untitled')
                         while q.count() != 0:
                             n += 1
-                            self.data[key] = u'%s [%d]' % (title, n)
+                            self.data[key] = '%s [%d]' % (title, n)
                             oxdbId = self.oxdb_id()
                             q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
                 self.oxdbId = oxdbId
@@ -821,7 +818,7 @@ class Item(models.Model):
             for key in settings.CONFIG['itemKeys']:
                 i = key['id']
                 if i == 'title':
-                    save(i, u'\n'.join(get_titles()))
+                    save(i, '\n'.join(get_titles()))
                 elif i == 'rightslevel':
                     save(i, self.level)
                 elif i == 'filename':
@@ -830,17 +827,17 @@ class Item(models.Model):
                     qs = Annotation.objects.filter(item=self)
                     qs = qs.filter(layer__in=Annotation.public_layers()).exclude(findvalue=None)
                     qs = qs.order_by('start')
-                    save(i, u'\n'.join([l.findvalue for l in qs]))
+                    save(i, '\n'.join([l.findvalue for l in qs]))
                 elif key['type'] == 'layer':
                     qs = Annotation.objects.filter(item=self).exclude(findvalue=None)
                     qs = qs.filter(layer=i)
                     qs = qs.order_by('start')
-                    save(i, u'\n'.join(list(filter(None, [l.findvalue for l in qs]))))
+                    save(i, '\n'.join(list(filter(None, [l.findvalue for l in qs]))))
                     layer_keys.append(i)
                 elif i != '*' and i not in self.facet_keys:
                     value = self.get(i)
                     if isinstance(value, list):
-                        value = u'\n'.join(value)
+                        value = '\n'.join(value)
                     save(i, value)
 
             for key in self.facet_keys:
@@ -911,11 +908,11 @@ class Item(models.Model):
             s = ItemSort(item=self)
 
         def sortNames(values):
-            sort_value = u''
+            sort_value = ''
             if values:
-                sort_value = u'; '.join([get_name_sort(name) for name in values])
+                sort_value = '; '.join([get_name_sort(name) for name in values])
             if not sort_value:
-                sort_value = u''
+                sort_value = ''
             return sort_value.lower()
 
         def set_value(s, name, value):
@@ -1019,7 +1016,7 @@ class Item(models.Model):
                 sort_type = sort_type[0]
             if name not in self.base_keys:
                 if sort_type == 'title':
-                    value = get_title_sort(self.get(source, u'Untitled'))
+                    value = get_title_sort(self.get(source, 'Untitled'))
                     value = utils.sort_title(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'person':
@@ -1027,9 +1024,9 @@ class Item(models.Model):
                     value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'string':
-                    value = self.get(source, u'')
+                    value = self.get(source, '')
                     if isinstance(value, list):
-                        value = u','.join(value)
+                        value = ','.join(value)
                     value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'words':
@@ -1784,7 +1781,6 @@ for key in settings.CONFIG['itemKeys']:
     if key.get('sortType') == 'person':
         Item.person_keys.append(key['id'])
 
-@python_2_unicode_compatible
 class ItemFind(models.Model):
     """
         used to find items,
@@ -1795,19 +1791,19 @@ class ItemFind(models.Model):
     class Meta:
         unique_together = ("item", "key")
 
-    item = models.ForeignKey('Item', related_name='find', db_index=True)
+    item = models.ForeignKey('Item', related_name='find', db_index=True, on_delete=models.CASCADE)
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True, db_index=settings.DB_GIN_TRGM)
 
     def __str__(self):
-        return u"%s=%s" % (self.key, self.value)
+        return "%s=%s" % (self.key, self.value)
 '''
 ItemSort
 table constructed based on info in settings.CONFIG['itemKeys']
 '''
 attrs = {
     '__module__': 'item.models',
-    'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
+    'item': models.OneToOneField('Item', related_name='sort', primary_key=True, on_delete=models.CASCADE),
     'duration': models.FloatField(null=True, blank=True, db_index=True),
     'width': models.BigIntegerField(null=True, blank=True, db_index=True),
     'height': models.BigIntegerField(null=True, blank=True, db_index=True),
@@ -1826,14 +1822,13 @@ for key in list(filter(lambda k: k.get('sort', False) or k['type'] in ('integer'
 ItemSort = type('ItemSort', (models.Model,), attrs)
 ItemSort.fields = [f.name for f in ItemSort._meta.fields]
 
-@python_2_unicode_compatible
 class Access(models.Model):
     class Meta:
         unique_together = ("item", "user")
 
     access = models.DateTimeField(auto_now=True)
-    item = models.ForeignKey(Item, related_name='accessed')
-    user = models.ForeignKey(User, null=True, related_name='accessed_items')
+    item = models.ForeignKey(Item, related_name='accessed', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, related_name='accessed_items', on_delete=models.CASCADE)
     accessed = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
@@ -1846,10 +1841,9 @@ class Access(models.Model):
 
     def __str__(self):
         if self.user:
-            return u"%s/%s/%s" % (self.user, self.item, self.access)
-        return u"%s/%s" % (self.item, self.access)
+            return "%s/%s/%s" % (self.user, self.item, self.access)
+        return "%s/%s" % (self.item, self.access)
 
-@python_2_unicode_compatible
 class Facet(models.Model):
     '''
         used for keys that can have multiple values like people, languages etc.
@@ -1860,13 +1854,13 @@ class Facet(models.Model):
     class Meta:
         unique_together = ("item", "key", "value")
 
-    item = models.ForeignKey('Item', related_name='facets')
+    item = models.ForeignKey('Item', related_name='facets', on_delete=models.CASCADE)
     key = models.CharField(max_length=200, db_index=True)
     value = models.CharField(max_length=1000, db_index=True)
     sortvalue = models.CharField(max_length=1000, db_index=True)
 
     def __str__(self):
-        return u"%s=%s" % (self.key, self.value)
+        return "%s=%s" % (self.key, self.value)
 
     def save(self, *args, **kwargs):
         if not self.sortvalue:
@@ -1886,7 +1880,7 @@ class Description(models.Model):
 
 
 class AnnotationSequence(models.Model):
-    item = models.OneToOneField('Item', related_name='_annotation_sequence')
+    item = models.OneToOneField('Item', related_name='_annotation_sequence', on_delete=models.CASCADE)
     value = models.BigIntegerField(default=1)
 
     @classmethod

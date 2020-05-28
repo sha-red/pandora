@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import copy
 from datetime import datetime
@@ -9,7 +8,6 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
-from django.utils.encoding import python_2_unicode_compatible
 from oxdjango.fields import JSONField
 
 import ox
@@ -21,10 +19,9 @@ from .utils import get_ip, get_location
 
 User = get_user_model()
 
-@python_2_unicode_compatible
 class SessionData(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
-    user = models.OneToOneField(User, null=True, blank=True, related_name='data')
+    user = models.OneToOneField(User, null=True, blank=True, related_name='data', on_delete=models.CASCADE)
     firstseen = models.DateTimeField(auto_now_add=True, db_index=True)
     lastseen = models.DateTimeField(default=datetime.now, db_index=True)
     username = models.CharField(max_length=255, null=True, db_index=True)
@@ -50,7 +47,7 @@ class SessionData(models.Model):
     groupssort = models.CharField(default=None, blank=True, null=True, max_length=255)
 
     def __str__(self):
-        return u"%s" % self.session_key
+        return "%s" % self.session_key
 
     def parse_useragent(self):
         if self.useragent:
@@ -69,8 +66,8 @@ class SessionData(models.Model):
         if self.ip:
             city, country = get_location(self.ip)
             if city:
-                location = u'%s, %s' % (city, country)
-                location_sort = u'%s, %s' % (country, city)
+                location = '%s, %s' % (city, country)
+                location_sort = '%s, %s' % (country, city)
             else:
                 location = location_sort = country
             self.location = location
@@ -98,10 +95,10 @@ class SessionData(models.Model):
             request.session.modified = True
         session_key = request.session.session_key
         assert session_key
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             cls.objects.filter(user=request.user).update(session_key=session_key)
         data, created = cls.objects.get_or_create(session_key=session_key)
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             data.user = request.user
         data.ip = get_ip(request)
         data.useragent = request.META.get('HTTP_USER_AGENT', '')[:4096]
@@ -115,10 +112,10 @@ class SessionData(models.Model):
                 ]
         screen = data.info.get('screen', {})
         if screen and 'height' in screen and 'width' in screen:
-            data.screensize = u'%s\xd7%s' % (screen['width'], screen['height'])
+            data.screensize = '%s\xd7%s' % (screen['width'], screen['height'])
         window = data.info.get('window', {})
         if window and 'outerHeight' in window and 'outerWidth' in window:
-            data.windowsize = u'%s\xd7%s' % (window['outerWidth'], window['outerHeight'])
+            data.windowsize = '%s\xd7%s' % (window['outerWidth'], window['outerHeight'])
         if not data.timesseen:
             data.timesseen = 0
         data.timesseen += 1
@@ -172,10 +169,9 @@ class SessionData(models.Model):
                     del j[key]
         return j
 
-@python_2_unicode_compatible
 class UserProfile(models.Model):
     reset_code = models.CharField(max_length=255, blank=True, null=True, unique=True)
-    user = models.OneToOneField(User, related_name='profile')
+    user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
 
     level = models.IntegerField(default=1)
     files_updated = models.DateTimeField(default=datetime.now)
@@ -395,7 +391,7 @@ def get_ui(user_ui, user=None):
 def init_user(user, request=None):
     if request:
         SessionData.get_or_create(request)
-    if user.is_anonymous():
+    if user.is_anonymous:
         result = settings.CONFIG['user'].copy()
         result['ui'] = get_ui(json.loads(request.session.get('ui', '{}')))
     else:
@@ -434,7 +430,7 @@ def user_json(user, keys=None):
     return j
 
 def has_capability(user, capability):
-    if user.is_anonymous():
+    if user.is_anonymous:
         level = 'guest'
     else:
         level = user.profile.get_level()

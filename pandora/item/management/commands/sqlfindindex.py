@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 
 
 from django.core.management.base import BaseCommand
@@ -44,7 +43,13 @@ class Command(BaseCommand):
                 (document.models.Find._meta.db_table, 'value'),   # Document Find
             ):
                 cursor = connection.cursor()
-                indexes = connection.introspection.get_indexes(cursor, table)
+                contraints = connection.introspection.get_constraints(cursor, table)
+                indexes = {
+                    ','.join(c['columns']): {'primary_key': c['primary_key'], 'unique': c['unique']}
+                    for k, c in contraints.items()
+                    if c['index'] or c['primary_key'] or c['unique']
+                }
+                #indexes = connection.introspection.get_indexes(cursor, table)
                 drop = []
                 if column in indexes:
                     for sql in (

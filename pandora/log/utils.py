@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, absolute_import
 
 import logging
 import sys
@@ -34,7 +33,7 @@ class ErrorHandler(logging.Handler):
                 request = record.request
 
             request_repr = repr(request)
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 user = request.user
             url = request.META.get('PATH_INFO', '')
         except:
