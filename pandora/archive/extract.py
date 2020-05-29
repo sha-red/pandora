@@ -12,7 +12,6 @@ import shutil
 from distutils.spawn import find_executable
 from glob import glob
 
-from six import string_types
 import numpy as np
 import ox
 import ox.image
@@ -463,7 +462,7 @@ def timeline(video, prefix, modes=None, size=None):
         modes = ['antialias', 'slitscan', 'keyframes', 'audio', 'data']
     if size is None:
         size = [64, 16]
-    if isinstance(video, string_types):
+    if isinstance(video, str):
         video = [video]
     cmd = ['../bin/oxtimelines',
            '-s', ','.join(map(str, reversed(sorted(size)))),

@@ -4,7 +4,6 @@ from __future__ import division, absolute_import
 import inspect
 import sys
 
-from six import PY2
 from django.conf import settings
 
 from ..shortcuts import render_to_json_response, json_response
@@ -109,12 +108,8 @@ class ApiActions(dict):
         if name != 'api' and hasattr(f, 'func_closure') and f.func_closure:
             fc = list(filter(lambda c: hasattr(c.cell_contents, '__call__'), f.func_closure))
             f = fc[len(fc)-1].cell_contents
-        if PY2:
-            info = f.func_code.co_filename[len(settings.PROJECT_ROOT)+1:]
-            info = '%s:%s' % (info, f.func_code.co_firstlineno)
-        else:
-            info = f.__code__.co_filename[len(settings.PROJECT_ROOT)+1:]
-            info = '%s:%s' % (info, f.__code__.co_firstlineno)
+        info = f.__code__.co_filename[len(settings.PROJECT_ROOT)+1:]
+        info = '%s:%s' % (info, f.__code__.co_firstlineno)
         return info, trim(inspect.getsource(f))
 
     def register(self, method, action=None, cache=True, version=None):

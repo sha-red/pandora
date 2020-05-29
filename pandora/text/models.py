@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from glob import glob
+from urllib.parse import quote
 import os
 import re
 import subprocess
-from glob import glob
 
-from six.moves.urllib.parse import quote
 from django.db import models
 from django.db.models import Max
 from django.contrib.auth import get_user_model

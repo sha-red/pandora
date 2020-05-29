@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import os.path
+from datetime import datetime, timedelta
+from urllib.parse import quote, urlparse
 import mimetypes
+import os.path
 import random
 import time
-from datetime import datetime, timedelta
 
-from six import PY2
-from six.moves.urllib.parse import quote, urlparse
 from PIL import Image
 from django.db.models import Count, Sum
 from django.http import HttpResponse, HttpResponseForbidden, Http404
@@ -35,8 +34,6 @@ from changelog.models import add_changelog
 
 from oxdjango.api import actions
 
-if not PY2:
-    unicode = str
 
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
@@ -1280,7 +1277,7 @@ def atom_xml(request):
                     }.get(key, key))
                 if value and value != -1:
                     el = ET.SubElement(format, key)
-                    el.text = unicode(value)
+                    el.text = str(value)
         el = ET.SubElement(format, 'pixel_aspect_ratio')
         el.text = "1:1"
 
@@ -1357,7 +1354,7 @@ def oembed(request):
         oxml = ET.Element('oembed')
         for key in oembed:
             e = ET.SubElement(oxml, key)
-            e.text = unicode(oembed[key])
+            e.text = str(oembed[key])
         return HttpResponse(
             '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' + ET.tostring(oxml).decode(),
             'application/xml'
@@ -1423,7 +1420,7 @@ def item_xml(request, id):
                         xmltree(root, k, data[k])
             else:
                 e = ET.SubElement(root, key)
-                e.text = unicode(data)
+                e.text = str(data)
 
         oxml = ET.Element('item')
         xmltree(oxml, 'item', j)
@@ -1483,7 +1480,7 @@ def item(request, id):
                 else:
                     title = key['title'] if key else k.capitalize()
                 if isinstance(value, list):
-                    value = value = ', '.join([unicode(v) for v in value])
+                    value = value = ', '.join([str(v) for v in value])
                 elif key and key.get('type') == 'float':
                     value = '%0.3f' % value
                 elif key and key.get('type') == 'time':

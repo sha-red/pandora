@@ -8,8 +8,6 @@ from django.utils import datetime_safe
 import django.contrib.postgres.fields
 from django.core.serializers.json import DjangoJSONEncoder
 
-from six import string_types
-
 from ox.utils import json
 
 class JSONField(django.contrib.postgres.fields.JSONField):
@@ -74,7 +72,7 @@ class DictField(models.TextField):
         except:
             raise Exception('failed to parse value: %s' % value)
         if value is not None:
-            if isinstance(value, string_types):
+            if isinstance(value, str):
                 value = json.loads(value)
             assert isinstance(value, self._type)
         return value
@@ -83,7 +81,7 @@ class DictField(models.TextField):
         if isinstance(value, self._type):
             value = self.dumps(value)
         if value is not None:
-            assert isinstance(value, string_types)
+            assert isinstance(value, str)
         value = models.TextField.get_prep_value(self, value)
         return value
 

@@ -10,9 +10,7 @@ import unicodedata
 import uuid
 from datetime import datetime
 from glob import glob
-
-from six import PY2, string_types
-from six.moves.urllib.parse import quote
+from urllib.parse import quote
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -46,8 +44,6 @@ import archive.models
 
 User = get_user_model()
 
-if not PY2:
-    unicode = str
 
 def get_id(info):
     q = Item.objects.all()
@@ -284,11 +280,11 @@ class Item(models.Model):
                     self.data[key] = [ox.escape_html(t) for t in data[key]]
                 elif key in ('episodeTitle', 'seriesTitle', 'episodeDirector', 'seriesYear'):
                     self.data[key] = ox.escape_html(data[key])
-                elif isinstance(data[key], string_types):
+                elif isinstance(data[key], str):
                     self.data[key] = ox.escape_html(data[key])
                 elif isinstance(data[key], list):
                     def cleanup(i):
-                        if isinstance(i, string_types):
+                        if isinstance(i, str):
                             i = ox.escape_html(i)
                         return i
                     self.data[key] = [cleanup(i) for i in data[key]]
@@ -329,7 +325,7 @@ class Item(models.Model):
         if c:
             for t in list(c):
                 if c[t]:
-                    if isinstance(c[t][0], string_types):
+                    if isinstance(c[t][0], str):
                         c[t] = [{'id': i, 'title': None} for i in c[t]]
                     ids = [i['id'] for i in c[t]]
                     known = {}
@@ -626,7 +622,7 @@ class Item(models.Model):
                     if value:
                         i[key] = value
 
-        if 'cast' in i and isinstance(i['cast'][0], string_types):
+        if 'cast' in i and isinstance(i['cast'][0], str):
             i['cast'] = [i['cast']]
         if 'cast' in i and isinstance(i['cast'][0], list):
             i['cast'] = [{'actor': x[0], 'character': x[1]} for x in i['cast']]
@@ -797,7 +793,7 @@ class Item(models.Model):
                 f, created = ItemFind.objects.get_or_create(item=self, key=key)
                 if isinstance(value, bool):
                     value = value and 'true' or 'false'
-                if isinstance(value, string_types):
+                if isinstance(value, str):
                     value = ox.decode_html(ox.strip_tags(value.strip()))
                     value = unicodedata.normalize('NFKD', value).lower()
                 f.value = value
@@ -916,7 +912,7 @@ class Item(models.Model):
             return sort_value.lower()
 
         def set_value(s, name, value):
-            if isinstance(value, string_types):
+            if isinstance(value, str):
                 value = ox.decode_html(value.lower())
                 if not value:
                     value = None
@@ -1052,7 +1048,7 @@ class Item(models.Model):
                     set_value(s, name, value)
                 elif sort_type == 'date':
                     value = value_ = self.get(source)
-                    if isinstance(value, string_types):
+                    if isinstance(value, str):
                         value_ = None
                         for fmt in ('%Y-%m-%d', '%Y-%m', '%Y'):
                             try:
@@ -1091,7 +1087,7 @@ class Item(models.Model):
             if not current_values:
                 current_values = []
             else:
-                current_values = [unicode(current_values)]
+                current_values = [str(current_values)]
 
         filter_map = utils.get_by_id(settings.CONFIG['itemKeys'], key).get('filterMap')
         if filter_map:

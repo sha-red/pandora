@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import os
-import mimetypes
 from datetime import datetime, timedelta
-from six.moves.urllib.parse import quote
+from urllib.parse import quote
+import mimetypes
+import os
 
 from django.http import HttpResponse, Http404
 from django.conf import settings

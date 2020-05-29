@@ -3,7 +3,6 @@
 from datetime import datetime
 import unicodedata
 
-from six import string_types
 from django.db.models import Q, Manager
 from django.conf import settings
 
@@ -123,7 +122,7 @@ def parseCondition(condition, user, owner=None):
         else:
             value_key = k
         if not k.startswith('public_id'):
-            if isinstance(v, string_types):
+            if isinstance(v, str):
                 v = unicodedata.normalize('NFKD', v).lower()
         if k in facet_keys:
             in_find = False

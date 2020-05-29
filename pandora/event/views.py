@@ -3,7 +3,6 @@
 from django.db.models import Count
 from django.conf import settings
 
-from six import string_types
 import ox
 from ox.utils import json
 
@@ -47,7 +46,7 @@ def addEvent(request, data):
                     'type', 'alternativeNames'):
             if key in data and data[key]:
                 value = data[key]
-                if isinstance(value, string_types):
+                if isinstance(value, str):
                     value = ox.escape_html(value)
                 if key == 'alternativeNames':
                     value = tuple([ox.escape_html(v) for v in value])
@@ -101,7 +100,7 @@ def editEvent(request, data):
                         'type', 'alternativeNames'):
                 if key in data:
                     value = data[key]
-                    if isinstance(value, string_types):
+                    if isinstance(value, str):
                         value = ox.escape_html(value)
                     if key == 'alternativeNames':
                         value = tuple([ox.escape_html(v) for v in value])

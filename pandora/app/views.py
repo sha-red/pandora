@@ -3,7 +3,6 @@
 import copy
 from datetime import datetime
 
-from six import string_types
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.http import HttpResponse
@@ -113,7 +112,7 @@ def getPage(request, data):
     }
     see: editPage
     '''
-    if isinstance(data, string_types):
+    if isinstance(data, str):
         name = data
     else:
         name = data['name']

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import unicodedata
 
-from six import string_types
 from django.db.models import Q, Manager
 from django.conf import settings
 
@@ -152,7 +151,7 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
             value_key = 'find__value'
         else:
             value_key = k
-        if isinstance(v, string_types):
+        if isinstance(v, str):
             v = unicodedata.normalize('NFKD', v).lower()
         if k in facet_keys:
             in_find = False

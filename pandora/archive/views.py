@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.conf import settings
 from django.db.models import Count, Q
 
-from six import string_types
 from celery.utils import get_full_cls_name
 from celery._state import current_app
 import ox
@@ -555,7 +554,7 @@ def getPath(request, data):
     '''
     response = json_response()
     ids = data['id']
-    if isinstance(ids, string_types):
+    if isinstance(ids, str):
         ids = [ids]
     for f in models.File.objects.filter(oshash__in=ids).values('path', 'oshash').order_by('sort_path'):
         response['data'][f['oshash']] = f['path']

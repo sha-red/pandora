@@ -2,7 +2,6 @@
 
 from glob import glob
 
-from six import string_types
 from celery.task import task
 from django.conf import settings
 from django.db.models import Q
@@ -219,7 +218,7 @@ def move_media(data, user):
         data['public_id'] = data.pop('item').strip()
         if not is_imdb_id(data['public_id']):
             del data['public_id']
-            if 'director' in data and isinstance(data['director'], string_types):
+            if 'director' in data and isinstance(data['director'], str):
                 if data['director'] == '':
                     data['director'] = []
                 else:

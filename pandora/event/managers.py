@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import unicodedata
 
-from six import string_types
 from django.db.models import Q, Manager
 
 from oxdjango.query import QuerySet
@@ -30,7 +29,7 @@ def parseCondition(condition, user):
 
     key = k + get_operator(op, 'istr')
     key = str(key)
-    if isinstance(v, string_types):
+    if isinstance(v, str):
         v = unicodedata.normalize('NFKD', v).lower()
     if exclude:
         q = ~Q(**{k: v})

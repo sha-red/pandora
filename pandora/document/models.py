@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from glob import glob
+from urllib.parse import quote, unquote
 import os
 import re
-from glob import glob
 import unicodedata
 
-from six import PY2, string_types
-from six.moves.urllib.parse import quote, unquote
 from django.db import models, transaction
 from django.db.models import Q, Sum, Max
 from django.contrib.auth import get_user_model
@@ -33,9 +32,6 @@ from . import tasks
 from .fulltext import FulltextMixin
 
 User = get_user_model()
-
-if not PY2:
-    unicode = str
 
 def get_path(f, x):
     return f.path(x)
@@ -88,7 +84,7 @@ class Document(models.Model, FulltextMixin):
             if not current_values:
                 current_values = []
             else:
-                current_values = [unicode(current_values)]
+                current_values = [str(current_values)]
 
         filter_map = utils.get_by_id(settings.CONFIG['documentKeys'], key).get('filterMap')
         if filter_map:
@@ -139,7 +135,7 @@ class Document(models.Model, FulltextMixin):
                 f, created = Find.objects.get_or_create(document=self, key=key)
                 if isinstance(value, bool):
                     value = value and 'true' or 'false'
-                if isinstance(value, string_types):
+                if isinstance(value, str):
                     value = ox.decode_html(ox.strip_tags(value.strip()))
                     value = unicodedata.normalize('NFKD', value).lower()
                 f.value = value
@@ -197,7 +193,7 @@ class Document(models.Model, FulltextMixin):
             return sort_value.lower()
 
         def set_value(s, name, value):
-            if isinstance(value, string_types):
+            if isinstance(value, str):
                 value = ox.decode_html(value.lower())
                 if not value:
                     value = None
@@ -259,7 +255,7 @@ class Document(models.Model, FulltextMixin):
                     set_value(s, name, value)
                 elif sort_type == 'date':
                     value = self.get_value(source)
-                    if isinstance(value, string_types):
+                    if isinstance(value, str):
                         value = datetime_safe.datetime.strptime(value, '%Y-%m-%d')
                     set_value(s, name, value)
         s.save()
@@ -370,11 +366,11 @@ class Document(models.Model, FulltextMixin):
                     self.data[key] = [ox.sanitize_html(t) for t in data[key]]
                 elif ktype == '[string]':
                     self.data[key] = [ox.escape_html(t) for t in data[key]]
-                elif isinstance(data[key], string_types):
+                elif isinstance(data[key], str):
                     self.data[key] = ox.escape_html(data[key])
                 elif isinstance(data[key], list):
                     def cleanup(i):
-                        if isinstance(i, string_types):
+                        if isinstance(i, str):
                             i = ox.escape_html(i)
                         return i
                     self.data[key] = [cleanup(i) for i in data[key]]
@@ -480,7 +476,7 @@ class Document(models.Model, FulltextMixin):
         if self.extension == 'html':
             response['text'] = self.data.get('text', '')
         if item:
-            if isinstance(item, string_types):
+            if isinstance(item, str):
                 item = Item.objects.get(public_id=item)
             d = self.descriptions.filter(item=item)
             if d.exists():

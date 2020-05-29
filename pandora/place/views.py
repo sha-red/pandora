@@ -3,7 +3,6 @@
 from django.db.models import Max, Min, Count
 from django.conf import settings
 
-from six import string_types
 import ox
 from ox.utils import json
 
@@ -115,7 +114,7 @@ def editPlace(request, data):
     '''
     place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data['id']))
     names = data.get('name', [])
-    if isinstance(names, string_types):
+    if isinstance(names, str):
         names = [names]
     names = [ox.escape_html(n) for n in names]
     alternative_names = [ox.escape_html(n) for n in data.get('alternativeNames', [])]
@@ -144,7 +143,7 @@ def editPlace(request, data):
             for key in data:
                 if key != 'id':
                     value = data[key]
-                    if isinstance(value, string_types):
+                    if isinstance(value, str):
                         value = ox.escape_html(value)
                     if isinstance(value, list):
                         value = tuple(value)

@@ -5,7 +5,6 @@ import re
 from glob import glob
 import unicodedata
 
-from six import string_types
 import ox
 from ox.utils import json
 from oxdjango.api import actions
@@ -70,7 +69,7 @@ def addDocument(request, data):
         else:
             ids = [data['id']]
         if 'item' in data:
-            if isinstance(data['item'], string_types):
+            if isinstance(data['item'], str):
                 item = Item.objects.get(public_id=data['item'])
                 if item.editable(request.user):
                     for id in ids:
@@ -87,7 +86,7 @@ def addDocument(request, data):
                             document.add(item)
                 add_changelog(request, data, data['item'])
         elif 'entity' in data:
-            if isinstance(data['entity'], string_types):
+            if isinstance(data['entity'], str):
                 entity = Entity.get(data['entity'])
                 if entity.editable(request.user):
                     for id in ids:

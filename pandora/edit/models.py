@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import re
-import os
-import shutil
 from glob import glob
+from urllib.parse import quote
+import os
+import re
+import shutil
 import subprocess
 import tempfile
 
-from six.moves.urllib.parse import quote
 import ox
 from django.conf import settings
 from django.db import models, transaction

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from six import string_types
 import ox
 from ox.utils import json
 from oxdjango.api import actions
@@ -69,7 +68,7 @@ def addEntity(request, data):
             for key in ('type', 'alternativeNames'):
                 if key in data and data[key]:
                     value = data[key]
-                    if isinstance(value, string_types):
+                    if isinstance(value, str):
                         value = ox.escape_html(value)
                     if key == 'alternativeNames':
                         value = tuple([ox.escape_html(v) for v in value])

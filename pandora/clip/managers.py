@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import unicodedata
 
-from six import string_types
 from django.db.models import Q, Manager
 from django.conf import settings
 
@@ -78,7 +77,7 @@ def parseCondition(condition, user):
     else:
         key = k + get_operator(op, 'istr' if k in case_insensitive_keys else 'str')
     key = str(key)
-    if isinstance(v, string_types) and op != '===':
+    if isinstance(v, str) and op != '===':
         v = unicodedata.normalize('NFKD', v).lower()
     if exclude:
         q = ~Q(**{key: v})
@@ -155,7 +154,7 @@ class ClipManager(Manager):
         def parse(condition):
             key = 'findvalue' + get_operator(condition.get('operator', ''))
             v = condition['value']
-            if isinstance(v, string_types):
+            if isinstance(v, str):
                 v = unicodedata.normalize('NFKD', v).lower()
             q = Q(**{key: v})
             if condition['key'] in layer_ids:

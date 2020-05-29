@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from glob import glob
+from urllib.parse import quote, unquote
 import os
 import re
-from glob import glob
 import unicodedata
 
-from six import string_types
-from six.moves.urllib.parse import quote, unquote
 from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth import get_user_model
@@ -188,7 +187,7 @@ class Entity(models.Model):
                     .delete()
             else:
                 #FIXME: more data validation
-                if isinstance(data[key], string_types):
+                if isinstance(data[key], str):
                     self.data[key] = ox.sanitize_html(data[key])
                 else:
                     self.data[key] = data[key]
@@ -275,7 +274,7 @@ class Entity(models.Model):
                 f, created = Find.objects.get_or_create(entity=self, key=key)
                 if isinstance(value, bool):
                     value = value and 'true' or 'false'
-                if isinstance(value, string_types):
+                if isinstance(value, str):
                     value = ox.decode_html(ox.strip_tags(value.strip()))
                     value = unicodedata.normalize('NFKD', value).lower()
                 f.value = value

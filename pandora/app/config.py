@@ -9,8 +9,8 @@ import sys
 import time
 from os.path import dirname, exists, join
 from glob import glob
+import _thread as thread
 
-from six.moves import _thread as thread
 from django.conf import settings
 from django.contrib.auth import get_user_model
 

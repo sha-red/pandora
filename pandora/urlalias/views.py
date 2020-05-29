@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from urllib.parse import quote
 import re
 
-from six.moves.urllib.parse import quote
 from django.shortcuts import get_object_or_404, redirect
 
 import app.views

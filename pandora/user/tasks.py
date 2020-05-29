@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import json
 from datetime import timedelta
+from itertools import zip_longest
+import json
 
-from six.moves import zip_longest
 from celery.task import task, periodic_task
 
 from app.utils import limit_rate

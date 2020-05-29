@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import os
 from datetime import timedelta, datetime
+from urllib.parse import quote
 import gzip
+import os
 import random
 
-from six.moves.urllib.parse import quote
 from celery.task import task, periodic_task
 from django.conf import settings
 from django.db import connection, transaction

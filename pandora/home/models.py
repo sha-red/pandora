@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from six import string_types
-from six.moves.urllib.parse import quote
+from urllib.parse import quote
 
 from django.db import models
 from django.db.models import Max
@@ -43,7 +42,7 @@ class Item(models.Model):
                             len([d for d in data[key] if isinstance(d, int)]) == 4):
                         return False
                 else:
-                    if not isinstance(data[key], string_types):
+                    if not isinstance(data[key], str):
                         return False
                 self.data[key] = data[key]
                 if key == 'contentid' and self.data[key]:

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from six import string_types
 from django.db import connection, transaction
 from celery.task import task
 
@@ -30,7 +29,7 @@ def get_sequences(public_id):
                     sequence['duration'] = sequence['end'] - sequence['start']
                     if not keys:
                         keys = ', '.join(['"%s"'%k for k in sequence.keys()])
-                    v = ', '.join([isinstance(v, string_types) and "'%s'"%v or str(v)
+                    v = ', '.join([isinstance(v, str) and "'%s'"%v or str(v)
                                    for v in sequence.values()])
                     values.append('(%s)'%v)
             if values:

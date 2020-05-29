@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import unicodedata
 
-from six import string_types
 from django.db.models import Q, Manager
 from oxdjango.query import QuerySet
 
@@ -68,7 +67,7 @@ def parseCondition(condition, user):
     else:
         key = k + get_operator(op, 'istr' if k in case_insensitive_keys else 'str')
     key = str(key)
-    if isinstance(v, string_types):
+    if isinstance(v, str):
         v = unicodedata.normalize('NFKD', v)
         if k not in case_sensitive_keys:
             v = v.lower()

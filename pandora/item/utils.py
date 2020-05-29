@@ -6,7 +6,6 @@ import unicodedata
 
 import ox
 from ox import sort_string
-from six import PY2
 
 
 def safe_filename(filename):
@@ -92,11 +91,7 @@ def get_by_id(objects, id):
     return get_by_key(objects, 'id', id)
 
 def normalize_dict(encoding, data):
-    if PY2:
-        string_type = unicode
-    else:
-        string_type = str
-    if isinstance(data, string_type):
+    if isinstance(data, str):
         data = unicodedata.normalize(encoding, data)
     elif isinstance(data, dict):
         for key in data:

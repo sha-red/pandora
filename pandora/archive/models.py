@@ -6,7 +6,6 @@ import shutil
 import tempfile
 import time
 
-from six import string_types, PY2
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -27,9 +26,6 @@ from . import extract
 from . import managers
 
 User = get_user_model()
-
-if not PY2:
-    unicode = str
 
 def data_path(f, x):
     return f.get_path('data.bin')
@@ -165,7 +161,7 @@ class File(models.Model):
         if self.item:
             for key in self.ITEM_INFO:
                 data[key] = self.item.get(key)
-                if isinstance(data[key], string_types):
+                if isinstance(data[key], str):
                     data[key] = ox.decode_html(data[key])
                 elif isinstance(data[key], list):
                     data[key] = [ox.decode_html(e) for e in data[key]]
@@ -259,8 +255,8 @@ class File(models.Model):
             data = self.get_path_info()
             self.extension = data.get('extension')
             self.language = data.get('language')
-            self.part = ox.sort_string(unicode(data.get('part') or ''))
-            self.part_title = ox.sort_string(unicode(data.get('partTitle')) or '')
+            self.part = ox.sort_string(str(data.get('part') or ''))
+            self.part_title = ox.sort_string(str(data.get('partTitle')) or '')
             self.type = data.get('type') or 'unknown'
             self.version = data.get('version')
 
