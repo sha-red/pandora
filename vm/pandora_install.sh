@@ -196,7 +196,10 @@ fi
 # configure nginx
 if [ "$NGINX" == "local" ]; then
 
-cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
+cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/pandora"
+rm /etc/nginx/sites-enabled/default
+ln -s ../sites-available/pandora /etc/nginx/sites-enabled/pandora
+
 read -r -d '' GZIP <<EOI
 gzip_static  on;\\
 \tgzip_http_version 1.1;\\
