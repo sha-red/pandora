@@ -120,6 +120,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'django.contrib.humanize',
+    'system',
 
     'django_extensions',
     'django_celery_results',
@@ -150,6 +151,8 @@ INSTALLED_APPS = (
     'taskqueue',
     'home',
 )
+
+AUTH_USER_MODEL = 'system.User'
 
 # Log errors into db
 LOGGING = {

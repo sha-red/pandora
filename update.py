@@ -117,6 +117,12 @@ def run_git(path, *args):
     return subprocess.check_output(cmd, env=env).decode().strip()
 
 
+def run_sql(sql):
+    cmd = [join(base, 'pandora/manage.py'), 'dbshell']
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    stdout, error = p.communicate(input=sql.encode())
+    return stdout.decode()
+
 def get_version(path):
     return run_git(path, 'rev-list', 'HEAD', '--count')
 
@@ -278,6 +284,14 @@ if __name__ == "__main__":
         if old <= 6313:
             run('./bin/pip', 'uninstall', 'django-celery', '-y')
             run('./bin/pip', 'install', '-r', 'requirements.txt')
+        if old <= 6315:
+            for sql in [
+                "INSERT INTO django_migrations (app, name, applied) VALUES ('system', '0001_initial', CURRENT_TIMESTAMP)",
+                "UPDATE django_content_type SET app_label = 'system' WHERE app_label = 'auth' and model = 'user'",
+            ]:
+                run_sql(sql)
+            run(join(base, 'pandora/manage.py'), 'migrate', 'system')
+
     else:
         if len(sys.argv) == 1:
             branch = get_branch()
