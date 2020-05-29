@@ -282,6 +282,12 @@ if __name__ == "__main__":
                 with open('pandora/local_settings.py', 'w') as f:
                     f.write('\n'.join(local_settings))
         if old <= 6313:
+            if sys.version_info[0:2] < (3, 6):
+                print('Python 3.6 or late is required now, upgrade your system and run:')
+                print('')
+                print('./update.py postupdate %s %s' % (6313, new))
+                print('')
+                sys.exit(1)
             run('./bin/pip', 'uninstall', 'django-celery', '-y')
             run('./bin/pip', 'install', '-r', 'requirements.txt')
         if old <= 6315:
