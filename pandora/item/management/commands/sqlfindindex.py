@@ -30,8 +30,6 @@ class Command(BaseCommand):
                 print(sql)
             cursor.execute(sql)
 
-        app.monkey_patch.apply_patch()
-
         if settings.DB_GIN_TRGM:
             import entity.models
             import document.models
