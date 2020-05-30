@@ -47,7 +47,6 @@ class Command(BaseCommand):
                     for k, c in contraints.items()
                     if c['index'] or c['primary_key'] or c['unique']
                 }
-                #indexes = connection.introspection.get_indexes(cursor, table)
                 drop = []
                 if column in indexes:
                     for sql in (
@@ -66,7 +65,12 @@ class Command(BaseCommand):
                         if options['debug']:
                             print(sql)
                         cursor.execute(sql)
-                    indexes = connection.introspection.get_indexes(cursor, table)
+                    contraints = connection.introspection.get_constraints(cursor, table)
+                    indexes = {
+                        ','.join(c['columns']): {'primary_key': c['primary_key'], 'unique': c['unique']}
+                        for k, c in contraints.items()
+                        if c['index'] or c['primary_key'] or c['unique']
+                    }
                 if column not in indexes:
                     create_index("%s_%s_idx" % (table, column), table, column)
             transaction.commit()
