@@ -394,8 +394,7 @@ def update_static():
 def update_geoip(force=False):
     path = os.path.join(settings.GEOIP_PATH, 'GeoLite2-City.mmdb')
     if not os.path.exists(path) or force:
-        url = 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz'
-        index = ox.net.read_url('https://db-ip.com/db/download/ip-to-country-lite').decode()
+        index = ox.net.read_url('https://db-ip.com/db/download/ip-to-city-lite').decode()
         match = re.compile('href=[\'"](http.*.mmdb.gz)').findall(index)
         if match:
             url = match[0]
@@ -405,7 +404,7 @@ def update_geoip(force=False):
                 os.unlink(path)
             os.system('gunzip "%s.gz"' % path)
         else:
-            print('failed to download dbip-country-lite-2020-03.mmdb.gz')
+            print('failed to download GeoLite2-City.mmdb')
 
 def init():
     if not settings.RELOADER_RUNNING:

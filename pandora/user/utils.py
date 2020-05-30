@@ -17,15 +17,22 @@ def get_location(ip):
     country = city = None
     try:
         g = GeoIP2()
-        location = g.city(ip)
+    except:
+        country = city = None
+    else:
+        try:
+            location = g.city(ip)
+        except django.contrib.gis.geoip2.GeoIP2Exception:
+            try:
+                location = g.country(s.ip)
+            except:
+                location = None
         if location:
             country = ox.get_country_name(location['country_code'])
-            if location['city']:
+            if location.get('city'):
                 city = location['city']
                 if isinstance(city, bytes):
                     city = city.decode('latin-1')
-    except:
-        country = city = None
     return city, country
 
 
