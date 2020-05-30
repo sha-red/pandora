@@ -12,7 +12,7 @@ NGINX=${NGINX-local}
 BRANCH=${BRANCH-stable}
 
 # add a pandora user
-echo Installing pandora with user: $PANDORA
+echo Installing pandora with user: $PANDORA branch: $BRANCH
 getent passwd $PANDORA > /dev/null 2>&1 || adduser --disabled-password --gecos "" $PANDORA
 
 #
@@ -197,8 +197,9 @@ fi
 if [ "$NGINX" == "local" ]; then
 
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/pandora"
-rm -f /etc/nginx/sites-enabled/default
+rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/pandora
 ln -s ../sites-available/pandora /etc/nginx/sites-enabled/pandora
+ln -s /srv/pandora/ctl /usr/local/bin/pandoractl
 
 read -r -d '' GZIP <<EOI
 gzip_static  on;\\
