@@ -1,4 +1,4 @@
-from django.contrib.gis.geoip2 import GeoIP2
+from django.contrib.gis.geoip2 import GeoIP, GeoIP2Exception2
 
 import ox
 
@@ -22,7 +22,7 @@ def get_location(ip):
     else:
         try:
             location = g.city(ip)
-        except django.contrib.gis.geoip2.GeoIP2Exception:
+        except GeoIP2Exception:
             try:
                 location = g.country(s.ip)
             except:
