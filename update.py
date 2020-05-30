@@ -316,14 +316,14 @@ if __name__ == "__main__":
             if exists(path):
                 os.chdir(path)
                 current_branch = get_branch(path)
+                revno = get_version(path)
                 if repo == 'pandora':
                     pandora_old_revno = revno
+                current += revno
                 if current_branch != branch:
                     run('git', 'remote', 'set-branches', 'origin', '*')
                     run('git', 'fetch', 'origin')
                     run('git', 'checkout', branch)
-                revno = get_version(path)
-                current += revno
                 url = repos[repo]['url']
                 print('Checking', repo)
                 run('git', 'pull')
