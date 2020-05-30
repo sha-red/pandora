@@ -456,6 +456,9 @@ appPanel
             videoFormat: Ox.getVideoFormat(pandora.site.video.formats)
         });
 
+        pandora.site.site.url = document.location.host
+        pandora.site.site.https = document.location.protocol == 'https:'
+
         Ox.Map.GoogleApiKey = pandora.site.site.googleapikey;
 
         // set locale and initialize url controller

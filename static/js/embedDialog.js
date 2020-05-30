@@ -40,7 +40,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 description: Ox._('Embed a Clip or a Full Video'),
                 inputs: [
                     'item', 'position', 'in', 'out', 'annotation', 'title',
-                    'showTimeline', 'showAnnotations', 'matchRatio'
+                    'showTimeline', 'showAnnotations', 'showLayers', 'matchRatio', 'timeline'
                 ]
             },
             {
@@ -85,7 +85,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
                 description: Ox._('Embed an Edited Video'),
                 inputs: [
                     'edit', 'editMode', 'position',
-                    'showTimeline', 'showAnnotations', 'matchRatio'
+                    'showTimeline', 'showAnnotations', 'showLayers', 'matchRatio', 'timeline'
                 ]
             }
         ].map(function(item, index) {
@@ -233,8 +233,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             data = getData();
         if (view == 'document') {
             var prefix = type == 'iframe'
-                ? (pandora.site.site.https ? 'https' : 'http')
-                    + '://' + pandora.site.site.url + '/'
+                ? (document.location.protocol + '//' + document.location.host + '/')
                 : '/',
                 page = type == 'iframe' ? 'documents' : 'document',
                 resolution = 480;
@@ -260,9 +259,12 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
             options = Ox.serialize({
                 title: data.title || void 0,
                 showTimeline: data.showTimeline || void 0,
-                timeline: data.timeline || void 0,
+                timeline: data.showTimeline && data.timeline ? data.timeline : void 0,
                 showAnnotations: data.showAnnotations || void 0,
-                showLayers: data.showAnnotations && data.showLayers ? data.showLayers : void 0,
+                showLayers: data.showAnnotations && data.showLayers &&
+                    data.showLayers.length < pandora.site.layers.length
+                    ? data.showLayers.join(',')
+                    : void 0,
                 matchRatio: Ox.contains(['video', 'edit'], view) ? data.matchRatio || void 0 : void 0,
                 showInfo: Ox.contains(['list', 'text'], view) || (view == 'edit' && !!$input.editMode.value()) || void 0
             }, true),
@@ -275,8 +277,7 @@ pandora.ui.embedDialog = function(/*[url, ]callback*/) {
         return Ox.encodeHTMLEntities(
             (
                 type == 'iframe'
-                ? (pandora.site.site.https ? 'https' : 'http')
-                    + '://' + pandora.site.site.url + '/'
+                ? (document.location.protocol + '//' + document.location.host + '/')
                 : '/'
             )
             + (
