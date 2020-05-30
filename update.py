@@ -297,7 +297,7 @@ if __name__ == "__main__":
             ]:
                 run_sql(sql)
             run(join(base, 'pandora/manage.py'), 'migrate', 'system')
-
+            run(join(base, 'pandora/manage.py'), 'update_geoip')
     else:
         if len(sys.argv) == 1:
             branch = get_branch()
@@ -316,13 +316,13 @@ if __name__ == "__main__":
             if exists(path):
                 os.chdir(path)
                 current_branch = get_branch(path)
-                if current_branch != branch:
-                        run('git', 'remote', 'set-branches', 'origin', '*')
-                        run('git', 'fetch', 'origin')
-                        run('git', 'checkout', branch)
-                revno = get_version(path)
                 if repo == 'pandora':
                     pandora_old_revno = revno
+                if current_branch != branch:
+                    run('git', 'remote', 'set-branches', 'origin', '*')
+                    run('git', 'fetch', 'origin')
+                    run('git', 'checkout', branch)
+                revno = get_version(path)
                 current += revno
                 url = repos[repo]['url']
                 print('Checking', repo)
