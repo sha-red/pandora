@@ -13,9 +13,16 @@ config.init()
 
 NEW_LENGTH = {
     'username': 255,
-    'email': 255,
+    'email': 254,
     'password': 255,
 }
+
+def monkey_patch_groupname():
+    f = Group._meta.get_field('name')
+    f.max_length = 255
+    for v in f.validators:
+        if isinstance(v, MaxLengthValidator):
+            v.limit_value = 255
 
 def monkey_patch_username():
     for field in NEW_LENGTH:
@@ -24,11 +31,22 @@ def monkey_patch_username():
         for v in f.validators:
             if isinstance(v, MaxLengthValidator):
                 v.limit_value = NEW_LENGTH[field]
+    monkey_patch_groupname()
 
-    f = Group._meta.get_field('name')
-    f.max_length = 255
-    for v in f.validators:
-        if isinstance(v, MaxLengthValidator):
-            v.limit_value = 255
+def apply_patch():
+    from django.db import connection, transaction
+    cursor = connection.cursor()
+    table = connection.introspection.get_table_description(cursor, Group._meta.db_table)
+    sql = []
+    for row in table:
+        if row.name == 'name' and row.internal_size != 255:
+            sql.append('ALTER TABLE "%s" ALTER "%s" TYPE varchar(%d)' % (
+                Group._meta.db_table, row.name, 255)
+            )
+    for q in sql:
+        cursor.execute(q)
+    if sql:
+        transaction.commit()
+
 
 monkey_patch_username()
