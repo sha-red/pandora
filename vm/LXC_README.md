@@ -15,7 +15,7 @@
 
 2) Create a new container, use different names if installing multiple instances:
 
-    sudo lxc-create -n pandora -t ubuntu-cloud -- -r bionic
+    sudo lxc-create -n pandora -t ubuntu-cloud -- -r focal
 
     or
 

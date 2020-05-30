@@ -4,15 +4,13 @@
 
 # Installing pan.do/ra inside LXD
 
-1) Install lxd on the host (Ubuntu 16.04 or later):
+1) Install lxd on the host (Ubuntu 18.04 or later, Debian/10):
 
-    sudo apt-get install lxd
-
-[on debian you can use snap install lxd]
+    sudo snap install lxd
 
 2) Create a new container, use different names if installing multiple instances:
 
-    sudo lxc launch ubuntu:18.04 pandora
+    sudo lxc launch ubuntu:20.04 pandora
 
     or
 
