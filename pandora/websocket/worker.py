@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+import logging
 
 from django.conf import settings
 
@@ -8,6 +8,7 @@ from kombu.mixins import ConsumerMixin
 
 from . import daemon, key
 
+logger = logging.getLogger('pandora.websocket')
 
 queue = Queue('websocket', Exchange(key, type='direct'), routing_key=key)
 
@@ -22,8 +23,11 @@ class Worker(ConsumerMixin):
                          callbacks=[self.process_task])]
 
     def process_task(self, body, message):
-        if body['task'] == 'trigger_event':
-            daemon.trigger_event(*body['args'])
+        try:
+            if body['task'] == 'trigger_event':
+                daemon.trigger_event(*body['args'])
+        except:
+            logger.error('faild to trigger event %s', body, exc_info=True)
         message.ack()
 
 def run():
