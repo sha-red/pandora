@@ -304,7 +304,7 @@ if __name__ == "__main__":
             development = branch == 'master'
         elif len(sys.argv) == 3 and sys.argv[1] == 'switch':
             branch = sys.argv[2]
-            development = False
+            development = branch == 'master'
         else:
             branch = 'master'
             development = True

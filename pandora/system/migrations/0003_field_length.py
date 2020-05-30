@@ -13,6 +13,16 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name='user',
+            name='password',
+            field=models.CharField(max_length=255, verbose_name='password'),
+        ),
+        migrations.AlterField(
+            model_name='user',
+            name='last_name',
+            fields=models.CharField(blank=True, max_length=30, verbose_name='last name'),
+        ),
+        migrations.AlterField(
+            model_name='user',
             name='email',
             field=models.EmailField(blank=True, max_length=254, verbose_name='email address'),
         ),

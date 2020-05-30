@@ -197,7 +197,7 @@ fi
 if [ "$NGINX" == "local" ]; then
 
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/pandora"
-rm /etc/nginx/sites-enabled/default
+rm -f /etc/nginx/sites-enabled/default
 ln -s ../sites-available/pandora /etc/nginx/sites-enabled/pandora
 
 read -r -d '' GZIP <<EOI
