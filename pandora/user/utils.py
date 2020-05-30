@@ -1,4 +1,4 @@
-from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception2
+from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 
 import ox
 
