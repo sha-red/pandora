@@ -49,15 +49,15 @@ if [ "$action" = "init" ]; then
 fi
 if [ "$action" = "manage" ]; then
     cd "`dirname "$self"`"
-    if [ `whoami` != 'root' ]; then
-        manage="./pandora/manage.py"
-    else
-        manage="sudo -u pandora ./pandora/manage.py"
+    BASE=`pwd`
+    SUDO=""
+    PANDORA_USER=`ls -l update.py | cut -f3 -d" "`
+    if [ `whoami` != $PANDORA_USER ]; then
+        SUDO="sudo -H -u $PANDORA_USER"
     fi
     shift
-    $manage $@
+    $SUDO $BASE/pandora/manage.py $@
     exit $?
-
 fi
 if [ `whoami` != 'root' ]; then
     echo you have to be root or run $0 with sudo
@@ -83,6 +83,7 @@ if [ "$action" = "install" ]; then
                 systemctl enable ${service}.service
             done
         fi
+        test -e /usr/local/bin/pandoractl || ln -s /srv/pandora/ctl /usr/local/bin/pandoractl
     else
         if [ -d /etc/init ]; then
             cp $BASE/etc/init/* /etc/init/
