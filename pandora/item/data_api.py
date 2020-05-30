@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, with_statement
-
 import ox
 from django.conf import settings
 

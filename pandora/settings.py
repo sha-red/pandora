@@ -2,7 +2,6 @@
 # Django settings for pan.do/ra project defaults,
 # create local_settings.py to overwrite
 # check pan.do/ra section below for relevant settings
-from __future__ import absolute_import
 
 import os
 from os.path import join, normpath, dirname

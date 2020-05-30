@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from functools import wraps
 
 from .shortcuts import render_to_json_response

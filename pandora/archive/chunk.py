@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, with_statement
-
 import os
 
 import ox
