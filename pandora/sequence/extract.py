@@ -96,7 +96,9 @@ class DataTimeline():
     def get_frame(self, pos):
         frame = int(pos * self.fps)
         tile = int(frame * 8 / self.timeline_width)
-        if self.current_tile != tile:
+        if len(self.file_names) <= tile:
+            tile = len(self.file_names) - 1
+        if self.current_tile != tile and len(self.file_names):
             self.timeline_image = Image.open(self.file_names[tile])
             self.current_tile = tile
         x = frame * 8 - tile * self.timeline_width
