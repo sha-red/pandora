@@ -10,6 +10,7 @@ self=`readlink "$0"`
 if [ -z $self ]; then
     self="$0"
 fi
+
 if [ "$action" = "init" ]; then
     cd "`dirname "$self"`"
     BASE=`pwd`
@@ -47,7 +48,15 @@ if [ "$action" = "init" ]; then
     fi
     exit 0
 fi
+
 if [ "$action" = "manage" ]; then
+    cmd="pandora/manage.py"
+fi
+if [ "$action" = "update" ]; then
+    cmd="update.py"
+fi
+
+if [ ! -z $cmd ]; then
     cd "`dirname "$self"`"
     BASE=`pwd`
     SUDO=""
@@ -56,9 +65,10 @@ if [ "$action" = "manage" ]; then
         SUDO="sudo -H -u $PANDORA_USER"
     fi
     shift
-    $SUDO $BASE/pandora/manage.py $@
+    $SUDO "$BASE/$cmd" $@
     exit $?
 fi
+
 if [ `whoami` != 'root' ]; then
     echo you have to be root or run $0 with sudo
     exit 1
