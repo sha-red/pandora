@@ -12,3 +12,4 @@ geoip2==3.0.0
 youtube-dl>=2020.5.8
 python-memcached
 elasticsearch
+future
