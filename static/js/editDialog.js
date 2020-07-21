@@ -84,7 +84,8 @@ pandora.ui.editDialog = function() {
                     }
                 ],
                 operator: '&'
-            }
+            },
+            range: [0, ids.length]
         }, function(result) {
             var data = {},
                 isMixed = {},
