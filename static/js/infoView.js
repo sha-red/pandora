@@ -198,9 +198,7 @@ pandora.ui.infoView = function(data, isMixed) {
                 top: margin + 'px',
                 right: margin + 'px'
             })
-            .appendTo($info),
-
-        $capabilities;
+            .appendTo($info);
 
     [$options, $edit].forEach(function($element) {
         $element.find('input').css({
@@ -346,7 +344,7 @@ pandora.ui.infoView = function(data, isMixed) {
         .append(formatKey('Rights Level', 'statistics'))
         .append($rightsLevel)
         .appendTo($statistics);
-    renderRightsLevel();
+    pandora.renderRightsLevel(that, $rightsLevel, data, isMixed, isMultiple, canEdit);
 
     // Notes --------------------------------------------------------------------
 
@@ -496,95 +494,11 @@ pandora.ui.infoView = function(data, isMixed) {
         return ret;
     }
 
-    function getRightsLevelElement(rightsLevel) {
-        return Ox.Theme.formatColorLevel(
-            rightsLevel,
-            pandora.site.rightsLevels.map(function(rightsLevel) {
-                return rightsLevel.name;
-            })
-        );
-    }
-
     function getValue(key, value) {
         return !value ? ''
             : Ox.contains(specialListKeys, key) ? value.join('; ')
             : Ox.contains(listKeys, key) ? value.join(', ')
             : value;
-    }
-
-    function renderCapabilities(rightsLevel) {
-        var capabilities = [].concat(
-                canEdit ? [{name: 'canSeeItem', symbol: 'Find'}] : [],
-                [
-                    {name: 'canPlayClips', symbol: 'PlayInToOut'},
-                    {name: 'canPlayVideo', symbol: 'Play'},
-                    {name: 'canDownloadVideo', symbol: 'Download'}
-                ]
-            ),
-            userLevels = canEdit ? pandora.site.userLevels : [pandora.user.level];
-        $capabilities.empty();
-        userLevels.forEach(function(userLevel, i) {
-            var $element,
-                $line = $('<div>')
-                    .css({
-                        height: '16px',
-                        marginBottom: '4px'
-                    })
-                    .appendTo($capabilities);
-            if (canEdit) {
-                $element = Ox.Theme.formatColorLevel(i, userLevels.map(function(userLevel) {
-                    return Ox.toTitleCase(userLevel);
-                }), [0, 240]);
-                Ox.Label({
-                        textAlign: 'center',
-                        title: Ox.toTitleCase(userLevel),
-                        width: 60
-                    })
-                    .addClass('OxColor OxColorGradient')
-                    .css({
-                        float: 'left',
-                        height: '12px',
-                        paddingTop: '2px',
-                        background: $element.css('background'),
-                        fontSize: '8px',
-                        color: $element.css('color')
-                    })
-                    .data({OxColor: $element.data('OxColor')})
-                    .appendTo($line);
-            }
-            capabilities.forEach(function(capability) {
-                var hasCapability = pandora.hasCapability(capability.name, userLevel) >= rightsLevel,
-                    $element = Ox.Theme.formatColorLevel(hasCapability, ['', '']);
-                Ox.Button({
-                        tooltip: (canEdit ? Ox.toTitleCase(userLevel) : 'You') + ' '
-                            + (hasCapability ? 'can' : 'can\'t') + ' '
-                            + Ox.toSlashes(capability.name)
-                                .split('/').slice(1).join(' ')
-                                .toLowerCase(),
-                        title: capability.symbol,
-                        type: 'image'
-                    })
-                    .addClass('OxColor OxColorGradient')
-                    .css({background: $element.css('background')})
-                    .css('margin' + (canEdit ? 'Left' : 'Right'), '4px')
-                    .data({OxColor: $element.data('OxColor')})
-                    .appendTo($line);
-            });
-            if (!canEdit) {
-                Ox.Button({
-                    title: Ox._('Help'),
-                    tooltip: Ox._('About Rights'),
-                    type: 'image'
-                })
-                .css({marginLeft: '52px'})
-                .bindEvent({
-                    click: function() {
-                        pandora.UI.set({page: 'rights'});
-                    }
-                })
-                .appendTo($line);
-            }
-        });
     }
 
     function renderGroup(keys) {
@@ -630,53 +544,6 @@ pandora.ui.infoView = function(data, isMixed) {
         if (keys.length) {
             renderGroup(keys)
         }
-    }
-
-    function renderRightsLevel() {
-        var $rightsLevelElement = getRightsLevelElement(data.rightslevel),
-            $rightsLevelSelect;
-        $rightsLevel.empty();
-        if (canEdit) {
-            $rightsLevelSelect = Ox.Select({
-                    items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
-                        return {id: i, title: rightsLevel.name};
-                    }),
-                    width: 128,
-                    value: data.rightslevel
-                })
-                .addClass('OxColor OxColorGradient')
-                .css({
-                    marginBottom: '4px',
-                    background: $rightsLevelElement.css('background')
-                })
-                .data({OxColor: $rightsLevelElement.data('OxColor')})
-                .bindEvent({
-                    change: function(event) {
-                        var rightsLevel = event.value;
-                        $rightsLevelElement = getRightsLevelElement(rightsLevel);
-                        $rightsLevelSelect
-                            .css({background: $rightsLevelElement.css('background')})
-                            .data({OxColor: $rightsLevelElement.data('OxColor')})
-                        renderCapabilities(rightsLevel);
-                        var edit = {
-                            id: isMultiple ? ui.listSelection : data.id,
-                            rightslevel: rightsLevel
-                        };
-                        pandora.api.edit(edit, function(result) {
-                            that.triggerEvent('change', Ox.extend({}, 'rightslevel', rightsLevel));
-                        });
-                    }
-                })
-                .appendTo($rightsLevel);
-        } else {
-            $rightsLevelElement
-                .css({
-                    marginBottom: '4px'
-                })
-                .appendTo($rightsLevel);
-        }
-        $capabilities = $('<div>').appendTo($rightsLevel);
-        renderCapabilities(data.rightslevel);
     }
 
     function toggleIconSize() {
