@@ -13,20 +13,6 @@ pandora.ui.collection = function() {
 
     if (view == 'list') {
         that = Ox.TableList({
-            draggable: true,
-            keys: keys,
-            items: function(data, callback) {
-                pandora.api.findDocuments(Ox.extend(data, {
-                    query: ui.findDocuments
-                }), callback);
-                return Ox.clone(data, true);
-            },
-            selected: ui.collectionSelection,
-            sort: ui.collectionSort.concat([
-                {key: 'extension', operator: '+'},
-                {key: 'title', operator: '+'}
-            ]),
-            unique: 'id',
             columns: pandora.site.documentSortKeys.filter(function(key) {
                 return !key.capability
                     || pandora.hasCapability(key.capability);
@@ -54,7 +40,24 @@ pandora.ui.collection = function() {
                 };
             }),
             columnsVisible: true,
+            columnsMovable: true,
+            columnsRemovable: true,
+            columnsResizable: true,
+            columnsVisible: true,
+            draggable: true,
+            items: function(data, callback) {
+                pandora.api.findDocuments(Ox.extend(data, {
+                    query: ui.findDocuments
+                }), callback);
+                return Ox.clone(data, true);
+            },
             scrollbarVisible: true,
+            selected: ui.collectionSelection,
+            sort: ui.collectionSort.concat([
+                {key: 'extension', operator: '+'},
+                {key: 'title', operator: '+'}
+            ]),
+            unique: 'id',
         })
         .bindEvent({
             columnchange: function(data) {
