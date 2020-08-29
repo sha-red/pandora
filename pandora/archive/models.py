@@ -492,7 +492,7 @@ class File(models.Model):
             data['instances'].append({
                 'ignore': False,
                 'path': self.info['filename'],
-                'user': f.item.user.username,
+                'user': self.item.user.username if self.item and self.item.user else 'system',
                 'volume': 'Direct Upload'
             })
         return data
