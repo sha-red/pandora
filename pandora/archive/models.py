@@ -483,11 +483,6 @@ class File(models.Model):
                 user.is_staff or \
                 self.item.user == user or \
                 self.item.groups.filter(id__in=user.groups.all()).count() > 0
-        if not can_see_media:
-            if 'instances' in data:
-                data['instances'] = []
-            if 'path' in data:
-                data['path'] = os.path.basename(data['path'])
         if 'instances' in data and 'filename' in self.info and self.data:
             data['instances'].append({
                 'ignore': False,
@@ -495,6 +490,11 @@ class File(models.Model):
                 'user': self.item.user.username if self.item and self.item.user else 'system',
                 'volume': 'Direct Upload'
             })
+        if not can_see_media:
+            if 'instances' in data:
+                data['instances'] = []
+            if 'path' in data:
+                data['path'] = os.path.basename(data['path'])
         return data
 
     def all_paths(self):
