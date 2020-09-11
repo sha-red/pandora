@@ -51,6 +51,7 @@ pandora.ui.collection = function() {
                 }), callback);
                 return Ox.clone(data, true);
             },
+            keys: keys,
             scrollbarVisible: true,
             selected: ui.collectionSelection,
             sort: ui.collectionSort.concat([
