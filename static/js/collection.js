@@ -26,7 +26,11 @@ pandora.ui.collection = function() {
                     defaultWidth: key.columnWidth,
                     format: (function() {
                         return function(value, data) {
-                            return pandora.formatDocumentKey(key, data);
+                            var value = pandora.formatDocumentKey(key, data);
+                            if (Ox.isArray(value)) {
+                                value = value.join(', ');
+                            }
+                            return value;
                         }
                     })(),
                     id: key.id,
