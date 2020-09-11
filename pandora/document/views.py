@@ -133,7 +133,7 @@ def editDocument(request, data):
     if data['id']:
         if isinstance(data['id'], list):
             add_changelog(request, data)
-            t = tasks.builk_edit.delay(data, request.user.username)
+            t = tasks.bulk_edit.delay(data, request.user.username)
             response['data']['taskId'] = t.task_id
         else:
             document = models.Document.get(data['id'])

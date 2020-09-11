@@ -9,7 +9,7 @@ def extract_fulltext(id):
 
 
 @task(queue='default')
-def builk_edit(data, username):
+def bulk_edit(data, username):
     from django.db import transaction
     from . import models
     from item.models import Item
