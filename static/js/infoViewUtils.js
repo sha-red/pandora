@@ -15,7 +15,8 @@ pandora.cleanupDate = function(value) {
 };
 
 pandora.renderRightsLevel = function(that, $rightsLevel, data, isMixed, isMultiple, canEdit) {
-    var rightsLevels = pandora.site.rightsLevels.map(function(rightsLevel) {
+    var ui = pandora.user.ui,
+        rightsLevels = pandora.site.rightsLevels.map(function(rightsLevel) {
                 return rightsLevel.name;
             }).concat(isMultiple ? ['Mixed'] : []),
         rightsLevel = isMixed.rightslevel ? rightsLevels.length - 1 : data.rightslevel,

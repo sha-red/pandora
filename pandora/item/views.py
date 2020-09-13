@@ -533,17 +533,18 @@ def get(request, data):
     return render_to_json_response(response)
 actions.register(get)
 
-def edit_item(request, item, data):
+def edit_item(user, item, data):
+    data = data.copy()
     update_clips = False
     response = json_response(status=200, text='ok')
     if 'rightslevel' in data:
-        if request.user.profile.capability('canEditRightsLevel'):
+        if user.profile.capability('canEditRightsLevel'):
             item.level = int(data['rightslevel'])
         else:
             response = json_response(status=403, text='permission denied')
         del data['rightslevel']
     if 'user' in data:
-        if request.user.profile.get_level() in ('admin', 'staff') and \
+        if user.profile.get_level() in ('admin', 'staff') and \
                 models.User.objects.filter(username=data['user']).exists():
             new_user = models.User.objects.get(username=data['user'])
             if new_user != item.user:
@@ -551,10 +552,10 @@ def edit_item(request, item, data):
                 update_clips = True
         del data['user']
     if 'groups' in data:
-        if not request.user.profile.capability('canManageUsers'):
+        if not user.profile.capability('canManageUsers'):
             # Users wihtout canManageUsers can only add/remove groups they are not in
             groups = set([g.name for g in item.groups.all()])
-            user_groups = set([g.name for g in request.user.groups.all()])
+            user_groups = set([g.name for g in user.groups.all()])
             other_groups = list(groups - user_groups)
             data['groups'] = [g for g in data['groups'] if g in user_groups] + other_groups
     r = item.edit(data)
@@ -597,7 +598,7 @@ def add(request, data):
             i.make_poster()
         del data['title']
         if data:
-            response = edit_item(request, item, data)
+            response = edit_item(request.user, item, data)
         response['data'] = item.json()
         add_changelog(request, request_data, item.public_id)
     return render_to_json_response(response)
@@ -619,16 +620,16 @@ def edit(request, data):
     see: add, find, get, lookup, remove, upload
     '''
     if isinstance(data['id'], list):
-        items = models.Item.objects.filter(public_id__in=data['id'])
+        add_changelog(request, data)
+        t = tasks.bulk_edit.delay(data, request.user.username)
+        response = json_response(status=200, text='ok')
+        response['data']['taskId'] = t.task_id
     else:
-        items = [get_object_or_404_json(models.Item, public_id=data['id'])]
-    for item in items:
+        item = get_object_or_404_json(models.Item, public_id=data['id'])
         if item.editable(request.user):
-            request_data = data.copy()
-            response = edit_item(request, item, data)
+            add_changelog(request, data)
+            response = edit_item(request.user, item, data)
             response['data'] = item.json()
-            if item == items[0]:
-                add_changelog(request, request_data)
         else:
             response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
