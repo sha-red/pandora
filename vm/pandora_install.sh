@@ -118,6 +118,7 @@ fi
 if [ "$RABBITMQ" == "local" ]; then
     RABBITPWD=$(pwgen -n 16 -1)
     rabbitmqctl add_user pandora $RABBITPWD
+    rabbitmqctl change_password pandora $RABBITPWD
     rabbitmqctl add_vhost /pandora
     rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
     CELERY_BROKER_URL="amqp://pandora:$RABBITPWD@localhost:5672//pandora"
