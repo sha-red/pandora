@@ -186,7 +186,7 @@ fi
 
 # if pandora is running inside a container, expose backend at port 2620
 if [ "$LXC" == "yes" ]; then
-    sed -i s/127.0.0.1/0.0.0.0/g /srv/pandora/pandora/gunicorn_config.py
+    sed -i "s/127.0.0.1/[::]/g" /srv/pandora/pandora/gunicorn_config.py
     echo "WEBSOCKET_ADDRESS = \"0.0.0.0\"" >> /srv/pandora/pandora/local_settings.py
 fi
 /srv/pandora/ctl start
