@@ -237,7 +237,7 @@ pandora.ui.editor = function(data) {
                         queue[data.id] = [];
                         pandora.api.addAnnotation(edit, function(result) {
                             callback(result);
-                            var id = data.id,
+                            var id = result.data.id,
                                 pending = queue[id];
                             delete queue[id];
                             pending.length && Ox.serialForEach(pending, function(edit, index, array, callback) {
