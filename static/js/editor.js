@@ -240,7 +240,7 @@ pandora.ui.editor = function(data) {
                             var id = result.data.id,
                                 pending = queue[id];
                             delete queue[id];
-                            pending.length && Ox.serialForEach(pending, function(edit, index, array, callback) {
+                            pending && pending.length && Ox.serialForEach(pending, function(edit, index, array, callback) {
                                 edit.id = id
                                 Ox.Log('', 'process pending editAnnotation request', id, edit);
                                 pandora.api.editAnnotation(edit, function(result) {
@@ -261,7 +261,7 @@ pandora.ui.editor = function(data) {
                             callback(result);
                             var pending = queue[edit.id];
                             delete queue[edit.id];
-                            pending.length && Ox.serialForEach(pending, function(edit, index, array, cb) {
+                            pending && pending.length && Ox.serialForEach(pending, function(edit, index, array, cb) {
                                 Ox.Log('', 'process pending editAnnotation request', edit.id, edit);
                                 pandora.api.editAnnotation(edit, function(result) {
                                     callback(result);
