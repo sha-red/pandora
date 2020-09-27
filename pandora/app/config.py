@@ -254,7 +254,6 @@ check the README for further details.
             except:
                 pass
 
-
 def update_static():
     oxjs_build = os.path.join(settings.STATIC_ROOT, 'oxjs/tools/build/build.py')
     if os.path.exists(oxjs_build):
@@ -363,4 +362,16 @@ def update_geoip(force=False):
             os.system('gunzip "%s.gz"' % path)
         else:
             print('failed to download GeoLite2-City.mmdb')
+
+def init():
+    load_config(True)
+
+def shutdown():
+    if settings.RELOADER_RUNNING:
+        RUN_RELOADER = False
+        settings.RELOADER_RUNNING = False
+        if NOTIFIER:
+            NOTIFIER.stop()
+
+
 

@@ -7,7 +7,9 @@ from django.core.validators import MaxLengthValidator
 
 User = get_user_model()
 
+# load config from json
 from . import config
+config.init()
 
 NEW_LENGTH = {
     'username': 255,
