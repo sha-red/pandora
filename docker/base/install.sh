@@ -30,6 +30,7 @@ apt-get update -qq
 apt-get install -y \
     netcat-openbsd \
     sudo \
+    rsync \
     iproute2 \
     vim \
     wget \

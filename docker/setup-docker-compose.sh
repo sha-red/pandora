@@ -26,7 +26,7 @@ and to get started run this:
 
 To update pan.do/ra run:
 
-    docker-compose run pandora update.py
+    docker-compose run pandora ctl update
 
 EOF
 touch __init__.py

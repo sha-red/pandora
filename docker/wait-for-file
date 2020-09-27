@@ -1,5 +1,5 @@
 #!/bin/sh
-TIMEOUT=60
+TIMEOUT=180
 TARGET="$1"
 
 for i in `seq $TIMEOUT` ; do

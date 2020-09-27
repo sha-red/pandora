@@ -56,13 +56,9 @@ cp /srv/pandora/docker/entrypoint.sh /entrypoint.sh
 mv /srv/pandora/ /srv/pandora_base/
 mkdir /pandora
 ln -s /pandora /srv/pandora
-cat > /usr/local/bin/update.py << EOF
-#!/bin/sh
-exec /srv/pandora/update.py \$@
-EOF
 
-cat > /usr/local/bin/manage.py << EOF
+cat > /usr/local/bin/pandoractl << EOF
 #!/bin/sh
-exec /srv/pandora/pandora/manage.py \$@
+exec /srv/pandora/ctl \$@
 EOF
-chmod +x /usr/local/bin/manage.py /usr/local/bin/update.py
+chmod +x /usr/local/bin/pandoractl
