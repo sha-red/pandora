@@ -5,7 +5,6 @@ from django.db import connection, transaction
 from django.db.models import fields
 from django.conf import settings
 
-settings.RELOAD_CONFIG = False
 import app.monkey_patch
 
 
