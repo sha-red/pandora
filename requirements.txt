@@ -1,4 +1,4 @@
-Django==3.0.6
+Django==3.0.10
 simplejson
 chardet
 celery>4.3.0

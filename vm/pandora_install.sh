@@ -89,6 +89,7 @@ apt-get install -y \
     python3-pyinotify \
     python3-simplejson \
     python3-lxml \
+    python3-cssselect \
     python3-html5lib \
     python3-ox \
     python3-elasticsearch \
