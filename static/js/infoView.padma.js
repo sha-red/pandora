@@ -45,6 +45,12 @@ pandora.ui.infoView = function(data, isMixed) {
         $options = Ox.MenuButton({
                 items: [
                     {
+                        id: 'toggle',
+                        title: Ox._('Toggle {0} size...', [
+                            Ox._(ui.icons == 'posters' ? 'poster' : 'icon')
+                        ]),
+                    },
+                    {
                         id: 'delete',
                         title: Ox._('Delete {0}...', [pandora.site.itemName.singular]),
                         disabled: !canRemove
@@ -62,7 +68,9 @@ pandora.ui.infoView = function(data, isMixed) {
             })
             .bindEvent({
                 click: function(data_) {
-                    if (data_.id == 'delete') {
+                    if (data_.id == 'toggle') {
+                        toggleIconSize()
+                    } else if (data_.id == 'delete') {
                         pandora.$ui.deleteItemsDialog = pandora.ui.deleteItemsDialog({
                             items: [data]
                         }).open();
