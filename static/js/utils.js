@@ -375,7 +375,11 @@ pandora.clickLink = function(e, selectEmbed) {
     if (match) {
         (selectEmbed || pandora.$ui.textPanel.selectEmbed)(parseInt(match[1]));
     } else {
-        pandora.openURL(e.target.href);
+        if (e.target.target == '_blank') {
+            pandora.openLink(e.target.href);
+        } else {
+            pandora.openURL(e.target.href);
+        }
     }
 };
 
