@@ -2,13 +2,13 @@
 
 import os
 from os.path import exists
-
 import fractions
+import math
+import re
+import shutil
 import subprocess
 import tempfile
 import time
-import math
-import shutil
 from distutils.spawn import find_executable
 from glob import glob
 
@@ -63,8 +63,8 @@ def supported_formats():
         'webm': 'libvpx' in stdout and 'libvorbis' in stdout,
         'vp8': 'libvpx' in stdout and 'libvorbis' in stdout,
         'vp9': 'libvpx-vp9' in stdout and 'libopus' in stdout,
-        'mp4': 'libx264' in stdout and 'DEA.L. aac' in stdout,
-        'h264': 'libx264' in stdout and 'DEA.L. aac' in stdout,
+        'mp4': 'libx264' in stdout and bool(re.compile('DEA.L. aac').findall(stdout)),
+        'h264': 'libx264' in stdout and bool(re.compile('DEA.L. aac').findall(stdout)),
     }
 
 def stream(video, target, profile, info, audio_track=0, flags={}):
