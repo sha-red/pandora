@@ -36,8 +36,10 @@ info_key_map = {
     'display_id': 'id',
 }
 
-def get_info(url):
+def get_info(url, referer=None):
     cmd = ['youtube-dl', '-j', '--all-subs', url]
+    if referer:
+        cmd += ['--referer', referer]
     p = subprocess.Popen(cmd,
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, close_fds=True)
@@ -88,7 +90,7 @@ def add_subtitles(item, media, tmp):
 
 def download(item_id, url, referer=None):
     item = Item.objects.get(public_id=item_id)
-    info = get_info(url)
+    info = get_info(url, referer)
     if not len(info):
         return '%s contains no videos' % url
     media = info[0]
