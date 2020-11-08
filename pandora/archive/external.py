@@ -105,7 +105,7 @@ def download(item_id, url, referer=None):
     elif 'referer' in media:
         cmd += ['--referer', media['referer']]
 
-    if settings.CONFIG['video'].get('reuseUload', False):
+    if settings.CONFIG['video'].get('reuseUpload', False):
         max_resolution = max(settings.CONFIG['video']['resolutions'])
         format = settings.CONFIG['video']['formats'][0]
         if format == 'mp4':
