@@ -745,6 +745,7 @@ def addMediaUrl(request, data):
 
     takes {
         url: string, // url
+        referer: string // optional referer url
         item: string // item
     }
     returns {
@@ -757,7 +758,7 @@ def addMediaUrl(request, data):
         response = json_response()
         i = Item.objects.get(public_id=data['item'])
         Task.start(i, request.user)
-        t = tasks.download_media.delay(data['item'], data['url'])
+        t = tasks.download_media.delay(data['item'], data['url'], data.get('referer'))
         response['data']['taskId'] = t.task_id
         add_changelog(request, data, data['item'])
     return render_to_json_response(response)

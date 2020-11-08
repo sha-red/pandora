@@ -200,8 +200,8 @@ def update_stream(id):
         c.save()
 
 @task(queue="encoding")
-def download_media(item_id, url):
-    return external.download(item_id, url)
+def download_media(item_id, url, referer=None):
+    return external.download(item_id, url, referer)
 
 @task(queue='default')
 def move_media(data, user):
