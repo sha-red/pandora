@@ -222,7 +222,8 @@ pandora.ui.addItemDialog = function(options) {
             }
             return value;
         });
-        values.url= info.url;
+        values.url = info.url;
+        values.referer = info.referer;
         return Ox.extend(info, values);
     }
 

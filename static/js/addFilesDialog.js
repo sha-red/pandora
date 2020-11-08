@@ -216,6 +216,7 @@ pandora.ui.addFilesDialog = function(options) {
                     ), function(result) {
                         pandora.api.addMediaUrl({
                             url: item.url,
+                            referer: item.referer,
                             item: id
                         }, callback);
                     });
