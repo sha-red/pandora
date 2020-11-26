@@ -572,6 +572,13 @@ pandora.ui.documentInfoView = function(data, isMixed) {
                             }
                         })
                         .appendTo($element);
+                    if (isMixed[key] && Ox.contains(listKeys, key)) {
+                        pandora.ui.addRemoveKeyDialog({
+                            ids: ui.collectionSelection,
+                            key: key,
+                            section: ui.section
+                        }).appendTo($element)
+                    }
                 }
             });
             $element.appendTo($text);
