@@ -1022,7 +1022,7 @@ class Item(models.Model):
                 elif sort_type == 'string':
                     value = self.get(source, '')
                     if isinstance(value, list):
-                        value = ','.join(value)
+                        value = ','.join([str(v) for v in value])
                     value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'words':
