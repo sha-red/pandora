@@ -2659,8 +2659,9 @@ pandora.openURL = function(url) {
 };
 
 pandora.safeDocumentName = function(name) {
-    ['?', '#', '%'].forEach(function(c) {
-        name = name.replace(c, '_');
+    ['\\?', '#', '%', '/'].forEach(function(c) {
+        var r = new RegExp(c, 'g')
+        name = name.replace(r, '_');
     })
     return name;
 };
