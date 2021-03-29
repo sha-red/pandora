@@ -1030,7 +1030,10 @@ def download(request, id, resolution=None, format='webm', part=None):
             return HttpResponseForbidden()
         elif r is True:
             response = HttpResponse(FileWrapper(video), content_type=content_type)
-            response['Content-Length'] = os.path.getsize(video.name)
+            try:
+                response['Content-Length'] = os.path.getsize(video.name)
+            except:
+                pass
         else:
             response = HttpFileResponse(r, content_type=content_type)
     else:
