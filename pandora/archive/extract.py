@@ -145,6 +145,13 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         audioquality = -1
         audiobitrate = '22k'
         audiochannels = 1
+    elif profile == '0p':
+        info['video'] = []
+        audiorate = 48000
+        audioquality = 6
+        audiobitrate = None
+        audiochannels = None
+        audio_codec = 'libopus'
     else:
         height = 96
 
