@@ -228,6 +228,7 @@ pandora.ui.infoView = function(data, isMixed) {
             Ox.EditableContent({
                     editable: canEdit,
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
+                    placeholder: formatLight(Ox._( isMixed.title ? 'Mixed title' : 'Untitled')),
                     value: data.title || ''
                 })
                 .css({
