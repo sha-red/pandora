@@ -5,7 +5,6 @@ pandora.ui.importAnnotationsDialog = function(options) {
     var layers = pandora.site.layers.filter(function(layer) {
             return layer.canAddAnnotations[pandora.user.level];
         }),
-
         languages = Ox.sortBy(Ox.LANGUAGES.map(function(language) {
             return {id: language.code, title: language.name};
         }), 'title'),
@@ -13,7 +12,12 @@ pandora.ui.importAnnotationsDialog = function(options) {
         $content = Ox.Element().css({margin: '16px'}),
 
         $layerSelect = Ox.Select({
-            items: layers,
+            items: [{
+                id: '',
+                type: '',
+                title: Ox._('Select Layer...'),
+                disabled: true,
+            }].concat(layers),
             label: Ox._('Layer'),
             labelWidth: 128,
             width: 384
@@ -22,7 +26,12 @@ pandora.ui.importAnnotationsDialog = function(options) {
             marginTop: '16px'
         })
         .bindEvent({
-            change: updateLanguageSelect
+            change: function(data) {
+                updateLanguageSelect()
+                that[
+                    (data.value.length && $fileInput.value().length) ? 'enableButton' : 'disableButton'
+                ]('import');
+            }
         })
         .appendTo($content),
 
@@ -72,13 +81,16 @@ pandora.ui.importAnnotationsDialog = function(options) {
                     var format = Ox.last(data.value[0].name.split('.'));
                     $formatSelect.options({value: format});
                     var subtitlesLayer = pandora.getSubtitlesLayer()
-                    if (subtitlesLayer && format == 'srt' && Ox.getObjectById(layers, subtitlesLayer))  {
+                    if (
+                        subtitlesLayer && !$layerSelect.value().length &&
+                        format == 'srt' && Ox.getObjectById(layers, subtitlesLayer)
+                    )  {
                         $layerSelect.options({value: subtitlesLayer})
                     }
                     updateLanguageSelect();
                 }
                 that[
-                    data.value.length ? 'enableButton' : 'disableButton'
+                    (data.value.length && $layerSelect.value().length) ? 'enableButton' : 'disableButton'
                 ]('import');
             }
         })
@@ -226,9 +238,10 @@ pandora.ui.importAnnotationsDialog = function(options) {
     }
 
     function updateLanguageSelect() {
-        var layerType = Ox.getObjectById(
-            pandora.site.layers, $layerSelect.value()
-        ).type;
+        var layer = $layerSelect.value(),
+            layerType = layer.length ? Ox.getObjectById(
+                pandora.site.layers, layer,
+            ).type : '';
         if (layerType != 'text') {
             $languageSelect.value(pandora.site.language);
         }
