@@ -80,7 +80,7 @@ def get_release():
 
 
 def reload_notice(base):
-    print('\nPlease restart pan.do/ra to finish the update:\n\tsudo %s/ctl reload\n' % base)
+    print('\nPlease restart pan.do/ra to finish the update:\n\tsudo pandoractl reload\n')
 
 
 def check_services(base):

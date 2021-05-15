@@ -50,4 +50,9 @@ export BRANCH=stable # change to 'master' to get current developement version
   More info at
   https://code.0x2620.org/0x2620/pandora/wiki/Customization
 
+## Update
+
+  To update your existing instlalation run
+
+  pandoractl update
 
