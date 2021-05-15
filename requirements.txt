@@ -10,7 +10,7 @@ requests<3.0.0,>=2.24.0
 urllib3<2.0.0,>=1.25.2
 tornado<5
 geoip2==4.1.0
-youtube-dl>=2020.5.8
+youtube-dl>=2021.4.26
 python-memcached
 elasticsearch
 future
