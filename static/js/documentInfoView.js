@@ -218,6 +218,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
         .append(
             Ox.EditableContent({
                     editable: canEdit,
+                    placeholder: formatLight(Ox._( isMixed.title ? 'Mixed title' : 'Untitled')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
                     value: data.title || ''
                 })
@@ -571,6 +572,13 @@ pandora.ui.documentInfoView = function(data, isMixed) {
                             }
                         })
                         .appendTo($element);
+                    if (isMixed[key] && Ox.contains(listKeys, key)) {
+                        pandora.ui.addRemoveKeyDialog({
+                            ids: ui.collectionSelection,
+                            key: key,
+                            section: ui.section
+                        }).appendTo($element)
+                    }
                 }
             });
             $element.appendTo($text);

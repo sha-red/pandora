@@ -13,20 +13,6 @@ pandora.ui.collection = function() {
 
     if (view == 'list') {
         that = Ox.TableList({
-            draggable: true,
-            keys: keys,
-            items: function(data, callback) {
-                pandora.api.findDocuments(Ox.extend(data, {
-                    query: ui.findDocuments
-                }), callback);
-                return Ox.clone(data, true);
-            },
-            selected: ui.collectionSelection,
-            sort: ui.collectionSort.concat([
-                {key: 'extension', operator: '+'},
-                {key: 'title', operator: '+'}
-            ]),
-            unique: 'id',
             columns: pandora.site.documentSortKeys.filter(function(key) {
                 return !key.capability
                     || pandora.hasCapability(key.capability);
@@ -40,7 +26,11 @@ pandora.ui.collection = function() {
                     defaultWidth: key.columnWidth,
                     format: (function() {
                         return function(value, data) {
-                            return pandora.formatDocumentKey(key, data);
+                            var value = pandora.formatDocumentKey(key, data);
+                            if (Ox.isArray(value)) {
+                                value = value.join(', ');
+                            }
+                            return value;
                         }
                     })(),
                     id: key.id,
@@ -54,7 +44,25 @@ pandora.ui.collection = function() {
                 };
             }),
             columnsVisible: true,
+            columnsMovable: true,
+            columnsRemovable: true,
+            columnsResizable: true,
+            columnsVisible: true,
+            draggable: true,
+            items: function(data, callback) {
+                pandora.api.findDocuments(Ox.extend(data, {
+                    query: ui.findDocuments
+                }), callback);
+                return Ox.clone(data, true);
+            },
+            keys: keys,
             scrollbarVisible: true,
+            selected: ui.collectionSelection,
+            sort: ui.collectionSort.concat([
+                {key: 'extension', operator: '+'},
+                {key: 'title', operator: '+'}
+            ]),
+            unique: 'id',
         })
         .bindEvent({
             columnchange: function(data) {

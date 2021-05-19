@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import logging
 import os
 import re
 import shutil
@@ -42,6 +43,7 @@ from user.utils import update_groups
 from user.models import Group
 import archive.models
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
@@ -855,7 +857,7 @@ class Item(models.Model):
                     values = list(set(values))
                 else:
                     values = self.get(key, '')
-                if isinstance(values, list):
+                if values and isinstance(values, list) and isinstance(values[0], str):
                     save(key, '\n'.join(values))
                 else:
                     save(key, values)
@@ -1022,7 +1024,7 @@ class Item(models.Model):
                 elif sort_type == 'string':
                     value = self.get(source, '')
                     if isinstance(value, list):
-                        value = ','.join(value)
+                        value = ','.join([str(v) for v in value])
                     value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'words':
@@ -1099,7 +1101,11 @@ class Item(models.Model):
                     _current_values.append(value[0])
             current_values = _current_values
 
-        current_values = list(set(current_values))
+        try:
+            current_values = list(set(current_values))
+        except:
+            logger.error('invalid facet data for %s: %s', key, current_values)
+            current_values = []
         current_values = [ox.decode_html(ox.strip_tags(v)) for v in current_values]
         current_values = [unicodedata.normalize('NFKD', v) for v in current_values]
         self.update_facet_values(key, current_values)

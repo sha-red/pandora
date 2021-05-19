@@ -24,9 +24,6 @@ User = get_user_model()
 
 _win = (sys.platform == "win32")
 
-RUN_RELOADER = True
-NOTIFIER = None
-
 def get_version():
     git_dir = join(dirname(dirname(dirname(__file__))), '.git')
     if exists(git_dir):
@@ -257,46 +254,6 @@ check the README for further details.
             except:
                 pass
 
-
-
-def reloader_thread():
-    global NOTIFIER
-    settings.RELOADER_RUNNING=True
-    _config_mtime = 0
-    try:
-        import pyinotify
-        INOTIFY = True
-    except:
-        INOTIFY = False
-    if INOTIFY:
-        def add_watch():
-            name = os.path.realpath(settings.SITE_CONFIG)
-            wm.add_watch(name, pyinotify.IN_CLOSE_WRITE, reload_config)
-
-        def reload_config(event):
-            load_config()
-            add_watch()
-
-        wm = pyinotify.WatchManager()
-        add_watch()
-        notifier = pyinotify.Notifier(wm)
-        NOTIFIER = notifier
-        notifier.loop()
-    else:
-        while RUN_RELOADER:
-            try:
-                stat = os.stat(settings.SITE_CONFIG)
-                mtime = stat.st_mtime
-                if _win:
-                    mtime -= stat.st_ctime
-                if mtime > _config_mtime:
-                    load_config()
-                    _config_mtime = mtime
-                time.sleep(10)
-            except:
-                #sys.stderr.write("reloading config failed\n")
-                pass
-
 def update_static():
     oxjs_build = os.path.join(settings.STATIC_ROOT, 'oxjs/tools/build/build.py')
     if os.path.exists(oxjs_build):
@@ -407,10 +364,7 @@ def update_geoip(force=False):
             print('failed to download GeoLite2-City.mmdb')
 
 def init():
-    if not settings.RELOADER_RUNNING:
-        load_config(True)
-        if settings.RELOAD_CONFIG:
-            thread.start_new_thread(reloader_thread, ())
+    load_config(True)
 
 def shutdown():
     if settings.RELOADER_RUNNING:

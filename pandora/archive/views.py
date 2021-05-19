@@ -195,7 +195,9 @@ def addMedia(request, data):
         response['data']['item'] = f.item.public_id
         response['data']['itemUrl'] = request.build_absolute_uri('/%s' % f.item.public_id)
         if not f.available:
-            add_changelog(request, data, f.item.public_id)
+            changelog_data = data.copy()
+            changelog_data['oshash'] = oshash
+            add_changelog(request, changelog_data, f.item.public_id)
     else:
         if 'item' in data:
             i = Item.objects.get(public_id=data['item'])
@@ -220,11 +222,15 @@ def addMedia(request, data):
         if 'info' in data and data['info'] and isinstance(data['info'], dict):
             f.info = data['info']
         f.info['extension'] = extension
+        if 'filename' in data:
+            f.info['filename'] = data['filename']
         f.parse_info()
         f.save()
         response['data']['item'] = i.public_id
         response['data']['itemUrl'] = request.build_absolute_uri('/%s' % i.public_id)
-        add_changelog(request, data, i.public_id)
+        changelog_data = data.copy()
+        changelog_data['oshash'] = oshash
+        add_changelog(request, changelog_data, i.public_id)
     return render_to_json_response(response)
 actions.register(addMedia, cache=False)
 
@@ -739,6 +745,7 @@ def addMediaUrl(request, data):
 
     takes {
         url: string, // url
+        referer: string // optional referer url
         item: string // item
     }
     returns {
@@ -751,7 +758,7 @@ def addMediaUrl(request, data):
         response = json_response()
         i = Item.objects.get(public_id=data['item'])
         Task.start(i, request.user)
-        t = tasks.download_media.delay(data['item'], data['url'])
+        t = tasks.download_media.delay(data['item'], data['url'], data.get('referer'))
         response['data']['taskId'] = t.task_id
         add_changelog(request, data, data['item'])
     return render_to_json_response(response)

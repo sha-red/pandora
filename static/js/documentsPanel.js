@@ -810,9 +810,8 @@ pandora.ui.documentsPanel = function(options) {
             item: function(data, sort, size) {
                 var sortKey = sort[0].key,
                     infoKey = sortKey == 'title' ? 'extension' : sortKey,
-                    info = (
-                        Ox.getObjectById(pandora.site.documentKeys, infoKey).format || Ox.identity
-                    )(data[infoKey]),
+                    key = Ox.getObjectById(pandora.site.documentKeys, infoKey),
+                    info = pandora.formatDocumentKey(key, data, size),
                     size = size || 128;
                 return {
                     height: Math.round(data.ratio > 1 ? size / data.ratio : size),

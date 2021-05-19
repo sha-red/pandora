@@ -22,7 +22,7 @@ def get_location(ip):
     else:
         try:
             location = g.city(ip)
-        except GeoIP2Exception:
+        except:
             try:
                 location = g.country(s.ip)
             except:

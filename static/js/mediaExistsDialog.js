@@ -58,10 +58,16 @@ pandora.ui.mediaExistsDialog = function(options) {
                         return existing.indexOf(item.oshash) == -1;
                     });
                 that.close();
-                pandora.ui.addFilesDialog({
-                    action: options.action,
-                    items: items
-                }).open();
+                (pandora.user.ui.item ? pandora.api.get : Ox.noop)({
+                    id: pandora.user.ui.item,
+                    keys: ['editable']
+                }, function(result) {
+                    pandora.ui.addFilesDialog({
+                        action: options.action,
+                        items: items,
+                        editable: pandora.user.ui.item && result.data.editable
+                    }).open();
+                })
             }
         })
     ];

@@ -3,14 +3,12 @@
 pandora.ui.editDocumentsDialog = function() {
     var ui = pandora.user.ui,
         hasChanged = false,
-        ids = ui.collectionSelection.filter(function(id) {
-            return pandora.$ui.list.value(id, 'editable');
-        }),
-        keys = pandora.site.documentKeys.filter(function(key) {
+        ids = ui.collectionSelection,
+        keys = ['editable'].concat(pandora.site.documentKeys.filter(function(key) {
             return key.id != '*'
         }).map(function(key) {
             return key.id
-        }),
+        })),
         listKeys = pandora.site.documentKeys.filter(function(key) {
             return Ox.isArray(key.type);
         }).map(function(key){
@@ -85,12 +83,36 @@ pandora.ui.editDocumentsDialog = function() {
                     }
                 ],
                 operator: '&'
-            }
+            },
+            range: [0, ids.length]
         }, function(result) {
             var data = {},
                 isMixed = {},
-                items = result.data.items;
-            keys.forEach(function(key) {
+                updateTitle = false,
+                items = result.data.items.filter(function(item) {
+                    if (!item.editable) {
+                        updateTitle = true
+                    }
+                    return item.editable;
+                });
+            if (updateTitle) {
+                that.options({
+                    title: Ox._('Edit Metadata for {0}', [
+                        Ox.formatNumber(items.length) + ' ' + Ox._(
+                            items.length == 1 ? 'Document' : 'Documents'
+                        )
+                    ])
+                })
+                // no editable items
+                if (!items.length) {
+                    that.close()
+                    return
+                }
+            }
+
+            keys.filter(function(key) {
+                return key != 'editable'
+            }).forEach(function(key) {
                 var isArray = Ox.contains(listKeys, key),
                     values = items.map(function(item) {
                         return item[key];

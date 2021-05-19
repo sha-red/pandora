@@ -375,7 +375,11 @@ pandora.clickLink = function(e, selectEmbed) {
     if (match) {
         (selectEmbed || pandora.$ui.textPanel.selectEmbed)(parseInt(match[1]));
     } else {
-        pandora.openURL(e.target.href);
+        if (e.target.target == '_blank') {
+            pandora.openLink(e.target.href);
+        } else {
+            pandora.openURL(e.target.href);
+        }
     }
 };
 
@@ -725,11 +729,11 @@ pandora.uploadDroppedFiles = function(files) {
 pandora.enableBatchEdit = function(section) {
     var ui = pandora.user.ui;
     if (section == 'documents') {
-        return !ui.document && ui.collectionSelection.length > 1 && ui.collectionSelection.every(function(item) {
+        return !ui.document && ui.collectionSelection.length > 1 && ui.collectionSelection.some(function(item) {
             return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
         })
     } else {
-        return !ui.item && ui.listSelection.length > 1 && ui.listSelection.every(function(item) {
+        return !ui.item && ui.listSelection.length > 1 && ui.listSelection.some(function(item) {
             return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
         })
     }
@@ -2655,8 +2659,9 @@ pandora.openURL = function(url) {
 };
 
 pandora.safeDocumentName = function(name) {
-    ['?', '#', '%'].forEach(function(c) {
-        name = name.replace(c, '_');
+    ['\\?', '#', '%', '/'].forEach(function(c) {
+        var r = new RegExp(c, 'g')
+        name = name.replace(r, '_');
     })
     return name;
 };

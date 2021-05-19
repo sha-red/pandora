@@ -442,7 +442,37 @@ pandora.ui.mainMenu = function() {
                         });
                     }
                 } else if (data.id == 'deletefromarchive') {
-                    if (ui.section == 'documents') {
+                    if (ui.section == 'items') {
+                        var ids;
+                        if (ui.item) {
+                            ids = [ui.item]
+                        } else {
+                            ids = ui.listSelection
+                        }
+                        pandora.api.find({
+                            query: {
+                                conditions: [{
+                                    key: 'id',
+                                    operator: '&',
+                                    value: ids
+                                }],
+                                operator: '&'
+                            },
+                            keys: ['id', 'title'],
+                            range: [0, ui.listSelection.length]
+                        }, function(result) {
+                            pandora.$ui.deleteItemsDialog = pandora.ui.deleteItemsDialog({
+                                items: result.data.items
+                            }, function() {
+                                Ox.Request.clearCache();
+                                if (ui.item) {
+                                    pandora.UI.set({item: ''});
+                                } else {
+                                    pandora.$ui.list.reloadList()
+                                }
+                            }).open();
+                        });
+                    } else if (ui.section == 'documents') {
                         var files;
                         if (ui.document) {
                             files = [pandora.$ui.document.info()];
@@ -1364,6 +1394,9 @@ pandora.ui.mainMenu = function() {
             { id: 'clearclipboard', title: Ox._('Clear Clipboard'), disabled: !clipboardItems},
             {},
             { id: 'delete', title: Ox._('{0} {1} {2}', [deleteVerb, selectionItemName, listName]), disabled: !canDelete, keyboard: 'delete' },
+            ui._list ? [
+                { id: 'deletefromarchive', title: Ox._('{0} {1} {2}', [Ox._('Delete'), selectionItemName, Ox._('from Archive')]), disabled: !canDelete }
+            ] : [],
             {},
             { id: 'undo', title: undoText ? Ox._('Undo {0}', [undoText]) : Ox._('Undo'), disabled: !undoText, keyboard: 'control z' },
             { id: 'redo', title: redoText ? Ox._('Redo {0}', [redoText]) : Ox._('Redo'), disabled: !redoText, keyboard: 'shift control z' },

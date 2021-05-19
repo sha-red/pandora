@@ -42,5 +42,5 @@ Pan.do/ra is installed in /srv/pandora and is served with nginx on http://pandor
 to get the latest version of pan.do/ra
 
     cd /srv/pandora
-    ./update.py
+    pandoractl update
 

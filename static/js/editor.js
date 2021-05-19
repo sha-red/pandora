@@ -205,9 +205,9 @@ pandora.ui.editor = function(data) {
                 }).open();
             },
             editannotation: function(data) {
-                Ox.Log('', 'editAnnotation', data);
+                Ox.Log('', 'editAnnotation', data.id, data);
                 function callback(result) {
-                    Ox.Log('', 'editAnnotation result', result);
+                    Ox.Log('', 'editAnnotation result', result.data.id, result);
                     if (!Ox.isEmpty(result.data)) {
                         result.data.date = Ox.formatDate(
                             result.data.modified.slice(0, 10), '%B %e, %Y'
@@ -222,21 +222,56 @@ pandora.ui.editor = function(data) {
                     pandora.UI.set('videoPoints.' + ui.item + '.annotation', result.data.id.split('/')[1] || '');
                     Ox.Request.clearCache();
                 };
+                var edit = {
+                    'in': data['in'],
+                    out: data.out,
+                    value: data.value
+                }
                 if (data.id[0] == '_') {
-                    pandora.api.addAnnotation({
-                        'in': data['in'],
-                        item: ui.item,
-                        layer: data.layer,
-                        out: data.out,
-                        value: data.value
-                    }, callback);
+                    edit.item = ui.item;
+                    edit.layer = data.layer;
+
+                    if (queue[data.id]) {
+                        queue[data.id].push(edit);
+                    } else {
+                        queue[data.id] = [];
+                        pandora.api.addAnnotation(edit, function(result) {
+                            callback(result);
+                            var id = result.data.id,
+                                pending = queue[id];
+                            delete queue[id];
+                            pending && pending.length && Ox.serialForEach(pending, function(edit, index, array, callback) {
+                                edit.id = id
+                                Ox.Log('', 'process pending editAnnotation request', id, edit);
+                                pandora.api.editAnnotation(edit, function(result) {
+                                    callback();
+                                })
+                            }, function() {
+                                Ox.Request.clearCache();
+                            });
+                        });
+                    }
                 } else {
-                    pandora.api.editAnnotation({
-                        id: data.id,
-                        'in': data['in'],
-                        out: data.out,
-                        value: data.value
-                    }, callback);
+                    edit.id = data.id;
+                    if (queue[data.id]) {
+                        queue[data.id].push(edit);
+                    } else {
+                        queue[data.id] = [];
+                        pandora.api.editAnnotation(edit, function(result) {
+                            callback(result);
+                            var pending = queue[edit.id];
+                            delete queue[edit.id];
+                            pending && pending.length && Ox.serialForEach(pending, function(edit, index, array, cb) {
+                                Ox.Log('', 'process pending editAnnotation request', edit.id, edit);
+                                pandora.api.editAnnotation(edit, function(result) {
+                                    callback(result);
+                                    cb();
+                                })
+                            }, function() {
+                                Ox.Request.clearCache();
+                            });
+                        });
+                    }
                 }
             },
             embedselection: function() {
@@ -387,7 +422,8 @@ pandora.ui.editor = function(data) {
             pandora_videotimeline: function(data) {
                 that.options({timeline: data.value});
             }
-        });
+        }),
+        queue = [];
 
     pandora._dontSelectResult = false;
 

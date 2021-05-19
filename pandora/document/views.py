@@ -23,6 +23,7 @@ from archive.chunk import process_chunk
 from changelog.models import add_changelog
 
 from . import models
+from . import tasks
 
 def get_document_or_404_json(request, id):
     response = {'status': {'code': 404,
@@ -131,13 +132,13 @@ def editDocument(request, data):
     item = 'item' in data and Item.objects.get(public_id=data['item']) or None
     if data['id']:
         if isinstance(data['id'], list):
-            documents = models.Document.objects.filter(pk__in=map(ox.fromAZ, data['id']))
+            add_changelog(request, data)
+            t = tasks.bulk_edit.delay(data, request.user.username)
+            response['data']['taskId'] = t.task_id
         else:
-            documents = [models.Document.get(data['id'])]
-        for document in documents:
+            document = models.Document.get(data['id'])
             if document.editable(request.user, item):
-                if document == documents[0]:
-                    add_changelog(request, data)
+                add_changelog(request, data)
                 document.edit(data, request.user, item)
                 document.save()
                 response['data'] = document.json(user=request.user, item=item)

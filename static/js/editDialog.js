@@ -4,14 +4,12 @@ pandora.ui.editDialog = function() {
 
     var ui = pandora.user.ui,
         hasChanged = false,
-        ids = ui.listSelection.filter(function(id) {
-            return pandora.$ui.list.value(id, 'editable');
-        }),
-        keys = pandora.site.itemKeys.filter(function(key) {
+        ids = ui.listSelection,
+        keys = ['editable'].concat(pandora.site.itemKeys.filter(function(key) {
             return key.id != '*'
         }).map(function(key) {
             return key.id
-        }),
+        })),
         listKeys = pandora.site.itemKeys.filter(function(key) {
             return Ox.isArray(key.type);
         }).map(function(key){
@@ -86,26 +84,51 @@ pandora.ui.editDialog = function() {
                     }
                 ],
                 operator: '&'
-            }
+            },
+            range: [0, ids.length]
         }, function(result) {
             var data = {},
                 isMixed = {},
-                items = result.data.items;
-            keys.forEach(function(key) {
+                updateTitle = false,
+                items = result.data.items.filter(function(item) {
+                    if (!item.editable) {
+                        updateTitle = true
+                    }
+                    return item.editable;
+                });
+
+            if (updateTitle) {
+                that.options({
+                    title: Ox._('Edit Metadata for {0}', [
+                        Ox.formatNumber(items.length) + ' ' + Ox._(
+                            items.length == 1 ? pandora.site.itemName.singular : pandora.site.itemName.plural
+                        )
+                    ])
+                })
+                // no editable items
+                if (!items.length) {
+                    that.close()
+                    return
+                }
+            }
+            keys.filter(function(key) {
+                return key != 'editable'
+            }).forEach(function(key) {
                 var isArray = Ox.contains(listKeys, key),
                     values = items.map(function(item) {
                         return item[key];
                     });
                 if (isArray) {
                     values = values.map(function(value) {
-                        return (value || []).join(separator);
+                        value = value || []
+                        return value.join ? value.join(separator) : value;
                     });
                 }
                 if (Ox.unique(values).length > 1) {
                     isMixed[key] = true;
                 }
                 data[key] = isMixed[key] ? null
-                    : isArray ? values[0].split(separator)
+                    : isArray && values.length ? values[0].split(separator)
                     : values[0];
             });
             that.options({

@@ -5,6 +5,7 @@ from urllib.parse import quote
 import gzip
 import os
 import random
+import logging
 
 from celery.task import task, periodic_task
 from django.conf import settings
@@ -14,6 +15,9 @@ from ox.utils import ET
 
 from app.utils import limit_rate
 from taskqueue.models import Task
+
+
+logger = logging.getLogger(__name__)
 
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')
@@ -350,3 +354,18 @@ def update_sitemap(base_url):
         f.write(data)
     with gzip.open(sitemap, 'wb') as f:
         f.write(data)
+
+
+@task(queue='default')
+def bulk_edit(data, username):
+    from django.db import transaction
+    from . import models
+    from .views import edit_item
+    user = models.User.objects.get(username=username)
+    items = models.Item.objects.filter(public_id__in=data['id'])
+    for item in items:
+        if item.editable(user):
+            with transaction.atomic():
+                item.refresh_from_db()
+                response = edit_item(user, item, data)
+    return {}

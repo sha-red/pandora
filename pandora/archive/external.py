@@ -36,8 +36,10 @@ info_key_map = {
     'display_id': 'id',
 }
 
-def get_info(url):
+def get_info(url, referer=None):
     cmd = ['youtube-dl', '-j', '--all-subs', url]
+    if referer:
+        cmd += ['--referer', referer]
     p = subprocess.Popen(cmd,
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, close_fds=True)
@@ -57,6 +59,8 @@ def get_info(url):
                     info[-1]['tags'] = []
                 if 'upload_date' in i and i['upload_date']:
                     info[-1]['date'] = '-'.join([i['upload_date'][:4], i['upload_date'][4:6], i['upload_date'][6:]])
+                if 'referer' not in info[-1]:
+                    info[-1]['referer'] = url
     return info
 
 def add_subtitles(item, media, tmp):
@@ -84,9 +88,9 @@ def add_subtitles(item, media, tmp):
                     sub.selected = True
                     sub.save()
 
-def download(item_id, url):
+def download(item_id, url, referer=None):
     item = Item.objects.get(public_id=item_id)
-    info = get_info(url)
+    info = get_info(url, referer)
     if not len(info):
         return '%s contains no videos' % url
     media = info[0]
@@ -96,7 +100,12 @@ def download(item_id, url):
         tmp = tmp.decode('utf-8')
     os.chdir(tmp)
     cmd = ['youtube-dl', '-q', media['url']]
-    if settings.CONFIG['video'].get('reuseUload', False):
+    if referer:
+        cmd += ['--referer', referer]
+    elif 'referer' in media:
+        cmd += ['--referer', media['referer']]
+
+    if settings.CONFIG['video'].get('reuseUpload', False):
         max_resolution = max(settings.CONFIG['video']['resolutions'])
         format = settings.CONFIG['video']['formats'][0]
         if format == 'mp4':

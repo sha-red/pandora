@@ -89,6 +89,7 @@ apt-get install -y \
     python3-pyinotify \
     python3-simplejson \
     python3-lxml \
+    python3-cssselect \
     python3-html5lib \
     python3-ox \
     python3-elasticsearch \
@@ -118,6 +119,7 @@ fi
 if [ "$RABBITMQ" == "local" ]; then
     RABBITPWD=$(pwgen -n 16 -1)
     rabbitmqctl add_user pandora $RABBITPWD
+    rabbitmqctl change_password pandora $RABBITPWD
     rabbitmqctl add_vhost /pandora
     rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
     CELERY_BROKER_URL="amqp://pandora:$RABBITPWD@localhost:5672//pandora"
@@ -185,7 +187,7 @@ fi
 
 # if pandora is running inside a container, expose backend at port 2620
 if [ "$LXC" == "yes" ]; then
-    sed -i s/127.0.0.1/0.0.0.0/g /srv/pandora/pandora/gunicorn_config.py
+    sed -i "s/127.0.0.1/[::]/g" /srv/pandora/pandora/gunicorn_config.py
     echo "WEBSOCKET_ADDRESS = \"0.0.0.0\"" >> /srv/pandora/pandora/local_settings.py
 fi
 /srv/pandora/ctl start
@@ -199,7 +201,6 @@ if [ "$NGINX" == "local" ]; then
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/pandora"
 rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/pandora
 ln -s ../sites-available/pandora /etc/nginx/sites-enabled/pandora
-ln -s /srv/pandora/ctl /usr/local/bin/pandoractl
 
 read -r -d '' GZIP <<EOI
 gzip_static  on;\\

@@ -30,6 +30,8 @@ apt-get update -qq
 apt-get install -y \
     netcat-openbsd \
     sudo \
+    rsync \
+    iproute2 \
     vim \
     wget \
     pwgen \
@@ -47,17 +49,20 @@ apt-get install -y \
     python3-cssselect \
     python3-html5lib \
     python3-ox \
+    python3-elasticsearch \
     oxframe \
     ffmpeg \
     mkvtoolnix \
     gpac \
     imagemagick \
     poppler-utils \
-    youtube-dl \
     ipython3 \
+    tesseract-ocr \
+    tesseract-ocr-eng \
     postfix \
     postgresql-client
 
+apt-get install -y --no-install-recommends youtube-dl rtmpdump
 apt-get clean
 
 rm -f /install.sh

@@ -8,6 +8,8 @@ export LANG=en_US.UTF-8
 mkdir -p /run/pandora
 chown -R ${user}.${user} /run/pandora
 
+update="/usr/bin/sudo -u $user -E -H /srv/pandora/update.py"
+
 # pan.do/ra services
 if [ "$action" = "pandora" ]; then
     if [ ! -e /srv/pandora/initialized ]; then
@@ -26,12 +28,12 @@ if [ "$action" = "pandora" ]; then
         /overlay/install.py
 
         echo "Initializing database..."
-        echo "CREATE EXTENSION pg_trgm;" | /srv/pandora/pandora/manage.py dbshell
+        echo "CREATE EXTENSION pg_trgm;" | /srv/pandora/pandora/manage.py dbshell || true
         /srv/pandora/pandora/manage.py init_db
-        /srv/pandora/update.py db
+        $update db
         echo "Generating static files..."
-        /srv/pandora/update.py static
         chown -R ${user}.${user} /srv/pandora/
+        $update static
         touch /srv/pandora/initialized
     fi
     /srv/pandora_base/docker/wait-for db 5432
@@ -44,54 +46,53 @@ if [ "$action" = "encoding" ]; then
     /srv/pandora_base/docker/wait-for-file /srv/pandora/initialized
     /srv/pandora_base/docker/wait-for rabbitmq 5672
     name=pandora-encoding-$(hostname)
+    cd /srv/pandora/pandora
     exec /usr/bin/sudo -u $user -E -H \
-        /srv/pandora/bin/python \
-        /srv/pandora/pandora/manage.py \
-        celery worker \
-        -c 1 \
-        -Q encoding -n $name \
-        -l INFO
+        /srv/pandora/bin/celery \
+            -A app worker \
+            -Q encoding -n ${name} \
+            --pidfile /run/pandora/encoding.pid \
+            --maxtasksperchild 500 \
+            -c 1 \
+            -l INFO
 fi
 if [ "$action" = "tasks" ]; then
     /srv/pandora_base/docker/wait-for-file /srv/pandora/initialized
     /srv/pandora_base/docker/wait-for rabbitmq 5672
     name=pandora-default-$(hostname)
+    cd /srv/pandora/pandora
     exec /usr/bin/sudo -u $user -E -H \
-        /srv/pandora/bin/python \
-        /srv/pandora/pandora/manage.py \
-        celery worker \
-        -Q default,celery -n $name \
+        /srv/pandora/bin/celery \
+        -A app worker \
+        -Q default,celery -n ${name} \
+        --pidfile /run/pandora/tasks.pid \
         --maxtasksperchild 1000 \
         -l INFO
 fi
 if [ "$action" = "cron" ]; then
     /srv/pandora_base/docker/wait-for-file /srv/pandora/initialized
     /srv/pandora_base/docker/wait-for rabbitmq 5672
+    cd /srv/pandora/pandora
     exec /usr/bin/sudo -u $user -E -H \
-        /srv/pandora/bin/python \
-        /srv/pandora/pandora/manage.py \
-        celerybeat -s /run/pandora/celerybeat-schedule \
+        /srv/pandora/bin/celery \
+        -A app beat \
+        -s /run/pandora/celerybeat-schedule \
         --pidfile /run/pandora/cron.pid \
         -l INFO
 fi
 if [ "$action" = "websocketd" ]; then
     /srv/pandora_base/docker/wait-for-file /srv/pandora/initialized
     /srv/pandora_base/docker/wait-for rabbitmq 5672
+    cd /srv/pandora/pandora
     exec /usr/bin/sudo -u $user -E -H \
         /srv/pandora/bin/python \
         /srv/pandora/pandora/manage.py websocketd
 fi
 
 # pan.do/ra management and update
-if [ "$action" = "manage.py" ]; then
+if [ "$action" = "ctl" ]; then
     shift
-    exec /usr/bin/sudo -u $user -E -H \
-        /srv/pandora/pandora/manage.py "$@"
-fi
-if [ "$action" = "update.py" ]; then
-    shift
-    exec /usr/bin/sudo -u $user -E -H \
-        /srv/pandora/update.py "$@"
+    exec /srv/pandora/ctl "$@"
 fi
 if [ "$action" = "bash" ]; then
     shift

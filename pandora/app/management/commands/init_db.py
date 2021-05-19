@@ -11,6 +11,8 @@ def run(cmd):
     stdout, stderr = p.communicate()
 
     if p.returncode != 0:
+        print('failed to run:', cmd)
+        print(stdout)
         print(stderr)
         sys.exit(1)
 

@@ -220,7 +220,6 @@ XACCELREDIRECT = False
 
 SITE_CONFIG = join(PROJECT_ROOT, 'config.jsonc')
 DEFAULT_CONFIG = join(PROJECT_ROOT, 'config.pandora.jsonc')
-RELOAD_CONFIG = False
 
 #used if CONFIG['canDownloadVideo'] is set
 TRACKER_URL = "udp://tracker.openbittorrent.com:80"
@@ -275,7 +274,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 32 * 1024 * 1024
 
-RELOADER_RUNNING = False
 #you can ignore things below this line
 #=========================================================================
 LOCAL_APPS = []

@@ -132,6 +132,7 @@ pandora.ui.importMediaDialog = function(options) {
                 pandora.api.edit(edit, function(result) {
                     pandora.api.addMediaUrl({
                         url: info.url,
+                        referer: info.referer,
                         item: edit.id
                     }, function(result) {
                         if (result.data.taskId) {

@@ -222,7 +222,8 @@ pandora.ui.addItemDialog = function(options) {
             }
             return value;
         });
-        values.url= info.url;
+        values.url = info.url;
+        values.referer = info.referer;
         return Ox.extend(info, values);
     }
 
@@ -270,10 +271,16 @@ pandora.ui.addItemDialog = function(options) {
             } else {
                 $screen.stop();
                 that.close();
-                pandora.ui.addFilesDialog({
-                    action: selected,
-                    items: items
-                }).open();
+                (pandora.user.ui.item ? pandora.api.get : Ox.noop)({
+                    id: pandora.user.ui.item,
+                    keys: ['editable']
+                }, function(result) {
+                    pandora.ui.addFilesDialog({
+                        action: selected,
+                        items: items,
+                        editable: pandora.user.ui.item && result.data.editable
+                    }).open();
+                })
             }
         })
     }

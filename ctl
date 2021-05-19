@@ -17,7 +17,7 @@ if [ "$action" = "init" ]; then
     SUDO=""
     PANDORA_USER=`ls -l update.py | cut -f3 -d" "`
     if [ `whoami` != $PANDORA_USER ]; then
-        SUDO="sudo -H -u $PANDORA_USER"
+        SUDO="sudo -E -H -u $PANDORA_USER"
     fi
     $SUDO python3 -m venv --system-site-packages .
     branch=`cat .git/HEAD  | sed 's@/@\n@g' | tail -n1`
@@ -62,11 +62,10 @@ if [ ! -z $cmd ]; then
     SUDO=""
     PANDORA_USER=`ls -l update.py | cut -f3 -d" "`
     if [ `whoami` != $PANDORA_USER ]; then
-        SUDO="sudo -H -u $PANDORA_USER"
+        SUDO="sudo -E -H -u $PANDORA_USER"
     fi
     shift
-    $SUDO "$BASE/$cmd" $@
-    exit $?
+    exec $SUDO "$BASE/$cmd" $@
 fi
 
 if [ `whoami` != 'root' ]; then

@@ -336,7 +336,9 @@ class File(models.Model):
 
             def done_cb():
                 if done:
-                    self.info.update(ox.avinfo(self.data.path))
+                    info = ox.avinfo(self.data.path)
+                    del info['path']
+                    self.info.update(info)
                     self.parse_info()
                     # reject invalid uploads
                     if self.info.get('oshash') != self.oshash:
@@ -481,6 +483,13 @@ class File(models.Model):
                 user.is_staff or \
                 self.item.user == user or \
                 self.item.groups.filter(id__in=user.groups.all()).count() > 0
+        if 'instances' in data and 'filename' in self.info and self.data:
+            data['instances'].append({
+                'ignore': False,
+                'path': self.info['filename'],
+                'user': self.item.user.username if self.item and self.item.user else 'system',
+                'volume': 'Direct Upload'
+            })
         if not can_see_media:
             if 'instances' in data:
                 data['instances'] = []

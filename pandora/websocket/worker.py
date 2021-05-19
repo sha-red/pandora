@@ -24,7 +24,7 @@ class Worker(ConsumerMixin):
 
     def process_task(self, body, message):
         try:
-            if body['task'] == 'trigger_event':
+            if isinstance(body, dict) and body.get('task') == 'trigger_event':
                 daemon.trigger_event(*body['args'])
         except:
             logger.error('faild to trigger event %s', body, exc_info=True)

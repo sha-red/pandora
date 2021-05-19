@@ -80,7 +80,7 @@ def get_release():
 
 
 def reload_notice(base):
-    print('\nPlease restart pan.do/ra to finish the update:\n\tsudo %s/ctl reload\n' % base)
+    print('\nPlease restart pan.do/ra to finish the update:\n\tsudo pandoractl reload\n')
 
 
 def check_services(base):
@@ -297,6 +297,8 @@ if __name__ == "__main__":
                 run_sql(sql)
             run(join(base, 'pandora/manage.py'), 'migrate', 'system')
             run(join(base, 'pandora/manage.py'), 'update_geoip')
+        if old <= 6383:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
         if len(sys.argv) == 1:
             branch = get_branch()

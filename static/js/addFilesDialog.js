@@ -106,7 +106,7 @@ pandora.ui.addFilesDialog = function(options) {
     });
 
     var selectItems = [];
-    if (!pandora.site.itemRequiresVideo && pandora.user.ui.item) {
+    if (pandora.user.ui.item && options.editable) {
         selectItems.push({
             id: 'add',
             title: Ox._(
@@ -114,31 +114,23 @@ pandora.ui.addFilesDialog = function(options) {
                 [pandora.site.itemName.singular.toLowerCase()]
             )
         });
+    }
+    if (options.items.length > 1) {
         selectItems.push({
-            id: 'one',
+            id: 'multiple',
             title: Ox._(
-                options.items.length > 1 ? 'Create new {0} with multiple parts' : 'Create new {0}',
-                [pandora.site.itemName.singular.toLowerCase()]
-            )
-        });
-    } else {
-        if (options.items.length > 1) {
-            selectItems.push({
-                id: 'multiple',
-                title: Ox._(
-                    'Create multiple {0}',
-                    [pandora.site.itemName.plural.toLowerCase()]
-                )
-            });
-        }
-        selectItems.push({
-            id: 'one',
-            title: Ox._(
-                'Create one {0} with multiple parts',
-                [pandora.site.itemName.singular.toLowerCase()]
+                'Create multiple {0}',
+                [pandora.site.itemName.plural.toLowerCase()]
             )
         });
     }
+    selectItems.push({
+        id: 'one',
+        title: Ox._(
+            options.items.length > 1 ? 'Create new {0} with multiple parts' : 'Create new {0}',
+            [pandora.site.itemName.singular.toLowerCase()]
+        )
+    });
     var $select = Ox.Select({
         items: selectItems,
         width: 256
@@ -224,6 +216,7 @@ pandora.ui.addFilesDialog = function(options) {
                     ), function(result) {
                         pandora.api.addMediaUrl({
                             url: item.url,
+                            referer: item.referer,
                             item: id
                         }, callback);
                     });
