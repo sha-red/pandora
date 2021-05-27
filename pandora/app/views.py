@@ -245,7 +245,7 @@ def getEmbedDefaults(request, data):
         i = qs[0].cache
         response['data']['item'] = i['id']
         response['data']['itemDuration'] = i['duration']
-        response['data']['itemRatio'] = i['videoRatio']
+        response['data']['itemRatio'] = i.get('videoRatio', settings.CONFIG['video']['previewRatio'])
     qs = List.objects.exclude(status='private').order_by('name')
     if qs.exists():
         i = qs[0].json()
