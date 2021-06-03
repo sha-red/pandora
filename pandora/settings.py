@@ -264,6 +264,7 @@ SCRIPT_ROOT = normpath(join(PROJECT_ROOT, '..', 'scripts'))
 #change script to customize
 ITEM_POSTER = join(SCRIPT_ROOT, 'poster.py')
 ITEM_ICON = join(SCRIPT_ROOT, 'item_icon.py')
+ITEM_ICON_DATA = False
 LIST_ICON = join(SCRIPT_ROOT, 'list_icon.py')
 COLLECTION_ICON = join(SCRIPT_ROOT, 'list_icon.py')
 

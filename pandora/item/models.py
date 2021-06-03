@@ -1614,8 +1614,15 @@ class Item(models.Model):
             cmd += ['-l', timeline]
         if frame:
             cmd += ['-f', frame]
-        p = subprocess.Popen(cmd, close_fds=True)
-        p.wait()
+        if settings.ITEM_POSTER_DATA:
+            cmd += '-d', '-'
+            data = self.json()
+            data = utils.normalize_dict('NFC', data)
+            p = subprocess.Popen(cmd, stdin=subprocess.PIPE, close_fds=True)
+            p.communicate(json.dumps(data, default=to_json).encode('utf-8'))
+        else:
+            p = subprocess.Popen(cmd, close_fds=True)
+            p.wait()
         # remove cached versions
         icon = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
         for f in glob(icon.replace('.jpg', '*.jpg')):
