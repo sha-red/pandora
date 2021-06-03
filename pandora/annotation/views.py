@@ -180,10 +180,10 @@ def addAnnotation(request, data):
                                                          text='invalid data'))
 
     item = get_object_or_404_json(Item, public_id=data['item'])
-    
+
     layer_id = data['layer']
     layer = get_by_id(settings.CONFIG['layers'], layer_id)
-    if layer['canAddAnnotations'].get(request.user.profile.get_level()):
+    if layer['canAddAnnotations'].get(request.user.profile.get_level()) or item.editable(request.user):
         if layer['type'] == 'entity':
             try:
                 value = Entity.get_by_name(ox.decode_html(data['value']), layer['entity']).get_id()
@@ -241,8 +241,7 @@ def addAnnotations(request, data):
     
     layer_id = data['layer']
     layer = get_by_id(settings.CONFIG['layers'], layer_id)
-    if item.editable(request.user) \
-        and layer['canAddAnnotations'].get(request.user.profile.get_level()):
+    if item.editable(request.user):
         response = json_response()
         data['user'] = request.user.username
         t = add_annotations.delay(data)
