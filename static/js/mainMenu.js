@@ -361,11 +361,23 @@ pandora.ui.mainMenu = function() {
                         }
                     } else if (ui.section == 'documents') {
                         var items = pandora.clipboard.paste('document');
+                        /*
                         items.length && pandora.doHistory('paste', items, ui._collection, function() {
-                            //fixme:
-                            //pandora.UI.set({listSelection: items});
-                            //pandora.reloadList();
+                            pandora.UI.set({listSelection: items});
+                            pandora.reloadList();
+                            pandora.UI.set({collectionSelection: items});
+                            pandora.reloadList();
                         });
+                        */
+                        if (items.length) {
+                            pandora.api.addCollectionItems({
+                                collection: ui._collection,
+                                items: items
+                            }, function() {
+                                pandora.UI.set({collectionSelection: items});
+                                pandora.reloadList();
+                            });
+                        }
                     } else if (ui.section == 'edits') {
                         var clips = pandora.clipboard.paste('clip');
                         clips.length && pandora.doHistory('paste', clips, ui.edit, function(result) {
