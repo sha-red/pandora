@@ -1614,7 +1614,7 @@ class Item(models.Model):
             cmd += ['-l', timeline]
         if frame:
             cmd += ['-f', frame]
-        if settings.ITEM_POSTER_DATA:
+        if settings.ITEM_ICON_DATA:
             cmd += '-d', '-'
             data = self.json()
             data = utils.normalize_dict('NFC', data)
