@@ -559,6 +559,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
                     $('<span>').html(formatKey(key)).appendTo($element);
                     Ox.EditableContent({
                             clickLink: pandora.clickLink,
+                            editable: canEdit,
                             format: function(value) {
                                 return formatValue(key, value);
                             },
