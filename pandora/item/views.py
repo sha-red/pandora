@@ -948,9 +948,11 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
     if not item.access(request.user):
         return HttpResponseForbidden()
 
+    modes = [t['id'] for t in settings.CONFIG['timelines']]
     if not mode:
         mode = 'antialias'
-    modes = [t['id'] for t in settings.CONFIG['timelines']]
+        if mode not in modes:
+            mode = modes[0]
     if mode not in modes:
         raise Http404
     modes.pop(modes.index(mode))
