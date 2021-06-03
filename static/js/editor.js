@@ -4,6 +4,7 @@ pandora.ui.editor = function(data) {
 
     var ui = pandora.user.ui,
         rightsLevel = data.rightslevel,
+        canEdit = pandora.hasCapability('canEditMetadata') || data.editable,
 
         that = Ox.VideoAnnotationPanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
@@ -44,7 +45,7 @@ pandora.ui.editor = function(data) {
             itemName: pandora.site.itemName,
             layers: data.annotations.map(function(layer) {
                 return Ox.extend({
-                    editable: layer.canAddAnnotations[pandora.user.level]
+                    editable: layer.canAddAnnotations[pandora.user.level] || canEdit
                 }, layer, {
                     autocomplete: layer.type == 'entity'
                         ? function(key, value, callback) {
