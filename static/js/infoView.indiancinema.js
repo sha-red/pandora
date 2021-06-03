@@ -1095,6 +1095,7 @@ pandora.ui.infoView = function(data, isMixed) {
                             .appendTo($element);
                     }
                     Ox.EditableContent({
+                            editable: canEdit,
                             clickLink: pandora.clickLink,
                             format: function(value) {
                                 return formatValue(key, value);
