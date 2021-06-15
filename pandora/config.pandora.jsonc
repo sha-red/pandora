@@ -29,7 +29,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "text": Text shown on mouseover
     */
     "cantPlay": {
-        "icon": "noCopyright",
+        "icon": "NoCopyright",
         "link": "",
         "text": ""
     },
