@@ -278,6 +278,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 32 * 1024 * 1024
 #you can ignore things below this line
 #=========================================================================
 LOCAL_APPS = []
+LOCAL_URLPATTERNS = []
 #load installation specific settings from local_settings.py
 try:
     from local_settings import *
@@ -303,5 +304,4 @@ except NameError:
             raise Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
 
 INSTALLED_APPS = tuple(list(INSTALLED_APPS) + LOCAL_APPS)
-
 

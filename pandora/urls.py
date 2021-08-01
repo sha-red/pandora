@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import importlib
 
 from django.urls import path, re_path
 from oxdjango.http import HttpFileResponse
@@ -87,4 +88,18 @@ urlpatterns += [
     re_path(r'^.*$', app.views.index),
     path(r'', app.views.index),
 ]
+
+if settings.LOCAL_URLPATTERNS:
+    patterns = []
+    for pattern, fn in settings.LOCAL_URLPATTERNS:
+        if isinstnace(fn, 'str'):
+            m, f = fn.rsplit('.', 1)
+            try:
+                m = importlib.import_module(m)
+            except ImportError:
+                logger.error('failed to import urllib module: %s', fn, exc_info=True)
+                continue
+            fn = getattr(m, f)
+            patterns.append(re_path(pattern, fn))
+    urlpatterns = patterns + urlpatterns
 
