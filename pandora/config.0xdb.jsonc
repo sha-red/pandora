@@ -1009,7 +1009,7 @@
         {
             "id": "tags",
             "title": "Tags",
-            "canAddAnnotations": {"member": true, "firend": true, "staff": true, "admin": true},
+            "canAddAnnotations": {"member": true, "friend": true, "staff": true, "admin": true},
             "item": "Tag",
             "autocomplete": true,
             "overlap": true,

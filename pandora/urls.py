@@ -92,7 +92,7 @@ urlpatterns += [
 if settings.LOCAL_URLPATTERNS:
     patterns = []
     for pattern, fn in settings.LOCAL_URLPATTERNS:
-        if isinstnace(fn, 'str'):
+        if isinstance(fn, str):
             m, f = fn.rsplit('.', 1)
             try:
                 m = importlib.import_module(m)
