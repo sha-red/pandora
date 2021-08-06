@@ -1761,6 +1761,9 @@ pandora.getLargeEditTimelineURL = function(edit, type, i, callback) {
         if (clipIn >= timelineOut) {
             return false; // break
         }
+        if (!clip.duration) {
+            return;
+        }
         if (
             (timelineIn <= clipIn && clipIn <= timelineOut)
             || (timelineIn <= clipOut && clipOut <= timelineOut)

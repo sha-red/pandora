@@ -673,6 +673,10 @@ pandora.ui.editPanel = function(isEmbed) {
             timelineIteration = self.timelineIteration = Ox.uid();
         Ox.serialForEach(edit.clips, function(clip) {
             var callback = Ox.last(arguments);
+            if (!clip.duration) {
+                callback()
+                return;
+            }
             pandora[
                 fps == 1 ? 'getSmallClipTimelineURL' : 'getLargeClipTimelineURL'
             ](clip.item, clip['in'], clip.out, ui.videoTimeline, function(url) {
