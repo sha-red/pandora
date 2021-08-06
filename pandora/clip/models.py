@@ -8,6 +8,7 @@ import ox
 from archive import extract
 
 from . import managers
+from .utils import add_cuts
 
 
 def get_layers(item, interval=None, user=None):
@@ -155,7 +156,7 @@ class MetaClip(object):
             if value:
                 data[key] = value
         data['duration'] = data['out'] - data['in']
-        data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
+        add_cuts(data, self.item, self.start, self.end)
         data['layers'] = self.get_layers(user)
         data['streams'] = [s.file.oshash for s in self.item.streams()]
         return data

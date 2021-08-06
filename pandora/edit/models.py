@@ -24,6 +24,7 @@ import clip.models
 from archive import extract
 from user.utils import update_groups
 from user.models import Group
+from clip.utils import add_cuts
 
 from . import managers
 
@@ -507,7 +508,7 @@ class Clip(models.Model):
             if value:
                 data[key] = value
         data['duration'] = data['out'] - data['in']
-        data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
+        add_cuts(data, self.item, self.start, self.end)
         data['layers'] = self.get_layers(user)
         data['streams'] = [s.file.oshash for s in self.item.streams()]
         return data
