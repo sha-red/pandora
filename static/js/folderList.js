@@ -478,7 +478,9 @@ pandora.ui.folderList = function(id, section) {
                 },
                 range: [0, 1]
             }, function(result) {
-                that.value(item, 'items', result.data.items[0].items);
+                if(result.data.items && result.data.items.length) {
+                    that.value(item, 'items', result.data.items[0].items);
+                }
                 callback();
             })
         })
