@@ -94,6 +94,8 @@ class Edit(models.Model):
         # dont add clip if in/out are invalid
         if not c.annotation:
             duration = c.item.sort.duration
+            if c.start is None or c.end is None:
+                return False
             if c.start > c.end \
                     or round(c.start, 3) >= round(duration, 3) \
                     or round(c.end, 3) > round(duration, 3):
