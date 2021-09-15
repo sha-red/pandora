@@ -429,7 +429,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
     function formatLink(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key
-                ? '<a href="/documents/' + key + '=' + value + '">' + value + '</a>'
+                ? '<a href="/documents/' + key + '=' + pandora.escapeQueryValue(value) + '">' + value + '</a>'
                 : value;
         }).join(', ');
     }

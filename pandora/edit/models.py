@@ -13,6 +13,7 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 
 from oxdjango.fields import JSONField
 
