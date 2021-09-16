@@ -1019,10 +1019,14 @@ class Item(models.Model):
                     set_value(s, name, value)
                 elif sort_type == 'person':
                     value = sortNames(self.get(source, []))
+                    if value is None:
+                        value = ''
                     value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'string':
                     value = self.get(source, '')
+                    if value is None:
+                        value = ''
                     if isinstance(value, list):
                         value = ','.join([str(v) for v in value])
                     value = utils.sort_string(value)[:955]
