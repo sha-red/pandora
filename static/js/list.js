@@ -181,6 +181,7 @@ pandora.ui.list = function() {
             id: 'list',
             item: function(data, sort, size) {
                 size = 128;
+                data.videoRatio = data.videoRatio || pandora.site.video.previewRatio;
                 var ratio = ui.icons == 'posters'
                         ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
                     url = pandora.getMediaURL('/' + data.id + '/' + (
