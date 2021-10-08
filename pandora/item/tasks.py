@@ -367,5 +367,5 @@ def bulk_edit(data, username):
         if item.editable(user):
             with transaction.atomic():
                 item.refresh_from_db()
-                response = edit_item(user, item, data)
+                response = edit_item(user, item, data, is_task=True)
     return {}

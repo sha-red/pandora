@@ -533,7 +533,7 @@ def get(request, data):
     return render_to_json_response(response)
 actions.register(get)
 
-def edit_item(user, item, data):
+def edit_item(user, item, data, is_task=False):
     data = data.copy()
     update_clips = False
     response = json_response(status=200, text='ok')
@@ -559,7 +559,7 @@ def edit_item(user, item, data):
             other_groups = list(groups - user_groups)
             data['groups'] = [g for g in data['groups'] if g in user_groups] + other_groups
     r = item.edit(data)
-    if r:
+    if r and not is_task:
         r.wait()
     if update_clips:
         tasks.update_clips.delay(item.public_id)
