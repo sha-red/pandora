@@ -240,7 +240,7 @@ class Item(models.Model):
             return True
         return False
 
-    def edit(self, data):
+    def edit(self, data, is_task=False):
         data = data.copy()
         # FIXME: how to map the keys to the right place to write them to?
         if 'id' in data:
@@ -296,7 +296,10 @@ class Item(models.Model):
                     self.data[key] = ox.escape_html(data[key])
         p = self.save()
         if not settings.USE_IMDB and list(filter(lambda k: k in self.poster_keys, data)):
-            p = tasks.update_poster.delay(self.public_id)
+            if is_task:
+                tasks.update_poster(self.public_id)
+            else:
+                p = tasks.update_poster.delay(self.public_id)
         return p
 
     def update_external(self):
