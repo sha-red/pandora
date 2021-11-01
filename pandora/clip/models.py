@@ -151,7 +151,7 @@ class MetaClip(object):
             data['annotation'] = qs[0].public_id
         data['parts'] = self.item.cache['parts']
         data['durations'] = self.item.cache['durations']
-        for key in ('title', 'director', 'year', 'videoRatio'):
+        for key in settings.CONFIG['itemTitleKeys'] + ['videoRatio']:
             value = self.item.cache.get(key)
             if value:
                 data[key] = value
