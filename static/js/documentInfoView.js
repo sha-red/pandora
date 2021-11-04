@@ -34,7 +34,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
             'extension', 'dimensions', 'size', 'matches',
             'created', 'modified', 'accessed',
             'random', 'entity'
-        ],
+        ].concat(pandora.site.documentKeys.filter(key => { return key.fulltext }).map(key => key.id)),
         statisticsWidth = 128,
 
         $bar = Ox.Bar({size: 16})
