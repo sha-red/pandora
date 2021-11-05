@@ -558,7 +558,7 @@ def edit_item(user, item, data, is_task=False):
             user_groups = set([g.name for g in user.groups.all()])
             other_groups = list(groups - user_groups)
             data['groups'] = [g for g in data['groups'] if g in user_groups] + other_groups
-    r = item.edit(data, is_task=is_tras)
+    r = item.edit(data, is_task=is_task)
     if r:
         r.wait()
     if update_clips:
