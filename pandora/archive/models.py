@@ -181,6 +181,11 @@ class File(models.Model):
             for type in ox.movie.EXTENSIONS:
                 if data['extension'] in ox.movie.EXTENSIONS[type]:
                     data['type'] = type
+        if data['type'] == 'unknown':
+            if self.info.get('video'):
+                data['type'] = 'video'
+            elif self.info.get('audio'):
+                data['type'] = 'audio'
         if 'part' in data and isinstance(data['part'], int):
             data['part'] = str(data['part'])
         return data
