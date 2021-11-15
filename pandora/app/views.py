@@ -59,11 +59,11 @@ def redirect_url(request, url):
     if settings.CONFIG['site'].get('sendReferrer', False):
         return redirect(url)
     else:
-        return HttpResponse('<script>document.location.href=%s;</script>'%json.dumps(url))
+        return HttpResponse('<script>document.location.href=%s;</script>' % json.dumps(url))
 
 def opensearch_xml(request):
     osd = ET.Element('OpenSearchDescription')
-    osd.attrib['xmlns']="http://a9.com/-/spec/opensearch/1.1/"
+    osd.attrib['xmlns'] = "http://a9.com/-/spec/opensearch/1.1/"
     e = ET.SubElement(osd, 'ShortName')
     e.text = settings.SITENAME
     e = ET.SubElement(osd, 'Description')
