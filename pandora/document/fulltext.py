@@ -1,14 +1,31 @@
 import subprocess
+import tempfile
 
 from django.conf import settings
 
 
-def extract_text(pdf):
-    cmd = ['pdftotext', pdf, '-']
+def extract_text(pdf, page=None):
+    if page is not None:
+        page = str(page)
+        cmd = ['pdftotext', '-f', page, '-l', page, pdf, '-']
+    else:
+        cmd = ['pdftotext', pdf, '-']
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
-    stdout = stdout.decode()
-    return stdout.strip()
+    stdout = stdout.decode().strip()
+    if not stdout:
+        if page:
+            # split page from pdf and ocr
+            fd, page_pdf = tempfile.mkstemp('.pdf')
+            cmd = ['pdfseparate', '-f', page, '-l', page, pdf, page_pdf]
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = p.communicate()
+            text = ocr_image(page_pdf)
+            os.unlink(page_pdf)
+            return text
+        else:
+            return ocr_image(pdf)
+    return stdout
 
 def ocr_image(path):
     cmd = ['tesseract', path, '-', 'txt']
@@ -19,6 +36,7 @@ def ocr_image(path):
 
 class FulltextMixin:
     _ES_INDEX = "document-index"
+    _ES_DOC_TYPE = "document"
 
     @classmethod
     def elasticsearch(cls):
@@ -43,7 +61,7 @@ class FulltextMixin:
         if self.has_fulltext_key():
             from elasticsearch.exceptions import NotFoundError
             try:
-                res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type='document', id=self.id)
+                res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type=self._ES_DOC_TYPE, id=self.id)
             except NotFoundError:
                 pass
 
@@ -54,7 +72,7 @@ class FulltextMixin:
                 doc = {
                     'text': text.lower()
                 }
-                res = self.elasticsearch().index(index=self._ES_INDEX, doc_type='document', id=self.id, body=doc)
+                res = self.elasticsearch().index(index=self._ES_INDEX, doc_type=self._ES_DOC_TYPE, id=self.id, body=doc)
 
     @classmethod
     def find_fulltext(cls, query):
@@ -95,3 +113,19 @@ class FulltextMixin:
             ids += [int(r['_id']) for r in res['hits']['hits']]
             from_ += len(res['hits']['hits'])
         return ids
+
+
+class FulltextPageMixin(FulltextMixin):
+    _ES_INDEX = "document-page-index"
+    _DOC_TYPE = 'page'
+
+    def extract_fulltext(self):
+        if self.document.file:
+            if self.document.extension == 'pdf':
+                return extract_text(self.document.file.path, self.page)
+            elif self.extension in ('png', 'jpg'):
+                return ocr_image(self.document.file.path)
+        elif self.extension == 'html':
+            # FIXME: is there a nice way to split that into pages
+            return self.data.get('text', '')
+        return ''

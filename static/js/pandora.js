@@ -419,11 +419,13 @@ appPanel
                 ]
             },
             sortKeys: pandora.getSortKeys(),
-            documentSortKeys: pandora.getDocumentSortKeys(),
-            collectionViews: [
-                {id: 'list', title: Ox._('View as List')},
-                {id: 'grid', title: Ox._('View as Grid')}
-            ]
+            documentSortKeys: pandora.getDocumentSortKeys()
+        });
+        pandora.site.collectionViews = (pandora.site.collectionViews || [
+            {id: 'list', title: 'as List'},
+            {id: 'grid', title: 'as Grid'}
+        ]).map(view => {
+            return {id: view.id, title: Ox._('View {0}', [Ox._(view.title)])};
         });
         pandora.site.listSettings = {};
         Ox.forEach(pandora.site.user.ui, function(val, key) {

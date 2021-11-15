@@ -6,6 +6,9 @@ def extract_fulltext(id):
     from . import models
     d = models.Document.objects.get(id=id)
     d.update_fulltext()
+    d.create_pages()
+    for page in d.pages_set.all():
+        page.update_fulltext()
 
 
 @task(queue='default')

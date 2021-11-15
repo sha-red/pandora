@@ -24,6 +24,7 @@ from changelog.models import add_changelog
 
 from . import models
 from . import tasks
+from . import page_views
 
 def get_document_or_404_json(request, id):
     response = {'status': {'code': 404,

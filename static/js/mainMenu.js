@@ -995,7 +995,7 @@ pandora.ui.mainMenu = function() {
                 if (ui.document && i < 2) {
                     pandora.UI.set({documentView: ['info', 'view'][i]});
                 } else if (i < 2) {
-                    pandora.UI.set({collectionView: ['list', 'grid'][i]});
+                    pandora.UI.set({collectionView: ['list', 'grid', 'pages'][i]});
                 }
             }
         });
@@ -1498,7 +1498,7 @@ pandora.ui.mainMenu = function() {
             return [
                 { id: 'documents', title: Ox._('View Documents'), items: [
                     { group: 'collectionview', min: 1, max: 1, items: pandora.site.listViews.filter(function(view) {
-                        return Ox.contains(['list', 'grid'], view.id)
+                        return Ox.contains(['list', 'grid', 'pages'], view.id)
                     }).map(function(view) {
                         return Ox.extend({
                             checked: ui.collectionView == view.id

@@ -29,7 +29,7 @@ from user.utils import update_groups
 from . import managers
 from . import utils
 from . import tasks
-from .fulltext import FulltextMixin
+from .fulltext import FulltextMixin, FulltextPageMixin
 
 User = get_user_model()
 
@@ -586,6 +586,11 @@ class Document(models.Model, FulltextMixin):
         image = os.path.join(os.path.dirname(pdf), '1024p%d.jpg' % page)
         utils.extract_pdfpage(pdf, image, page)
 
+    def create_pages(self):
+        for page in range(self.pages):
+            page += 1
+            p, c = Page.objects.get_or_create(document=self, page=page)
+
     def get_info(self):
         if self.extension == 'pdf':
             self.thumbnail(1024)
@@ -701,6 +706,41 @@ class ItemProperties(models.Model):
 
         super(ItemProperties, self).save(*args, **kwargs)
 
+
+class Page(models.Model, FulltextPageMixin):
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    document = models.ForeignKey(Document, related_name='pages_set', on_delete=models.CASCADE)
+    page = models.IntegerField(default=1)
+    data = JSONField(default=dict, editable=False)
+
+    objects = managers.PageManager()
+
+    def __str__(self):
+        return u"%s:%s" % (self.document, self.page)
+
+    def json(self, keys=None, user=None):
+        data = {}
+        data['document'] = ox.toAZ(self.document.id)
+        data['page'] = self.page
+        data['id'] = '{document}/{page}'.format(**data)
+        document_keys = []
+        if keys:
+            for key in list(data):
+                if key not in keys:
+                    del data[key]
+            for key in keys:
+                if 'fulltext' in key:
+                    data['fulltext'] = self.extract_fulltext()
+                elif key in ('document', 'page', 'id'):
+                    pass
+                else:
+                    document_keys.append(key)
+        if document_keys:
+            data.update(self.document.json(document_keys, user))
+        return data
 
 class Access(models.Model):
     class Meta:

@@ -124,6 +124,67 @@ pandora.ui.collection = function() {
             unique: 'id'
         })
         .addClass('OxMedia');
+    } else if (view == 'pages') {
+        that = Ox.InfoList({
+            borderRadius: 0,
+            defaultRatio: 640/1024,
+            draggable: true,
+            id: 'list',
+            item: function(data, sort, size) {
+                size = 128;
+                var sortKey = sort[0].key,
+                    infoKey = sortKey == 'title' ? 'extension' : sortKey,
+                    key = Ox.getObjectById(pandora.site.documentKeys, infoKey),
+                    info = pandora.formatDocumentKey(key, data, size);
+                return {
+                    icon: {
+                        height: Math.round(data.ratio > 1 ? size / data.ratio : size),
+                        id: data.id,
+                        info: info,
+                        title: data.title,
+                        url: pandora.getMediaURL('/documents/' + data.id + '/256p.jpg?' + data.modified),
+                        width: Math.round(data.ratio >= 1 ? size : size * data.ratio)
+                    },
+                    info: {
+                        css: {marginTop: '2px'},
+                        element: pandora.ui.documentPages,
+                        id: data.id,
+                        options: {
+                            id: data.id,
+                            pages: data.pages,
+                            query: ui.findDocuments,
+                            ratio: data.ratio
+                        }
+                    }
+                };
+            },
+            items: function(data, callback) {
+                pandora.api.findDocuments(Ox.extend(data, {
+                    query: ui.findDocuments
+                }), callback);
+                return Ox.clone(data, true);
+            },
+            keys: ['id', 'pages', 'title', 'ratio', 'modified'],
+            selected: ui.listSelection,
+            size: 192,
+            sort: ui.collectionSort.concat([
+                {key: 'extension', operator: '+'},
+                {key: 'title', operator: '+'}
+            ]),
+            unique: 'id',
+            width: window.innerWidth
+                - ui.showSidebar * ui.sidebarSize - 1
+                - Ox.UI.SCROLLBAR_SIZE
+        })
+        .addClass('OxMedia')
+        .bindEvent({
+            key_left: function() {
+                // ...
+            },
+            key_right: function() {
+                // ...
+            }
+        });
     }
 
     if (['list', 'grid'].indexOf(view) > -1) {
@@ -138,7 +199,7 @@ pandora.ui.collection = function() {
         });
     }
 
-    if (['list', 'grid'].indexOf(view) > -1) {
+    if (['list', 'grid', 'pages'].indexOf(view) > -1) {
 
         //fixme
 

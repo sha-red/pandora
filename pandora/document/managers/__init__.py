@@ -14,6 +14,7 @@ from documentcollection.models import Collection
 from item import utils
 from user.models import Group
 
+from .pages import PageManager
 
 keymap = {
     'item': 'items__public_id',
@@ -61,7 +62,7 @@ def parseCondition(condition, user, item=None, owner=None):
 
 def buildCondition(k, op, v, user, exclude=False, owner=None):
     import entity.models
-    from . import models
+    from .. import models
 
     # fixme: frontend should never call with list
     if k == 'list':
@@ -299,3 +300,4 @@ class DocumentManager(Manager):
             qs = qs.filter(q)
 
         return qs
+
