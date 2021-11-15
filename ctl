@@ -79,6 +79,7 @@ if [ "$action" = "install" ]; then
     BASE=`pwd`
     if [ -x /bin/systemctl ]; then
         if [ -d /etc/systemd/system/ ]; then
+            cd ${BASE}
             for template in gunicorn_config.py encoding.conf tasks.conf; do
                 if [ ! -e pandora/$template ]; then
                     $SUDO cp pandora/${template}.in pandora/$template
