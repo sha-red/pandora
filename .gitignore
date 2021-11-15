@@ -36,3 +36,5 @@ pandora/gunicorn_config.py
 .DS_Store
 .env
 overlay/
+pandora/encoding.conf
+pandora/tasks.conf

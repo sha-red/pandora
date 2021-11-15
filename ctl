@@ -43,9 +43,11 @@ if [ "$action" = "init" ]; then
     done
     cd ${BASE}
     $SUDO ./bin/pip install -r requirements.txt
-    if [ ! -e pandora/gunicorn_config.py ]; then
-        $SUDO cp pandora/gunicorn_config.py.in pandora/gunicorn_config.py
-    fi
+    for template in gunicorn_config.py encoding.conf tasks.conf; do
+        if [ ! -e pandora/$template ]; then
+            $SUDO cp pandora/${template}.in pandora/$template
+        fi
+    done
     exit 0
 fi
 
@@ -77,6 +79,11 @@ if [ "$action" = "install" ]; then
     BASE=`pwd`
     if [ -x /bin/systemctl ]; then
         if [ -d /etc/systemd/system/ ]; then
+            for template in gunicorn_config.py encoding.conf tasks.conf; do
+                if [ ! -e pandora/$template ]; then
+                    $SUDO cp pandora/${template}.in pandora/$template
+                fi
+            done
             for service in $SERVICES; do
                 if [ -e /lib/systemd/system/${service}.service ]; then
                     rm -f /lib/systemd/system/${service}.service \
