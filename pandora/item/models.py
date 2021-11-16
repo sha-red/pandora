@@ -43,7 +43,7 @@ from user.utils import update_groups
 from user.models import Group
 import archive.models
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('pandora.' + __name__)
 User = get_user_model()
 
 

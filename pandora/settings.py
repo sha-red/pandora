@@ -161,13 +161,18 @@ LOGGING = {
         'errors': {
             'level': 'ERROR',
             'class': 'log.utils.ErrorHandler'
-        }
+        },
     },
     'loggers': {
-        'django.request': {
+        'django': {
             'handlers': ['errors'],
             'level': 'ERROR',
-            'propagate': True,
+            'propagate': False,
+        },
+        'pandora': {
+            'handlers': ['errors'],
+            'level': 'ERROR',
+            'propagate': False,
         },
     }
 }

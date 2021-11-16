@@ -17,7 +17,7 @@ from app.utils import limit_rate
 from taskqueue.models import Task
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('pandora.' + __name__)
 
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')
