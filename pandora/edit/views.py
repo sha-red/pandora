@@ -190,7 +190,7 @@ def _order_clips(edit, sort):
             'in': 'start',
             'out': 'end',
             'text': 'sortvalue',
-            'volume': 'sortvolume',
+            'volume': 'volume' if edit.type == 'smart' else 'sortvolume',
             'item__sort__item': 'item__sort__public_id',
         }.get(key, key)
         order = '%s%s' % (operator, key)
