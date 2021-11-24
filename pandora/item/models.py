@@ -294,7 +294,6 @@ class Item(models.Model):
                     self.data[key] = data[key]
                 else:
                     self.data[key] = ox.escape_html(data[key])
-        self.cache = self.json()
         p = self.save()
         if not settings.USE_IMDB and list(filter(lambda k: k in self.poster_keys, data)):
             if is_task:
