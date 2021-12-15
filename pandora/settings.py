@@ -123,6 +123,7 @@ INSTALLED_APPS = (
 
     'django_extensions',
     'django_celery_results',
+    'django_celery_beat',
     'app',
     'log',
     'annotation',
@@ -184,6 +185,9 @@ CACHES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 AUTH_CHECK_USERNAME = True
 FFMPEG = 'ffmpeg'
@@ -209,6 +213,8 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TIMEZONE = 'UTC'
+CELERY_ENABLE_UTC = True
 
 CELERY_BROKER_URL = 'amqp://pandora:box@localhost:5672//pandora'
 

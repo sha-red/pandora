@@ -11,7 +11,7 @@ PIDFile=/run/pandora/cron.pid
 WorkingDirectory=/srv/pandora/pandora
 ExecStart=/srv/pandora/bin/celery \
     -A app beat \
-    -s /run/pandora/celerybeat-schedule \
+    --scheduler django_celery_beat.schedulers:DatabaseScheduler \
     --pidfile /run/pandora/cron.pid \
     -l INFO
 ExecReload=/bin/kill -HUP $MAINPID

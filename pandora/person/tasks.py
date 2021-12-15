@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from celery.task import task
 
 from . import models
+from app.celery import app
 
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_itemsort(id):
     try:
         p = models.Person.objects.get(pk=id)
@@ -13,7 +13,7 @@ def update_itemsort(id):
     except models.Person.DoesNotExist:
         pass
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_file_paths(id):
     from item.models import Item, ItemFind
     p = models.Person.objects.get(pk=id)
