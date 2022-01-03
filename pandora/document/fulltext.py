@@ -19,10 +19,11 @@ def extract_text(pdf, page=None):
             # split page from pdf and ocr
             fd, page_pdf = tempfile.mkstemp('.pdf')
             cmd = ['pdfseparate', '-f', page, '-l', page, pdf, page_pdf]
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
             stdout, stderr = p.communicate()
             text = ocr_image(page_pdf)
             os.unlink(page_pdf)
+            os.close(fd)
             return text
         else:
             return ocr_image(pdf)
