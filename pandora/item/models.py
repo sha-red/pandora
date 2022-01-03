@@ -522,6 +522,7 @@ class Item(models.Model):
                     cmd, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'), close_fds=True)
                 p.wait()
                 os.unlink(tmp_output_txt)
+                os.close(fd)
                 return True
             else:
                 return None
