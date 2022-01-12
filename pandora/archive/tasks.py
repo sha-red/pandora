@@ -4,6 +4,7 @@ from glob import glob
 
 from celery.task import task
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Q
 
 from item.models import Item
@@ -248,7 +249,8 @@ def move_media(data, user):
     if old_item and old_item.files.count() == 0 and i.files.count() == len(data['ids']):
         for a in old_item.annotations.all().order_by('id'):
             a.item = i
-            a.set_public_id()
+            with transaction.atomic():
+                a.set_public_id()
             Annotation.objects.filter(id=a.id).update(item=i, public_id=a.public_id)
         old_item.clips.all().update(item=i, sort=i.sort)
 

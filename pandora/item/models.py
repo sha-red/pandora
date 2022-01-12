@@ -478,7 +478,8 @@ class Item(models.Model):
 
         for a in self.annotations.all().order_by('id'):
             a.item = other
-            a.set_public_id()
+            with transaction.atomic():
+                a.set_public_id()
             Annotation.objects.filter(id=a.id).update(item=other, public_id=a.public_id)
         try:
             other_sort = other.sort
@@ -1910,13 +1911,12 @@ class AnnotationSequence(models.Model):
 
     @classmethod
     def nextid(cls, item):
-        with transaction.atomic():
-            s, created = cls.objects.get_or_create(item=item)
-            if created:
-                nextid = s.value
-            else:
-                cursor = connection.cursor()
-                sql = "UPDATE %s SET value = value + 1 WHERE item_id = %s RETURNING value" % (cls._meta.db_table, item.id)
-                cursor.execute(sql)
-                nextid = cursor.fetchone()[0]
+        s, created = cls.objects.get_or_create(item=item)
+        if created:
+            nextid = s.value
+        else:
+            cursor = connection.cursor()
+            sql = "UPDATE %s SET value = value + 1 WHERE item_id = %s RETURNING value" % (cls._meta.db_table, item.id)
+            cursor.execute(sql)
+            nextid = cursor.fetchone()[0]
         return "%s/%s" % (item.public_id, ox.toAZ(nextid))
