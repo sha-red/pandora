@@ -42,7 +42,9 @@ pandora.ui.embedPlayer = function() {
             sizes = getSizes();
 
         options.height = sizes.videoHeight;
-        video.subtitles = pandora.getSubtitles(video);
+        if (!video.subtitles) {
+            video.subtitles = pandora.getSubtitles(video);
+        }
 
         if (options.title) {
             $title = Ox.Element()
@@ -107,7 +109,10 @@ pandora.ui.embedPlayer = function() {
                 scaleToFill: ui.videoScale == 'fill',
                 showIconOnLoad: true,
                 subtitles: video.subtitles,
+                subtitlesDefaultTrack: video.subtitlesDefaultTrack || Ox.getLanguageNameByCode(pandora.site.language),
+                subtitlesLayer: video.subtitlesLayer,
                 subtitlesOffset: ui.videoSubtitlesOffset,
+                subtitlesTrack: video.subtitlesTrack || Ox.getLanguageNameByCode(pandora.site.language),
                 timeline: options.playInToOut ? function(size, i) {
                     return pandora.getMediaURL('/' + options.item
                         + '/timelineantialias'
