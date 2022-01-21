@@ -495,6 +495,7 @@ appPanel
                             pandora.$ui.embedPanel.options(data);
                         }
                     });
+                    pandora.localInit && pandora.localInit();
                 } else if (isPrint) {
                     pandora.$ui.printView = pandora.ui.printView().display();
                 } else if (isHome) {
