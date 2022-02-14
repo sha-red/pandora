@@ -60,9 +60,7 @@ class MetaClip(object):
             self.hue = self.saturation = self.lightness = 0
             self.volume = 0
 
-    def save(self, *args, **kwargs):
-        if self.duration != self.end - self.start:
-            self.update_calculated_values()
+    def update_findvalue(self):
         if not self.aspect_ratio and self.item:
             streams = self.item.streams()
             if streams:
@@ -90,6 +88,11 @@ class MetaClip(object):
             self.findvalue = '\n'.join(list(filter(None, [a.findvalue for a in anns])))
             for l in [k['id'] for k in settings.CONFIG['layers']]:
                 setattr(self, l, l in anns_by_layer and bool(len(anns_by_layer[l])))
+
+    def save(self, *args, **kwargs):
+        if self.duration != self.end - self.start:
+            self.update_calculated_values()
+        self.update_findvalue()
         models.Model.save(self, *args, **kwargs)
 
     clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',

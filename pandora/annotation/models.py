@@ -163,28 +163,25 @@ class Annotation(models.Model):
             self.sortvalue = None
             self.languages = None
 
-        with transaction.atomic():
-            if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
-                self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
+        if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
+            self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
 
+        with transaction.atomic():
             if set_public_id:
                 self.set_public_id()
 
             super(Annotation, self).save(*args, **kwargs)
 
-            if self.clip:
-                Clip.objects.filter(**{
-                    'id': self.clip.id,
-                    self.layer: False
-                }).update(**{self.layer: True})
-                # update clip.findvalue
-                self.clip.save()
+        if self.clip:
+            self.clip.update_findvalue()
+            setattr(self.clip, self.layer, True)
+            self.clip.save(update_fields=[self.layer, 'sortvalue', 'findvalue'])
 
-            # update matches in bulk if called from load_subtitles
-            if not delay_matches:
-                self.update_matches()
-            self.update_documents()
-            self.update_translations()
+        # update matches in bulk if called from load_subtitles
+        if not delay_matches:
+            self.update_matches()
+        self.update_documents()
+        self.update_translations()
 
     def update_matches(self):
         from place.models import Place
