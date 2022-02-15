@@ -559,7 +559,7 @@ pandora.uploadDroppedFiles = function(files) {
         var clips, type = getType(items);
         if (Ox.isUndefined(callback)) {
             callback = index;
-            index = pandora.$ui.editPanel
+            index = pandora.$ui.editPanel && pandora.$ui.editPanel.getPasteIndex
                     ? pandora.$ui.editPanel.getPasteIndex()
                     : void 0;
         }
