@@ -1,8 +1,12 @@
+import logging
 import os
 import subprocess
 import tempfile
 
 from django.conf import settings
+
+
+logger = logging.getLogger('pandora.' + __name__)
 
 
 def extract_text(pdf, page=None):
@@ -66,6 +70,8 @@ class FulltextMixin:
                 res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type=self._ES_DOC_TYPE, id=self.id)
             except NotFoundError:
                 pass
+            except:
+                logger.error('failed to delete fulltext document', exc_info=True)
 
     def update_fulltext(self):
         if self.has_fulltext_key():
