@@ -181,6 +181,8 @@ class File(models.Model):
             for type in ox.movie.EXTENSIONS:
                 if data['extension'] in ox.movie.EXTENSIONS[type]:
                     data['type'] = type
+            if data['extension'] == 'ogg' and self.info.get('video'):
+                data['type'] = 'video'
         if data['type'] == 'unknown':
             if self.info.get('video'):
                 data['type'] = 'video'
