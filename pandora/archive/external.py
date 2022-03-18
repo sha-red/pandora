@@ -37,7 +37,7 @@ info_key_map = {
 }
 
 def get_info(url, referer=None):
-    cmd = ['youtube-dl', '-j', '--all-subs', url]
+    cmd = ['yt-dlp', '-j', '--all-subs', url]
     if referer:
         cmd += ['--referer', referer]
     p = subprocess.Popen(cmd,
@@ -99,7 +99,7 @@ def download(item_id, url, referer=None):
     if isinstance(tmp, bytes):
         tmp = tmp.decode('utf-8')
     os.chdir(tmp)
-    cmd = ['youtube-dl', '-q', media['url']]
+    cmd = ['yt-dlp', '-q', media['url']]
     if referer:
         cmd += ['--referer', referer]
     elif 'referer' in media:
