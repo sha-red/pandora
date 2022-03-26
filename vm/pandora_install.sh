@@ -33,6 +33,23 @@ echo "deb http://ppa.launchpad.net/j/pandora/ubuntu ${UBUNTU_CODENAME} main" > /
 
 apt-get install -y gnupg
 
+if [ -e /etc/apt/trusted.gpg.d ]; then
+gpg --dearmor > /etc/apt/trusted.gpg.d/j-pandora.gpg <<EOF
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1
+
+mI0ESXYhEgEEALl9jDTdmgpApPbjN+7b85dC92HisPUp56ifEkKJOBj0X5HhRqxs
+Wjx/zlP4/XJGrHnxJyrdPxjSwAXz7bNdeggkN4JWdusTkr5GOXvggQnng0X7f/rX
+oJwoEGtYOCODLPs6PC0qjh5yPzJVeiRsKUOZ7YVNnwNwdfS4D8RZvtCrABEBAAG0
+FExhdW5jaHBhZCBQUEEgZm9yIGpeiLYEEwECACAFAkl2IRICGwMGCwkIBwMCBBUC
+CAMEFgIDAQIeAQIXgAAKCRAohRM8AZde82FfA/9OB/64/YLaCpizHZ8f6DK3rGgF
+e6mX3rFK8yOKGGL06316VhDzfzMiZSauUZ0t+lKHR/KZYeSaFwEoUoblTG/s4IIo
+9aBMHWhVXJW6eifKUmTGqEn2/0UxoWQq2C3F6njMkCaP+ALOD5uzaSYGdjqAUAwS
+pAAGSEQ4uz6bYSeM4Q==
+=SM2a
+-----END PGP PUBLIC KEY BLOCK-----
+EOF
+else
 apt-key add - <<EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1
@@ -48,6 +65,7 @@ pAAGSEQ4uz6bYSeM4Q==
 =SM2a
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
+fi
 echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99languages
 
 apt-get update -qq
