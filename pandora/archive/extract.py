@@ -57,14 +57,15 @@ def supported_formats():
     stdout = stdout.decode('utf-8')
     stderr = stderr.decode('utf-8')
     version = stderr.split('\n')[0].split(' ')[2]
+    mp4 = 'libx264' in stdout and bool(re.compile('DEA.L. aac').findall(stdout))
     return {
         'version': version.split('.'),
         'ogg': 'libtheora' in stdout and 'libvorbis' in stdout,
         'webm': 'libvpx' in stdout and 'libvorbis' in stdout,
         'vp8': 'libvpx' in stdout and 'libvorbis' in stdout,
         'vp9': 'libvpx-vp9' in stdout and 'libopus' in stdout,
-        'mp4': 'libx264' in stdout and bool(re.compile('DEA.L. aac').findall(stdout)),
-        'h264': 'libx264' in stdout and bool(re.compile('DEA.L. aac').findall(stdout)),
+        'mp4': mp4,
+        'h264': mp4,
     }
 
 def stream(video, target, profile, info, audio_track=0, flags={}):
