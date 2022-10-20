@@ -794,12 +794,14 @@
             "id": "user",
             "title": "User",
             "type": "string",
+            "columnWidth": 30,
             "capability": "canSeeMedia",
             "find": true
         },
         {
             "id": "groups",
             "title": "Group",
+            "columnWidth": 30,
             "type": ["string"]
         },
         {
