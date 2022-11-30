@@ -84,7 +84,13 @@ pandora.ui.player = function(data) {
                 }), 'clip');
             },
             downloadvideo: function() {
-                document.location.href = pandora.getDownloadLink(ui.item, data.rightslevel);
+                pandora.ui.downloadVideoDialog({
+                    item: ui.item,
+                    rightsLevel: data.rightsLevel,
+                    source: data.source && pandora.hasCapability('canDownloadSource'),
+                    title: data.title,
+                    video: data.video
+                }).open();
             },
             find: function(data) {
                 pandora.UI.set({itemFind: data.find});
