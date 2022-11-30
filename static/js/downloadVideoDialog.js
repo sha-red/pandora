@@ -128,7 +128,7 @@ pandora.ui.downloadVideoDialog = function(options) {
                             }, function(result) {
                                 if (result.data.taskId) {
                                     pandora.wait(result.data.taskId, function(result) {
-                                        console.log('wait -> ', result)
+                                        //console.log('wait -> ', result)
                                         if (result.data.result) {
                                             url = '/' + options.item
                                                 + '/' + values.resolution
@@ -163,7 +163,7 @@ pandora.ui.downloadVideoDialog = function(options) {
                         }
                         if (url) {
                             that.close();
-                            document.location.href = url
+                            document.location.href = pandora.getMediaURL(url)
                         }
                     }
                 })
