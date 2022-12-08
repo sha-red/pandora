@@ -233,6 +233,10 @@ class Item(models.Model):
     def editable(self, user):
         if user.is_anonymous:
             return False
+        level = user.profile.get_level()
+        allowed_level = settings.CONFIG['capabilities']['canSeeItem'][level]
+        if self.level > allowed_level:
+            return False
         if user.profile.capability('canEditMetadata') or \
            user.is_staff or \
            self.user == user or \
