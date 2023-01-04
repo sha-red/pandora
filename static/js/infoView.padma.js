@@ -312,7 +312,7 @@ pandora.ui.infoView = function(data, isMixed) {
                     editable: canEdit,
                     placeholder: formatLight(Ox._('No Title')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
-                    value: data.title
+                    value: data.title || ""
                 })
                 .css({
                     fontWeight: 'bold',
