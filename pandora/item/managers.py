@@ -318,6 +318,8 @@ class ItemManager(Manager):
                 q |= Q(groups__in=user.groups.all())
                 rendered_q |= Q(groups__in=user.groups.all())
             qs = qs.filter(q)
+            max_level = len(settings.CONFIG['rightsLevels'])
+            qs = qs.filter(level__lte=max_level)
         if settings.CONFIG.get('itemRequiresVideo') and level != 'admin':
             qs = qs.filter(rendered_q)
         return qs

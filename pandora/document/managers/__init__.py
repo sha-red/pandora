@@ -298,6 +298,8 @@ class DocumentManager(Manager):
                 q |= Q(groups__in=user.groups.all())
                 rendered_q |= Q(groups__in=user.groups.all())
             qs = qs.filter(q)
+            max_level = len(settings.CONFIG['documentRightsLevels'])
+            qs = qs.filter(rightslevel__lte=max_level)
 
         return qs
 

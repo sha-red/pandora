@@ -327,6 +327,9 @@ class Document(models.Model, FulltextMixin):
     def editable(self, user, item=None):
         if not user or user.is_anonymous:
             return False
+        max_level = len(settings.CONFIG['rightsLevels'])
+        if self.level > max_level:
+            return False
         if self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0 or \
            user.is_staff or \
