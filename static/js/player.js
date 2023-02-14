@@ -1,6 +1,10 @@
 'use strict';
 
 pandora.ui.player = function(data) {
+    // FIXME: is this the right location to load subtitles?
+    if (!data.subtitles) {
+        data.subtitles = pandora.getSubtitles(data);
+    }
 
     var ui = pandora.user.ui,
 
