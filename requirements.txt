@@ -2,7 +2,7 @@ Django==3.0.10
 simplejson
 chardet
 celery<5.0,>4.3
-django-celery-results
+django-celery-results<2
 django-extensions==2.2.9
 gunicorn==20.0.4
 html5lib
@@ -12,5 +12,5 @@ tornado<5
 geoip2==4.1.0
 yt-dlp>=2022.3.8.2
 python-memcached
-elasticsearch
+elasticsearch<8
 future
