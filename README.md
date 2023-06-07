@@ -7,7 +7,7 @@
   We recommend to run pan.do/ra inside of LXD or LXC or dedicated VM or server.
   You will need at least 2GB of free disk space
 
-  pan.do/ra is known to work with Ubuntu 18.04, 20.04 and Debian/10 (buster),
+  pan.do/ra is known to work with Debian/11 (bullseye) and Ubuntu 20.04,
   other distributions might also work, let us know if it works for you.
 
   Use the following commands as root to install pan.do/ra and all dependencies:
