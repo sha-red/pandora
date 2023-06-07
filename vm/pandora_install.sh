@@ -28,6 +28,9 @@ fi
 if [ -z "$UBUNTU_CODENAME" ]; then
     UBUNTU_CODENAME=bionic
 fi
+if [ "$VERSION_CODENAME" = "bullseye" ]; then
+    UBUNTU_CODENAME=focal
+fi
 export DEBIAN_FRONTEND=noninteractive
 echo "deb http://ppa.launchpad.net/j/pandora/ubuntu ${UBUNTU_CODENAME} main" > /etc/apt/sources.list.d/j-pandora.list
 
@@ -106,12 +109,13 @@ apt-get install -y \
     python3-psycopg2 \
     python3-pyinotify \
     python3-simplejson \
+    python3-maxminddb \
+    libmaxminddb-dev \
     python3-lxml \
     python3-cssselect \
     python3-html5lib \
     python3-ox \
     python3-elasticsearch \
-    oxframe \
     ffmpeg \
     mkvtoolnix \
     gpac \
@@ -123,7 +127,9 @@ apt-get install -y \
     postfix \
     postgresql-client $EXTRA
 
+apt-get install -y oxframe
 apt-get install -y --no-install-recommends youtube-dl rtmpdump
+
 
 # setup database
 

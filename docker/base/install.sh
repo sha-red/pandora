@@ -1,8 +1,13 @@
 #!/bin/bash
 
-UBUNTU_CODENAME=bionic
 if [ -e /etc/os-release ]; then
     . /etc/os-release
+fi
+if [ -z "$UBUNTU_CODENAME" ]; then
+    UBUNTU_CODENAME=bionic
+fi
+if [ "$VERSION_CODENAME" = "bullseye" ]; then
+    UBUNTU_CODENAME=focal
 fi
 
 export DEBIAN_FRONTEND=noninteractive
