@@ -9,6 +9,9 @@ fi
 if [ "$VERSION_CODENAME" = "bullseye" ]; then
     UBUNTU_CODENAME=focal
 fi
+if [ "$VERSION_CODENAME" = "bookworm" ]; then
+    UBUNTU_CODENAME=lunar
+fi
 
 export DEBIAN_FRONTEND=noninteractive
 echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99languages
