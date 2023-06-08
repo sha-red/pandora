@@ -2639,7 +2639,10 @@ pandora.openLink = function(url) {
     if (Ox.startsWith(url, 'mailto:')) {
         window.open(url);
     } else {
-        window.open('/url=' + encodeURIComponent(url), '_blank');
+        if (!pandora.site.site.sendReferrer) {
+            url = '/url=' + btoa(url);
+        }
+        window.open(url, '_blank');
     }
 };
 

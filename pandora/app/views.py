@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
-import copy
 from datetime import datetime
+import base64
+import copy
 
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -53,9 +53,7 @@ def embed(request, id):
     })
 
 def redirect_url(request, url):
-    if request.META['QUERY_STRING']:
-        url += "?" + request.META['QUERY_STRING']
-
+    url = base64.decodebytes(url.encode()).decode()
     if settings.CONFIG['site'].get('sendReferrer', False):
         return redirect(url)
     else:
