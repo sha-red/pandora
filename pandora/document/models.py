@@ -349,6 +349,8 @@ class Document(models.Model, FulltextMixin):
                 groups = data.pop('groups')
                 update_groups(self, groups)
             for key in data:
+                if key == "id":
+                    continue
                 k = list(filter(lambda i: i['id'] == key, settings.CONFIG['documentKeys']))
                 ktype = k and k[0].get('type') or ''
                 if key == 'text' and self.extension == 'html':
