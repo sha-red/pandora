@@ -1165,7 +1165,7 @@ pandora.formatDocumentKey = function(key, data, size) {
             value.css({width: size * 0.75 + 'px'});
         }
     } else {
-        value = data[key.id];
+        value = data[key.id] || '';
         if (key.id == 'extension') {
             value = value.toUpperCase();
         } else if (key.id == 'dimensions') {
