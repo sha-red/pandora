@@ -25,8 +25,12 @@ pandora.ui.documentPages = function(options) {
     self.width = self.options.ratio > 1 ? self.size : Math.round(self.size * self.options.ratio);
     self.height = self.options.ratio > 1 ? Math.round(self.size / self.options.ratio) : self.size;
 
-    function renderPage(page) {
+    function renderPage(page, query) {
+        self.pages.push(page)
         var url = `/documents/${self.options.id}/${self.size}p${page}.jpg`
+        if (query) {
+            url += '?q=' + encodeURIComponent(query)
+        }
         var $item = Ox.IconItem({
                 imageHeight: self.height,
                 imageWidth: self.width,
@@ -45,12 +49,11 @@ pandora.ui.documentPages = function(options) {
         that.append($item);
     }
 
-    function renderPages(pages) {
-        console.log('renderPages', pages, self.options.pages)
+    function renderPages(pages, query) {
+        self.pages = []
         if (pages) {
-            console.log('renderPages', pages)
             pages.forEach(page => {
-                renderPage(page.page)
+                renderPage(page.page, query)
             })
         } else {
             if (self.options.pages > 1) {
@@ -78,7 +81,7 @@ pandora.ui.documentPages = function(options) {
             range: [0, 100],
             keys: ['page']
         }, function(result) {
-            renderPages(result.data.items)
+            renderPages(result.data.items, pandora.getFulltextQuery())
         })
     } else {
         renderPages()
@@ -97,7 +100,31 @@ pandora.ui.documentPages = function(options) {
     }
 
     function singleclick(data) {
-        // ..
+        var $item, $target = $(data.target), annotation, item, points, set;
+        if ($target.parent().parent().is('.OxSpecialTarget')) {
+            $target = $target.parent().parent();
+        }
+        if ($target.is('.OxSpecialTarget')) {
+            $item = $target.parent().parent();
+            var page = $item.data('page')
+            if (!pandora.$ui.pageDialog) {
+                pandora.$ui.pageDialog = pandora.ui.pageDialog({
+                    document: self.options.id,
+                    page: page,
+                    pages: self.pages,
+                    query: pandora.getFulltextQuery(),
+                    dimensions: [self.width, self.height],
+                    title: self.options.title,
+                    size: self.size
+                });
+                pandora.$ui.pageDialog.open()
+            } else {
+                pandora.$ui.pageDialog.update({
+                    page: page,
+                    pages: self.pages,
+                });
+            }
+        }
     }
 
     return that;

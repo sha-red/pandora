@@ -122,6 +122,57 @@ class FulltextMixin:
             from_ += len(res['hits']['hits'])
         return ids
 
+    def highlight_page(self, page, query, size):
+        import pypdfium2 as pdfium
+        from PIL import Image
+        from PIL import ImageDraw
+
+        pdfpath = self.file.path
+        pagenumber = int(page) - 1
+        jpg = tempfile.NamedTemporaryFile(suffix='.jpg')
+        output = jpg.name
+        TINT_COLOR = (255, 255, 0)
+        TRANSPARENCY = .45
+        OPACITY = int(255 * TRANSPARENCY)
+        scale = 150/72
+
+        pdf = pdfium.PdfDocument(pdfpath)
+        page = pdf[pagenumber]
+
+        bitmap = page.render(scale=scale, rotation=0)
+        img = bitmap.to_pil().convert('RGBA')
+        overlay = Image.new('RGBA', img.size, TINT_COLOR+(0,))
+        draw = ImageDraw.Draw(overlay)
+
+        textpage = page.get_textpage()
+        search = textpage.search(query)
+        result = search.get_next()
+        while result:
+            pos, steps = result
+            steps += 1
+            while steps:
+                box = textpage.get_charbox(pos)
+                box = [b*scale for b in box]
+                tl = (box[0], img.size[1] - box[3])
+                br = (box[2], img.size[1] - box[1])
+                draw.rectangle((tl, br), fill=TINT_COLOR+(OPACITY,))
+                pos += 1
+                steps -= 1
+            result = search.get_next()
+        img = Image.alpha_composite(img, overlay)
+        img = img.convert("RGB")
+        aspect = img.size[0] / img.size[1]
+        resize_method = Image.ANTIALIAS
+        if img.size[0] >= img.size[1]:
+            width = size
+            height = int(size / aspect)
+        else:
+            width = int(size / aspect)
+            height = size
+        img = img.resize((width, height), resize_method)
+        img.save(output, quality=72)
+        return jpg
+
 
 class FulltextPageMixin(FulltextMixin):
     _ES_INDEX = "document-page-index"

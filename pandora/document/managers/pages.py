@@ -54,8 +54,6 @@ def parseCondition(condition, user, item=None, owner=None):
     if not op:
         op = '='
 
-    print(k, op, v)
-
     if op.startswith('!'):
         return buildCondition(k, op[1:], v, user, True, owner=owner)
     else:
@@ -136,7 +134,6 @@ def buildCondition(k, op, v, user, exclude=False, owner=None):
                 q = Q(id=0)
         return q
     elif key_config.get('fulltext'):
-        print('fulltext?')
         qs = models.Page.find_fulltext_ids(v)
         q = Q(id__in=qs)
         if exclude:

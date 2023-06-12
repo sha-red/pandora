@@ -153,7 +153,8 @@ pandora.ui.collection = function() {
                             id: data.id,
                             pages: data.pages,
                             query: ui.findDocuments,
-                            ratio: data.ratio
+                            ratio: data.ratio,
+                            title: data.title
                         }
                     }
                 };
@@ -164,7 +165,7 @@ pandora.ui.collection = function() {
                 }), callback);
                 return Ox.clone(data, true);
             },
-            keys: ['id', 'pages', 'title', 'ratio', 'modified'],
+            keys: ['pages'].concat(keys),
             selected: ui.listSelection,
             size: 192,
             sort: ui.collectionSort.concat([

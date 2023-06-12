@@ -14,6 +14,7 @@ from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, 
 from django import forms
 from django.db.models import Count, Sum
 from django.conf import settings
+from django.http import HttpResponse
 
 from item import utils
 from item.models import Item
@@ -381,7 +382,11 @@ def file(request, id, name=None):
 def thumbnail(request, id, size=256, page=None):
     size = int(size)
     document = get_document_or_404_json(request, id)
+    if "q" in request.GET and page:
+        img = document.highlight_page(page, request.GET["q"], size)
+        return HttpResponse(img, content_type="image/jpeg")
     return HttpFileResponse(document.thumbnail(size, page=page))
+
 
 @login_required_json
 def upload(request):

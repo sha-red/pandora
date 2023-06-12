@@ -1470,6 +1470,17 @@ pandora.getFindLayer = function() {
     return key
 };
 
+pandora.getFulltextQuery = function() {
+    if (pandora.user.ui.findDocuments) {
+        var conditions = pandora.user.ui.findDocuments.conditions.filter(condition => {
+            return condition.key == 'fulltext'
+        })
+        if (conditions.length) {
+            return conditions[0].value
+        }
+    }
+};
+
 pandora.getHash = function(state, callback) {
     // FIXME: remove this
     var embedKeys = [
