@@ -103,7 +103,7 @@ def update(request, data):
                                                                          file__available=False,
                                                                          file__wanted=True)]
 
-        if list(filter(lambda l: l['id'] == 'subtitles', settings.CONFIG['layers'])):
+        if utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True):
             qs = files.filter(
                 file__is_subtitle=True,
                 file__available=False
