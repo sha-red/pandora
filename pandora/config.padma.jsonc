@@ -545,7 +545,6 @@
             "title": "Director",
             "type": ["string"],
             "autocomplete": true,
-            "columnRequired": true,
             "columnWidth": 180,
             "sort": true,
             "sortType": "person"
@@ -564,7 +563,6 @@
             "title": "Featuring",
             "type": ["string"],
             "autocomplete": true,
-            "columnRequired": true,
             "columnWidth": 180,
             "filter": true,
             "sort": true,
