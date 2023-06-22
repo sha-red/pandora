@@ -31,9 +31,6 @@ pandora.ui.editDialog = function() {
                 })
                 .bindEvent({
                     click: function() {
-                        if (!ui.updateResults && hasChanged) {
-                            pandora.$ui.list.reloadList()
-                        }
                         that.close();
                     }
                 })
@@ -48,6 +45,12 @@ pandora.ui.editDialog = function() {
                 )
             ]),
             width: 768
+        }).bindEvent({
+            close: function() {
+                if (!ui.updateResults && hasChanged) {
+                    pandora.$ui.list.reloadList()
+                }
+            }
         }),
 
         $updateCheckbox = Ox.Checkbox({
