@@ -301,6 +301,8 @@ if __name__ == "__main__":
             run('./bin/pip', 'install', '-r', 'requirements.txt')
         if old < 6442:
             run('./bin/pip', 'install', 'yt-dlp>=2022.3.8.2')
+        if old < 6465:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
         if len(sys.argv) == 1:
             branch = get_branch()
