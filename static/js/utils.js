@@ -2961,7 +2961,7 @@ pandora.resizeFolders = function(section) {
         : section == 'edits' ? width - 16
         : width - 48
     ) - 8);
-    Ox.forEach(pandora.$ui.folderList, function($list, id) {
+    pandora.$ui.folderList && Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getIndexById(pandora.site.sectionFolders[section], id);
         pandora.$ui.folder[pos] && pandora.$ui.folder[pos].css({
             width: width + 'px'
