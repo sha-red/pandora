@@ -73,6 +73,7 @@ pandora.ui.editPanel = function(isEmbed) {
         if (ui.section != 'edits' || ui.edit != edit.id) {
             return;
         }
+        var editSettings = ui.edits[ui.edit] || pandora.site.editSettings
         that = pandora.$ui.editPanel = Ox.VideoEditPanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
             annotationsMapSize: ui.annotationsMapSize,
@@ -83,7 +84,7 @@ pandora.ui.editPanel = function(isEmbed) {
             clips: Ox.clone(edit.clips),
             clipSize: ui.clipSize + Ox.UI.SCROLLBAR_SIZE,
             clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.shift + 'C</span>',
-            clipView: ui.edits[ui.edit].view,
+            clipView: editSettings.view,
             controlsTooltips: {
                 open: Ox._('Open in {0} View', [Ox._(Ox.getObjectById(
                     pandora.site.itemViews, pandora.user.ui.videoView
@@ -104,15 +105,15 @@ pandora.ui.editPanel = function(isEmbed) {
                 pandora.getLargeEditTimelineURL(edit, type, i, callback);
             },
             height: pandora.$ui.appPanel.size(1),
-            'in': ui.edits[ui.edit]['in'],
+            'in': editSettings['in'],
             layers: getLayers(edit.clips),
             loop: ui.videoLoop,
             muted: ui.videoMuted,
-            out: ui.edits[ui.edit].out,
-            position: ui.edits[ui.edit].position,
+            out: editSettings.out,
+            position: editSettings.position,
             resolution: ui.videoResolution,
             scaleToFill: ui.videoScale == 'fill',
-            selected: ui.edits[ui.edit].selection,
+            selected: editSettings.selection,
             showAnnotationsCalendar: ui.showAnnotationsCalendar,
             showAnnotationsMap: ui.showAnnotationsMap,
             showClips: ui.showClips,
@@ -120,7 +121,7 @@ pandora.ui.editPanel = function(isEmbed) {
             showTimeline: ui.showTimeline,
             showUsers: pandora.site.annotations.showUsers,
             smallTimelineURL: getSmallTimelineURL(),
-            sort: ui.edits[ui.edit].sort,
+            sort: editSettings.sort,
             sortOptions: (
                     edit.type == 'static'
                     ? [{id: 'index', title: Ox._('Sort Manually'), operator: '+'}]
@@ -411,7 +412,7 @@ pandora.ui.editPanel = function(isEmbed) {
         that.css('right', right);
 
         updateSmallTimelineURL();
-        ui.edits[ui.edit].view == 'grid' && enableDragAndDrop();
+        editSettings.view == 'grid' && enableDragAndDrop();
         if (!Ox.Focus.focusedElementIsInput()) {
             that.gainFocus();
         }
@@ -464,12 +465,13 @@ pandora.ui.editPanel = function(isEmbed) {
     }
 
     function renderEmbedEdit() {
+        var editSettings = ui.edits[ui.edit] || pandora.site.editSettings
         that = Ox.VideoPlayer({
             clickLink: pandora.clickLink,
             clipRatio: pandora.site.video.previewRatio,
             clips: Ox.clone(edit.clips),
             clipTooltip: 'clips <span class="OxBright">' + Ox.SYMBOLS.shift + 'C</span>',
-            clipView: ui.edits[ui.edit].view,
+            clipView: editSettings.view,
             controlsBottom: [
                 'play', 'volume', 'scale', 'timeline', 'position', 'settings'
             ],
