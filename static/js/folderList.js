@@ -411,7 +411,7 @@ pandora.ui.folderList = function(id, section) {
             });
         },
         paste: function() {
-            pandora.$ui.list.triggerEvent('paste');
+            pandora.$ui.list && pandora.$ui.list.triggerEvent('paste');
         },
         select: function(data) {
             var list = data.ids.length ? data.ids[0] : '';
