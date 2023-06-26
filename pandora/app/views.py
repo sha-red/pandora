@@ -53,7 +53,10 @@ def embed(request, id):
     })
 
 def redirect_url(request, url):
-    url = base64.decodebytes(url.encode()).decode()
+    try:
+        url = base64.decodebytes(url.encode()).decode()
+    except:
+        pass
     if settings.CONFIG['site'].get('sendReferrer', False):
         return redirect(url)
     else:
