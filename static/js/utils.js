@@ -3002,7 +3002,7 @@ pandora.resizeWindow = function() {
     pandora.resizeFolders();
     if (pandora.user.ui.section == 'items') {
         if (!pandora.user.ui.item) {
-            pandora.resizeFilters(pandora.$ui.rightPanel.width());
+            pandora.$ui.rightPanel && pandora.resizeFilters(pandora.$ui.rightPanel.width());
             if (pandora.user.ui.listView == 'clips') {
                 var clipsItems = pandora.getClipsItems(),
                     previousClipsItems = pandora.getClipsItems(
@@ -3064,7 +3064,7 @@ pandora.resizeWindow = function() {
             }
         }
     } else if (pandora.user.ui.section == 'documents') {
-        pandora.resizeFilters(pandora.$ui.documentPanel.width());
+        pandora.$ui.documentPanel && pandora.resizeFilters(pandora.$ui.documentPanel.width());
         if (pandora.user.ui.document) {
             pandora.$ui.document && pandora.$ui.document.update();
         } else {
