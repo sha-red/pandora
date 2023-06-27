@@ -3234,11 +3234,11 @@ pandora.updateItemContext = function() {
                 pandora.$ui.contentPanel.replaceElement(
                     0, pandora.$ui.browser = pandora.ui.browser()
                 );
-            } else {
+            } else if (pandora.$ui.browser) {
                 pandora.$ui.browser.reloadList();
             }
         });
-    } else {
+    } else if (pandora.$ui.browser) {
         pandora.$ui.browser.reloadList();
     }
 };
