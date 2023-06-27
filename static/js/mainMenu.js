@@ -854,7 +854,7 @@ pandora.ui.mainMenu = function() {
             if (!pandora.hasDialogOrScreen()) {
                 if (ui._findState.key != 'advanced') {
                     setTimeout(function() {
-                        pandora.$ui.findInput.focusInput(true);
+                        pandora.$ui.findInput && pandora.$ui.findInput.focusInput(true);
                     }, 25);
                 } else {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
