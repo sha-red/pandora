@@ -151,8 +151,10 @@ class File(models.Model):
                 self.sampleate = 0
                 self.channels = 0
 
-            if self.framerate:
+            if self.framerate and self.duration > 0:
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
+            else:
+                self.pixels = 0
 
     def get_path_info(self):
         data = {}
