@@ -1494,6 +1494,7 @@
             "hasEvents": true,
             "hasPlaces": true,
             "item": "Keyword",
+            "autocomplete": true,
             "overlap": true,
             "type": "string"
         },
