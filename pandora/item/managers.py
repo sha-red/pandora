@@ -86,8 +86,11 @@ def parseCondition(condition, user, owner=None):
     elif k == 'rendered':
         return Q(rendered=v)
     elif k == 'resolution':
-        q = parseCondition({'key': 'width', 'value': v[0], 'operator': op}, user) \
-            & parseCondition({'key': 'height', 'value': v[1], 'operator': op}, user)
+        if isinstance(v, list) and len(v) == 2:
+            q = parseCondition({'key': 'width', 'value': v[0], 'operator': op}, user) \
+                & parseCondition({'key': 'height', 'value': v[1], 'operator': op}, user)
+        else:
+            q = Q(id=0)
         if exclude:
             q = ~q
         return q
