@@ -18,6 +18,7 @@ pandora.ui.documentPanel = function() {
             resize: function(data) {
                 if (!pandora.user.ui.document) {
                     pandora.$ui.list && pandora.$ui.list.size();
+                    pandora.resizeFilters();
                 } else {
                     pandora.$ui.document && pandora.$ui.document.update();
                 }
