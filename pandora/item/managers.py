@@ -33,7 +33,7 @@ def parseCondition(condition, user, owner=None):
     k = {'id': 'public_id'}.get(k, k)
     if not k:
         k = '*'
-    v = condition['value']
+    v = condition.get('value', '')
     op = condition.get('operator')
     if not op:
         op = '='
