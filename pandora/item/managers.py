@@ -62,6 +62,9 @@ def parseCondition(condition, user, owner=None):
     if k == 'list':
         key_type = ''
 
+    if k in ('width', 'height'):
+        key_type = 'integer'
+
     if k == 'groups':
         if op == '==' and v == '$my':
             if not owner:
