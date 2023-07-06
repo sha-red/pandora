@@ -1401,7 +1401,7 @@ class Item(models.Model):
             source=None, available=True, file__item=self, file__selected=True
         ).filter(
             Q(file__is_audio=True) | Q(file__is_video=True)
-        )
+        ).select_related()
         if not track:
             tracks = self.audio_tracks()
             if len(tracks) > 1:
