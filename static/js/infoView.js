@@ -588,6 +588,10 @@ pandora.ui.infoView = function(data, isMixed) {
         pandora.UI.set({infoIconSize: iconSize});
     }
 
+    that.resizeElement = function() {
+        // overwrite splitpanel resize
+    };
+
     that.reload = function() {
         var src = src = '/' + data.id + '/' + (
                 ui.icons == 'posters' ? 'poster' : 'icon'
