@@ -291,27 +291,27 @@ pandora.ui.mainMenu = function() {
                             items: 'Lists'
                         }[ui.section],
                         folderKey = folderItems.toLowerCase(),
-                        listName = data.id.slice(7).replace(/\t/g, '_'),
+                        name = data.id.slice(7).replace(/\t/g, '_'),
                         set = {}
 
                     if (ui.section == "items") {
                         set.find = {
                             conditions: [
-                                {key: 'list', value: pandora.user.username + ":" + listName, operator: '=='}
+                                {key: 'list', value: pandora.user.username + ":" + name, operator: '=='}
                             ],
                             operator: '&'
                         }
                     } else if (ui.section == "edits") {
-                        set.edit = pandora.user.username + ":" + listName;
+                        set.edit = pandora.user.username + ":" + name;
                     } else if (ui.section == "documents") {
                         set.findDocuments = {
                             conditions: [
-                                {key: 'collection', value: pandora.user.username + ":" + listName, operator: '=='}
+                                {key: 'collection', value: pandora.user.username + ":" + name, operator: '=='}
                             ],
                             operator: '&'
                         }
                     }
-                    set['hidden.' + folderKey] = ui.hidden[folderKey].filter(name => { return name != listName })
+                    set['hidden.' + folderKey] = ui.hidden[folderKey].filter(other => { return other != name })
                     pandora.UI.set(set)
                     Ox.Request.clearCache('find' + folderItems);
                     pandora.$ui.folderList.personal.reloadList()
@@ -326,7 +326,7 @@ pandora.ui.mainMenu = function() {
                             documents: ui._collection,
                             edits: ui.edit,
                             items: ui._list
-                        }[ui.section]).split(':', 2)[1],
+                        }[ui.section]).split(':').slice(1).join(':'),
                         set = {};
                     if (ui.section == "items") {
                         set.find = {
@@ -341,7 +341,7 @@ pandora.ui.mainMenu = function() {
                             operator: '&'
                         };
                     }
-                    set['hidden.' + folderKey] = Ox.unique([listName].concat(pandora.user.ui.hidden[folderKey]))
+                    set['hidden.' + folderKey] = Ox.sort(Ox.unique([listName].concat(pandora.user.ui.hidden[folderKey])))
                     pandora.UI.set(set)
                     Ox.Request.clearCache('find' + folderItems);
                     pandora.$ui.folderList.personal.reloadList()
