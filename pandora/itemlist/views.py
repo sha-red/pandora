@@ -97,7 +97,7 @@ def findLists(request, data):
     else:
         qs = _order_query(query['qs'], query['sort'])
 
-    if is_personal and request.user.profile.ui['hidden']['lists']:
+    if is_personal and request.user.profile.ui.get('hidden', {}).get('lists'):
         qs = qs.exclude(name__in=request.user.profile.ui['hidden']['lists'])
 
     response = json_response()

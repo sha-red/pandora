@@ -99,7 +99,7 @@ def findCollections(request, data):
     else:
         qs = _order_query(query['qs'], query['sort'])
 
-    if is_personal and request.user.profile.ui['hidden']['collections']:
+    if is_personal and request.user.profile.ui.get('hidden', {}).get('collections'):
         qs = qs.exclude(name__in=request.user.profile.ui['hidden']['collections'])
 
     response = json_response()

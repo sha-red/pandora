@@ -425,7 +425,7 @@ def findEdits(request, data):
     else:
         qs = _order_query(query['qs'], query['sort'])
 
-    if is_personal and request.user.profile.ui['hidden']['edits']:
+    if is_personal and request.user.profile.ui.get('hidden', {}).get('edits'):
         qs = qs.exclude(name__in=request.user.profile.ui['hidden']['edits'])
 
     response = json_response()
