@@ -60,7 +60,7 @@ pandora.ui.folders = function(section) {
                                 {},
                                 { id: 'duplicatelist', title: Ox._('Duplicate Selected {0}', [Ox._(folderItem)]), keyboard: 'control d', disabled: ui.section == 'documents' ? !ui._collection : !ui._list },
                                 { id: 'editlist', title: Ox._('Edit Selected {0}...', [Ox._(folderItem)]), keyboard: 'control e', disabled: !editable },
-                                { id: 'deletelist', title: Ox._('Delete Selected {0}...', [Ox._(folderItem)]), keyboard: 'delete', disabled: !editable }
+                                { id: 'deletelist', title: Ox._('Delete Selected {0}...', [Ox._(folderItem)]), keyboard: 'delete', disabled: !editable },
                             ],
                             title: 'edit',
                             tooltip: Ox._('Manage Personal ' + folderItems),

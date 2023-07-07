@@ -284,6 +284,67 @@ pandora.ui.mainMenu = function() {
                     }
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
+                } else if (data.id.startsWith('hidden:')) {
+                    var folderItems = {
+                            documents: 'Collections',
+                            edits: 'Edits',
+                            items: 'Lists'
+                        }[ui.section],
+                        folderKey = folderItems.toLowerCase(),
+                        listName = data.id.slice(7).replace(/\t/g, '_'),
+                        set = {}
+
+                    if (ui.section == "items") {
+                        set.find = {
+                            conditions: [
+                                {key: 'list', value: pandora.user.username + ":" + listName, operator: '=='}
+                            ],
+                            operator: '&'
+                        }
+                    } else if (ui.section == "edits") {
+                        set.edit = pandora.user.username + ":" + listName;
+                    } else if (ui.section == "documents") {
+                        set.findDocuments = {
+                            conditions: [
+                                {key: 'collection', value: pandora.user.username + ":" + listName, operator: '=='}
+                            ],
+                            operator: '&'
+                        }
+                    }
+                    set['hidden.' + folderKey] = ui.hidden[folderKey].filter(name => { return name != listName })
+                    pandora.UI.set(set)
+                    Ox.Request.clearCache('find' + folderItems);
+                    pandora.$ui.folderList.personal.reloadList()
+                } else if (data.id == 'hidelist') {
+                    var folderItems = {
+                            documents: 'Collections',
+                            edits: 'Edits',
+                            items: 'Lists'
+                        }[ui.section],
+                        folderKey = folderItems.toLowerCase(),
+                        listName = ({
+                            documents: ui._collection,
+                            edits: ui.edit,
+                            items: ui._list
+                        }[ui.section]).split(':', 2)[1],
+                        set = {};
+                    if (ui.section == "items") {
+                        set.find = {
+                            conditions: [],
+                            operator: '&'
+                        }
+                    } else if (ui.section == "edits") {
+                        set.edit = ""
+                    } else if (ui.section == "documents") {
+                        set.findDocuments = {
+                            conditions: [],
+                            operator: '&'
+                        };
+                    }
+                    set['hidden.' + folderKey] = Ox.unique([listName].concat(pandora.user.ui.hidden[folderKey]))
+                    pandora.UI.set(set)
+                    Ox.Request.clearCache('find' + folderItems);
+                    pandora.$ui.folderList.personal.reloadList()
                 } else if (data.id == 'print') {
                     window.open(document.location.href + '#print', '_blank');
                 } else if (data.id == 'tv') {
@@ -627,7 +688,11 @@ pandora.ui.mainMenu = function() {
                     that.uncheckItem(previousList == '' ? 'allitems' : 'viewlist' + previousList.replace(/_/g, Ox.char(9)));
                     that.checkItem(list == '' ? 'allitems' : 'viewlist' + list.replace(/_/g, '\t'));
                 }
-                that[ui._list ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[list ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[
+                    list && pandora.$ui.folderList && pandora.$ui.folderList.personal.options('selected').length
+                    ? 'enableItem' : 'disableItem'
+                ]('hidelist');
                 that[action]('editlist');
                 that[action]('deletelist');
                 that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
@@ -646,6 +711,10 @@ pandora.ui.mainMenu = function() {
                     that.checkItem(edit == '' ? 'allitems' : 'viewlist' + edit.replace(/_/g, '\t'));
                 }
                 that[!isGuest && edit ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[
+                    !isGuest && edit && pandora.$ui.folderList && pandora.$ui.folderList.personal.options('selected').length
+                    ? 'enableItem' : 'disableItem'
+                ]('hidelist');
                 that[action]('editlist');
                 that[action]('deletelist');
                 that[!isGuest && edit ? 'enableItem' : 'disableItem']('newlistfromselection');
@@ -665,7 +734,11 @@ pandora.ui.mainMenu = function() {
                     that.uncheckItem(previousList == '' ? 'allitems' : 'viewlist' + previousList.replace(/_/g, Ox.char(9)));
                     that.checkItem(list == '' ? 'allitems' : 'viewlist' + list.replace(/_/g, '\t'));
                 }
-                that[ui._list ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[list ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[
+                    list && pandora.$ui.folderList && pandora.$ui.folderList.personal.options('selected').length
+                    ? 'enableItem' : 'disableItem'
+                ]('hidelist');
                 that[action]('editlist');
                 that[action]('deletelist');
                 that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
@@ -1169,6 +1242,18 @@ pandora.ui.mainMenu = function() {
                         })
                 };
             }),
+            ui.hidden[itemNamePlural.toLowerCase()].length ? [
+                {
+                    id: 'hiddenlists',
+                    title: Ox._('Hidden ' + itemNamePlural),
+                    items: ui.hidden[itemNamePlural.toLowerCase()].map(id => {
+                        return {
+                            id: 'hidden:' + id.replace(/_/g, Ox.char(9)),
+                            title: id
+                        }
+                    })
+                }
+            ] : [],
             [
                 {},
                 { id: 'newlist', title: Ox._('New ' + itemNameSingular), disabled: isGuest, keyboard: 'control n' },
@@ -1179,6 +1264,8 @@ pandora.ui.mainMenu = function() {
                 { id: 'duplicatelist', title: Ox._('Duplicate Selected ' + itemNameSingular), disabled: disableEdit, keyboard: 'control d' },
                 { id: 'editlist', title: Ox._('Edit Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'control e' },
                 { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'delete' },
+                {},
+                { id: 'hidelist', title: Ox._('Hide Selected ' + itemNameSingular + '...'), disabled: disableEdit || !pandora.$ui.folderList || !pandora.$ui.folderList.personal.options('selected').length},
                 {},
                 { id: 'print', title: Ox._('Print'), keyboard: 'control p' }
             ]
@@ -1216,6 +1303,18 @@ pandora.ui.mainMenu = function() {
                         })
                 };
             }),
+            ui.hidden[itemNamePlural.toLowerCase()].length ? [
+                {
+                    id: 'hiddenlists',
+                    title: Ox._('Hidden ' + itemNamePlural),
+                    items: ui.hidden[itemNamePlural.toLowerCase()].map(id => {
+                        return {
+                            id: 'hidden:' + id.replace(/_/g, Ox.char(9)),
+                            title: id
+                        }
+                    })
+                }
+            ] : [],
             [
                 {},
                 { id: 'newlist', title: Ox._('New ' + itemNameSingular), disabled: isGuest, keyboard: 'control n' },
@@ -1224,7 +1323,9 @@ pandora.ui.mainMenu = function() {
                 {},
                 { id: 'duplicatelist', title: Ox._('Duplicate Selected ' + itemNameSingular), disabled: disableEdit, keyboard: 'control d' },
                 { id: 'editlist', title: Ox._('Edit Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'control e' },
-                { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'delete' }
+                { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'delete' },
+                {},
+                { id: 'hidelist', title: Ox._('Hide Selected ' + itemNameSingular + '...'), disabled: disableEdit || !pandora.$ui.folderList || !pandora.$ui.folderList.personal.options('selected').length},
             ]
         )};
     }
@@ -1284,6 +1385,18 @@ pandora.ui.mainMenu = function() {
                         })
                 };
             }),
+            ui.hidden[itemNamePlural.toLowerCase()].length ? [
+                {
+                    id: 'hiddenlists',
+                    title: Ox._('Hidden ' + itemNamePlural),
+                    items: ui.hidden[itemNamePlural.toLowerCase()].map(id => {
+                        return {
+                            id: 'hidden:' + id.replace(/_/g, Ox.char(9)),
+                            title: id
+                        }
+                    })
+                }
+            ] : [],
             [
                 {},
                 { id: 'newlist', title: Ox._('New ' + itemNameSingular), disabled: isGuest, keyboard: 'control n' },
@@ -1296,6 +1409,8 @@ pandora.ui.mainMenu = function() {
                 { id: 'duplicatelist', title: Ox._('Duplicate Selected ' + itemNameSingular), disabled: disableEdit, keyboard: 'control d' },
                 { id: 'editlist', title: Ox._('Edit Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'control e' },
                 { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'delete' },
+                {},
+                { id: 'hidelist', title: Ox._('Hide Selected ' + itemNameSingular + '...'), disabled: disableEdit || !pandora.$ui.folderList || !pandora.$ui.folderList.personal.options('selected').length},
                 {},
                 { id: 'print', title: Ox._('Print'), keyboard: 'control p' },
                 { id: 'tv', title: Ox._('TV'), keyboard: 'control space' }

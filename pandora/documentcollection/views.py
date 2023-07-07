@@ -86,6 +86,11 @@ def findCollections(request, data):
         for x in data.get('query', {}).get('conditions', [])
     )
 
+    is_personal = request.user.is_authenticated and any(
+        (x['key'] == 'user' and x['value'] == request.user.username and x['operator'] == '==')
+        for x in data.get('query', {}).get('conditions', [])
+    )
+
     if is_section_request:
         qs = query['qs']
         if not is_featured and not request.user.is_anonymous:
@@ -93,6 +98,9 @@ def findCollections(request, data):
         qs = qs.order_by('position__position')
     else:
         qs = _order_query(query['qs'], query['sort'])
+
+    if is_personal and request.user.profile.ui['hidden']['collections']:
+        qs = qs.exclude(name__in=request.user.profile.ui['hidden']['collections'])
 
     response = json_response()
     if 'keys' in data:

@@ -1159,6 +1159,11 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "findDocuments": {"conditions": [], "operator": "&"},
             "followPlayer": true,
             "help": "",
+            "hidden": {
+                "collections": [],
+                "edits": [],
+                "lists": []
+            },
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
