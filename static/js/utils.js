@@ -2476,6 +2476,7 @@ pandora.getVideoOptions = function(data) {
         });
     });
     data.videoRatio = data.videoRatio || pandora.site.video.previewRatio;
+
     return options;
 };
 
@@ -3212,7 +3213,7 @@ pandora.unloadWindow = function() {
         && pandora.user.ui.item
         && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
         && pandora.UI.set(
-            'videoPosition.' + pandora.user.ui.item,
+            'videoPoints.' + pandora.user.ui.item,
             pandora.$ui[
                 pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
             ].options('position')
