@@ -377,7 +377,7 @@ pandora.ui.folderList = function(id, section) {
             }
         },
         init: function(data) {
-            if (pandora.site.sectionFolders[section][i]) {
+            if (pandora.site.sectionFolders[section][i] && pandora.$ui.folder[i] && pandora.$ui.folderList[id]) {
                 pandora.site.sectionFolders[section][i].items = data.items;
                 pandora.$ui.folder[i].$content.css({
                     height: (data.items || 1) * 16 + 'px'
