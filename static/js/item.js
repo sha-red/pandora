@@ -31,6 +31,17 @@ pandora.ui.item = function() {
 
         // fixme: layers have value, subtitles has text?
         isVideoView && Ox.extend(result.data, pandora.getVideoOptions(result.data));
+        if (isVideoView && result.data.duration) {
+            var videoPoints = pandora.user.ui.videoPoints[item], set = {};
+            ['in', 'out', 'position'].forEach(point => {
+                if (videoPoints[point] > result.data.duration) {
+                    set[point] = result.data.duration;
+                }
+            })
+            if (!Ox.isEmpty(set)) {
+                pandora.UI.set('videoPoints.' + item, Ox.extend(videoPoints[point], set[point]))
+            }
+        }
 
         if (!result.data.rendered && [
             'clips', 'timeline', 'player', 'editor', 'map', 'calendar'
