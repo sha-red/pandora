@@ -1690,19 +1690,40 @@ pandora.ui.mainMenu = function() {
                         Ox._('Open {0}', [Ox._(pandora.site.itemName.singular)]),
                         Ox._('Open {0}', [Ox._(pandora.site.itemName.plural)])
                     ], items: [
-                    { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.filter(function(view) {
-                        return view.id != 'data' && view.id != 'media' ||
-                            pandora.hasCapability('canSeeExtraItemViews');
-                    }).map(function(view) {
-                        return Ox.extend({
-                            checked: ui.itemView == view.id
-                        }, view, {
-                            keyboard: itemViewKey <= 10
-                                ? 'shift ' + (itemViewKey++%10)
-                                : void 0,
-                            title: Ox._(view.title)
-                        });
-                    }) },
+                    {
+                        group: 'itemview',
+                        min: 1,
+                        max: 1,
+                        items: [].concat(
+                            pandora.site.itemViews.filter(function(view) {
+                                return view.id != 'data' && view.id != 'media'
+                            }).map(function(view) {
+                                return Ox.extend({
+                                    checked: ui.itemView == view.id
+                                }, view, {
+                                    keyboard: itemViewKey <= 10
+                                        ? 'shift ' + (itemViewKey++%10)
+                                        : void 0,
+                                    title: Ox._(view.title)
+                                });
+                            }),
+                            pandora.hasCapability('canSeeExtraItemViews') ? [{}] : [],
+                            pandora.hasCapability('canSeeExtraItemViews')
+                                ? pandora.site.itemViews.filter(function(view) {
+                                        return view.id == 'data' || view.id == 'media'
+                                    }).map(function(view) {
+                                        return Ox.extend({
+                                            checked: ui.itemView == view.id
+                                        }, view, {
+                                            keyboard: itemViewKey <= 10
+                                                ? 'shift ' + (itemViewKey++%10)
+                                                : void 0,
+                                            title: Ox._(view.title)
+                                        });
+                                    })
+                                : [],
+                        )
+                    },
                 ] },
                 { id: 'clips', title: Ox._('Open Clips'), items: [
                     { group: 'videoview', min: 1, max: 1, items: ['player', 'editor', 'timeline'].map(function(view) {
