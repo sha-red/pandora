@@ -104,7 +104,11 @@ pandora.ui.folderList = function(id, section) {
                 operator: '+',
                 tooltip: function(data) {
                     return data.type == 'static'
-                        ? (data.editable ? Ox._('Edit {0}', [Ox._(folderItem)]) : '')
+                        ? (data.editable
+                            ? folderItem == "Edit"
+                                ? Ox._('Edit this {0}', [Ox._(folderItem)])
+                                : Ox._('Edit {0}', [Ox._(folderItem)])
+                            : '')
                         : data.type == 'smart'
                         ? (data.editable ? Ox._('Edit Query') : Ox._('Show Query'))
                         : data.type.toUpperCase();
