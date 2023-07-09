@@ -367,7 +367,7 @@ pandora.ui.folders = function(section) {
         }
         pandora.$ui.folder[i] = Ox.CollapsePanel({
                 id: folder.id,
-                collapsed: !ui.showFolder.items[folder.id],
+                collapsed: !ui.showFolder[section][folder.id],
                 extras: extras,
                 size: 16,
                 title: Ox._(folder.title)
