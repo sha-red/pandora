@@ -52,6 +52,9 @@ pandora.ui.editPanel = function(isEmbed) {
     }
 
     function getSmallTimelineURL() {
+        if (!edit.duration) {
+            return ''
+        }
         smallTimelineCanvas = getSmallTimelineCanvas();
         smallTimelineContext = smallTimelineCanvas.getContext('2d');
         return smallTimelineCanvas.toDataURL();
