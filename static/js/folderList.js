@@ -406,6 +406,11 @@ pandora.ui.folderList = function(id, section) {
                 pandora.ui.listDialog().open();
             }
         },
+        key_control_v: function() {
+            if (pandora.user.ui.section == 'edits' && pandora.$ui.editPanel) {
+                pandora.$ui.editPanel.triggerEvent("paste")
+            }
+        },
         move: function(data) {
             pandora.api['sort' + folderItems]({
                 section: id,
