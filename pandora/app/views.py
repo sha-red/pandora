@@ -163,7 +163,7 @@ def init(request, data):
     del config['keys']
 
     if 'HTTP_ACCEPT_LANGUAGE' in request.META:
-        response['data']['locale'] = request.META['HTTP_ACCEPT_LANGUAGE'].split(';')[0].split('-')[0]
+        response['data']['locale'] = request.META['HTTP_ACCEPT_LANGUAGE'].split(';')[0].split('-')[0].split(',')[0]
 
     if request.META.get('HTTP_X_PREFIX') == 'NO':
         config['site']['videoprefix'] = ''
