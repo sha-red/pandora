@@ -157,9 +157,6 @@ def get_icon_path(f, x):
 def get_poster_path(f, x):
     return get_path(f, 'poster.jpg')
 
-def get_torrent_path(f, x):
-    return get_path(f, 'torrent.torrent')
-
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -185,7 +182,6 @@ class Item(models.Model):
 
     icon = models.ImageField(default=None, blank=True, upload_to=get_icon_path)
 
-    torrent = models.FileField(default=None, blank=True, max_length=1000, upload_to=get_torrent_path)
     stream_info = JSONField(default=dict, editable=False)
 
     # stream related fields
@@ -1306,90 +1302,6 @@ class Item(models.Model):
             self.files.filter(selected=True).update(selected=False)
             self.save()
 
-    def get_torrent(self, request):
-        if self.torrent:
-            self.torrent.seek(0)
-            data = ox.torrent.bdecode(self.torrent.read())
-            url = request.build_absolute_uri("%s/torrent/" % self.get_absolute_url())
-            if url.startswith('https://'):
-                url = 'http' + url[5:]
-            data['url-list'] = ['%s%s' % (url, u.split('torrent/')[1]) for u in data['url-list']]
-            return ox.torrent.bencode(data)
-
-    def make_torrent(self):
-        if not settings.CONFIG['video'].get('torrent'):
-            return
-        streams = self.streams()
-        if streams.count() == 0:
-            return
-        base = self.path('torrent')
-        base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
-        if not isinstance(base, bytes):
-            base = base.encode('utf-8')
-        if os.path.exists(base):
-            shutil.rmtree(base)
-        ox.makedirs(base)
-
-        filename = utils.safe_filename(ox.decode_html(self.get('title')))
-        base = self.path('torrent/%s' % filename)
-        base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
-        size = 0
-        duration = 0.0
-        if streams.count() == 1:
-            v = streams[0]
-            media_path = v.media.path
-            extension = media_path.split('.')[-1]
-            url = "%s/torrent/%s.%s" % (self.get_absolute_url(),
-                                        quote(filename.encode('utf-8')),
-                                        extension)
-            video = "%s.%s" % (base, extension)
-            if not isinstance(media_path, bytes):
-                media_path = media_path.encode('utf-8')
-            if not isinstance(video, bytes):
-                video = video.encode('utf-8')
-            media_path = os.path.relpath(media_path, os.path.dirname(video))
-            os.symlink(media_path, video)
-            size = v.media.size
-            duration = v.duration
-        else:
-            url = "%s/torrent/" % self.get_absolute_url()
-            part = 1
-            ox.makedirs(base)
-            for v in streams:
-                media_path = v.media.path
-                extension = media_path.split('.')[-1]
-                video = "%s/%s.Part %d.%s" % (base, filename, part, extension)
-                part += 1
-                if not isinstance(media_path, bytes):
-                    media_path = media_path.encode('utf-8')
-                if not isinstance(video, bytes):
-                    video = video.encode('utf-8')
-                media_path = os.path.relpath(media_path, os.path.dirname(video))
-                os.symlink(media_path, video)
-                size += v.media.size
-                duration += v.duration
-            video = base
-
-        torrent = '%s.torrent' % base
-        url = "http://%s%s" % (settings.CONFIG['site']['url'], url)
-        meta = {
-            'filesystem_encoding': 'utf-8',
-            'target': torrent,
-            'url-list': url,
-        }
-        if duration:
-            meta['playtime'] = ox.format_duration(duration*1000)[:-4]
-
-        # slightly bigger torrent file but better for streaming
-        piece_size_pow2 = 15  # 1 mbps -> 32KB pieces
-        if size / duration >= 1000000:
-            piece_size_pow2 = 16  # 2 mbps -> 64KB pieces
-        meta['piece_size_pow2'] = piece_size_pow2
-
-        ox.torrent.create_torrent(video, settings.TRACKER_URL, meta)
-        self.torrent.name = torrent[len(settings.MEDIA_ROOT)+1:]
-        self.save()
-
     def audio_tracks(self):
         tracks = [f['language']
                   for f in self.files.filter(selected=True).filter(Q(is_video=True) | Q(is_audio=True)).values('language')
@@ -1440,7 +1352,6 @@ class Item(models.Model):
         self.select_frame()
         self.make_poster()
         self.make_icon()
-        self.make_torrent()
         self.rendered = streams.count() > 0
         self.save()
         if self.rendered:

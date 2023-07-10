@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
                 ('poster_width', models.IntegerField(default=0)),
                 ('poster_frame', models.FloatField(default=-1)),
                 ('icon', models.ImageField(blank=True, default=None, upload_to=item.models.get_icon_path)),
-                ('torrent', models.FileField(blank=True, default=None, max_length=1000, upload_to=item.models.get_torrent_path)),
+                ('torrent', models.FileField(blank=True, default=None, max_length=1000)),
                 ('stream_info', oxdjango.fields.DictField(default={}, editable=False)),
                 ('stream_aspect', models.FloatField(default=1.3333333333333333)),
             ],

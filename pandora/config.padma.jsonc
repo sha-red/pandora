@@ -1334,10 +1334,8 @@
             corner of the screen
         "resolutions": List of video resolutions. Supported values are 96, 144,
             240, 288, 360, 432, 480, 720 and 1080.
-        "torrent": If true, video downloads are offered via BitTorrent
     */
     "video": {
-        "torrent": true,
         "formats": ["webm", "mp4"],
         "previewRatio": 1.3333333333,
         //supported resolutions are

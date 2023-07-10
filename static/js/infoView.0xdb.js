@@ -895,7 +895,12 @@ pandora.ui.infoView = function(data, isMixed) {
                                 } else if (capability.name == 'canPlayVideo') {
                                     pandora.UI.set({itemView: ui.videoView});
                                 } else if (capability.name == 'canDownloadVideo') {
-                                    document.location.href = '/' + ui.item + '/torrent/';
+                                    pandora.ui.downloadVideoDialog({
+                                        item: ui.item,
+                                        rightsLevel: data.rightsLevel,
+                                        title: data.title,
+                                        video: data.video
+                                    }).open();
                                 }
                             }
                         }

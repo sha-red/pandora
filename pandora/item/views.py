@@ -1046,27 +1046,6 @@ def download(request, id, resolution=None, format='webm', part=None):
     response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
     return response
 
-def torrent(request, id, filename=None):
-    item = get_object_or_404(models.Item, public_id=id)
-    if not item.access(request.user):
-        return HttpResponseForbidden()
-    if not item.torrent:
-        raise Http404
-    if not filename or filename.endswith('.torrent'):
-        response = HttpResponse(item.get_torrent(request),
-                                content_type='application/x-bittorrent')
-        filename = utils.safe_filename("%s.torrent" % item.get('title'))
-        response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
-        return response
-    while filename.startswith('/'):
-        filename = filename[1:]
-    filename = filename.replace('/../', '/')
-    filename = item.path('torrent/%s' % filename)
-    filename = os.path.abspath(os.path.join(settings.MEDIA_ROOT, filename))
-    response = HttpFileResponse(filename)
-    response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % \
-                                      quote(os.path.basename(filename.encode('utf-8')))
-    return response
 
 def video(request, id, resolution, format, index=None, track=None):
     resolution = int(resolution)
@@ -1288,12 +1267,6 @@ def atom_xml(request):
         el.text = "1:1"
 
         if has_capability(request.user, 'canDownloadVideo'):
-            if item.torrent:
-                el = ET.SubElement(entry, "link")
-                el.attrib['rel'] = 'enclosure'
-                el.attrib['type'] = 'application/x-bittorrent'
-                el.attrib['href'] = '%s/torrent/' % page_link
-                el.attrib['length'] = '%s' % ox.get_torrent_size(item.torrent.path)
             # FIXME: loop over streams
             # for s in item.streams().filter(resolution=max(settings.CONFIG['video']['resolutions'])):
             for s in item.streams().filter(source=None):

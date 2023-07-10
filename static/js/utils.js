@@ -1399,14 +1399,8 @@ pandora.getCurrentFrameAnnotation = function(data) {
 }());
 
 pandora.getDownloadLink = function(item, rightslevel) {
-    var torrent = pandora.site.video.torrent,
-        url;
-    if (arguments.length == 2 && torrent &&
-        pandora.hasCapability('canSeeItem', 'guest') < rightslevel) {
-        torrent = false;
-    }
-    url = '/' + item + (torrent ? '/torrent/' : '/download/');
-    if (!torrent && pandora.site.video.downloadFormat) {
+    var url = '/' + item + '/download/';
+    if (pandora.site.video.downloadFormat) {
         url += Ox.max(pandora.site.video.resolutions) + 'p.' + pandora.site.video.downloadFormat;
     }
     return url;
