@@ -1289,12 +1289,15 @@ def atom_xml(request):
         'application/atom+xml'
     )
 
+
 def oembed(request):
     format = request.GET.get('format', 'json')
     maxwidth = int(request.GET.get('maxwidth', 640))
     maxheight = int(request.GET.get('maxheight', 480))
 
-    url = request.GET['url']
+    url = request.GET.get('url')
+    if not url:
+        raise Http404
     parts = urlparse(url).path.split('/')
     if len(parts) < 2:
         raise Http404
