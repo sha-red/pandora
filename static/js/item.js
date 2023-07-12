@@ -34,7 +34,7 @@ pandora.ui.item = function() {
         if (isVideoView && result.data.duration) {
             var videoPoints = pandora.user.ui.videoPoints[item], set = {};
             ['in', 'out', 'position'].forEach(point => {
-                if (videoPoints[point] > result.data.duration) {
+                if (videoPoints && videoPoints[point] > result.data.duration) {
                     set[point] = result.data.duration;
                 }
             })
