@@ -42,7 +42,6 @@ def ocr_image(path):
 
 class FulltextMixin:
     _ES_INDEX = "document-index"
-    _ES_DOC_TYPE = "document"
 
     @classmethod
     def elasticsearch(cls):
@@ -67,7 +66,7 @@ class FulltextMixin:
         if self.has_fulltext_key():
             from elasticsearch.exceptions import NotFoundError
             try:
-                res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type=self._ES_DOC_TYPE, id=self.id)
+                res = self.elasticsearch().delete(index=self._ES_INDEX, id=self.id)
             except NotFoundError:
                 pass
             except:
@@ -80,7 +79,7 @@ class FulltextMixin:
                 doc = {
                     'text': text.lower()
                 }
-                res = self.elasticsearch().index(index=self._ES_INDEX, doc_type=self._ES_DOC_TYPE, id=self.id, body=doc)
+                res = self.elasticsearch().index(index=self._ES_INDEX, id=self.id, body=doc)
 
     @classmethod
     def find_fulltext(cls, query):
@@ -176,7 +175,6 @@ class FulltextMixin:
 
 class FulltextPageMixin(FulltextMixin):
     _ES_INDEX = "document-page-index"
-    _DOC_TYPE = 'page'
 
     def extract_fulltext(self):
         if self.document.file:

@@ -311,6 +311,14 @@
             "columnWidth": 128
         },
         {
+            "id": "fulltext",
+            "operator": "+",
+            "title": "Fulltext",
+            "type": "text",
+            "fulltext": true,
+            "find": true
+        },
+        {
             "id": "created",
             "operator": "-",
             "title": "Created",
