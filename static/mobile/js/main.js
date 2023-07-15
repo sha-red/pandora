@@ -1,10 +1,11 @@
 
 
 function parseURL() {
-    var fragment = document.location.hash.slice(1)
-    if (!fragment && document.location.pathname.startsWith('/m/')) {
-        var prefix = document.location.protocol + '//' + document.location.hostname + '/m/'
-        fragment = document.location.href.slice(prefix.length)
+    var url = pandora.url ? pandora.url : document.location,
+        fragment = url.hash.slice(1)
+    if (!fragment && url.pathname.startsWith('/m/')) {
+        var prefix = url.protocol + '//' + url.hostname + '/m/'
+        fragment = url.href.slice(prefix.length)
     }
     var args = fragment.split('?')
     var id = args.shift()

@@ -31,17 +31,18 @@ function renderItem(data) {
             <div class="video"></div>
         </div>
         <div class="value">${data.value}</div>
+        <div class="comments"></div>
         <div class="more">
             <a href="${data.link}">Open on ${data.site}</a>
         </div>
     `
-    var comments = `
-        <div class="comments" style="width: 100%;text-align: center;">
-            <textarea style="width:90%;height:45px" placeholder="Respond in style..."></textarea>
-            <button style="width:90%">Submit</button>
-            <br>
-        </div>
-    `
+
+    var comments = div.querySelector('.comments')
+    if (window.renderComments) {
+        renderComments(comments, data)
+    } else {
+        comments.remove()
+    }
 
     div.querySelectorAll('.layer a').forEach(a => {
         a.addEventListener("click", clickLink)
