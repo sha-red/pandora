@@ -190,11 +190,6 @@ class MetaClip(object):
     def __str__(self):
         return self.public_id
 
-    def get_first_frame(self, resolution=None):
-        if resolution is None:
-            resolution = max(settings.CONFIG['video']['resolutions'])
-        return '/%s/%sp%0.03f.jpg' % (self.item.public_id, resolution, float(self.start))
-
 
 class Meta:
     unique_together = ("item", "start", "end")

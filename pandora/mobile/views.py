@@ -47,7 +47,11 @@ def index(request, fragment):
             context['title'] = name
             context['description'] = edit.description.split('\n\n')[0]
             # FIXME: use sort from parts if needed
-            context['preview'] = request.build_absolute_uri(edit.get_clips().first().get_first_frame())
+            resolution = max(settings.CONFIG['video']['resolutions'])
+            clip = edit.get_clips().first()
+            if clip:
+                preview = '/%s/%sp%0.03f.jpg' % (clip.item.public_id, resolution, float(clip.start))
+                context['preview'] = request.build_absolute_uri(preview)
     else:
         type = 'item'
         id = parts[0]
