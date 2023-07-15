@@ -67,7 +67,8 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    "sass_processor.finders.CssFinder",
+    "compressor.finders.CompressorFinder",
 )
 
 GEOIP_PATH = normpath(join(PROJECT_ROOT, '..', 'data', 'geo'))
@@ -124,6 +125,9 @@ INSTALLED_APPS = (
     'django_extensions',
     'django_celery_results',
     'django_celery_beat',
+    'compressor',
+    'sass_processor',
+
     'app',
     'log',
     'annotation',
@@ -150,6 +154,7 @@ INSTALLED_APPS = (
     'websocket',
     'taskqueue',
     'home',
+    'mobile',
 )
 
 AUTH_USER_MODEL = 'system.User'

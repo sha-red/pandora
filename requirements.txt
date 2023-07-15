@@ -5,6 +5,9 @@ celery<5.0,>4.3
 django-celery-results<2
 django-celery-beat
 django-extensions==2.2.9
+libsass
+django-compressor
+django-sass-processor
 gunicorn==20.0.4
 html5lib
 requests<3.0.0,>=2.24.0

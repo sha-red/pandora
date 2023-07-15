@@ -609,6 +609,8 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.player.options({fullscreen: true});
                 } else if (data.id == 'embed') {
                     pandora.$ui.embedDialog = pandora.ui.embedDialog().open();
+                } else if (data.id == 'share') {
+                    pandora.$ui.shareDialog = pandora.ui.shareDialog().open();
                 } else if (data.id == 'advancedfind') {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 } else if (data.id == 'clearquery') {
@@ -1909,7 +1911,8 @@ pandora.ui.mainMenu = function() {
                 }) }
             ] },
             {},
-            { id: 'embed', title: Ox._('Embed...') }
+            { id: 'embed', title: Ox._('Embed...') },
+            { id: 'share', title: Ox._('Share...') }
         ]}
     }
 

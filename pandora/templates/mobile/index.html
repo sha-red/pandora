@@ -1,0 +1,45 @@
+<!DOCTYPE html>{% load static sass_tags compress %}
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% if title %}
+        <title>{{title}}</title>
+        <meta name="title" content="{{title}}"/>
+        <meta property="og:title" content="{{title}}"/>
+        {% endif %}
+        {%if description %}
+        <meta name="description" content="{{description}}"/>
+        <meta property="og:description" content="{{description}}"/>
+        {%endif%}
+        {% if preview %}
+        <meta content="{{ preview }}" name="thumbnail"/>
+        <meta content="{{ preview }}" name="image_src"/>
+        <meta property="og:image" content="{{ preview }}"/>
+        {% endif %}
+        {% if url %}
+        <meta property="og:url" content="{{ url }}"/>
+        {% endif %}
+        <meta property="og:site_name" content="{{ settings.SITENAME }}"/>
+        {% compress css file m %}
+        <link rel="stylesheet" href="{% static 'mobile/css/reset.css' %}"></link>
+        <link rel="stylesheet" href="{% static 'mobile/css/style.css' %}"></link>
+        {% endcompress %}
+        <meta name="google" value="notranslate"/>
+    </head>
+    <body>
+        <div class="content"></div>
+        {% compress js file m %}
+        <script src="{% static 'mobile/js/utils.js' %}"></script>
+        <script src="{% static 'mobile/js/api.js' %}"></script>
+        <script src="{% static 'mobile/js/icons.js' %}"></script>
+        <script src="{% static 'mobile/js/VideoElement.js' %}"></script>
+        <script src="{% static 'mobile/js/VideoPlayer.js' %}"></script>
+        <script src="{% static 'mobile/js/documents.js' %}"></script>
+        <script src="{% static 'mobile/js/edits.js' %}"></script>
+        <script src="{% static 'mobile/js/item.js' %}"></script>
+        <script src="{% static 'mobile/js/render.js' %}"></script>
+        <script src="{% static 'mobile/js/main.js' %}"></script>
+        {% endcompress %}
+    </body>
+</html>

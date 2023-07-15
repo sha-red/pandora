@@ -26,6 +26,7 @@ import edit.views
 import itemlist.views
 import item.views
 import item.site
+import mobile.views
 import translation.views
 import urlalias.views
 
@@ -47,6 +48,7 @@ urlpatterns = [
     re_path(r'^collection/(?P<id>.*?)/icon(?P<size>\d*).jpg$', documentcollection.views.icon),
     re_path(r'^documents/(?P<id>[A-Z0-9]+)/(?P<size>\d*)p(?P<page>[\d,]*).jpg$', document.views.thumbnail),
     re_path(r'^documents/(?P<id>[A-Z0-9]+)/(?P<name>.*?\.[^\d]{3})$', document.views.file),
+    re_path(r'^documents/(?P<fragment>.*?)$', document.views.document),
     re_path(r'^edit/(?P<id>.*?)/icon(?P<size>\d*).jpg$', edit.views.icon),
     re_path(r'^list/(?P<id>.*?)/icon(?P<size>\d*).jpg$', itemlist.views.icon),
     re_path(r'^text/(?P<id>.*?)/icon(?P<size>\d*).jpg$', text.views.icon),
@@ -65,6 +67,7 @@ urlpatterns = [
     re_path(r'^robots.txt$', app.views.robots_txt),
     re_path(r'^sitemap.xml$', item.views.sitemap_xml),
     re_path(r'^sitemap(?P<part>\d+).xml$', item.views.sitemap_part_xml),
+    re_path(r'm/(?P<fragment>.*?)$', mobile.views.index),
     path(r'', item.site.urls),
 ]
 #sould this not be enabled by default? nginx should handle those

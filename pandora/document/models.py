@@ -567,7 +567,7 @@ class Document(models.Model, FulltextMixin):
                     if len(crop) == 4:
                         path = os.path.join(folder, '%s.jpg' % ','.join(map(str, crop)))
                         if not os.path.exists(path):
-                            img = Image.open(src).crop(crop)
+                            img = Image.open(src).convert('RGB').crop(crop)
                             img.save(path)
                         else:
                             img = Image.open(path)
