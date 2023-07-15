@@ -8,6 +8,7 @@ def index(request, fragment):
     from item.models import Item, Annotation
     from edit.models import Edit
     from document.models import Document
+    from edit.views import _order_clips
     context = {}
     parts = fragment.split('/')
     if parts[0] in ('document', 'documents'):
@@ -46,9 +47,23 @@ def index(request, fragment):
             link = request.build_absolute_uri('/m' + edit.get_absolute_url())
             context['title'] = name
             context['description'] = edit.description.split('\n\n')[0]
-            # FIXME: use sort from parts if needed
             resolution = max(settings.CONFIG['video']['resolutions'])
-            clip = edit.get_clips().first()
+            if len(parts) > 3:
+                sort = parts[3]
+                if sort[0] in ('+', '-'):
+                    sort = [{
+                        'operator': sort[0],
+                        'key': sort[1:],
+                    }]
+                else:
+                    sort = [{
+                        'operator': '+',
+                        'key': sort,
+                    }]
+                clips = _order_clips(edit, sort)
+            else:
+                clips = edit.get_clips(request.user)
+            clip = clips.first()
             if clip:
                 preview = '/%s/%sp%0.03f.jpg' % (clip.item.public_id, resolution, float(clip.start))
                 context['preview'] = request.build_absolute_uri(preview)
