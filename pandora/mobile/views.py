@@ -5,7 +5,7 @@ import ox
 
 
 def index(request, fragment):
-    from item.models import Item
+    from item.models import Item, Annotation
     from edit.models import Edit
     from document.models import Document
     context = {}
@@ -52,19 +52,26 @@ def index(request, fragment):
         type = 'item'
         id = parts[0]
         item = Item.objects.filter(public_id=id).first()
-        if item and item.accessible(request.user):
+        if item and item.access(request.user):
             link = request.build_absolute_uri(item.get_absolute_url())
             if len(parts) > 1 and parts[1] in ('editor', 'player'):
                 parts = [parts[0]] + parts[2:]
             if len(parts) > 1:
-                inout = parts[1]
-                if '-' in inout:
-                    inout = inout.split('-')
+                aid = '%s/%s' % (id, parts[1])
+                annotation = Annotation.objects.filter(public_id=aid).first()
+                if annotation:
+                    inout = [annotation.start, annotation.end]
                 else:
-                    inout = inout.split(',')
-                inout = [ox.parse_timecode(p) for p in inout]
-                if len(inout) == 3:
-                    inout.pop(1)
+                    inout = parts[1]
+                    if '-' in inout:
+                        inout = inout.split('-')
+                    else:
+                        inout = inout.split(',')
+                    print(inout)
+                    if len(inout) == 3:
+                        inout.pop(1)
+                    if len(inout) == 2:
+                        inout = [ox.parse_timecode(p) for p in inout]
                 context['preview'] = link + '/480p%s.jpg' % inout[0]
             else:
                 context['preview'] = link + '/480p.jpg'
