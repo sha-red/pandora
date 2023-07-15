@@ -65,7 +65,8 @@ def index(request, fragment):
                 clips = edit.get_clips(request.user)
             clip = clips.first()
             if clip:
-                preview = '/%s/%sp%0.03f.jpg' % (clip.item.public_id, resolution, float(clip.start))
+                start = clip.json()['in']
+                preview = '/%s/%sp%0.03f.jpg' % (clip.item.public_id, resolution, float(start))
                 context['preview'] = request.build_absolute_uri(preview)
     else:
         type = 'item'
