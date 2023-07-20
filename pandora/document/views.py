@@ -518,6 +518,7 @@ actions.register(autocompleteDocuments)
 def document(request, fragment):
     context = {}
     parts = fragment.split('/')
+    # FIXME: parse collection urls and return the right metadata for those
     id = parts[0]
     page = None
     crop = None
@@ -527,7 +528,10 @@ def document(request, fragment):
             page = rect[0]
         else:
             crop = rect
-    document = models.Document.objects.filter(id=ox.fromAZ(id)).first()
+    try:
+        document = models.Document.objects.filter(id=ox.fromAZ(id)).first()
+    except:
+        document = None
     if document and document.access(request.user):
         context['title'] = document.data['title']
         if document.data.get('description'):
