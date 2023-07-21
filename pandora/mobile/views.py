@@ -28,7 +28,7 @@ def index(request, fragment):
             link = request.build_absolute_uri(document.get_absolute_url())
             # FIXME: get preview image or fragment parse from url
             public_id = ox.toAZ(document.id)
-            if self.extension != 'html':
+            if document.extension != 'html':
                 preview = '/documents/%s/512p.jpg' % public_id
                 if page:
                     preview = '/documents/%s/512p%s.jpg' % (public_id, page)
