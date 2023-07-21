@@ -28,12 +28,13 @@ def index(request, fragment):
             link = request.build_absolute_uri(document.get_absolute_url())
             # FIXME: get preview image or fragment parse from url
             public_id = ox.toAZ(document.id)
-            preview = '/documents/%s/512p.jpg' % public_id
-            if page:
-                preview = '/documents/%s/512p%s.jpg' % (public_id, page)
-            if crop:
-                preview = '/documents/%s/512p%s.jpg' % (public_id, ','.join(crop))
-            context['preview'] = request.build_absolute_uri(preview)
+            if self.extension != 'html':
+                preview = '/documents/%s/512p.jpg' % public_id
+                if page:
+                    preview = '/documents/%s/512p%s.jpg' % (public_id, page)
+                if crop:
+                    preview = '/documents/%s/512p%s.jpg' % (public_id, ','.join(crop))
+                context['preview'] = request.build_absolute_uri(preview)
 
     elif parts[0] == 'edits':
         type = 'edit'
