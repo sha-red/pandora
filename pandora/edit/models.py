@@ -35,6 +35,9 @@ User = get_user_model()
 def get_path(f, x): return f.path(x)
 def get_icon_path(f, x): return get_path(f, 'icon.jpg')
 
+def default_query():
+    return {"static": True}
+
 class Edit(models.Model):
 
     class Meta:
@@ -53,7 +56,7 @@ class Edit(models.Model):
     description = models.TextField(default='')
     rightslevel = models.IntegerField(db_index=True, default=0)
 
-    query = JSONField(default=lambda: {"static": True}, editable=False)
+    query = JSONField(default=default_query, editable=False)
     type = models.CharField(max_length=255, default='static')
 
     icon = models.ImageField(default=None, blank=True, null=True, upload_to=get_icon_path)
