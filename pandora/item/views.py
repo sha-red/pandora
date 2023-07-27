@@ -308,7 +308,7 @@ def find(request, data):
     responsive UI: First leave out `keys` to get totals as fast as possible,
     then pass `positions` to get the positions of previously selected items,
     finally make the query with the `keys` you need and an appropriate `range`.
-    For more examples, see https://wiki.0x2620.org/wiki/pandora/QuerySyntax.
+    For more examples, see https://code.0x2620.org/0x2620/pandora/wiki/QuerySyntax.
     see: add, edit, get, lookup, remove, upload
     '''
     if settings.JSON_DEBUG:
