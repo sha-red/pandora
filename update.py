@@ -306,6 +306,7 @@ if __name__ == "__main__":
         if old < 6500:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
         if old <= 6517:
+            run('./bin/pip', 'install', '-U', 'pip')
             run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
         if len(sys.argv) == 1:
