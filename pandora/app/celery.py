@@ -8,6 +8,6 @@ os.chdir(root_dir)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 
-app = Celery('pandora')
+app = Celery('pandora', broker_connection_retry_on_startup=True)
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
