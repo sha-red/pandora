@@ -1,6 +1,7 @@
 from django.apps import AppConfig
 
 
-class TranslationConfig(AppConfig):
+class ChangelogConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = 'translation'
+    name = 'changelog'
+
