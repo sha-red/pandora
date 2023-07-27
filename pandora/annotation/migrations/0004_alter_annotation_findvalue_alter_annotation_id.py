@@ -12,11 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name='annotation',
-            name='findvalue',
-            field=models.TextField(db_index=True, null=True),
-        ),
-        migrations.AlterField(
-            model_name='annotation',
             name='id',
             field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
         ),
