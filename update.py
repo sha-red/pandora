@@ -297,14 +297,8 @@ if __name__ == "__main__":
                 run_sql(sql)
             run(join(base, 'pandora/manage.py'), 'migrate', 'system')
             run(join(base, 'pandora/manage.py'), 'update_geoip')
-        if old <= 6383:
-            run('./bin/pip', 'install', '-r', 'requirements.txt')
         if old < 6442:
             run('./bin/pip', 'install', 'yt-dlp>=2022.3.8.2')
-        if old < 6465:
-            run('./bin/pip', 'install', '-r', 'requirements.txt')
-        if old < 6500:
-            run('./bin/pip', 'install', '-r', 'requirements.txt')
         if old <= 6517:
             run('./bin/pip', 'install', '-U', 'pip')
             run('./bin/pip', 'install', '-r', 'requirements.txt')
