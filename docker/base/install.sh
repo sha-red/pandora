@@ -61,7 +61,6 @@ apt-get install -y \
     oxframe \
     ffmpeg \
     mkvtoolnix \
-    gpac \
     imagemagick \
     poppler-utils \
     ipython3 \

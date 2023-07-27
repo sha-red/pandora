@@ -121,7 +121,6 @@ apt-get install -y \
     python3-elasticsearch \
     ffmpeg \
     mkvtoolnix \
-    gpac \
     imagemagick \
     poppler-utils \
     ipython3 \
