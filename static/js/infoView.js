@@ -516,12 +516,12 @@ pandora.ui.infoView = function(data, isMixed) {
                     }
                     $('<span>').html(formatKey(key)).appendTo($element);
                     Ox.EditableContent({
-                            editable: canEdit,
                             clickLink: pandora.clickLink,
+                            editable: canEdit,
                             format: function(value) {
                                 return formatValue(key, value);
                             },
-                            placeholder: formatLight(Ox._( isMixed[key] ? 'mixed' : 'unknown')),
+                            placeholder: formatLight(Ox._(isMixed[key] ? 'mixed' : 'unknown')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: getValue(key, data[key])
                         })
@@ -542,6 +542,7 @@ pandora.ui.infoView = function(data, isMixed) {
             });
             $element.appendTo($text);
         }
+        return $element;
     }
 
     function renderRemainingKeys() {

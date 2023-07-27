@@ -655,8 +655,8 @@ pandora.ui.infoView = function(data, isMixed) {
                     }
                     $('<span>').html(formatKey(key)).appendTo($element);
                     Ox.EditableContent({
-                            editable: canEdit,
                             clickLink: pandora.clickLink,
+                            editable: canEdit,
                             format: function(value) {
                                 return formatValue(key, value);
                             },
@@ -670,10 +670,18 @@ pandora.ui.infoView = function(data, isMixed) {
                             }
                         })
                         .appendTo($element);
+                    if (isMixed[key] && Ox.contains(listKeys, key)) {
+                        pandora.ui.addRemoveKeyDialog({
+                            ids: ui.listSelection,
+                            key: key,
+                            section: ui.section
+                        }).appendTo($element)
+                    }
                 }
             });
             $element.appendTo($text);
         }
+        return $element;
     }
 
     function toggleIconSize() {
