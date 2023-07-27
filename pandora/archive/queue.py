@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from time import time
+from time import time, monotonic
 
-import celery.task.control
-import kombu.five
-
+from app.celery import app
 
 from .models import File
 
@@ -18,7 +16,7 @@ def parse_job(job):
         'file': f.oshash
     }
     if job['time_start']:
-        start_time = datetime.fromtimestamp(time() - (kombu.five.monotonic() - job['time_start']))
+        start_time = datetime.fromtimestamp(time() - (monotonic() - job['time_start']))
         r.update({
             'started': start_time,
             'running': (datetime.now() - start_time).total_seconds()
@@ -30,7 +28,7 @@ def parse_job(job):
 def status():
     status = []
     encoding_jobs = ('archive.tasks.extract_stream', 'archive.tasks.process_stream')
-    c = celery.task.control.inspect()
+    c = app.control.inspect()
     for job in c.active(safe=True).get('celery@pandora-encoding', []):
         if job['name'] in encoding_jobs:
             status.append(parse_job(job))

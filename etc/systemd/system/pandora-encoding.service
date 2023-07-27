@@ -15,7 +15,7 @@ ExecStart=/srv/pandora/bin/celery \
     -Q encoding -n pandora-encoding \
     --pidfile /run/pandora/encoding.pid \
     -c $CONCURRENCY \
-    --maxtasksperchild $MAX_TASKS_PER_CHILD \
+    --max-tasks-per-child $MAX_TASKS_PER_CHILD \
     -l $LOGLEVEL
 ExecReload=/bin/kill -TERM $MAINPID
 

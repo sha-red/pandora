@@ -5,12 +5,12 @@ import copy
 
 from django.db import models
 from django.utils import datetime_safe
-import django.contrib.postgres.fields
 from django.core.serializers.json import DjangoJSONEncoder
 
 from ox.utils import json
 
-class JSONField(django.contrib.postgres.fields.JSONField):
+
+class JSONField(models.JSONField):
 
     def __init__(self, *args, **kwargs):
         if 'encoder' not in kwargs:

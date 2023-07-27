@@ -305,6 +305,8 @@ if __name__ == "__main__":
             run('./bin/pip', 'install', '-r', 'requirements.txt')
         if old < 6500:
             run('./bin/pip', 'install', '-r', 'requirements.txt')
+        if old <= 6517:
+            run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
         if len(sys.argv) == 1:
             branch = get_branch()
