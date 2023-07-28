@@ -285,7 +285,7 @@ class File(models.Model):
 
         if self.is_subtitle:
             self.available = self.data and True or False
-        else:
+        elif self.id:
             self.available = not self.uploading and \
                 self.streams.filter(source=None, available=True).count()
         super(File, self).save(*args, **kwargs)
