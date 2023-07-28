@@ -190,7 +190,7 @@ CACHES = {
     }
 }
 
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 AUTH_PROFILE_MODULE = 'user.UserProfile'
