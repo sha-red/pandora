@@ -321,9 +321,9 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         if format == 'webm':
             pass1_post = ['-speed', '4'] + pass1_post
             post = ['-speed', '1'] + post
-        cmds.append(base + ['-an', '-pass', '1', '-passlogfile', '%s.log' % target]
+        cmds.append(base + ['-an', '-v:pass', '1', '-passlogfile', '%s.log' % target]
                          + video_settings + pass1_post)
-        cmds.append(base + ['-pass', '2', '-passlogfile', '%s.log' % target]
+        cmds.append(base + ['-v:pass', '2', '-passlogfile', '%s.log' % target]
                          + audio_settings + video_settings + post)
     else:
         cmds.append(base + audio_settings + video_settings + post)
