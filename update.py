@@ -352,25 +352,15 @@ if __name__ == "__main__":
             run('./manage.py', 'update_static')
             run('./manage.py', 'compile_pyc', '-p', '.')
         os.chdir(join(base, 'pandora'))
-        diff = get('./manage.py', 'sqldiff', '-a').strip()
-        for row in [
-            '-- Model missing for table: djcelery_periodictasks\n',
-            '-- Model missing for table: celery_taskmeta\n',
-            '-- Model missing for table: celery_tasksetmeta\n',
-            '-- Model missing for table: djcelery_crontabschedule\n',
-            '-- Model missing for table: djcelery_periodictask\n',
-            '-- Model missing for table: djcelery_intervalschedule\n',
-            '-- Model missing for table: djcelery_workerstate\n',
-            '-- Model missing for table: djcelery_taskstate\n',
-            '-- Model missing for table: south_migrationhistory\n',
-            '-- Model missing for table: cache\n',
-        ]:
-            if row in diff:
-                diff = diff.replace(row, '')
-        if diff not in [
-            '-- No differences',
-            'BEGIN;\nCOMMIT;'
-        ]:
+        diff = get('./manage.py', 'sqldiff', '-a').strip().split('\n')
+        diff = [
+            row for row in diff
+            if not row.strip().startswith('ALTER "id" TYPE')
+            and not row.startswith('--')
+            and not row.startswith('ALTER TABLE')
+            and row not in ['BEGIN;', 'COMMIT;']
+        ]
+        if diff:
             print('Database has changed, please make a backup and run %s db' % sys.argv[0])
         elif branch != 'master':
             print('pan.do/ra is at the latest release,\nyou can run "%s switch master" to switch to the development version' % sys.argv[0])
