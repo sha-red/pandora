@@ -322,12 +322,12 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             if video_codec != 'libvpx-vp9':
                 pass1_post = ['-speed', '4'] + pass1_post
             post = ['-speed', '1'] + post
-        cmds.append(base + ['-an', '-pass', '1', '-passlogfile', '%s.log' % target]
-                         + video_settings + pass1_post)
+        cmds.append(base + ['-pass', '1', '-passlogfile', '%s.log' % target]
+                         + video_settings + ['-an'] + pass1_post)
         cmds.append(base + ['-pass', '2', '-passlogfile', '%s.log' % target]
-                         + audio_settings + video_settings + post)
+                         + video_settings + audio_settings + post)
     else:
-        cmds.append(base + audio_settings + video_settings + post)
+        cmds.append(base + video_settings + audio_settings + post)
 
     if settings.FFMPEG_DEBUG:
         print('\n'.join([' '.join(cmd) for cmd in cmds]))
