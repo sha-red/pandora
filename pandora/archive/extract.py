@@ -219,7 +219,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         bitrate = height*width*fps*bpp/1000
 
         video_settings = trim + [
-            '-vb', '%dk' % bitrate,
+            '-b:v', '%dk' % bitrate,
             '-aspect', aspect,
             # '-vf', 'yadif',
             '-max_muxing_queue_size', '512',
@@ -286,7 +286,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             ac = min(ac, audiochannels)
             audio_settings += ['-ac', str(ac)]
         if audiobitrate:
-            audio_settings += ['-ab', audiobitrate]
+            audio_settings += ['-b:a', audiobitrate]
         if format == 'mp4':
             audio_settings += ['-c:a', 'aac', '-strict', '-2']
         elif audio_codec == 'libopus':
@@ -319,11 +319,12 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         pass1_post = post[:]
         pass1_post[-1] = '/dev/null'
         if format == 'webm':
-            pass1_post = ['-speed', '4'] + pass1_post
+            if video_codec != 'libvpx-vp9':
+                pass1_post = ['-speed', '4'] + pass1_post
             post = ['-speed', '1'] + post
-        cmds.append(base + ['-an', '-v:pass', '1', '-passlogfile', '%s.log' % target]
+        cmds.append(base + ['-an', '-pass', '1', '-passlogfile', '%s.log' % target]
                          + video_settings + pass1_post)
-        cmds.append(base + ['-v:pass', '2', '-passlogfile', '%s.log' % target]
+        cmds.append(base + ['-pass', '2', '-passlogfile', '%s.log' % target]
                          + audio_settings + video_settings + post)
     else:
         cmds.append(base + audio_settings + video_settings + post)
