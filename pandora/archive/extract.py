@@ -156,7 +156,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
     else:
         height = 96
 
-        if settings.FFMPEG_SUPPORTS_VP9:
+        if settings.USE_VP9 and settings.FFMPEG_SUPPORTS_VP9:
             audio_codec = 'libopus'
             video_codec = 'libvpx-vp9'
 
