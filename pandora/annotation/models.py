@@ -264,7 +264,10 @@ class Annotation(models.Model):
         from translation.models import Translation
         layer = self.get_layer()
         if layer.get('translate'):
-            Translation.objects.get_or_create(lang=lang, key=self.value, defaults={'type': Translation.CONTENT})
+            for lang in settings.CONFIG['languages']:
+                if lang == settings.CONFIG['language']:
+                    continue
+                Translation.objects.get_or_create(lang=lang, key=self.value, defaults={'type': Translation.CONTENT})
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
