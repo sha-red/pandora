@@ -1912,7 +1912,7 @@ pandora.ui.mainMenu = function() {
             ] },
             {},
             { id: 'embed', title: Ox._('Embed...') },
-            { id: 'share', title: Ox._('Share...'), disabled: isGuest }
+            { id: 'share', title: Ox._('Share...'), disabled: !pandora.canShareView() }
         ]}
     }
 

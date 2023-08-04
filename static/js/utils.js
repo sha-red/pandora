@@ -330,6 +330,12 @@ pandora.beforeUnloadWindow = function() {
     pandora.isUnloading = true;
 };
 
+
+pandora.canShareView = function() {
+    return pandora.hasCapability('canShare')
+};
+
+
 pandora.changeFolderItemStatus = function(id, status, callback) {
     var ui = pandora.user.ui,
         folderItems = pandora.getFolderItems(ui.section),

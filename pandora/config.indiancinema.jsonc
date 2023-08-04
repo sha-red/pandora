@@ -73,13 +73,14 @@
         "canSeeAccessed": {"researcher": true, "staff": true, "admin": true},
         "canSeeAllTasks": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"researcher": true, "staff": true, "admin": true},
-        "canSeeExtraItemViews": {"researcher": true, "staff": true, "admin": true},
-        "canSeeMedia": {"researcher": true, "staff": true, "admin": true},
         "canSeeDocument": {"guest": 1, "member": 1, "researcher": 2, "staff": 3, "admin": 3},
+        "canSeeExtraItemViews": {"researcher": true, "staff": true, "admin": true},
         "canSeeItem": {"guest": 2, "member": 2, "researcher": 2, "staff": 3, "admin": 3},
+        "canSeeMedia": {"researcher": true, "staff": true, "admin": true},
         "canSeeSize": {"researcher": true, "staff": true, "admin": true},
         "canSeeSoftwareVersion": {"researcher": true, "staff": true, "admin": true},
-        "canSendMail": {"staff": true, "admin": true}
+        "canSendMail": {"staff": true, "admin": true},
+        "canShare": {"staff": true, "admin": true}
     },
     /*
     "clipKeys" are the properties that clips can be sorted by (the values are
