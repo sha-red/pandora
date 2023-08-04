@@ -327,7 +327,11 @@ def update_static():
     #locale
     for f in sorted(glob(os.path.join(settings.STATIC_ROOT, 'json/locale.pandora.*.json'))):
         with open(f) as fd:
-            locale = json.load(fd)
+            try:
+                locale = json.load(fd)
+            except:
+                print("failed to parse %s" % f)
+                raise
         site_locale = f.replace('locale.pandora', 'locale.' + settings.CONFIG['site']['id'])
         locale_file = f.replace('locale.pandora', 'locale')
         print('write', locale_file)
