@@ -2,6 +2,7 @@
 
 from datetime import timedelta, datetime
 from urllib.parse import quote
+import xml.etree.ElementTree as ET
 import gzip
 import os
 import random
@@ -12,7 +13,6 @@ from celery.schedules import crontab
 from django.conf import settings
 from django.db import connection, transaction
 from django.db.models import Q
-from ox.utils import ET
 
 from app.utils import limit_rate
 from taskqueue.models import Task
