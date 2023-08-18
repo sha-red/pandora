@@ -1309,7 +1309,7 @@ class Item(models.Model):
         return sorted(set(tracks))
 
     def streams(self, track=None):
-        files = self.files.filter(selected=True).filter(Q(is_audio=True) | Q(is_video=True)),
+        files = self.files.filter(selected=True).filter(Q(is_audio=True) | Q(is_video=True))
         qs = archive.models.Stream.objects.filter(
             file__in=files, source=None, available=True
         ).select_related()
