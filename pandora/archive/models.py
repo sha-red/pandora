@@ -734,6 +734,9 @@ class Stream(models.Model):
 
     class Meta:
         unique_together = ("file", "resolution", "format")
+        indexes = [
+            models.Index(fields=['file', 'source', 'available'])
+        ]
 
     file = models.ForeignKey(File, related_name='streams', on_delete=models.CASCADE)
     resolution = models.IntegerField(default=96)

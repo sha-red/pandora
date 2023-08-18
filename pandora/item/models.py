@@ -644,7 +644,7 @@ class Item(models.Model):
             i['hasSource'] = self.streams().exclude(file__data='').exists()
 
         streams = self.streams()
-        i['durations'] = [s.duration for s in streams]
+        i['durations'] = [s[0] for s in streams.values_list('duration')]
         i['duration'] = sum(i['durations'])
         i['audioTracks'] = self.audio_tracks()
         if not i['audioTracks']:
@@ -1309,10 +1309,9 @@ class Item(models.Model):
         return sorted(set(tracks))
 
     def streams(self, track=None):
+        files = self.files.filter(selected=True).filter(Q(is_audio=True) | Q(is_video=True)),
         qs = archive.models.Stream.objects.filter(
-            source=None, available=True, file__item=self, file__selected=True
-        ).filter(
-            Q(file__is_audio=True) | Q(file__is_video=True)
+            file__in=files, source=None, available=True
         ).select_related()
         if not track:
             tracks = self.audio_tracks()
@@ -1561,7 +1560,7 @@ class Item(models.Model):
         if not subtitles:
             return
         # otherwise add empty 5 seconds annotation every minute
-        duration = sum([s.duration for s in self.streams()])
+        duration = sum([s[0] for s in self.streams().values_list('duration')])
         layer = subtitles['id']
         # FIXME: allow annotations from no user instead?
         user = User.objects.all().order_by('id')[0]
