@@ -3,7 +3,8 @@ function renderItemInfo(data) {
     div = document.createElement('div')
     div.className = "content"
     div.innerHTML = `
-        <div class="title">${data.title}</div>
+        <h1 class="item-title">${item.title}</h1>
+        <h2 class="title">${data.title}</h2>
         <div class="byline">${data.byline}</div>
         <figure>
             <img src="${data.icon}">
@@ -12,10 +13,14 @@ function renderItemInfo(data) {
             <a href="${data.link}">Open on ${data.site}</a>
         </div>
     `
+    if (!item.title) {
+        div.querySelector('item-title').remove()
+    }
     document.querySelector(".content").replaceWith(div)
 }
 
 function renderItem(data) {
+    window.item = window.item || {}
     if (data.error) {
         return renderError(data)
     }
@@ -25,17 +30,23 @@ function renderItem(data) {
     div = document.createElement('div')
     div.className = "content"
     div.innerHTML = `
-        <div class="title">${data.title}</div>
+        <h1 class="item-title">${item.title}</h1>
+        <h2 class="title">${data.title}</h2>
         <div class="byline">${data.byline}</div>
         <div class="player">
             <div class="video"></div>
         </div>
-        <div class="value">${data.value}</div>
-        <div class="comments"></div>
+        <div class="value">
+            ${data.value}
+            <div class="comments"></div>
+        </div>
         <div class="more">
             <a href="${data.link}">Open on ${data.site}</a>
         </div>
     `
+    if (!item.title) {
+        div.querySelector('.item-title').remove()
+    }
 
     var comments = div.querySelector('.comments')
     if (window.renderComments) {
@@ -98,6 +109,28 @@ function renderItem(data) {
         })
 
     })
+    if (item.next || item.previous) {
+        var nav = document.createElement('nav')
+        nav.classList.add('items')
+        if (item.previous) {
+            var a = document.createElement('a')
+            a.href = item.previous
+            a.innerText = '<< previous'
+            nav.appendChild(a)
+        }
+        if (item.previous && item.next) {
+            var e = document.createElement('span')
+            e.innerText = ' | '
+            nav.appendChild(e)
+        }
+        if (item.next) {
+            var a = document.createElement('a')
+            a.href = item.next
+            a.innerText = 'next >>'
+            nav.appendChild(a)
+        }
+        div.appendChild(nav)
+    }
     document.querySelector(".content").replaceWith(div)
 }
 

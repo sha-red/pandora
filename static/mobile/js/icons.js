@@ -123,6 +123,15 @@ icon.pause = `
 </svg>
 `
 icon.loading = `
+<svg width="512" height="512" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path fill="none" stroke="#B1B1B1" stroke-dasharray="15" stroke-dashoffset="15" stroke-linecap="round" stroke-width="2" d="M12 3C16.9706 3 21 7.02944 21 12">
+        <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/>
+        <animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/>
+    </path>
+</svg>
+`
+
+icon.loading_w = `
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
     <g transform="translate(128, 128)" stroke="#404040" stroke-linecap="round" stroke-width="28">
         <line x1="0" y1="-114" x2="0" y2="-70" transform="rotate(0)" opacity="1">
@@ -178,5 +187,14 @@ icon.left  = `
 icon.down  = `
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
     <polygon points="32,56 224,56 128,248" fill="#808080"/>
+</svg>
+`
+
+icon.publishComment = `
+                    <svg width="512" height="512" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#ef4444">
+        <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293L1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7l-.896-.897l.707-.707l.543.543l6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
+        <path d="m5.354 7.146l.896.897l-.707.707l-.897-.896a.5.5 0 1 1 .708-.708z"/>
+    </g>
 </svg>
 `

@@ -175,7 +175,6 @@ async function loadEdit(id, args) {
             position += duration
         })
         Object.keys(clip.layers).forEach(layer => {
-            data.layers[layer] = data.layers[layer] || []
             clip.layers[layer].forEach(annotation => {
                 if (args.users && !args.users.includes(annotation.user)) {
                     return
@@ -193,6 +192,7 @@ async function loadEdit(id, args) {
                     clip['position'] + clip['duration'],
                     a.out - clip['in'] + clip['position']
                 );
+                data.layers[layer] = data.layers[layer] || []
                 data.layers[layer].push(a)
             })
         })

@@ -71,8 +71,8 @@ window.VideoPlayer = function(options) {
                     height: 64px;
                 }
                 .mx-controls .toggle .loading svg {
-                    width: 32px;
-                    height: 32px;
+                    width: 64px;
+                    height: 64px;
                 }
                 .mx-controls .controls .volume svg,
                 .mx-controls .controls .fullscreen-btn svg {

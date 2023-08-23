@@ -86,8 +86,8 @@ function render() {
 var loadingScreen = `
     <style>
         svg {
-            width: 32px;
-            height: 32px;
+            width: 64px;
+            height: 64px;
         }
     </style>
     <div style="margin: auto;width: 64px;height: 64px;">${icon.loading}</div>

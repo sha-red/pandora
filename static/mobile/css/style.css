@@ -1,16 +1,29 @@
+:root {
+    --bg: rgb(16, 16, 16);
+    --fg: #CCCCCC;
+    --title: rgb(240, 240, 240);
+}
+
 body {
     margin: 0;
-    //background: rgb(240, 240, 240);
-    //background: rgb(144, 144, 144);
-    //color: rgb(0, 0, 0);
-    background: rgb(16, 16, 16);
-    color: rgb(240, 240, 240);
+    background: var(--bg);
+    color: var(--fg);
     font-family: "Noto Sans", "Lucida Grande", "Segoe UI", "DejaVu Sans", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
     line-height: normal;
 }
 
+*, *::after, *::before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+*:focus {
+    outline: none;
+}
+
 a {
-    color: rgb(128, 128, 255)
+    color: var(--fg)
 }
 iframe {
     max-width: 100%;
@@ -28,12 +41,19 @@ video, .poster {
     min-height: 100vh;
     max-width: 1000px;
     margin: auto;
+    padding-top: 16px;
+}
+.item-title {
+    color: var(--title);
+    text-decoration: underline;
+    padding-bottom: 0;
+    font-size: 16px;
+    text-wrap: balance;
 }
 .title {
-    padding-top: 16px;
     padding-bottom: 0;
     margin-bottom: 4px;
-    font-size: 14pt;
+    font-size: 18px;
     font-weight: bold;
     border-bottom: 1px solid pink;
     text-wrap: balance;
@@ -48,6 +68,7 @@ video, .poster {
     padding-bottom: 0px;
 }
 @media(max-width:768px) {
+    .item-title,
     .title,
     .byline {
         padding-left: 4px;
@@ -78,7 +99,14 @@ video, .poster {
     padding-top: 16px;
     padding-bottom: 16px;
     text-align: center;
-    font-size: 16pt;
+    font-size: 14px;
+}
+.more a {
+    color: rgb(144, 144, 144);
+}
+.more nav {
+    margin-top: 24px;
+    margin-bottom: 24px;
 }
 .layer.active {
     padding-top: 8px;

@@ -10,6 +10,7 @@ async function loadData(id, args) {
             "id",
             "title",
             "director",
+            "source",
             "summary",
             "streams",
             "duration",
@@ -39,7 +40,11 @@ async function loadData(id, args) {
     if (id.split('/').length == 1 || id.split('/')[1] == 'info') {
         data.view = 'info'
         data.title = data.item.title
-        data.byline = data.item.director ? data.item.director.join(', ') : ''
+        if (data.item.source) {
+            data.byline = data.item.source
+        } else {
+            data.byline = data.item.director ? data.item.director.join(', ') : ''
+        }
         data.link = `${pandora.proto}://${data.site}/${data.item.id}/info`
         let poster = pandora.site.user.ui.icons == 'posters' ? 'poster' : 'icon'
         data.icon = `${pandora.proto}://${data.site}/${data.item.id}/${poster}.jpg`
@@ -109,6 +114,13 @@ async function loadData(id, args) {
             ${layerData.title}
         </h3>`)
         data.layers[layer].forEach(annotation => {
+            if (pandora.url) {
+                annotation.value = annotation.value.replace(
+                    /src="\//g, `src="${pandora.url.origin}/`
+                ).replace(
+                    /href="\//g, `href="${pandora.url.origin}/`
+                )
+            }
             html.push(`
                 <div class="annotation ${layerData.type}" data-in="${annotation.in}" data-out="${annotation.out}">
                     ${annotation.value}
@@ -120,7 +132,11 @@ async function loadData(id, args) {
     data.value = value.join('\n')
 
     data.title = data.item.title
-    data.byline = data.item.director ? data.item.director.join(', ') : ''
+    if (data.item.source) {
+        data.byline = data.item.source
+    } else {
+        data.byline = data.item.director ? data.item.director.join(', ') : ''
+    }
     data.link = `${pandora.proto}://${data.site}/${data.item.id}/${data["in"]},${data.out}`
     data.poster = `${pandora.proto}://${data.site}/${data.item.id}/480p${data["in"]}.jpg`
     data.aspectratio = data.item.videoRatio

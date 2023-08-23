@@ -155,6 +155,9 @@ const getVideoURL = function(id, resolution, part, track, streamId) {
             .replace('{resolution}', resolution)
             .replace('{uid}', uid)
             .replace('{uid42}', uid % 42);
+    if (!prefix) {
+        prefix = pandoraURL
+    }
     return prefix + '/' + getVideoURLName(id, resolution, part, track, streamId);
 };
 
