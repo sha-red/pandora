@@ -277,7 +277,7 @@ class File(models.Model):
 
         if self.type not in ('audio', 'video'):
             self.duration = None
-        else:
+        elif self.id:
             duration = sum([s.info.get('duration', 0)
                             for s in self.streams.filter(source=None)])
             if duration:
