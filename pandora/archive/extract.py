@@ -459,7 +459,7 @@ def resize_image(image_source, image_output, width=None, size=None):
         height = max(height, 1)
 
         if width < source_width:
-            resize_method = Image.ANTIALIAS
+            resize_method = Image.LANCZOS
         else:
             resize_method = Image.BICUBIC
         output = source.resize((width, height), resize_method)
@@ -605,7 +605,7 @@ def timeline_strip(item, cuts, info, prefix):
                         print(frame, 'cut', c, 'frame', s, frame, 'width', widths[s], box)
                     # FIXME: why does this have to be frame+1?
                     frame_image = Image.open(item.frame((frame+1)/fps))
-                    frame_image = frame_image.crop(box).resize((widths[s], timeline_height), Image.ANTIALIAS)
+                    frame_image = frame_image.crop(box).resize((widths[s], timeline_height), Image.LANCZOS)
                     for x_ in range(widths[s]):
                         line_image.append(frame_image.crop((x_, 0, x_ + 1, timeline_height)))
                     frame += widths[s]

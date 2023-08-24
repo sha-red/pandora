@@ -24,11 +24,11 @@ def render_list_icon(frames, icon):
         frame_image_ratio = frame_image.size[0] / frame_image.size[1]
         frame_width_ = frame_width + (1 if i % 2 == 1 else 0)
         if frame_ratio < frame_image_ratio:
-            frame_image = frame_image.resize((int(frame_height * frame_image_ratio), frame_height), Image.ANTIALIAS)
+            frame_image = frame_image.resize((int(frame_height * frame_image_ratio), frame_height), Image.LANCZOS)
             left = int((frame_image.size[0] - frame_width_) / 2)
             frame_image = frame_image.crop((left, 0, left + frame_width_, frame_height))
         else:
-            frame_image = frame_image.resize((frame_width_, int(frame_width_ / frame_image_ratio)), Image.ANTIALIAS)
+            frame_image = frame_image.resize((frame_width_, int(frame_width_ / frame_image_ratio)), Image.LANCZOS)
             top = int((frame_image.size[1] - frame_height) / 2)
             frame_image = frame_image.crop((0, top, frame_width_, top + frame_height))
         icon_image.paste(frame_image, (i % 2 * frame_width + (1 if i % 2 == 2 else 0),

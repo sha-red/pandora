@@ -161,7 +161,7 @@ class FulltextMixin:
         img = Image.alpha_composite(img, overlay)
         img = img.convert("RGB")
         aspect = img.size[0] / img.size[1]
-        resize_method = Image.ANTIALIAS
+        resize_method = Image.LANCZOS
         if img.size[0] >= img.size[1]:
             width = size
             height = int(size / aspect)
