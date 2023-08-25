@@ -38,7 +38,7 @@ function parseURL() {
     } else if (id.startsWith('edits/')) {
         var parts = id.split('/')
         parts.shift()
-        id = parts.shift().replace(/_/g, ' ')
+        id = parts.shift().replace(/_/g, ' ').replace(/%09/g, '_')
         type = "edit"
         if (parts.length >= 2) {
             args.sort = parts[1]
