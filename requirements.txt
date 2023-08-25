@@ -20,4 +20,4 @@ elasticsearch<8
 future
 pytz
 pypdfium2
-Pillow>=10
+Pillow<10
