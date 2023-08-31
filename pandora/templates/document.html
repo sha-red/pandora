@@ -22,7 +22,7 @@
                 <img src="/{{id}}/{{icon}}128.jpg" alt="" style="padding-top: 64px; -moz-user-drag: none; -o-user-drag: none; -webkit-user-drag: none">
                 <div style="position: absolute; width: 512px; left: 0; right: 0; margin: auto; -moz-user-select: text; -o-user-select: text; -webkit-user-select: text">
                     <div style="padding: 16px 0 8px 0; font-weight: bold; font-size: 13px">{{title}}</div>
-                    <div>{{description_html|safe}}</div>
+                    <div>{{description|safe}}</div>
                     {% for c in clips %}
                         <div style="clear:both; padding-top: 4px">
                             <img src="/{{id}}/96p{{c.in}}.jpg" alt="" style="float: left; margin-right: 8px">

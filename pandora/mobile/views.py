@@ -25,6 +25,8 @@ def index(request, fragment):
         document = Document.objects.filter(id=ox.fromAZ(id)).first()
         if document and document.access(request.user):
             context['title'] = document.data['title']
+            if document.data.get('description'):
+                context['description'] = document.data['description']
             link = request.build_absolute_uri(document.get_absolute_url())
             # FIXME: get preview image or fragment parse from url
             public_id = ox.toAZ(document.id)
