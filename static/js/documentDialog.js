@@ -222,6 +222,13 @@ pandora.ui.documentDialog = function(options) {
                         {position: $content.getArea().map(Math.round)}
                     );
                 },
+                embed: function(data) {
+                    var id = options.items[options.index].id;
+                    pandora.$ui.embedDocumentDialog = pandora.ui.embedDocumentDialog(
+                        id,
+                        data.page
+                    ).open();
+                },
                 key_escape: function() {
                     pandora.$ui.documentDialog.close();
                 },

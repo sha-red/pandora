@@ -4,6 +4,8 @@ var cache = {}
 var documentId
 var baseUrl = document.location.protocol + '//' + document.location.host
 
+
+
 var div = document.createElement("div")
 div.innerHTML = `
 <button id="cropFile" class="toolbarButton cropFile hiddenLargeView" title="Crop" tabindex="30" data-l10n-id="crop_file">
@@ -13,6 +15,19 @@ div.innerHTML = `
 var cropFile = div.querySelector("#cropFile")
 
 document.querySelector('#toolbarViewerRight').insertBefore(cropFile, document.querySelector('#toolbarViewerRight').firstChild)
+
+div.innerHTML = `
+<button id="embedPage" class="toolbarButton embedPage hiddenLargeView" title="Embed" tabindex="29" data-l10n-id="embed">
+    <span data-l10n-id="embed_label">Embed</span>
+</button>
+`
+var embedPage = div.querySelector("#embedPage")
+document.querySelector('#toolbarViewerRight').insertBefore(embedPage, document.querySelector('#toolbarViewerRight').firstChild)
+embedPage.addEventListener("click", event => {
+    Ox.$parent.postMessage('embed', {
+        page: PDFViewerApplication.page
+    });
+})
 
 async function archiveAPI(action, data) {
     var url = baseUrl + '/api/'
@@ -206,6 +221,9 @@ function initOverlay() {
             }
             div.appendChild(overlay)
             renderCropOverlay(overlay, documentId, page)
+        })
+        PDFViewerApplication.pdfViewer.eventBus.on("pagechanging", function(event) {
+            console.log("pagechanging", event, event.pageNumber.toString())
         })
     })
 }

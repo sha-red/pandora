@@ -4,15 +4,17 @@ Ox.load({
     }
 }, function() {
     var currentPage = PDFViewerApplication.page;
-    window.addEventListener('pagechange', function (evt) {
-        var page = evt.pageNumber;
-        if (page && page != currentPage) {
-            currentPage = page;
-            Ox.$parent.postMessage('page', {
-                page: Math.round(page)
-            });
-        }
-    });
+    PDFViewerApplication.initializedPromise.then(function() {
+        PDFViewerApplication.pdfViewer.eventBus.on("pagechanging", function(event) {
+            var page = event.pageNumber;
+            if (page && page != currentPage) {
+                currentPage = page;
+                Ox.$parent.postMessage('page', {
+                    page: page
+                });
+            }
+        })
+    })
     Ox.$parent.bindMessage({
         page: function(data) {
             if (data.page != PDFViewerApplication.page) {

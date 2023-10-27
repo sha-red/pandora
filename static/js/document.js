@@ -95,6 +95,13 @@ pandora.ui.document = function() {
                         {position: $content.getArea().map(Math.round)}
                     );
                 },
+                embed: function(data) {
+                    var id = item.id;
+                    pandora.$ui.embedDocumentDialog = pandora.ui.embedDocumentDialog(
+                        id,
+                        data.page
+                    ).open();
+                },
                 key_escape: function() {
                     // ...
                 },
