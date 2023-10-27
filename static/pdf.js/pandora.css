@@ -20,9 +20,11 @@
 
 .verticalToolbarSeparator.hiddenMediumView,
 #print,
+#secondaryPrint,
 #openFile,
+#secondaryOpenFile,
 #editorModeButtons {
-    display: none;
+    display: none !important;
 }
 
 .page .crop-overlay {

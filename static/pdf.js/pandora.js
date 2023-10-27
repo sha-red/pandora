@@ -29,6 +29,35 @@ embedPage.addEventListener("click", event => {
     });
 })
 
+// secondary menu
+div.innerHTML = `
+<button id="secondaryCropFile" class="secondaryToolbarButton visibleMediumView cropFile" title="Crop" tabindex="50" data-l10n-id="crop">
+  <span data-l10n-id="crop_label">Crop</span>
+</button>
+`
+var secondaryCropFile = div.querySelector("#secondaryCropFile")
+document.querySelector('#secondaryToolbarButtonContainer').insertBefore(
+    secondaryCropFile,
+    document.querySelector('#secondaryToolbarButtonContainer').firstChild
+)
+
+div.innerHTML = `
+<button id="secondaryEmbedPage" class="secondaryToolbarButton visibleMediumView embedPage" title="Embed" tabindex="50" data-l10n-id="embed">
+  <span data-l10n-id="embed_label">Embed</span>
+</button>
+`
+var secondaryEmbedPage = div.querySelector("#secondaryEmbedPage")
+document.querySelector('#secondaryToolbarButtonContainer').insertBefore(
+    secondaryEmbedPage,
+    document.querySelector('#secondaryToolbarButtonContainer').firstChild
+)
+secondaryEmbedPage.addEventListener("click", event => {
+    Ox.$parent.postMessage('embed', {
+        page: PDFViewerApplication.page
+    });
+})
+
+
 async function archiveAPI(action, data) {
     var url = baseUrl + '/api/'
     var key = JSON.stringify([action, data])
@@ -180,20 +209,22 @@ const addToRecent = obj => {
 }
 
 function initOverlay() {
-    document.querySelector('#cropFile').addEventListener('click', event=> {
-        if (cropInactive) {
-            event.target.style.background = 'red'
-            cropInactive = false
-            document.querySelectorAll('.crop-overlay.inactive').forEach(element => {
-                element.classList.remove('inactive')
-            })
-        } else {
-            event.target.style.background = ''
-            cropInactive = true
-            document.querySelectorAll('.crop-overlay').forEach(element => {
-                element.classList.add('inactive')
-            })
-        }
+    document.querySelectorAll('#cropFile,.secondaryToolbarButton.cropFile').forEach(btn => {
+        btn.addEventListener('click', event=> {
+            if (cropInactive) {
+                event.target.style.background = 'red'
+                cropInactive = false
+                document.querySelectorAll('.crop-overlay.inactive').forEach(element => {
+                    element.classList.remove('inactive')
+                })
+            } else {
+                event.target.style.background = ''
+                cropInactive = true
+                document.querySelectorAll('.crop-overlay').forEach(element => {
+                    element.classList.add('inactive')
+                })
+            }
+        })
     })
     var first = true
     PDFViewerApplication.initializedPromise.then(function() {
@@ -221,9 +252,6 @@ function initOverlay() {
             }
             div.appendChild(overlay)
             renderCropOverlay(overlay, documentId, page)
-        })
-        PDFViewerApplication.pdfViewer.eventBus.on("pagechanging", function(event) {
-            console.log("pagechanging", event, event.pageNumber.toString())
         })
     })
 }
