@@ -1,0 +1,38 @@
+
+.toolbarButton.cropFile::before,
+    .secondaryToolbarButton.cropFile::before {
+    mask-image: url(custom/toolbarButton-crop.png);
+}
+@media screen and (min-resolution: 2dppx) {
+    .toolbarButton.cropFile::before,
+    .secondaryToolbarButton.cropFile::before {
+        mask-image: url(custom/toolbarButton-crop@2x.png);
+    }
+}
+
+.verticalToolbarSeparator.hiddenMediumView,
+#print,
+#openFile,
+#editorModeButtons {
+    display: none;
+}
+
+.page .crop-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    //background: rgba(0,0,0,0.5);
+    cursor: crosshair;
+    z-index: 100;
+}
+.page .crop-overlay.inactive {
+  pointer-events: none;
+  cursor: default;
+}
+
+.page .crop-overlay canvas {
+  width: 100%;
+  height: 100%;
+}
