@@ -253,6 +253,7 @@ appPanel
                 });
             }
         });
+        window.pandora.getVersion = getPandoraVersion
     }
 
     function loadPandoraFiles(callback) {
