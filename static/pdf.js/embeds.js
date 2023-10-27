@@ -3,7 +3,7 @@ Ox.load({
         loadCSS: false
     }
 }, function() {
-    var currentPage = PDFView.page;
+    var currentPage = PDFViewerApplication.page;
     window.addEventListener('pagechange', function (evt) {
         var page = evt.pageNumber;
         if (page && page != currentPage) {
@@ -15,13 +15,13 @@ Ox.load({
     });
     Ox.$parent.bindMessage({
         page: function(data) {
-            if (data.page != PDFView.page) {
-                PDFView.page = data.page;
+            if (data.page != PDFViewerApplication.page) {
+                PDFViewerApplication.page = data.page;
             }
         },
         pdf: function(data) {
-            if (PDFView.url != data.pdf) {
-                PDFView.open(data.pdf);
+            if (PDFViewerApplication.url != data.pdf) {
+                PDFViewerApplication.open(data.pdf);
             }
         }
     });
