@@ -31,23 +31,28 @@ class Channel(models.Model):
             items = Item.objects.filter(rendered=True, level__lte=cansee, sort__duration__gt=0)
         if items.count() == 0:
             return None
-
         program = self.program.order_by('-start')
         changed = False
-        while program.count() < 1 or program[0].end < now:
-            not_played = items.exclude(program__in=self.program.filter(run=self.run))
-            not_played_count = not_played.count()
-            if not_played_count == 0:
-                self.run += 1
+        play_now = program.filter(start__lte=now, end__gt=now).first()
+        while not play_now or not play_now.next():
+            played = self.program.filter(run=self.run)
+            if played.exists():
+                not_played = items.exclude(program__in=self.program.filter(run=self.run))
+                not_played_count = not_played.count()
+                if not_played_count == 0:
+                    self.run += 1
+                    changed = True
+            else:
                 changed = True
+            if changed:
                 not_played = items
                 not_played_count = not_played.count()
-                if not_played_count > 1:
+                if not_played_count > 1 and program.exists():
                     not_played = not_played.exclude(id=program[0].id)
                     not_played_count = not_played.count()
             item = not_played[randint(0, not_played_count-1)]
-            if program.count() > 0:
-                start = program.aggregate(Max('end'))['end__max']
+            if program.exists():
+                start = program.order_by('-end')[0].end
             else:
                 start = now
             p = Program()
@@ -58,9 +63,10 @@ class Channel(models.Model):
             p.channel = self
             p.save()
             program = self.program.order_by('-start')
+            play_now = program.filter(start__lte=now, end__gt=now).first()
         if changed:
             self.save()
-        return program[0]
+        return play_now
 
     def json(self, user):
         now = datetime.now()
@@ -82,6 +88,9 @@ class Program(models.Model):
     def __str__(self):
         return "%s %s" % (self.item, self.start)
 
+    def next(self):
+        return self.channel.program.filter(start__gte=self.end).order_by('start').first()
+
     def json(self, user, current=False):
         item_json = self.item.json()
         r = {
@@ -92,8 +101,6 @@ class Program(models.Model):
         r['layers'] = self.item.get_layers(user)
         r['streams'] = [s.file.oshash for s in self.item.streams()]
         if current:
-            #requires python2.7
-            #r['position'] = (current - self.start).total_seconds()
-            td = current - self.start
-            r['position'] = td.seconds + td.days * 24 * 3600 + float(td.microseconds)/10**6
+            r['position'] = (current - self.start).total_seconds()
+            r['next'] = self.next().json(user)
         return r
