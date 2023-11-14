@@ -473,7 +473,7 @@ def timeline(video, prefix, modes=None, size=None):
         size = [64, 16]
     if isinstance(video, str):
         video = [video]
-    cmd = ['../bin/oxtimelines',
+    cmd = [os.path.normpath(os.path.join(settings.BASE_DIR, '../bin/oxtimelines')),
            '-s', ','.join(map(str, reversed(sorted(size)))),
            '-m', ','.join(modes),
            '-o', prefix,
