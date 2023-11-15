@@ -31,6 +31,16 @@ pandora.ui.infoView = function(data, isMixed) {
             return key.id;
         }),
         posterKeys = ['title', 'date'],
+        displayedKeys = [ // FIXME: can tis be a flag in the config?
+            'title', 'notes', 'name', 'summary', 'id',
+            'hue', 'saturation', 'lightness', 'cutsperminute', 'volume',
+            'user', 'rightslevel', 'bitrate', 'timesaccessed',
+            'numberoffiles', 'numberofannotations', 'numberofcuts', 'words', 'wordsperminute',
+            'annotations', 'groups', 'filename',
+            'duration', 'aspectratio', 'pixels', 'size', 'resolution',
+            'created', 'modified', 'accessed',
+            'random'
+        ],
         statisticsWidth = 128,
 
         $bar = Ox.Bar({size: 16})
@@ -236,6 +246,7 @@ pandora.ui.infoView = function(data, isMixed) {
     if (!isMultiple) {
 
     ['source', 'project'].forEach(function(key) {
+        displayedKeys.push(key);
         if (canEdit || data[key]) {
             var $div = $('<div>')
                 .addClass('OxSelectable')
@@ -379,7 +390,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     // License -----------------------------------------------------------------
 
-    renderGroup(['license']);
+    Ox.getObjectById(pandora.site.itemKeys, 'license') && renderGroup(['license']);
 
 
     $('<div>')
@@ -388,6 +399,9 @@ pandora.ui.infoView = function(data, isMixed) {
         .css({height: '16px'})
         .appendTo($text);
 
+    // Render any remaing keys defined in config
+
+    renderRemainingKeys();
 
 
     // Duration, Aspect Ratio --------------------------------------------------
@@ -649,6 +663,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     function renderGroup(keys) {
         var $element;
+        keys.forEach(function(key) { displayedKeys.push(key) });
         if (canEdit || keys.filter(function(key) {
             return data[key];
         }).length) {
@@ -690,6 +705,18 @@ pandora.ui.infoView = function(data, isMixed) {
         }
         return $element;
     }
+
+    function renderRemainingKeys() {
+        var keys = pandora.site.itemKeys.filter(function(item) {
+            return item.id != '*' && item.type != 'layer' && !Ox.contains(displayedKeys, item.id);
+        }).map(function(item) {
+            return item.id;
+        });
+        if (keys.length) {
+            renderGroup(keys)
+        }
+    }
+
 
     function toggleIconSize() {
         iconSize = iconSize == 256 ? 512 : 256;
