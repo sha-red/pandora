@@ -100,6 +100,7 @@ pandoraAPI("init").then(response => {
         ...response.data
     }
     pandora.proto = pandora.site.site.https ? 'https' : 'http'
+    pandora.resolution = Math.max.apply(null, pandora.site.video.resolutions)
     if (pandora.site.site.videoprefix.startsWith('//')) {
         pandora.site.site.videoprefix = pandora.proto + ':' + pandora.site.site.videoprefix
     }

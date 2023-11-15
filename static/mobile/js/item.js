@@ -99,7 +99,7 @@ async function loadData(id, args) {
     data.videos = []
     data.item.durations.forEach((duration, idx) => {
         var oshash = data.item.streams[idx]
-        var url = getVideoURL(data.item.id, 480, idx+1, '', oshash)
+        var url = getVideoURL(data.item.id, pandora.resolution, idx+1, '', oshash)
         data.videos.push({
             src: url,
             duration: duration
@@ -138,7 +138,7 @@ async function loadData(id, args) {
         data.byline = data.item.director ? data.item.director.join(', ') : ''
     }
     data.link = `${pandora.proto}://${data.site}/${data.item.id}/${data["in"]},${data.out}`
-    data.poster = `${pandora.proto}://${data.site}/${data.item.id}/480p${data["in"]}.jpg`
+    data.poster = `${pandora.proto}://${data.site}/${data.item.id}/${pandora.resolution}p${data["in"]}.jpg`
     data.aspectratio = data.item.videoRatio
     if (data['in'] == data['out']) {
         data['out'] += 0.04

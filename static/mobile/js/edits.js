@@ -140,7 +140,7 @@ async function loadEdit(id, args) {
             } else {
                 var video = {}
                 var oshash = clip.streams[idx]
-                video.src = getVideoURL(clip.item, 480, idx+1, '', oshash)
+                video.src = getVideoURL(clip.item, pandora.resolution, idx+1, '', oshash)
                 /*
                 if (clip['in'] && clip.out) {
                     video.src += `#t=${clip['in']},${clip.out}`
@@ -222,7 +222,7 @@ async function loadEdit(id, args) {
     data.title = data.edit.name
     data.byline = data.edit.description
     data.link = `${pandora.proto}://${data.site}/edits/${data.edit.id}`
-    data.poster = data.videos[0].src.split('/48')[0] + `/480p${data.videos[0].in}.jpg`
+    data.poster = data.videos[0].src.split('/' + pandora.resolution)[0] + `/${pandora.resolution}p${data.videos[0].in}.jpg`
     data.aspectratio = data.edit.clips[0].videoRatio
     data.duration = data.edit.duration
     return data
