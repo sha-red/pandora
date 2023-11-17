@@ -256,6 +256,7 @@ class Item(models.Model):
                 description = data.pop(key)
                 if isinstance(description, dict):
                     for value in description:
+                        value = ox.sanitize_html(value)
                         d, created = Description.objects.get_or_create(key=k, value=value)
                         d.description = ox.sanitize_html(description[value])
                         d.save()
@@ -704,7 +705,7 @@ class Item(models.Model):
                     for d in Description.objects.filter(key=key, value__in=values):
                         i['%sdescription' % key][d.value] = d.description
             else:
-                values = ox.sanitize_html(self.get(key, ''))
+                value = ox.sanitize_html(self.get(key, ''))
                 qs = Description.objects.filter(key=key, value=value)
                 i['%sdescription' % key] = '' if qs.count() == 0 else qs[0].description
         if keys:
