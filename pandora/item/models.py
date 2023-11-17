@@ -260,7 +260,7 @@ class Item(models.Model):
                         d.description = ox.sanitize_html(description[value])
                         d.save()
                 else:
-                    value = data.get(k, self.get(k, ''))
+                    value = ox.escape_html(data.get(k, self.get(k, '')))
                     if not description:
                         description = ''
                     d, created = Description.objects.get_or_create(key=k, value=value)
@@ -1809,6 +1809,8 @@ class Description(models.Model):
     value = models.CharField(max_length=1000, db_index=True)
     description = models.TextField()
 
+    def __str__(self):
+        return "%s=%s" % (self.key, self.value)
 
 class AnnotationSequence(models.Model):
     item = models.OneToOneField('Item', related_name='_annotation_sequence', on_delete=models.CASCADE)
