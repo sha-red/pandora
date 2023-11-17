@@ -260,7 +260,7 @@ class Item(models.Model):
                         d.description = ox.sanitize_html(description[value])
                         d.save()
                 else:
-                    value = ox.escape_html(data.get(k, self.get(k, '')))
+                    value = ox.sanitize_html(data.get(k, self.get(k, '')))
                     if not description:
                         description = ''
                     d, created = Description.objects.get_or_create(key=k, value=value)
@@ -700,10 +700,12 @@ class Item(models.Model):
                 else:
                     values = self.get(key)
                 if values:
+                    values = [ox.sanitize_html(value) for value in values]
                     for d in Description.objects.filter(key=key, value__in=values):
                         i['%sdescription' % key][d.value] = d.description
             else:
-                qs = Description.objects.filter(key=key, value=self.get(key, ''))
+                values = ox.sanitize_html(self.get(key, ''))
+                qs = Description.objects.filter(key=key, value=value)
                 i['%sdescription' % key] = '' if qs.count() == 0 else qs[0].description
         if keys:
             info = {}
