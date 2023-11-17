@@ -723,7 +723,7 @@ pandora.ui.infoView = function(data, isMixed) {
             return key
                 ? '<a href="/' + (
                     key == 'alternativeTitles' ? 'title' : key
-                ) + '=' + pandora.escapeQueryValue(linkValue[idx]) + '">' + value + '</a>'
+                ) + '=' + pandora.escapeQueryValue(Ox.decodeHTMLEntities(linkValue[idx])) + '">' + value + '</a>'
                 : value;
         }).join(Ox.contains(specialListKeys, key) ? '; ' : ', ');
     }

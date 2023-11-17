@@ -635,7 +635,9 @@ pandora.ui.infoView = function(data, isMixed) {
     function formatLink(key, value, linkValue) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key
-                ? '<a href="/' + key + '=' + pandora.escapeQueryValue(linkValue ? linkValue : value) + '">' + value + '</a>'
+                ? '<a href="/' + key + '=' + pandora.escapeQueryValue(
+                    Ox.decodeHTMLEntities(linkValue ? linkValue : value)
+                ) + '">' + value + '</a>'
                 : value;
         }).join(', ');
     }
