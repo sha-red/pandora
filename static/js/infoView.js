@@ -405,6 +405,8 @@ pandora.ui.infoView = function(data, isMixed) {
             .appendTo($statistics);
     });
 
+    }
+
     // Created and Modified ----------------------------------------------------
     if (!isMultiple && canEdit) {
 
@@ -417,6 +419,8 @@ pandora.ui.infoView = function(data, isMixed) {
             )
             .appendTo($statistics);
     });
+
+    }
 
     // Notes --------------------------------------------------------------------
 
