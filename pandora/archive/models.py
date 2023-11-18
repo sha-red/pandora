@@ -404,7 +404,7 @@ class File(models.Model):
         config = settings.CONFIG['video']
         height = self.info['video'][0]['height'] if self.info.get('video') else None
         max_resolution = max(config['resolutions'])
-        if height <= max_resolution and self.extension in ('mov', 'mkv', 'mp4', 'm4v'):
+        if height and height <= max_resolution and self.extension in ('mov', 'mkv', 'mp4', 'm4v'):
             vcodec = self.get_codec('video')
             acodec = self.get_codec('audio')
             if vcodec in self.MP4_VCODECS and acodec in self.MP4_ACODECS:
@@ -415,7 +415,7 @@ class File(models.Model):
         config = settings.CONFIG['video']
         height = self.info['video'][0]['height'] if self.info.get('video') else None
         max_resolution = max(config['resolutions'])
-        if height <= max_resolution and config['formats'][0] == self.extension:
+        if height and height <= max_resolution and config['formats'][0] == self.extension:
             vcodec = self.get_codec('video')
             acodec = self.get_codec('audio')
             if self.extension in ['mp4', 'm4v'] and vcodec in self.MP4_VCODECS and acodec in self.MP4_ACODECS:
