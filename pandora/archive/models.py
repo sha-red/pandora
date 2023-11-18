@@ -816,6 +816,8 @@ class Stream(models.Model):
                 shutil.move(self.file.data.path, target)
                 self.file.data.name = ''
                 self.file.save()
+                self.available = True
+                self.save()
             elif self.file.can_remux():
                 ok, error = extract.remux_stream(media, target)
                 done = True
