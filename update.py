@@ -299,7 +299,7 @@ if __name__ == "__main__":
             run(join(base, 'pandora/manage.py'), 'update_geoip')
         if old < 6442:
             run('./bin/pip', 'install', 'yt-dlp>=2022.3.8.2')
-        if old <= 6517:
+        if old <= 6581:
             run('./bin/pip', 'install', '-U', 'pip')
             run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:

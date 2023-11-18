@@ -52,6 +52,10 @@ if [ "$action" = "init" ]; then
     done
     exit 0
 fi
+if [ "$action" = "version" ]; then
+    git rev-list HEAD --count
+    exit 0
+fi
 
 if [ "$action" = "manage" ]; then
     cmd="pandora/manage.py"

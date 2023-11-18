@@ -52,7 +52,6 @@ apt-get install -y \
     python3-numpy \
     python3-psycopg2 \
     python3-pyinotify \
-    python3-simplejson \
     python3-lxml \
     python3-cssselect \
     python3-html5lib \

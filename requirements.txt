@@ -1,7 +1,6 @@
-Django==4.2.3
-simplejson
+Django==4.2.7
 chardet
-celery==5.3.1
+celery==5.3.5
 django-celery-results==2.5.1
 django-celery-beat==2.5.0
 django-extensions==3.2.3
@@ -12,7 +11,7 @@ gunicorn==20.0.4
 html5lib
 requests<3.0.0,>=2.24.0
 urllib3<2.0.0,>=1.25.2
-tornado==6.3.2
+tornado==6.3.3
 geoip2==4.7.0
 yt-dlp>=2023.11.16
 python-memcached

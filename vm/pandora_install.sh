@@ -111,7 +111,6 @@ apt-get install -y \
     python3-numpy \
     python3-psycopg2 \
     python3-pyinotify \
-    python3-simplejson \
     python3-maxminddb \
     libmaxminddb-dev \
     python3-lxml \
