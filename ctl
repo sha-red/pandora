@@ -39,7 +39,9 @@ if [ "$action" = "init" ]; then
             $SUDO git clone -b $branch https://git.0x2620.org/${package}.git src/${package}
         fi
         cd ${BASE}/src/${package}
-        $SUDO ${BASE}/bin/python setup.py develop
+
+        $SUDO ${BASE}/bin/pip install -e .
+
     done
     cd ${BASE}
     $SUDO ./bin/pip install -r requirements.txt
