@@ -818,6 +818,7 @@ class Stream(models.Model):
                 self.file.save()
                 self.available = True
                 self.save()
+                done = True
             elif self.file.can_remux():
                 ok, error = extract.remux_stream(media, target)
                 done = True
