@@ -111,7 +111,7 @@ def download(item_id, url, referer=None):
         format = settings.CONFIG['video']['formats'][0]
         if format == 'mp4':
             cmd += [
-                '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio',
+                '-f', 'bestvideo[height<=%s][ext=mp4]+bestaudio[ext=m4a]' % max_resolution,
                 '--merge-output-format', 'mp4'
             ]
         elif format == 'webm':
