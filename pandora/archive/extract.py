@@ -733,19 +733,24 @@ def remux_stream(src, dst):
     cmd = [
         settings.FFMPEG,
         '-nostats', '-loglevel', 'error',
-        '-map_metadata', '-1', '-sn',
         '-i', src,
+        '-map_metadata', '-1', '-sn',
     ] + video + [
     ] + audio + [
         '-movflags', '+faststart',
         dst
     ]
+    print(cmd)
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-                         stdout=open('/dev/null', 'w'),
-                         stderr=open('/dev/null', 'w'),
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT,
                          close_fds=True)
-    p.wait()
-    return True, None
+    stdout, stderr = p.communicate()
+    if stderr:
+        logger.error("failed to remux %s  %s", cmd, stderr)
+        return False, stderr
+    else:
+        return True, None
 
 
 def ffprobe(path, *args):
