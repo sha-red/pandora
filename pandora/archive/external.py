@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-import logger
+import logging
 import os
 import shutil
 import subprocess
