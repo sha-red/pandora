@@ -205,6 +205,7 @@ def download(item_id, url, referer=None):
                 f.extract_stream()
                 status = True
             else:
+                logger.error("failed to import %s file already exists %s", url, oshash)
                 status = 'file exists'
         if len(parts) == 1:
             add_subtitles(f.item, media, tmp)
