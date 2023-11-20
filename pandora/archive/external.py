@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import json
-import subprocess
-import shutil
-import tempfile
+import logger
 import os
+import shutil
+import subprocess
+import tempfile
 
 import ox
 from django.conf import settings
@@ -13,6 +14,9 @@ from item.models import Item
 from item.tasks import load_subtitles
 
 from . import models
+
+logger = logging.getLogger('pandora.' + __name__)
+
 
 info_keys = [
     'title',
@@ -88,6 +92,15 @@ def add_subtitles(item, media, tmp):
                     sub.selected = True
                     sub.save()
 
+def load_formats(url):
+    cmd = ['yt-dlp', '-q', url, '-j', '-F']
+    p = subprocess.Popen(cmd,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, close_fds=True)
+    stdout, stderr = p.communicate()
+    formats = stdout.decode().strip().split('\n')[-1]
+    return json.loads(formats)
+
 def download(item_id, url, referer=None):
     item = Item.objects.get(public_id=item_id)
     info = get_info(url, referer)
@@ -121,6 +134,50 @@ def download(item_id, url, referer=None):
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, close_fds=True)
     stdout, stderr = p.communicate()
+    if stderr and b'Requested format is not available.' in stderr:
+        formats = load_formats(url)
+        has_audio = bool([fmt for fmt in formats['formats'] if fmt['resolution'] == 'audio only'])
+        has_video = bool([fmt for fmt in formats['formats'] if 'x' in fmt['resolution']])
+
+        cmd = [
+            'yt-dlp', '-q', url,
+            '-o', '%(title)80s.%(ext)s'
+        ]
+        if referer:
+            cmd += ['--referer', referer]
+        elif 'referer' in media:
+            cmd += ['--referer', media['referer']]
+        if has_video and not has_audio:
+            cmd += [
+                '-f', 'bestvideo[height<=%s][ext=mp4]' % max_resolution,
+            ]
+        elif not has_video and has_audio:
+            cmd += [
+                'bestaudio[ext=m4a]'
+            ]
+        else:
+            cmd = []
+        if cmd:
+            p = subprocess.Popen(cmd,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, close_fds=True)
+            stdout, stderr = p.communicate()
+    if stderr and b'Requested format is not available.' in stderr:
+        cmd = [
+            'yt-dlp', '-q', url,
+            '-o', '%(title)80s.%(ext)s'
+        ]
+        if referer:
+            cmd += ['--referer', referer]
+        elif 'referer' in media:
+            cmd += ['--referer', media['referer']]
+        if cmd:
+            p = subprocess.Popen(cmd,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, close_fds=True)
+            stdout, stderr = p.communicate()
+    if stdout or stderr:
+        logger.error("import failed:\n%s\n%s\n%s", " ".join(cmd), stdout.decode(), stderr.decode())
     parts = list(os.listdir(tmp))
     if parts:
         part = 1
