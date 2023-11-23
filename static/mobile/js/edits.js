@@ -107,7 +107,7 @@ async function loadEdit(id, args) {
         }
     }
     data.edit = response['data']
-    if (data.edit.status !== 'public') {
+    if (['public', 'featured'].indexOf(data.edit) == -1) {
         return {
             site: data.site,
             error: {
