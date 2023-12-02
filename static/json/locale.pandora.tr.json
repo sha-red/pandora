@@ -528,7 +528,7 @@
   "Staff": "Personel",
   "Statistics...": "İstatistikler...",
   "Statistics": "İstatistik",
-  "Status": "Statüs",
+  "Status": "Durum",
   "Stay Signed In": "Çevrimiçi kal",
   "Student": "Öğrenci",
   "Subject": "Konu",
@@ -656,6 +656,10 @@
   "Inactive": "İnaktif",
   "Custom": "Özel",
   "Collection": "Koleksiyon",
+  "Collections": "Koleksiyonlar",
+  "Personal Collections": "Kişisel Koleksiyonlar",
+  "Favorite Collections": "Favoriler",
+  "Featured Collections": "Öne Çıkanlar",
   "Image URL": "İmge URL",
   "Link URL": "Link URL",
   "Embed a Poster and Basic Metadata": "Poster ve Temel Meta Verileri Yerleştir",
@@ -687,8 +691,14 @@
   "File": "Dosya",
   "Select Video Files": "Video Dosyaları Seç",
   "YouTube, Vimeo, etc.": "YouTuve, Vimeo, vs.",
-  "No Summary": "",
+  "No Summary": "Açıklama yok",
   "No Groups": "",
   "Mixed Notes": "",
-  "Mixed Titles": ""
+  "Mixed Titles": "",
+  "Publisher": "Yayıncı",
+  "Author": "Yazar",
+  "Year": "Yıl",
+  "as List": "",
+  "as Grid": ""
+
 }
