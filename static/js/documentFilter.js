@@ -189,7 +189,9 @@ pandora.ui.documentFilter = function(id) {
                     {id: 'clearFilters', title: Ox._('Clear All Filters'), keyboard: 'shift alt control a'},
                     {},
                     {group: 'filter', max: 1, min: 1, items: pandora.site.documentFilters.map(function(filter) {
-                        return Ox.extend({checked: filter.id == id}, filter);
+                        return Ox.extend({checked: filter.id == id}, filter, {
+                            title: Ox._(filter.title)
+                        });
                     })}
                 ],
                 type: 'image',
