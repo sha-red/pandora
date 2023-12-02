@@ -44,7 +44,7 @@
   "Anti-Alias": "Anti-Alias",
   "API Documentation...": "API Belgeleme...",
   "API Documentation": "API Belgeleme",
-  "Appearance": "Görünüm:",
+  "Appearance": "Görünüm",
   "Application Error": "Uygulama Hatası",
   "Archives...": "Arşivler...",
   "Are you sure you want to delete the {0} \"{1}\"?": "{0} \"{1}\"? Silmek istediğinden emin misin",
@@ -690,5 +690,5 @@
   "No Summary": "",
   "No Groups": "",
   "Mixed Notes": "",
-  "Mixed Titles": "",
+  "Mixed Titles": ""
 }
