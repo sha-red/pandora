@@ -1830,8 +1830,8 @@ pandora.ui.mainMenu = function() {
     function getViewMenu() {
         return { id: 'viewMenu', title: Ox._('View'), items: [
             { id: 'section', title: Ox._('Section'), items: [
-                { group: 'viewsection', min: 1, max: 1, items: pandora.site.sections.map(function(section) {
-                    section = Ox.extend({}, section)
+                { group: 'viewsection', min: 1, max: 1, items: Ox.clone(pandora.site.sections, true).map(function(section) {
+                    section.title = Ox._(section.title);
                     section.checked = section.id == ui.section;
                     return section;
                 }) }
