@@ -15,7 +15,6 @@ services:
             - "127.0.0.1:2620:80"
         networks:
             - backend
-            - default
         links:
             - pandora
             - websocketd
