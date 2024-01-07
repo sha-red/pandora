@@ -32,7 +32,7 @@ if [ "$action" = "pandora" ]; then
         /srv/pandora/pandora/manage.py init_db
         $update db
         echo "Generating static files..."
-        chown -R ${user}.${user} /srv/pandora/
+        chown -R ${user}:${user} /srv/pandora/
         $update static
         touch /srv/pandora/initialized
     fi
