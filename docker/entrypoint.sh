@@ -6,7 +6,7 @@ user=pandora
 
 export LANG=en_US.UTF-8
 mkdir -p /run/pandora
-chown -R ${user}.${user} /run/pandora
+chown -R ${user}:${user} /run/pandora
 
 update="/usr/bin/sudo -u $user -E -H /srv/pandora/update.py"
 
@@ -103,9 +103,9 @@ fi
 # pan.do/ra setup hooks
 if [ "$action" = "docker-compose.yml" ]; then
     cat /srv/pandora_base/docker-compose.yml | \
-        sed "s#build: \.#image: 0x2620/pandora:latest#g" | \
+        sed "s#build: \.#image: code.0x2620.org/0x2620/pandora:latest#g" | \
         sed "s#\./overlay:#.:#g" | \
-        sed "s#build: docker/nginx#image: 0x2620/pandora-nginx:latest#g"
+        sed "s#build: docker/nginx#image: code.0x2620.org/0x2620/pandora-nginx:latest#g"
     exit
 fi
 if [ "$action" = ".env" ]; then
