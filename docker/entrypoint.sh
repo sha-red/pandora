@@ -66,7 +66,7 @@ if [ "$action" = "tasks" ]; then
         -A app worker \
         -Q default,celery -n ${name} \
         --pidfile /run/pandora/tasks.pid \
-        --maxtasksperchild 1000 \
+        --max-tasks-per-child 1000 \
         -l INFO
 fi
 if [ "$action" = "cron" ]; then

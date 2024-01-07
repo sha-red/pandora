@@ -1,4 +1,4 @@
-FROM 0x2620/pandora-base:latest
+FROM code.0x2620.org/0x2620/pandora-base:latest
 
 LABEL maintainer="0x2620@0x2620.org"
 
