@@ -27,7 +27,7 @@ services:
         restart: unless-stopped
 
     db:
-        image: postgres:latest
+        image: postgres:15
         networks:
             - backend
         env_file: .env
