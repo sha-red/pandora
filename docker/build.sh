@@ -11,7 +11,7 @@ else
     proxy=
 fi
 
-docker build $proxy -t 0x2620/pandora-base base
-docker build -t 0x2620/pandora-nginx nginx
+docker build $proxy -t code.0x2620.org/0x2620/pandora-base base
+docker build -t code.0x2620.org/0x2620/pandora-nginx nginx
 cd ..
-docker build -t 0x2620/pandora .
+docker build -t code.0x2620.org/0x2620/pandora .

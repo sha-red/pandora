@@ -52,7 +52,7 @@ if [ "$action" = "encoding" ]; then
             -A app worker \
             -Q encoding -n ${name} \
             --pidfile /run/pandora/encoding.pid \
-            --maxtasksperchild 500 \
+            --max-tasks-per-child 500 \
             -c 1 \
             -l INFO
 fi
