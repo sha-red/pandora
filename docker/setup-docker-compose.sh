@@ -22,11 +22,14 @@ To start pan.do/ra adjust the files in this folder:
 
 and to get started run this:
 
-    docker-compose up -d
+    docker compose up -d
 
 To update pan.do/ra run:
 
-    docker-compose run pandora ctl update
+    docker compose run --rm pandora ctl update
 
+To run pan.do/ra manage shell:
+
+    docker compose run --rm pandora ctl manage shell
 EOF
 touch __init__.py

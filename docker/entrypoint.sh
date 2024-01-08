@@ -131,5 +131,5 @@ echo "  docker run 0x2620/pandora setup | sh"
 echo
 echo adjust created files to match your needs and run:
 echo
-echo "  docker-compose up"
+echo "  docker compose up"
 echo
