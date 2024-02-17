@@ -66,10 +66,25 @@ def index(request, fragment):
                 clips = _order_clips(edit, sort)
             else:
                 clips = edit.get_clips(request.user)
-            clip = clips.first()
-            if clip:
-                start = clip.json()['in']
-                preview = '/%s/%sp%0.03f.jpg' % (clip.item.public_id, resolution, float(start))
+
+            preview = None
+
+            if len(parts) >= 3 and ':' in parts[-1]:
+                ts = ox.parse_timecode(parts[-1])
+                position = 0
+                for clip in clips:
+                    c = clip.json()
+                    if ts > position and ts < position + c['duration']:
+                        start = ts - position + c.get('in', 0)
+                        preview = '/%s/%sp%0.03f.jpg' % (clip.item.public_id, resolution, float(start))
+                        break
+                    position += c['duration']
+            if not preview:
+                clip = clips.first()
+                if clip:
+                    start = clip.json()['in']
+                    preview = '/%s/%sp%0.03f.jpg' % (clip.item.public_id, resolution, float(start))
+            if preview:
                 context['preview'] = request.build_absolute_uri(preview)
     else:
         type = 'item'
