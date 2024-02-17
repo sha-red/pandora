@@ -255,7 +255,7 @@ async function loadEdit(id, args) {
         poster = getClip(data.edit, parseDuration(args.parts[2]))
     }
     if (poster && poster.item) {
-        data.poster = `${pandora.proto}://${data.site}/${poster.item}/${pandora.resolution}${poster.position.toFixed(3)}.jpg`
+        data.poster = `${pandora.proto}://${data.site}/${poster.item}/${pandora.resolution}p${poster.position.toFixed(3)}.jpg`
     } else {
         data.poster = data.videos[0].src.split('/48')[0] + `/${pandora.resolution}p${data.videos[0].in.toFixed(3)}.jpg`
     }
