@@ -109,6 +109,7 @@ pandoraAPI("init").then(response => {
     if (subtitleLayer) {
         layerKeys.push(subtitleLayer.id)
     }
+    pandora.subtitleLayer = subtitleLayer.id
     pandora.site.layers.map(layer => {
         return layer.id
     }).filter(layer => {

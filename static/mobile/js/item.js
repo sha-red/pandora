@@ -10,6 +10,8 @@ async function loadData(id, args) {
             "id",
             "title",
             "director",
+            "year",
+            "date",
             "source",
             "summary",
             "streams",
@@ -44,6 +46,11 @@ async function loadData(id, args) {
             data.byline = data.item.source
         } else {
             data.byline = data.item.director ? data.item.director.join(', ') : ''
+        }
+        if (data.item.year) {
+            data.byline += ' (' + data.item.year + ')'
+        } else if (data.item.date) {
+            data.byline += ' (' + data.item.date.split('-')[0] + ')'
         }
         data.link = `${pandora.proto}://${data.site}/${data.item.id}/info`
         let poster = pandora.site.user.ui.icons == 'posters' ? 'poster' : 'icon'
@@ -105,6 +112,15 @@ async function loadData(id, args) {
             duration: duration
         })
     })
+    if (data.layers[pandora.subtitleLayer]) {
+        var previous;
+        data.layers[pandora.subtitleLayer].forEach(annotation => {
+            if (previous) {
+                previous.out = annotation['in']
+            }
+            previous = annotation
+        })
+    }
     var value = []
     Object.keys(data.layers).forEach(layer => {
         var html = []
@@ -127,7 +143,11 @@ async function loadData(id, args) {
                 </div>
             `)
         })
-        value.push('<div class="layer">' + html.join('\n') + '</div>')
+        var layerClass = ""
+        if (layerData.isSubtitles) {
+            layerClass = " is-subtitles"
+        }
+        value.push('<div class="layer'+layerClass+'">' + html.join('\n') + '</div>')
     })
     data.value = value.join('\n')
 
@@ -136,6 +156,11 @@ async function loadData(id, args) {
         data.byline = data.item.source
     } else {
         data.byline = data.item.director ? data.item.director.join(', ') : ''
+    }
+    if (data.item.year) {
+        data.byline += ' (' + data.item.year + ')'
+    } else if (data.item.date) {
+        data.byline += ' (' + data.item.date.split('-')[0] + ')'
     }
     data.link = `${pandora.proto}://${data.site}/${data.item.id}/${data["in"]},${data.out}`
     data.poster = `${pandora.proto}://${data.site}/${data.item.id}/${pandora.resolution}p${data["in"]}.jpg`

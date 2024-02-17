@@ -18,6 +18,9 @@ window.VideoPlayer = function(options) {
 
     self.controls = document.createElement('div')
     self.controls.classList.add('mx-controls')
+    if (options.poster) {
+        self.controls.classList.add('poster')
+    }
     //self.controls.style.display = "none"
     if (self.options.controls) {
         var ratio = `aspect-ratio: ${self.options.aspectratio};`
@@ -43,6 +46,13 @@ window.VideoPlayer = function(options) {
                     color: white;
                     z-index: 1;
                     margin: auto;
+                }
+
+                .mx-controls.poster {
+                    background-image: url(${self.options.poster});
+                    background-repeat: no-repeat;
+                    background-size: contain;
+                    background-blend-mode: overlay;
                 }
 
                 .mx-controls .toggle {
@@ -160,6 +170,7 @@ window.VideoPlayer = function(options) {
             event.preventDefault()
             event.stopPropagation()
             if (that.paused) {
+                self.controls.classList.remove('poster')
                 that.play()
             } else {
                 that.pause()
@@ -193,6 +204,7 @@ window.VideoPlayer = function(options) {
                     })
                 }
                 if (that.paused && !failed) {
+                    self.controls.classList.remove('poster')
                     that.play()
                 }
             } else {
@@ -314,6 +326,7 @@ window.VideoPlayer = function(options) {
             toggle.querySelector('div').innerHTML = icon.pause
             self.controls.style.opacity = '0'
             unblock.remove()
+            self.controls.classList.remove('poster')
             that.play()
         }
     })

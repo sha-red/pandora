@@ -90,6 +90,21 @@ async function sortClips(edit, sort) {
     }
 }
 
+function getClip(edit, position) {
+    const response = {}
+    let pos = 0
+    edit.clips.forEach(function(clip) {
+        if (clip.position < position && clip.position + clip.duration > position) {
+            response.item = clip.item
+            response.position = position - clip.position
+            if (clip['in']) {
+                response.position += clip['in']
+            }
+        }
+    });
+    return response
+}
+
 async function loadEdit(id, args) {
     var data = window.data = {}
     data.id = id
@@ -107,7 +122,7 @@ async function loadEdit(id, args) {
         }
     }
     data.edit = response['data']
-    if (['public', 'featured'].indexOf(data.edit) == -1) {
+    if (data.edit.status !== 'public') {
         return {
             site: data.site,
             error: {
@@ -197,6 +212,15 @@ async function loadEdit(id, args) {
             })
         })
     })
+    if (data.layers[pandora.subtitleLayer]) {
+        var previous;
+        data.layers[pandora.subtitleLayer].forEach(annotation => {
+            if (previous) {
+                previous.out = annotation['in']
+            }
+            previous = annotation
+        })
+    }
     var value = []
     pandora.layerKeys.forEach(layer => {
         if (!data.layers[layer]) {
@@ -215,14 +239,26 @@ async function loadEdit(id, args) {
                 </div>
             `)
         })
-        value.push('<div class="layer">' + html.join('\n') + '</div>')
+        var layerClass = ""
+        if (layerData.isSubtitles) {
+            layerClass = " is-subtitles"
+        }
+        value.push('<div class="layer'+layerClass+'">' + html.join('\n') + '</div>')
     })
     data.value = value.join('\n')
 
     data.title = data.edit.name
     data.byline = data.edit.description
     data.link = `${pandora.proto}://${data.site}/edits/${data.edit.id}`
-    data.poster = data.videos[0].src.split('/' + pandora.resolution)[0] + `/${pandora.resolution}p${data.videos[0].in}.jpg`
+    let poster = data.edit.posterFrames[0]
+    if (args.parts[2] && args.parts[2].indexOf(':') > -1) {
+        poster = getClip(data.edit, parseDuration(args.parts[2]))
+    }
+    if (poster && poster.item) {
+        data.poster = `${pandora.proto}://${data.site}/${poster.item}/${pandora.resolution}${poster.position.toFixed(3)}.jpg`
+    } else {
+        data.poster = data.videos[0].src.split('/48')[0] + `/${pandora.resolution}p${data.videos[0].in.toFixed(3)}.jpg`
+    }
     data.aspectratio = data.edit.clips[0].videoRatio
     data.duration = data.edit.duration
     return data
