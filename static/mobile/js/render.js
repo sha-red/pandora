@@ -20,6 +20,7 @@ function renderItemInfo(data) {
 }
 
 function renderItem(data) {
+    window.item = window.item || {}
     if (data.error) {
         return renderError(data)
     }
