@@ -362,17 +362,12 @@ pandora.ui.infoView = function(data, isMixed) {
                 clickLink: pandora.clickLink,
                 collapseToEnd: false,
                 editable: canEdit,
-                format: function(value) {
-                    return value.replace(
-                        /<img src=/g,
-                        '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
-                    );
-                },
                 placeholder: formatLight(Ox._(isMixed.summary ? 'Mixed Summary' : 'No Summary')),
                 tooltip: canEdit ? pandora.getEditTooltip() : '',
                 type: 'textarea',
                 value: data.summary || ''
             })
+            .addClass("InlineImages")
             .css(css)
             .css({
                 marginTop: '12px',
@@ -449,18 +444,13 @@ pandora.ui.infoView = function(data, isMixed) {
                 clickLink: pandora.clickLink,
                 collapseToEnd: false,
                 editable: canEdit,
-                format: function(value) {
-                    return value.replace(
-                        /<img src=/g,
-                        '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
-                    );
-                },
                 placeholder: formatLight(Ox._(isMixed.songs ? 'Mixed Songs' : 'unknown')),
                 tooltip: canEdit ? pandora.getEditTooltip() : '',
                 type: 'textarea',
                 value: data.songs || ''
 
             })
+            .addClass("InlineImages")
             .css(css)
             .css({
                 overflow: 'hidden'
@@ -1043,17 +1033,12 @@ pandora.ui.infoView = function(data, isMixed) {
                     Ox.EditableContent({
                             clickLink: pandora.clickLink,
                             editable: canEdit,
-                            format: function(value) {
-                                return value.replace(
-                                    /<img /g,
-                                    '<img style="max-width: 256px; max-height: 256px; margin: 0 16px 16px 0; float: left;" '
-                                );
-                            },
                             placeholder: formatLight(Ox._('No Description')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             type: 'textarea',
                             value: value.description || ''
                         })
+                        .addClass("InlineImages")
                         .css(css)
                         .css({
                             overflow: 'hidden'

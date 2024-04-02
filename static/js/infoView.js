@@ -260,16 +260,11 @@ pandora.ui.infoView = function(data, isMixed) {
 
     if (canEdit || data.summary) {
         $('<div>')
+            .addClass("InlineImages")
             .append(
                 Ox.EditableContent({
                     clickLink: pandora.clickLink,
                     editable: canEdit,
-                    format: function(value) {
-                        return value.replace(
-                            /<img src=/g,
-                            '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
-                        );
-                    },
                     maxHeight: Infinity,
                     placeholder: formatLight(Ox._( isMixed.summary ? 'Mixed Summary' : 'No Summary')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',

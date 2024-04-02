@@ -280,16 +280,11 @@ pandora.ui.infoView = function(data, isMixed) {
                 .appendTo($div);
             if (canEdit || data[key + 'description']) {
                 $('<div>')
+                    .addClass("InlineImages")
                     .append(
                         descriptions[key] = Ox.EditableContent({
                             clickLink: pandora.clickLink,
                             editable: canEdit,
-                            format: function(value) {
-                                return value.replace(
-                                    /<img src=/g,
-                                    '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
-                                );
-                            },
                             placeholder: formatLight(Ox._('No {0} Description', [Ox._(Ox.toTitleCase(key))])),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             type: 'textarea',
@@ -353,6 +348,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     if (canEdit || data.summary) {
         $('<div>')
+            .addClass("InlineImages")
             .css({
                 marginTop: '12px',
                 marginBottom: '12px'
@@ -362,12 +358,6 @@ pandora.ui.infoView = function(data, isMixed) {
                     clickLink: pandora.clickLink,
                     collapseToEnd: false,
                     editable: canEdit,
-                    format: function(value) {
-                        return value.replace(
-                            /<img src=/g,
-                            '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
-                        );
-                    },
                     maxHeight: Infinity,
                     placeholder: formatLight(Ox._('No Summary')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
