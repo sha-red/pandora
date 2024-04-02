@@ -1,0 +1,6 @@
+.InlineImages img {
+    float: left;
+    max-width: 256px;
+    max-height: 256px;
+    margin: 0 16px 16px 0;
+}

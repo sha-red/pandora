@@ -248,6 +248,28 @@
             "find": true
         },
         {
+            "id": "source",
+            "title": "Source",
+            "type": "string",
+            "autocomplete": true,
+            "description": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true,
+            "sort": true
+        },
+        {
+            "id": "project",
+            "title": "Project",
+            "type": "string",
+            "autocomplete": true,
+            "description": true,
+            "columnWidth": 120,
+            "filter": true,
+            "find": true,
+            "sort": true
+        },
+        {
             "id": "id",
             "operator": "+",
             "title": "ID",
@@ -293,6 +315,24 @@
             "columnWidth": 256
         },
         {
+            "id": "content",
+            "operator": "+",
+            "title": "Content",
+            "type": "text",
+            "find": true,
+            "sort": true,
+            "columnWidth": 256
+        },
+        {
+            "id": "transcript",
+            "operator": "+",
+            "title": "Transcript",
+            "type": "text",
+            "find": true,
+            "sort": true,
+            "columnWidth": 256
+        },
+        {
             "id": "matches",
             "operator": "-",
             "title": "Matches",
@@ -310,6 +350,12 @@
             "sort": true,
             "autocomplete": true,
             "columnWidth": 128
+        },
+        {
+            "id": "notes",
+            "title": "Notes",
+            "type": "text",
+            "capability": "canEditMetadata"
         },
         {
             "id": "fulltext",

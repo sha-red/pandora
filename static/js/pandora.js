@@ -258,6 +258,7 @@ appPanel
 
     function loadPandoraFiles(callback) {
         var prefix = '/static/';
+        Ox.getFile(prefix + 'css/pandora.css?' + getPandoraVersion())
         if (enableDebugMode) {
             Ox.getJSON(
                 prefix + 'json/pandora.json?' + Ox.random(1000),
