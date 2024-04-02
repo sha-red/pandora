@@ -34,7 +34,8 @@ pandora.ui.documentInfoView = function(data, isMixed) {
             'user', 'rightslevel', 'timesaccessed',
             'extension', 'dimensions', 'size', 'matches',
             'created', 'modified', 'accessed',
-            'random', 'entity'
+            'random', 'entity',
+            'content', 'transcript'
         ].concat(pandora.site.documentKeys.filter(key => { return key.fulltext }).map(key => key.id)),
         statisticsWidth = 128,
 
