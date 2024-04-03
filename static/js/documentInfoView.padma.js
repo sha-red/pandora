@@ -359,7 +359,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
             .appendTo($text);
     }
 
-    ;['content', 'transcript'].forEach(key => {
+    ;['content', 'translation'].forEach(key => {
         if (canEdit || data[key]) {
             var item = Ox.getObjectById(pandora.site.documentKeys, key);
             $('<div>')

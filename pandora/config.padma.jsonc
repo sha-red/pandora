@@ -324,9 +324,9 @@
             "columnWidth": 256
         },
         {
-            "id": "transcript",
+            "id": "translation",
             "operator": "+",
-            "title": "Transcript",
+            "title": "Translation",
             "type": "text",
             "find": true,
             "sort": true,
