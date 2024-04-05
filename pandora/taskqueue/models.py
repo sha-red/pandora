@@ -167,7 +167,7 @@ class Task(models.Model):
             job = self.get_job()
             if job:
                 print(job)
-                r = celery.task.control.revoke(job['id'])
+                r = app.control.revoke(job['id'])
                 print(r)
                 for f in self.item.files.filter(encoding=True):
                     f.delete()
