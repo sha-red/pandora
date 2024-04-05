@@ -24,7 +24,7 @@ def get_location(ip):
             location = g.city(ip)
         except:
             try:
-                location = g.country(s.ip)
+                location = g.country(ip)
             except:
                 location = None
         if location:
