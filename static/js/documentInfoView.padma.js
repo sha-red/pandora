@@ -29,6 +29,9 @@ pandora.ui.documentInfoView = function(data, isMixed) {
         }).map(function(key){
             return key.id;
         }),
+        linkKeys = [
+            'type', 'publisher', 'source', 'project'
+        ],
         displayedKeys = [ // FIXME: can tis be a flag in the config?
             'title', 'notes', 'name', 'description', 'id',
             'user', 'rightslevel', 'timesaccessed',
@@ -324,6 +327,9 @@ pandora.ui.documentInfoView = function(data, isMixed) {
     renderGroup(['publisher', 'place', 'series', 'edition', 'language']);
 
     Ox.getObjectById(pandora.site.documentKeys, 'keywords') && renderGroup(['keywords'])
+    if (isMultiple) {
+        renderGroup(['source', 'project']);
+    }
 
     // Render any remaing keys defined in config
 
@@ -632,7 +638,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
             ret = formatLink(value.split(', '), key);
         } else if (listKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), key);
-        } else if (['type', 'publisher'].indexOf(key) > -1) {
+        } else if (linkKeys.indexOf(key) > -1) {
             ret = formatLink(value, key);
         } else {
             if (isMixed[key]) {
