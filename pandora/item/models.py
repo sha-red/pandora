@@ -1209,7 +1209,7 @@ class Item(models.Model):
             if not r:
                 return False
             path = video.name
-            duration = sum(item.cache['durations'])
+            duration = sum(self.item.cache['durations'])
         else:
             path = stream.media.path
             duration = stream.info['duration']

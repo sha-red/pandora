@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import os
+from distutils.spawn import find_executable
+from glob import glob
 from os.path import exists
 import fractions
+import logging
 import math
+import os
 import re
 import shutil
 import subprocess
 import tempfile
 import time
-from distutils.spawn import find_executable
-from glob import glob
 
 import numpy as np
 import ox
@@ -20,6 +21,9 @@ from django.conf import settings
 from PIL import Image
 
 from .chop import Chop, make_keyframe_index
+
+
+logger = logging.getLogger('pandora.' + __name__)
 
 img_extension = 'jpg'
 

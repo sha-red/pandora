@@ -375,13 +375,3 @@ def update_geoip(force=False):
 
 def init():
     load_config(True)
-
-def shutdown():
-    if settings.RELOADER_RUNNING:
-        RUN_RELOADER = False
-        settings.RELOADER_RUNNING = False
-        if NOTIFIER:
-            NOTIFIER.stop()
-
-
-

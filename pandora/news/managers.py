@@ -11,7 +11,7 @@ keymap = {
 default_key = 'name'
 
 def parseCondition(condition, user):
-    k = condition.get('key', defauly_key)
+    k = condition.get('key', default_key)
     k = keymap.get(k, k)
     if not k:
         k = default_key

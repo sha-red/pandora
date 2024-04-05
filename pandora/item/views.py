@@ -16,11 +16,13 @@ from wsgiref.util import FileWrapper
 from django.conf import settings
 
 from ox.utils import json, ET
-
-from oxdjango.decorators import login_required_json
-from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
-from oxdjango.http import HttpFileResponse
 import ox
+
+from oxdjango.api import actions
+from oxdjango.decorators import login_required_json
+from oxdjango.http import HttpFileResponse
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+import oxdjango
 
 from . import models
 from . import utils
@@ -32,7 +34,6 @@ from clip.models import Clip
 from user.models import has_capability
 from changelog.models import add_changelog
 
-from oxdjango.api import actions
 
 
 def _order_query(qs, sort, prefix='sort__'):
@@ -595,7 +596,7 @@ def add(request, data):
         if p:
             p.wait()
         else:
-            i.make_poster()
+            item.make_poster()
         del data['title']
         if data:
             response = edit_item(request.user, item, data)

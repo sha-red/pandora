@@ -65,7 +65,7 @@ def fill_queue():
 def get_celery_worker_status():
     ERROR_KEY = "ERROR"
     try:
-        insp = celery.task.control.inspect()
+        insp = app.control.inspect()
         d = insp.stats()
         if not d:
             d = {ERROR_KEY: 'No running Celery workers were found.'}

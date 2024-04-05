@@ -6,11 +6,12 @@ import os
 import re
 import unicodedata
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models, transaction
 from django.db.models import Q, Sum, Max
-from django.contrib.auth import get_user_model
 from django.db.models.signals import pre_delete
-from django.conf import settings
+from django.utils import datetime_safe
 from oxdjango.fields import JSONField
 
 from PIL import Image
@@ -79,7 +80,7 @@ class Document(models.Model, FulltextMixin):
             current_values = []
             for k in settings.CONFIG['documentKeys']:
                 if k.get('sortType') == 'person':
-                    current_values += self.get(k['id'], [])
+                    current_values += self.get_value(k['id'], [])
         if not isinstance(current_values, list):
             if not current_values:
                 current_values = []

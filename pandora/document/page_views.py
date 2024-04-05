@@ -60,6 +60,25 @@ def _order_query(qs, sort):
     qs = qs.distinct()
     return qs
 
+def _order_by_group(query):
+    prefix = 'document__sort__'
+    if 'sort' in query:
+        op = '-' if query['sort'][0]['operator'] == '-' else ''
+        if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
+            order_by = op + prefix + 'items'
+            if query['group'] == "year":
+                secondary = op + prefix + 'sortvalue'
+                order_by = (order_by, secondary)
+            elif query['group'] != "keyword":
+                order_by = (order_by, prefix + 'sortvalue')
+            else:
+                order_by = (order_by, 'value')
+        else:
+            order_by = op + prefix + 'sortvalue'
+            order_by = (order_by, prefix + 'items')
+    else:
+        order_by = ('-' + prefix + 'sortvalue', prefix + 'items')
+    return order_by
 
 def findPages(request, data):
     '''

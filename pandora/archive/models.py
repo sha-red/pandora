@@ -832,7 +832,7 @@ class Stream(models.Model):
         # get current version from db and update
         try:
             self.refresh_from_db()
-        except archive.models.DoesNotExist:
+        except Stream.DoesNotExist:
             pass
         else:
             self.update_status(ok, error)
