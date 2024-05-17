@@ -27,6 +27,7 @@ class Command(BaseCommand):
         parser.add_argument('username', help='username')
         parser.add_argument('item', help='item')
         parser.add_argument('layer', help='layer')
+        parser.add_argument('language', help='language', default="")
         parser.add_argument('filename', help='filename.srt')
 
     def handle(self, *args, **options):
@@ -34,6 +35,7 @@ class Command(BaseCommand):
         public_id = options['item']
         layer_id = options['layer']
         filename = options['filename']
+        language = options.get("language")
 
         user = User.objects.get(username=username)
         item = Item.objects.get(public_id=public_id)
@@ -47,6 +49,9 @@ class Command(BaseCommand):
         for i in range(len(annotations)-1):
             if annotations[i]['out'] == annotations[i+1]['in']:
                 annotations[i]['out'] = annotations[i]['out'] - 0.001
+        if language:
+            for annotation in annotations:
+                annotation["value"] = '<span lang="%s">%s</span>' % (language, annotation["value"])
         tasks.add_annotations.delay({
             'item': item.public_id,
             'layer': layer_id,
