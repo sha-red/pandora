@@ -289,6 +289,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 32 * 1024 * 1024
 
+EMPTY_CLIPS = True
+
 #you can ignore things below this line
 #=========================================================================
 LOCAL_APPS = []

@@ -1559,6 +1559,8 @@ class Item(models.Model):
         return icon
 
     def add_empty_clips(self):
+        if not settings.EMPTY_CLIPS:
+            return
         subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
         if not subtitles:
             return
