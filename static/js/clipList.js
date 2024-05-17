@@ -76,7 +76,14 @@ pandora.ui.clipList = function(videoRatio) {
                 var itemsQuery, query;
                 if (!ui.item) {
                     itemsQuery = ui.find;
-                    query = {conditions: [], operator: itemsQuery.operator};
+                    query = {
+                        conditions: [{
+                            key: "layer",
+                            operator: "&",
+                            value: pandora.site.clipLayers
+                        }],
+                        operator: itemsQuery.operator
+                    };
                     // if the item query contains a layer condition,
                     // then this condition is added to the clip query
                     addConditions(query, itemsQuery.conditions);
@@ -99,13 +106,20 @@ pandora.ui.clipList = function(videoRatio) {
                         operator: '&'
                     };
                     query = {
-                        conditions: ui.itemFind === '' ? [] : [{
-                            key: 'annotations',
-                            value: ui.itemFind,
-                            operator: '='
+                        conditions: [{
+                            key: "layer",
+                            operator: "&",
+                            value: pandora.site.clipLayers
                         }],
                         operator: '&'
                     };
+                    if(ui.itemFind) {
+                        query.conditions.push({
+                            key: 'annotations',
+                            value: ui.itemFind,
+                            operator: '='
+                        })
+                    }
                     findClips();
                 }
 

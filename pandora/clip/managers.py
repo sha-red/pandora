@@ -17,6 +17,7 @@ keymap = {
     'place': 'annotations__places__id',
     'text': 'findvalue',
     'annotations': 'findvalue',
+    'layer': 'annotations__layer',
     'user': 'annotations__user__username',
 }
 case_insensitive_keys = ('annotations__user__username', )

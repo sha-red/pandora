@@ -1265,6 +1265,25 @@ pandora.getClipsQuery = function(callback) {
     };
     addClipsConditions(pandora.user.ui.find.conditions);
     clipsQuery.operator = clipsQuery.conditions.length ? '|' : '&';
+    if (clipsQuery.conditions.length) {
+        clipsQuery.conditions = [
+            {
+                key: "layer",
+                operator: "&",
+                value: pandora.site.clipLayers
+            }, {
+                conditions: clipsQuery.conditions,
+                operator: '|'
+            }
+        ]
+        clipsQuery.operator = '&'
+    } else {
+        clipsQuery.conditions.push({
+            "key": "layer",
+            "operator": "&",
+            "value":pandora.site.clipLayers
+        })
+    }
     if (callback) {
         if (pandora.user.ui._list) {
             pandora.api.getList({id: pandora.user.ui._list}, function(result) {

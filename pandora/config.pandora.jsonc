@@ -102,8 +102,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     ],
     /*
     "clipLayers" is the ordered list of public layers that will appear as the
-    text of clips (in grid view, below the icon). Excluding a layer from this
-    list means it will not be included in find annotations.
+    text of clips (in grid view, below the icon).
     */
     "clipLayers": ["publicnotes", "keywords", "subtitles"],
     /*

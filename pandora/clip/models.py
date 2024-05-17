@@ -115,8 +115,7 @@ class MetaClip(object):
                     del j[key]
             #needed here to make item find with clips work
             if 'annotations' in keys:
-                #annotations = self.annotations.filter(layer__in=settings.CONFIG['clipLayers'])
-                annotations = self.annotations.all()
+                annotations = self.annotations.all().exclude(value='')
                 if qs:
                     for q in qs:
                         annotations = annotations.filter(q)
