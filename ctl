@@ -27,16 +27,16 @@ if [ "$action" = "init" ]; then
         $SUDO bin/python3 -m pip install -U --ignore-installed "pip<9"
     fi
     if [ ! -d static/oxjs ]; then
-        $SUDO git clone -b $branch https://git.0x2620.org/oxjs.git static/oxjs
+        $SUDO git clone -b $branch https://code.0x2620.org/0x2620/oxjs.git static/oxjs
     fi
     $SUDO mkdir -p src
     if [ ! -d src/oxtimelines ]; then
-        $SUDO git clone -b $branch https://git.0x2620.org/oxtimelines.git src/oxtimelines
+        $SUDO git clone -b $branch https://code.0x2620.org/0x2620/oxtimelines.git src/oxtimelines
     fi
     for package in oxtimelines python-ox; do
         cd ${BASE}
         if [ ! -d src/${package} ]; then
-            $SUDO git clone -b $branch https://git.0x2620.org/${package}.git src/${package}
+            $SUDO git clone -b $branch https://code.0x2620.org/0x2620/${package}.git src/${package}
         fi
         cd ${BASE}/src/${package}
 

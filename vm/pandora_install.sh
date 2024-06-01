@@ -153,7 +153,7 @@ else
 fi
 
 # checkout pandora from git
-git clone https://git.0x2620.org/pandora.git /srv/pandora
+git clone https://code.0x2620.org/0x2620/pandora.git /srv/pandora
 cd /srv/pandora
 git checkout $BRANCH
 chown -R $PANDORA:$PANDORA /srv/pandora
