@@ -240,6 +240,8 @@ EOI
 
 sed -i -e "s#gzip_disable \"msie6\";#${GZIP}#g" /etc/nginx/nginx.conf
 
+echo "types { application/javascript js mjs; }" > /etc/nginx/conf.d/mjs.conf
+
 service nginx restart
 
 fi
