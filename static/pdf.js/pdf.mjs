@@ -10217,7 +10217,7 @@ class TextLayer {
   #textDivProperties = new WeakMap();
   #transform = null;
   static #ascentCache = new Map();
-  static #canvasCtx = null;
+  static #canvasContexts = new Map();
   static #pendingTextLayers = new Set();
   constructor({
     textContentSource,
@@ -10256,7 +10256,6 @@ class TextLayer {
     this.#pageWidth = pageWidth;
     this.#pageHeight = pageHeight;
     setLayerDimensions(container, viewport);
-    TextLayer.#pendingTextLayers.add(this);
     this.#capability.promise.catch(() => {}).then(() => {
       TextLayer.#pendingTextLayers.delete(this);
       this.#layoutTextParams = null;
@@ -10280,6 +10279,7 @@ class TextLayer {
       }, this.#capability.reject);
     };
     this.#reader = this.#textContentSource.getReader();
+    TextLayer.#pendingTextLayers.add(this);
     pump();
     return this.#capability.promise;
   }
@@ -10474,19 +10474,26 @@ class TextLayer {
       return;
     }
     this.#ascentCache.clear();
-    this.#canvasCtx?.canvas.remove();
-    this.#canvasCtx = null;
+    for (const {
+      canvas
+    } of this.#canvasContexts.values()) {
+      canvas.remove();
+    }
+    this.#canvasContexts.clear();
   }
   static #getCtx(lang = null) {
-    if (!this.#canvasCtx) {
+    let canvasContext = this.#canvasContexts.get(lang ||= "");
+    if (!canvasContext) {
       const canvas = document.createElement("canvas");
       canvas.className = "hiddenCanvasElement";
+      canvas.lang = lang;
       document.body.append(canvas);
-      this.#canvasCtx = canvas.getContext("2d", {
+      canvasContext = canvas.getContext("2d", {
         alpha: false
       });
+      this.#canvasContexts.set(lang, canvasContext);
     }
-    return this.#canvasCtx;
+    return canvasContext;
   }
   static #getAscent(fontFamily, lang) {
     const cachedAscent = this.#ascentCache.get(fontFamily);
@@ -10717,7 +10724,7 @@ function getDocument(src) {
   }
   const docParams = {
     docId,
-    apiVersion: "4.3.98",
+    apiVersion: "4.4.11",
     data,
     password,
     disableAutoFetch,
@@ -10741,11 +10748,13 @@ function getDocument(src) {
   const transportParams = {
     disableFontFace,
     fontExtraProperties,
-    enableXfa,
     ownerDocument,
-    disableAutoFetch,
     pdfBug,
-    styleElement
+    styleElement,
+    loadingParams: {
+      disableAutoFetch,
+      enableXfa
+    }
   };
   worker.promise.then(function () {
     if (task.destroyed) {
@@ -11729,6 +11738,7 @@ class WorkerTransport {
       ownerDocument: params.ownerDocument,
       styleElement: params.styleElement
     });
+    this.loadingParams = params.loadingParams;
     this._params = params;
     this.canvasFactory = factory.canvasFactory;
     this.filterFactory = factory.filterFactory;
@@ -12270,16 +12280,6 @@ class WorkerTransport {
     const refStr = ref.gen === 0 ? `${ref.num}R` : `${ref.num}R${ref.gen}`;
     return this.#pageRefCache.get(refStr) ?? null;
   }
-  get loadingParams() {
-    const {
-      disableAutoFetch,
-      enableXfa
-    } = this._params;
-    return shadow(this, "loadingParams", {
-      disableAutoFetch,
-      enableXfa
-    });
-  }
 }
 const INITIAL_DATA = Symbol("INITIAL_DATA");
 class PDFObjects {
@@ -12491,8 +12491,8 @@ class InternalRenderTask {
     }
   }
 }
-const version = "4.3.98";
-const build = "8dba041e6";
+const version = "4.4.11";
+const build = "d76501a0c";
 
 ;// CONCATENATED MODULE: ./src/shared/scripting_utils.js
 function makeColorComp(n) {
@@ -13175,15 +13175,9 @@ class AnnotationElement {
     if (!quadPoints) {
       return;
     }
-    const [rectBlX, rectBlY, rectTrX, rectTrY] = this.data.rect;
-    if (quadPoints.length === 1) {
-      const [, {
-        x: trX,
-        y: trY
-      }, {
-        x: blX,
-        y: blY
-      }] = quadPoints[0];
+    const [rectBlX, rectBlY, rectTrX, rectTrY] = this.data.rect.map(x => Math.fround(x));
+    if (quadPoints.length === 8) {
+      const [trX, trY, blX, blY] = quadPoints.subarray(2, 6);
       if (rectTrX === trX && rectTrY === trY && rectBlX === blX && rectBlY === blY) {
         return;
       }
@@ -13217,13 +13211,11 @@ class AnnotationElement {
     clipPath.setAttribute("id", id);
     clipPath.setAttribute("clipPathUnits", "objectBoundingBox");
     defs.append(clipPath);
-    for (const [, {
-      x: trX,
-      y: trY
-    }, {
-      x: blX,
-      y: blY
-    }] of quadPoints) {
+    for (let i = 2, ii = quadPoints.length; i < ii; i += 8) {
+      const trX = quadPoints[i];
+      const trY = quadPoints[i + 1];
+      const blX = quadPoints[i + 2];
+      const blY = quadPoints[i + 3];
       const rect = svgFactory.createElement("rect");
       const x = (blX - rectBlX) / width;
       const y = (rectTrY - trY) / height;
@@ -14936,27 +14928,37 @@ class PolylineAnnotationElement extends AnnotationElement {
   }
   render() {
     this.container.classList.add(this.containerClassName);
-    const data = this.data;
+    const {
+      data: {
+        rect,
+        vertices,
+        borderStyle,
+        popupRef
+      }
+    } = this;
+    if (!vertices) {
+      return this.container;
+    }
     const {
       width,
       height
-    } = getRectDims(data.rect);
+    } = getRectDims(rect);
     const svg = this.svgFactory.create(width, height, true);
     let points = [];
-    for (const coordinate of data.vertices) {
-      const x = coordinate.x - data.rect[0];
-      const y = data.rect[3] - coordinate.y;
-      points.push(x + "," + y);
+    for (let i = 0, ii = vertices.length; i < ii; i += 2) {
+      const x = vertices[i] - rect[0];
+      const y = rect[3] - vertices[i + 1];
+      points.push(`${x},${y}`);
     }
     points = points.join(" ");
     const polyline = this.#polyline = this.svgFactory.createElement(this.svgElementName);
     polyline.setAttribute("points", points);
-    polyline.setAttribute("stroke-width", data.borderStyle.width || 1);
+    polyline.setAttribute("stroke-width", borderStyle.width || 1);
     polyline.setAttribute("stroke", "transparent");
     polyline.setAttribute("fill", "transparent");
     svg.append(polyline);
     this.container.append(svg);
-    if (!data.popupRef && this.hasPopupData) {
+    if (!popupRef && this.hasPopupData) {
       this._createPopup();
     }
     return this.container;
@@ -15003,27 +15005,34 @@ class InkAnnotationElement extends AnnotationElement {
   }
   render() {
     this.container.classList.add(this.containerClassName);
-    const data = this.data;
+    const {
+      data: {
+        rect,
+        inkLists,
+        borderStyle,
+        popupRef
+      }
+    } = this;
     const {
       width,
       height
-    } = getRectDims(data.rect);
+    } = getRectDims(rect);
     const svg = this.svgFactory.create(width, height, true);
-    for (const inkList of data.inkLists) {
+    for (const inkList of inkLists) {
       let points = [];
-      for (const coordinate of inkList) {
-        const x = coordinate.x - data.rect[0];
-        const y = data.rect[3] - coordinate.y;
+      for (let i = 0, ii = inkList.length; i < ii; i += 2) {
+        const x = inkList[i] - rect[0];
+        const y = rect[3] - inkList[i + 1];
         points.push(`${x},${y}`);
       }
       points = points.join(" ");
       const polyline = this.svgFactory.createElement(this.svgElementName);
       this.#polylines.push(polyline);
       polyline.setAttribute("points", points);
-      polyline.setAttribute("stroke-width", data.borderStyle.width || 1);
+      polyline.setAttribute("stroke-width", borderStyle.width || 1);
       polyline.setAttribute("stroke", "transparent");
       polyline.setAttribute("fill", "transparent");
-      if (!data.popupRef && this.hasPopupData) {
+      if (!popupRef && this.hasPopupData) {
         this._createPopup();
       }
       svg.append(polyline);
@@ -17225,7 +17234,7 @@ class HighlightEditor extends AnnotationEditor {
     }
     const [pageWidth, pageHeight] = this.pageDimensions;
     const boxes = this.#boxes;
-    const quadPoints = new Array(boxes.length * 8);
+    const quadPoints = new Float32Array(boxes.length * 8);
     let i = 0;
     for (const {
       x,
@@ -19367,8 +19376,8 @@ class DrawLayer {
 
 
 
-const pdfjsVersion = "4.3.98";
-const pdfjsBuild = "8dba041e6";
+const pdfjsVersion = "4.4.11";
+const pdfjsBuild = "d76501a0c";
 
 var __webpack_exports__AbortException = __webpack_exports__.AbortException;
 var __webpack_exports__AnnotationEditorLayer = __webpack_exports__.AnnotationEditorLayer;
