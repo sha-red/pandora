@@ -251,7 +251,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
                 '-level', '4.0',
                 '-pix_fmt', 'yuv420p',
             ]
-        if info.get("force_framerate"):
+        if info['video'][0].get("force_framerate"):
             video_settings += ['-r:v', str(float(info["framerate"]))]
         video_settings += ['-map', '0:%s,0:0' % info['video'][0]['id']]
         audio_only = False
