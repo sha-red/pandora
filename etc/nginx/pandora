@@ -17,6 +17,7 @@ server {
     #server_name  pandora.YOURDOMAIN.COM;
 
     listen   80 default;
+    listen   [::]:80 default;
 
     access_log  /var/log/nginx/pandora.access.log;
     error_log   /var/log/nginx/pandora.error.log;
