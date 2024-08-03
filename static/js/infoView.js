@@ -540,7 +540,7 @@ pandora.ui.infoView = function(data, isMixed) {
         var ret;
         if (key == 'date' && (!value || value.split('-').length < 4)) {
             ret = pandora.formatDate(value);
-        elif (nameKeys.indexOf(key) > -1) {
+        } else if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), 'name');
         } else if (
             listKeys.indexOf(key) > -1 && Ox.getObjectById(pandora.site.itemKeys, key).type[0] == 'date'
