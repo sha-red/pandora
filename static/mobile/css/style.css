@@ -139,6 +139,10 @@ video, .poster {
     border: 1px solid blueviolet;
     margin-bottom: 4px;
 }
+.annotation .user {
+    opacity: 0.75;
+}
+
 @media(max-width:768px) {
     .annotation a img {
         width: 100%;

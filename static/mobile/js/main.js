@@ -14,7 +14,7 @@ function parseURL() {
             var kv = arg.split('=')
             k = kv.shift()
             v = kv.join('=')
-            if (['users', 'layers'].includes(k)) {
+            if (['users', 'layers', 'show'].includes(k)) {
                 v = v.split(',')
             }
             return [k, v]

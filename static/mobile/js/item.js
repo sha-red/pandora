@@ -137,9 +137,13 @@ async function loadData(id, args) {
                     /href="\//g, `href="${pandora.url.origin}/`
                 )
             }
+            let content = annotation.value
+            if (!layerData.isSubtitles && layerData.type == "text" && args.show && args.show.includes("user")) {
+                content += `\n<div class="user">— ${annotation.user}</div>`
+            }
             html.push(`
                 <div class="annotation ${layerData.type}" data-in="${annotation.in}" data-out="${annotation.out}">
-                    ${annotation.value}
+                    ${content}
                 </div>
             `)
         })
