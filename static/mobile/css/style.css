@@ -141,6 +141,7 @@ video, .poster {
 }
 .annotation .user {
     opacity: 0.75;
+    font-style: italic;
 }
 
 @media(max-width:768px) {
