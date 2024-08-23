@@ -18,7 +18,7 @@ import ox
 import ox.image
 from ox.utils import json
 from django.conf import settings
-from PIL import Image
+from PIL import Image, ImageOps
 
 from .chop import Chop, make_keyframe_index
 
@@ -441,10 +441,15 @@ def frame_direct(video, target, position):
     r = run_command(cmd)
     return r == 0
 
+def open_image_rgb(image_source):
+    source = Image.open(image_source)
+    source = ImageOps.exif_transpose(source)
+    source = source.convert('RGB')
+    return source
 
 def resize_image(image_source, image_output, width=None, size=None):
     if exists(image_source):
-        source = Image.open(image_source).convert('RGB')
+        source = open_image_rgb(image_source)
         source_width = source.size[0]
         source_height = source.size[1]
         if size:

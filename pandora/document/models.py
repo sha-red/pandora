@@ -22,7 +22,7 @@ from oxdjango.sortmodel import get_sort_field
 from person.models import get_name_sort
 from item.models import Item
 from annotation.models import Annotation
-from archive.extract import resize_image
+from archive.extract import resize_image, open_image_rgb
 from archive.chunk import save_chunk
 from user.models import Group
 from user.utils import update_groups
@@ -552,10 +552,10 @@ class Document(models.Model, FulltextMixin):
             if len(crop) == 4:
                 path = os.path.join(folder, '%dp%d,%s.jpg' % (1024, page, ','.join(map(str, crop))))
                 if not os.path.exists(path):
-                    img = Image.open(src).crop(crop)
+                    img = open_image_rgb(src).crop(crop)
                     img.save(path)
                 else:
-                    img = Image.open(path)
+                    img = open_image_rgb(path)
                 src = path
                 if size < max(img.size):
                     path = os.path.join(folder, '%dp%d,%s.jpg' % (size, page, ','.join(map(str, crop))))
@@ -568,10 +568,10 @@ class Document(models.Model, FulltextMixin):
                     if len(crop) == 4:
                         path = os.path.join(folder, '%s.jpg' % ','.join(map(str, crop)))
                         if not os.path.exists(path):
-                            img = Image.open(src).convert('RGB').crop(crop)
+                            img = open_image_rgb(src).convert('RGB').crop(crop)
                             img.save(path)
                         else:
-                            img = Image.open(path)
+                            img = open_image_rgb(path)
                         src = path
                         if size < max(img.size):
                             path = os.path.join(folder, '%sp%s.jpg' % (size, ','.join(map(str, crop))))
@@ -580,7 +580,7 @@ class Document(models.Model, FulltextMixin):
         if os.path.exists(src) and not os.path.exists(path):
             image_size = max(self.width, self.height)
             if image_size == -1:
-                image_size = max(*Image.open(src).size)
+                image_size = max(*open_image_rgb(src).size)
             if size > image_size:
                 path = src
             else:
@@ -606,7 +606,7 @@ class Document(models.Model, FulltextMixin):
                 self.pages = utils.pdfpages(self.file.path)
         elif self.width == -1:
             self.pages = -1
-            self.width, self.height = Image.open(self.file.path).size
+            self.width, self.height = open_image_rgb(self.file.path).size
 
     def get_ratio(self):
         if self.extension == 'pdf':
