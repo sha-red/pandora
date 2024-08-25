@@ -753,6 +753,13 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "find": true
         },
         {
+            "id": "filename",
+            "title": "Filename",
+            "type": ["string"],
+            "capability": "canSeeMedia",
+            "find": true
+        },
+        {
             "id": "created",
             "title": "Date Created",
             "type": "date",
