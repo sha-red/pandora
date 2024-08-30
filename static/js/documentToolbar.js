@@ -184,7 +184,12 @@ pandora.ui.documentToolbar = function() {
                     items: [
                         {id: 'info', title: Ox._('View Info')},
                         {id: 'view', title: Ox._('View Document')}
-                    ],
+                    ].concat(
+                        pandora.hasCapability('canSeeExtraItemViews') ? [
+                            {id: 'data', title: Ox._('View Data')}
+                        ] : []
+
+                    ),
                     value: ui.documentView,
                     width: 128
                 })

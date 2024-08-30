@@ -52,6 +52,13 @@ pandora.ui.document = function() {
             $content.replaceWith(
                 $content = pandora.ui.documentInfoView(result.data)
             );
+        } else if (pandora.user.ui.documentView == 'data') {
+            $content.replaceWith(
+                $content = Ox.TreeList({
+                    data: result.data,
+                    width: pandora.$ui.mainPanel.size(1) - Ox.UI.SCROLLBAR_SIZE
+                })
+            );
         } else {
             setContent();
         }
