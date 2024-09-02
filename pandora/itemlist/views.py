@@ -242,7 +242,7 @@ def addList(request, data):
     'type' and 'view'.
     see: editList, findLists, getList, removeList, sortLists
     '''
-    data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
+    data['name'] = re.sub(r' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
     if not name:
         name = "Untitled"

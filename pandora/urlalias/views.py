@@ -64,7 +64,7 @@ def padma_video(request, url):
         except:
             return app.views.index(request)
     if view:
-        timecodes = re.compile('(\d{2}:\d{2}:\d{2}\.\d{3})-(\d{2}:\d{2}:\d{2}\.\d{3})').findall(view)
+        timecodes = re.compile(r'(\d{2}:\d{2}:\d{2}\.\d{3})-(\d{2}:\d{2}:\d{2}\.\d{3})').findall(view)
         if timecodes:
             view = ','.join(timecodes[0])
     if view:

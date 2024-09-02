@@ -246,7 +246,7 @@ def addCollection(request, data):
     'type' and 'view'.
     see: editCollection, findCollections, getCollection, removeCollection, sortCollections
     '''
-    data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
+    data['name'] = re.sub(r' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
     if not name:
         name = "Untitled"

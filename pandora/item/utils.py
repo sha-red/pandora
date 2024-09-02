@@ -61,7 +61,7 @@ def sort_title(title):
     title = sort_string(title)
 
     #title
-    title = re.sub('[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
+    title = re.sub(r'[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
     return title.strip()
 
 def get_positions(ids, pos, decode_id=False):

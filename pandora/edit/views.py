@@ -262,7 +262,7 @@ def addEdit(request, data):
     }
     see: editEdit, findEdit, getEdit, removeEdit, sortEdits
     '''
-    data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
+    data['name'] = re.sub(r' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
     if not name:
         name = "Untitled"

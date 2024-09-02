@@ -914,7 +914,7 @@ def addGroup(request, data):
     created = False
     n = 1
     name = data['name']
-    _name = re.sub(' \[\d+\]$', '', name).strip()
+    _name = re.sub(r' \[\d+\]$', '', name).strip()
     while not created:
         g, created = Group.objects.get_or_create(name=name)
         n += 1
@@ -946,7 +946,7 @@ def editGroup(request, data):
     name = data['name']
     n = 1
     name = data['name']
-    _name = re.sub(' \[\d+\]$', '', name).strip()
+    _name = re.sub(r' \[\d+\]$', '', name).strip()
     while Group.objects.filter(name=name).count():
         n += 1
         name = '%s [%d]' % (_name, n)
