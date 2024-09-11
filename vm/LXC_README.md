@@ -19,7 +19,7 @@
 
     or
 
-    sudo lxc-create -n pandora -t debian -- -r buster
+    sudo lxc-create -n pandora -t debian -- -r bullseye
 
 3) Install pan.do/ra in container:
 

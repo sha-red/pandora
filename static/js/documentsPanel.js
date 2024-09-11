@@ -64,10 +64,7 @@ pandora.ui.documentSortSelect = function() {
 pandora.ui.documentViewSelect = function() {
     var ui = pandora.user.ui,
         that = Ox.Select({
-            items: [
-                {id: 'list', title: Ox._('View as List')},
-                {id: 'grid', title: Ox._('View as Grid')}
-            ],
+            items: pandora.site.collectionViews,
             value: ui.documentsView,
             width: 128
         })

@@ -1,6 +1,10 @@
 'use strict';
 
 pandora.ui.player = function(data) {
+    // FIXME: is this the right location to load subtitles?
+    if (!data.subtitles) {
+        data.subtitles = pandora.getSubtitles(data);
+    }
 
     var ui = pandora.user.ui,
 
@@ -47,10 +51,11 @@ pandora.ui.player = function(data) {
             showUsers: pandora.site.annotations.showUsers,
             showTimeline: ui.showTimeline,
             smallTimelineURL: pandora.getMediaURL('/' + ui.item + '/timeline16p.jpg?' + data.modified),
-            subtitlesDefaultTrack: Ox.getLanguageNameByCode(pandora.site.language),
+            subtitles: data.subtitles || [],
+            subtitlesDefaultTrack: data.subtitlesDefaultTrack || Ox.getLanguageNameByCode(pandora.site.language),
             subtitlesLayer: data.subtitlesLayer,
             subtitlesOffset: ui.videoSubtitlesOffset,
-            subtitlesTrack: Ox.getLanguageNameByCode(pandora.site.language),
+            subtitlesTrack: data.subtitlesTrack || Ox.getLanguageNameByCode(pandora.site.language),
             timeline: ui.videoTimeline,
             timelineTooltip: Ox._('timeline') + ' <span class="OxBright">' + Ox.SYMBOLS.shift + 'T</span>',
             video: data.video,
@@ -83,7 +88,13 @@ pandora.ui.player = function(data) {
                 }), 'clip');
             },
             downloadvideo: function() {
-                document.location.href = pandora.getDownloadLink(ui.item, data.rightslevel);
+                pandora.ui.downloadVideoDialog({
+                    item: ui.item,
+                    rightsLevel: data.rightsLevel,
+                    source: data.source && pandora.hasCapability('canDownloadSource'),
+                    title: data.title,
+                    video: data.video
+                }).open();
             },
             find: function(data) {
                 pandora.UI.set({itemFind: data.find});

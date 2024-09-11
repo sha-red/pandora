@@ -1009,7 +1009,7 @@
         {
             "id": "tags",
             "title": "Tags",
-            "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "canAddAnnotations": {"member": true, "friend": true, "staff": true, "admin": true},
             "item": "Tag",
             "autocomplete": true,
             "overlap": true,
@@ -1399,10 +1399,8 @@
             corner of the screen
         "resolutions": List of video resolutions. Supported values are 96, 144,
             240, 288, 360, 432, 480, 720 and 1080.
-        "torrent": If true, video downloads are offered via BitTorrent
     */
     "video": {
-        "torrent": false,
         "formats": ["webm", "mp4"],
         // fixme: this should be named "ratio" or "defaultRatio",
         // as it also applies to clip lists (on load)

@@ -2,10 +2,15 @@
 
 from datetime import timedelta, datetime
 
-from celery.task import periodic_task
+from app.celery import app
+from celery.schedules import crontab
 
 from . import models
 
-@periodic_task(run_every=timedelta(days=1), queue='encoding')
+@app.task(queue='encoding')
 def cronjob(**kwargs):
     models.Log.objects.filter(modified__lt=datetime.now()-timedelta(days=30)).delete()
+
+@app.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(timedelta(days=1), cronjob.s())

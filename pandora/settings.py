@@ -67,7 +67,8 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    "sass_processor.finders.CssFinder",
+    "compressor.finders.CompressorFinder",
 )
 
 GEOIP_PATH = normpath(join(PROJECT_ROOT, '..', 'data', 'geo'))
@@ -123,6 +124,10 @@ INSTALLED_APPS = (
 
     'django_extensions',
     'django_celery_results',
+    'django_celery_beat',
+    'compressor',
+    'sass_processor',
+
     'app',
     'log',
     'annotation',
@@ -149,6 +154,7 @@ INSTALLED_APPS = (
     'websocket',
     'taskqueue',
     'home',
+    'mobile',
 )
 
 AUTH_USER_MODEL = 'system.User'
@@ -161,13 +167,18 @@ LOGGING = {
         'errors': {
             'level': 'ERROR',
             'class': 'log.utils.ErrorHandler'
-        }
+        },
     },
     'loggers': {
-        'django.request': {
+        'django': {
             'handlers': ['errors'],
             'level': 'ERROR',
-            'propagate': True,
+            'propagate': False,
+        },
+        'pandora': {
+            'handlers': ['errors'],
+            'level': 'ERROR',
+            'propagate': False,
         },
     }
 }
@@ -179,10 +190,14 @@ CACHES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 AUTH_CHECK_USERNAME = True
 FFMPEG = 'ffmpeg'
 FFPROBE = 'ffprobe'
+USE_VP9 = True
 FFMPEG_SUPPORTS_VP9 = True
 FFMPEG_DEBUG = False
 
@@ -204,6 +219,8 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TIMEZONE = 'UTC'
+CELERY_ENABLE_UTC = True
 
 CELERY_BROKER_URL = 'amqp://pandora:box@localhost:5672//pandora'
 
@@ -220,9 +237,6 @@ XACCELREDIRECT = False
 
 SITE_CONFIG = join(PROJECT_ROOT, 'config.jsonc')
 DEFAULT_CONFIG = join(PROJECT_ROOT, 'config.pandora.jsonc')
-
-#used if CONFIG['canDownloadVideo'] is set
-TRACKER_URL = "udp://tracker.openbittorrent.com:80"
 
 DATA_SERVICE = ''
 POSTER_PRECEDENCE = ()
@@ -264,6 +278,7 @@ SCRIPT_ROOT = normpath(join(PROJECT_ROOT, '..', 'scripts'))
 #change script to customize
 ITEM_POSTER = join(SCRIPT_ROOT, 'poster.py')
 ITEM_ICON = join(SCRIPT_ROOT, 'item_icon.py')
+ITEM_ICON_DATA = False
 LIST_ICON = join(SCRIPT_ROOT, 'list_icon.py')
 COLLECTION_ICON = join(SCRIPT_ROOT, 'list_icon.py')
 
@@ -274,9 +289,12 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 32 * 1024 * 1024
 
+EMPTY_CLIPS = True
+
 #you can ignore things below this line
 #=========================================================================
 LOCAL_APPS = []
+LOCAL_URLPATTERNS = []
 #load installation specific settings from local_settings.py
 try:
     from local_settings import *
@@ -302,5 +320,4 @@ except NameError:
             raise Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
 
 INSTALLED_APPS = tuple(list(INSTALLED_APPS) + LOCAL_APPS)
-
 

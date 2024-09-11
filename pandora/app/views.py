@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
-import copy
 from datetime import datetime
+import base64
+import copy
 
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -53,17 +53,18 @@ def embed(request, id):
     })
 
 def redirect_url(request, url):
-    if request.META['QUERY_STRING']:
-        url += "?" + request.META['QUERY_STRING']
-
+    try:
+        url = base64.decodebytes(url.encode()).decode()
+    except:
+        pass
     if settings.CONFIG['site'].get('sendReferrer', False):
         return redirect(url)
     else:
-        return HttpResponse('<script>document.location.href=%s;</script>'%json.dumps(url))
+        return HttpResponse('<script>document.location.href=%s;</script>' % json.dumps(url))
 
 def opensearch_xml(request):
     osd = ET.Element('OpenSearchDescription')
-    osd.attrib['xmlns']="http://a9.com/-/spec/opensearch/1.1/"
+    osd.attrib['xmlns'] = "http://a9.com/-/spec/opensearch/1.1/"
     e = ET.SubElement(osd, 'ShortName')
     e.text = settings.SITENAME
     e = ET.SubElement(osd, 'Description')
@@ -162,7 +163,7 @@ def init(request, data):
     del config['keys']
 
     if 'HTTP_ACCEPT_LANGUAGE' in request.META:
-        response['data']['locale'] = request.META['HTTP_ACCEPT_LANGUAGE'].split(';')[0].split('-')[0]
+        response['data']['locale'] = request.META['HTTP_ACCEPT_LANGUAGE'].split(';')[0].split('-')[0].split(',')[0]
 
     if request.META.get('HTTP_X_PREFIX') == 'NO':
         config['site']['videoprefix'] = ''
@@ -245,7 +246,7 @@ def getEmbedDefaults(request, data):
         i = qs[0].cache
         response['data']['item'] = i['id']
         response['data']['itemDuration'] = i['duration']
-        response['data']['itemRatio'] = i['videoRatio']
+        response['data']['itemRatio'] = i.get('videoRatio', settings.CONFIG['video']['previewRatio'])
     qs = List.objects.exclude(status='private').order_by('name')
     if qs.exists():
         i = qs[0].json()

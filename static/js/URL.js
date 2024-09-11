@@ -399,13 +399,14 @@ pandora.URL = (function() {
 
         // Documents
         views['documents'] = {
-            list: ['grid', 'list'],
-            item: ['view', 'info']
+            list: ['grid', 'list', 'pages'],
+            item: ['view', 'info', 'data']
         };
         sortKeys['documents'] = {
             list: {
                 list: pandora.site.documentKeys,
-                grid: pandora.site.documentKeys
+                grid: pandora.site.documentKeys,
+                pages: pandora.site.documentKeys
             },
             item: {}
         };

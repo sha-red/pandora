@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:12
 
 LABEL maintainer="0x2620@0x2620.org"
 

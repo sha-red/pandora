@@ -34,7 +34,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
             'extension', 'dimensions', 'size', 'matches',
             'created', 'modified', 'accessed',
             'random', 'entity'
-        ],
+        ].concat(pandora.site.documentKeys.filter(key => { return key.fulltext }).map(key => key.id)),
         statisticsWidth = 128,
 
         $bar = Ox.Bar({size: 16})
@@ -251,16 +251,11 @@ pandora.ui.documentInfoView = function(data, isMixed) {
 
     if (canEdit || data.description) {
         $('<div>')
+            .addClass("InlineImages")
             .append(
                 Ox.EditableContent({
                     clickLink: pandora.clickLink,
                     editable: canEdit,
-                    format: function(value) {
-                        return value.replace(
-                            /<img src=/g,
-                            '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
-                        );
-                    },
                     maxHeight: Infinity,
                     placeholder: formatLight(Ox._('No Description')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
@@ -429,7 +424,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
     function formatLink(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key
-                ? '<a href="/documents/' + key + '=' + value + '">' + value + '</a>'
+                ? '<a href="/documents/' + key + '=' + pandora.escapeQueryValue(value) + '">' + value + '</a>'
                 : value;
         }).join(', ');
     }
@@ -559,6 +554,7 @@ pandora.ui.documentInfoView = function(data, isMixed) {
                     $('<span>').html(formatKey(key)).appendTo($element);
                     Ox.EditableContent({
                             clickLink: pandora.clickLink,
+                            editable: canEdit,
                             format: function(value) {
                                 return formatValue(key, value);
                             },

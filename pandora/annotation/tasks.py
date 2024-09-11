@@ -5,12 +5,12 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 import ox
-from celery.task import task
+from app.celery import app
 
 from .models import Annotation
 
 
-@task(ignore_results=False, queue='default')
+@app.task(ignore_results=False, queue='default')
 def add_annotations(data):
     from item.models import Item
     from entity.models import Entity
@@ -51,7 +51,7 @@ def add_annotations(data):
         annotation.item.update_facets()
     return True
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_item(id, force=False):
     from item.models import Item
     from clip.models import Clip
@@ -72,7 +72,7 @@ def update_item(id, force=False):
                 a.item.save()
 
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_annotations(layers, value):
     items = {}
 

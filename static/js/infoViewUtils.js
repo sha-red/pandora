@@ -137,7 +137,7 @@ pandora.renderRightsLevel = function(that, $rightsLevel, data, isMixed, isMultip
                     .data({OxColor: $element.data('OxColor')})
                     .appendTo($line);
             });
-            if (!canEdit) {
+            if (!canEdit && Ox.getObjectById(pandora.site.sitePages, 'rights')) {
                 Ox.Button({
                     title: Ox._('Help'),
                     tooltip: Ox._('About Rights'),

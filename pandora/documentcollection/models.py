@@ -34,6 +34,9 @@ def get_collectionview():
 def get_collectionsort():
     return tuple(settings.CONFIG['user']['ui']['collectionSort'])
 
+def default_query():
+    return {"static": True}
+
 class Collection(models.Model):
 
     class Meta:
@@ -46,7 +49,7 @@ class Collection(models.Model):
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, default='private')
     _status = ['private', 'public', 'featured']
-    query = JSONField(default=lambda: {"static": True}, editable=False)
+    query = JSONField(default=default_query, editable=False)
     type = models.CharField(max_length=255, default='static')
     description = models.TextField(default='')
 

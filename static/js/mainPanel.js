@@ -78,7 +78,7 @@ pandora.ui.mainPanel = function() {
                         if (['clips', 'clip'].indexOf(ui.listView) > -1) {
                             pandora.$ui.list.options({find: ui.itemFind});
                         }
-                        pandora.$ui.list.reloadList();
+                        pandora.$ui.list && pandora.$ui.list.reloadList();
                     }
                     // FIXME: why is this being handled _here_?
                     ui._filterState.forEach(function(data, i) {

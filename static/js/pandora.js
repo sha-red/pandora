@@ -253,10 +253,12 @@ appPanel
                 });
             }
         });
+        window.pandora.getVersion = getPandoraVersion
     }
 
     function loadPandoraFiles(callback) {
         var prefix = '/static/';
+        Ox.getFile(prefix + 'css/pandora.css?' + getPandoraVersion())
         if (enableDebugMode) {
             Ox.getJSON(
                 prefix + 'json/pandora.json?' + Ox.random(1000),
@@ -402,28 +404,30 @@ appPanel
             ],
             sectionFolders: {
                 items: [
-                    {id: 'personal', title: 'Personal Lists'},
-                    {id: 'favorite', title: 'Favorite Lists', showBrowser: false},
-                    {id: 'featured', title: 'Featured Lists', showBrowser: false},
-                    {id: 'volumes', title: 'Local Volumes'}
+                    {id: 'personal', title: Ox._('Personal Lists')},
+                    {id: 'favorite', title: Ox._('Favorite Lists'), showBrowser: false},
+                    {id: 'featured', title: Ox._('Featured Lists'), showBrowser: false},
+                    {id: 'volumes', title: Ox._('Local Volumes')}
                 ],
                 edits: [
-                    {id: 'personal', title: 'Personal Edits'},
-                    {id: 'favorite', title: 'Favorite Edits', showBrowser: false},
-                    {id: 'featured', title: 'Featured Edits', showBrowser: false}
+                    {id: 'personal', title: Ox._('Personal Edits')},
+                    {id: 'favorite', title: Ox._('Favorite Edits'), showBrowser: false},
+                    {id: 'featured', title: Ox._('Featured Edits'), showBrowser: false}
                 ],
                 documents: [
-                    {id: 'personal', title: 'Personal Collections'},
-                    {id: 'favorite', title: 'Favorite Collections', showBrowser: false},
-                    {id: 'featured', title: 'Featured Collections', showBrowser: false}
+                    {id: 'personal', title: Ox._('Personal Collections')},
+                    {id: 'favorite', title: Ox._('Favorite Collections'), showBrowser: false},
+                    {id: 'featured', title: Ox._('Featured Collections'), showBrowser: false}
                 ]
             },
             sortKeys: pandora.getSortKeys(),
-            documentSortKeys: pandora.getDocumentSortKeys(),
-            collectionViews: [
-                {id: 'list', title: Ox._('View as List')},
-                {id: 'grid', title: Ox._('View as Grid')}
-            ]
+            documentSortKeys: pandora.getDocumentSortKeys()
+        });
+        pandora.site.collectionViews = (pandora.site.collectionViews || [
+            {id: 'list', title: Ox._('as List')},
+            {id: 'grid', title: Ox._('as Grid')}
+        ]).map(view => {
+            return {id: view.id, title: Ox._('View {0}', [Ox._(view.title)])};
         });
         pandora.site.listSettings = {};
         Ox.forEach(pandora.site.user.ui, function(val, key) {
@@ -493,6 +497,7 @@ appPanel
                             pandora.$ui.embedPanel.options(data);
                         }
                     });
+                    pandora.localInit && pandora.localInit();
                 } else if (isPrint) {
                     pandora.$ui.printView = pandora.ui.printView().display();
                 } else if (isHome) {

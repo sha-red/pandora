@@ -2,13 +2,14 @@
 
 from glob import glob
 
-from celery.task import task
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Q
 
 from item.models import Item
 from item.tasks import update_poster, update_timeline
 from taskqueue.models import Task
+from app.celery import app
 
 from . import models
 from . import extract
@@ -68,7 +69,7 @@ def update_or_create_instance(volume, f):
             instance.file.item.update_wanted()
     return instance
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_files(user, volume, files):
     user = models.User.objects.get(username=user)
     volume, created = models.Volume.objects.get_or_create(user=user, name=volume)
@@ -100,7 +101,7 @@ def update_files(user, volume, files):
         Task.start(i, user)
         update_timeline.delay(i.public_id)
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_info(user, info):
     user = models.User.objects.get(username=user)
     files = models.File.objects.filter(oshash__in=list(info))
@@ -114,7 +115,7 @@ def update_info(user, info):
             Task.start(i, user)
             update_timeline.delay(i.public_id)
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def process_stream(fileId):
     '''
         process uploaded stream
@@ -140,7 +141,7 @@ def process_stream(fileId):
     Task.finish(file.item)
     return True
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def extract_stream(fileId):
     '''
         extract stream from direct upload
@@ -169,7 +170,7 @@ def extract_stream(fileId):
     models.File.objects.filter(id=fileId).update(encoding=False)
     Task.finish(file.item)
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def extract_derivatives(fileId, rebuild=False):
     file = models.File.objects.get(id=fileId)
     streams = file.streams.filter(source=None)
@@ -177,7 +178,7 @@ def extract_derivatives(fileId, rebuild=False):
         streams[0].extract_derivatives(rebuild)
     return True
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def update_stream(id):
     s = models.Stream.objects.get(pk=id)
     if not glob("%s*" % s.timeline_prefix):
@@ -199,11 +200,11 @@ def update_stream(id):
         c.update_calculated_values()
         c.save()
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def download_media(item_id, url, referer=None):
     return external.download(item_id, url, referer)
 
-@task(queue='default')
+@app.task(queue='default')
 def move_media(data, user):
     from changelog.models import add_changelog
     from item.models import get_item, Item, ItemSort
@@ -248,7 +249,8 @@ def move_media(data, user):
     if old_item and old_item.files.count() == 0 and i.files.count() == len(data['ids']):
         for a in old_item.annotations.all().order_by('id'):
             a.item = i
-            a.set_public_id()
+            with transaction.atomic():
+                a.set_public_id()
             Annotation.objects.filter(id=a.id).update(item=i, public_id=a.public_id)
         old_item.clips.all().update(item=i, sort=i.sort)
 

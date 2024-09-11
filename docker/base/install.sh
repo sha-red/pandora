@@ -1,8 +1,16 @@
 #!/bin/bash
 
-UBUNTU_CODENAME=bionic
 if [ -e /etc/os-release ]; then
     . /etc/os-release
+fi
+if [ -z "$UBUNTU_CODENAME" ]; then
+    UBUNTU_CODENAME=bionic
+fi
+if [ "$VERSION_CODENAME" = "bullseye" ]; then
+    UBUNTU_CODENAME=focal
+fi
+if [ "$VERSION_CODENAME" = "bookworm" ]; then
+    UBUNTU_CODENAME=lunar
 fi
 
 export DEBIAN_FRONTEND=noninteractive
@@ -44,7 +52,6 @@ apt-get install -y \
     python3-numpy \
     python3-psycopg2 \
     python3-pyinotify \
-    python3-simplejson \
     python3-lxml \
     python3-cssselect \
     python3-html5lib \
@@ -53,7 +60,6 @@ apt-get install -y \
     oxframe \
     ffmpeg \
     mkvtoolnix \
-    gpac \
     imagemagick \
     poppler-utils \
     ipython3 \

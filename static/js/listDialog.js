@@ -36,6 +36,9 @@ pandora.ui.listDialog = function(section) {
                             mode: 'list',
                             list: listData
                         })
+                        .css({
+                            'overflow-y': 'auto'
+                        })
                         .bindEvent({
                             change: function(data) {
                                 listData.query = data.query;

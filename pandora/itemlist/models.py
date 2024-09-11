@@ -26,6 +26,9 @@ def get_icon_path(f, x): return get_path(f, 'icon.jpg')
 def get_listview(): return settings.CONFIG['user']['ui']['listView']
 def get_listsort(): return tuple(settings.CONFIG['user']['ui']['listSort'])
 
+def default_query():
+    return {"static": True}
+
 class List(models.Model):
 
     class Meta:
@@ -38,7 +41,7 @@ class List(models.Model):
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, default='private')
     _status = ['private', 'public', 'featured']
-    query = JSONField(default=lambda: {"static": True}, editable=False)
+    query = JSONField(default=default_query, editable=False)
     type = models.CharField(max_length=255, default='static')
     description = models.TextField(default='')
 

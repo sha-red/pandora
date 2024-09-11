@@ -3,14 +3,16 @@
 import os
 import re
 
-import ox
+from oxdjango.api import actions
 from oxdjango.decorators import login_required_json
+from oxdjango.http import HttpFileResponse
 from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+import ox
+
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Max
-from oxdjango.http import HttpFileResponse
-from oxdjango.api import actions
-from django.conf import settings
+from django.db.models import Sum
 
 from item import utils
 from changelog.models import add_changelog
@@ -190,7 +192,7 @@ def _order_clips(edit, sort):
             'in': 'start',
             'out': 'end',
             'text': 'sortvalue',
-            'volume': 'sortvolume',
+            'volume': 'volume' if edit.type == 'smart' else 'sortvolume',
             'item__sort__item': 'item__sort__public_id',
         }.get(key, key)
         order = '%s%s' % (operator, key)
@@ -260,7 +262,7 @@ def addEdit(request, data):
     }
     see: editEdit, findEdit, getEdit, removeEdit, sortEdits
     '''
-    data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
+    data['name'] = re.sub(r' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
     if not name:
         name = "Untitled"
@@ -412,6 +414,11 @@ def findEdits(request, data):
 
     is_featured = any(filter(is_featured_condition, data.get('query', {}).get('conditions', [])))
 
+    is_personal = request.user.is_authenticated and any(
+        (x['key'] == 'user' and x['value'] == request.user.username and x['operator'] == '==')
+        for x in data.get('query', {}).get('conditions', [])
+    )
+
     if is_section_request:
         qs = query['qs']
         if not is_featured and not request.user.is_anonymous:
@@ -419,6 +426,9 @@ def findEdits(request, data):
         qs = qs.order_by('position__position')
     else:
         qs = _order_query(query['qs'], query['sort'])
+
+    if is_personal and request.user.profile.ui.get('hidden', {}).get('edits'):
+        qs = qs.exclude(name__in=request.user.profile.ui['hidden']['edits'])
 
     response = json_response()
     if 'keys' in data:

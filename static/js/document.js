@@ -52,6 +52,13 @@ pandora.ui.document = function() {
             $content.replaceWith(
                 $content = pandora.ui.documentInfoView(result.data)
             );
+        } else if (pandora.user.ui.documentView == 'data') {
+            $content.replaceWith(
+                $content = Ox.TreeList({
+                    data: result.data,
+                    width: pandora.$ui.mainPanel.size(1) - Ox.UI.SCROLLBAR_SIZE
+                })
+            );
         } else {
             setContent();
         }
@@ -94,6 +101,13 @@ pandora.ui.document = function() {
                         'documents.' + item.id,
                         {position: $content.getArea().map(Math.round)}
                     );
+                },
+                embed: function(data) {
+                    var id = item.id;
+                    pandora.$ui.embedDocumentDialog = pandora.ui.embedDocumentDialog(
+                        id,
+                        data.page
+                    ).open();
                 },
                 key_escape: function() {
                     // ...

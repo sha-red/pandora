@@ -95,7 +95,7 @@ pandora.ui.toolbar = function() {
         return ['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1 ? 152 : 316;
     }
     that.updateListName = function(listId) {
-        pandora.$ui.listTitle.options({title: getListName(listId)});
+        pandora.$ui.listTitle && pandora.$ui.listTitle.options({title: getListName(listId)});
     };
     return that;
 };

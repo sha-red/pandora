@@ -15,7 +15,6 @@ services:
             - "127.0.0.1:2620:80"
         networks:
             - backend
-            - default
         links:
             - pandora
             - websocketd
@@ -28,7 +27,7 @@ services:
         restart: unless-stopped
 
     db:
-        image: postgres:latest
+        image: postgres:15
         networks:
             - backend
         env_file: .env

@@ -65,7 +65,7 @@ actions.register(removeErrorLogs, cache=False)
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'name', 'operator':'+'}]
+    query['sort'] = [{'key': 'modified', 'operator': '-'}]
     for key in ('keys', 'group', 'list', 'range', 'sort', 'query'):
         if key in data:
             query[key] = data[key]

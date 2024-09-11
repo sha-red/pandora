@@ -142,7 +142,7 @@ pandora.ui.info = function() {
                             })
                             .bindEvent({
                                 click: function(data) {
-                                    if (ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1) {
+                                    if (ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1 && pandora.$ui[ui.itemView]) {
                                         pandora.$ui[ui.itemView].options({
                                             position: data.position
                                         });

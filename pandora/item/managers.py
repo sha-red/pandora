@@ -33,7 +33,7 @@ def parseCondition(condition, user, owner=None):
     k = {'id': 'public_id'}.get(k, k)
     if not k:
         k = '*'
-    v = condition['value']
+    v = condition.get('value', '')
     op = condition.get('operator')
     if not op:
         op = '='
@@ -62,6 +62,9 @@ def parseCondition(condition, user, owner=None):
     if k == 'list':
         key_type = ''
 
+    if k in ('width', 'height'):
+        key_type = 'integer'
+
     if k == 'groups':
         if op == '==' and v == '$my':
             if not owner:
@@ -86,8 +89,11 @@ def parseCondition(condition, user, owner=None):
     elif k == 'rendered':
         return Q(rendered=v)
     elif k == 'resolution':
-        q = parseCondition({'key': 'width', 'value': v[0], 'operator': op}, user) \
-            & parseCondition({'key': 'height', 'value': v[1], 'operator': op}, user)
+        if isinstance(v, list) and len(v) == 2:
+            q = parseCondition({'key': 'width', 'value': v[0], 'operator': op}, user) \
+                & parseCondition({'key': 'height', 'value': v[1], 'operator': op}, user)
+        else:
+            q = Q(id=0)
         if exclude:
             q = ~q
         return q
@@ -318,6 +324,8 @@ class ItemManager(Manager):
                 q |= Q(groups__in=user.groups.all())
                 rendered_q |= Q(groups__in=user.groups.all())
             qs = qs.filter(q)
+            max_level = len(settings.CONFIG['rightsLevels'])
+            qs = qs.filter(level__lte=max_level)
         if settings.CONFIG.get('itemRequiresVideo') and level != 'admin':
             qs = qs.filter(rendered_q)
         return qs

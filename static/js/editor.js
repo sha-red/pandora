@@ -4,6 +4,7 @@ pandora.ui.editor = function(data) {
 
     var ui = pandora.user.ui,
         rightsLevel = data.rightslevel,
+        canEdit = pandora.hasCapability('canEditMetadata') || data.editable,
 
         that = Ox.VideoAnnotationPanel({
             annotationsCalendarSize: ui.annotationsCalendarSize,
@@ -44,7 +45,7 @@ pandora.ui.editor = function(data) {
             itemName: pandora.site.itemName,
             layers: data.annotations.map(function(layer) {
                 return Ox.extend({
-                    editable: layer.canAddAnnotations[pandora.user.level]
+                    editable: layer.canAddAnnotations[pandora.user.level] || canEdit
                 }, layer, {
                     autocomplete: layer.type == 'entity'
                         ? function(key, value, callback) {
@@ -98,10 +99,10 @@ pandora.ui.editor = function(data) {
             showLayers: Ox.clone(ui.showLayers),
             showUsers: pandora.site.annotations.showUsers,
             subtitles: data.subtitles,
-            subtitlesDefaultTrack: Ox.getLanguageNameByCode(pandora.site.language),
+            subtitlesDefaultTrack: data.subtitlesDefaultTrack || Ox.getLanguageNameByCode(pandora.site.language),
             subtitlesLayer: data.subtitlesLayer,
             subtitlesOffset: ui.videoSubtitlesOffset,
-            subtitlesTrack: Ox.getLanguageNameByCode(pandora.site.language),
+            subtitlesTrack: data.subtitlesTrack || Ox.getLanguageNameByCode(pandora.site.language),
             timeline: ui.videoTimeline,
             timelines: pandora.site.timelines,
             video: data.video,

@@ -24,10 +24,6 @@ urls = [
         re_path(r'^(?P<id>[A-Z0-9].*)/(?P<resolution>\d+)p(?P<index>\d*)\.(?P<format>webm|ogv|mp4)$', views.video),
         re_path(r'^(?P<id>[A-Z0-9].*)/(?P<resolution>\d+)p(?P<index>\d*)\.(?P<track>.+)\.(?P<format>webm|ogv|mp4)$', views.video),
 
-        #torrent
-        re_path(r'^(?P<id>[A-Z0-9].*)/torrent$', views.torrent),
-        re_path(r'^(?P<id>[A-Z0-9].*)/torrent/(?P<filename>.*?)$', views.torrent),
-
         #export
         re_path(r'^(?P<id>[A-Z0-9].*)/json$', views.item_json),
         re_path(r'^(?P<id>[A-Z0-9].*)/xml$', views.item_xml),

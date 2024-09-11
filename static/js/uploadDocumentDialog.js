@@ -18,7 +18,10 @@ pandora.ui.uploadDocumentDialog = function(options, callback) {
 
         $errorDialog,
 
-        $content = Ox.Element().css({margin: '16px'}),
+        $content = Ox.Element().css({
+            margin: '16px',
+            overflow: 'hidden'
+        }),
 
         $text = $('<div>')
             .html(Ox._('Uploading {0}', [files[0].name]))

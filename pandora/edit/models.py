@@ -13,6 +13,7 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 
 from oxdjango.fields import JSONField
 
@@ -24,6 +25,7 @@ import clip.models
 from archive import extract
 from user.utils import update_groups
 from user.models import Group
+from clip.utils import add_cuts
 
 from . import managers
 
@@ -32,6 +34,9 @@ User = get_user_model()
 
 def get_path(f, x): return f.path(x)
 def get_icon_path(f, x): return get_path(f, 'icon.jpg')
+
+def default_query():
+    return {"static": True}
 
 class Edit(models.Model):
 
@@ -51,7 +56,7 @@ class Edit(models.Model):
     description = models.TextField(default='')
     rightslevel = models.IntegerField(db_index=True, default=0)
 
-    query = JSONField(default=lambda: {"static": True}, editable=False)
+    query = JSONField(default=default_query, editable=False)
     type = models.CharField(max_length=255, default='static')
 
     icon = models.ImageField(default=None, blank=True, null=True, upload_to=get_icon_path)
@@ -93,6 +98,8 @@ class Edit(models.Model):
         # dont add clip if in/out are invalid
         if not c.annotation:
             duration = c.item.sort.duration
+            if c.start is None or c.end is None:
+                return False
             if c.start > c.end \
                     or round(c.start, 3) >= round(duration, 3) \
                     or round(c.end, 3) > round(duration, 3):
@@ -507,7 +514,7 @@ class Clip(models.Model):
             if value:
                 data[key] = value
         data['duration'] = data['out'] - data['in']
-        data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
+        add_cuts(data, self.item, self.start, self.end)
         data['layers'] = self.get_layers(user)
         data['streams'] = [s.file.oshash for s in self.item.streams()]
         return data

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from django.db import connection, transaction
-from celery.task import task
+from app.celery import app
 
 import item.models
 from . import extract
 
-@task(ignore_results=True, queue='encoding')
+@app.task(ignore_results=True, queue='encoding')
 def get_sequences(public_id):
     from . import models
     i = item.models.Item.objects.get(public_id=public_id)

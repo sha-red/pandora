@@ -37,9 +37,6 @@ pandora.ui.documentContentPanel = function() {
             orientation: 'vertical'
         })
         .bindEvent({
-            resize: function(data) {
-                Ox.print('split resize');
-            },
             pandora_document: function(data) {
                 if (data.value && data.previousValue) {
                     that.replaceElement(1, pandora.$ui.document = pandora.ui.document());

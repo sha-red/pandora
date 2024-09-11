@@ -2,7 +2,10 @@
 
 pandora.ui.sectionButtons = function(section) {
     var that = Ox.ButtonGroup({
-            buttons: pandora.site.sections,
+            buttons: Ox.clone(pandora.site.sections, true).map(function(section) {
+                section.title = Ox._(section.title);
+                return section;
+            }),
             id: 'sectionButtons',
             selectable: true,
             value: section || pandora.user.ui.section

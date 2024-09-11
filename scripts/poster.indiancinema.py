@@ -160,7 +160,7 @@ def render_poster(data, poster):
         if frame_ratio < frame_image_ratio:
             frame_image = frame_image.resize(
                 (int(frame_height * frame_image_ratio), frame_height),
-                Image.ANTIALIAS
+                Image.LANCZOS
             )
             left = int((frame_image.size[0] - poster_width) / 2)
             frame_image = frame_image.crop(
@@ -169,7 +169,7 @@ def render_poster(data, poster):
         else:
             frame_image = frame_image.resize(
                 (poster_width, int(poster_width / frame_image_ratio)),
-                Image.ANTIALIAS
+                Image.LANCZOS
             )
             top = int((frame_image.size[1] - frame_height) / 2)
             frame_image = frame_image.crop(
@@ -187,7 +187,7 @@ def render_poster(data, poster):
         timeline_image = Image.open(timeline)
         timeline_image = timeline_image.resize(
             (poster_width, timeline_height),
-            Image.ANTIALIAS
+            Image.LANCZOS
         )
         poster_image.paste(timeline_image, (0, poster_height - timeline_height))
     else:

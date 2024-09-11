@@ -1,14 +1,37 @@
+import logging
+import os
 import subprocess
+import tempfile
 
 from django.conf import settings
 
 
-def extract_text(pdf):
-    cmd = ['pdftotext', pdf, '-']
+logger = logging.getLogger('pandora.' + __name__)
+
+
+def extract_text(pdf, page=None):
+    if page is not None:
+        page = str(page)
+        cmd = ['pdftotext', '-f', page, '-l', page, pdf, '-']
+    else:
+        cmd = ['pdftotext', pdf, '-']
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
-    stdout = stdout.decode()
-    return stdout.strip()
+    stdout = stdout.decode().strip()
+    if not stdout:
+        if page:
+            # split page from pdf and ocr
+            fd, page_pdf = tempfile.mkstemp('.pdf')
+            cmd = ['pdfseparate', '-f', page, '-l', page, pdf, page_pdf]
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+            stdout, stderr = p.communicate()
+            text = ocr_image(page_pdf)
+            os.unlink(page_pdf)
+            os.close(fd)
+            return text
+        else:
+            return ocr_image(pdf)
+    return stdout
 
 def ocr_image(path):
     cmd = ['tesseract', path, '-', 'txt']
@@ -43,9 +66,11 @@ class FulltextMixin:
         if self.has_fulltext_key():
             from elasticsearch.exceptions import NotFoundError
             try:
-                res = self.elasticsearch().delete(index=self._ES_INDEX, doc_type='document', id=self.id)
+                res = self.elasticsearch().delete(index=self._ES_INDEX, id=self.id)
             except NotFoundError:
                 pass
+            except:
+                logger.error('failed to delete fulltext document', exc_info=True)
 
     def update_fulltext(self):
         if self.has_fulltext_key():
@@ -54,7 +79,7 @@ class FulltextMixin:
                 doc = {
                     'text': text.lower()
                 }
-                res = self.elasticsearch().index(index=self._ES_INDEX, doc_type='document', id=self.id, body=doc)
+                res = self.elasticsearch().index(index=self._ES_INDEX, id=self.id, body=doc)
 
     @classmethod
     def find_fulltext(cls, query):
@@ -95,3 +120,69 @@ class FulltextMixin:
             ids += [int(r['_id']) for r in res['hits']['hits']]
             from_ += len(res['hits']['hits'])
         return ids
+
+    def highlight_page(self, page, query, size):
+        import pypdfium2 as pdfium
+        from PIL import Image
+        from PIL import ImageDraw
+
+        pdfpath = self.file.path
+        pagenumber = int(page) - 1
+        jpg = tempfile.NamedTemporaryFile(suffix='.jpg')
+        output = jpg.name
+        TINT_COLOR = (255, 255, 0)
+        TRANSPARENCY = .45
+        OPACITY = int(255 * TRANSPARENCY)
+        scale = 150/72
+
+        pdf = pdfium.PdfDocument(pdfpath)
+        page = pdf[pagenumber]
+
+        bitmap = page.render(scale=scale, rotation=0)
+        img = bitmap.to_pil().convert('RGBA')
+        overlay = Image.new('RGBA', img.size, TINT_COLOR+(0,))
+        draw = ImageDraw.Draw(overlay)
+
+        textpage = page.get_textpage()
+        search = textpage.search(query)
+        result = search.get_next()
+        while result:
+            pos, steps = result
+            steps += 1
+            while steps:
+                box = textpage.get_charbox(pos)
+                box = [b*scale for b in box]
+                tl = (box[0], img.size[1] - box[3])
+                br = (box[2], img.size[1] - box[1])
+                draw.rectangle((tl, br), fill=TINT_COLOR+(OPACITY,))
+                pos += 1
+                steps -= 1
+            result = search.get_next()
+        img = Image.alpha_composite(img, overlay)
+        img = img.convert("RGB")
+        aspect = img.size[0] / img.size[1]
+        resize_method = Image.LANCZOS
+        if img.size[0] >= img.size[1]:
+            width = size
+            height = int(size / aspect)
+        else:
+            width = int(size / aspect)
+            height = size
+        img = img.resize((width, height), resize_method)
+        img.save(output, quality=72)
+        return jpg
+
+
+class FulltextPageMixin(FulltextMixin):
+    _ES_INDEX = "document-page-index"
+
+    def extract_fulltext(self):
+        if self.document.file:
+            if self.document.extension == 'pdf':
+                return extract_text(self.document.file.path, self.page)
+            elif self.extension in ('png', 'jpg'):
+                return ocr_image(self.document.file.path)
+        elif self.extension == 'html':
+            # FIXME: is there a nice way to split that into pages
+            return self.data.get('text', '')
+        return ''

@@ -330,6 +330,12 @@ pandora.beforeUnloadWindow = function() {
     pandora.isUnloading = true;
 };
 
+
+pandora.canShareView = function() {
+    return pandora.hasCapability('canShare')
+};
+
+
 pandora.changeFolderItemStatus = function(id, status, callback) {
     var ui = pandora.user.ui,
         folderItems = pandora.getFolderItems(ui.section),
@@ -559,7 +565,7 @@ pandora.uploadDroppedFiles = function(files) {
         var clips, type = getType(items);
         if (Ox.isUndefined(callback)) {
             callback = index;
-            index = pandora.$ui.editPanel
+            index = pandora.$ui.editPanel && pandora.$ui.editPanel.getPasteIndex
                     ? pandora.$ui.editPanel.getPasteIndex()
                     : void 0;
         }
@@ -729,11 +735,11 @@ pandora.uploadDroppedFiles = function(files) {
 pandora.enableBatchEdit = function(section) {
     var ui = pandora.user.ui;
     if (section == 'documents') {
-        return !ui.document && ui.collectionSelection.length > 1 && ui.collectionSelection.some(function(item) {
+        return !ui.document && ui.collectionSelection.length > 0 && ui.collectionSelection.some(function(item) {
             return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
         })
     } else {
-        return !ui.item && ui.listSelection.length > 1 && ui.listSelection.some(function(item) {
+        return !ui.item && ui.listSelection.length > 0 && ui.listSelection.some(function(item) {
             return pandora.$ui.list && pandora.$ui.list.value(item, 'editable');
         })
     }
@@ -1110,7 +1116,9 @@ pandora.escapeQueryValue = function(value) {
     if (!Ox.isString(value)) {
         value = value.toString();
     }
-    return value.replace(/%/, '%25')
+    return value
+        .replace(/%/g, '%25')
+        .replace(/&/g, '%26')
         .replace(/_/g, '%09')
         .replace(/\s/g, '_')
         .replace(/</g, '%0E')
@@ -1163,7 +1171,7 @@ pandora.formatDocumentKey = function(key, data, size) {
             value.css({width: size * 0.75 + 'px'});
         }
     } else {
-        value = data[key.id];
+        value = data[key.id] || '';
         if (key.id == 'extension') {
             value = value.toUpperCase();
         } else if (key.id == 'dimensions') {
@@ -1257,6 +1265,25 @@ pandora.getClipsQuery = function(callback) {
     };
     addClipsConditions(pandora.user.ui.find.conditions);
     clipsQuery.operator = clipsQuery.conditions.length ? '|' : '&';
+    if (clipsQuery.conditions.length) {
+        clipsQuery.conditions = [
+            {
+                key: "layer",
+                operator: "&",
+                value: pandora.site.clipLayers
+            }, {
+                conditions: clipsQuery.conditions,
+                operator: '|'
+            }
+        ]
+        clipsQuery.operator = '&'
+    } else {
+        clipsQuery.conditions.push({
+            "key": "layer",
+            "operator": "&",
+            "value":pandora.site.clipLayers
+        })
+    }
     if (callback) {
         if (pandora.user.ui._list) {
             pandora.api.getList({id: pandora.user.ui._list}, function(result) {
@@ -1397,14 +1424,8 @@ pandora.getCurrentFrameAnnotation = function(data) {
 }());
 
 pandora.getDownloadLink = function(item, rightslevel) {
-    var torrent = pandora.site.video.torrent,
-        url;
-    if (arguments.length == 2 && torrent &&
-        pandora.hasCapability('canSeeItem', 'guest') < rightslevel) {
-        torrent = false;
-    }
-    url = '/' + item + (torrent ? '/torrent/' : '/download/');
-    if (!torrent && pandora.site.video.downloadFormat) {
+    var url = '/' + item + '/download/';
+    if (pandora.site.video.downloadFormat) {
         url += Ox.max(pandora.site.video.resolutions) + 'p.' + pandora.site.video.downloadFormat;
     }
     return url;
@@ -1466,6 +1487,17 @@ pandora.getFindLayer = function() {
         key = '*'
     }
     return key
+};
+
+pandora.getFulltextQuery = function() {
+    if (pandora.user.ui.findDocuments) {
+        var conditions = pandora.user.ui.findDocuments.conditions.filter(condition => {
+            return condition.key == 'fulltext'
+        })
+        if (conditions.length) {
+            return conditions[0].value
+        }
+    }
 };
 
 pandora.getHash = function(state, callback) {
@@ -1760,6 +1792,9 @@ pandora.getLargeEditTimelineURL = function(edit, type, i, callback) {
             clipOut = clip.position + clip.duration;
         if (clipIn >= timelineOut) {
             return false; // break
+        }
+        if (!clip.duration) {
+            return;
         }
         if (
             (timelineIn <= clipIn && clipIn <= timelineOut)
@@ -2460,6 +2495,7 @@ pandora.getVideoOptions = function(data) {
         });
     });
     data.videoRatio = data.videoRatio || pandora.site.video.previewRatio;
+
     return options;
 };
 
@@ -2634,7 +2670,10 @@ pandora.openLink = function(url) {
     if (Ox.startsWith(url, 'mailto:')) {
         window.open(url);
     } else {
-        window.open('/url=' + encodeURIComponent(url), '_blank');
+        if (!pandora.site.site.sendReferrer) {
+            url = '/url=' + btoa(url);
+        }
+        window.open(url, '_blank');
     }
 };
 
@@ -2942,7 +2981,7 @@ pandora.resizeFolders = function(section) {
         : section == 'edits' ? width - 16
         : width - 48
     ) - 8);
-    Ox.forEach(pandora.$ui.folderList, function($list, id) {
+    pandora.$ui.folderList && Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getIndexById(pandora.site.sectionFolders[section], id);
         pandora.$ui.folder[pos] && pandora.$ui.folder[pos].css({
             width: width + 'px'
@@ -2983,7 +3022,7 @@ pandora.resizeWindow = function() {
     pandora.resizeFolders();
     if (pandora.user.ui.section == 'items') {
         if (!pandora.user.ui.item) {
-            pandora.resizeFilters(pandora.$ui.rightPanel.width());
+            pandora.$ui.rightPanel && pandora.resizeFilters(pandora.$ui.rightPanel.width());
             if (pandora.user.ui.listView == 'clips') {
                 var clipsItems = pandora.getClipsItems(),
                     previousClipsItems = pandora.getClipsItems(
@@ -3045,7 +3084,7 @@ pandora.resizeWindow = function() {
             }
         }
     } else if (pandora.user.ui.section == 'documents') {
-        pandora.resizeFilters(pandora.$ui.documentPanel.width());
+        pandora.$ui.documentPanel && pandora.resizeFilters(pandora.$ui.documentPanel.width());
         if (pandora.user.ui.document) {
             pandora.$ui.document && pandora.$ui.document.update();
         } else {
@@ -3193,7 +3232,7 @@ pandora.unloadWindow = function() {
         && pandora.user.ui.item
         && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
         && pandora.UI.set(
-            'videoPosition.' + pandora.user.ui.item,
+            'videoPoints.' + pandora.user.ui.item,
             pandora.$ui[
                 pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
             ].options('position')
@@ -3215,11 +3254,11 @@ pandora.updateItemContext = function() {
                 pandora.$ui.contentPanel.replaceElement(
                     0, pandora.$ui.browser = pandora.ui.browser()
                 );
-            } else {
+            } else if (pandora.$ui.browser) {
                 pandora.$ui.browser.reloadList();
             }
         });
-    } else {
+    } else if (pandora.$ui.browser) {
         pandora.$ui.browser.reloadList();
     }
 };

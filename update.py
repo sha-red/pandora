@@ -13,19 +13,19 @@ from os.path import join, exists
 
 repos = {
     "pandora": {
-        "url": "https://git.0x2620.org/pandora.git",
+        "url": "https://code.0x2620.org/0x2620/pandora.git",
         "path": ".",
     },
     "oxjs": {
-        "url": "https://git.0x2620.org/oxjs.git",
+        "url": "https://code.0x2620.org/0x2620/oxjs.git",
         "path": "./static/oxjs",
     },
     "oxtimelines": {
-        "url": "https://git.0x2620.org/oxtimelines.git",
+        "url": "https://code.0x2620.org/0x2620/oxtimelines.git",
         "path": "./src/oxtimelines",
     },
     "python-ox": {
-        "url": "https://git.0x2620.org/python-ox.git",
+        "url": "https://code.0x2620.org/0x2620/python-ox.git",
         "path": "./src/python-ox",
     }
 }
@@ -207,12 +207,12 @@ if __name__ == "__main__":
             for component in ('oxtimelines', 'python-ox'):
                 if not os.path.exists('./src/%s/.git' % component):
                     run('./bin/pip', 'install', '-e',
-                        'git+https://git.0x2620.org/%s.git#egg=%s' % (component, component),
+                        'git+https://code.0x2620.org/0x2620/%s.git#egg=%s' % (component, component),
                         '--exists-action', 'w')
             if not os.path.exists('./static/oxjs/.git'):
                 if os.path.exists('static/oxjs'):
                     shutil.move('static/oxjs', 'static/oxjs_bzr')
-                run('git', 'clone', '--depth', '1', 'https://git.0x2620.org/oxjs.git', 'static/oxjs')
+                run('git', 'clone', '--depth', '1', 'https://code.0x2620.org/0x2620/oxjs.git', 'static/oxjs')
                 run('./pandora/manage.py', 'update_static')
                 if os.path.exists('static/oxjs_bzr'):
                     shutil.rmtree('static/oxjs_bzr')
@@ -297,7 +297,10 @@ if __name__ == "__main__":
                 run_sql(sql)
             run(join(base, 'pandora/manage.py'), 'migrate', 'system')
             run(join(base, 'pandora/manage.py'), 'update_geoip')
-        if old <= 6383:
+        if old < 6442:
+            run('./bin/pip', 'install', 'yt-dlp>=2022.3.8.2')
+        if old <= 6581:
+            run('./bin/pip', 'install', '-U', 'pip')
             run('./bin/pip', 'install', '-r', 'requirements.txt')
     else:
         if len(sys.argv) == 1:
@@ -349,25 +352,15 @@ if __name__ == "__main__":
             run('./manage.py', 'update_static')
             run('./manage.py', 'compile_pyc', '-p', '.')
         os.chdir(join(base, 'pandora'))
-        diff = get('./manage.py', 'sqldiff', '-a').strip()
-        for row in [
-            '-- Model missing for table: djcelery_periodictasks\n',
-            '-- Model missing for table: celery_taskmeta\n',
-            '-- Model missing for table: celery_tasksetmeta\n',
-            '-- Model missing for table: djcelery_crontabschedule\n',
-            '-- Model missing for table: djcelery_periodictask\n',
-            '-- Model missing for table: djcelery_intervalschedule\n',
-            '-- Model missing for table: djcelery_workerstate\n',
-            '-- Model missing for table: djcelery_taskstate\n',
-            '-- Model missing for table: south_migrationhistory\n',
-            '-- Model missing for table: cache\n',
-        ]:
-            if row in diff:
-                diff = diff.replace(row, '')
-        if diff not in [
-            '-- No differences',
-            'BEGIN;\nCOMMIT;'
-        ]:
+        diff = get('./manage.py', 'sqldiff', '-a').strip().split('\n')
+        diff = [
+            row for row in diff
+            if not row.strip().startswith('ALTER "id" TYPE')
+            and not row.startswith('--')
+            and not row.startswith('ALTER TABLE')
+            and row not in ['BEGIN;', 'COMMIT;']
+        ]
+        if diff:
             print('Database has changed, please make a backup and run %s db' % sys.argv[0])
         elif branch != 'master':
             print('pan.do/ra is at the latest release,\nyou can run "%s switch master" to switch to the development version' % sys.argv[0])

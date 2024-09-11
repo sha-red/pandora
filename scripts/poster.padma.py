@@ -33,7 +33,7 @@ def render_poster(data, poster):
     timeline_lines = 16
     if timeline:
         timeline_image = Image.open(timeline)
-        timeline_image = timeline_image.resize((10240, timeline_height), Image.ANTIALIAS)
+        timeline_image = timeline_image.resize((10240, timeline_height), Image.LANCZOS)
         for i in range(timeline_lines):
             line_image = timeline_image.crop((i * poster_width, 0, (i + 1) * poster_width, 64))
             poster_image.paste(line_image, (0, i * timeline_height))

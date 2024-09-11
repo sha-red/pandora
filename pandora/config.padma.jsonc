@@ -71,13 +71,14 @@
         "canSeeAccessed": {"staff": true, "admin": true},
         "canSeeAllTasks": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"staff": true, "admin": true},
-        "canSeeExtraItemViews": {"staff": true, "admin": true},
-        "canSeeMedia": {"staff": true, "admin": true},
         "canSeeDocument": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
+        "canSeeExtraItemViews": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
+        "canSeeMedia": {"staff": true, "admin": true},
         "canSeeSize": {"staff": true, "admin": true},
         "canSeeSoftwareVersion": {"staff": true, "admin": true},
-        "canSendMail": {"staff": true, "admin": true}
+        "canSendMail": {"staff": true, "admin": true},
+        "canShare": {"staff": true, "admin": true}
     },
     /*
     "clipKeys" are the properties that clips can be sorted by (the values are
@@ -247,6 +248,28 @@
             "find": true
         },
         {
+            "id": "source",
+            "title": "Source",
+            "type": "string",
+            "autocomplete": true,
+            "description": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true,
+            "sort": true
+        },
+        {
+            "id": "project",
+            "title": "Project",
+            "type": "string",
+            "autocomplete": true,
+            "description": true,
+            "columnWidth": 120,
+            "filter": true,
+            "find": true,
+            "sort": true
+        },
+        {
             "id": "id",
             "operator": "+",
             "title": "ID",
@@ -292,6 +315,24 @@
             "columnWidth": 256
         },
         {
+            "id": "content",
+            "operator": "+",
+            "title": "Content",
+            "type": "text",
+            "find": true,
+            "sort": true,
+            "columnWidth": 256
+        },
+        {
+            "id": "translation",
+            "operator": "+",
+            "title": "Translation",
+            "type": "text",
+            "find": true,
+            "sort": true,
+            "columnWidth": 256
+        },
+        {
             "id": "matches",
             "operator": "-",
             "title": "Matches",
@@ -309,6 +350,20 @@
             "sort": true,
             "autocomplete": true,
             "columnWidth": 128
+        },
+        {
+            "id": "notes",
+            "title": "Notes",
+            "type": "text",
+            "capability": "canEditMetadata"
+        },
+        {
+            "id": "fulltext",
+            "operator": "+",
+            "title": "Fulltext",
+            "type": "text",
+            "fulltext": true,
+            "find": true
         },
         {
             "id": "created",
@@ -545,7 +600,6 @@
             "title": "Director",
             "type": ["string"],
             "autocomplete": true,
-            "columnRequired": true,
             "columnWidth": 180,
             "sort": true,
             "sortType": "person"
@@ -564,7 +618,6 @@
             "title": "Featuring",
             "type": ["string"],
             "autocomplete": true,
-            "columnRequired": true,
             "columnWidth": 180,
             "filter": true,
             "sort": true,
@@ -620,7 +673,7 @@
         {
             "id": "annotations",
             "title": "Annotations",
-            "type": "string", // fixme: not the best type for this magic key
+            "type": "text", // fixme: not the best type for this magic key
             "find": true
         },
         {
@@ -658,7 +711,7 @@
         },
         {
             "id": "numberofannotations",
-            "title": "Annotations",
+            "title": "Number of Annotations",
             "type": "integer",
             "columnWidth": 60,
             "sort": true
@@ -794,12 +847,16 @@
             "id": "user",
             "title": "User",
             "type": "string",
+            "columnWidth": 90,
             "capability": "canSeeMedia",
+            "sort": true,
             "find": true
         },
         {
             "id": "groups",
             "title": "Group",
+            "columnWidth": 90,
+            "sort": true,
             "type": ["string"]
         },
         {
@@ -1332,10 +1389,8 @@
             corner of the screen
         "resolutions": List of video resolutions. Supported values are 96, 144,
             240, 288, 360, 432, 480, 720 and 1080.
-        "torrent": If true, video downloads are offered via BitTorrent
     */
     "video": {
-        "torrent": true,
         "formats": ["webm", "mp4"],
         "previewRatio": 1.3333333333,
         //supported resolutions are

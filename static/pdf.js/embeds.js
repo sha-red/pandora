@@ -3,25 +3,27 @@ Ox.load({
         loadCSS: false
     }
 }, function() {
-    var currentPage = PDFView.page;
-    window.addEventListener('pagechange', function (evt) {
-        var page = evt.pageNumber;
-        if (page && page != currentPage) {
-            currentPage = page;
-            Ox.$parent.postMessage('page', {
-                page: Math.round(page)
-            });
-        }
-    });
+    var currentPage = PDFViewerApplication.page;
+    PDFViewerApplication.initializedPromise.then(function() {
+        PDFViewerApplication.pdfViewer.eventBus.on("pagechanging", function(event) {
+            var page = event.pageNumber;
+            if (page && page != currentPage) {
+                currentPage = page;
+                Ox.$parent.postMessage('page', {
+                    page: page
+                });
+            }
+        })
+    })
     Ox.$parent.bindMessage({
         page: function(data) {
-            if (data.page != PDFView.page) {
-                PDFView.page = data.page;
+            if (data.page != PDFViewerApplication.page) {
+                PDFViewerApplication.page = data.page;
             }
         },
         pdf: function(data) {
-            if (PDFView.url != data.pdf) {
-                PDFView.open(data.pdf);
+            if (PDFViewerApplication.url != data.pdf) {
+                PDFViewerApplication.open(data.pdf);
             }
         }
     });

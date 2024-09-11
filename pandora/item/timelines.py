@@ -71,7 +71,7 @@ def join_tiles(source_paths, durations, target_path):
                 if not w or large_tile_i < large_tile_n - 1:
                     w = 60
                 data['target_images']['large'] = data['target_images']['large'].resize(
-                    (w, small_tile_h), Image.ANTIALIAS
+                    (w, small_tile_h), Image.LANCZOS
                 )
                 if data['target_images']['small']:
                     data['target_images']['small'].paste(
@@ -90,7 +90,7 @@ def join_tiles(source_paths, durations, target_path):
                     if data['full_tile_widths'][0]:
                         resized = data['target_images']['large'].resize((
                             data['full_tile_widths'][0], large_tile_h
-                        ), Image.ANTIALIAS)
+                        ), Image.LANCZOS)
                         data['target_images']['full'].paste(resized, (data['full_tile_offset'], 0))
                         data['full_tile_offset'] += data['full_tile_widths'][0]
                     data['full_tile_widths'] = data['full_tile_widths'][1:]
@@ -196,7 +196,7 @@ def join_tiles(source_paths, durations, target_path):
     #print(image_file)
     image_file = '%stimeline%s%dp.jpg' % (target_path, full_tile_mode, small_tile_h)
     data['target_images']['full'].resize(
-        (full_tile_w, small_tile_h), Image.ANTIALIAS
+        (full_tile_w, small_tile_h), Image.LANCZOS
     ).save(image_file)
     #print(image_file)
 

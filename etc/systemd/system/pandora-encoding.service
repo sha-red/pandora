@@ -7,14 +7,16 @@ Type=simple
 Restart=always
 User=pandora
 Group=pandora
+EnvironmentFile=/srv/pandora/pandora/encoding.conf
 PIDFile=/run/pandora/encoding.pid
 WorkingDirectory=/srv/pandora/pandora
 ExecStart=/srv/pandora/bin/celery \
     -A app worker \
     -Q encoding -n pandora-encoding \
     --pidfile /run/pandora/encoding.pid \
-    --maxtasksperchild 500 \
-    -l INFO
+    -c $CONCURRENCY \
+    --max-tasks-per-child $MAX_TASKS_PER_CHILD \
+    -l $LOGLEVEL
 ExecReload=/bin/kill -TERM $MAINPID
 
 [Install]

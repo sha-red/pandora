@@ -133,7 +133,13 @@ def load_config(init=False):
                 added = []
                 for key in sorted(d):
                     if key not in c:
-                        added.append("\"%s\": %s," % (key, json.dumps(d[key])))
+                        if key not in (
+                            'hidden',
+                            'find',
+                            'findDocuments',
+                            'videoPoints',
+                        ):
+                            added.append("\"%s\": %s," % (key, json.dumps(d[key])))
                         c[key] = d[key]
                 if added:
                     sys.stderr.write("adding default %s:\n\t" % section)
@@ -321,7 +327,11 @@ def update_static():
     #locale
     for f in sorted(glob(os.path.join(settings.STATIC_ROOT, 'json/locale.pandora.*.json'))):
         with open(f) as fd:
-            locale = json.load(fd)
+            try:
+                locale = json.load(fd)
+            except:
+                print("failed to parse %s" % f)
+                raise
         site_locale = f.replace('locale.pandora', 'locale.' + settings.CONFIG['site']['id'])
         locale_file = f.replace('locale.pandora', 'locale')
         print('write', locale_file)
@@ -365,13 +375,3 @@ def update_geoip(force=False):
 
 def init():
     load_config(True)
-
-def shutdown():
-    if settings.RELOADER_RUNNING:
-        RUN_RELOADER = False
-        settings.RELOADER_RUNNING = False
-        if NOTIFIER:
-            NOTIFIER.stop()
-
-
-

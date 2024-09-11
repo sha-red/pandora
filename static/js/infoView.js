@@ -260,16 +260,11 @@ pandora.ui.infoView = function(data, isMixed) {
 
     if (canEdit || data.summary) {
         $('<div>')
+            .addClass("InlineImages")
             .append(
                 Ox.EditableContent({
                     clickLink: pandora.clickLink,
                     editable: canEdit,
-                    format: function(value) {
-                        return value.replace(
-                            /<img src=/g,
-                            '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
-                        );
-                    },
                     maxHeight: Infinity,
                     placeholder: formatLight(Ox._( isMixed.summary ? 'Mixed Summary' : 'No Summary')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
@@ -346,6 +341,81 @@ pandora.ui.infoView = function(data, isMixed) {
         .append($rightsLevel)
         .appendTo($statistics);
     pandora.renderRightsLevel(that, $rightsLevel, data, isMixed, isMultiple, canEdit);
+
+    // User and Groups ---------------------------------------------------------
+    if (!isMultiple || pandora.hasCapability('canEditUsers')) {
+
+    ['user', 'groups'].forEach(function(key) {
+        if (key == 'groups' && isMultiple) {
+            return
+        };
+        var $input;
+        (canEdit || data[key] && data[key].length) && $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey(key, 'statistics'))
+            .append(
+                $('<div>')
+                    .css({margin: '2px 0 0 -1px'}) // fixme: weird
+                    .append(
+                        $input = Ox.Editable({
+                            placeholder: key == 'groups'
+                                ? formatLight(Ox._(isMixed[key] ? 'Mixed Groups' : 'No Groups'))
+                                : isMixed[key] ? formatLight(Ox._('Mixed Users')) : '',
+                            editable: key == 'user' && canEdit,
+                            tooltip: canEdit ? pandora.getEditTooltip() : '',
+                            value: isMixed[key]
+                                ? ''
+                                : key == 'user' ? data[key] : data[key].join(', ')
+                        })
+                        .bindEvent(Ox.extend({
+                            submit: function(event) {
+                                editMetadata(key, event.value);
+                            }
+                        }, key == 'groups' ? {
+                            doubleclick: canEdit ? function() {
+                                setTimeout(function() {
+                                    if (window.getSelection) {
+                                        window.getSelection().removeAllRanges();
+                                    } else if (document.selection) {
+                                        document.selection.empty();
+                                    }
+                                });
+                                pandora.$ui.groupsDialog = pandora.ui.groupsDialog({
+                                        id: data.id,
+                                        name: data.title,
+                                        type: 'item'
+                                    })
+                                    .bindEvent({
+                                        groups: function(data) {
+                                            $input.options({
+                                                value: data.groups.join(', ')
+                                            });
+                                        }
+                                    })
+                                    .open();
+                            } : function() {}
+                        } : {}))
+                    )
+            )
+            .appendTo($statistics);
+    });
+
+    }
+
+    // Created and Modified ----------------------------------------------------
+    if (!isMultiple && canEdit) {
+
+    ['created', 'modified'].forEach(function(key) {
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey(key, 'statistics'))
+            .append(
+                $('<div>').html(Ox.formatDate(data[key], '%B %e, %Y'))
+            )
+            .appendTo($statistics);
+    });
+
+    }
 
     // Notes --------------------------------------------------------------------
 
@@ -461,14 +531,16 @@ pandora.ui.infoView = function(data, isMixed) {
             return key
                 ? '<a href="/' + (
                     key == 'alternativeTitles' ? 'title' : key
-                ) + '=' + pandora.escapeQueryValue(linkValue[idx]) + '">' + value + '</a>'
+                ) + '=' + pandora.escapeQueryValue(Ox.decodeHTMLEntities(linkValue[idx])) + '">' + value + '</a>'
                 : value;
         }).join(Ox.contains(specialListKeys, key) ? '; ' : ', ');
     }
 
     function formatValue(key, value) {
         var ret;
-        if (nameKeys.indexOf(key) > -1) {
+        if (key == 'date' && (!value || value.split('-').length < 4)) {
+            ret = pandora.formatDate(value);
+        } else if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), 'name');
         } else if (
             listKeys.indexOf(key) > -1 && Ox.getObjectById(pandora.site.itemKeys, key).type[0] == 'date'
@@ -517,10 +589,11 @@ pandora.ui.infoView = function(data, isMixed) {
                     $('<span>').html(formatKey(key)).appendTo($element);
                     Ox.EditableContent({
                             clickLink: pandora.clickLink,
+                            editable: canEdit,
                             format: function(value) {
                                 return formatValue(key, value);
                             },
-                            placeholder: formatLight(Ox._( isMixed[key] ? 'mixed' : 'unknown')),
+                            placeholder: formatLight(Ox._(isMixed[key] ? 'mixed' : 'unknown')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: getValue(key, data[key])
                         })
@@ -541,6 +614,7 @@ pandora.ui.infoView = function(data, isMixed) {
             });
             $element.appendTo($text);
         }
+        return $element;
     }
 
     function renderRemainingKeys() {
@@ -586,6 +660,10 @@ pandora.ui.infoView = function(data, isMixed) {
         }, 250);
         pandora.UI.set({infoIconSize: iconSize});
     }
+
+    that.resizeElement = function() {
+        // overwrite splitpanel resize
+    };
 
     that.reload = function() {
         var src = src = '/' + data.id + '/' + (

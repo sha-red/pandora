@@ -151,8 +151,10 @@ class File(models.Model):
                 self.sampleate = 0
                 self.channels = 0
 
-            if self.framerate:
+            if self.framerate and self.duration > 0:
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
+            else:
+                self.pixels = 0
 
     def get_path_info(self):
         data = {}
@@ -181,6 +183,13 @@ class File(models.Model):
             for type in ox.movie.EXTENSIONS:
                 if data['extension'] in ox.movie.EXTENSIONS[type]:
                     data['type'] = type
+            if data['extension'] == 'ogg' and self.info.get('video'):
+                data['type'] = 'video'
+        if data['type'] == 'unknown':
+            if self.info.get('video'):
+                data['type'] = 'video'
+            elif self.info.get('audio'):
+                data['type'] = 'audio'
         if 'part' in data and isinstance(data['part'], int):
             data['part'] = str(data['part'])
         return data
@@ -268,7 +277,7 @@ class File(models.Model):
 
         if self.type not in ('audio', 'video'):
             self.duration = None
-        else:
+        elif self.id:
             duration = sum([s.info.get('duration', 0)
                             for s in self.streams.filter(source=None)])
             if duration:
@@ -276,7 +285,7 @@ class File(models.Model):
 
         if self.is_subtitle:
             self.available = self.data and True or False
-        else:
+        elif self.id:
             self.available = not self.uploading and \
                 self.streams.filter(source=None, available=True).count()
         super(File, self).save(*args, **kwargs)
@@ -365,8 +374,8 @@ class File(models.Model):
                         self.info.update(stream.info)
                         self.parse_info()
                         self.save()
-                    if stream.info.get('video'):
-                        extract.make_keyframe_index(stream.media.path)
+                    #if stream.info.get('video'):
+                    #    extract.make_keyframe_index(stream.media.path)
                 return True, stream.media.size
             return save_chunk(stream, stream.media, chunk, offset, name, done_cb)
         return False, 0
@@ -395,7 +404,7 @@ class File(models.Model):
         config = settings.CONFIG['video']
         height = self.info['video'][0]['height'] if self.info.get('video') else None
         max_resolution = max(config['resolutions'])
-        if height <= max_resolution and self.extension in ('mov', 'mkv', 'mp4', 'm4v'):
+        if height and height <= max_resolution and self.extension in ('mov', 'mkv', 'mp4', 'm4v'):
             vcodec = self.get_codec('video')
             acodec = self.get_codec('audio')
             if vcodec in self.MP4_VCODECS and acodec in self.MP4_ACODECS:
@@ -406,7 +415,7 @@ class File(models.Model):
         config = settings.CONFIG['video']
         height = self.info['video'][0]['height'] if self.info.get('video') else None
         max_resolution = max(config['resolutions'])
-        if height <= max_resolution and config['formats'][0] == self.extension:
+        if height and height <= max_resolution and config['formats'][0] == self.extension:
             vcodec = self.get_codec('video')
             acodec = self.get_codec('audio')
             if self.extension in ['mp4', 'm4v'] and vcodec in self.MP4_VCODECS and acodec in self.MP4_ACODECS:
@@ -725,6 +734,9 @@ class Stream(models.Model):
 
     class Meta:
         unique_together = ("file", "resolution", "format")
+        indexes = [
+            models.Index(fields=['file', 'source', 'available'])
+        ]
 
     file = models.ForeignKey(File, related_name='streams', on_delete=models.CASCADE)
     resolution = models.IntegerField(default=96)
@@ -804,9 +816,15 @@ class Stream(models.Model):
                 shutil.move(self.file.data.path, target)
                 self.file.data.name = ''
                 self.file.save()
+                self.available = True
+                self.save()
+                done = True
             elif self.file.can_remux():
                 ok, error = extract.remux_stream(media, target)
-                done = True
+                if ok:
+                    self.available = True
+                    self.save()
+                    done = True
         if not done:
             ok, error = extract.stream(media, target, self.name(), info, flags=self.flags)
 
@@ -814,7 +832,7 @@ class Stream(models.Model):
         # get current version from db and update
         try:
             self.refresh_from_db()
-        except archive.models.DoesNotExist:
+        except Stream.DoesNotExist:
             pass
         else:
             self.update_status(ok, error)

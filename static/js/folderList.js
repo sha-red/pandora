@@ -104,7 +104,11 @@ pandora.ui.folderList = function(id, section) {
                 operator: '+',
                 tooltip: function(data) {
                     return data.type == 'static'
-                        ? (data.editable ? Ox._('Edit {0}', [Ox._(folderItem)]) : '')
+                        ? (data.editable
+                            ? folderItem == "Edit"
+                                ? Ox._('Edit this {0}', [Ox._(folderItem)])
+                                : Ox._('Edit {0}', [Ox._(folderItem)])
+                            : '')
                         : data.type == 'smart'
                         ? (data.editable ? Ox._('Edit Query') : Ox._('Show Query'))
                         : data.type.toUpperCase();
@@ -377,7 +381,7 @@ pandora.ui.folderList = function(id, section) {
             }
         },
         init: function(data) {
-            if (pandora.site.sectionFolders[section][i]) {
+            if (pandora.site.sectionFolders[section][i] && pandora.$ui.folder[i] && pandora.$ui.folderList[id]) {
                 pandora.site.sectionFolders[section][i].items = data.items;
                 pandora.$ui.folder[i].$content.css({
                     height: (data.items || 1) * 16 + 'px'
@@ -402,6 +406,11 @@ pandora.ui.folderList = function(id, section) {
                 pandora.ui.listDialog().open();
             }
         },
+        key_control_v: function() {
+            if (pandora.user.ui.section == 'edits' && pandora.$ui.editPanel) {
+                pandora.$ui.editPanel.triggerEvent("paste")
+            }
+        },
         move: function(data) {
             pandora.api['sort' + folderItems]({
                 section: id,
@@ -411,7 +420,7 @@ pandora.ui.folderList = function(id, section) {
             });
         },
         paste: function() {
-            pandora.$ui.list.triggerEvent('paste');
+            pandora.$ui.list && pandora.$ui.list.triggerEvent('paste');
         },
         select: function(data) {
             var list = data.ids.length ? data.ids[0] : '';
@@ -478,7 +487,9 @@ pandora.ui.folderList = function(id, section) {
                 },
                 range: [0, 1]
             }, function(result) {
-                that.value(item, 'items', result.data.items[0].items);
+                if(result.data.items && result.data.items.length) {
+                    that.value(item, 'items', result.data.items[0].items);
+                }
                 callback();
             })
         })

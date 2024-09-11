@@ -27,25 +27,33 @@ if [ "$action" = "init" ]; then
         $SUDO bin/python3 -m pip install -U --ignore-installed "pip<9"
     fi
     if [ ! -d static/oxjs ]; then
-        $SUDO git clone --depth 1 -b $branch https://git.0x2620.org/oxjs.git static/oxjs
+        $SUDO git clone -b $branch https://code.0x2620.org/0x2620/oxjs.git static/oxjs
     fi
     $SUDO mkdir -p src
     if [ ! -d src/oxtimelines ]; then
-        $SUDO git clone --depth 1 -b $branch https://git.0x2620.org/oxtimelines.git src/oxtimelines
+        $SUDO git clone -b $branch https://code.0x2620.org/0x2620/oxtimelines.git src/oxtimelines
     fi
     for package in oxtimelines python-ox; do
         cd ${BASE}
         if [ ! -d src/${package} ]; then
-            $SUDO git clone --depth 1 -b $branch https://git.0x2620.org/${package}.git src/${package}
+            $SUDO git clone -b $branch https://code.0x2620.org/0x2620/${package}.git src/${package}
         fi
         cd ${BASE}/src/${package}
-        $SUDO ${BASE}/bin/python setup.py develop
+
+        $SUDO ${BASE}/bin/pip install -e .
+
     done
     cd ${BASE}
     $SUDO ./bin/pip install -r requirements.txt
-    if [ ! -e pandora/gunicorn_config.py ]; then
-        $SUDO cp pandora/gunicorn_config.py.in pandora/gunicorn_config.py
-    fi
+    for template in gunicorn_config.py encoding.conf tasks.conf; do
+        if [ ! -e pandora/$template ]; then
+            $SUDO cp pandora/${template}.in pandora/$template
+        fi
+    done
+    exit 0
+fi
+if [ "$action" = "version" ]; then
+    git rev-list HEAD --count
     exit 0
 fi
 
@@ -73,10 +81,15 @@ if [ `whoami` != 'root' ]; then
     exit 1
 fi
 if [ "$action" = "install" ]; then
-    cd "`dirname "$0"`"
+    cd "`dirname "$self"`"
     BASE=`pwd`
     if [ -x /bin/systemctl ]; then
         if [ -d /etc/systemd/system/ ]; then
+            for template in gunicorn_config.py encoding.conf tasks.conf; do
+                if [ ! -e pandora/$template ]; then
+                    $SUDO cp pandora/${template}.in pandora/$template
+                fi
+            done
             for service in $SERVICES; do
                 if [ -e /lib/systemd/system/${service}.service ]; then
                     rm -f /lib/systemd/system/${service}.service \

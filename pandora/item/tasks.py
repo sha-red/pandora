@@ -2,30 +2,34 @@
 
 from datetime import timedelta, datetime
 from urllib.parse import quote
+import xml.etree.ElementTree as ET
 import gzip
 import os
 import random
 import logging
 
-from celery.task import task, periodic_task
+from app.celery import app
+from celery.schedules import crontab
 from django.conf import settings
 from django.db import connection, transaction
 from django.db.models import Q
-from ox.utils import ET
 
 from app.utils import limit_rate
 from taskqueue.models import Task
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('pandora.' + __name__)
 
-
-@periodic_task(run_every=timedelta(days=1), queue='encoding')
+@app.task(queue='encoding')
 def cronjob(**kwargs):
     if limit_rate('item.tasks.cronjob', 8 * 60 * 60):
         update_random_sort()
         update_random_clip_sort()
         clear_cache.delay()
+
+@app.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(timedelta(days=1), cronjob.s())
 
 def update_random_sort():
     from . import models
@@ -54,7 +58,7 @@ def update_random_clip_sort():
                 cursor.execute(row)
 
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_clips(public_id):
     from . import models
     try:
@@ -63,7 +67,7 @@ def update_clips(public_id):
         return
     item.clips.all().update(user=item.user.id)
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_poster(public_id):
     from . import models
     try:
@@ -81,7 +85,7 @@ def update_poster(public_id):
             icon=item.icon.name
         )
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_file_paths(public_id):
     from . import models
     try:
@@ -90,7 +94,7 @@ def update_file_paths(public_id):
         return
     item.update_file_paths()
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_external(public_id):
     from . import models
     try:
@@ -99,7 +103,7 @@ def update_external(public_id):
         return
     item.update_external()
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def update_timeline(public_id):
     from . import models
     try:
@@ -109,7 +113,7 @@ def update_timeline(public_id):
     item.update_timeline(async_=False)
     Task.finish(item)
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def rebuild_timeline(public_id):
     from . import models
     i = models.Item.objects.get(public_id=public_id)
@@ -117,7 +121,7 @@ def rebuild_timeline(public_id):
         s.make_timeline()
     i.update_timeline(async_=False)
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def load_subtitles(public_id):
     from . import models
     try:
@@ -130,7 +134,7 @@ def load_subtitles(public_id):
         item.update_facets()
 
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def extract_clip(public_id, in_, out, resolution, format, track=None):
     from . import models
     try:
@@ -142,7 +146,7 @@ def extract_clip(public_id, in_, out, resolution, format, track=None):
     return False
 
 
-@task(queue="encoding")
+@app.task(queue="encoding")
 def clear_cache(days=60):
     import subprocess
     path = os.path.join(settings.MEDIA_ROOT, 'media')
@@ -156,7 +160,7 @@ def clear_cache(days=60):
     subprocess.check_output(cmd)
 
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_sitemap(base_url):
     from . import models
     sitemap = os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'sitemap.xml.gz'))
@@ -356,7 +360,7 @@ def update_sitemap(base_url):
         f.write(data)
 
 
-@task(queue='default')
+@app.task(queue='default')
 def bulk_edit(data, username):
     from django.db import transaction
     from . import models
@@ -367,5 +371,5 @@ def bulk_edit(data, username):
         if item.editable(user):
             with transaction.atomic():
                 item.refresh_from_db()
-                response = edit_item(user, item, data)
+                response = edit_item(user, item, data, is_task=True)
     return {}

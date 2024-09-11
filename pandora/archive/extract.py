@@ -1,25 +1,29 @@
 # -*- coding: utf-8 -*-
 
-import os
+from distutils.spawn import find_executable
+from glob import glob
 from os.path import exists
 import fractions
+import logging
 import math
+import os
 import re
 import shutil
 import subprocess
 import tempfile
 import time
-from distutils.spawn import find_executable
-from glob import glob
 
 import numpy as np
 import ox
 import ox.image
 from ox.utils import json
 from django.conf import settings
-from PIL import Image
+from PIL import Image, ImageOps
 
 from .chop import Chop, make_keyframe_index
+
+
+logger = logging.getLogger('pandora.' + __name__)
 
 img_extension = 'jpg'
 
@@ -57,14 +61,15 @@ def supported_formats():
     stdout = stdout.decode('utf-8')
     stderr = stderr.decode('utf-8')
     version = stderr.split('\n')[0].split(' ')[2]
+    mp4 = 'libx264' in stdout and bool(re.compile('DEA.L. aac').findall(stdout))
     return {
         'version': version.split('.'),
         'ogg': 'libtheora' in stdout and 'libvorbis' in stdout,
         'webm': 'libvpx' in stdout and 'libvorbis' in stdout,
         'vp8': 'libvpx' in stdout and 'libvorbis' in stdout,
         'vp9': 'libvpx-vp9' in stdout and 'libopus' in stdout,
-        'mp4': 'libx264' in stdout and bool(re.compile('DEA.L. aac').findall(stdout)),
-        'h264': 'libx264' in stdout and bool(re.compile('DEA.L. aac').findall(stdout)),
+        'mp4': mp4,
+        'h264': mp4,
     }
 
 def stream(video, target, profile, info, audio_track=0, flags={}):
@@ -155,7 +160,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
     else:
         height = 96
 
-        if settings.FFMPEG_SUPPORTS_VP9:
+        if settings.USE_VP9 and settings.FFMPEG_SUPPORTS_VP9:
             audio_codec = 'libopus'
             video_codec = 'libvpx-vp9'
 
@@ -218,7 +223,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         bitrate = height*width*fps*bpp/1000
 
         video_settings = trim + [
-            '-vb', '%dk' % bitrate,
+            '-b:v', '%dk' % bitrate,
             '-aspect', aspect,
             # '-vf', 'yadif',
             '-max_muxing_queue_size', '512',
@@ -246,6 +251,8 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
                 '-level', '4.0',
                 '-pix_fmt', 'yuv420p',
             ]
+        if info['video'][0].get("force_framerate"):
+            video_settings += ['-r:v', str(fps)]
         video_settings += ['-map', '0:%s,0:0' % info['video'][0]['id']]
         audio_only = False
     else:
@@ -285,7 +292,7 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
             ac = min(ac, audiochannels)
             audio_settings += ['-ac', str(ac)]
         if audiobitrate:
-            audio_settings += ['-ab', audiobitrate]
+            audio_settings += ['-b:a', audiobitrate]
         if format == 'mp4':
             audio_settings += ['-c:a', 'aac', '-strict', '-2']
         elif audio_codec == 'libopus':
@@ -318,14 +325,15 @@ def stream(video, target, profile, info, audio_track=0, flags={}):
         pass1_post = post[:]
         pass1_post[-1] = '/dev/null'
         if format == 'webm':
-            pass1_post = ['-speed', '4'] + pass1_post
+            if video_codec != 'libvpx-vp9':
+                pass1_post = ['-speed', '4'] + pass1_post
             post = ['-speed', '1'] + post
-        cmds.append(base + ['-an', '-pass', '1', '-passlogfile', '%s.log' % target]
-                         + video_settings + pass1_post)
+        cmds.append(base + ['-pass', '1', '-passlogfile', '%s.log' % target]
+                         + video_settings + ['-an'] + pass1_post)
         cmds.append(base + ['-pass', '2', '-passlogfile', '%s.log' % target]
-                         + audio_settings + video_settings + post)
+                         + video_settings + audio_settings + post)
     else:
-        cmds.append(base + audio_settings + video_settings + post)
+        cmds.append(base + video_settings + audio_settings + post)
 
     if settings.FFMPEG_DEBUG:
         print('\n'.join([' '.join(cmd) for cmd in cmds]))
@@ -433,10 +441,15 @@ def frame_direct(video, target, position):
     r = run_command(cmd)
     return r == 0
 
+def open_image_rgb(image_source):
+    source = Image.open(image_source)
+    source = ImageOps.exif_transpose(source)
+    source = source.convert('RGB')
+    return source
 
 def resize_image(image_source, image_output, width=None, size=None):
     if exists(image_source):
-        source = Image.open(image_source).convert('RGB')
+        source = open_image_rgb(image_source)
         source_width = source.size[0]
         source_height = source.size[1]
         if size:
@@ -457,7 +470,7 @@ def resize_image(image_source, image_output, width=None, size=None):
         height = max(height, 1)
 
         if width < source_width:
-            resize_method = Image.ANTIALIAS
+            resize_method = Image.LANCZOS
         else:
             resize_method = Image.BICUBIC
         output = source.resize((width, height), resize_method)
@@ -471,7 +484,7 @@ def timeline(video, prefix, modes=None, size=None):
         size = [64, 16]
     if isinstance(video, str):
         video = [video]
-    cmd = ['../bin/oxtimelines',
+    cmd = [os.path.normpath(os.path.join(settings.BASE_DIR, '../bin/oxtimelines')),
            '-s', ','.join(map(str, reversed(sorted(size)))),
            '-m', ','.join(modes),
            '-o', prefix,
@@ -603,7 +616,7 @@ def timeline_strip(item, cuts, info, prefix):
                         print(frame, 'cut', c, 'frame', s, frame, 'width', widths[s], box)
                     # FIXME: why does this have to be frame+1?
                     frame_image = Image.open(item.frame((frame+1)/fps))
-                    frame_image = frame_image.crop(box).resize((widths[s], timeline_height), Image.ANTIALIAS)
+                    frame_image = frame_image.crop(box).resize((widths[s], timeline_height), Image.LANCZOS)
                     for x_ in range(widths[s]):
                         line_image.append(frame_image.crop((x_, 0, x_ + 1, timeline_height)))
                     frame += widths[s]
@@ -731,19 +744,24 @@ def remux_stream(src, dst):
     cmd = [
         settings.FFMPEG,
         '-nostats', '-loglevel', 'error',
-        '-map_metadata', '-1', '-sn',
         '-i', src,
+        '-map_metadata', '-1', '-sn',
     ] + video + [
     ] + audio + [
         '-movflags', '+faststart',
         dst
     ]
+    print(cmd)
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-                         stdout=open('/dev/null', 'w'),
-                         stderr=open('/dev/null', 'w'),
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT,
                          close_fds=True)
-    p.wait()
-    return True, None
+    stdout, stderr = p.communicate()
+    if stderr:
+        logger.error("failed to remux %s  %s", cmd, stderr)
+        return False, stderr
+    else:
+        return True, None
 
 
 def ffprobe(path, *args):

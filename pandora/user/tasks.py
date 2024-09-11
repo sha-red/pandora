@@ -4,16 +4,21 @@ from datetime import timedelta
 from itertools import zip_longest
 import json
 
-from celery.task import task, periodic_task
+from celery.schedules import crontab
 
+from app.celery import app
 from app.utils import limit_rate
 from app.models import Settings
 from .statistics import Statistics
 
-@periodic_task(run_every=timedelta(hours=1), queue='encoding')
+@app.task(queue='encoding')
 def cronjob(**kwargs):
     if limit_rate('user.tasks.cronjob', 30 * 60):
         update_statistics()
+
+@app.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(timedelta(hours=1), cronjob.s())
 
 def update_statistics():
     from . import models
@@ -31,7 +36,7 @@ def update_statistics():
             stats.add(u.json())
     Settings.set('statistics', stats)
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def parse_data(key):
     from . import models
     try:
@@ -41,7 +46,7 @@ def parse_data(key):
     session_data.parse_data()
     session_data.save()
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_numberoflists(username):
     from . import models
     user = models.User.objects.get(username=username)
@@ -51,7 +56,7 @@ def update_numberoflists(username):
         numberoflists=user.lists.count()
     )
 
-@task(ignore_results=True, queue='default')
+@app.task(ignore_results=True, queue='default')
 def update_numberofcollections(username):
     from . import models
     user = models.User.objects.get(username=username)

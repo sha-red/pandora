@@ -8,9 +8,10 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
-import celery.task.control
-import kombu.five
 import ox
+
+from app.celery import app
+
 
 User = get_user_model()
 
@@ -111,7 +112,7 @@ class Task(models.Model):
         return False
 
     def get_job(self):
-        c = celery.task.control.inspect()
+        c = app.control.inspect()
         active = c.active(safe=True)
         if active:
             for queue in active:
@@ -166,7 +167,7 @@ class Task(models.Model):
             job = self.get_job()
             if job:
                 print(job)
-                r = celery.task.control.revoke(job['id'])
+                r = app.control.revoke(job['id'])
                 print(r)
                 for f in self.item.files.filter(encoding=True):
                     f.delete()

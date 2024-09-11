@@ -12,8 +12,10 @@ from oxdjango.decorators import login_required_json
 from oxdjango.http import HttpFileResponse
 from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response, HttpErrorJson
 from django import forms
-from django.db.models import Count, Sum
 from django.conf import settings
+from django.db.models import Count, Sum
+from django.http import HttpResponse
+from django.shortcuts import render
 
 from item import utils
 from item.models import Item
@@ -24,6 +26,7 @@ from changelog.models import add_changelog
 
 from . import models
 from . import tasks
+from . import page_views
 
 def get_document_or_404_json(request, id):
     response = {'status': {'code': 404,
@@ -380,7 +383,11 @@ def file(request, id, name=None):
 def thumbnail(request, id, size=256, page=None):
     size = int(size)
     document = get_document_or_404_json(request, id)
+    if "q" in request.GET and page:
+        img = document.highlight_page(page, request.GET["q"], size)
+        return HttpResponse(img, content_type="image/jpeg")
     return HttpFileResponse(document.thumbnail(size, page=page))
+
 
 @login_required_json
 def upload(request):
@@ -506,3 +513,37 @@ def autocompleteDocuments(request, data):
     response['data']['items'] = [i['value'] for i in qs]
     return render_to_json_response(response)
 actions.register(autocompleteDocuments)
+
+
+def document(request, fragment):
+    context = {}
+    parts = fragment.split('/')
+    # FIXME: parse collection urls and return the right metadata for those
+    id = parts[0]
+    page = None
+    crop = None
+    if len(parts) == 2:
+        rect = parts[1].split(',')
+        if len(rect) == 1:
+            page = rect[0]
+        else:
+            crop = rect
+    try:
+        document = models.Document.objects.filter(id=ox.fromAZ(id)).first()
+    except:
+        document = None
+    if document and document.access(request.user):
+        context['title'] = document.data['title']
+        if document.data.get('description'):
+            context['description'] = document.data['description']
+        link = request.build_absolute_uri(document.get_absolute_url())
+        public_id = ox.toAZ(document.id)
+        preview = '/documents/%s/512p.jpg' % public_id
+        if page:
+            preview = '/documents/%s/512p%s.jpg' % (public_id, page)
+        if crop:
+            preview = '/documents/%s/512p%s.jpg' % (public_id, ','.join(crop))
+        context['preview'] = request.build_absolute_uri(preview)
+        context['url'] = request.build_absolute_uri('/documents/' + fragment)
+    context['settings'] = settings
+    return render(request, "document.html", context)

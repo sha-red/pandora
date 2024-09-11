@@ -37,12 +37,12 @@ class NullsLastQuery(Query):
         obj.nulls_last = self.nulls_last
         return obj
 
-    def get_compiler(self, using=None, connection=None):
+    def get_compiler(self, using=None, connection=None, elide_empty=True):
         if using is None and connection is None:
             raise ValueError("Need either using or connection")
         if using:
             connection = connections[using]
-        return NullLastSQLCompiler(self, connection, using)
+        return NullLastSQLCompiler(self, connection, using, elide_empty)
 
 class QuerySet(django.db.models.query.QuerySet):
 

@@ -31,6 +31,16 @@ pandora.ui.infoView = function(data, isMixed) {
             return key.id;
         }),
         posterKeys = ['title', 'date'],
+        displayedKeys = [ // FIXME: can tis be a flag in the config?
+            'title', 'notes', 'name', 'summary', 'id',
+            'hue', 'saturation', 'lightness', 'cutsperminute', 'volume',
+            'user', 'rightslevel', 'bitrate', 'timesaccessed',
+            'numberoffiles', 'numberofannotations', 'numberofcuts', 'words', 'wordsperminute',
+            'annotations', 'groups', 'filename',
+            'duration', 'aspectratio', 'pixels', 'size', 'resolution',
+            'created', 'modified', 'accessed',
+            'random'
+        ],
         statisticsWidth = 128,
 
         $bar = Ox.Bar({size: 16})
@@ -236,6 +246,7 @@ pandora.ui.infoView = function(data, isMixed) {
     if (!isMultiple) {
 
     ['source', 'project'].forEach(function(key) {
+        displayedKeys.push(key);
         if (canEdit || data[key]) {
             var $div = $('<div>')
                 .addClass('OxSelectable')
@@ -269,16 +280,11 @@ pandora.ui.infoView = function(data, isMixed) {
                 .appendTo($div);
             if (canEdit || data[key + 'description']) {
                 $('<div>')
+                    .addClass("InlineImages")
                     .append(
                         descriptions[key] = Ox.EditableContent({
                             clickLink: pandora.clickLink,
                             editable: canEdit,
-                            format: function(value) {
-                                return value.replace(
-                                    /<img src=/g,
-                                    '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
-                                );
-                            },
                             placeholder: formatLight(Ox._('No {0} Description', [Ox._(Ox.toTitleCase(key))])),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             type: 'textarea',
@@ -312,7 +318,7 @@ pandora.ui.infoView = function(data, isMixed) {
                     editable: canEdit,
                     placeholder: formatLight(Ox._('No Title')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
-                    value: data.title
+                    value: data.title || ""
                 })
                 .css({
                     fontWeight: 'bold',
@@ -342,6 +348,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     if (canEdit || data.summary) {
         $('<div>')
+            .addClass("InlineImages")
             .css({
                 marginTop: '12px',
                 marginBottom: '12px'
@@ -351,12 +358,6 @@ pandora.ui.infoView = function(data, isMixed) {
                     clickLink: pandora.clickLink,
                     collapseToEnd: false,
                     editable: canEdit,
-                    format: function(value) {
-                        return value.replace(
-                            /<img src=/g,
-                            '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
-                        );
-                    },
                     maxHeight: Infinity,
                     placeholder: formatLight(Ox._('No Summary')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
@@ -379,7 +380,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     // License -----------------------------------------------------------------
 
-    renderGroup(['license']);
+    Ox.getObjectById(pandora.site.itemKeys, 'license') && renderGroup(['license']);
 
 
     $('<div>')
@@ -388,6 +389,9 @@ pandora.ui.infoView = function(data, isMixed) {
         .css({height: '16px'})
         .appendTo($text);
 
+    // Render any remaing keys defined in config
+
+    renderRemainingKeys();
 
 
     // Duration, Aspect Ratio --------------------------------------------------
@@ -446,9 +450,12 @@ pandora.ui.infoView = function(data, isMixed) {
     pandora.renderRightsLevel(that, $rightsLevel, data, isMixed, isMultiple, canEdit);
 
     // User and Groups ---------------------------------------------------------
-    if (!isMultiple) {
+    if (!isMultiple || pandora.hasCapability('canEditUsers')) {
 
     ['user', 'groups'].forEach(function(key) {
+        if (key == 'groups' && isMultiple) {
+            return
+        };
         var $input;
         (canEdit || data[key] && data[key].length) && $('<div>')
             .css({marginBottom: '4px'})
@@ -458,10 +465,14 @@ pandora.ui.infoView = function(data, isMixed) {
                     .css({margin: '2px 0 0 -1px'}) // fixme: weird
                     .append(
                         $input = Ox.Editable({
-                            placeholder: key == 'groups' ? formatLight(Ox._(isMixed[key] ? 'Mixed Groups' : 'No Groups')) : '',
+                            placeholder: key == 'groups'
+                                ? formatLight(Ox._(isMixed[key] ? 'Mixed Groups' : 'No Groups'))
+                                : isMixed[key] ? formatLight(Ox._('Mixed Users')) : '',
                             editable: key == 'user' && canEdit,
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
-                            value: key == 'user' ? data[key] : isMixed[key] ? '' : data[key].join(', ')
+                            value: isMixed[key]
+                                ? ''
+                                : key == 'user' ? data[key] : data[key].join(', ')
                         })
                         .bindEvent(Ox.extend({
                             submit: function(event) {
@@ -614,7 +625,9 @@ pandora.ui.infoView = function(data, isMixed) {
     function formatLink(key, value, linkValue) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key
-                ? '<a href="/' + key + '=' + pandora.escapeQueryValue(linkValue ? linkValue : value) + '">' + value + '</a>'
+                ? '<a href="/' + key + '=' + pandora.escapeQueryValue(
+                    Ox.decodeHTMLEntities(linkValue ? linkValue : value)
+                ) + '">' + value + '</a>'
                 : value;
         }).join(', ');
     }
@@ -642,6 +655,7 @@ pandora.ui.infoView = function(data, isMixed) {
 
     function renderGroup(keys) {
         var $element;
+        keys.forEach(function(key) { displayedKeys.push(key) });
         if (canEdit || keys.filter(function(key) {
             return data[key];
         }).length) {
@@ -656,6 +670,7 @@ pandora.ui.infoView = function(data, isMixed) {
                     $('<span>').html(formatKey(key)).appendTo($element);
                     Ox.EditableContent({
                             clickLink: pandora.clickLink,
+                            editable: canEdit,
                             format: function(value) {
                                 return formatValue(key, value);
                             },
@@ -669,11 +684,31 @@ pandora.ui.infoView = function(data, isMixed) {
                             }
                         })
                         .appendTo($element);
+                    if (isMixed[key] && Ox.contains(listKeys, key)) {
+                        pandora.ui.addRemoveKeyDialog({
+                            ids: ui.listSelection,
+                            key: key,
+                            section: ui.section
+                        }).appendTo($element)
+                    }
                 }
             });
             $element.appendTo($text);
         }
+        return $element;
     }
+
+    function renderRemainingKeys() {
+        var keys = pandora.site.itemKeys.filter(function(item) {
+            return item.id != '*' && item.type != 'layer' && !Ox.contains(displayedKeys, item.id);
+        }).map(function(item) {
+            return item.id;
+        });
+        if (keys.length) {
+            renderGroup(keys)
+        }
+    }
+
 
     function toggleIconSize() {
         iconSize = iconSize == 256 ? 512 : 256;

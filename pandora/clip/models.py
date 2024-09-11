@@ -8,6 +8,7 @@ import ox
 from archive import extract
 
 from . import managers
+from .utils import add_cuts
 
 
 def get_layers(item, interval=None, user=None):
@@ -59,9 +60,7 @@ class MetaClip(object):
             self.hue = self.saturation = self.lightness = 0
             self.volume = 0
 
-    def save(self, *args, **kwargs):
-        if self.duration != self.end - self.start:
-            self.update_calculated_values()
+    def update_findvalue(self):
         if not self.aspect_ratio and self.item:
             streams = self.item.streams()
             if streams:
@@ -89,6 +88,11 @@ class MetaClip(object):
             self.findvalue = '\n'.join(list(filter(None, [a.findvalue for a in anns])))
             for l in [k['id'] for k in settings.CONFIG['layers']]:
                 setattr(self, l, l in anns_by_layer and bool(len(anns_by_layer[l])))
+
+    def save(self, *args, **kwargs):
+        if self.duration != self.end - self.start:
+            self.update_calculated_values()
+        self.update_findvalue()
         models.Model.save(self, *args, **kwargs)
 
     clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
@@ -111,8 +115,7 @@ class MetaClip(object):
                     del j[key]
             #needed here to make item find with clips work
             if 'annotations' in keys:
-                #annotations = self.annotations.filter(layer__in=settings.CONFIG['clipLayers'])
-                annotations = self.annotations.all()
+                annotations = self.annotations.all().exclude(value='')
                 if qs:
                     for q in qs:
                         annotations = annotations.filter(q)
@@ -150,12 +153,12 @@ class MetaClip(object):
             data['annotation'] = qs[0].public_id
         data['parts'] = self.item.cache['parts']
         data['durations'] = self.item.cache['durations']
-        for key in ('title', 'director', 'year', 'videoRatio'):
+        for key in settings.CONFIG['itemTitleKeys'] + ['videoRatio']:
             value = self.item.cache.get(key)
             if value:
                 data[key] = value
         data['duration'] = data['out'] - data['in']
-        data['cuts'] = tuple([c for c in self.item.get('cuts', []) if c > self.start and c < self.end])
+        add_cuts(data, self.item, self.start, self.end)
         data['layers'] = self.get_layers(user)
         data['streams'] = [s.file.oshash for s in self.item.streams()]
         return data
@@ -185,6 +188,7 @@ class MetaClip(object):
 
     def __str__(self):
         return self.public_id
+
 
 class Meta:
     unique_together = ("item", "start", "end")

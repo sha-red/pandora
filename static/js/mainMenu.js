@@ -284,6 +284,67 @@ pandora.ui.mainMenu = function() {
                     }
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
+                } else if (data.id.startsWith('hidden:')) {
+                    var folderItems = {
+                            documents: 'Collections',
+                            edits: 'Edits',
+                            items: 'Lists'
+                        }[ui.section],
+                        folderKey = folderItems.toLowerCase(),
+                        name = data.id.slice(7).replace(/\t/g, '_'),
+                        set = {}
+
+                    if (ui.section == "items") {
+                        set.find = {
+                            conditions: [
+                                {key: 'list', value: pandora.user.username + ":" + name, operator: '=='}
+                            ],
+                            operator: '&'
+                        }
+                    } else if (ui.section == "edits") {
+                        set.edit = pandora.user.username + ":" + name;
+                    } else if (ui.section == "documents") {
+                        set.findDocuments = {
+                            conditions: [
+                                {key: 'collection', value: pandora.user.username + ":" + name, operator: '=='}
+                            ],
+                            operator: '&'
+                        }
+                    }
+                    set['hidden.' + folderKey] = ui.hidden[folderKey].filter(other => { return other != name })
+                    pandora.UI.set(set)
+                    Ox.Request.clearCache('find' + folderItems);
+                    pandora.$ui.folderList.personal.reloadList()
+                } else if (data.id == 'hidelist') {
+                    var folderItems = {
+                            documents: 'Collections',
+                            edits: 'Edits',
+                            items: 'Lists'
+                        }[ui.section],
+                        folderKey = folderItems.toLowerCase(),
+                        listName = ({
+                            documents: ui._collection,
+                            edits: ui.edit,
+                            items: ui._list
+                        }[ui.section]).split(':').slice(1).join(':'),
+                        set = {};
+                    if (ui.section == "items") {
+                        set.find = {
+                            conditions: [],
+                            operator: '&'
+                        }
+                    } else if (ui.section == "edits") {
+                        set.edit = ""
+                    } else if (ui.section == "documents") {
+                        set.findDocuments = {
+                            conditions: [],
+                            operator: '&'
+                        };
+                    }
+                    set['hidden.' + folderKey] = Ox.sort(Ox.unique([listName].concat(pandora.user.ui.hidden[folderKey])))
+                    pandora.UI.set(set)
+                    Ox.Request.clearCache('find' + folderItems);
+                    pandora.$ui.folderList.personal.reloadList()
                 } else if (data.id == 'print') {
                     window.open(document.location.href + '#print', '_blank');
                 } else if (data.id == 'tv') {
@@ -361,11 +422,23 @@ pandora.ui.mainMenu = function() {
                         }
                     } else if (ui.section == 'documents') {
                         var items = pandora.clipboard.paste('document');
+                        /*
                         items.length && pandora.doHistory('paste', items, ui._collection, function() {
-                            //fixme:
-                            //pandora.UI.set({listSelection: items});
-                            //pandora.reloadList();
+                            pandora.UI.set({listSelection: items});
+                            pandora.reloadList();
+                            pandora.UI.set({collectionSelection: items});
+                            pandora.reloadList();
                         });
+                        */
+                        if (items.length) {
+                            pandora.api.addCollectionItems({
+                                collection: ui._collection,
+                                items: items
+                            }, function() {
+                                pandora.UI.set({collectionSelection: items});
+                                pandora.reloadList();
+                            });
+                        }
                     } else if (ui.section == 'edits') {
                         var clips = pandora.clipboard.paste('clip');
                         clips.length && pandora.doHistory('paste', clips, ui.edit, function(result) {
@@ -536,6 +609,8 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.player.options({fullscreen: true});
                 } else if (data.id == 'embed') {
                     pandora.$ui.embedDialog = pandora.ui.embedDialog().open();
+                } else if (data.id == 'share') {
+                    pandora.$ui.shareDialog = pandora.ui.shareDialog().open();
                 } else if (data.id == 'advancedfind') {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 } else if (data.id == 'clearquery') {
@@ -615,7 +690,11 @@ pandora.ui.mainMenu = function() {
                     that.uncheckItem(previousList == '' ? 'allitems' : 'viewlist' + previousList.replace(/_/g, Ox.char(9)));
                     that.checkItem(list == '' ? 'allitems' : 'viewlist' + list.replace(/_/g, '\t'));
                 }
-                that[ui._list ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[list ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[
+                    list && pandora.$ui.folderList && pandora.$ui.folderList.personal.options('selected').length
+                    ? 'enableItem' : 'disableItem'
+                ]('hidelist');
                 that[action]('editlist');
                 that[action]('deletelist');
                 that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
@@ -634,6 +713,10 @@ pandora.ui.mainMenu = function() {
                     that.checkItem(edit == '' ? 'allitems' : 'viewlist' + edit.replace(/_/g, '\t'));
                 }
                 that[!isGuest && edit ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[
+                    !isGuest && edit && pandora.$ui.folderList && pandora.$ui.folderList.personal.options('selected').length
+                    ? 'enableItem' : 'disableItem'
+                ]('hidelist');
                 that[action]('editlist');
                 that[action]('deletelist');
                 that[!isGuest && edit ? 'enableItem' : 'disableItem']('newlistfromselection');
@@ -653,7 +736,11 @@ pandora.ui.mainMenu = function() {
                     that.uncheckItem(previousList == '' ? 'allitems' : 'viewlist' + previousList.replace(/_/g, Ox.char(9)));
                     that.checkItem(list == '' ? 'allitems' : 'viewlist' + list.replace(/_/g, '\t'));
                 }
-                that[ui._list ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[list ? 'enableItem' : 'disableItem']('duplicatelist');
+                that[
+                    list && pandora.$ui.folderList && pandora.$ui.folderList.personal.options('selected').length
+                    ? 'enableItem' : 'disableItem'
+                ]('hidelist');
                 that[action]('editlist');
                 that[action]('deletelist');
                 that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
@@ -842,7 +929,7 @@ pandora.ui.mainMenu = function() {
             if (!pandora.hasDialogOrScreen()) {
                 if (ui._findState.key != 'advanced') {
                     setTimeout(function() {
-                        pandora.$ui.findInput.focusInput(true);
+                        pandora.$ui.findInput && pandora.$ui.findInput.focusInput(true);
                     }, 25);
                 } else {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
@@ -983,7 +1070,7 @@ pandora.ui.mainMenu = function() {
                 if (ui.document && i < 2) {
                     pandora.UI.set({documentView: ['info', 'view'][i]});
                 } else if (i < 2) {
-                    pandora.UI.set({collectionView: ['list', 'grid'][i]});
+                    pandora.UI.set({collectionView: ['list', 'grid', 'pages'][i]});
                 }
             }
         });
@@ -1157,6 +1244,18 @@ pandora.ui.mainMenu = function() {
                         })
                 };
             }),
+            ui.hidden[itemNamePlural.toLowerCase()].length ? [
+                {
+                    id: 'hiddenlists',
+                    title: Ox._('Hidden ' + itemNamePlural),
+                    items: ui.hidden[itemNamePlural.toLowerCase()].map(id => {
+                        return {
+                            id: 'hidden:' + id.replace(/_/g, Ox.char(9)),
+                            title: id
+                        }
+                    })
+                }
+            ] : [],
             [
                 {},
                 { id: 'newlist', title: Ox._('New ' + itemNameSingular), disabled: isGuest, keyboard: 'control n' },
@@ -1167,6 +1266,8 @@ pandora.ui.mainMenu = function() {
                 { id: 'duplicatelist', title: Ox._('Duplicate Selected ' + itemNameSingular), disabled: disableEdit, keyboard: 'control d' },
                 { id: 'editlist', title: Ox._('Edit Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'control e' },
                 { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'delete' },
+                {},
+                { id: 'hidelist', title: Ox._('Hide Selected ' + itemNameSingular + '...'), disabled: disableEdit || !pandora.$ui.folderList || !pandora.$ui.folderList.personal.options('selected').length},
                 {},
                 { id: 'print', title: Ox._('Print'), keyboard: 'control p' }
             ]
@@ -1204,6 +1305,18 @@ pandora.ui.mainMenu = function() {
                         })
                 };
             }),
+            ui.hidden[itemNamePlural.toLowerCase()].length ? [
+                {
+                    id: 'hiddenlists',
+                    title: Ox._('Hidden ' + itemNamePlural),
+                    items: ui.hidden[itemNamePlural.toLowerCase()].map(id => {
+                        return {
+                            id: 'hidden:' + id.replace(/_/g, Ox.char(9)),
+                            title: id
+                        }
+                    })
+                }
+            ] : [],
             [
                 {},
                 { id: 'newlist', title: Ox._('New ' + itemNameSingular), disabled: isGuest, keyboard: 'control n' },
@@ -1212,7 +1325,9 @@ pandora.ui.mainMenu = function() {
                 {},
                 { id: 'duplicatelist', title: Ox._('Duplicate Selected ' + itemNameSingular), disabled: disableEdit, keyboard: 'control d' },
                 { id: 'editlist', title: Ox._('Edit Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'control e' },
-                { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'delete' }
+                { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'delete' },
+                {},
+                { id: 'hidelist', title: Ox._('Hide Selected ' + itemNameSingular + '...'), disabled: disableEdit || !pandora.$ui.folderList || !pandora.$ui.folderList.personal.options('selected').length},
             ]
         )};
     }
@@ -1272,6 +1387,18 @@ pandora.ui.mainMenu = function() {
                         })
                 };
             }),
+            ui.hidden[itemNamePlural.toLowerCase()].length ? [
+                {
+                    id: 'hiddenlists',
+                    title: Ox._('Hidden ' + itemNamePlural),
+                    items: ui.hidden[itemNamePlural.toLowerCase()].map(id => {
+                        return {
+                            id: 'hidden:' + id.replace(/_/g, Ox.char(9)),
+                            title: id
+                        }
+                    })
+                }
+            ] : [],
             [
                 {},
                 { id: 'newlist', title: Ox._('New ' + itemNameSingular), disabled: isGuest, keyboard: 'control n' },
@@ -1284,6 +1411,8 @@ pandora.ui.mainMenu = function() {
                 { id: 'duplicatelist', title: Ox._('Duplicate Selected ' + itemNameSingular), disabled: disableEdit, keyboard: 'control d' },
                 { id: 'editlist', title: Ox._('Edit Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'control e' },
                 { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: disableEdit, keyboard: 'delete' },
+                {},
+                { id: 'hidelist', title: Ox._('Hide Selected ' + itemNameSingular + '...'), disabled: disableEdit || !pandora.$ui.folderList || !pandora.$ui.folderList.personal.options('selected').length},
                 {},
                 { id: 'print', title: Ox._('Print'), keyboard: 'control p' },
                 { id: 'tv', title: Ox._('TV'), keyboard: 'control space' }
@@ -1486,7 +1615,7 @@ pandora.ui.mainMenu = function() {
             return [
                 { id: 'documents', title: Ox._('View Documents'), items: [
                     { group: 'collectionview', min: 1, max: 1, items: pandora.site.listViews.filter(function(view) {
-                        return Ox.contains(['list', 'grid'], view.id)
+                        return Ox.contains(['list', 'grid', 'pages'], view.id)
                     }).map(function(view) {
                         return Ox.extend({
                             checked: ui.collectionView == view.id
@@ -1563,19 +1692,40 @@ pandora.ui.mainMenu = function() {
                         Ox._('Open {0}', [Ox._(pandora.site.itemName.singular)]),
                         Ox._('Open {0}', [Ox._(pandora.site.itemName.plural)])
                     ], items: [
-                    { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.filter(function(view) {
-                        return view.id != 'data' && view.id != 'media' ||
-                            pandora.hasCapability('canSeeExtraItemViews');
-                    }).map(function(view) {
-                        return Ox.extend({
-                            checked: ui.itemView == view.id
-                        }, view, {
-                            keyboard: itemViewKey <= 10
-                                ? 'shift ' + (itemViewKey++%10)
-                                : void 0,
-                            title: Ox._(view.title)
-                        });
-                    }) },
+                    {
+                        group: 'itemview',
+                        min: 1,
+                        max: 1,
+                        items: [].concat(
+                            pandora.site.itemViews.filter(function(view) {
+                                return view.id != 'data' && view.id != 'media'
+                            }).map(function(view) {
+                                return Ox.extend({
+                                    checked: ui.itemView == view.id
+                                }, view, {
+                                    keyboard: itemViewKey <= 10
+                                        ? 'shift ' + (itemViewKey++%10)
+                                        : void 0,
+                                    title: Ox._(view.title)
+                                });
+                            }),
+                            pandora.hasCapability('canSeeExtraItemViews') ? [{}] : [],
+                            pandora.hasCapability('canSeeExtraItemViews')
+                                ? pandora.site.itemViews.filter(function(view) {
+                                        return view.id == 'data' || view.id == 'media'
+                                    }).map(function(view) {
+                                        return Ox.extend({
+                                            checked: ui.itemView == view.id
+                                        }, view, {
+                                            keyboard: itemViewKey <= 10
+                                                ? 'shift ' + (itemViewKey++%10)
+                                                : void 0,
+                                            title: Ox._(view.title)
+                                        });
+                                    })
+                                : [],
+                        )
+                    },
                 ] },
                 { id: 'clips', title: Ox._('Open Clips'), items: [
                     { group: 'videoview', min: 1, max: 1, items: ['player', 'editor', 'timeline'].map(function(view) {
@@ -1680,8 +1830,8 @@ pandora.ui.mainMenu = function() {
     function getViewMenu() {
         return { id: 'viewMenu', title: Ox._('View'), items: [
             { id: 'section', title: Ox._('Section'), items: [
-                { group: 'viewsection', min: 1, max: 1, items: pandora.site.sections.map(function(section) {
-                    section = Ox.extend({}, section)
+                { group: 'viewsection', min: 1, max: 1, items: Ox.clone(pandora.site.sections, true).map(function(section) {
+                    section.title = Ox._(section.title);
                     section.checked = section.id == ui.section;
                     return section;
                 }) }
@@ -1761,7 +1911,8 @@ pandora.ui.mainMenu = function() {
                 }) }
             ] },
             {},
-            { id: 'embed', title: Ox._('Embed...') }
+            { id: 'embed', title: Ox._('Embed...') },
+            { id: 'share', title: Ox._('Share...'), disabled: !pandora.canShareView() }
         ]}
     }
 

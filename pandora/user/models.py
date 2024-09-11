@@ -79,7 +79,9 @@ class SessionData(models.Model):
             self.level = self.user.profile.level
             self.firstseen = self.user.date_joined
             if self.user.groups.exists():
-                self.groupssort = ''.join([g.name for g in self.user.groups.all()])
+                self.groupsort = ''.join(
+                    ox.sorted_strings(self.user.groups.all().values_list('name', flat=True))
+                ).lower()
             else:
                 self.groupssort = None
             self.numberoflists = self.user.lists.count()

@@ -43,7 +43,7 @@ from user.utils import update_groups
 from user.models import Group
 import archive.models
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('pandora.' + __name__)
 User = get_user_model()
 
 
@@ -157,9 +157,6 @@ def get_icon_path(f, x):
 def get_poster_path(f, x):
     return get_path(f, 'poster.jpg')
 
-def get_torrent_path(f, x):
-    return get_path(f, 'torrent.torrent')
-
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -185,7 +182,6 @@ class Item(models.Model):
 
     icon = models.ImageField(default=None, blank=True, upload_to=get_icon_path)
 
-    torrent = models.FileField(default=None, blank=True, max_length=1000, upload_to=get_torrent_path)
     stream_info = JSONField(default=dict, editable=False)
 
     # stream related fields
@@ -233,6 +229,9 @@ class Item(models.Model):
     def editable(self, user):
         if user.is_anonymous:
             return False
+        max_level = len(settings.CONFIG['rightsLevels'])
+        if self.level > max_level:
+            return False
         if user.profile.capability('canEditMetadata') or \
            user.is_staff or \
            self.user == user or \
@@ -240,7 +239,7 @@ class Item(models.Model):
             return True
         return False
 
-    def edit(self, data):
+    def edit(self, data, is_task=False):
         data = data.copy()
         # FIXME: how to map the keys to the right place to write them to?
         if 'id' in data:
@@ -257,11 +256,12 @@ class Item(models.Model):
                 description = data.pop(key)
                 if isinstance(description, dict):
                     for value in description:
+                        value = ox.sanitize_html(value)
                         d, created = Description.objects.get_or_create(key=k, value=value)
                         d.description = ox.sanitize_html(description[value])
                         d.save()
                 else:
-                    value = data.get(k, self.get(k, ''))
+                    value = ox.sanitize_html(data.get(k, self.get(k, '')))
                     if not description:
                         description = ''
                     d, created = Description.objects.get_or_create(key=k, value=value)
@@ -296,7 +296,10 @@ class Item(models.Model):
                     self.data[key] = ox.escape_html(data[key])
         p = self.save()
         if not settings.USE_IMDB and list(filter(lambda k: k in self.poster_keys, data)):
-            p = tasks.update_poster.delay(self.public_id)
+            if is_task:
+                tasks.update_poster(self.public_id)
+            else:
+                p = tasks.update_poster.delay(self.public_id)
         return p
 
     def update_external(self):
@@ -475,7 +478,8 @@ class Item(models.Model):
 
         for a in self.annotations.all().order_by('id'):
             a.item = other
-            a.set_public_id()
+            with transaction.atomic():
+                a.set_public_id()
             Annotation.objects.filter(id=a.id).update(item=other, public_id=a.public_id)
         try:
             other_sort = other.sort
@@ -519,6 +523,7 @@ class Item(models.Model):
                     cmd, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'), close_fds=True)
                 p.wait()
                 os.unlink(tmp_output_txt)
+                os.close(fd)
                 return True
             else:
                 return None
@@ -636,11 +641,11 @@ class Item(models.Model):
             if self.poster_height:
                 i['posterRatio'] = self.poster_width / self.poster_height
 
-        if keys and 'source' in keys:
-            i['source'] = self.streams().exclude(file__data='').exists()
+        if keys and 'hasSource' in keys:
+            i['hasSource'] = self.streams().exclude(file__data='').exists()
 
         streams = self.streams()
-        i['durations'] = [s.duration for s in streams]
+        i['durations'] = [s[0] for s in streams.values_list('duration')]
         i['duration'] = sum(i['durations'])
         i['audioTracks'] = self.audio_tracks()
         if not i['audioTracks']:
@@ -696,10 +701,12 @@ class Item(models.Model):
                 else:
                     values = self.get(key)
                 if values:
+                    values = [ox.sanitize_html(value) for value in values]
                     for d in Description.objects.filter(key=key, value__in=values):
                         i['%sdescription' % key][d.value] = d.description
             else:
-                qs = Description.objects.filter(key=key, value=self.get(key, ''))
+                value = ox.sanitize_html(self.get(key, ''))
+                qs = Description.objects.filter(key=key, value=value)
                 i['%sdescription' % key] = '' if qs.count() == 0 else qs[0].description
         if keys:
             info = {}
@@ -1019,10 +1026,14 @@ class Item(models.Model):
                     set_value(s, name, value)
                 elif sort_type == 'person':
                     value = sortNames(self.get(source, []))
+                    if value is None:
+                        value = ''
                     value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'string':
                     value = self.get(source, '')
+                    if value is None:
+                        value = ''
                     if isinstance(value, list):
                         value = ','.join([str(v) for v in value])
                     value = utils.sort_string(value)[:955]
@@ -1198,7 +1209,7 @@ class Item(models.Model):
             if not r:
                 return False
             path = video.name
-            duration = sum(item.cache['durations'])
+            duration = sum(self.item.cache['durations'])
         else:
             path = stream.media.path
             duration = stream.info['duration']
@@ -1294,90 +1305,6 @@ class Item(models.Model):
             self.files.filter(selected=True).update(selected=False)
             self.save()
 
-    def get_torrent(self, request):
-        if self.torrent:
-            self.torrent.seek(0)
-            data = ox.torrent.bdecode(self.torrent.read())
-            url = request.build_absolute_uri("%s/torrent/" % self.get_absolute_url())
-            if url.startswith('https://'):
-                url = 'http' + url[5:]
-            data['url-list'] = ['%s%s' % (url, u.split('torrent/')[1]) for u in data['url-list']]
-            return ox.torrent.bencode(data)
-
-    def make_torrent(self):
-        if not settings.CONFIG['video'].get('torrent'):
-            return
-        streams = self.streams()
-        if streams.count() == 0:
-            return
-        base = self.path('torrent')
-        base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
-        if not isinstance(base, bytes):
-            base = base.encode('utf-8')
-        if os.path.exists(base):
-            shutil.rmtree(base)
-        ox.makedirs(base)
-
-        filename = utils.safe_filename(ox.decode_html(self.get('title')))
-        base = self.path('torrent/%s' % filename)
-        base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
-        size = 0
-        duration = 0.0
-        if streams.count() == 1:
-            v = streams[0]
-            media_path = v.media.path
-            extension = media_path.split('.')[-1]
-            url = "%s/torrent/%s.%s" % (self.get_absolute_url(),
-                                        quote(filename.encode('utf-8')),
-                                        extension)
-            video = "%s.%s" % (base, extension)
-            if not isinstance(media_path, bytes):
-                media_path = media_path.encode('utf-8')
-            if not isinstance(video, bytes):
-                video = video.encode('utf-8')
-            media_path = os.path.relpath(media_path, os.path.dirname(video))
-            os.symlink(media_path, video)
-            size = v.media.size
-            duration = v.duration
-        else:
-            url = "%s/torrent/" % self.get_absolute_url()
-            part = 1
-            ox.makedirs(base)
-            for v in streams:
-                media_path = v.media.path
-                extension = media_path.split('.')[-1]
-                video = "%s/%s.Part %d.%s" % (base, filename, part, extension)
-                part += 1
-                if not isinstance(media_path, bytes):
-                    media_path = media_path.encode('utf-8')
-                if not isinstance(video, bytes):
-                    video = video.encode('utf-8')
-                media_path = os.path.relpath(media_path, os.path.dirname(video))
-                os.symlink(media_path, video)
-                size += v.media.size
-                duration += v.duration
-            video = base
-
-        torrent = '%s.torrent' % base
-        url = "http://%s%s" % (settings.CONFIG['site']['url'], url)
-        meta = {
-            'filesystem_encoding': 'utf-8',
-            'target': torrent,
-            'url-list': url,
-        }
-        if duration:
-            meta['playtime'] = ox.format_duration(duration*1000)[:-4]
-
-        # slightly bigger torrent file but better for streaming
-        piece_size_pow2 = 15  # 1 mbps -> 32KB pieces
-        if size / duration >= 1000000:
-            piece_size_pow2 = 16  # 2 mbps -> 64KB pieces
-        meta['piece_size_pow2'] = piece_size_pow2
-
-        ox.torrent.create_torrent(video, settings.TRACKER_URL, meta)
-        self.torrent.name = torrent[len(settings.MEDIA_ROOT)+1:]
-        self.save()
-
     def audio_tracks(self):
         tracks = [f['language']
                   for f in self.files.filter(selected=True).filter(Q(is_video=True) | Q(is_audio=True)).values('language')
@@ -1385,11 +1312,10 @@ class Item(models.Model):
         return sorted(set(tracks))
 
     def streams(self, track=None):
+        files = self.files.filter(selected=True).filter(Q(is_audio=True) | Q(is_video=True))
         qs = archive.models.Stream.objects.filter(
-            source=None, available=True, file__item=self, file__selected=True
-        ).filter(
-            Q(file__is_audio=True) | Q(file__is_video=True)
-        )
+            file__in=files, source=None, available=True
+        ).select_related()
         if not track:
             tracks = self.audio_tracks()
             if len(tracks) > 1:
@@ -1428,7 +1354,6 @@ class Item(models.Model):
         self.select_frame()
         self.make_poster()
         self.make_icon()
-        self.make_torrent()
         self.rendered = streams.count() > 0
         self.save()
         if self.rendered:
@@ -1614,8 +1539,15 @@ class Item(models.Model):
             cmd += ['-l', timeline]
         if frame:
             cmd += ['-f', frame]
-        p = subprocess.Popen(cmd, close_fds=True)
-        p.wait()
+        if settings.ITEM_ICON_DATA:
+            cmd += '-d', '-'
+            data = self.json()
+            data = utils.normalize_dict('NFC', data)
+            p = subprocess.Popen(cmd, stdin=subprocess.PIPE, close_fds=True)
+            p.communicate(json.dumps(data, default=to_json).encode('utf-8'))
+        else:
+            p = subprocess.Popen(cmd, close_fds=True)
+            p.wait()
         # remove cached versions
         icon = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
         for f in glob(icon.replace('.jpg', '*.jpg')):
@@ -1627,11 +1559,13 @@ class Item(models.Model):
         return icon
 
     def add_empty_clips(self):
+        if not settings.EMPTY_CLIPS:
+            return
         subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
         if not subtitles:
             return
         # otherwise add empty 5 seconds annotation every minute
-        duration = sum([s.duration for s in self.streams()])
+        duration = sum([s[0] for s in self.streams().values_list('duration')])
         layer = subtitles['id']
         # FIXME: allow annotations from no user instead?
         user = User.objects.all().order_by('id')[0]
@@ -1880,6 +1814,8 @@ class Description(models.Model):
     value = models.CharField(max_length=1000, db_index=True)
     description = models.TextField()
 
+    def __str__(self):
+        return "%s=%s" % (self.key, self.value)
 
 class AnnotationSequence(models.Model):
     item = models.OneToOneField('Item', related_name='_annotation_sequence', on_delete=models.CASCADE)
@@ -1895,13 +1831,12 @@ class AnnotationSequence(models.Model):
 
     @classmethod
     def nextid(cls, item):
-        with transaction.atomic():
-            s, created = cls.objects.get_or_create(item=item)
-            if created:
-                nextid = s.value
-            else:
-                cursor = connection.cursor()
-                sql = "UPDATE %s SET value = value + 1 WHERE item_id = %s RETURNING value" % (cls._meta.db_table, item.id)
-                cursor.execute(sql)
-                nextid = cursor.fetchone()[0]
+        s, created = cls.objects.get_or_create(item=item)
+        if created:
+            nextid = s.value
+        else:
+            cursor = connection.cursor()
+            sql = "UPDATE %s SET value = value + 1 WHERE item_id = %s RETURNING value" % (cls._meta.db_table, item.id)
+            cursor.execute(sql)
+            nextid = cursor.fetchone()[0]
         return "%s/%s" % (item.public_id, ox.toAZ(nextid))

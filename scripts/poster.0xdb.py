@@ -64,11 +64,11 @@ def render_poster(data, poster):
         frame_image = Image.open(frame)
         frame_image_ratio = frame_image.size[0] / frame_image.size[1]
         if frame_ratio < frame_image_ratio:
-            frame_image = frame_image.resize((int(frame_size[1] * frame_image_ratio), frame_size[1]), Image.ANTIALIAS)
+            frame_image = frame_image.resize((int(frame_size[1] * frame_image_ratio), frame_size[1]), Image.LANCZOS)
             left = int((frame_image.size[0] - frame_size[0]) / 2)
             frame_image = frame_image.crop((left, 0, left + frame_size[0], frame_size[1]))
         else:
-            frame_image = frame_image.resize((frame_size[0], int(frame_size[0] / frame_image_ratio)), Image.ANTIALIAS)
+            frame_image = frame_image.resize((frame_size[0], int(frame_size[0] / frame_image_ratio)), Image.LANCZOS)
             top = int((frame_image.size[1] - frame_size[1]) / 2)
             frame_image = frame_image.crop((0, top, frame_size[0], top + frame_size[1]))
         poster_image.paste(frame_image, (0, 0))
@@ -77,7 +77,7 @@ def render_poster(data, poster):
 
     # logo
     logo_image = Image.open(os.path.join(static_root, 'logo.0xdb.png'))
-    logo_image = logo_image.resize(logo_size, Image.ANTIALIAS)
+    logo_image = logo_image.resize(logo_size, Image.LANCZOS)
     for y in range(logo_size[1]):
         for x in range(logo_size[0]):
             poster_color = poster_image.getpixel((margin + x, margin + y))
@@ -95,11 +95,11 @@ def render_poster(data, poster):
             if small_frame_image:
                 small_frame_image_ratio = small_frame_image.size[0] / small_frame_image.size[1]
                 if small_frame_ratio < small_frame_image_ratio:
-                    small_frame_image = small_frame_image.resize((int(small_frame_size[1] * small_frame_image_ratio), small_frame_size[1]), Image.ANTIALIAS)
+                    small_frame_image = small_frame_image.resize((int(small_frame_size[1] * small_frame_image_ratio), small_frame_size[1]), Image.LANCZOS)
                     left = int((small_frame_image.size[0] - small_frame_size[0]) / 2)
                     small_frame_image = small_frame_image.crop((left, 0, left + small_frame_size[0], small_frame_size[1]))
                 else:
-                    small_frame_image = small_frame_image.resize((small_frame_size[0], int(small_frame_size[0] / small_frame_image_ratio)), Image.ANTIALIAS)
+                    small_frame_image = small_frame_image.resize((small_frame_size[0], int(small_frame_size[0] / small_frame_image_ratio)), Image.LANCZOS)
                     top = int((small_frame_image.size[1] - small_frame_size[1]) / 2)
                     small_frame_image = small_frame_image.crop((0, top, small_frame_size[0], top + small_frame_size[1]))
                 poster_image.paste(small_frame_image, (i * small_frame_size[0], frame_size[1]))
@@ -189,7 +189,7 @@ def render_poster(data, poster):
     # timeline
     if timeline:
         timeline_image = Image.open(timeline)
-        timeline_image = timeline_image.resize(timeline_size, Image.ANTIALIAS)
+        timeline_image = timeline_image.resize(timeline_size, Image.LANCZOS)
         poster_image.paste(timeline_image, (0, poster_size[1] - timeline_size[1]))
     else:
         draw.rectangle(((0, poster_size[1] - timeline_size[1]), poster_size), fill=image_color)

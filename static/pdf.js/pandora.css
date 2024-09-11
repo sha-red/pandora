@@ -1,0 +1,48 @@
+
+.toolbarButton.cropFile::before,
+    .secondaryToolbarButton.cropFile::before {
+    mask-image: url(custom/toolbarButton-crop.png);
+}
+.toolbarButton.embedPage::before,
+    .secondaryToolbarButton.embedPage::before {
+    mask-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiI+PGxpbmUgeDE9Ijg4IiB5MT0iNTYiIHgyPSIyNCIgeTI9IjEyOCIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iNDgiLz48bGluZSB4MT0iMjQiIHkxPSIxMjgiIHgyPSI4OCIgeTI9IjIwMCIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iNDgiLz48bGluZSB4MT0iMTY4IiB5MT0iNTYiIHgyPSIyMzIiIHkyPSIxMjgiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjQ4Ii8+PGxpbmUgeDE9IjIzMiIgeTE9IjEyOCIgeDI9IjE2OCIgeTI9IjIwMCIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iNDgiLz48L3N2Zz48IS0teyJjb2xvciI6ImRlZmF1bHQiLCJuYW1lIjoic3ltYm9sRW1iZWQiLCJ0aGVtZSI6Im94bWVkaXVtIn0tLT4=);
+}
+@media screen and (min-resolution: 2dppx) {
+    .toolbarButton.cropFile::before,
+    .secondaryToolbarButton.cropFile::before {
+        mask-image: url(custom/toolbarButton-crop@2x.png);
+    }
+    .toolbarButton.embedPage::before,
+    .secondaryToolbarButton.embedPage::before {
+        mask-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiI+PGxpbmUgeDE9Ijg4IiB5MT0iNTYiIHgyPSIyNCIgeTI9IjEyOCIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iNDgiLz48bGluZSB4MT0iMjQiIHkxPSIxMjgiIHgyPSI4OCIgeTI9IjIwMCIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iNDgiLz48bGluZSB4MT0iMTY4IiB5MT0iNTYiIHgyPSIyMzIiIHkyPSIxMjgiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjQ4Ii8+PGxpbmUgeDE9IjIzMiIgeTE9IjEyOCIgeDI9IjE2OCIgeTI9IjIwMCIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iNDgiLz48L3N2Zz48IS0teyJjb2xvciI6ImRlZmF1bHQiLCJuYW1lIjoic3ltYm9sRW1iZWQiLCJ0aGVtZSI6Im94bWVkaXVtIn0tLT4=);
+    }
+}
+
+.verticalToolbarSeparator.hiddenMediumView,
+#print,
+#secondaryPrint,
+#openFile,
+#secondaryOpenFile,
+#editorModeButtons {
+    display: none !important;
+}
+
+.page .crop-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    //background: rgba(0,0,0,0.5);
+    cursor: crosshair;
+    z-index: 100;
+}
+.page .crop-overlay.inactive {
+  pointer-events: none;
+  cursor: default;
+}
+
+.page .crop-overlay canvas {
+  width: 100%;
+  height: 100%;
+}

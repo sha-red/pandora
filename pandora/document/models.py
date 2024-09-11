@@ -6,11 +6,12 @@ import os
 import re
 import unicodedata
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models, transaction
 from django.db.models import Q, Sum, Max
-from django.contrib.auth import get_user_model
 from django.db.models.signals import pre_delete
-from django.conf import settings
+from django.utils import datetime_safe
 from oxdjango.fields import JSONField
 
 from PIL import Image
@@ -21,7 +22,7 @@ from oxdjango.sortmodel import get_sort_field
 from person.models import get_name_sort
 from item.models import Item
 from annotation.models import Annotation
-from archive.extract import resize_image
+from archive.extract import resize_image, open_image_rgb
 from archive.chunk import save_chunk
 from user.models import Group
 from user.utils import update_groups
@@ -29,7 +30,7 @@ from user.utils import update_groups
 from . import managers
 from . import utils
 from . import tasks
-from .fulltext import FulltextMixin
+from .fulltext import FulltextMixin, FulltextPageMixin
 
 User = get_user_model()
 
@@ -79,7 +80,7 @@ class Document(models.Model, FulltextMixin):
             current_values = []
             for k in settings.CONFIG['documentKeys']:
                 if k.get('sortType') == 'person':
-                    current_values += self.get(k['id'], [])
+                    current_values += self.get_value(k['id'], [])
         if not isinstance(current_values, list):
             if not current_values:
                 current_values = []
@@ -327,6 +328,9 @@ class Document(models.Model, FulltextMixin):
     def editable(self, user, item=None):
         if not user or user.is_anonymous:
             return False
+        max_level = len(settings.CONFIG['rightsLevels'])
+        if self.rightslevel > max_level:
+            return False
         if self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0 or \
            user.is_staff or \
@@ -346,6 +350,8 @@ class Document(models.Model, FulltextMixin):
                 groups = data.pop('groups')
                 update_groups(self, groups)
             for key in data:
+                if key == "id":
+                    continue
                 k = list(filter(lambda i: i['id'] == key, settings.CONFIG['documentKeys']))
                 ktype = k and k[0].get('type') or ''
                 if key == 'text' and self.extension == 'html':
@@ -546,10 +552,10 @@ class Document(models.Model, FulltextMixin):
             if len(crop) == 4:
                 path = os.path.join(folder, '%dp%d,%s.jpg' % (1024, page, ','.join(map(str, crop))))
                 if not os.path.exists(path):
-                    img = Image.open(src).crop(crop)
+                    img = open_image_rgb(src).crop(crop)
                     img.save(path)
                 else:
-                    img = Image.open(path)
+                    img = open_image_rgb(path)
                 src = path
                 if size < max(img.size):
                     path = os.path.join(folder, '%dp%d,%s.jpg' % (size, page, ','.join(map(str, crop))))
@@ -562,10 +568,10 @@ class Document(models.Model, FulltextMixin):
                     if len(crop) == 4:
                         path = os.path.join(folder, '%s.jpg' % ','.join(map(str, crop)))
                         if not os.path.exists(path):
-                            img = Image.open(src).crop(crop)
+                            img = open_image_rgb(src).convert('RGB').crop(crop)
                             img.save(path)
                         else:
-                            img = Image.open(path)
+                            img = open_image_rgb(path)
                         src = path
                         if size < max(img.size):
                             path = os.path.join(folder, '%sp%s.jpg' % (size, ','.join(map(str, crop))))
@@ -574,7 +580,7 @@ class Document(models.Model, FulltextMixin):
         if os.path.exists(src) and not os.path.exists(path):
             image_size = max(self.width, self.height)
             if image_size == -1:
-                image_size = max(*Image.open(src).size)
+                image_size = max(*open_image_rgb(src).size)
             if size > image_size:
                 path = src
             else:
@@ -586,6 +592,11 @@ class Document(models.Model, FulltextMixin):
         image = os.path.join(os.path.dirname(pdf), '1024p%d.jpg' % page)
         utils.extract_pdfpage(pdf, image, page)
 
+    def create_pages(self):
+        for page in range(self.pages):
+            page += 1
+            p, c = Page.objects.get_or_create(document=self, page=page)
+
     def get_info(self):
         if self.extension == 'pdf':
             self.thumbnail(1024)
@@ -595,7 +606,7 @@ class Document(models.Model, FulltextMixin):
                 self.pages = utils.pdfpages(self.file.path)
         elif self.width == -1:
             self.pages = -1
-            self.width, self.height = Image.open(self.file.path).size
+            self.width, self.height = open_image_rgb(self.file.path).size
 
     def get_ratio(self):
         if self.extension == 'pdf':
@@ -701,6 +712,41 @@ class ItemProperties(models.Model):
 
         super(ItemProperties, self).save(*args, **kwargs)
 
+
+class Page(models.Model, FulltextPageMixin):
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    document = models.ForeignKey(Document, related_name='pages_set', on_delete=models.CASCADE)
+    page = models.IntegerField(default=1)
+    data = JSONField(default=dict, editable=False)
+
+    objects = managers.PageManager()
+
+    def __str__(self):
+        return u"%s:%s" % (self.document, self.page)
+
+    def json(self, keys=None, user=None):
+        data = {}
+        data['document'] = ox.toAZ(self.document.id)
+        data['page'] = self.page
+        data['id'] = '{document}/{page}'.format(**data)
+        document_keys = []
+        if keys:
+            for key in list(data):
+                if key not in keys:
+                    del data[key]
+            for key in keys:
+                if 'fulltext' in key:
+                    data['fulltext'] = self.extract_fulltext()
+                elif key in ('document', 'page', 'id'):
+                    pass
+                else:
+                    document_keys.append(key)
+        if document_keys:
+            data.update(self.document.json(document_keys, user))
+        return data
 
 class Access(models.Model):
     class Meta:

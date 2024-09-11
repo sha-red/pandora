@@ -6,7 +6,7 @@ user=pandora
 
 export LANG=en_US.UTF-8
 mkdir -p /run/pandora
-chown -R ${user}.${user} /run/pandora
+chown -R ${user}:${user} /run/pandora
 
 update="/usr/bin/sudo -u $user -E -H /srv/pandora/update.py"
 
@@ -32,7 +32,7 @@ if [ "$action" = "pandora" ]; then
         /srv/pandora/pandora/manage.py init_db
         $update db
         echo "Generating static files..."
-        chown -R ${user}.${user} /srv/pandora/
+        chown -R ${user}:${user} /srv/pandora/
         $update static
         touch /srv/pandora/initialized
     fi
@@ -52,7 +52,7 @@ if [ "$action" = "encoding" ]; then
             -A app worker \
             -Q encoding -n ${name} \
             --pidfile /run/pandora/encoding.pid \
-            --maxtasksperchild 500 \
+            --max-tasks-per-child 500 \
             -c 1 \
             -l INFO
 fi
@@ -66,7 +66,7 @@ if [ "$action" = "tasks" ]; then
         -A app worker \
         -Q default,celery -n ${name} \
         --pidfile /run/pandora/tasks.pid \
-        --maxtasksperchild 1000 \
+        --max-tasks-per-child 1000 \
         -l INFO
 fi
 if [ "$action" = "cron" ]; then
@@ -103,9 +103,9 @@ fi
 # pan.do/ra setup hooks
 if [ "$action" = "docker-compose.yml" ]; then
     cat /srv/pandora_base/docker-compose.yml | \
-        sed "s#build: \.#image: 0x2620/pandora:latest#g" | \
+        sed "s#build: \.#image: code.0x2620.org/0x2620/pandora:latest#g" | \
         sed "s#\./overlay:#.:#g" | \
-        sed "s#build: docker/nginx#image: 0x2620/pandora-nginx:latest#g"
+        sed "s#build: docker/nginx#image: code.0x2620.org/0x2620/pandora-nginx:latest#g"
     exit
 fi
 if [ "$action" = ".env" ]; then
@@ -131,5 +131,5 @@ echo "  docker run 0x2620/pandora setup | sh"
 echo
 echo adjust created files to match your needs and run:
 echo
-echo "  docker-compose up"
+echo "  docker compose up"
 echo

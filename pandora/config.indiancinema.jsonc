@@ -73,13 +73,14 @@
         "canSeeAccessed": {"researcher": true, "staff": true, "admin": true},
         "canSeeAllTasks": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"researcher": true, "staff": true, "admin": true},
-        "canSeeExtraItemViews": {"researcher": true, "staff": true, "admin": true},
-        "canSeeMedia": {"researcher": true, "staff": true, "admin": true},
         "canSeeDocument": {"guest": 1, "member": 1, "researcher": 2, "staff": 3, "admin": 3},
+        "canSeeExtraItemViews": {"researcher": true, "staff": true, "admin": true},
         "canSeeItem": {"guest": 2, "member": 2, "researcher": 2, "staff": 3, "admin": 3},
+        "canSeeMedia": {"researcher": true, "staff": true, "admin": true},
         "canSeeSize": {"researcher": true, "staff": true, "admin": true},
         "canSeeSoftwareVersion": {"researcher": true, "staff": true, "admin": true},
-        "canSendMail": {"staff": true, "admin": true}
+        "canSendMail": {"staff": true, "admin": true},
+        "canShare": {"staff": true, "admin": true}
     },
     /*
     "clipKeys" are the properties that clips can be sorted by (the values are
@@ -311,6 +312,14 @@
             "sort": true,
             "autocomplete": true,
             "columnWidth": 128
+        },
+        {
+            "id": "fulltext",
+            "operator": "+",
+            "title": "Fulltext",
+            "type": "text",
+            "fulltext": true,
+            "find": true
         },
         {
             "id": "created",
@@ -1494,6 +1503,7 @@
             "hasEvents": true,
             "hasPlaces": true,
             "item": "Keyword",
+            "autocomplete": true,
             "overlap": true,
             "type": "string"
         },
@@ -1875,10 +1885,8 @@
             corner of the screen
         "resolutions": List of video resolutions. Supported values are 96, 144,
             240, 288, 360, 432, 480, 720 and 1080.
-        "torrent": If true, video downloads are offered via BitTorrent
     */
     "video": {
-        "torrent": false,
         "formats": ["webm", "mp4"],
         "previewRatio": 1.375,
         "resolutions": [240, 480]

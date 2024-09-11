@@ -29,7 +29,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "text": Text shown on mouseover
     */
     "cantPlay": {
-        "icon": "noCopyright",
+        "icon": "NoCopyright",
         "link": "",
         "text": ""
     },
@@ -67,7 +67,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
         "canManageEntities": {"member": true, "staff": true, "admin": true},
         "canManageHome": {"staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "staff": true, "admin": true},
-        "canManageTitlesAndNames": {"member": true, "staff": true, "admin": true},
+        "canManageTitlesAndNames": {"member": false, "staff": true, "admin": true},
         "canManageTranslations": {"admin": true},
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
@@ -102,8 +102,7 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
     ],
     /*
     "clipLayers" is the ordered list of public layers that will appear as the
-    text of clips (in grid view, below the icon). Excluding a layer from this
-    list means it will not be included in find annotations.
+    text of clips (in grid view, below the icon).
     */
     "clipLayers": ["publicnotes", "keywords", "subtitles"],
     /*
@@ -351,11 +350,11 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "type": "enum",
             "columnWidth": 90,
             "format": {"type": "ColorLevel", "args": [
-                ["Public", "Out of Copyright", "Under Copyright", "Private"]
+                ["Public", "Restricted", "Private"]
             ]},
             "sort": true,
             "sortOperator": "+",
-            "values": ["Public", "Out of Copyright", "Under Copyright", "Private", "Unknown"]
+            "values": ["Public", "Restricted", "Private", "Unknown"]
         }
     ],
     /*
@@ -750,6 +749,13 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "id": "user",
             "title": "User",
             "type": "string",
+            "capability": "canSeeMedia",
+            "find": true
+        },
+        {
+            "id": "filename",
+            "title": "Filename",
+            "type": ["string"],
             "capability": "canSeeMedia",
             "find": true
         },
@@ -1159,6 +1165,11 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             "findDocuments": {"conditions": [], "operator": "&"},
             "followPlayer": true,
             "help": "",
+            "hidden": {
+                "collections": [],
+                "edits": [],
+                "lists": []
+            },
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
@@ -1267,13 +1278,11 @@ examples (config.SITENAME.jsonc) that are part of this pan.do/ra distribution.
             corner of the screen
         "resolutions": List of video resolutions. Supported values are 96, 144,
             240, 288, 360, 432, 480, 720 and 1080.
-        "torrent": If true, video downloads are offered via BitTorrent
     */
     "video": {
         "downloadFormat": "webm",
         "formats": ["webm", "mp4"],
         "previewRatio": 1.3333333333,
-        "resolutions": [240, 480],
-        "torrent": false
+        "resolutions": [240, 480]
     }
 }

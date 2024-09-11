@@ -16,11 +16,13 @@ from wsgiref.util import FileWrapper
 from django.conf import settings
 
 from ox.utils import json, ET
-
-from oxdjango.decorators import login_required_json
-from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
-from oxdjango.http import HttpFileResponse
 import ox
+
+from oxdjango.api import actions
+from oxdjango.decorators import login_required_json
+from oxdjango.http import HttpFileResponse
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+import oxdjango
 
 from . import models
 from . import utils
@@ -32,7 +34,6 @@ from clip.models import Clip
 from user.models import has_capability
 from changelog.models import add_changelog
 
-from oxdjango.api import actions
 
 
 def _order_query(qs, sort, prefix='sort__'):
@@ -308,7 +309,7 @@ def find(request, data):
     responsive UI: First leave out `keys` to get totals as fast as possible,
     then pass `positions` to get the positions of previously selected items,
     finally make the query with the `keys` you need and an appropriate `range`.
-    For more examples, see https://wiki.0x2620.org/wiki/pandora/QuerySyntax.
+    For more examples, see https://code.0x2620.org/0x2620/pandora/wiki/QuerySyntax.
     see: add, edit, get, lookup, remove, upload
     '''
     if settings.JSON_DEBUG:
@@ -533,7 +534,7 @@ def get(request, data):
     return render_to_json_response(response)
 actions.register(get)
 
-def edit_item(user, item, data):
+def edit_item(user, item, data, is_task=False):
     data = data.copy()
     update_clips = False
     response = json_response(status=200, text='ok')
@@ -558,7 +559,7 @@ def edit_item(user, item, data):
             user_groups = set([g.name for g in user.groups.all()])
             other_groups = list(groups - user_groups)
             data['groups'] = [g for g in data['groups'] if g in user_groups] + other_groups
-    r = item.edit(data)
+    r = item.edit(data, is_task=is_task)
     if r:
         r.wait()
     if update_clips:
@@ -595,7 +596,7 @@ def add(request, data):
         if p:
             p.wait()
         else:
-            i.make_poster()
+            item.make_poster()
         del data['title']
         if data:
             response = edit_item(request.user, item, data)
@@ -948,9 +949,11 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
     if not item.access(request.user):
         return HttpResponseForbidden()
 
+    modes = [t['id'] for t in settings.CONFIG['timelines']]
     if not mode:
         mode = 'antialias'
-    modes = [t['id'] for t in settings.CONFIG['timelines']]
+        if mode not in modes:
+            mode = modes[0]
     if mode not in modes:
         raise Http404
     modes.pop(modes.index(mode))
@@ -1044,27 +1047,6 @@ def download(request, id, resolution=None, format='webm', part=None):
     response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
     return response
 
-def torrent(request, id, filename=None):
-    item = get_object_or_404(models.Item, public_id=id)
-    if not item.access(request.user):
-        return HttpResponseForbidden()
-    if not item.torrent:
-        raise Http404
-    if not filename or filename.endswith('.torrent'):
-        response = HttpResponse(item.get_torrent(request),
-                                content_type='application/x-bittorrent')
-        filename = utils.safe_filename("%s.torrent" % item.get('title'))
-        response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
-        return response
-    while filename.startswith('/'):
-        filename = filename[1:]
-    filename = filename.replace('/../', '/')
-    filename = item.path('torrent/%s' % filename)
-    filename = os.path.abspath(os.path.join(settings.MEDIA_ROOT, filename))
-    response = HttpFileResponse(filename)
-    response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % \
-                                      quote(os.path.basename(filename.encode('utf-8')))
-    return response
 
 def video(request, id, resolution, format, index=None, track=None):
     resolution = int(resolution)
@@ -1286,12 +1268,6 @@ def atom_xml(request):
         el.text = "1:1"
 
         if has_capability(request.user, 'canDownloadVideo'):
-            if item.torrent:
-                el = ET.SubElement(entry, "link")
-                el.attrib['rel'] = 'enclosure'
-                el.attrib['type'] = 'application/x-bittorrent'
-                el.attrib['href'] = '%s/torrent/' % page_link
-                el.attrib['length'] = '%s' % ox.get_torrent_size(item.torrent.path)
             # FIXME: loop over streams
             # for s in item.streams().filter(resolution=max(settings.CONFIG['video']['resolutions'])):
             for s in item.streams().filter(source=None):
@@ -1314,12 +1290,15 @@ def atom_xml(request):
         'application/atom+xml'
     )
 
+
 def oembed(request):
     format = request.GET.get('format', 'json')
     maxwidth = int(request.GET.get('maxwidth', 640))
     maxheight = int(request.GET.get('maxheight', 480))
 
-    url = request.GET['url']
+    url = request.GET.get('url')
+    if not url:
+        raise Http404
     parts = urlparse(url).path.split('/')
     if len(parts) < 2:
         raise Http404
