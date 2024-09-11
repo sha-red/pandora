@@ -25,53 +25,20 @@ LXC=`grep -q lxc /proc/1/environ && echo 'yes' || echo 'no'`
 if [ -e /etc/os-release ]; then
     . /etc/os-release
 fi
-if [ -z "$UBUNTU_CODENAME" ]; then
-    UBUNTU_CODENAME=bionic
-fi
-if [ "$VERSION_CODENAME" = "bullseye" ]; then
-    UBUNTU_CODENAME=focal
-fi
-if [ "$VERSION_CODENAME" = "bookworm" ]; then
-    UBUNTU_CODENAME=lunar
-fi
 export DEBIAN_FRONTEND=noninteractive
-echo "deb http://ppa.launchpad.net/j/pandora/ubuntu ${UBUNTU_CODENAME} main" > /etc/apt/sources.list.d/j-pandora.list
 
-apt-get install -y gnupg
+apt-get install -y gnupg curl
 
-if [ -e /etc/apt/trusted.gpg.d ]; then
-gpg --dearmor > /etc/apt/trusted.gpg.d/j-pandora.gpg <<EOF
------BEGIN PGP PUBLIC KEY BLOCK-----
-Version: GnuPG v1
+distribution=bookworm
+for version in bookworm trixie bionic focal jammy noble; do
+    if [ "$VERSION_CODENAME" = $version ]; then
+        distribution=$VERSION_CODENAME
+    fi
+done
 
-mI0ESXYhEgEEALl9jDTdmgpApPbjN+7b85dC92HisPUp56ifEkKJOBj0X5HhRqxs
-Wjx/zlP4/XJGrHnxJyrdPxjSwAXz7bNdeggkN4JWdusTkr5GOXvggQnng0X7f/rX
-oJwoEGtYOCODLPs6PC0qjh5yPzJVeiRsKUOZ7YVNnwNwdfS4D8RZvtCrABEBAAG0
-FExhdW5jaHBhZCBQUEEgZm9yIGpeiLYEEwECACAFAkl2IRICGwMGCwkIBwMCBBUC
-CAMEFgIDAQIeAQIXgAAKCRAohRM8AZde82FfA/9OB/64/YLaCpizHZ8f6DK3rGgF
-e6mX3rFK8yOKGGL06316VhDzfzMiZSauUZ0t+lKHR/KZYeSaFwEoUoblTG/s4IIo
-9aBMHWhVXJW6eifKUmTGqEn2/0UxoWQq2C3F6njMkCaP+ALOD5uzaSYGdjqAUAwS
-pAAGSEQ4uz6bYSeM4Q==
-=SM2a
------END PGP PUBLIC KEY BLOCK-----
-EOF
-else
-apt-key add - <<EOF
------BEGIN PGP PUBLIC KEY BLOCK-----
-Version: GnuPG v1
+curl -Ls https://code.0x2620.org/api/packages/0x2620/debian/repository.key -o /etc/apt/keyrings/pandora.asc
+echo "deb [signed-by=/etc/apt/keyrings/pandora.asc] https://code.0x2620.org/api/packages/0x2620/debian $distribution main" > /etc/apt/sources.list.d/pandora.list
 
-mI0ESXYhEgEEALl9jDTdmgpApPbjN+7b85dC92HisPUp56ifEkKJOBj0X5HhRqxs
-Wjx/zlP4/XJGrHnxJyrdPxjSwAXz7bNdeggkN4JWdusTkr5GOXvggQnng0X7f/rX
-oJwoEGtYOCODLPs6PC0qjh5yPzJVeiRsKUOZ7YVNnwNwdfS4D8RZvtCrABEBAAG0
-FExhdW5jaHBhZCBQUEEgZm9yIGpeiLYEEwECACAFAkl2IRICGwMGCwkIBwMCBBUC
-CAMEFgIDAQIeAQIXgAAKCRAohRM8AZde82FfA/9OB/64/YLaCpizHZ8f6DK3rGgF
-e6mX3rFK8yOKGGL06316VhDzfzMiZSauUZ0t+lKHR/KZYeSaFwEoUoblTG/s4IIo
-9aBMHWhVXJW6eifKUmTGqEn2/0UxoWQq2C3F6njMkCaP+ALOD5uzaSYGdjqAUAwS
-pAAGSEQ4uz6bYSeM4Q==
-=SM2a
------END PGP PUBLIC KEY BLOCK-----
-EOF
-fi
 echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99languages
 
 apt-get update -qq
