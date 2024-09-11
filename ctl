@@ -30,9 +30,6 @@ if [ "$action" = "init" ]; then
         $SUDO git clone -b $branch https://code.0x2620.org/0x2620/oxjs.git static/oxjs
     fi
     $SUDO mkdir -p src
-    if [ ! -d src/oxtimelines ]; then
-        $SUDO git clone -b $branch https://code.0x2620.org/0x2620/oxtimelines.git src/oxtimelines
-    fi
     for package in oxtimelines python-ox; do
         cd ${BASE}
         if [ ! -d src/${package} ]; then
