@@ -270,7 +270,7 @@ pandora.ui.list = function() {
             item: function(data, sort, size) {
                 size = 128;
                 var clipsQuery = pandora.getClipsQuery(),
-                    isClipsQuery = !!clipsQuery.conditions.length,
+                    isClipsQuery = clipsQuery.conditions.length > 1,
                     ratio = ui.icons == 'posters'
                         ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
                     url = pandora.getMediaURL('/' + data.id + '/' + (
@@ -352,7 +352,7 @@ pandora.ui.list = function() {
             },
             items: function(data, callback) {
                 var clipsQuery = pandora.getClipsQuery(),
-                    isClipsQuery = !!clipsQuery.conditions.length;
+                    isClipsQuery = clipsQuery.conditions.length > 1;
                 pandora.api.find(Ox.extend(data, Ox.extend({
                     query: ui.find
                 }, isClipsQuery ? {clips: {
