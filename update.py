@@ -363,7 +363,7 @@ if __name__ == "__main__":
             and row not in ['BEGIN;', 'COMMIT;']
         ]
         if diff:
-            print('Database has changed, please make a backup and run %s db' % sys.argv[0])
+            print('Database has changed, please make a backup and run: sudo pandoractl update db')
         elif branch != 'master':
             print('pan.do/ra is at the latest release,\nyou can run "%s switch master" to switch to the development version' % sys.argv[0])
         elif current != new:
