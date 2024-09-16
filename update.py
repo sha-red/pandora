@@ -322,6 +322,7 @@ if __name__ == "__main__":
                 current_branch = get_branch(path)
                 revno = get_version(path)
                 if repo == 'pandora':
+                    print("Pandora Version pre update: ", revno)
                     pandora_old_revno = revno
                 current += revno
                 if current_branch != branch:
@@ -345,6 +346,7 @@ if __name__ == "__main__":
                 new += '+'
         os.chdir(join(base, 'pandora'))
         if pandora_old_revno != pandora_new_revno:
+            print("Pandora Version post update: ", pandora_new_revno)
             os.chdir(base)
             run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
         os.chdir(join(base, 'pandora'))
