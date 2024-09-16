@@ -137,24 +137,26 @@ pandora.ui.helpDialog = function() {
 
     that.select = function(id) {
         var img, $img;
-        $text.html(text[id || 'help']).scrollTop(0);
-        img = $text.find('img');
-        if (img) {
-            $img = $(img);
-            $img.replaceWith(
-                $image = Ox.ImageElement(
-                    Ox.extend(getImageSize(), {src: $img.attr('src')})
-                )
-                .css({borderRadius: '8px'})
-            );
+        if ($text) {
+            $text.html(text[id || 'help']).scrollTop(0);
+            img = $text.find('img');
+            if (img) {
+                $img = $(img);
+                $img.replaceWith(
+                    $image = Ox.ImageElement(
+                        Ox.extend(getImageSize(), {src: $img.attr('src')})
+                    )
+                    .css({borderRadius: '8px'})
+                );
+            }
+            $text.find('td:first-child')
+                .css({
+                    height: '16px',
+                    paddingRight: '8px',
+                    textAlign: 'right',
+                    whiteSpace: 'nowrap'
+                });
         }
-        $text.find('td:first-child')
-            .css({
-                height: '16px',
-                paddingRight: '8px',
-                textAlign: 'right',
-                whiteSpace: 'nowrap'
-            });
         return that;
     }
 
