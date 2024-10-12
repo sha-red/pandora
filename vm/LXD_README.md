@@ -29,8 +29,16 @@
     update-locale LANG=en_US.UTF-8
     export LANG=en_US.UTF-8
 
+    sudo lxc launch ubuntu-minimal:20.04 pandora
+    sudo lxc shell pandora
+    apt update && apt -y dist-upgrade
+    apt -y install curl ca-certificates locales
+
     cd /root
     curl -sL https://pan.do/ra-install > pandora_install.sh
     chmod +x pandora_install.sh
     ./pandora_install.sh 2>&1 | tee pandora_install.log
+
+
+
 
