@@ -5,10 +5,11 @@ from django.contrib.auth.models import Group
 
 from django.core.validators import MaxLengthValidator
 
-User = get_user_model()
-
 # load config from json
 from . import config
+
+
+User = get_user_model()
 config.init()
 
 NEW_LENGTH = {
@@ -17,12 +18,14 @@ NEW_LENGTH = {
     'password': 255,
 }
 
+
 def monkey_patch_groupname():
     f = Group._meta.get_field('name')
     f.max_length = 255
     for v in f.validators:
         if isinstance(v, MaxLengthValidator):
             v.limit_value = 255
+
 
 def monkey_patch_username():
     for field in NEW_LENGTH:
@@ -32,6 +35,7 @@ def monkey_patch_username():
             if isinstance(v, MaxLengthValidator):
                 v.limit_value = NEW_LENGTH[field]
     monkey_patch_groupname()
+
 
 def apply_patch():
     from django.db import connection, transaction

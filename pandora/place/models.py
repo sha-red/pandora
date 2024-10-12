@@ -13,6 +13,7 @@ from . import managers
 
 User = get_user_model()
 
+
 class Place(models.Model):
     '''
         Places are named locations, they should have geographical information attached to them.

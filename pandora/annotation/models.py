@@ -81,10 +81,11 @@ def get_matches(obj, model, layer_type, qs=None):
         matches = [-1]
     return Annotation.objects.filter(id__in=matches)
 
+
 class Annotation(models.Model):
     objects = managers.AnnotationManager()
 
-    #FIXME: here having a item,start index would be good
+    # FIXME: here having a item,start index would be good
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, related_name='annotations', on_delete=models.CASCADE)
@@ -92,7 +93,7 @@ class Annotation(models.Model):
     clip = models.ForeignKey('clip.Clip', null=True, related_name='annotations', on_delete=models.CASCADE)
 
     public_id = models.CharField(max_length=128, unique=True)
-    #seconds
+    # stard and end are seconds
     start = models.FloatField(default=-1, db_index=True)
     end = models.FloatField(default=-1, db_index=True)
 
@@ -186,12 +187,15 @@ class Annotation(models.Model):
     def update_matches(self):
         from place.models import Place
         from event.models import Event
+
         types = []
         layer = self.get_layer()
+        
         if layer.get('type') == 'place' or layer.get('hasPlaces'):
             types.append('place')
         if layer.get('type') == 'event' or layer.get('hasEvents'):
             types.append('event')
+        
         for type in types:
             if type == 'place':
                 Model = Place
@@ -213,18 +217,22 @@ class Annotation(models.Model):
                 names = {}
                 for n in Model.objects.all().values('id', 'name', 'alternativeNames'):
                     names[n['id']] = [ox.decode_html(x) for x in (n['name'],) + n['alternativeNames']]
+
                 value = self.findvalue.lower()
                 current = {p.id for p in a_matches.all()}
                 matches = []
                 name_matches = set()
                 new = set()
 
+                # search annotation value for all place/event name occurences
                 for i in names:
                     for name in names[i]:
                         if name.lower() in value:
                             matches.append(i)
                             name_matches.add(name.lower())
+                            # break on first alternative name
                             break
+
                 for p in Model.objects.filter(id__in=matches):
                     # only add places/events that did not get added as a super match
                     # i.e. only add The Paris Region and not Paris
@@ -249,6 +257,7 @@ class Annotation(models.Model):
     def update_documents(self):
         from document.models import Document
         from document.utils import get_documents
+
         old = [d.id for d in self.documents.all()]
         current = get_documents(self.value) if self.value else []
         removed = list(set(old) - set(current))
@@ -262,6 +271,7 @@ class Annotation(models.Model):
 
     def update_translations(self):
         from translation.models import Translation
+        
         layer = self.get_layer()
         if layer.get('translate'):
             for lang in settings.CONFIG['languages']:

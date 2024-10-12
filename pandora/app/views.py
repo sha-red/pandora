@@ -55,7 +55,7 @@ def embed(request, id):
 def redirect_url(request, url):
     try:
         url = base64.decodebytes(url.encode()).decode()
-    except:
+    except Exception:
         pass
     if settings.CONFIG['site'].get('sendReferrer', False):
         return redirect(url)
